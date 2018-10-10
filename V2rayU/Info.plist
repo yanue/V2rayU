@@ -25,7 +25,9 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018 yanue. All rights reserved.</string>
 	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
+	<string>Menu</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
