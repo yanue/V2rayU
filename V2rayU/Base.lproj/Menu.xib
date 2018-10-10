@@ -13,42 +13,48 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="V2rayU" customModuleProvider="target">
             <connections>
-                <outlet property="quickClicked" destination="eoI-of-kVd" id="1ym-HB-9cq"/>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="VhP-6X-4cc"/>
                 <outlet property="stateMenu" destination="9n3-TW-9ur" id="Vkj-Ge-f59"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <menu title="load" id="9n3-TW-9ur" userLabel="StatusBarMenu">
+        <menu title="load" id="9n3-TW-9ur" userLabel="stateMenu">
             <items>
-                <menuItem title="Start" state="on" id="SML-EF-rdT" userLabel="Start">
+                <menuItem title="Start" id="SML-EF-rdT" userLabel="Start">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
                 <menuItem title="Config" id="GqB-HP-8ns">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openConfig:" target="Voe-Tx-rLC" id="gIr-30-Wl6"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="qqG-Nh-BTg"/>
-                <menuItem title="Servers" id="cio-ej-HL5">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
-                </menuItem>
-                <menuItem title="Log" id="eLc-0G-7He">
+                <menuItem title="Logs" id="eLc-0G-7He">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
                 <menuItem isSeparatorItem="YES" id="zsh-Mj-59b"/>
+                <menuItem title="Server" id="cio-ej-HL5">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Server" id="NCx-DY-Hm4"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="Zgj-uB-kMv"/>
+                <menuItem title="Help" id="YoX-II-o27" userLabel="Help">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openHelp:" target="Voe-Tx-rLC" id="HHr-m6-jeV"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="About" id="mkZ-vI-Lc2">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openAbout:" target="Voe-Tx-rLC" id="BXd-I1-Rc4"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Quit" keyEquivalent="q" id="eoI-of-kVd">
+                <menuItem isSeparatorItem="YES" id="JSk-ds-GrJ"/>
+                <menuItem title="Quit" keyEquivalent="q" id="28U-8z-8lS" userLabel="Quit">
                     <connections>
-                        <action selector="quickClicked:" target="Voe-Tx-rLC" id="FY0-C2-003"/>
+                        <action selector="quitClicked:" target="Voe-Tx-rLC" id="XuU-xE-8GB"/>
                     </connections>
                 </menuItem>
             </items>

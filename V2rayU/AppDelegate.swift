@@ -28,16 +28,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var myArray: Array<MyClass>!
     
-    
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
     let configWindow = ConfigWindow()
     let aboutWindow = AboutWindow()
 
-    @IBAction func quickClicked(_ sender: NSMenuItem) {
+    @IBAction func quitClicked(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(self)
     }
     
+    @IBAction func openHelp(_ sender: NSMenuItem) {
+        if let url = URL(string: "https://www.google.com"),NSWorkspace.shared.open(url) {
+        }
+    }
+    
+    // switch server
+    @IBAction func switchServer(_ sender: NSMenuItem) {
+        if let obj = sender.representedObject {
+            if obj is MyClass {
+                let myItem = obj as! MyClass
+                NSLog("id: \(myItem.id), name: \(myItem.name)")
+            }
+        }
+    }
+    
+    // open config window
     @IBAction func openConfig(_ sender: NSMenuItem) {
         configWindow.showWindow (nil)
         // bring to front
@@ -46,12 +61,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
     }
     
+    // open about window
     @IBAction func openAbout(_ sender: NSMenuItem) {
         aboutWindow.showWindow (nil)
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
     }
     
+    // server list items
     @IBOutlet weak var serverItems: NSMenuItem!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -66,34 +83,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.myArray.append(MyClass(id: 1, name: "a"))
         self.myArray.append(MyClass(id: 2, name: "b"))
         self.myArray.append(MyClass(id: 3, name: "c"))
-        
+
         for myItem in self.myArray {
-            let menuItem = NSMenuItem.init(title: myItem.name, action: Selector(("menuItemClick")), keyEquivalent:"")
+            let menuItem : NSMenuItem = NSMenuItem()
+            menuItem.title = myItem.name
+            menuItem.action = #selector(AppDelegate.switchServer(_:))
+            menuItem.target = nil
             menuItem.representedObject = myItem
+            menuItem.target = self
+            menuItem.isEnabled = true
             serverItems.submenu?.addItem(menuItem)
         }
         
-//        let newItem : NSMenuItem = NSMenuItem(title: "hk", action: Selector(("Test:")), keyEquivalent: "")
-//        stateMenu.addItem(newItem)
-        stateMenu.autoenablesItems = true
         statusItem.menu = stateMenu
-    }
-    
-    @IBAction func menuItemClick(sender: AnyObject) {
-        if let obj = sender.representedObject {
-            if obj is MyClass {
-                let myItem = obj as! MyClass
-                NSLog("id: \(myItem.id), name: \(myItem.name)")
-            }
-        }
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
-    }
-    
-    func Test(send: AnyObject?) {
-        NSLog("Exit")
     }
 }
 

@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6612ACC0216DB6DC00A8BF83 /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6612ACBF216DB6DC00A8BF83 /* Config.xib */; };
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB37A216C9A5F00B6AE0D /* Menu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* Menu.xib */; };
 		664EB392216CA9E800B6AE0D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* Config.swift */; };
-		664EB393216CA9E800B6AE0D /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB391216CA9E800B6AE0D /* Config.xib */; };
 		664EB396216CB48400B6AE0D /* About.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB394216CB48400B6AE0D /* About.swift */; };
 		664EB397216CB48400B6AE0D /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB395216CB48400B6AE0D /* About.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6612ACBF216DB6DC00A8BF83 /* Config.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
 		664EB371216C9A5E00B6AE0D /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664EB374216C9A5E00B6AE0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		664EB376216C9A5F00B6AE0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -24,7 +25,6 @@
 		664EB37B216C9A5F00B6AE0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		664EB37C216C9A5F00B6AE0D /* V2rayU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayU.entitlements; sourceTree = "<group>"; };
 		664EB390216CA9E800B6AE0D /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		664EB391216CA9E800B6AE0D /* Config.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
 		664EB394216CB48400B6AE0D /* About.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = About.swift; sourceTree = "<group>"; };
 		664EB395216CB48400B6AE0D /* About.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = About.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,7 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB390216CA9E800B6AE0D /* Config.swift */,
-				664EB391216CA9E800B6AE0D /* Config.xib */,
+				6612ACBF216DB6DC00A8BF83 /* Config.xib */,
 				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB378216C9A5F00B6AE0D /* Menu.xib */,
@@ -130,8 +130,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				664EB393216CA9E800B6AE0D /* Config.xib in Resources */,
 				664EB397216CB48400B6AE0D /* About.xib in Resources */,
+				6612ACC0216DB6DC00A8BF83 /* Config.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				664EB37A216C9A5F00B6AE0D /* Menu.xib in Resources */,
 			);
