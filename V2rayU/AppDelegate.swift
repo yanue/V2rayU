@@ -10,28 +10,15 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // bar menu
     @IBOutlet weak var stateMenu: NSMenu!
-    
-    class MyClass : NSObject {
-        var id: Int = 0
-        var name: String = ""
-        
-        override init() {
-            super.init()
-        }
-        
-        init(id: Int, name: String) {
-            self.id = id
-            self.name = name
-        }
-    }
-    
-    var myArray: Array<MyClass>!
+    // server list items
+    @IBOutlet weak var serverItems: NSMenuItem!
     
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    
     let configWindow = ConfigWindow()
     let aboutWindow = AboutWindow()
+    let configServer = ConfigServer()
 
     @IBAction func quitClicked(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(self)
@@ -45,10 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // switch server
     @IBAction func switchServer(_ sender: NSMenuItem) {
         if let obj = sender.representedObject {
-            if obj is MyClass {
-                let myItem = obj as! MyClass
-                NSLog("id: \(myItem.id), name: \(myItem.name)")
-            }
+            print(obj)
         }
     }
     
@@ -67,9 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
     }
-    
-    // server list items
-    @IBOutlet weak var serverItems: NSMenuItem!
+
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -77,25 +59,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("TrayIcon"))
         }
+        let list  = self.configServer.list()
+        self.showServers(list:list)
+        statusItem.menu = stateMenu
+    }
+    
+    func showServers(list:[Dictionary<String, String>]) {
+        // reomve old items
+        serverItems.submenu?.removeAllItems()
         
-        // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-        self.myArray = Array<MyClass>()
-        self.myArray.append(MyClass(id: 1, name: "a"))
-        self.myArray.append(MyClass(id: 2, name: "b"))
-        self.myArray.append(MyClass(id: 3, name: "c"))
-
-        for myItem in self.myArray {
+        // add new
+        for myItem in list {
+                        print("myItem",myItem,myItem["remark"]!)
             let menuItem : NSMenuItem = NSMenuItem()
-            menuItem.title = myItem.name
+            menuItem.title = myItem["remark"]!
             menuItem.action = #selector(AppDelegate.switchServer(_:))
             menuItem.target = nil
-            menuItem.representedObject = myItem
+            menuItem.representedObject = myItem["remark"]!
             menuItem.target = self
             menuItem.isEnabled = true
             serverItems.submenu?.addItem(menuItem)
         }
-        
-        statusItem.menu = stateMenu
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
