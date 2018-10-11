@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="ConfigWindow" customModule="V2rayU">
             <connections>
                 <outlet property="addRemoveButton" destination="7rT-zk-KIa" id="wbT-dZ-Twc"/>
+                <outlet property="configText" destination="dNK-7u-GUm" id="8ai-Fj-rxY"/>
                 <outlet property="tableView" destination="iEj-cB-TDD" id="T94-2p-I2F"/>
             </connections>
         </customObject>
@@ -93,8 +94,8 @@
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment image="NSAddTemplate" width="32"/>
-                                <segment image="NSRemoveTemplate" width="32" tag="1"/>
-                                <segment width="65"/>
+                                <segment image="NSRemoveTemplate" imageScaling="proportionallyUpOrDown" width="32" tag="1"/>
+                                <segment width="65" enabled="NO"/>
                             </segments>
                             <connections>
                                 <action selector="addRemoveServer:" target="-2" id="mfS-2o-yqj"/>

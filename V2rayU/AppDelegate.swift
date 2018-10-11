@@ -60,23 +60,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("TrayIcon"))
         }
+//        print("loadConfig",self.configServer.loadConfig())
         let list  = self.configServer.list()
         self.showServers(list:list)
         statusItem.menu = stateMenu
     }
     
-    func showServers(list:[Dictionary<String, String>]) {
+    func showServers(list:[serverItem]) {
         // reomve old items
         serverItems.submenu?.removeAllItems()
         
         // add new
-        for myItem in list {
-                        print("myItem",myItem,myItem["remark"]!)
+        for item in list {
             let menuItem : NSMenuItem = NSMenuItem()
-            menuItem.title = myItem["remark"]!
+            menuItem.title = item.remark
             menuItem.action = #selector(AppDelegate.switchServer(_:))
             menuItem.target = nil
-            menuItem.representedObject = myItem["remark"]!
+            menuItem.representedObject = item.remark
             menuItem.target = self
             menuItem.isEnabled = true
             serverItems.submenu?.addItem(menuItem)

@@ -17,6 +17,7 @@ class ConfigWindow: NSWindowController {
         return "Config" // no extension .xib here
     }
 
+    @IBOutlet weak var configText: NSTextView!
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
 
@@ -35,11 +36,7 @@ class ConfigWindow: NSWindowController {
             self.tableView.reloadData()
             // selected current row
             self.tableView.selectRowIndexes(NSIndexSet(index: configServer.count() - 1) as IndexSet, byExtendingSelection: false)
-
-            // refresh menu
-//            appDelegate.showServers(list:list)
-//            self.openEdit(tableView.NSTextFieldCell)
-
+            
             break
 
                 // delete server config
@@ -60,7 +57,9 @@ class ConfigWindow: NSWindowController {
                 rowIndex = cnt - 1
             }
             if rowIndex >= 0 {
-                self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+                self.loadServer(rowIndex: rowIndex)
+            } else {
+                self.tableView.becomeFirstResponder()
             }
 
             // refresh menu
@@ -72,17 +71,29 @@ class ConfigWindow: NSWindowController {
         }
     }
 
+    func loadServer(rowIndex:Int) {
+        self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+        // insert text
+//       text
+        self.configText.string=configServer.loadFile( idx: rowIndex)
+
+        // focus
+//        self.configText.becomeFirstResponder()
+    }
+    
     @IBAction func editCell(_ sender: NSTextFieldCell) {
         print("open edit")
     }
 
     @IBAction func ok(_ sender: NSButton) {
         // todo save
+        let text = self.configText.string
 
+        configServer.save(text: text, idx: self.tableView.selectedRow)
         // self close
-        self.close()
+//        self.close()
         // hide dock icon and close all opened windows
-        NSApp.setActivationPolicy(.accessory)
+//        NSApp.setActivationPolicy(.accessory)
     }
 
     @IBAction func cancel(_ sender: NSButton) {
@@ -102,10 +113,6 @@ class ConfigWindow: NSWindowController {
         self.tableView.doubleAction = #selector(onDoubleClicked)
     }
 
-    @objc private func onEdit() {
-        print("onEdit")
-    }
-
     @objc private func onDoubleClicked() {
         print("onDoubleClicked row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
     }
@@ -123,6 +130,7 @@ class ConfigWindow: NSWindowController {
 // NSTableViewDataSource
 extension ConfigWindow: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
+        print("configServer.count()",configServer.count())
         return configServer.count()
     }
 }
@@ -130,10 +138,9 @@ extension ConfigWindow: NSTableViewDataSource {
 // NSTableViewDelegate
 extension ConfigWindow: NSTableViewDelegate {
     
-    // _ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let tableViewData = configServer.list()
-
+        let tableViewData = configServer.source()
+        print("tableViewData",tableViewData)
         // get cell Identifier (name is "remark")
         let cellIdentifier: NSUserInterfaceItemIdentifier = NSUserInterfaceItemIdentifier(rawValue: (tableColumn?.identifier)!.rawValue)
         
@@ -160,7 +167,9 @@ extension ConfigWindow: NSTableViewDelegate {
     }
 
     func selectionShouldChange(in tableView: NSTableView) -> Bool {
-        print("selectionShouldChange")
+        // focus
+        self.loadServer(rowIndex: self.tableView.selectedRow)
+        // can select
         return true
     }
     
