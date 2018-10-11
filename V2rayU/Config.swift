@@ -16,7 +16,6 @@ class ConfigWindow: NSWindowController {
     override var windowNibName: String? {
         return "Config" // no extension .xib here
     }
-        
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
     
@@ -74,7 +73,7 @@ class ConfigWindow: NSWindowController {
         }
     }
     
-    @IBAction func openEdit(_ sender: NSTextFieldCell) {
+    @IBAction func editCell(_ sender: NSTextFieldCell) {
         print("open edit")
     }
     
