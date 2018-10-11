@@ -10,13 +10,17 @@ import Cocoa
 import WebKit
 
 
-class ConfigWindow: NSWindowController {
+class ConfigWindow: NSWindowController,NSTextFieldDelegate {
     let configServer = ConfigServer()
 
+    @IBAction func edit(_ sender: Any) {
+        print("edit")
+    }
     override var windowNibName: String? {
         return "Config" // no extension .xib here
     }
     @IBOutlet weak var tableView: NSTableView!
+    @IBOutlet weak var remark: NSTextFieldCell!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
     
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -32,7 +36,6 @@ class ConfigWindow: NSWindowController {
             
             // reload data
             self.tableView.reloadData()
-            
             // selected current row
             self.tableView.selectRowIndexes(NSIndexSet(index: configServer.count()-1) as IndexSet, byExtendingSelection: false)
             
@@ -97,12 +100,51 @@ class ConfigWindow: NSWindowController {
         super.windowDidLoad()
         self.tableView.delegate = self as? NSTableViewDelegate
         self.tableView.dataSource = self
-    }
+        self.tableView.action = #selector(onItemClicked)
+        self.tableView.doubleAction = #selector(onDoubleClicked)
 
+//        self.remark.action = #selector(onEdit)
+//        self.tableView.target
+    }
+    @objc private func onEdit() {
+        print("onEdit")
+    }
+    @objc private func onDoubleClicked() {
+        print("onDoubleClicked row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
+    }
+    
+    @objc private func onItemClicked() {
+//        print("row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
+    }
+    
     func windowWillClose(_ notification: Notification) {
         // hide dock icon and close all opened windows
         NSApp.setActivationPolicy(.accessory)
     }
+    func controlTextDidChange(_ obj: Notification) {
+        print("controlTextDidChange")
+        
+        // Get the data every time the user writes a character
+    }
+    
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        let tableView = notification.object as! NSTableView
+        
+        if let identifier = tableView.identifier, identifier.rawValue == "remark" {
+            print("myTableView1")
+        }
+                let selectedRow = self.tableView.selectedRow
+                print("selectedRow",selectedRow)
+                // If the user selected a row. (When no row is selected, the index is -1)
+                if (selectedRow > -1) {
+        //            let myCell = self.tableView.view(atColumn: self.tableView!.column(withIdentifier: "remark"), row: selectedRow, makeIfNecessary: true) as! NSTableCellView
+        //
+        //            // Get the textField to detect and add it the delegate
+        //            let textField = myCell.textField
+        //            textField?.delegate = self
+                }
+    }
+    
 }
 
 extension ConfigWindow: NSTableViewDataSource {

@@ -31,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // switch server
     @IBAction func switchServer(_ sender: NSMenuItem) {
+        print("switchServer")
         if let obj = sender.representedObject {
             print(obj)
         }
