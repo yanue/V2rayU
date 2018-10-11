@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		660D0E5A216E0158000C2922 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D0E59216E0158000C2922 /* Server.swift */; };
-		6612ACC0216DB6DC00A8BF83 /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6612ACBF216DB6DC00A8BF83 /* Config.xib */; };
+		660D0E5C216EFEFA000C2922 /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 660D0E5B216EFEFA000C2922 /* Config.xib */; };
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB37A216C9A5F00B6AE0D /* Menu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* Menu.xib */; };
@@ -19,7 +19,7 @@
 
 /* Begin PBXFileReference section */
 		660D0E59216E0158000C2922 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
-		6612ACBF216DB6DC00A8BF83 /* Config.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
+		660D0E5B216EFEFA000C2922 /* Config.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
 		664EB371216C9A5E00B6AE0D /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664EB374216C9A5E00B6AE0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		664EB376216C9A5F00B6AE0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 			children = (
 				660D0E59216E0158000C2922 /* Server.swift */,
 				664EB390216CA9E800B6AE0D /* Config.swift */,
-				6612ACBF216DB6DC00A8BF83 /* Config.xib */,
+				660D0E5B216EFEFA000C2922 /* Config.xib */,
 				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB378216C9A5F00B6AE0D /* Menu.xib */,
@@ -134,7 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				664EB397216CB48400B6AE0D /* About.xib in Resources */,
-				6612ACC0216DB6DC00A8BF83 /* Config.xib in Resources */,
+				660D0E5C216EFEFA000C2922 /* Config.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				664EB37A216C9A5F00B6AE0D /* Menu.xib in Resources */,
 			);
