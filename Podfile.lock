@@ -1,0 +1,24 @@
+PODS:
+  - Alamofire (4.7.3)
+  - SSZipArchive (2.1.4)
+  - SwiftyJSON (4.2.0)
+
+DEPENDENCIES:
+  - Alamofire (~> 4.7)
+  - SSZipArchive
+  - SwiftyJSON (~> 4.0)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - SSZipArchive
+    - SwiftyJSON
+
+SPEC CHECKSUMS:
+  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  SSZipArchive: 41455d4b8d2b6ab93990820b50dc697c2554a322
+  SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
+
+PODFILE CHECKSUM: a0e9cb77734aed51bd7e6663f814c76231a4c208
+
+COCOAPODS: 1.6.0.beta.1

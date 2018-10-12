@@ -16,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var serverItems: NSMenuItem!
     
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    let configWindow = ConfigWindow()
+    let configWindow = ConfigWindowController()
     let aboutWindow = AboutWindow()
     let configServer = ConfigServer()
 
@@ -56,6 +56,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
+        V2rayCore().unzip()
         
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("TrayIcon"))

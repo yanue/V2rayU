@@ -10,7 +10,7 @@ import Cocoa
 import WebKit
 
 
-class ConfigWindow: NSWindowController {
+class ConfigWindowController: NSWindowController,NSWindowDelegate {
     let configServer = ConfigServer()
 
     override var windowNibName: String? {
@@ -105,6 +105,8 @@ class ConfigWindow: NSWindowController {
 
     override func windowDidLoad() {
         super.windowDidLoad()
+        self.window?.delegate = self
+
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.reloadData()
@@ -121,14 +123,23 @@ class ConfigWindow: NSWindowController {
         print("row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
     }
 
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+//        NSApp.setActivationPolicy(.accessory)
+        print("close1")
+        self.close()
+        NSApp.terminate(self)
+        return true
+    }
+    
     func windowWillClose(_ notification: Notification) {
         // hide dock icon and close all opened windows
-        NSApp.setActivationPolicy(.accessory)
+        print("close")
+//        NSApp.setActivationPolicy(.accessory)
     }
 }
 
 // NSTableViewDataSource
-extension ConfigWindow: NSTableViewDataSource {
+extension ConfigWindowController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         print("configServer.count()",configServer.count())
         return configServer.count()
@@ -136,7 +147,7 @@ extension ConfigWindow: NSTableViewDataSource {
 }
 
 // NSTableViewDelegate
-extension ConfigWindow: NSTableViewDelegate {
+extension ConfigWindowController: NSTableViewDelegate {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tableViewData = configServer.source()
@@ -178,3 +189,59 @@ extension ConfigWindow: NSTableViewDelegate {
         //        updateStatus()
     }
 }
+
+class ConfigView: NSView {
+    @IBAction func closeButtonClicked(_ sender: Any) {
+        print("closeButtonClicked")
+        window?.close()
+    }
+}
+
+class ConfigViewController: NSViewController {
+    var observer: NSObjectProtocol!
+    
+    @IBOutlet weak var accessibilitySetupView: NSView!
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        print("viewWillAppear")
+
+        
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        print("viewDidAppear")
+
+        observer = DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("com.apple.accessibility.api"), object: nil, queue: nil) { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+            })
+        }
+    }
+    
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        print("viewWillDisappear")
+
+        DistributedNotificationCenter.default().removeObserver(observer, name: NSNotification.Name("com.apple.accessibility.api"), object: nil)
+    }
+    
+    func showNextView() {
+        performSegue(withIdentifier: "showCompleteView", sender: self)
+    }
+}
+
+
+
+class ConfigWindow: NSWindow {
+    override func keyDown(with event: NSEvent) {
+        super.keyDown(with: event)
+        print("keyDown")
+        if event.keyCode == 13 && event.modifierFlags.contains(.command) {
+            close()
+        } else if event.keyCode == 46 && event.modifierFlags.contains(.command) {
+            miniaturize(self)
+        }
+    }
+}
+
