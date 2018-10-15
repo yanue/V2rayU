@@ -52,18 +52,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
     }
-
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
-        V2rayCore().unzip()
         
+        // v2ray-core check version
+        V2rayCore().checkVersion()
+
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("TrayIcon"))
         }
-//        print("loadConfig",self.configServer.loadConfig())
+
         let list  = self.configServer.list()
         self.showServers(list:list)
+        
         statusItem.menu = stateMenu
     }
     

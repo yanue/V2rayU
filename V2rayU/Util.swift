@@ -40,7 +40,10 @@ func getApplicationDirectory() -> URL {
     return paths[0]
 }
 
-// 
+//  run custom shell
+// demo:
+// shell("/bin/bash",["-c","ls"])
+// shell("/bin/bash",["-c","cd ~ && ls -la"])
 func shell(launchPath: String, arguments: [String]) -> String?
 {
     let task = Process()
@@ -53,17 +56,22 @@ func shell(launchPath: String, arguments: [String]) -> String?
     
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     let output = String(data: data, encoding: String.Encoding.utf8)!
+
     if output.count > 0 {
         //remove newline character.
         let lastIndex = output.index(before: output.endIndex)
         return String(output[output.startIndex ..< lastIndex])
     }
     
-    print("output:",output)
-    
     return output
 }
 
+// → /var/folders/v8/tft1q…/T/…-8DC6DD131DC1/report.pdf
+//  guard let tmp = try? TemporaryFile(creatingTempDirectoryForFilename: "v2ray-macos.zip") else {
+//      print("err get tmp")
+//      return
+//  }
+//  let fileUrl = tmp.fileURL
 
 /// 临时目录中临时文件的包装（Wrapper）。目录是为文件而特别创建的，因此不再需要文件时，可以安全地删除该文件。
 ///

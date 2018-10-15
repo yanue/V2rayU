@@ -10,13 +10,8 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
+// v2ray-core version check, download, unzip
 class V2rayCore {
-//    init(){
-//        self.download()
-//    }
-//
-    private var jsonData: [String: Any] = [:]
-
     // need replace ${version}
     var releaseUrl:String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos.zip"
     // lastet release verison info
@@ -55,9 +50,7 @@ class V2rayCore {
                 }
                 
                 let currentVersion = tag_name as! String
-                // store
-//                UserDefaults.set(forKey: .v2rayCoreVersion, value: "v1.900")
-                
+
                 // get old versiion
                 if let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) {
                     let oldVer = oldVersion.replacingOccurrences(of: "v", with: "").versionToInt()
@@ -65,11 +58,13 @@ class V2rayCore {
                     // compare with [Int]
                     if oldVer.lexicographicallyPrecedes(curVer) {
                         print("new version",currentVersion,oldVersion)
+                        // store version
+                        UserDefaults.set(forKey: .v2rayCoreVersion, value: currentVersion)
+                        // download new version
+                        self.download();
                     }
                 }
                 
-                // store
-                UserDefaults.set(forKey: .v2rayCoreVersion, value: currentVersion)
             }
         }
     }
@@ -82,16 +77,22 @@ class V2rayCore {
         
         let url = releaseUrl.replacingOccurrences(of: "${version}", with: version)
         
-        // → /var/folders/v8/tft1q…/T/…-8DC6DD131DC1/report.pdf
-        guard let tmp = try? TemporaryFile(creatingTempDirectoryForFilename: "v2ray-macos.zip") else {
-            print("err get tmp")
+        // check unzip sh file
+        // path: /Application/V2rayU.app/Contents/Resources/unzip.sh
+        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
+            print("unzip shell file no found")
             return
         }
         
-        let fileURL = tmp.fileURL
+        // path: /Application/V2rayU.app/Contents/Resources
+        let workPath = shFile.path.replacingOccurrences(of: "/unzip.sh", with: "")
+        
+        // download file: /Application/V2rayU.app/Contents/Resources/v2ray-macos.zip
+        let fileUrl = URL.init(fileURLWithPath:  shFile.path.replacingOccurrences(of: "/unzip.sh", with: "/v2ray-macos.zip"))
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-            return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
+            return (fileUrl, [.removePreviousFile, .createIntermediateDirectories])
         }
+        
         let utilityQueue = DispatchQueue.global(qos: .utility)
         Alamofire.download(url,to:destination)
             .downloadProgress (queue: utilityQueue){ progress in
@@ -107,25 +108,13 @@ class V2rayCore {
                 }
                 
                 if let data = response.result.value {
-                    print("done.",data,fileURL)
-                    
+                    // unzip v2ray-core
+                    // cmd: /bin/bash -c 'cd path && ./unzip.sh '
+                    let sh = "cd "+workPath+" && ./unzip.sh"
+                    // exec shell
+                    let res = shell(launchPath:"/bin/bash", arguments: ["-c",sh])
+                    print("res",data,res!)
                 }
             }
     }
-    
-    func unzip()  {
-//        let a =  Bundle.main.resourcePath
-//        print("Bundle.main.url",a)
-        
-        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
-            print("unzip shell file no found")
-            return
-        }
-        
-        
-//        shFile.absoluteURL
-        let res = shell(launchPath: shFile.absoluteString, arguments: [""])
-        print("res",res!)
-    }
-    
 }
