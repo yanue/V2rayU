@@ -18,7 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     let configWindow = ConfigWindowController()
     let aboutWindow = AboutWindow()
-    let configServer = ConfigServer()
 
     @IBAction func quitClicked(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(self)
@@ -59,17 +58,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // v2ray-core check version
         V2rayCore().checkVersion()
 
+        // load server list
+        V2rayServer.loadConfig()
+        let list  = V2rayServer.list()
+        self.showServers(list:list)
+        
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("TrayIcon"))
         }
-
-        let list  = self.configServer.list()
-        self.showServers(list:list)
         
         statusItem.menu = stateMenu
     }
     
-    func showServers(list:[serverItem]) {
+    func showServers(list:[v2rayItem]) {
         // reomve old items
         serverItems.submenu?.removeAllItems()
         

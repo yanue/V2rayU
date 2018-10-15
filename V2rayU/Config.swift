@@ -11,7 +11,6 @@ import WebKit
 
 
 class ConfigWindowController: NSWindowController,NSWindowDelegate {
-    let configServer = ConfigServer()
 
     override var windowNibName: String? {
         return "Config" // no extension .xib here
@@ -30,12 +29,12 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
                 // add server config
         case 0:
             // add
-            _ = configServer.add()
+            _ = V2rayServer.add()
 
             // reload data
             self.tableView.reloadData()
             // selected current row
-            self.tableView.selectRowIndexes(NSIndexSet(index: configServer.count() - 1) as IndexSet, byExtendingSelection: false)
+            self.tableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
             
             break
 
@@ -45,19 +44,19 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             let idx = self.tableView.selectedRow
 
             // remove
-            let list = configServer.remove(idx: idx)
+            let list = V2rayServer.remove(idx: idx)
 
             // reload
             self.tableView.reloadData()
 
             // selected prev row
-            let cnt: Int = configServer.count()
+            let cnt: Int = V2rayServer.count()
             var rowIndex: Int = idx - 1
             if rowIndex < 0 {
                 rowIndex = cnt - 1
             }
             if rowIndex >= 0 {
-                self.loadServer(rowIndex: rowIndex)
+                self.loadJsonFile(rowIndex: rowIndex)
             } else {
                 self.tableView.becomeFirstResponder()
             }
@@ -71,11 +70,13 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         }
     }
 
-    func loadServer(rowIndex:Int) {
+    func loadJsonFile(rowIndex:Int) {
         self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
         // insert text
 //       text
-        self.configText.string=configServer.loadFile( idx: rowIndex)
+        let txt = V2rayServer.loadFile( idx: rowIndex)
+        print("load")
+        self.configText.string = txt
 
         // focus
 //        self.configText.becomeFirstResponder()
@@ -89,7 +90,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         // todo save
         let text = self.configText.string
 
-        configServer.save(text: text, idx: self.tableView.selectedRow)
+        V2rayServer.save(jsonData: text, idx: self.tableView.selectedRow)
         // self close
 //        self.close()
         // hide dock icon and close all opened windows
@@ -141,8 +142,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
 // NSTableViewDataSource
 extension ConfigWindowController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print("configServer.count()",configServer.count())
-        return configServer.count()
+        return V2rayServer.count()
     }
 }
 
@@ -150,14 +150,14 @@ extension ConfigWindowController: NSTableViewDataSource {
 extension ConfigWindowController: NSTableViewDelegate {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let tableViewData = configServer.source()
+        let tableViewData = V2rayServer.list()
         print("tableViewData",tableViewData)
         // get cell Identifier (name is "remark")
         let cellIdentifier: NSUserInterfaceItemIdentifier = NSUserInterfaceItemIdentifier(rawValue: (tableColumn?.identifier)!.rawValue)
         
         if let cell = tableView.makeView(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView {
             // set cell val
-            cell.textField?.stringValue = tableViewData[row][cellIdentifier.rawValue]!
+            cell.textField?.stringValue = tableViewData[row].remark
             return cell
         }
         
@@ -179,7 +179,7 @@ extension ConfigWindowController: NSTableViewDelegate {
 
     func selectionShouldChange(in tableView: NSTableView) -> Bool {
         // focus
-        self.loadServer(rowIndex: self.tableView.selectedRow)
+        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
         // can select
         return true
     }

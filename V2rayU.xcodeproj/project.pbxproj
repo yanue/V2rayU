@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		660D0E5A216E0158000C2922 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D0E59216E0158000C2922 /* Server.swift */; };
+		660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D0E59216E0158000C2922 /* V2rayServer.swift */; };
 		6610ECB721742AFD008FC401 /* Menu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* Menu.xib */; };
 		6610ECB821742B18008FC401 /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 660D0E5B216EFEFA000C2922 /* Config.xib */; };
-		6610ECBA21742B59008FC401 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6610ECB921742B59008FC401 /* unzip.sh */; };
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB392216CA9E800B6AE0D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* Config.swift */; };
@@ -22,10 +21,8 @@
 
 /* Begin PBXFileReference section */
 		0FE808B3F8A39DF1A10A6FFF /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
-		660D0E59216E0158000C2922 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
+		660D0E59216E0158000C2922 /* V2rayServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayServer.swift; sourceTree = "<group>"; };
 		660D0E5B216EFEFA000C2922 /* Config.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
-		6610ECB921742B59008FC401 /* unzip.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = SOURCE_ROOT; };
-		6643159221707E1600F2A175 /* V2rayCore.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = V2rayCore.xib; sourceTree = "<group>"; };
 		664B95DD217062A500DBC941 /* Alamofire */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Alamofire; path = Pods/Alamofire; sourceTree = "<group>"; };
 		664EB371216C9A5E00B6AE0D /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664EB374216C9A5E00B6AE0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -39,6 +36,7 @@
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		66ACB19C21744EF6005B5881 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,11 +73,9 @@
 		664EB373216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
-				6610ECB921742B59008FC401 /* unzip.sh */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				66784AFF21704E1300AD307F /* V2rayCore.swift */,
-				6643159221707E1600F2A175 /* V2rayCore.xib */,
-				660D0E59216E0158000C2922 /* Server.swift */,
+				660D0E59216E0158000C2922 /* V2rayServer.swift */,
 				664EB390216CA9E800B6AE0D /* Config.swift */,
 				660D0E5B216EFEFA000C2922 /* Config.xib */,
 				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
@@ -89,6 +85,7 @@
 				664EB37C216C9A5F00B6AE0D /* V2rayU.entitlements */,
 				664EB394216CB48400B6AE0D /* About.swift */,
 				664EB395216CB48400B6AE0D /* About.xib */,
+				66ACB19C21744EF6005B5881 /* unzip.sh */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -174,7 +171,6 @@
 				6610ECB821742B18008FC401 /* Config.xib in Resources */,
 				6610ECB721742AFD008FC401 /* Menu.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
-				6610ECBA21742B59008FC401 /* unzip.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,7 +235,7 @@
 				664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */,
 				664EB396216CB48400B6AE0D /* About.swift in Sources */,
 				66784AFC2170486D00AD307F /* Util.swift in Sources */,
-				660D0E5A216E0158000C2922 /* Server.swift in Sources */,
+				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* Config.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
 			);

@@ -9,8 +9,10 @@
 import Foundation
 
 extension UserDefaults {
+    
     enum KEY: String {
         case v2rayCoreVersion
+        case v2rayServerList
     }
     
     static func set(forKey key: KEY, value: String) {
@@ -19,6 +21,22 @@ extension UserDefaults {
     
     static func get(forKey key: KEY) -> String? {
         return UserDefaults.standard.string(forKey: key.rawValue)
+    }
+    
+    static func del(forKey key: KEY) {
+         UserDefaults.standard.removeObject(forKey: key.rawValue)
+    }
+    
+    static func setArray(forKey key: KEY,value: [String]){
+        UserDefaults.standard.set(value, forKey: key.rawValue)
+    }
+    
+    static func getArray(forKey key: KEY) -> [String]? {
+        return UserDefaults.standard.array(forKey: key.rawValue) as? [String]
+    }
+    
+    static func delArray(forKey key: KEY) {
+         UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
 }
 
