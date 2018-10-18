@@ -8,7 +8,6 @@
 
 import Foundation
 import Cocoa
-import SwiftLog
 import ServiceManagement
 
 // menu controller
@@ -30,24 +29,24 @@ class MenuController:NSObject,NSMenuDelegate {
     @IBAction func toggleStartAtLogin(_ sender: NSMenuItem) {
         print("toggle",sender.state)
 
-        if sender.state.rawValue == 1 {
-            sender.state = .off
-            // off
-            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
-        } else {
-            sender.state = .on
-            // on
-            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
-        }
+//        if sender.state.rawValue == 1 {
+//            sender.state = .off
+//            // off
+//            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
+//        } else {
+//            sender.state = .on
+//            // on
+//            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
+//        }
     }
     @IBAction func start(_ sender: NSMenuItem) {
         guard let v2ray = V2rayServer.loadSelectedItem() else {
-            logw("v2ray config not fould")
+            NSLog("v2ray config not fould")
             return
         }
         
         if !v2ray.usable {
-            logw("invid v2ray config")
+            NSLog("invid v2ray config")
             return
         }
         

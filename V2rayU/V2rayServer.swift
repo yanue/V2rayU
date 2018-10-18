@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftyJSON
-import SwiftLog
 
 // ----- v2ray server manager -----
 class V2rayServer: NSObject {

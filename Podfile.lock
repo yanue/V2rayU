@@ -1,24 +1,24 @@
 PODS:
   - Alamofire (4.7.3)
-  - SwiftLog (1.0.0)
+  - LaunchAtLogin (2.3.0)
   - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire (~> 4.7)
-  - SwiftLog (~> 1.0.0)
+  - LaunchAtLogin
   - SwiftyJSON (~> 4.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
-    - SwiftLog
+    - LaunchAtLogin
     - SwiftyJSON
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
+  LaunchAtLogin: 7ca1e1ab83a07ce89443d321eea20451658181d1
   SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: 208c989e671bbf83c89a6b18bf4a176209bb4983
+PODFILE CHECKSUM: 5f68cfc19b1d01d7c93f89ddcbd513b0f79ff679
 
 COCOAPODS: 1.6.0.beta.1

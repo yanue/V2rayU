@@ -8,12 +8,8 @@
 
 import Cocoa
 import ServiceManagement
-
-let launcherAppIdentifier = "yanue.V2rayU.Launcher"
-
-extension Notification.Name {
-    static let killLauncher = Notification.Name("killLauncher")
-}
+import os.log
+import LaunchAtLogin
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -22,27 +18,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
-        
-        let runningApps = NSWorkspace.shared.runningApplications
-        let isRunning = !runningApps.filter { $0.bundleIdentifier == launcherAppIdentifier }.isEmpty
-        
-        // run at login 
-        SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
-        
-        if isRunning {
-            DistributedNotificationCenter.default().post(name: .killLauncher, object: Bundle.main.bundleIdentifier!)
-        }
+        os_log("v2rayu init.")
 
-        UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
+        print(LaunchAtLogin.isEnabled)
+        //=> false
         
-        print("startedAtLogin", isRunning)
+        LaunchAtLogin.isEnabled = true
         
-        // v2ray-core check version
-        V2rayCore().check()
-        generateSSLocalLauchAgentPlist()
-        StartV2rayCore()
+        print(LaunchAtLogin.isEnabled)
+        //=> true
+    
+        // 定义NSUserNotification
+        let userNotification = NSUserNotification()
+        userNotification.title = "消息Title"
+        userNotification.subtitle = "消息SubTitle"
+        userNotification.informativeText = "消息InformativeText"
+        // 使用NSUserNotificationCenter发送NSUserNotification
+        let userNotificationCenter = NSUserNotificationCenter.default
+        userNotificationCenter.scheduleNotification(userNotification)
+       
+        //
+//        UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
+//
+//        print("startedAtLogin", isRunning)
+//
+//        // v2ray-core check version
+//        V2rayCore().check()
+//        generateSSLocalLauchAgentPlist()
+//        StartV2rayCore()
     }
-   
+  
+    
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
         print("Terminate")
