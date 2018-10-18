@@ -8,9 +8,20 @@
 
 import Foundation
 import SwiftyJSON
+import SwiftLog
 
 // ----- v2ray server manager -----
 class V2rayServer: NSObject {
+    static var shared = V2rayServer()
+    
+    static private let defaultV2rayName = "config.default"
+    
+    // Initialization
+    override init() {
+        super.init()
+        V2rayServer.loadConfig()
+    }
+    
     // v2ray server list
     static private var tableViewData:[v2rayItem] = []
 
@@ -25,7 +36,7 @@ class V2rayServer: NSObject {
         if list == nil {
             list = ["default"]
             // store default
-            let model = v2rayItem(name: "default", remark: "default",usable:false)
+            let model = v2rayItem(name: self.defaultV2rayName, remark: "default",usable:false)
             model.store()
         }
         
@@ -53,15 +64,15 @@ class V2rayServer: NSObject {
     }
     
     // add v2ray server (tmp)
-    static func add() -> [v2rayItem] {
+    static func add() {
         if self.tableViewData.count > 20 {
             print("over max len")
-            return self.tableViewData
+            return
         }
         
         let now = Date()
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let dateStr = dateFormatter.string(from: now)
 
         // name is : config. + current time str
@@ -76,15 +87,13 @@ class V2rayServer: NSObject {
         
         // update server list UserDefaults
         self.saveItemList()
-        
-        return self.tableViewData
     }
     
     // remove v2ray server (tmp and UserDefaults and config json file)
-    static func remove(idx: Int) -> [v2rayItem] {
+    static func remove(idx: Int) {
         if !V2rayServer.tableViewData.indices.contains(idx) {
             print("index out of range",idx)
-            return self.tableViewData
+            return
         }
         
         let v2ray = V2rayServer.tableViewData[idx]
@@ -97,11 +106,6 @@ class V2rayServer: NSObject {
     
         // update server list UserDefaults
         self.saveItemList()
-    
-        // todo delete file
-        try? FileManager.default.removeItem(at: V2rayServer.getJsonFile(name:v2ray.name))
-
-        return self.tableViewData
     }
     
     // update server list UserDefaults
@@ -115,35 +119,35 @@ class V2rayServer: NSObject {
     }
 
     // get json file url
-    static func getJsonFile(name:String) -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-            print("paths",paths)
-        return paths[0].appendingPathComponent(name+".json")
+    static func getJsonFile() -> String? {
+       
+//        // check unzip sh file
+//        // path: /Application/V2rayU.app/Contents/Resources/unzip.sh
+//        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
+//            print("unzip shell file no found")
+//            return nil
+//        }
+//
+        return Bundle.main.url(forResource: "unzip", withExtension:"sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
     }
     
     // load json file data
-    static func loadFile(idx:Int) -> String {
+    static func loadV2rayItem(idx:Int) -> v2rayItem? {
         if !V2rayServer.tableViewData.indices.contains(idx) {
             print("index out of range",idx)
-            return ""
+            return nil
         }
         
-        let v2ray = self.tableViewData[idx]
-        if v2ray.name == "" {
-            print("name is empty")
-            return ""
+        return self.tableViewData[idx]
+    }
+    
+    // load selected v2ray item
+    static func loadSelectedItem() -> v2rayItem? {
+        guard let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) else {
+            return nil
         }
         
-        let jsonFile = V2rayServer.getJsonFile(name:v2ray.name)
-        //reading
-        do {
-            let text = try String(contentsOf: jsonFile, encoding: .utf8)
-            return text
-        } catch {
-            /* error handling here */
-            print("Error: load json config file")
-            return ""
-        }
+       return v2rayItem.load(name: curName)
     }
     
     // save json data into local file
@@ -189,18 +193,13 @@ class V2rayServer: NSObject {
             return
         }
         
-        // todo check json
-        let jsonFile = V2rayServer.getJsonFile(name:v2ray.name)
-
-        do {
-            try jsonData.write(to: jsonFile, atomically: true, encoding: String.Encoding.utf8)
-        } catch {
-            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-        }
-        
         // store
         v2ray.usable = true
+        v2ray.json = jsonData
         v2ray.store()
+        
+        // update current
+        self.tableViewData[idx].usable = true
     }
 }
 
@@ -209,11 +208,13 @@ class v2rayItem: NSObject, NSCoding {
     var name: String
     var remark: String
     var usable: Bool
+    var json: String
     
     // init
-    required init(name:String="", remark:String="", usable: Bool=false) {
+    required init(name:String="", remark:String="", usable: Bool=false, json:String="") {
         self.name = name
         self.remark = remark
+        self.json = json
         self.usable = usable
     }
     
@@ -221,6 +222,7 @@ class v2rayItem: NSObject, NSCoding {
     required init(coder decoder: NSCoder) {
         self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
         self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
+        self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
         self.usable = decoder.decodeObject(forKey: "Usable") as? Bool ?? false
     }
     
@@ -228,6 +230,7 @@ class v2rayItem: NSObject, NSCoding {
     func encode(with coder: NSCoder) {
         coder.encode(name, forKey:"Name")
         coder.encode(remark, forKey:"Remark")
+        coder.encode(json, forKey:"Json")
         coder.encode(usable, forKey:"Usable")
     }
     

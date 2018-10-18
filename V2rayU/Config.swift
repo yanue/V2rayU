@@ -11,7 +11,9 @@ import WebKit
 
 
 class ConfigWindowController: NSWindowController,NSWindowDelegate {
-
+    // menu controller
+    let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
+    
     override var windowNibName: String? {
         return "Config" // no extension .xib here
     }
@@ -23,7 +25,6 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
         // 0 add,1 remove
         let seg = addRemoveButton.indexOfSelectedItem
-        let appDelegate = NSApplication.shared.delegate as! AppDelegate
 
         switch seg {
                 // add server config
@@ -44,7 +45,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             let idx = self.tableView.selectedRow
 
             // remove
-            let list = V2rayServer.remove(idx: idx)
+            V2rayServer.remove(idx: idx)
 
             // reload
             self.tableView.reloadData()
@@ -62,7 +63,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             }
 
             // refresh menu
-            appDelegate.showServers(list: list)
+            menuController.showServers()
             break
                 // unknown action
         default:
@@ -74,9 +75,8 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
         // insert text
 //       text
-        let txt = V2rayServer.loadFile( idx: rowIndex)
-        print("load")
-        self.configText.string = txt
+        let v2ray = V2rayServer.loadV2rayItem(idx: rowIndex)
+        self.configText.string = v2ray?.json ?? ""
 
         // focus
 //        self.configText.becomeFirstResponder()
@@ -90,11 +90,12 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         // todo save
         let text = self.configText.string
 
+        // save
         V2rayServer.save(jsonData: text, idx: self.tableView.selectedRow)
-        // self close
-//        self.close()
-        // hide dock icon and close all opened windows
-//        NSApp.setActivationPolicy(.accessory)
+        
+        print("save ok fater")
+        // refresh menu
+        menuController.showServers()
     }
 
     @IBAction func cancel(_ sender: NSButton) {

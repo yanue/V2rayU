@@ -14,14 +14,35 @@
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB392216CA9E800B6AE0D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* Config.swift */; };
 		664EB396216CB48400B6AE0D /* About.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB394216CB48400B6AE0D /* About.swift */; };
+		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
+		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66A5CE4B21706C92009B08B2 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
+		66ACB19D21757B59005B5881 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB395216CB48400B6AE0D /* About.xib */; };
+		66ACB1A021757D5B005B5881 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* Menu.swift */; };
+		66DDEDEB21787D580022FD8B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DDEDEA21787D580022FD8B /* AppDelegate.swift */; };
+		66DDEDED21787D590022FD8B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66DDEDEC21787D590022FD8B /* Assets.xcassets */; };
+		66DDEDF621787DAD0022FD8B /* Launcher.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66DDEDE821787D580022FD8B /* Launcher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		66DDEDF821787E0C0022FD8B /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66DDEDF721787E0C0022FD8B /* ServiceManagement.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6650AAFC21785A64000909D8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				66DDEDF621787DAD0022FD8B /* Launcher.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0FE808B3F8A39DF1A10A6FFF /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
-		660D0E59216E0158000C2922 /* V2rayServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayServer.swift; sourceTree = "<group>"; };
+		660D0E59216E0158000C2922 /* V2rayServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = V2rayServer.swift; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		660D0E5B216EFEFA000C2922 /* Config.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
 		664B95DD217062A500DBC941 /* Alamofire */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Alamofire; path = Pods/Alamofire; sourceTree = "<group>"; };
 		664EB371216C9A5E00B6AE0D /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -33,10 +54,19 @@
 		664EB390216CA9E800B6AE0D /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		664EB394216CB48400B6AE0D /* About.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = About.swift; sourceTree = "<group>"; };
 		664EB395216CB48400B6AE0D /* About.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = About.xib; sourceTree = "<group>"; };
+		6650AAAC21771E11000909D8 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
+		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
+		6650AAB621784303000909D8 /* V2rayUHelper */ = {isa = PBXFileReference; lastKnownFileType = folder; path = V2rayUHelper; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		66ACB19C21744EF6005B5881 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
+		66ACB19F21757D5B005B5881 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
+		66DDEDE821787D580022FD8B /* Launcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Launcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66DDEDEA21787D580022FD8B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		66DDEDEC21787D590022FD8B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		66DDEDF121787D590022FD8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66DDEDF221787D590022FD8B /* Launcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Launcher.entitlements; sourceTree = "<group>"; };
+		66DDEDF721787E0C0022FD8B /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,7 +75,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66DDEDF821787E0C0022FD8B /* ServiceManagement.framework in Frameworks */,
 				66A5CE4B21706C92009B08B2 /* Pods_V2rayU.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66DDEDE521787D580022FD8B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
+				66DDEDE921787D580022FD8B /* Launcher */,
 				664EB372216C9A5E00B6AE0D /* Products */,
 				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
@@ -66,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB371216C9A5E00B6AE0D /* V2rayU.app */,
+				66DDEDE821787D580022FD8B /* Launcher.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,26 +113,41 @@
 		664EB373216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
-				66784AFB2170486D00AD307F /* Util.swift */,
-				66784AFF21704E1300AD307F /* V2rayCore.swift */,
-				660D0E59216E0158000C2922 /* V2rayServer.swift */,
+				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
+				66ACB19F21757D5B005B5881 /* Menu.swift */,
+				664EB378216C9A5F00B6AE0D /* Menu.xib */,
 				664EB390216CA9E800B6AE0D /* Config.swift */,
 				660D0E5B216EFEFA000C2922 /* Config.xib */,
-				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
-				664EB378216C9A5F00B6AE0D /* Menu.xib */,
+				660D0E59216E0158000C2922 /* V2rayServer.swift */,
+				66784AFF21704E1300AD307F /* V2rayCore.swift */,
+				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
 				664EB37C216C9A5F00B6AE0D /* V2rayU.entitlements */,
 				664EB394216CB48400B6AE0D /* About.swift */,
 				664EB395216CB48400B6AE0D /* About.xib */,
-				66ACB19C21744EF6005B5881 /* unzip.sh */,
+				66784AFB2170486D00AD307F /* Util.swift */,
+				6650AAAC21771E11000909D8 /* unzip.sh */,
 			);
 			path = V2rayU;
+			sourceTree = "<group>";
+		};
+		66DDEDE921787D580022FD8B /* Launcher */ = {
+			isa = PBXGroup;
+			children = (
+				66DDEDEA21787D580022FD8B /* AppDelegate.swift */,
+				66DDEDEC21787D590022FD8B /* Assets.xcassets */,
+				66DDEDF121787D590022FD8B /* Info.plist */,
+				66DDEDF221787D590022FD8B /* Launcher.entitlements */,
+			);
+			path = Launcher;
 			sourceTree = "<group>";
 		};
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				66DDEDF721787E0C0022FD8B /* ServiceManagement.framework */,
+				6650AAB621784303000909D8 /* V2rayUHelper */,
 				66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */,
 				664B95DD217062A500DBC941 /* Alamofire */,
 			);
@@ -120,6 +175,7 @@
 				664EB36E216C9A5E00B6AE0D /* Frameworks */,
 				664EB36F216C9A5E00B6AE0D /* Resources */,
 				83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */,
+				6650AAFC21785A64000909D8 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -128,6 +184,23 @@
 			name = V2rayU;
 			productName = V2rayU;
 			productReference = 664EB371216C9A5E00B6AE0D /* V2rayU.app */;
+			productType = "com.apple.product-type.application";
+		};
+		66DDEDE721787D580022FD8B /* Launcher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66DDEDF321787D590022FD8B /* Build configuration list for PBXNativeTarget "Launcher" */;
+			buildPhases = (
+				66DDEDE421787D580022FD8B /* Sources */,
+				66DDEDE521787D580022FD8B /* Frameworks */,
+				66DDEDE621787D580022FD8B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Launcher;
+			productName = Launcher;
+			productReference = 66DDEDE821787D580022FD8B /* Launcher.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -141,6 +214,9 @@
 				ORGANIZATIONNAME = yanue;
 				TargetAttributes = {
 					664EB370216C9A5E00B6AE0D = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					66DDEDE721787D580022FD8B = {
 						CreatedOnToolsVersion = 10.0;
 					};
 				};
@@ -159,6 +235,7 @@
 			projectRoot = "";
 			targets = (
 				664EB370216C9A5E00B6AE0D /* V2rayU */,
+				66DDEDE721787D580022FD8B /* Launcher */,
 			);
 		};
 /* End PBXProject section */
@@ -168,9 +245,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66ACB19D21757B59005B5881 /* About.xib in Resources */,
 				6610ECB821742B18008FC401 /* Config.xib in Resources */,
+				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* Menu.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66DDEDE621787D580022FD8B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66DDEDED21787D590022FD8B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +274,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftLog/SwiftLog.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -195,7 +282,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftLog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,10 +321,20 @@
 			files = (
 				664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */,
 				664EB396216CB48400B6AE0D /* About.swift in Sources */,
+				6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */,
+				66ACB1A021757D5B005B5881 /* Menu.swift in Sources */,
 				66784AFC2170486D00AD307F /* Util.swift in Sources */,
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* Config.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66DDEDE421787D580022FD8B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66DDEDEB21787D580022FD8B /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +408,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -365,6 +463,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -378,6 +477,7 @@
 				CODE_SIGN_ENTITLEMENTS = V2rayU/V2rayU.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -397,12 +497,53 @@
 				CODE_SIGN_ENTITLEMENTS = V2rayU/V2rayU.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = yanue.V2rayU;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		66DDEDF421787D590022FD8B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Launcher/Launcher.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = Launcher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = yanue.V2rayU.Launcher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		66DDEDF521787D590022FD8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Launcher/Launcher.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = Launcher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = yanue.V2rayU.Launcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 			};
@@ -425,6 +566,15 @@
 			buildConfigurations = (
 				664EB380216C9A5F00B6AE0D /* Debug */,
 				664EB381216C9A5F00B6AE0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66DDEDF321787D590022FD8B /* Build configuration list for PBXNativeTarget "Launcher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66DDEDF421787D590022FD8B /* Debug */,
+				66DDEDF521787D590022FD8B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

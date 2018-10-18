@@ -16,9 +16,33 @@ class V2rayCore {
     var releaseUrl:String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos.zip"
     // lastet release verison info
     let versionUrl:String = "https://api.github.com/repos/v2ray/v2ray-core/releases/latest"
+    
+    func checkLocal(hasNewVersion:Bool) {
+        // has new verion
+        if hasNewVersion {
+            // download new version
+            self.download()
+            return
+        }
+        
+        let fileMgr = FileManager.default
+        if !fileMgr.fileExists(atPath: v2rayCoreFullPath) {
+            self.download();
+        }
+    }
+    
+    func check() {
+        // 当前版本检测
+        let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.46"
 
-    func checkVersion() {
         Alamofire.request(versionUrl).responseJSON { response in
+            var hasNewVersion = false
+            
+            defer {
+                // check local file
+                self.checkLocal(hasNewVersion:hasNewVersion)
+            }
+            
             //to get status code
             if let status = response.response?.statusCode {
                 if status != 200 {
@@ -33,6 +57,7 @@ class V2rayCore {
 
                 // get tag_name (verion)
                 guard let tag_name = JSON["tag_name"] else {
+                    print("err: no tag_name")
                     return
                 }
                 
@@ -49,43 +74,37 @@ class V2rayCore {
                     return
                 }
                 
-                let currentVersion = tag_name as! String
+                let newVersion = tag_name as! String
 
                 // get old versiion
-                if let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) {
-                    let oldVer = oldVersion.replacingOccurrences(of: "v", with: "").versionToInt()
-                    let curVer = currentVersion.replacingOccurrences(of: "v", with: "").versionToInt()
-                    // compare with [Int]
-                    if oldVer.lexicographicallyPrecedes(curVer) {
-                        print("new version",currentVersion,oldVersion)
-                        // store version
-                        UserDefaults.set(forKey: .v2rayCoreVersion, value: currentVersion)
-                        // download new version
-                        self.download();
-                    }
+                let oldVer = oldVersion.replacingOccurrences(of: "v", with: "").versionToInt()
+                let curVer = newVersion.replacingOccurrences(of: "v", with: "").versionToInt()
+
+                // compare with [Int]
+                if oldVer.lexicographicallyPrecedes(curVer) {
+                    // store this version
+                    UserDefaults.set(forKey: .v2rayCoreVersion, value: newVersion)
+                    // has new version
+                    hasNewVersion = true
+                    NSLog("has new version", newVersion)
                 }
                 
+                return
             }
         }
     }
   
     func download(){
-        guard let version = UserDefaults.get(forKey: .v2rayCoreVersion) else {
-            print("err get verion")
-            return
-        }
-        
+        let version = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.47"
         let url = releaseUrl.replacingOccurrences(of: "${version}", with: version)
-        
+        NSLog("start download", version)
+
         // check unzip sh file
         // path: /Application/V2rayU.app/Contents/Resources/unzip.sh
         guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
-            print("unzip shell file no found")
+            NSLog("unzip shell file no found")
             return
         }
-        
-        // path: /Application/V2rayU.app/Contents/Resources
-        let workPath = shFile.path.replacingOccurrences(of: "/unzip.sh", with: "")
         
         // download file: /Application/V2rayU.app/Contents/Resources/v2ray-macos.zip
         let fileUrl = URL.init(fileURLWithPath:  shFile.path.replacingOccurrences(of: "/unzip.sh", with: "/v2ray-macos.zip"))
@@ -96,7 +115,7 @@ class V2rayCore {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         Alamofire.download(url,to:destination)
             .downloadProgress (queue: utilityQueue){ progress in
-                print("已下载：\(progress.completedUnitCount/1024)KB")
+                NSLog("已下载：\(progress.completedUnitCount/1024)KB")
             }
             .responseData { response in
                 switch response.result {
@@ -108,9 +127,14 @@ class V2rayCore {
                 }
                 
                 if let data = response.result.value {
+                    // make unzip.sh execable
+                    // chmod 777 unzip.sh
+                    let execable = "cd "+AppResourcesPath+" && /bin/chmod 777 ./unzip.sh"
+                    _ = shell(launchPath:"/bin/bash",arguments:["-c",execable])
+                    
                     // unzip v2ray-core
                     // cmd: /bin/bash -c 'cd path && ./unzip.sh '
-                    let sh = "cd "+workPath+" && ./unzip.sh"
+                    let sh = "cd "+AppResourcesPath+" && ./unzip.sh"
                     // exec shell
                     let res = shell(launchPath:"/bin/bash", arguments: ["-c",sh])
                     print("res",data,res!)

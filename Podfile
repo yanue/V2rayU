@@ -10,5 +10,6 @@ target 'V2rayU' do
   # Pods for V2rayU
   pod 'Alamofire', '~> 4.7'
   pod 'SwiftyJSON', '~> 4.0'
-  
+  pod 'SwiftLog', '~> 1.0.0'
+
 end

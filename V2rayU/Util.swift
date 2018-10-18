@@ -13,6 +13,7 @@ extension UserDefaults {
     enum KEY: String {
         case v2rayCoreVersion
         case v2rayServerList
+        case v2rayCurrentServerName
     }
     
     static func set(forKey key: KEY, value: String) {
@@ -47,9 +48,8 @@ extension String {
     }
 }
 
-func getDocumentsDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    print("paths",paths)
+func getApplicationSupportDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
     return paths[0]
 }
 

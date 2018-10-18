@@ -3,8 +3,9 @@
 #  unzip.sh
 #  V2rayU
 #
-#  Created by yanue on 2018/10/17.
+#  Created by yanue on 2018/10/12.
 #  Copyright © 2018 yanue. All rights reserved.
+# set +x
 
 rm -rf ./v2ray-core
 unzip -o ./v2ray-macos.zip -d ./v2ray-core
