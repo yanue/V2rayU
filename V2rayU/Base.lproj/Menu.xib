@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
     </dependencies>
     <objects>
@@ -31,12 +32,6 @@
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Start at Login" state="on" id="W8C-IS-e0J">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="toggleStartAtLogin:" target="hcZ-V7-Dui" id="6Ud-Oq-hlt"/>
-                    </connections>
-                </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
                 <menuItem title="Config" id="GqB-HP-8ns">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -44,31 +39,36 @@
                         <action selector="openConfig:" target="hcZ-V7-Dui" id="2ur-ix-0ZF"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Logs" id="eLc-0G-7He">
+                <menuItem title="Server" id="cio-ej-HL5" userLabel="ServerItems">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Server" id="NCx-DY-Hm4"/>
+                </menuItem>
+                <menuItem title="Show Logs..." id="eLc-0G-7He">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openLogs:" target="hcZ-V7-Dui" id="bGW-eH-KTP"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="zsh-Mj-59b"/>
-                <menuItem title="Server" id="cio-ej-HL5" userLabel="ServerItems">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Server" id="NCx-DY-Hm4"/>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="Zgj-uB-kMv"/>
-                <menuItem title="Help" id="YoX-II-o27" userLabel="Help">
+                <menuItem isSeparatorItem="YES" id="6DA-yz-9jm"/>
+                <menuItem title="Generate QR code" id="eG7-US-3LU">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openHelp:" target="hcZ-V7-Dui" id="Bwq-Yj-2xm"/>
+                        <action selector="generateQRCode:" target="hcZ-V7-Dui" id="lfg-Eq-VHT"/>
                     </connections>
                 </menuItem>
-                <menuItem title="About" id="mkZ-vI-Lc2">
+                <menuItem title="Scan QR Code from Screen" id="eEW-X9-KYU">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openAbout:" target="hcZ-V7-Dui" id="Zo8-33-SZQ"/>
+                        <action selector="scanQRCode:" target="hcZ-V7-Dui" id="l4e-c8-gnv"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="JSk-ds-GrJ"/>
+                <menuItem isSeparatorItem="YES" id="BIh-xV-fA5"/>
+                <menuItem title="Preference..." id="YoX-II-o27" userLabel="Preference">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openPreference:" target="hcZ-V7-Dui" id="NV6-3j-EiH"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="28U-8z-8lS" userLabel="Quit">
                     <connections>
                         <action selector="quitClicked:" target="hcZ-V7-Dui" id="eyG-94-Avh"/>

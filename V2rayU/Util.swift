@@ -14,6 +14,16 @@ extension UserDefaults {
         case v2rayCoreVersion
         case v2rayServerList
         case v2rayCurrentServerName
+        case autoCheckVersion
+        case autoLaunch
+    }
+    
+    static func setBool(forKey key: KEY, value: Bool) {
+        UserDefaults.standard.set(value, forKey: key.rawValue)
+    }
+    
+    static func getBool(forKey key: KEY) -> Bool {
+        return UserDefaults.standard.bool(forKey: key.rawValue)
     }
     
     static func set(forKey key: KEY, value: String) {

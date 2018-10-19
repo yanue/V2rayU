@@ -15,14 +15,16 @@
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB392216CA9E800B6AE0D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* Config.swift */; };
-		664EB396216CB48400B6AE0D /* About.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB394216CB48400B6AE0D /* About.swift */; };
 		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
-		66ACB19D21757B59005B5881 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB395216CB48400B6AE0D /* About.xib */; };
 		66ACB1A021757D5B005B5881 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* Menu.swift */; };
+		66FEAD3B2179A5E0009DECF9 /* PreferenceAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD3A2179A5E0009DECF9 /* PreferenceAbout.swift */; };
+		66FEAD402179A912009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD3E2179A911009DECF9 /* PreferenceGeneral.xib */; };
+		66FEAD412179A912009DECF9 /* PreferenceAbout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */; };
+		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -54,8 +56,6 @@
 		664EB379216C9A5F00B6AE0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Menu.xib; sourceTree = "<group>"; };
 		664EB37B216C9A5F00B6AE0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		664EB390216CA9E800B6AE0D /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		664EB394216CB48400B6AE0D /* About.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = About.swift; sourceTree = "<group>"; };
-		664EB395216CB48400B6AE0D /* About.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = About.xib; sourceTree = "<group>"; };
 		6650AAAC21771E11000909D8 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
@@ -63,6 +63,10 @@
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
+		66FEAD3A2179A5E0009DECF9 /* PreferenceAbout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceAbout.swift; sourceTree = "<group>"; };
+		66FEAD3E2179A911009DECF9 /* PreferenceGeneral.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferenceGeneral.xib; sourceTree = "<group>"; };
+		66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferenceAbout.xib; sourceTree = "<group>"; };
+		66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,10 +133,12 @@
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
-				664EB394216CB48400B6AE0D /* About.swift */,
-				664EB395216CB48400B6AE0D /* About.xib */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				6650AAAC21771E11000909D8 /* unzip.sh */,
+				66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */,
+				66FEAD3E2179A911009DECF9 /* PreferenceGeneral.xib */,
+				66FEAD3A2179A5E0009DECF9 /* PreferenceAbout.swift */,
+				66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -253,9 +259,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66ACB19D21757B59005B5881 /* About.xib in Resources */,
 				6610ECB821742B18008FC401 /* Config.xib in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
+				66FEAD402179A912009DECF9 /* PreferenceGeneral.xib in Resources */,
+				66FEAD412179A912009DECF9 /* PreferenceAbout.xib in Resources */,
 				6610ECB721742AFD008FC401 /* Menu.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 			);
@@ -328,13 +335,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */,
-				664EB396216CB48400B6AE0D /* About.swift in Sources */,
 				6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */,
 				66ACB1A021757D5B005B5881 /* Menu.swift in Sources */,
 				66784AFC2170486D00AD307F /* Util.swift in Sources */,
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* Config.swift in Sources */,
+				66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
+				66FEAD3B2179A5E0009DECF9 /* PreferenceAbout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

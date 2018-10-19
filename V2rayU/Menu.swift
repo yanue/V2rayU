@@ -9,14 +9,38 @@
 import Foundation
 import Cocoa
 import ServiceManagement
+import Preferences
 
 // menu controller
 class MenuController:NSObject,NSMenuDelegate {
+    // when menu.xib loaded
+    override func awakeFromNib() {
+        // load server list
+        V2rayServer.loadConfig()
+        self.showServers()
+        statusMenu.delegate = self
+        
+        if let button = statusItem.button {
+            button.image = NSImage(named:NSImage.Name("TrayIcon"))
+        }
+        
+        statusItem.menu = statusMenu
+        configWindow = ConfigWindowController()
+    }
+    
+    let preferencesWindowController = PreferencesWindowController(
+        viewControllers: [
+            PreferenceGeneralViewController(),
+        ]
+    )
+    
     var configWindow: ConfigWindowController!
-    var aboutWindow: AboutWindow!
     
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var statusItemClicked: (() -> Void)?
+    
+    
+    
     // bar menu
     @IBOutlet weak var statusMenu: NSMenu!
     // server list items
@@ -25,19 +49,7 @@ class MenuController:NSObject,NSMenuDelegate {
     @IBAction func openLogs(_ sender: NSMenuItem) {
         V2rayU.OpenLogs()
     }
-    
-    @IBAction func toggleStartAtLogin(_ sender: NSMenuItem) {
-        if sender.state.rawValue == 1 {
-            sender.state = .off
-            // off
-            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
-        } else {
-            sender.state = .on
-            // on
-            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
-        }
-    }
-    
+
     @IBAction func start(_ sender: NSMenuItem) {
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not fould")
@@ -56,25 +68,19 @@ class MenuController:NSObject,NSMenuDelegate {
         NSApplication.shared.terminate(self)
     }
     
-    // when menu.xib loaded
-    override func awakeFromNib() {
-        // load server list
-        V2rayServer.loadConfig()
-        self.showServers()
-        statusMenu.delegate = self
-
-        if let button = statusItem.button {
-            button.image = NSImage(named:NSImage.Name("TrayIcon"))
-        }
-
-        statusItem.menu = statusMenu
-        configWindow = ConfigWindowController()
-        aboutWindow = AboutWindow()
+    @IBAction func generateQRCode(_ sender: NSMenuItem) {
+        print("GenerateQRCode")
     }
     
-    @IBAction func openHelp(_ sender: NSMenuItem) {
-        if let url = URL(string: "https://www.google.com"),NSWorkspace.shared.open(url) {
-        }
+    @IBAction func scanQRCode(_ sender: NSMenuItem) {
+        print("ScanQRCode")
+    }
+    
+    @IBAction func openPreference(_ sender: NSMenuItem) {
+        print("openPreference ")
+//        let app = NSApplication.shared.delegate as! AppDelegate
+
+        self.preferencesWindowController.showWindow()
     }
     
     // switch server
@@ -105,13 +111,6 @@ class MenuController:NSObject,NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
         // show dock icon
         NSApp.setActivationPolicy(.regular)
-    }
-    
-    // open about window
-    @IBAction func openAbout(_ sender: NSMenuItem) {
-        aboutWindow.showWindow (nil)
-        // bring to front
-        NSApp.activate(ignoringOtherApps: true)
     }
     
     func showServers() {

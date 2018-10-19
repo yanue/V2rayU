@@ -9,6 +9,7 @@
 import Cocoa
 import ServiceManagement
 import os.log
+
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 
 @NSApplicationMain
