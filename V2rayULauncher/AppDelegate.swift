@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  V2rayuHelper
+//  V2rayULauncher
 //
 //  Created by yanue on 2018/10/19.
 //  Copyright © 2018 yanue. All rights reserved.
@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class V2rayuHelperApplication: NSApplication {
+class V2rayULauncherApplication: NSApplication {
     let strongDelegate = AppDelegate()
     
     override init() {
@@ -37,7 +37,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         if !alreadyRunning {
-            DistributedNotificationCenter.default().addObserver(NSApp, selector: #selector(NSApplication.terminate(_:)), name: Notification.Name("terminateV2ray"), object: mainAppIdentifier)
+            DistributedNotificationCenter.default().addObserver(NSApp, selector: #selector(NSApplication.terminate(_:)), name: Notification.Name("terminateV2rayU"), object: mainAppIdentifier)
             
             let path = Bundle.main.bundlePath as NSString
             var components = path.pathComponents
@@ -61,4 +61,3 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     
 }
-

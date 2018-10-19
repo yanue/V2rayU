@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6604E43C21798F2A00E54AE1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6604E43B21798F2A00E54AE1 /* AppDelegate.swift */; };
+		6604E447217990CD00E54AE1 /* V2rayULauncher.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6604E43921798F2900E54AE1 /* V2rayULauncher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D0E59216E0158000C2922 /* V2rayServer.swift */; };
 		6610ECB721742AFD008FC401 /* Menu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* Menu.xib */; };
 		6610ECB821742B18008FC401 /* Config.xib in Resources */ = {isa = PBXBuildFile; fileRef = 660D0E5B216EFEFA000C2922 /* Config.xib */; };
@@ -19,8 +21,6 @@
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
-		66973EBF21797780001FEA1E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66973EBE21797780001FEA1E /* AppDelegate.swift */; };
-		66973ECB21797A7E001FEA1E /* V2rayuHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66973EBC2179777F001FEA1E /* V2rayuHelper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		66ACB19D21757B59005B5881 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB395216CB48400B6AE0D /* About.xib */; };
 		66ACB1A021757D5B005B5881 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* Menu.swift */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
@@ -33,7 +33,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
-				66973ECB21797A7E001FEA1E /* V2rayuHelper.app in CopyFiles */,
+				6604E447217990CD00E54AE1 /* V2rayULauncher.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +41,10 @@
 
 /* Begin PBXFileReference section */
 		0FE808B3F8A39DF1A10A6FFF /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
+		6604E43921798F2900E54AE1 /* V2rayULauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayULauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6604E43B21798F2A00E54AE1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		6604E44221798F2A00E54AE1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6604E44321798F2A00E54AE1 /* V2rayULauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayULauncher.entitlements; sourceTree = "<group>"; };
 		660D0E59216E0158000C2922 /* V2rayServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = V2rayServer.swift; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
 		660D0E5B216EFEFA000C2922 /* Config.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Config.xib; sourceTree = "<group>"; };
 		664B95DD217062A500DBC941 /* Alamofire */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Alamofire; path = Pods/Alamofire; sourceTree = "<group>"; };
@@ -57,16 +61,19 @@
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		66973EBC2179777F001FEA1E /* V2rayuHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayuHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		66973EBE21797780001FEA1E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		66973EC521797781001FEA1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		66973EC621797781001FEA1E /* V2rayuHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayuHelper.entitlements; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6604E43621798F2900E54AE1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		664EB36E216C9A5E00B6AE0D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -76,21 +83,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		66973EB92179777F001FEA1E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6604E43A21798F2A00E54AE1 /* V2rayULauncher */ = {
+			isa = PBXGroup;
+			children = (
+				6604E43B21798F2A00E54AE1 /* AppDelegate.swift */,
+				6604E44221798F2A00E54AE1 /* Info.plist */,
+				6604E44321798F2A00E54AE1 /* V2rayULauncher.entitlements */,
+			);
+			path = V2rayULauncher;
+			sourceTree = "<group>";
+		};
 		664EB368216C9A5E00B6AE0D = {
 			isa = PBXGroup;
 			children = (
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
-				66973EBD21797780001FEA1E /* V2rayuHelper */,
+				6604E43A21798F2A00E54AE1 /* V2rayULauncher */,
 				664EB372216C9A5E00B6AE0D /* Products */,
 				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
@@ -101,7 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB371216C9A5E00B6AE0D /* V2rayU.app */,
-				66973EBC2179777F001FEA1E /* V2rayuHelper.app */,
+				6604E43921798F2900E54AE1 /* V2rayULauncher.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -127,16 +137,6 @@
 			path = V2rayU;
 			sourceTree = "<group>";
 		};
-		66973EBD21797780001FEA1E /* V2rayuHelper */ = {
-			isa = PBXGroup;
-			children = (
-				66973EBE21797780001FEA1E /* AppDelegate.swift */,
-				66973EC521797781001FEA1E /* Info.plist */,
-				66973EC621797781001FEA1E /* V2rayuHelper.entitlements */,
-			);
-			path = V2rayuHelper;
-			sourceTree = "<group>";
-		};
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,6 +159,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6604E43821798F2900E54AE1 /* V2rayULauncher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6604E44421798F2B00E54AE1 /* Build configuration list for PBXNativeTarget "V2rayULauncher" */;
+			buildPhases = (
+				6604E43521798F2900E54AE1 /* Sources */,
+				6604E43621798F2900E54AE1 /* Frameworks */,
+				6604E43721798F2900E54AE1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = V2rayULauncher;
+			productName = V2rayULauncher;
+			productReference = 6604E43921798F2900E54AE1 /* V2rayULauncher.app */;
+			productType = "com.apple.product-type.application";
+		};
 		664EB370216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 664EB37F216C9A5F00B6AE0D /* Build configuration list for PBXNativeTarget "V2rayU" */;
@@ -179,23 +196,6 @@
 			productReference = 664EB371216C9A5E00B6AE0D /* V2rayU.app */;
 			productType = "com.apple.product-type.application";
 		};
-		66973EBB2179777F001FEA1E /* V2rayuHelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 66973EC721797781001FEA1E /* Build configuration list for PBXNativeTarget "V2rayuHelper" */;
-			buildPhases = (
-				66973EB82179777F001FEA1E /* Sources */,
-				66973EB92179777F001FEA1E /* Frameworks */,
-				66973EBA2179777F001FEA1E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = V2rayuHelper;
-			productName = V2rayuHelper;
-			productReference = 66973EBC2179777F001FEA1E /* V2rayuHelper.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -206,6 +206,9 @@
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = yanue;
 				TargetAttributes = {
+					6604E43821798F2900E54AE1 = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					664EB370216C9A5E00B6AE0D = {
 						CreatedOnToolsVersion = 10.0;
 						SystemCapabilities = {
@@ -216,9 +219,6 @@
 								enabled = 0;
 							};
 						};
-					};
-					66973EBB2179777F001FEA1E = {
-						CreatedOnToolsVersion = 10.0;
 					};
 				};
 			};
@@ -236,12 +236,19 @@
 			projectRoot = "";
 			targets = (
 				664EB370216C9A5E00B6AE0D /* V2rayU */,
-				66973EBB2179777F001FEA1E /* V2rayuHelper */,
+				6604E43821798F2900E54AE1 /* V2rayULauncher */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6604E43721798F2900E54AE1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		664EB36F216C9A5E00B6AE0D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -251,13 +258,6 @@
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* Menu.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		66973EBA2179777F001FEA1E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +315,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6604E43521798F2900E54AE1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6604E43C21798F2A00E54AE1 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		664EB36D216C9A5E00B6AE0D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -327,14 +335,6 @@
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* Config.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		66973EB82179777F001FEA1E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				66973EBF21797780001FEA1E /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +352,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		6604E44521798F2B00E54AE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = V2rayULauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		6604E44621798F2B00E54AE1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = V2rayULauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
 		664EB37D216C9A5F00B6AE0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -517,51 +561,18 @@
 			};
 			name = Release;
 		};
-		66973EC821797781001FEA1E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = V2rayuHelper/V2rayuHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				INFOPLIST_FILE = V2rayuHelper/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayuHelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		66973EC921797781001FEA1E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = V2rayuHelper/V2rayuHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				INFOPLIST_FILE = V2rayuHelper/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayuHelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6604E44421798F2B00E54AE1 /* Build configuration list for PBXNativeTarget "V2rayULauncher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6604E44521798F2B00E54AE1 /* Debug */,
+				6604E44621798F2B00E54AE1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		664EB36C216C9A5E00B6AE0D /* Build configuration list for PBXProject "V2rayU" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -576,15 +587,6 @@
 			buildConfigurations = (
 				664EB380216C9A5F00B6AE0D /* Debug */,
 				664EB381216C9A5F00B6AE0D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		66973EC721797781001FEA1E /* Build configuration list for PBXNativeTarget "V2rayuHelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				66973EC821797781001FEA1E /* Debug */,
-				66973EC921797781001FEA1E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

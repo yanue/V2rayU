@@ -9,7 +9,7 @@
 import Cocoa
 import ServiceManagement
 import os.log
-let launcherAppIdentifier = "net.yanue.v2rayu.v2rayuHelper"
+let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("startedAtLogin",startedAtLogin)
         os_log("startedAtLogin", startedAtLogin)
         if startedAtLogin {
-            DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2ray"), object: Bundle.main.bundleIdentifier!)
+            DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
         }
         
         // 定义NSUserNotification

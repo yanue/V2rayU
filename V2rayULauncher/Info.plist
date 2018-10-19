@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>net.yanue.v2rayu.v2rayuHelper</string>
+	<string>net.yanue.V2rayU.Launcher</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -27,6 +27,6 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSPrincipalClass</key>
-	<string>V2rayuHelper.V2rayuHelperApplication</string>
+	<string>V2rayULauncher.V2rayULauncherApplication</string>
 </dict>
 </plist>
