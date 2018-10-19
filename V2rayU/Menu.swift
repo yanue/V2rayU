@@ -27,18 +27,17 @@ class MenuController:NSObject,NSMenuDelegate {
     }
     
     @IBAction func toggleStartAtLogin(_ sender: NSMenuItem) {
-        print("toggle",sender.state)
-
-//        if sender.state.rawValue == 1 {
-//            sender.state = .off
-//            // off
-//            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
-//        } else {
-//            sender.state = .on
-//            // on
-//            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
-//        }
+        if sender.state.rawValue == 1 {
+            sender.state = .off
+            // off
+            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, false)
+        } else {
+            sender.state = .on
+            // on
+            SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
+        }
     }
+    
     @IBAction func start(_ sender: NSMenuItem) {
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not fould")

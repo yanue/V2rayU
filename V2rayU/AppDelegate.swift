@@ -9,7 +9,7 @@
 import Cocoa
 import ServiceManagement
 import os.log
-import LaunchAtLogin
+let launcherAppIdentifier = "net.yanue.v2rayu.v2rayuHelper"
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -19,15 +19,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
         os_log("v2rayu init.")
+//        showAccessibilityDeniedAlert()
 
-        print(LaunchAtLogin.isEnabled)
-        //=> false
+        let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
+            $0.bundleIdentifier == launcherAppIdentifier
+        }
         
-        LaunchAtLogin.isEnabled = true
+        print("startedAtLogin",startedAtLogin)
+        os_log("startedAtLogin", startedAtLogin)
+        if startedAtLogin {
+            DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2ray"), object: Bundle.main.bundleIdentifier!)
+        }
         
-        print(LaunchAtLogin.isEnabled)
-        //=> true
-    
         // 定义NSUserNotification
         let userNotification = NSUserNotification()
         userNotification.title = "消息Title"
@@ -48,6 +51,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //        StartV2rayCore()
     }
   
+    func showAccessibilityDeniedAlert() {
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        
+        let alert: NSAlert = NSAlert()
+        alert.messageText = NSLocalizedString("alert.accessibility_disabled_message", comment: "Accessibility permissions for Shifty have been disabled")
+        alert.informativeText = NSLocalizedString("alert.accessibility_disabled_informative", comment: "Accessibility must be allowed to enable website shifting. Grant access to Shifty in Security & Privacy preferences, located in System Preferences.")
+        alert.alertStyle = NSAlert.Style.warning
+        alert.addButton(withTitle: NSLocalizedString("alert.open_preferences", comment: "Open System Preferences"))
+        alert.addButton(withTitle: NSLocalizedString("alert.not_now", comment: "Not now"))
+        if alert.runModal() == .alertFirstButtonReturn {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+            NSLog("Open System Preferences button clicked")
+        } else {
+            NSLog("Not now button clicked")
+        }
+    }
+    
     
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application

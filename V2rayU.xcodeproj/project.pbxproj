@@ -18,10 +18,26 @@
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
+		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
+		66973EBF21797780001FEA1E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66973EBE21797780001FEA1E /* AppDelegate.swift */; };
+		66973ECB21797A7E001FEA1E /* V2rayuHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66973EBC2179777F001FEA1E /* V2rayuHelper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		66ACB19D21757B59005B5881 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB395216CB48400B6AE0D /* About.xib */; };
 		66ACB1A021757D5B005B5881 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* Menu.swift */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		66973ECA21797A6B001FEA1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				66973ECB21797A7E001FEA1E /* V2rayuHelper.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0FE808B3F8A39DF1A10A6FFF /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
@@ -33,7 +49,6 @@
 		664EB376216C9A5F00B6AE0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		664EB379216C9A5F00B6AE0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Menu.xib; sourceTree = "<group>"; };
 		664EB37B216C9A5F00B6AE0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		664EB37C216C9A5F00B6AE0D /* V2rayU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayU.entitlements; sourceTree = "<group>"; };
 		664EB390216CA9E800B6AE0D /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		664EB394216CB48400B6AE0D /* About.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = About.swift; sourceTree = "<group>"; };
 		664EB395216CB48400B6AE0D /* About.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = About.xib; sourceTree = "<group>"; };
@@ -41,6 +56,11 @@
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
+		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		66973EBC2179777F001FEA1E /* V2rayuHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayuHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66973EBE21797780001FEA1E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		66973EC521797781001FEA1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66973EC621797781001FEA1E /* V2rayuHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayuHelper.entitlements; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
@@ -51,7 +71,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */,
 				F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66973EB92179777F001FEA1E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
+				66973EBD21797780001FEA1E /* V2rayuHelper */,
 				664EB372216C9A5E00B6AE0D /* Products */,
 				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
@@ -72,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				664EB371216C9A5E00B6AE0D /* V2rayU.app */,
+				66973EBC2179777F001FEA1E /* V2rayuHelper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,7 +119,6 @@
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
-				664EB37C216C9A5F00B6AE0D /* V2rayU.entitlements */,
 				664EB394216CB48400B6AE0D /* About.swift */,
 				664EB395216CB48400B6AE0D /* About.xib */,
 				66784AFB2170486D00AD307F /* Util.swift */,
@@ -98,9 +127,20 @@
 			path = V2rayU;
 			sourceTree = "<group>";
 		};
+		66973EBD21797780001FEA1E /* V2rayuHelper */ = {
+			isa = PBXGroup;
+			children = (
+				66973EBE21797780001FEA1E /* AppDelegate.swift */,
+				66973EC521797781001FEA1E /* Info.plist */,
+				66973EC621797781001FEA1E /* V2rayuHelper.entitlements */,
+			);
+			path = V2rayuHelper;
+			sourceTree = "<group>";
+		};
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				66973EB621797719001FEA1E /* ServiceManagement.framework */,
 				66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */,
 				664B95DD217062A500DBC941 /* Alamofire */,
 			);
@@ -128,7 +168,7 @@
 				664EB36E216C9A5E00B6AE0D /* Frameworks */,
 				664EB36F216C9A5E00B6AE0D /* Resources */,
 				83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */,
-				6606F1A82178B42000C077BF /* ShellScript */,
+				66973ECA21797A6B001FEA1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -137,6 +177,23 @@
 			name = V2rayU;
 			productName = V2rayU;
 			productReference = 664EB371216C9A5E00B6AE0D /* V2rayU.app */;
+			productType = "com.apple.product-type.application";
+		};
+		66973EBB2179777F001FEA1E /* V2rayuHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66973EC721797781001FEA1E /* Build configuration list for PBXNativeTarget "V2rayuHelper" */;
+			buildPhases = (
+				66973EB82179777F001FEA1E /* Sources */,
+				66973EB92179777F001FEA1E /* Frameworks */,
+				66973EBA2179777F001FEA1E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = V2rayuHelper;
+			productName = V2rayuHelper;
+			productReference = 66973EBC2179777F001FEA1E /* V2rayuHelper.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -152,10 +209,16 @@
 					664EB370216C9A5E00B6AE0D = {
 						CreatedOnToolsVersion = 10.0;
 						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 0;
+							};
 							com.apple.Sandbox = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
+					};
+					66973EBB2179777F001FEA1E = {
+						CreatedOnToolsVersion = 10.0;
 					};
 				};
 			};
@@ -173,6 +236,7 @@
 			projectRoot = "";
 			targets = (
 				664EB370216C9A5E00B6AE0D /* V2rayU */,
+				66973EBB2179777F001FEA1E /* V2rayuHelper */,
 			);
 		};
 /* End PBXProject section */
@@ -190,26 +254,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		6606F1A82178B42000C077BF /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
+		66973EBA2179777F001FEA1E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "./Pods/LaunchAtLogin/LaunchAtLogin/copy-helper.sh";
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
 		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
 		83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -220,7 +274,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/LaunchAtLogin/LaunchAtLogin.framework",
+				"${BUILT_PRODUCTS_DIR}/Preferences/Preferences.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -228,7 +282,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LaunchAtLogin.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Preferences.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -276,6 +330,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		66973EB82179777F001FEA1E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66973EBF21797780001FEA1E /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
@@ -294,6 +356,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -341,12 +404,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -356,6 +419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -397,11 +461,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -412,7 +476,6 @@
 			baseConfigurationReference = BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = V2rayU/V2rayU.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -423,7 +486,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = yanue.V2rayU;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
@@ -436,7 +499,6 @@
 			baseConfigurationReference = 0FE808B3F8A39DF1A10A6FFF /* Pods-V2rayU.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = V2rayU/V2rayU.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -447,10 +509,52 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = yanue.V2rayU;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		66973EC821797781001FEA1E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = V2rayuHelper/V2rayuHelper.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = V2rayuHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayuHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		66973EC921797781001FEA1E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = V2rayuHelper/V2rayuHelper.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				INFOPLIST_FILE = V2rayuHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayuHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
@@ -472,6 +576,15 @@
 			buildConfigurations = (
 				664EB380216C9A5F00B6AE0D /* Debug */,
 				664EB381216C9A5F00B6AE0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66973EC721797781001FEA1E /* Build configuration list for PBXNativeTarget "V2rayuHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66973EC821797781001FEA1E /* Debug */,
+				66973EC921797781001FEA1E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
