@@ -24,7 +24,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            ShiftyUpdater.checkForUpdates(self)
+            os_log("check version")
+            ShiftyUpdater.checkForUpdatesInBackground()
         }
         
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {

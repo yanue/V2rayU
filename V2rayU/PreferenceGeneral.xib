@@ -13,7 +13,6 @@
                 <outlet property="VersionLabel" destination="GfP-Xl-Rdf" id="tPf-dh-zDO"/>
                 <outlet property="autoCheckVersion" destination="m2S-Mu-rFM" id="GQD-EA-vJj"/>
                 <outlet property="autoLaunch" destination="NZE-cI-j04" id="ktV-ps-tl4"/>
-                <outlet property="autoLaunchBtn" destination="NZE-cI-j04" id="12d-BM-b48"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
         </customObject>

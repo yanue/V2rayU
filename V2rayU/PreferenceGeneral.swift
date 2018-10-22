@@ -18,9 +18,7 @@ final class PreferenceGeneralViewController: NSViewController, Preferenceable {
     let toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
     
     @IBOutlet weak var CopyrightLabel: NSTextField!
-   
     @IBOutlet weak var VersionLabel: NSTextField!
-    
     @IBOutlet weak var V2rayCoreVersion: NSTextField!
     
     override var nibName: NSNib.Name? {
@@ -49,31 +47,23 @@ final class PreferenceGeneralViewController: NSViewController, Preferenceable {
         if autoCheckVersionState {
             autoCheckVersion.state = .on
         }
-        
-        // Setup stuff here
     }
     
     @IBAction func SetAutoLogin(_ sender: NSButtonCell) {
-        print("SetAutoLogin")
-
         SMLoginItemSetEnabled(launcherAppIdentifier as CFString, sender.state == .on)
         UserDefaults.setBool(forKey: .autoLaunch, value: sender.state == .on)
     }
     
     @IBAction func SetAutoCheckVersion(_ sender: NSButtonCell) {
-        print("SetAutoCheckVersion")
         UserDefaults.setBool(forKey: .autoCheckVersion, value: sender.state == .on)
     }
     
     @IBAction func goWebsite(_ sender: NSButton) {
-        print("goWebsite")
         guard let url = URL(string: "https://yanue.github.io/V2rayU/") else { return }
         NSWorkspace.shared.open(url)
     }
     
     @IBAction func goV2ray(_ sender: NSButton) {
-        print("goV2ray")
-
         guard let url = URL(string: "https://github.com/v2ray/v2ray-core") else { return }
         NSWorkspace.shared.open(url)
     }
