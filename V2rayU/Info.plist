@@ -32,5 +32,7 @@
 	<string>Menu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/yanue/V2rayU/master/appcast.xml</string>
 </dict>
 </plist>

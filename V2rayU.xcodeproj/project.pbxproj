@@ -25,6 +25,8 @@
 		66FEAD402179A912009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD3E2179A911009DECF9 /* PreferenceGeneral.xib */; };
 		66FEAD412179A912009DECF9 /* PreferenceAbout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
+		66FEAD48217D7852009DECF9 /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD47217D7852009DECF9 /* appcast.xml */; };
+		66FEAD4A217D7874009DECF9 /* appcast.inc in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD49217D7874009DECF9 /* appcast.inc */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +69,10 @@
 		66FEAD3E2179A911009DECF9 /* PreferenceGeneral.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferenceGeneral.xib; sourceTree = "<group>"; };
 		66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferenceAbout.xib; sourceTree = "<group>"; };
 		66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
+		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
+		66FEAD46217D7612009DECF9 /* bump.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = bump.sh; sourceTree = "<group>"; };
+		66FEAD47217D7852009DECF9 /* appcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
+		66FEAD49217D7874009DECF9 /* appcast.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = appcast.inc; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +109,7 @@
 		664EB368216C9A5E00B6AE0D = {
 			isa = PBXGroup;
 			children = (
+				66FEAD44217D75D7009DECF9 /* Build */,
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
 				6604E43A21798F2A00E54AE1 /* V2rayULauncher */,
 				664EB372216C9A5E00B6AE0D /* Products */,
@@ -141,6 +148,17 @@
 				66FEAD3F2179A911009DECF9 /* PreferenceAbout.xib */,
 			);
 			path = V2rayU;
+			sourceTree = "<group>";
+		};
+		66FEAD44217D75D7009DECF9 /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				66FEAD45217D75FC009DECF9 /* release.sh */,
+				66FEAD46217D7612009DECF9 /* bump.sh */,
+				66FEAD47217D7852009DECF9 /* appcast.xml */,
+				66FEAD49217D7874009DECF9 /* appcast.inc */,
+			);
+			path = Build;
 			sourceTree = "<group>";
 		};
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
@@ -260,6 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6610ECB821742B18008FC401 /* Config.xib in Resources */,
+				66FEAD48217D7852009DECF9 /* appcast.xml in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				66FEAD402179A912009DECF9 /* PreferenceGeneral.xib in Resources */,
 				66FEAD412179A912009DECF9 /* PreferenceAbout.xib in Resources */,
@@ -282,6 +301,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Preferences/Preferences.framework",
+				"${PODS_ROOT}/Sparkle/Sparkle.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -290,6 +310,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Preferences.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -341,6 +362,7 @@
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* Config.swift in Sources */,
 				66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */,
+				66FEAD4A217D7874009DECF9 /* appcast.inc in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
 				66FEAD3B2179A5E0009DECF9 /* PreferenceAbout.swift in Sources */,
 			);

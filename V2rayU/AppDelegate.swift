@@ -22,6 +22,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         os_log("v2rayu init.")
 //        showAccessibilityDeniedAlert()
 
+        // auto check updates
+        if UserDefaults.getBool(forKey: .autoCheckVersion) {
+            ShiftyUpdater.checkForUpdates(self)
+        }
+        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == launcherAppIdentifier
         }

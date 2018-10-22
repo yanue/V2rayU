@@ -8,8 +8,9 @@ target 'V2rayU' do
   use_frameworks!
 
   # Pods for V2rayU
-  pod 'Alamofire', '~> 4.7'
-  pod 'SwiftyJSON', '~> 4.0'
+  pod 'Alamofire'
+  pod 'SwiftyJSON'
   pod 'Preferences'
-
+  pod 'Sparkle'
+  
 end
