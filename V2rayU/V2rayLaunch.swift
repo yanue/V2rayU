@@ -17,39 +17,63 @@ let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCoreFile = "v2ray-core/v2ray"
 let v2rayCoreFullPath = AppResourcesPath + "/" + v2rayCoreFile
 
-func StartV2rayCore() {
-    // cmd: /bin/launchctl load -wF /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
-    let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load" ,"-wF",launchAgentPlistFile])
-    task.waitUntilExit()
-    if task.terminationStatus == 0 {
-        NSLog("Start v2ray-core succeeded.")
-    } else {
-        NSLog("Start v2ray-core failed.")
-    }
-}
-
-func StopV2rayCore() {
-    // cmd: /bin/launchctl unload /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
-    let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload" ,launchAgentPlistFile])
-    task.waitUntilExit()
-    if task.terminationStatus == 0 {
-        NSLog("Stop v2ray-core succeeded.")
-    } else {
-        NSLog("Stop v2ray-core failed.")
-    }
-}
-
-func OpenLogs(){
-    if !FileManager.default.fileExists(atPath: logFilePath) {
-        let txt = ""
-        try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+class V2rayLaunch: NSObject {
+    static func generateLauchAgentPlist() {
+        // Ensure launch agent directory is existed.
+        let fileMgr = FileManager.default
+        if !fileMgr.fileExists(atPath: launchAgentDirPath) {
+            try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
+        }
+        
+        let arguments = [v2rayCoreFile, "-config", "config.json"]
+        
+        let dict: NSMutableDictionary = [
+            "Label": LAUNCH_AGENT_PLIST.replacingOccurrences(of: ".plist", with: ""),
+            "WorkingDirectory": AppResourcesPath,
+            "StandardOutPath": logFilePath,
+            "StandardErrorPath": logFilePath,
+            "ProgramArguments": arguments,
+            "KeepAlive":true,
+            "RunAtLoad":true,
+            ]
+        
+        dict.write(toFile: launchAgentPlistFile, atomically: true)
     }
     
-    let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
-    task.waitUntilExit()
-    if task.terminationStatus == 0 {
-        NSLog("open logs succeeded.")
-    } else {
-        NSLog("open logs failed.")
+    static func Start() {
+        // cmd: /bin/launchctl load -wF /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load" ,"-wF",launchAgentPlistFile])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("Start v2ray-core succeeded.")
+        } else {
+            NSLog("Start v2ray-core failed.")
+        }
+    }
+    
+    static func Stop() {
+        // cmd: /bin/launchctl unload /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload" ,launchAgentPlistFile])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("Stop v2ray-core succeeded.")
+        } else {
+            NSLog("Stop v2ray-core failed.")
+        }
+    }
+
+    static func OpenLogs(){
+        if !FileManager.default.fileExists(atPath: logFilePath) {
+            let txt = ""
+            try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+        }
+        
+        let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("open logs succeeded.")
+        } else {
+            NSLog("open logs failed.")
+        }
     }
 }

@@ -29,10 +29,6 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         
         self.tableView.action = #selector(onItemClicked)
         self.tableView.doubleAction = #selector(onDoubleClicked)
-        
-        
-        self.configText.copy(<#T##sender: Any?##Any?#>)
-
     }
 
     @IBOutlet weak var configText: NSTextView!

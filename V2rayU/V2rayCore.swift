@@ -33,7 +33,7 @@ class V2rayCore {
     
     func check() {
         // 当前版本检测
-        let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.46"
+        let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.47"
 
         Alamofire.request(versionUrl).responseJSON { response in
             var hasNewVersion = false

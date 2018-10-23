@@ -20,10 +20,12 @@ class MenuController:NSObject,NSMenuDelegate {
         self.showServers()
         statusMenu.delegate = self
         
-        if let button = statusItem.button {
-            button.image = NSImage(named:NSImage.Name("TrayIcon"))
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            self.setStatusOn()
+        } else{
+            self.setStatusOff()
         }
-        
+    
         statusItem.menu = statusMenu
         configWindow = ConfigWindowController()
     }
@@ -33,8 +35,6 @@ class MenuController:NSObject,NSMenuDelegate {
             PreferenceGeneralViewController(),
         ]
     )
-    
-    var v2rayStatus = false
     
     var configWindow: ConfigWindowController!
     
@@ -50,20 +50,38 @@ class MenuController:NSObject,NSMenuDelegate {
     @IBOutlet weak var serverItems: NSMenuItem!
     
     @IBAction func openLogs(_ sender: NSMenuItem) {
-        V2rayU.OpenLogs()
+        V2rayLaunch.OpenLogs()
     }
 
+    func setStatusOff() {
+        v2rayStatusItem.title = "V2ray-Core: Off"
+        toggleV2rayItem.title = "Turn V2ray-Core On"
+        
+        if let button = statusItem.button {
+            button.image = NSImage(named:NSImage.Name("IconOff"))
+        }
+    }
+    
+    func setStatusOn() {
+        v2rayStatusItem.title = "V2ray-Core: Off"
+        toggleV2rayItem.title = "Turn V2ray-Core On"
+        
+        if let button = statusItem.button {
+            button.image = NSImage(named:NSImage.Name("IconOn"))
+        }
+    }
+    
     @IBAction func start(_ sender: NSMenuItem) {
         // turn off
-        if v2rayStatus {
-            v2rayStatusItem.title = "V2ray-Core: Off"
-            toggleV2rayItem.title = "Turn V2ray-Core On"
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            // set off
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
+            
+            // set status
+            self.setStatusOff()
+            
             return
         }
-        
-        // turn on
-        v2rayStatusItem.title = "V2ray-Core: On"
-        toggleV2rayItem.title = "Turn V2ray-Core Off"
         
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not fould")
@@ -75,9 +93,14 @@ class MenuController:NSObject,NSMenuDelegate {
             return
         }
         
-        StartV2rayCore()
-        // has turned on
-        v2rayStatus = true
+        // set on
+        UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+        
+        // set status
+        setStatusOn()
+        
+        // launch
+        V2rayLaunch.Start()
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {

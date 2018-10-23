@@ -14,6 +14,7 @@ extension UserDefaults {
         case v2rayCoreVersion
         case v2rayServerList
         case v2rayCurrentServerName
+        case v2rayTurnOn
         case autoCheckVersion
         case autoLaunch
     }

@@ -28,10 +28,10 @@
         </customObject>
         <menu title="load" id="9n3-TW-9ur" userLabel="stateMenu">
             <items>
-                <menuItem title="V2ray-Core: Off" enabled="NO" id="P34-uO-Vwf">
+                <menuItem title="V2ray-Core: On" enabled="NO" id="P34-uO-Vwf">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="Turn v2ray-core On" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
+                <menuItem title="Turn v2ray-core Off" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
