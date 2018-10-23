@@ -62,6 +62,22 @@ class V2rayServer: NSObject {
        return self.tableViewData.count
     }
     
+    // move item to new index
+    static func move(oldIndex:Int, newIndex:Int) {
+        if !V2rayServer.tableViewData.indices.contains(oldIndex) {
+            print("index out of range",oldIndex)
+            return
+        }
+        if !V2rayServer.tableViewData.indices.contains(newIndex) {
+            print("index out of range",newIndex)
+            return
+        }
+        
+        let o = self.tableViewData[oldIndex]
+        self.tableViewData.remove(at: oldIndex)
+        self.tableViewData.insert(o, at: newIndex)
+    }
+    
     // add v2ray server (tmp)
     static func add() {
         if self.tableViewData.count > 20 {

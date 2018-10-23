@@ -15,24 +15,30 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
     }
-    
+    let tableViewDragType: String = "ss.server.profile.data"
+
     // menu controller
     let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     
     override func windowDidLoad() {
         super.windowDidLoad()
 //        self.window?.delegate = self
+
+        self.serversTableView.delegate = self
+        self.serversTableView.dataSource = self
+        self.serversTableView.reloadData()
         
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.reloadData()
-        
-        self.tableView.action = #selector(onItemClicked)
-        self.tableView.doubleAction = #selector(onDoubleClicked)
+        self.serversTableView.action = #selector(onItemClicked)
+        self.serversTableView.doubleAction = #selector(onDoubleClicked)
     }
 
+    override func awakeFromNib() {
+        serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
+        serversTableView.allowsMultipleSelection = true
+    }
+    
     @IBOutlet weak var configText: NSTextView!
-    @IBOutlet weak var tableView: NSTableView!
+    @IBOutlet weak var serversTableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -46,22 +52,22 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             _ = V2rayServer.add()
 
             // reload data
-            self.tableView.reloadData()
+            self.serversTableView.reloadData()
             // selected current row
-            self.tableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
+            self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
             
             break
 
                 // delete server config
         case 1:
             // get seleted index
-            let idx = self.tableView.selectedRow
+            let idx = self.serversTableView.selectedRow
 
             // remove
             V2rayServer.remove(idx: idx)
 
             // reload
-            self.tableView.reloadData()
+            self.serversTableView.reloadData()
 
             // selected prev row
             let cnt: Int = V2rayServer.count()
@@ -72,7 +78,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             if rowIndex >= 0 {
                 self.loadJsonFile(rowIndex: rowIndex)
             } else {
-                self.tableView.becomeFirstResponder()
+                self.serversTableView.becomeFirstResponder()
             }
 
             // refresh menu
@@ -109,7 +115,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         let text = self.configText.string
 
         // save
-        V2rayServer.save(jsonData: text, idx: self.tableView.selectedRow)
+        V2rayServer.save(jsonData: text, idx: self.serversTableView.selectedRow)
         
         print("save ok fater")
         // refresh menu
@@ -124,11 +130,11 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     }
 
     @objc private func onDoubleClicked() {
-        print("onDoubleClicked row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
+        print("onDoubleClicked row \(serversTableView.clickedRow), col \(serversTableView.clickedColumn) clicked")
     }
 
     @objc private func onItemClicked() {
-        print("row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
+        print("row \(serversTableView.clickedRow), col \(serversTableView.clickedColumn) clicked")
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -172,140 +178,81 @@ extension ConfigWindowController: NSTableViewDataSource {
 // NSTableViewDelegate
 extension ConfigWindowController: NSTableViewDelegate {
    
+    // Drag & Drop reorder rows
     
-    func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView?{
-        return nil
+    func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+        let item = NSPasteboardItem()
+        item.setString(String(row), forType: NSPasteboard.PasteboardType(rawValue: tableViewDragType))
+        return item
     }
     
+    func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int
+        , proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+        if dropOperation == .above {
+            return .move
+        }
+        return NSDragOperation()
+    }
     
-    func tableView(_ tableView: NSTableView, didAdd rowView: NSTableRowView, forRow row: Int){
+    func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
+        var oldIndexes = [Int]()
+        info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:], using: {
+            (draggingItem: NSDraggingItem, idx: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+            if let str = (draggingItem.item as! NSPasteboardItem).string(forType: NSPasteboard.PasteboardType(rawValue: self.tableViewDragType)), let index = Int(str) {
+                oldIndexes.append(index)
+            }
+        })
+
+        var oldIndexOffset = 0
+        var newIndexOffset = 0
+        var oldIndexLast = 0
+        var newIndexLast = 0
+
+        // For simplicity, the code below uses `tableView.moveRowAtIndex` to move rows around directly.
+        // You may want to move rows in your content array and then call `tableView.reloadData()` instead.
+        for oldIndex in oldIndexes {
+            if oldIndex < row {
+                oldIndexLast = oldIndex + oldIndexOffset
+                newIndexLast = row - 1
+                oldIndexOffset -= 1
+            
+            } else {
+                oldIndexLast = oldIndex
+                newIndexLast = row + newIndexOffset
+                newIndexOffset += 1
+            }
+        }
         
+        // remove
+        V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
+        self.serversTableView.reloadData()
+
+        return true
+
+    }
+    //--------------------------------------------------
+    // For NSTableViewDelegate
+    
+    func tableView(_ tableView: NSTableView
+        , shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool {
+        return false
     }
     
-    
-    func tableView(_ tableView: NSTableView, didRemove rowView: NSTableRowView, forRow row: Int){
+    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+        if row < 0 {
+//            editingProfile = nil
+            return true
+        }
+//        if editingProfile != nil {
+//            if !editingProfile.isValid() {
+//                return false
+//            }
+//        }
         
-    }
-    
-    
-//    func tableView(_ tableView: NSTableView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet{
-//
-//    }
-    
-    func tableView(_ tableView: NSTableView, shouldSelect tableColumn: NSTableColumn?) -> Bool{
         return true
     }
     
-    func tableView(_ tableView: NSTableView, mouseDownInHeaderOf tableColumn: NSTableColumn){
-        print("mouseDownInHeaderOf")
-    }
-    
-    func tableView(_ tableView: NSTableView, didClick tableColumn: NSTableColumn){
-        print("didClick")
-    }
-//    
-//    func tableViewSelectionDidChange(_ notification: Notification){
-//        if self.tableView.selectedRow < 0 {
-//            return
-//        }
-//        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
-//
-//        print("tableViewSelectionDidChange",self.tableView.selectedRow, notification)
-//    }
-//
-//
-    
-//    func tableView(_ tableView: NSTableView, didClick tableColumn: NSTableColumn){
-//        print("didClick")
-//    }
-//
-//    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-//        return true
-//    }
-//
-//    func tableView(_ tableView: NSTableView, shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool{
-//        print("shouldEdit")
-//        return true
-//    }
-//
-//    //当添加行时调用的回调
-//    func tableView(_ tableView: NSTableView, didAdd rowView: NSTableRowView, forRow row: Int) {
-//        print("addRow")
-//    }
-//    //当移除行时调用的回调
-//    func tableView(_ tableView: NSTableView, didRemove rowView: NSTableRowView, forRow row: Int) {
-//        print("removeRow")
-//    }
-//
-//    func tableView(_ tableView: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int){
-//        print("edit")
-//    }
-
-//    func selectionShouldChange(in tableView: NSTableView) -> Bool {
-//        // focus
-////        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
-//        // can select
-//        return true
-//    }
-    
-//    func tableViewSelectionDidChange(_ notification: Notification) {
-////        print("changed")
-//        //        updateStatus()
-//    }
-}
-
-class ConfigView: NSView {
-    @IBAction func closeButtonClicked(_ sender: Any) {
-        print("closeButtonClicked")
-        window?.close()
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        print("tableViewSelectionDidChange")
     }
 }
-
-class ConfigViewController: NSViewController {
-    var observer: NSObjectProtocol!
-    
-    @IBOutlet weak var accessibilitySetupView: NSView!
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        print("viewWillAppear")
-
-        
-    }
-    
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        print("viewDidAppear")
-
-        observer = DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("com.apple.accessibility.api"), object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-            })
-        }
-    }
-    
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-        print("viewWillDisappear")
-
-        DistributedNotificationCenter.default().removeObserver(observer, name: NSNotification.Name("com.apple.accessibility.api"), object: nil)
-    }
-    
-    func showNextView() {
-        performSegue(withIdentifier: "showCompleteView", sender: self)
-    }
-}
-
-
-
-class ConfigWindow: NSWindow {
-    override func keyDown(with event: NSEvent) {
-        super.keyDown(with: event)
-        print("keyDown")
-        if event.keyCode == 13 && event.modifierFlags.contains(.command) {
-            close()
-        } else if event.keyCode == 46 && event.modifierFlags.contains(.command) {
-            miniaturize(self)
-        }
-    }
-}
-
