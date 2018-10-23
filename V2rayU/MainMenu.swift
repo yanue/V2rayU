@@ -34,12 +34,15 @@ class MenuController:NSObject,NSMenuDelegate {
         ]
     )
     
+    var v2rayStatus = false
+    
     var configWindow: ConfigWindowController!
     
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var statusItemClicked: (() -> Void)?
     
-    
+    @IBOutlet weak var toggleV2rayItem: NSMenuItem!
+    @IBOutlet weak var v2rayStatusItem: NSMenuItem!
     
     // bar menu
     @IBOutlet weak var statusMenu: NSMenu!
@@ -51,6 +54,17 @@ class MenuController:NSObject,NSMenuDelegate {
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
+        // turn off
+        if v2rayStatus {
+            v2rayStatusItem.title = "V2ray-Core: Off"
+            toggleV2rayItem.title = "Turn V2ray-Core On"
+            return
+        }
+        
+        // turn on
+        v2rayStatusItem.title = "V2ray-Core: On"
+        toggleV2rayItem.title = "Turn V2ray-Core Off"
+        
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not fould")
             return
@@ -62,6 +76,8 @@ class MenuController:NSObject,NSMenuDelegate {
         }
         
         StartV2rayCore()
+        // has turned on
+        v2rayStatus = true
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {
@@ -113,10 +129,25 @@ class MenuController:NSObject,NSMenuDelegate {
         NSApp.setActivationPolicy(.regular)
     }
     
+    @IBAction func goHelp(_ sender: NSMenuItem) {
+        guard let url = URL(string: "https://github.com/yanue/v2rayu/wiki") else { return }
+        NSWorkspace.shared.open(url)
+    }
+    
     func showServers() {
         // reomve old items
         serverItems.submenu?.removeAllItems()
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
+        
+        let menuItem : NSMenuItem = NSMenuItem()
+        menuItem.title = "servers preferences..."
+        menuItem.action = #selector(self.openConfig(_:))
+        menuItem.target = self
+        menuItem.isEnabled = true
+        serverItems.submenu?.addItem(menuItem)
+
+        serverItems.submenu?.addItem(NSMenuItem.separator())
+
         // add new
         for item in V2rayServer.list() {
             if !item.usable {
@@ -126,7 +157,6 @@ class MenuController:NSObject,NSMenuDelegate {
             let menuItem : NSMenuItem = NSMenuItem()
             menuItem.title = item.remark
             menuItem.action = #selector(self.switchServer(_:))
-            menuItem.target = nil
             menuItem.representedObject = item
             menuItem.target = self
             menuItem.isEnabled = true

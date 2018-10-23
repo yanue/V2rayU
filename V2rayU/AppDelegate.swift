@@ -32,21 +32,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             $0.bundleIdentifier == launcherAppIdentifier
         }
         
-        print("startedAtLogin",startedAtLogin)
         os_log("startedAtLogin", startedAtLogin)
         if startedAtLogin {
             DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
         }
-        
-        // 定义NSUserNotification
-        let userNotification = NSUserNotification()
-        userNotification.title = "消息Title"
-        userNotification.subtitle = "消息SubTitle"
-        userNotification.informativeText = "消息InformativeText"
-        // 使用NSUserNotificationCenter发送NSUserNotification
-        let userNotificationCenter = NSUserNotificationCenter.default
-        userNotificationCenter.scheduleNotification(userNotification)
-       
+
         //
 //        UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
 //

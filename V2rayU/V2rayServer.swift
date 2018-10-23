@@ -119,14 +119,6 @@ class V2rayServer: NSObject {
 
     // get json file url
     static func getJsonFile() -> String? {
-       
-//        // check unzip sh file
-//        // path: /Application/V2rayU.app/Contents/Resources/unzip.sh
-//        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
-//            print("unzip shell file no found")
-//            return nil
-//        }
-//
         return Bundle.main.url(forResource: "unzip", withExtension:"sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
     }
     

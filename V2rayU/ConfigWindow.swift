@@ -11,11 +11,28 @@ import WebKit
 
 
 class ConfigWindowController: NSWindowController,NSWindowDelegate {
+    var lastIndex:Int = 0
+    override var windowNibName: String? {
+        return "ConfigWindow" // no extension .xib here
+    }
+    
     // menu controller
     let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     
-    override var windowNibName: String? {
-        return "Config" // no extension .xib here
+    override func windowDidLoad() {
+        super.windowDidLoad()
+//        self.window?.delegate = self
+        
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.reloadData()
+        
+        self.tableView.action = #selector(onItemClicked)
+        self.tableView.doubleAction = #selector(onDoubleClicked)
+        
+        
+        self.configText.copy(<#T##sender: Any?##Any?#>)
+
     }
 
     @IBOutlet weak var configText: NSTextView!
@@ -72,7 +89,12 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     }
 
     func loadJsonFile(rowIndex:Int) {
-        self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+        if rowIndex < 0 {
+//            self.configText.string = ""
+            return
+        }
+        
+        print("rowIndex",rowIndex)
         // insert text
 //       text
         let v2ray = V2rayServer.loadV2rayItem(idx: rowIndex)
@@ -105,23 +127,11 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         NSApp.setActivationPolicy(.accessory)
     }
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        self.window?.delegate = self
-
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.reloadData()
-
-        self.tableView.action = #selector(onItemClicked)
-        self.tableView.doubleAction = #selector(onDoubleClicked)
-    }
-
     @objc private func onDoubleClicked() {
         print("onDoubleClicked row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
     }
 
-    @objc func onItemClicked() {
+    @objc private func onItemClicked() {
         print("row \(tableView.clickedRow), col \(tableView.clickedColumn) clicked")
     }
 
@@ -145,50 +155,107 @@ extension ConfigWindowController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         return V2rayServer.count()
     }
-}
-
-// NSTableViewDelegate
-extension ConfigWindowController: NSTableViewDelegate {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tableViewData = V2rayServer.list()
-        print("tableViewData",tableViewData)
         // get cell Identifier (name is "remark")
         let cellIdentifier: NSUserInterfaceItemIdentifier = NSUserInterfaceItemIdentifier(rawValue: (tableColumn?.identifier)!.rawValue)
         
         if let cell = tableView.makeView(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView {
             // set cell val
             cell.textField?.stringValue = tableViewData[row].remark
+            cell.textField?.isEditable = true
+            
             return cell
         }
         
         return nil
     }
-    
-    //当添加行时调用的回调
-    func tableView(_ tableView: NSTableView, didAdd rowView: NSTableRowView, forRow row: Int) {
-        print("addRow")
-    }
-    //当移除行时调用的回调
-    func tableView(_ tableView: NSTableView, didRemove rowView: NSTableRowView, forRow row: Int) {
-        print("removeRow")
-    }
-    
-    func tableView(_ tableView: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int){
-        print("edit")
-    }
+}
 
-    func selectionShouldChange(in tableView: NSTableView) -> Bool {
-        // focus
-        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
-        // can select
+// NSTableViewDelegate
+extension ConfigWindowController: NSTableViewDelegate {
+   
+    
+    func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView?{
+        return nil
+    }
+    
+    
+    func tableView(_ tableView: NSTableView, didAdd rowView: NSTableRowView, forRow row: Int){
+        
+    }
+    
+    
+    func tableView(_ tableView: NSTableView, didRemove rowView: NSTableRowView, forRow row: Int){
+        
+    }
+    
+    
+//    func tableView(_ tableView: NSTableView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet{
+//
+//    }
+    
+    func tableView(_ tableView: NSTableView, shouldSelect tableColumn: NSTableColumn?) -> Bool{
         return true
     }
     
-    func tableViewSelectionDidChange(_ notification: Notification) {
-//        print("changed")
-        //        updateStatus()
+    func tableView(_ tableView: NSTableView, mouseDownInHeaderOf tableColumn: NSTableColumn){
+        print("mouseDownInHeaderOf")
     }
+    
+    func tableView(_ tableView: NSTableView, didClick tableColumn: NSTableColumn){
+        print("didClick")
+    }
+//    
+//    func tableViewSelectionDidChange(_ notification: Notification){
+//        if self.tableView.selectedRow < 0 {
+//            return
+//        }
+//        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
+//
+//        print("tableViewSelectionDidChange",self.tableView.selectedRow, notification)
+//    }
+//
+//
+    
+//    func tableView(_ tableView: NSTableView, didClick tableColumn: NSTableColumn){
+//        print("didClick")
+//    }
+//
+//    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+//        return true
+//    }
+//
+//    func tableView(_ tableView: NSTableView, shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool{
+//        print("shouldEdit")
+//        return true
+//    }
+//
+//    //当添加行时调用的回调
+//    func tableView(_ tableView: NSTableView, didAdd rowView: NSTableRowView, forRow row: Int) {
+//        print("addRow")
+//    }
+//    //当移除行时调用的回调
+//    func tableView(_ tableView: NSTableView, didRemove rowView: NSTableRowView, forRow row: Int) {
+//        print("removeRow")
+//    }
+//
+//    func tableView(_ tableView: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int){
+//        print("edit")
+//    }
+
+//    func selectionShouldChange(in tableView: NSTableView) -> Bool {
+//        // focus
+////        self.loadJsonFile(rowIndex: self.tableView.selectedRow)
+//        // can select
+//        return true
+//    }
+    
+//    func tableViewSelectionDidChange(_ notification: Notification) {
+////        print("changed")
+//        //        updateStatus()
+//    }
 }
 
 class ConfigView: NSView {

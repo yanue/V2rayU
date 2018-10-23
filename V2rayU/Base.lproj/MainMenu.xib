@@ -22,34 +22,26 @@
             <connections>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="0Z8-41-eCi"/>
                 <outlet property="statusMenu" destination="9n3-TW-9ur" id="Hgg-sa-fM8"/>
+                <outlet property="toggleV2rayItem" destination="SML-EF-rdT" id="am7-ue-GN3"/>
+                <outlet property="v2rayStatusItem" destination="P34-uO-Vwf" id="F8I-tt-922"/>
             </connections>
         </customObject>
         <menu title="load" id="9n3-TW-9ur" userLabel="stateMenu">
             <items>
-                <menuItem title="Start V2rayCore" state="on" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
+                <menuItem title="V2ray-Core: Off" enabled="NO" id="P34-uO-Vwf">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Turn v2ray-core On" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
-                <menuItem title="Config" id="GqB-HP-8ns">
+                <menuItem title="Servers" id="cio-ej-HL5" userLabel="ServerItems">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="openConfig:" target="hcZ-V7-Dui" id="2ur-ix-0ZF"/>
-                    </connections>
+                    <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
-                <menuItem title="Server" id="cio-ej-HL5" userLabel="ServerItems">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Server" id="NCx-DY-Hm4"/>
-                </menuItem>
-                <menuItem title="Show Logs..." id="eLc-0G-7He">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="openLogs:" target="hcZ-V7-Dui" id="bGW-eH-KTP"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="6DA-yz-9jm"/>
                 <menuItem title="Generate QR code" id="eG7-US-3LU">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -62,11 +54,24 @@
                         <action selector="scanQRCode:" target="hcZ-V7-Dui" id="l4e-c8-gnv"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="BIh-xV-fA5"/>
-                <menuItem title="Preference..." id="YoX-II-o27" userLabel="Preference">
+                <menuItem isSeparatorItem="YES" id="6DA-yz-9jm"/>
+                <menuItem title="Preferences..." id="YoX-II-o27" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openPreference:" target="hcZ-V7-Dui" id="NV6-3j-EiH"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Show Logs..." id="eLc-0G-7He">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openLogs:" target="hcZ-V7-Dui" id="bGW-eH-KTP"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
+                <menuItem title="Help" id="hWR-vJ-0Au">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="goHelp:" target="hcZ-V7-Dui" id="nSk-K4-IVg"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="28U-8z-8lS" userLabel="Quit">
