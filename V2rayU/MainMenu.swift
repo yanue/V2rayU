@@ -13,22 +13,11 @@ import Preferences
 
 // menu controller
 class MenuController:NSObject,NSMenuDelegate {
-    // when menu.xib loaded
-    override func awakeFromNib() {
-        // load server list
-        V2rayServer.loadConfig()
-        self.showServers()
-        statusMenu.delegate = self
-        
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            self.setStatusOn()
-        } else{
-            self.setStatusOff()
-        }
+
+    var configWindow: ConfigWindowController!
     
-        statusItem.menu = statusMenu
-        configWindow = ConfigWindowController()
-    }
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    var statusItemClicked: (() -> Void)?
     
     let preferencesWindowController = PreferencesWindowController(
         viewControllers: [
@@ -36,18 +25,31 @@ class MenuController:NSObject,NSMenuDelegate {
         ]
     )
     
-    var configWindow: ConfigWindowController!
-    
-    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    var statusItemClicked: (() -> Void)?
-    
+    @IBOutlet weak var statusMenu: NSMenu!
     @IBOutlet weak var toggleV2rayItem: NSMenuItem!
     @IBOutlet weak var v2rayStatusItem: NSMenuItem!
-    
-    // bar menu
-    @IBOutlet weak var statusMenu: NSMenu!
-    // server list items
     @IBOutlet weak var serverItems: NSMenuItem!
+    
+    // when menu.xib loaded
+    override func awakeFromNib() {
+        statusMenu.delegate = self
+        NSLog("start menu")
+        // load server list
+        V2rayServer.loadConfig()
+        // show server list
+        self.showServers()
+
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            // start
+            self.startV2rayCore()
+        } else{
+            self.setStatusOff()
+        }
+    
+        statusItem.menu = statusMenu
+        
+        configWindow = ConfigWindowController()
+    }
     
     @IBAction func openLogs(_ sender: NSMenuItem) {
         V2rayLaunch.OpenLogs()
@@ -60,29 +62,27 @@ class MenuController:NSObject,NSMenuDelegate {
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("IconOff"))
         }
+        
+        // set off
+        UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
     }
     
     func setStatusOn() {
-        v2rayStatusItem.title = "V2ray-Core: Off"
-        toggleV2rayItem.title = "Turn V2ray-Core On"
+        v2rayStatusItem.title = "V2ray-Core: On"
+        toggleV2rayItem.title = "Turn V2ray-Core Off"
         
         if let button = statusItem.button {
             button.image = NSImage(named:NSImage.Name("IconOn"))
         }
+        
+        // set on
+        UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
     }
     
-    @IBAction func start(_ sender: NSMenuItem) {
-        // turn off
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            // set off
-            UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
-            
-            // set status
-            self.setStatusOff()
-            
-            return
-        }
-        
+    // start v2ray core
+    func startV2rayCore() {
+        NSLog("start v2ray-core begin")
+
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not fould")
             return
@@ -93,14 +93,27 @@ class MenuController:NSObject,NSMenuDelegate {
             return
         }
         
-        // set on
-        UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+        // create json file
+        V2rayServer.createJsonFile(item: v2ray)
         
         // set status
         setStatusOn()
         
         // launch
         V2rayLaunch.Start()
+        NSLog("start v2ray-core end.")
+    }
+    
+    @IBAction func start(_ sender: NSMenuItem) {
+        // turn off
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            // set status
+            self.setStatusOff()
+            return
+        }
+        
+        // start
+        self.startV2rayCore()
     }
     
     @IBAction func quitClicked(_ sender: NSMenuItem) {
@@ -108,39 +121,25 @@ class MenuController:NSObject,NSMenuDelegate {
     }
     
     @IBAction func generateQRCode(_ sender: NSMenuItem) {
-        print("GenerateQRCode")
+        NSLog("GenerateQRCode")
     }
     
     @IBAction func scanQRCode(_ sender: NSMenuItem) {
-        print("ScanQRCode")
+        NSLog("ScanQRCode")
     }
     
     @IBAction func openPreference(_ sender: NSMenuItem) {
-        print("openPreference ")
-//        let app = NSApplication.shared.delegate as! AppDelegate
-
         self.preferencesWindowController.showWindow()
     }
     
     // switch server
     @IBAction func switchServer(_ sender: NSMenuItem) {
-        if let obj = sender.representedObject as? v2rayItem {
-
-            // path: /Application/V2rayU.app/Contents/Resources/config.json
-            guard let jsonFile = V2rayServer.getJsonFile() else {
-                print("unable get config file path")
-                return
-            }
-            let jsonText = obj.json
-            do {
-                try jsonText.write(to: URL.init(fileURLWithPath: jsonFile), atomically: true, encoding: String.Encoding.utf8)
-            } catch {
-                // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-                return
-            }
-            
-            UserDefaults.set(forKey: .v2rayCurrentServerName,value: obj.name)
+        guard let obj = sender.representedObject as? v2rayItem else {
+            NSLog("switchServer err")
+            return
         }
+        
+        UserDefaults.set(forKey: .v2rayCurrentServerName,value: obj.name)
     }
     
     // open config window
@@ -162,6 +161,7 @@ class MenuController:NSObject,NSMenuDelegate {
         serverItems.submenu?.removeAllItems()
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
         
+        // servers preferences...
         let menuItem : NSMenuItem = NSMenuItem()
         menuItem.title = "servers preferences..."
         menuItem.action = #selector(self.openConfig(_:))
@@ -169,6 +169,7 @@ class MenuController:NSObject,NSMenuDelegate {
         menuItem.isEnabled = true
         serverItems.submenu?.addItem(menuItem)
 
+        // separator
         serverItems.submenu?.addItem(NSMenuItem.separator())
 
         // add new
@@ -184,7 +185,7 @@ class MenuController:NSObject,NSMenuDelegate {
             menuItem.target = self
             menuItem.isEnabled = true
             
-            if curSer == item.name {
+            if curSer == item.name || V2rayServer.count() == 1 {
                 menuItem.state = NSControl.StateValue.on
             }
             

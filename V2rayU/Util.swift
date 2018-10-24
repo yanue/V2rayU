@@ -11,11 +11,17 @@ import Foundation
 extension UserDefaults {
     
     enum KEY: String {
+        // v2ray-core version
         case v2rayCoreVersion
+        // v2ray server item list
         case v2rayServerList
+        // current v2ray server name
         case v2rayCurrentServerName
+        // v2ray-core turn on status
         case v2rayTurnOn
+        // auth check version
         case autoCheckVersion
+        // auto launch after login
         case autoLaunch
     }
     
@@ -53,20 +59,11 @@ extension UserDefaults {
 }
 
 extension String {
+    // version compare
     func versionToInt() -> [Int] {
         return self.components(separatedBy: ".")
             .map { Int.init($0) ?? 0 }
     }
-}
-
-func getApplicationSupportDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-    return paths[0]
-}
-
-func getApplicationDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask)
-    return paths[0]
 }
 
 //  run custom shell

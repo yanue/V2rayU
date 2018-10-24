@@ -22,12 +22,12 @@ class V2rayServer: NSObject {
     }
     
     // v2ray server list
-    static private var tableViewData:[v2rayItem] = []
+    static private var v2rayItemList:[v2rayItem] = []
 
     // (init) load v2ray server list from UserDefaults
     static func loadConfig() {
         // static reset
-        self.tableViewData = []
+        self.v2rayItemList = []
         
         // load name list from UserDefaults
         var list = UserDefaults.getArray(forKey: .v2rayServerList)
@@ -41,56 +41,55 @@ class V2rayServer: NSObject {
         
         // load each v2rayItem
         for item in list! {
-            guard let v2ray = v2rayItem.load(name:item) else {
+            guard let v2ray = v2rayItem.load(name: item) else {
                 // delete from UserDefaults
                 v2rayItem.remove(name: item)
                 continue
             }
-            
             // append
-            self.tableViewData.append(v2ray)
+            self.v2rayItemList.append(v2ray)
         }
     }
     
     // get list from v2ray server list
     static func list() -> [v2rayItem] {
-        return self.tableViewData
+        return self.v2rayItemList
     }
     
     // get count from v2ray server list
     static func count() -> Int {
-       return self.tableViewData.count
+       return self.v2rayItemList.count
     }
     
     static func edit(rowIndex:Int, remark:String) {
-        if !self.tableViewData.indices.contains(rowIndex) {
-            print("index out of range",rowIndex)
+        if !self.v2rayItemList.indices.contains(rowIndex) {
+            NSLog("index out of range",rowIndex)
             return
         }
         
         // update list
-        self.tableViewData[rowIndex].remark = remark
+        self.v2rayItemList[rowIndex].remark = remark
         
         // save
-        let v2ray = self.tableViewData[rowIndex]
+        let v2ray = self.v2rayItemList[rowIndex]
         v2ray.remark = remark
         v2ray.store()
     }
     
     // move item to new index
     static func move(oldIndex:Int, newIndex:Int) {
-        if !V2rayServer.tableViewData.indices.contains(oldIndex) {
-            print("index out of range",oldIndex)
+        if !V2rayServer.v2rayItemList.indices.contains(oldIndex) {
+            NSLog("index out of range",oldIndex)
             return
         }
-        if !V2rayServer.tableViewData.indices.contains(newIndex) {
-            print("index out of range",newIndex)
+        if !V2rayServer.v2rayItemList.indices.contains(newIndex) {
+            NSLog("index out of range",newIndex)
             return
         }
         
-        let o = self.tableViewData[oldIndex]
-        self.tableViewData.remove(at: oldIndex)
-        self.tableViewData.insert(o, at: newIndex)
+        let o = self.v2rayItemList[oldIndex]
+        self.v2rayItemList.remove(at: oldIndex)
+        self.v2rayItemList.insert(o, at: newIndex)
         
         // update server list UserDefaults
         self.saveItemList()
@@ -98,8 +97,8 @@ class V2rayServer: NSObject {
     
     // add v2ray server (tmp)
     static func add() {
-        if self.tableViewData.count > 20 {
-            print("over max len")
+        if self.v2rayItemList.count > 20 {
+            NSLog("over max len")
             return
         }
         
@@ -116,7 +115,7 @@ class V2rayServer: NSObject {
         v2ray.store()
         
         // just add to mem
-        self.tableViewData.append(v2ray)
+        self.v2rayItemList.append(v2ray)
         
         // update server list UserDefaults
         self.saveItemList()
@@ -124,21 +123,27 @@ class V2rayServer: NSObject {
     
     // remove v2ray server (tmp and UserDefaults and config json file)
     static func remove(idx: Int) {
-        if !V2rayServer.tableViewData.indices.contains(idx) {
-            print("index out of range",idx)
+        if !V2rayServer.v2rayItemList.indices.contains(idx) {
+            NSLog("index out of range",idx)
             return
         }
         
-        let v2ray = V2rayServer.tableViewData[idx]
+        let v2ray = V2rayServer.v2rayItemList[idx]
         
         // delete from tmp
-        self.tableViewData.remove(at: idx)
+        self.v2rayItemList.remove(at: idx)
         
         // delete from v2ray UserDefaults
         v2rayItem.remove(name: v2ray.name)
     
         // update server list UserDefaults
         self.saveItemList()
+        
+        // if cuerrent item is default
+        let curName = UserDefaults.get(forKey: .v2rayCurrentServerName)
+        if  curName != nil && v2ray.name == curName {
+            UserDefaults.del(forKey: .v2rayCurrentServerName)
+        }
     }
     
     // update server list UserDefaults
@@ -158,63 +163,98 @@ class V2rayServer: NSObject {
     
     // load json file data
     static func loadV2rayItem(idx:Int) -> v2rayItem? {
-        if !V2rayServer.tableViewData.indices.contains(idx) {
-            print("index out of range",idx)
+        if !V2rayServer.v2rayItemList.indices.contains(idx) {
+            NSLog("index out of range",idx)
             return nil
         }
         
-        return self.tableViewData[idx]
+        return self.v2rayItemList[idx]
     }
     
     // load selected v2ray item
     static func loadSelectedItem() -> v2rayItem? {
-        guard let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) else {
-            return nil
+        
+        var v2ray:v2rayItem? = nil
+        
+        if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
+            v2ray = v2rayItem.load(name: curName)
         }
         
-       return v2rayItem.load(name: curName)
+        // if default server not fould
+        if v2ray == nil {
+            for item in self.v2rayItemList {
+                if item.usable {
+                    v2ray = v2rayItem.load(name: item.name)
+                    break
+                }
+            }
+        }
+        
+        return v2ray
     }
     
-    // save json data into local file
+    // create current v2ray server json file
+   static func createJsonFile(item:v2rayItem) {
+        let jsonText = item.json
+
+        // path: /Application/V2rayU.app/Contents/Resources/config.json
+        guard let jsonFile = V2rayServer.getJsonFile() else {
+            NSLog("unable get config file path")
+            return
+        }
+    
+        do {
+            let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
+            
+            try! FileManager.default.removeItem(at: jsonFilePath)
+            
+            try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
+        } catch {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+            NSLog("save json file fail.",item.remark)
+        }
+    }
+    
+    // save json data
     static func save(idx:Int, jsonData:String)  {
-        if !self.tableViewData.indices.contains(idx) {
-            print("index out of range",idx)
+        if !self.v2rayItemList.indices.contains(idx) {
+            NSLog("index out of range",idx)
             return
         }
 
-        let v2ray = self.tableViewData[idx]
+        let v2ray = self.v2rayItemList[idx]
         if v2ray.name == "" {
-            print("name is empty")
+            NSLog("name is empty")
             return
         }
         
         guard let json = try? JSON(data: jsonData.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
-            print("invalid json")
+            NSLog("invalid json")
             return
         }
         
         if !json.exists(){
-            print("invalid json")
+            NSLog("invalid json")
             return
         }
         
         if !json["dns"].exists() {
-            print("missing inbound")
+            NSLog("missing inbound")
             return
         }
         
         if !json["inbound"].exists() {
-            print("missing inbound")
+            NSLog("missing inbound")
             return
         }
         
         if !json["outbound"].exists() {
-            print("missing outbound")
+            NSLog("missing outbound")
             return
         }
         
         if !json["routing"].exists() {
-            print("missing routing")
+            NSLog("missing routing")
             return
         }
         
@@ -224,7 +264,21 @@ class V2rayServer: NSObject {
         v2ray.store()
         
         // update current
-        self.tableViewData[idx].usable = true
+        self.v2rayItemList[idx] = v2ray
+        
+        // if just one usable server
+        // set as default server
+        var usableCount = 0
+        for item in v2rayItemList {
+            if item.usable {
+                usableCount += 1
+            }
+        }
+        
+        // contain self
+        if usableCount <= 1 {
+            UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
+        }
     }
 }
 
@@ -232,11 +286,11 @@ class V2rayServer: NSObject {
 class v2rayItem: NSObject, NSCoding {
     var name: String
     var remark: String
-    var usable: Bool
     var json: String
-    
+    var usable: Bool
+
     // init
-    required init(name:String="", remark:String="", usable: Bool=false, json:String="") {
+    required init(name: String, remark: String, usable: Bool, json: String="") {
         self.name = name
         self.remark = remark
         self.json = json
@@ -248,7 +302,7 @@ class v2rayItem: NSObject, NSCoding {
         self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
         self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
         self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
-        self.usable = decoder.decodeObject(forKey: "Usable") as? Bool ?? false
+        self.usable = decoder.decodeBool(forKey: "Usable")
     }
     
     // object encode

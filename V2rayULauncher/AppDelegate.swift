@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import os.log
 
 class V2rayULauncherApplication: NSApplication {
     let strongDelegate = AppDelegate()
@@ -55,7 +56,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
-        print("helper app terminated")
         // Insert code here to tear down your application
     }
     

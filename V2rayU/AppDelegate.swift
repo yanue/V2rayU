@@ -8,7 +8,6 @@
 
 import Cocoa
 import ServiceManagement
-import os.log
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 
@@ -16,11 +15,9 @@ let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 class AppDelegate: NSObject, NSApplicationDelegate {
     // bar menu
     @IBOutlet weak var statusMenu: NSMenu!
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        os_log("v2rayu init.")
-        
+        // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == launcherAppIdentifier
         }
@@ -30,9 +27,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         V2rayLaunch.generateLauchAgentPlist()
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            V2rayLaunch.Start()
-        }
         
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {

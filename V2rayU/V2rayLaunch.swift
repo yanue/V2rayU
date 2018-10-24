@@ -41,7 +41,7 @@ class V2rayLaunch: NSObject {
     }
     
     static func Start() {
-        // cmd: /bin/launchctl load -wF /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+        // cmd: /bin/launchctl load -wF /Users/xxx/Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load" ,"-wF",launchAgentPlistFile])
         task.waitUntilExit()
         if task.terminationStatus == 0 {

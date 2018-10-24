@@ -46,7 +46,7 @@ class V2rayCore {
             //to get status code
             if let status = response.response?.statusCode {
                 if status != 200 {
-                    print("error with response status: \(status)")
+                    NSLog("error with response status: ",status)
                     return
                 }
             }
@@ -57,20 +57,20 @@ class V2rayCore {
 
                 // get tag_name (verion)
                 guard let tag_name = JSON["tag_name"] else {
-                    print("err: no tag_name")
+                    NSLog("error: no tag_name")
                     return
                 }
                 
                 // get prerelease and draft
                 guard let prerelease = JSON["prerelease"],let draft = JSON["draft"] else {
                     // get
-                    print("err: get prerelease or draft")
+                    NSLog("error: get prerelease or draft")
                     return
                 }
                 
                 // not pre release or draft
                 if prerelease as! Bool == true || draft as! Bool == true {
-                    print("this release is a prerelease or draft")
+                    NSLog("this release is a prerelease or draft")
                     return
                 }
                 
@@ -122,11 +122,11 @@ class V2rayCore {
                     case .success(_):
                         break
                     case .failure(_):
-                        print("error with response status:")
+                        NSLog("error with response status:")
                         return
                 }
                 
-                if let data = response.result.value {
+                if let _ = response.result.value {
                     // make unzip.sh execable
                     // chmod 777 unzip.sh
                     let execable = "cd "+AppResourcesPath+" && /bin/chmod 777 ./unzip.sh"
@@ -137,7 +137,7 @@ class V2rayCore {
                     let sh = "cd "+AppResourcesPath+" && ./unzip.sh"
                     // exec shell
                     let res = shell(launchPath:"/bin/bash", arguments: ["-c",sh])
-                    print("res",data,res!)
+                    NSLog("res:",res!)
                 }
             }
     }

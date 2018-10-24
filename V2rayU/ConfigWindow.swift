@@ -8,14 +8,14 @@
 
 import Cocoa
 import WebKit
-import os.log
 
-class ConfigWindowController: NSWindowController,NSWindowDelegate {
-    var lastIndex:Int = 0
+class ConfigWindowController: NSWindowController, NSWindowDelegate {
+    
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
     }
-    let tableViewDragType: String = "ss.server.profile.data"
+    
+    let tableViewDragType: String = "v2ray.item"
 
     @IBOutlet weak var errTip: NSTextField!
     
@@ -106,7 +106,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         // save
         V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         
-        print("save ok fater")
+        NSLog("save ok fater")
         // refresh menu
         menuController.showServers()
     }
@@ -118,17 +118,8 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         NSApp.setActivationPolicy(.accessory)
     }
 
-    @objc private func onDoubleClicked() {
-        print("onDoubleClicked row \(serversTableView.clickedRow), col \(serversTableView.clickedColumn) clicked")
-    }
-
-    @objc private func onItemClicked() {
-        print("row \(serversTableView.clickedRow), col \(serversTableView.clickedColumn) clicked")
-    }
-
     func windowShouldClose(_ sender: NSWindow) -> Bool {
 //        NSApp.setActivationPolicy(.accessory)
-        print("close1")
         self.close()
         NSApp.terminate(self)
         return true
@@ -136,12 +127,12 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     
     func windowWillClose(_ notification: Notification) {
         // hide dock icon and close all opened windows
-        print("close")
+        NSLog("close")
 //        NSApp.setActivationPolicy(.accessory)
     }
 }
 
-// NSTableViewDataSource
+// NSv2rayItemListSource
 extension ConfigWindowController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
@@ -149,15 +140,15 @@ extension ConfigWindowController: NSTableViewDataSource {
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        let tableViewData = V2rayServer.list()
+        let v2rayItemList = V2rayServer.list()
         // set cell data
-        return tableViewData[row].remark
+        return v2rayItemList[row].remark
     }
     
     // edit cell
     func tableView(_ tableView: NSTableView, setObjectValue: Any?, for forTableColumn: NSTableColumn?, row: Int) {
         guard let remark = setObjectValue as? String else {
-            os_log("remark is nil")
+            NSLog("remark is nil")
             return
         }
         // edit
