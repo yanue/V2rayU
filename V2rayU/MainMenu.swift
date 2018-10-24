@@ -155,7 +155,18 @@ class MenuController:NSObject,NSMenuDelegate {
     
     // open config window
     @IBAction func openConfig(_ sender: NSMenuItem) {
-        configWindow.showWindow (nil)
+        if configWindow != nil {
+            // close by window `x` button
+            if configWindow.closedByWindowButton {
+                configWindow.close()
+                // need renew
+                configWindow = ConfigWindowController()
+            }
+        } else {
+            configWindow = ConfigWindowController()
+        }
+        
+        configWindow.showWindow(self)
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
         // show dock icon

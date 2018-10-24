@@ -9,35 +9,38 @@
 import Cocoa
 import WebKit
 
-class ConfigWindowController: NSWindowController, NSWindowDelegate {
+class ConfigWindowController: NSWindowController,NSWindowDelegate {
+    // closed by window 'x' button
+    var closedByWindowButton:Bool = false
     
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
     }
     
+    let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     let tableViewDragType: String = "v2ray.item"
 
     @IBOutlet weak var errTip: NSTextField!
+    @IBOutlet weak var configText: NSTextView!
+    @IBOutlet weak var serversTableView: NSTableView!
+    @IBOutlet weak var addRemoveButton: NSSegmentedControl!
     
-    // menu controller
-    let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
-    
+    override func awakeFromNib() {
+        // set table drag style
+        serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
+        serversTableView.allowsMultipleSelection = true
+    }
+
     override func windowDidLoad() {
         super.windowDidLoad()
-        self.window?.delegate = self
 
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
+        
+        // windowWillClose Notification
+        NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
     }
-
-    override func awakeFromNib() {
-        serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
-    }
-    
-    @IBOutlet weak var configText: NSTextView!
-    @IBOutlet weak var serversTableView: NSTableView!
-    @IBOutlet weak var addRemoveButton: NSSegmentedControl!
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
         // 0 add,1 remove
@@ -98,7 +101,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         self.configText.string = v2ray?.json ?? ""
     }
     
-
     @IBAction func ok(_ sender: NSButton) {
         // todo save
         let text = self.configText.string
@@ -116,18 +118,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         // hide dock icon and close all opened windows
         NSApp.setActivationPolicy(.accessory)
     }
-
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-//        NSApp.setActivationPolicy(.accessory)
-        self.close()
-        NSApp.terminate(self)
-        return true
-    }
     
     func windowWillClose(_ notification: Notification) {
+        // closed by window 'x' button
+        self.closedByWindowButton = true
         // hide dock icon and close all opened windows
-        NSLog("close")
-//        NSApp.setActivationPolicy(.accessory)
+        NSApp.setActivationPolicy(.accessory)
     }
 }
 

@@ -206,7 +206,7 @@ class V2rayServer: NSObject {
         do {
             let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
             
-            try! FileManager.default.removeItem(at: jsonFilePath)
+            try FileManager.default.removeItem(at: jsonFilePath)
             
             try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
         } catch {

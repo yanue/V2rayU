@@ -26,7 +26,7 @@
                 <outlet property="v2rayStatusItem" destination="P34-uO-Vwf" id="F8I-tt-922"/>
             </connections>
         </customObject>
-        <menu title="load" id="9n3-TW-9ur" userLabel="stateMenu">
+        <menu title="V2rayU" id="9n3-TW-9ur" userLabel="stateMenu">
             <items>
                 <menuItem title="V2ray-Core: On" enabled="NO" id="P34-uO-Vwf">
                     <modifierMask key="keyEquivalentModifierMask"/>
