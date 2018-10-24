@@ -8,7 +8,7 @@
 
 import Cocoa
 import WebKit
-
+import os.log
 
 class ConfigWindowController: NSWindowController,NSWindowDelegate {
     var lastIndex:Int = 0
@@ -17,24 +17,22 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     }
     let tableViewDragType: String = "ss.server.profile.data"
 
+    @IBOutlet weak var errTip: NSTextField!
+    
     // menu controller
     let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     
     override func windowDidLoad() {
         super.windowDidLoad()
-//        self.window?.delegate = self
+        self.window?.delegate = self
 
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
-        
-        self.serversTableView.action = #selector(onItemClicked)
-        self.serversTableView.doubleAction = #selector(onDoubleClicked)
     }
 
     override func awakeFromNib() {
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
-        serversTableView.allowsMultipleSelection = true
     }
     
     @IBOutlet weak var configText: NSTextView!
@@ -84,7 +82,8 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             // refresh menu
             menuController.showServers()
             break
-                // unknown action
+            
+        // unknown action
         default:
             return
         }
@@ -92,30 +91,20 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
 
     func loadJsonFile(rowIndex:Int) {
         if rowIndex < 0 {
-//            self.configText.string = ""
             return
         }
         
-        print("rowIndex",rowIndex)
-        // insert text
-//       text
         let v2ray = V2rayServer.loadV2rayItem(idx: rowIndex)
         self.configText.string = v2ray?.json ?? ""
-
-        // focus
-//        self.configText.becomeFirstResponder()
     }
     
-    @IBAction func editCell(_ sender: NSTextFieldCell) {
-        print("open edit")
-    }
 
     @IBAction func ok(_ sender: NSButton) {
         // todo save
         let text = self.configText.string
 
         // save
-        V2rayServer.save(jsonData: text, idx: self.serversTableView.selectedRow)
+        V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         
         print("save ok fater")
         // refresh menu
@@ -154,32 +143,32 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
 
 // NSTableViewDataSource
 extension ConfigWindowController: NSTableViewDataSource {
+
     func numberOfRows(in tableView: NSTableView) -> Int {
         return V2rayServer.count()
     }
-    
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let tableViewData = V2rayServer.list()
-        // get cell Identifier (name is "remark")
-        let cellIdentifier: NSUserInterfaceItemIdentifier = NSUserInterfaceItemIdentifier(rawValue: (tableColumn?.identifier)!.rawValue)
-        
-        if let cell = tableView.makeView(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView {
-            // set cell val
-            cell.textField?.stringValue = tableViewData[row].remark
-            cell.textField?.isEditable = true
-            
-            return cell
+        // set cell data
+        return tableViewData[row].remark
+    }
+    
+    // edit cell
+    func tableView(_ tableView: NSTableView, setObjectValue: Any?, for forTableColumn: NSTableColumn?, row: Int) {
+        guard let remark = setObjectValue as? String else {
+            os_log("remark is nil")
+            return
         }
-        
-        return nil
+        // edit
+        V2rayServer.edit(rowIndex: row, remark: remark)
+        tableView.reloadData()
     }
 }
 
 // NSTableViewDelegate
 extension ConfigWindowController: NSTableViewDelegate {
-   
     // Drag & Drop reorder rows
-    
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let item = NSPasteboardItem()
         item.setString(String(row), forType: NSPasteboard.PasteboardType(rawValue: tableViewDragType))
@@ -198,7 +187,8 @@ extension ConfigWindowController: NSTableViewDelegate {
         var oldIndexes = [Int]()
         info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:], using: {
             (draggingItem: NSDraggingItem, idx: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-            if let str = (draggingItem.item as! NSPasteboardItem).string(forType: NSPasteboard.PasteboardType(rawValue: self.tableViewDragType)), let index = Int(str) {
+            if let str = (draggingItem.item as! NSPasteboardItem).string(forType: NSPasteboard.PasteboardType(rawValue: self.tableViewDragType)),
+                let index = Int(str) {
                 oldIndexes.append(index)
             }
         })
@@ -215,7 +205,6 @@ extension ConfigWindowController: NSTableViewDelegate {
                 oldIndexLast = oldIndex + oldIndexOffset
                 newIndexLast = row - 1
                 oldIndexOffset -= 1
-            
             } else {
                 oldIndexLast = oldIndex
                 newIndexLast = row + newIndexOffset
@@ -223,36 +212,16 @@ extension ConfigWindowController: NSTableViewDelegate {
             }
         }
         
-        // remove
+        // move
         V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
         self.serversTableView.reloadData()
+        self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
 
         return true
-
     }
-    //--------------------------------------------------
+    
     // For NSTableViewDelegate
-    
-    func tableView(_ tableView: NSTableView
-        , shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool {
-        return false
-    }
-    
-    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-        if row < 0 {
-//            editingProfile = nil
-            return true
-        }
-//        if editingProfile != nil {
-//            if !editingProfile.isValid() {
-//                return false
-//            }
-//        }
-        
-        return true
-    }
-    
     func tableViewSelectionDidChange(_ notification: Notification) {
-        print("tableViewSelectionDidChange")
+        self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
     }
 }

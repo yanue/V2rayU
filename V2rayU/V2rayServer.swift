@@ -62,6 +62,21 @@ class V2rayServer: NSObject {
        return self.tableViewData.count
     }
     
+    static func edit(rowIndex:Int, remark:String) {
+        if !self.tableViewData.indices.contains(rowIndex) {
+            print("index out of range",rowIndex)
+            return
+        }
+        
+        // update list
+        self.tableViewData[rowIndex].remark = remark
+        
+        // save
+        let v2ray = self.tableViewData[rowIndex]
+        v2ray.remark = remark
+        v2ray.store()
+    }
+    
     // move item to new index
     static func move(oldIndex:Int, newIndex:Int) {
         if !V2rayServer.tableViewData.indices.contains(oldIndex) {
@@ -76,6 +91,9 @@ class V2rayServer: NSObject {
         let o = self.tableViewData[oldIndex]
         self.tableViewData.remove(at: oldIndex)
         self.tableViewData.insert(o, at: newIndex)
+        
+        // update server list UserDefaults
+        self.saveItemList()
     }
     
     // add v2ray server (tmp)
@@ -158,7 +176,7 @@ class V2rayServer: NSObject {
     }
     
     // save json data into local file
-    static func save(jsonData:String,idx:Int)  {
+    static func save(idx:Int, jsonData:String)  {
         if !self.tableViewData.indices.contains(idx) {
             print("index out of range",idx)
             return
