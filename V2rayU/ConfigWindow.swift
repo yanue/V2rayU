@@ -106,7 +106,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         // save
         V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         
-        NSLog("save ok fater")
         // refresh menu
         menuController.showServers()
     }
@@ -151,29 +150,36 @@ extension ConfigWindowController: NSTableViewDataSource {
             NSLog("remark is nil")
             return
         }
-        // edit
+        // edit item
         V2rayServer.edit(rowIndex: row, remark: remark)
+        // reload table
         tableView.reloadData()
+        // reload menu
+        menuController.showServers()
     }
 }
 
 // NSTableViewDelegate
 extension ConfigWindowController: NSTableViewDelegate {
+    // For NSTableViewDelegate
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
+    }
+    
     // Drag & Drop reorder rows
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let item = NSPasteboardItem()
         item.setString(String(row), forType: NSPasteboard.PasteboardType(rawValue: tableViewDragType))
         return item
     }
-    
-    func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int
-        , proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+
+    func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation:NSTableView.DropOperation) -> NSDragOperation {
         if dropOperation == .above {
             return .move
         }
         return NSDragOperation()
     }
-    
+
     func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
         var oldIndexes = [Int]()
         info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:], using: {
@@ -202,17 +208,16 @@ extension ConfigWindowController: NSTableViewDelegate {
                 newIndexOffset += 1
             }
         }
-        
+
         // move
         V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
-        self.serversTableView.reloadData()
+        // set selected
         self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
+        // reload table
+        self.serversTableView.reloadData()
+        // reload menu
+        menuController.showServers()
 
         return true
-    }
-    
-    // For NSTableViewDelegate
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
     }
 }

@@ -139,7 +139,18 @@ class MenuController:NSObject,NSMenuDelegate {
             return
         }
         
+        if !obj.usable {
+            NSLog("current server is invaid",obj.remark)
+            return
+        }
+        // set current
         UserDefaults.set(forKey: .v2rayCurrentServerName,value: obj.name)
+        // stop first
+        V2rayLaunch.Stop()
+        // start
+        startV2rayCore()
+        // reload menu
+        self.showServers()
     }
     
     // open config window
