@@ -15,7 +15,8 @@ let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 class AppDelegate: NSObject, NSApplicationDelegate {
     // bar menu
     @IBOutlet weak var statusMenu: NSMenu!
-
+    
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {

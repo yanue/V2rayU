@@ -216,46 +216,38 @@ class V2rayServer: NSObject {
     }
     
     // save json data
-    static func save(idx:Int, jsonData:String)  {
+    static func save(idx:Int, jsonData:String) -> String {
         if !self.v2rayItemList.indices.contains(idx) {
-            NSLog("index out of range",idx)
-            return
+            return "index out of range"
         }
 
         let v2ray = self.v2rayItemList[idx]
         if v2ray.name == "" {
-            NSLog("name is empty")
-            return
+            return "name is empty"
         }
         
         guard let json = try? JSON(data: jsonData.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
-            NSLog("invalid json")
-            return
+            return "invalid json"
         }
         
         if !json.exists(){
-            NSLog("invalid json")
-            return
+            return "invalid json"
         }
         
         if !json["dns"].exists() {
-            NSLog("missing inbound")
-            return
+            return "missing inbound"
         }
         
         if !json["inbound"].exists() {
-            NSLog("missing inbound")
-            return
+            return "missing inbound"
         }
         
         if !json["outbound"].exists() {
-            NSLog("missing outbound")
-            return
+            return "missing outbound"
         }
         
         if !json["routing"].exists() {
-            NSLog("missing routing")
-            return
+            return "missing routing"
         }
         
         // store
@@ -279,6 +271,7 @@ class V2rayServer: NSObject {
         if usableCount <= 1 {
             UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
         }
+        return ""
     }
 }
 

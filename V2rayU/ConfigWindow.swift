@@ -104,10 +104,10 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     @IBAction func ok(_ sender: NSButton) {
         // todo save
         let text = self.configText.string
-
         // save
-        V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
-        
+        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
+        self.errTip.stringValue = errMsg
+
         // refresh menu
         menuController.showServers()
     }
@@ -160,6 +160,7 @@ extension ConfigWindowController: NSTableViewDelegate {
     // For NSTableViewDelegate
     func tableViewSelectionDidChange(_ notification: Notification) {
         self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
+        self.errTip.stringValue = ""
     }
     
     // Drag & Drop reorder rows
