@@ -79,6 +79,13 @@ class MenuController:NSObject,NSMenuDelegate {
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
     }
     
+    func stopV2rayCore() {
+        // set status
+        self.setStatusOff()
+        // stop launch
+        V2rayLaunch.Stop()
+    }
+    
     // start v2ray core
     func startV2rayCore() {
         NSLog("start v2ray-core begin")
@@ -94,7 +101,7 @@ class MenuController:NSObject,NSMenuDelegate {
         }
         
         // create json file
-        V2rayServer.createJsonFile(item: v2ray)
+        V2rayConfig.createJsonFile(item: v2ray)
         
         // set status
         setStatusOn()
@@ -107,8 +114,7 @@ class MenuController:NSObject,NSMenuDelegate {
     @IBAction func start(_ sender: NSMenuItem) {
         // turn off
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            // set status
-            self.setStatusOff()
+            self.stopV2rayCore()
             return
         }
         
@@ -170,7 +176,7 @@ class MenuController:NSObject,NSMenuDelegate {
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
         // show dock icon
-        NSApp.setActivationPolicy(.regular)
+//        NSApp.setActivationPolicy(.regular)
     }
     
     @IBAction func goHelp(_ sender: NSMenuItem) {

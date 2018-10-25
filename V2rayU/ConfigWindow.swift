@@ -8,6 +8,7 @@
 
 import Cocoa
 import WebKit
+import Alamofire
 
 class ConfigWindowController: NSWindowController,NSWindowDelegate {
     // closed by window 'x' button
@@ -24,22 +25,30 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     @IBOutlet weak var configText: NSTextView!
     @IBOutlet weak var serversTableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
+    @IBOutlet weak var logLevel: NSPopUpButton!
+    @IBOutlet weak var jsonUrl: NSTextField!
+    @IBOutlet weak var selectFileBtn: NSButton!
+    @IBOutlet weak var importBtn: NSButton!
     
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
         serversTableView.allowsMultipleSelection = true
+        // windowWillClose Notification
+        NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
     }
 
     override func windowDidLoad() {
         super.windowDidLoad()
+//        comboUri.selectItem(at: 0)
 
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
         
-        // windowWillClose Notification
-        NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
+        if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
+            logLevel.selectItem(withTitle: level)
+        }
     }
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -101,29 +110,132 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         self.configText.string = v2ray?.json ?? ""
     }
     
-    @IBAction func ok(_ sender: NSButton) {
+    func saveConfig() {
         // todo save
         let text = self.configText.string
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         self.errTip.stringValue = errMsg
-
+        
         // refresh menu
         menuController.showServers()
+        // if server is current
+        if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName){
+            let v2rayItemList = V2rayServer.list()
+            if curName == v2rayItemList[self.serversTableView.selectedRow].name {
+                if errMsg != "" {
+                    menuController.stopV2rayCore()
+                } else {
+                    menuController.startV2rayCore()
+                }
+            }
+        }
+    }
+    
+    @IBAction func ok(_ sender: NSButton) {
+        self.saveConfig()
     }
 
     @IBAction func cancel(_ sender: NSButton) {
         // self close
         self.close()
         // hide dock icon and close all opened windows
-        NSApp.setActivationPolicy(.accessory)
+//        NSApp.setActivationPolicy(.accessory)
+    }
+    
+    @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
+        if let item = logLevel.selectedItem {
+            UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
+            // restart service
+            menuController.startV2rayCore()
+        }
+    }
+    
+    @IBAction func importConfig(_ sender: NSButton) {
+        self.configText.string = ""
+        self.importJson()
+    }
+    
+    func importJson() {
+        let text = self.configText.string
+
+        // download json file
+        Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
+            if (DataResponse.error != nil) {
+                self.errTip.stringValue = "error: "+DataResponse.error.debugDescription
+                return
+            }
+            
+            if DataResponse.value != nil {
+                self.configText.string = DataResponse.value ?? text
+                
+                // save
+                let msg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: self.configText.string)
+                if msg != "" {
+                    self.saveConfig()
+                }
+            }
+        }
+    }
+    
+    @IBAction func switchUri(_ sender: NSPopUpButton) {
+        guard let item = sender.selectedItem else {
+            return
+        }
+        // Url
+        print("item.title",sender.title)
+        if item.title == "Url" {
+            UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
+            // restart service
+            menuController.startV2rayCore()
+
+            jsonUrl.stringValue = ""
+            selectFileBtn.isHidden = true
+            importBtn.isHidden = false
+            jsonUrl.isEditable = true
+        } else {
+            // local file
+            jsonUrl.stringValue = ""
+            selectFileBtn.isHidden = false
+            importBtn.isHidden = true
+            jsonUrl.isEditable = false
+        }
+    }
+    
+    @IBAction func browseFile(_ sender: NSButton) {
+        jsonUrl.stringValue = ""
+        let dialog = NSOpenPanel()
+        
+        dialog.title                   = "Choose a .json file";
+        dialog.showsResizeIndicator    = true;
+        dialog.showsHiddenFiles        = false;
+        dialog.canChooseDirectories    = true;
+        dialog.canCreateDirectories    = true;
+        dialog.allowsMultipleSelection = false;
+        dialog.allowedFileTypes        = ["json","txt"];
+        
+        if (dialog.runModal() == NSApplication.ModalResponse.OK) {
+            let result = dialog.url // Pathname of the file
+            
+            if (result != nil) {
+                jsonUrl.stringValue = result?.absoluteString ?? ""
+                self.importJson()
+            }
+        } else {
+            // User clicked on "Cancel"
+            return
+        }
+    }
+    
+    @IBAction func openLogs(_ sender: NSButton) {
+        V2rayLaunch.OpenLogs()
     }
     
     func windowWillClose(_ notification: Notification) {
         // closed by window 'x' button
         self.closedByWindowButton = true
         // hide dock icon and close all opened windows
-        NSApp.setActivationPolicy(.accessory)
+//        NSApp.setActivationPolicy(.accessory)
     }
 }
 

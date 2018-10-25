@@ -19,6 +19,8 @@ extension UserDefaults {
         case v2rayCurrentServerName
         // v2ray-core turn on status
         case v2rayTurnOn
+        // v2ray-core log level
+        case v2rayLogLevel
         // auth check version
         case autoCheckVersion
         // auto launch after login

@@ -20,6 +20,7 @@
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
+		66E22CF5218164000082F8E5 /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E22CF4218163FF0082F8E5 /* V2rayConfig.swift */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		66FEAD48217D7852009DECF9 /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD47217D7852009DECF9 /* appcast.xml */; };
 		66FEAD4A217D7874009DECF9 /* appcast.inc in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD49217D7874009DECF9 /* appcast.inc */; };
@@ -62,6 +63,7 @@
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		66E22CF4218163FF0082F8E5 /* V2rayConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD46217D7612009DECF9 /* bump.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = bump.sh; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */,
 				66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */,
 				660D0E59216E0158000C2922 /* V2rayServer.swift */,
+				66E22CF4218163FF0082F8E5 /* V2rayConfig.swift */,
 				66784AFF21704E1300AD307F /* V2rayCore.swift */,
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
@@ -352,6 +355,7 @@
 				6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */,
 				66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */,
 				66784AFC2170486D00AD307F /* Util.swift in Sources */,
+				66E22CF5218164000082F8E5 /* V2rayConfig.swift in Sources */,
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */,
 				66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */,

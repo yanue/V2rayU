@@ -27,14 +27,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
         }
 
+        // check v2ray core
+        V2rayCore().check()
+        // generate plist
         V2rayLaunch.generateLauchAgentPlist()
-        
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // check version
             ShiftyUpdater.checkForUpdatesInBackground()
-            // check v2ray core
-            V2rayCore().check()
         }
     }
 

@@ -193,35 +193,42 @@ class V2rayServer: NSObject {
         return v2ray
     }
     
-    // create current v2ray server json file
-   static func createJsonFile(item:v2rayItem) {
-        let jsonText = item.json
-
-        // path: /Application/V2rayU.app/Contents/Resources/config.json
-        guard let jsonFile = V2rayServer.getJsonFile() else {
-            NSLog("unable get config file path")
-            return
-        }
-    
-        do {
-            let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
-            
-            try FileManager.default.removeItem(at: jsonFilePath)
-            
-            try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
-        } catch {
-            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-            NSLog("save json file fail.",item.remark)
-        }
-    }
-    
     // save json data
     static func save(idx:Int, jsonData:String) -> String {
+        var isUsable = false
+        
         if !self.v2rayItemList.indices.contains(idx) {
             return "index out of range"
         }
-
+        
         let v2ray = self.v2rayItemList[idx]
+        
+        defer {
+            // store
+            v2ray.usable = isUsable
+            v2ray.json = jsonData
+            v2ray.store()
+            
+            // update current
+            self.v2rayItemList[idx] = v2ray
+            
+            if isUsable {
+                // if just one usable server
+                // set as default server
+                var usableCount = 0
+                for item in v2rayItemList {
+                    if item.usable {
+                        usableCount += 1
+                    }
+                }
+                
+                // contain self
+                if usableCount <= 1 {
+                    UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
+                }
+            }
+        }
+
         if v2ray.name == "" {
             return "name is empty"
         }
@@ -235,7 +242,7 @@ class V2rayServer: NSObject {
         }
         
         if !json["dns"].exists() {
-            return "missing inbound"
+//            return "missing dns"
         }
         
         if !json["inbound"].exists() {
@@ -249,28 +256,9 @@ class V2rayServer: NSObject {
         if !json["routing"].exists() {
             return "missing routing"
         }
-        
-        // store
-        v2ray.usable = true
-        v2ray.json = jsonData
-        v2ray.store()
-        
-        // update current
-        self.v2rayItemList[idx] = v2ray
-        
-        // if just one usable server
-        // set as default server
-        var usableCount = 0
-        for item in v2rayItemList {
-            if item.usable {
-                usableCount += 1
-            }
-        }
-        
-        // contain self
-        if usableCount <= 1 {
-            UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
-        }
+
+        isUsable = true
+
         return ""
     }
 }
