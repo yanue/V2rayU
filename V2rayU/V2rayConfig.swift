@@ -7,23 +7,54 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class V2rayConfig: NSObject {
-    enum v2rayLogLevel:String {
-        case debug
-        case info
-        case warning
-        case error
-        case none
-    }
-        
+    
     // import by url
     static func importByUrl(jsonUrl: String) {
         
     }
     
-    func saveByJson() {
+   static func saveByJson(jsonText: String) -> String {
+        guard let json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
+            return "invalid json"
+        }
         
+        if !json.exists(){
+            return "invalid json"
+        }
+        
+        if json["dns"].exists() {
+
+        }
+        
+        if !json["inbound"].exists() {
+            return "missing inbound"
+        } else {
+            
+            let inbound = json["inbound"]
+            print("inbound",inbound)
+            if !inbound["listen"].exists() {
+                return "missing inbound.listen"
+            }
+            if !inbound["protocol"].exists() {
+                return "missing inbound.protocol"
+            }
+            if !inbound["port"].exists() {
+                return "missing inbound.port"
+            }
+        }
+   
+        if !json["outbound"].exists() {
+            return "missing outbound"
+        }
+        
+        if !json["routing"].exists() {
+            return "missing routing"
+        }
+
+        return ""
     }
     
     // create current v2ray server json file

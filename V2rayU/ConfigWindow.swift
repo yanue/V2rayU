@@ -113,6 +113,9 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     func saveConfig() {
         // todo save
         let text = self.configText.string
+        
+        self.errTip.stringValue = V2rayConfig.saveByJson(jsonText: text)
+        return
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         self.errTip.stringValue = errMsg
@@ -153,6 +156,11 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     
     @IBAction func importConfig(_ sender: NSButton) {
         self.configText.string = ""
+        if jsonUrl.stringValue == "" {
+            self.errTip.stringValue = "error: invaid url"
+            return
+        }
+        
         self.importJson()
     }
     
@@ -183,12 +191,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             return
         }
         // Url
-        print("item.title",sender.title)
         if item.title == "Url" {
-            UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
-            // restart service
-            menuController.startV2rayCore()
-
             jsonUrl.stringValue = ""
             selectFileBtn.isHidden = true
             importBtn.isHidden = false

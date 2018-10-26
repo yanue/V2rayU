@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "660C8C9E2181CBAA00896361"
+               BuildableName = "V2rayUTests.xctest"
+               BlueprintName = "V2rayUTests"
+               ReferencedContainer = "container:V2rayU.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "664EB370216C9A5E00B6AE0D"
+            BuildableName = "V2rayU.app"
+            BlueprintName = "V2rayU"
+            ReferencedContainer = "container:V2rayU.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -66,6 +85,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "664EB370216C9A5E00B6AE0D"
+            BuildableName = "V2rayU.app"
+            BlueprintName = "V2rayU"
+            ReferencedContainer = "container:V2rayU.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

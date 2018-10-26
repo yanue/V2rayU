@@ -12,5 +12,6 @@ target 'V2rayU' do
   pod 'SwiftyJSON'
   pod 'Preferences'
   pod 'Sparkle'
-  
+  pod 'HandyJSON', '~> 4.2.0'
+
 end

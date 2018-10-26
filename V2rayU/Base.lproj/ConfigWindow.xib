@@ -112,15 +112,6 @@ Gw
                             <action selector="ok:" target="-2" id="VQa-fP-dxw"/>
                         </connections>
                     </button>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyE-Zy-64R">
-                        <rect key="frame" x="180" y="7" width="399" height="16"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" id="wIV-Kw-tAz">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <tabView fixedFrame="YES" drawsBackground="NO" allowsTruncatedLabels="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ppK-ei-cOI">
                         <rect key="frame" x="173" y="9" width="414" height="494"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -195,8 +186,8 @@ Gw
                                             <color key="borderColor" name="unemphasizedSelectedContentBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="fillColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </box>
-                                        <scrollView fixedFrame="YES" borderType="line" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" allowsMagnification="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5yh-KN-ihD">
-                                            <rect key="frame" x="7" y="10" width="377" height="384"/>
+                                        <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5yh-KN-ihD">
+                                            <rect key="frame" x="8" y="8" width="377" height="384"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <clipView key="contentView" ambiguous="YES" id="0rS-HW-TeI">
                                                 <rect key="frame" x="1" y="1" width="375" height="382"/>
@@ -219,6 +210,15 @@ Gw
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyE-Zy-64R">
+                                            <rect key="frame" x="5" y="-4" width="381" height="16"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" id="wIV-Kw-tAz">
+                                                <font key="font" metaFont="system" size="11"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
