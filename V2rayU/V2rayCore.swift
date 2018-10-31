@@ -13,44 +13,44 @@ import SwiftyJSON
 // v2ray-core version check, download, unzip
 class V2rayCore {
     // need replace ${version}
-    var releaseUrl:String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos.zip"
+    var releaseUrl: String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos.zip"
     // lastet release verison info
-    let versionUrl:String = "https://api.github.com/repos/v2ray/v2ray-core/releases/latest"
-    
-    func checkLocal(hasNewVersion:Bool) {
+    let versionUrl: String = "https://api.github.com/repos/v2ray/v2ray-core/releases/latest"
+
+    func checkLocal(hasNewVersion: Bool) {
         // has new verion
         if hasNewVersion {
             // download new version
             self.download()
             return
         }
-        
+
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: v2rayCoreFullPath) {
             self.download();
         }
     }
-    
+
     func check() {
         // 当前版本检测
         let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.47"
 
         Alamofire.request(versionUrl).responseJSON { response in
             var hasNewVersion = false
-            
+
             defer {
                 // check local file
-                self.checkLocal(hasNewVersion:hasNewVersion)
+                self.checkLocal(hasNewVersion: hasNewVersion)
             }
-            
+
             //to get status code
             if let status = response.response?.statusCode {
                 if status != 200 {
-                    NSLog("error with response status: ",status)
+                    NSLog("error with response status: ", status)
                     return
                 }
             }
-            
+
             //to get JSON return value
             if let result = response.result.value {
                 let JSON = result as! NSDictionary
@@ -60,20 +60,20 @@ class V2rayCore {
                     NSLog("error: no tag_name")
                     return
                 }
-                
+
                 // get prerelease and draft
-                guard let prerelease = JSON["prerelease"],let draft = JSON["draft"] else {
+                guard let prerelease = JSON["prerelease"], let draft = JSON["draft"] else {
                     // get
                     NSLog("error: get prerelease or draft")
                     return
                 }
-                
+
                 // not pre release or draft
                 if prerelease as! Bool == true || draft as! Bool == true {
                     NSLog("this release is a prerelease or draft")
                     return
                 }
-                
+
                 let newVersion = tag_name as! String
 
                 // get old versiion
@@ -88,57 +88,57 @@ class V2rayCore {
                     hasNewVersion = true
                     NSLog("has new version", newVersion)
                 }
-                
+
                 return
             }
         }
     }
-  
-    func download(){
+
+    func download() {
         let version = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v3.47"
         let url = releaseUrl.replacingOccurrences(of: "${version}", with: version)
         NSLog("start download", version)
 
         // check unzip sh file
         // path: /Application/V2rayU.app/Contents/Resources/unzip.sh
-        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension:"sh") else {
+        guard let shFile = Bundle.main.url(forResource: "unzip", withExtension: "sh") else {
             NSLog("unzip shell file no found")
             return
         }
-        
+
         // download file: /Application/V2rayU.app/Contents/Resources/v2ray-macos.zip
-        let fileUrl = URL.init(fileURLWithPath:  shFile.path.replacingOccurrences(of: "/unzip.sh", with: "/v2ray-macos.zip"))
+        let fileUrl = URL.init(fileURLWithPath: shFile.path.replacingOccurrences(of: "/unzip.sh", with: "/v2ray-macos.zip"))
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
             return (fileUrl, [.removePreviousFile, .createIntermediateDirectories])
         }
-        
+
         let utilityQueue = DispatchQueue.global(qos: .utility)
-        Alamofire.download(url,to:destination)
-            .downloadProgress (queue: utilityQueue){ progress in
-                NSLog("已下载：\(progress.completedUnitCount/1024)KB")
-            }
-            .responseData { response in
-                switch response.result {
+        Alamofire.download(url, to: destination)
+                .downloadProgress(queue: utilityQueue) { progress in
+                    NSLog("已下载：\(progress.completedUnitCount / 1024)KB")
+                }
+                .responseData { response in
+                    switch response.result {
                     case .success(_):
                         break
                     case .failure(_):
                         NSLog("error with response status:")
                         return
+                    }
+
+                    if let _ = response.result.value {
+                        // make unzip.sh execable
+                        // chmod 777 unzip.sh
+                        let execable = "cd " + AppResourcesPath + " && /bin/chmod 777 ./unzip.sh"
+                        _ = shell(launchPath: "/bin/bash", arguments: ["-c", execable])
+
+                        // unzip v2ray-core
+                        // cmd: /bin/bash -c 'cd path && ./unzip.sh '
+                        let sh = "cd " + AppResourcesPath + " && ./unzip.sh"
+                        // exec shell
+                        let res = shell(launchPath: "/bin/bash", arguments: ["-c", sh])
+                        NSLog("res:", res!)
+                    }
                 }
-                
-                if let _ = response.result.value {
-                    // make unzip.sh execable
-                    // chmod 777 unzip.sh
-                    let execable = "cd "+AppResourcesPath+" && /bin/chmod 777 ./unzip.sh"
-                    _ = shell(launchPath:"/bin/bash",arguments:["-c",execable])
-                    
-                    // unzip v2ray-core
-                    // cmd: /bin/bash -c 'cd path && ./unzip.sh '
-                    let sh = "cd "+AppResourcesPath+" && ./unzip.sh"
-                    // exec shell
-                    let res = shell(launchPath:"/bin/bash", arguments: ["-c",sh])
-                    NSLog("res:",res!)
-                }
-            }
     }
 }

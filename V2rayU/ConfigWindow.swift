@@ -10,14 +10,14 @@ import Cocoa
 import WebKit
 import Alamofire
 
-class ConfigWindowController: NSWindowController,NSWindowDelegate {
+class ConfigWindowController: NSWindowController, NSWindowDelegate {
     // closed by window 'x' button
-    var closedByWindowButton:Bool = false
-    
+    var closedByWindowButton: Bool = false
+
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
     }
-    
+
     let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     let tableViewDragType: String = "v2ray.item"
 
@@ -29,7 +29,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
     @IBOutlet weak var jsonUrl: NSTextField!
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
-    
+
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
@@ -45,7 +45,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
-        
+
         if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
             logLevel.selectItem(withTitle: level)
         }
@@ -65,7 +65,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             self.serversTableView.reloadData()
             // selected current row
             self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
-            
+
             break
 
                 // delete server config
@@ -94,36 +94,36 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             // refresh menu
             menuController.showServers()
             break
-            
-        // unknown action
+
+                // unknown action
         default:
             return
         }
     }
 
-    func loadJsonFile(rowIndex:Int) {
+    func loadJsonFile(rowIndex: Int) {
         if rowIndex < 0 {
             return
         }
-        
+
         let v2ray = V2rayServer.loadV2rayItem(idx: rowIndex)
         self.configText.string = v2ray?.json ?? ""
     }
-    
+
     func saveConfig() {
         // todo save
         let text = self.configText.string
-        
+
         self.errTip.stringValue = V2rayConfig.saveByJson(jsonText: text)
         return
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
         self.errTip.stringValue = errMsg
-        
+
         // refresh menu
         menuController.showServers()
         // if server is current
-        if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName){
+        if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
             let v2rayItemList = V2rayServer.list()
             if curName == v2rayItemList[self.serversTableView.selectedRow].name {
                 if errMsg != "" {
@@ -134,7 +134,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             }
         }
     }
-    
+
     @IBAction func ok(_ sender: NSButton) {
         self.saveConfig()
     }
@@ -145,7 +145,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
         // hide dock icon and close all opened windows
 //        NSApp.setActivationPolicy(.accessory)
     }
-    
+
     @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
         if let item = logLevel.selectedItem {
             UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
@@ -153,30 +153,30 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             menuController.startV2rayCore()
         }
     }
-    
+
     @IBAction func importConfig(_ sender: NSButton) {
         self.configText.string = ""
         if jsonUrl.stringValue == "" {
             self.errTip.stringValue = "error: invaid url"
             return
         }
-        
+
         self.importJson()
     }
-    
+
     func importJson() {
         let text = self.configText.string
 
         // download json file
         Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
             if (DataResponse.error != nil) {
-                self.errTip.stringValue = "error: "+DataResponse.error.debugDescription
+                self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
                 return
             }
-            
+
             if DataResponse.value != nil {
                 self.configText.string = DataResponse.value ?? text
-                
+
                 // save
                 let msg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: self.configText.string)
                 if msg != "" {
@@ -185,7 +185,7 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             }
         }
     }
-    
+
     @IBAction func switchUri(_ sender: NSPopUpButton) {
         guard let item = sender.selectedItem else {
             return
@@ -204,22 +204,22 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             jsonUrl.isEditable = false
         }
     }
-    
+
     @IBAction func browseFile(_ sender: NSButton) {
         jsonUrl.stringValue = ""
         let dialog = NSOpenPanel()
-        
-        dialog.title                   = "Choose a .json file";
-        dialog.showsResizeIndicator    = true;
-        dialog.showsHiddenFiles        = false;
-        dialog.canChooseDirectories    = true;
-        dialog.canCreateDirectories    = true;
+
+        dialog.title = "Choose a .json file";
+        dialog.showsResizeIndicator = true;
+        dialog.showsHiddenFiles = false;
+        dialog.canChooseDirectories = true;
+        dialog.canCreateDirectories = true;
         dialog.allowsMultipleSelection = false;
-        dialog.allowedFileTypes        = ["json","txt"];
-        
+        dialog.allowedFileTypes = ["json", "txt"];
+
         if (dialog.runModal() == NSApplication.ModalResponse.OK) {
             let result = dialog.url // Pathname of the file
-            
+
             if (result != nil) {
                 jsonUrl.stringValue = result?.absoluteString ?? ""
                 self.importJson()
@@ -229,11 +229,11 @@ class ConfigWindowController: NSWindowController,NSWindowDelegate {
             return
         }
     }
-    
+
     @IBAction func openLogs(_ sender: NSButton) {
         V2rayLaunch.OpenLogs()
     }
-    
+
     func windowWillClose(_ notification: Notification) {
         // closed by window 'x' button
         self.closedByWindowButton = true
@@ -254,7 +254,7 @@ extension ConfigWindowController: NSTableViewDataSource {
         // set cell data
         return v2rayItemList[row].remark
     }
-    
+
     // edit cell
     func tableView(_ tableView: NSTableView, setObjectValue: Any?, for forTableColumn: NSTableColumn?, row: Int) {
         guard let remark = setObjectValue as? String else {
@@ -277,7 +277,7 @@ extension ConfigWindowController: NSTableViewDelegate {
         self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
         self.errTip.stringValue = ""
     }
-    
+
     // Drag & Drop reorder rows
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let item = NSPasteboardItem()
@@ -285,7 +285,7 @@ extension ConfigWindowController: NSTableViewDelegate {
         return item
     }
 
-    func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation:NSTableView.DropOperation) -> NSDragOperation {
+    func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
         if dropOperation == .above {
             return .move
         }
@@ -297,7 +297,7 @@ extension ConfigWindowController: NSTableViewDelegate {
         info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:], using: {
             (draggingItem: NSDraggingItem, idx: Int, stop: UnsafeMutablePointer<ObjCBool>) in
             if let str = (draggingItem.item as! NSPasteboardItem).string(forType: NSPasteboard.PasteboardType(rawValue: self.tableViewDragType)),
-                let index = Int(str) {
+               let index = Int(str) {
                 oldIndexes.append(index)
             }
         })

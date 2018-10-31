@@ -9,7 +9,7 @@
 import Foundation
 
 extension UserDefaults {
-    
+
     enum KEY: String {
         // v2ray-core version
         case v2rayCoreVersion
@@ -26,37 +26,37 @@ extension UserDefaults {
         // auto launch after login
         case autoLaunch
     }
-    
+
     static func setBool(forKey key: KEY, value: Bool) {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }
-    
+
     static func getBool(forKey key: KEY) -> Bool {
         return UserDefaults.standard.bool(forKey: key.rawValue)
     }
-    
+
     static func set(forKey key: KEY, value: String) {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }
-    
+
     static func get(forKey key: KEY) -> String? {
         return UserDefaults.standard.string(forKey: key.rawValue)
     }
-    
+
     static func del(forKey key: KEY) {
-         UserDefaults.standard.removeObject(forKey: key.rawValue)
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
-    
-    static func setArray(forKey key: KEY,value: [String]){
+
+    static func setArray(forKey key: KEY, value: [String]) {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }
-    
+
     static func getArray(forKey key: KEY) -> [String]? {
         return UserDefaults.standard.array(forKey: key.rawValue) as? [String]
     }
-    
+
     static func delArray(forKey key: KEY) {
-         UserDefaults.standard.removeObject(forKey: key.rawValue)
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
 }
 
@@ -64,7 +64,9 @@ extension String {
     // version compare
     func versionToInt() -> [Int] {
         return self.components(separatedBy: ".")
-            .map { Int.init($0) ?? 0 }
+                .map {
+                    Int.init($0) ?? 0
+                }
     }
 }
 
@@ -72,25 +74,24 @@ extension String {
 // demo:
 // shell("/bin/bash",["-c","ls"])
 // shell("/bin/bash",["-c","cd ~ && ls -la"])
-func shell(launchPath: String, arguments: [String]) -> String?
-{
+func shell(launchPath: String, arguments: [String]) -> String? {
     let task = Process()
     task.launchPath = launchPath
     task.arguments = arguments
-    
+
     let pipe = Pipe()
     task.standardOutput = pipe
     task.launch()
-    
+
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     let output = String(data: data, encoding: String.Encoding.utf8)!
 
     if output.count > 0 {
         //remove newline character.
         let lastIndex = output.index(before: output.endIndex)
-        return String(output[output.startIndex ..< lastIndex])
+        return String(output[output.startIndex..<lastIndex])
     }
-    
+
     return output
 }
 
@@ -114,7 +115,7 @@ struct TemporaryFile {
     /// - 注意: 这里不会创建文件！
     init(creatingTempDirectoryForFilename filename: String) throws {
         let (directory, deleteDirectory) = try FileManager.default
-            .urlForUniqueTemporaryDirectory()
+                .urlForUniqueTemporaryDirectory()
         self.directoryURL = directory
         self.fileURL = directory.appendingPathComponent(filename)
         self.deleteDirectory = deleteDirectory
@@ -129,17 +130,16 @@ extension FileManager {
     ///
     /// - 注意: 在应用退出后，不应该存在依赖的临时目录。
     func urlForUniqueTemporaryDirectory(preferredName: String? = nil) throws
-        -> (url: URL, deleteDirectory: () throws -> Void)
-    {
+                    -> (url: URL, deleteDirectory: () throws -> Void) {
         let basename = preferredName ?? UUID().uuidString
-        
+
         var counter = 0
         var createdSubdirectory: URL? = nil
         repeat {
             do {
                 let subdirName = counter == 0 ? basename : "\(basename)-\(counter)"
                 let subdirectory = temporaryDirectory
-                    .appendingPathComponent(subdirName, isDirectory: true)
+                        .appendingPathComponent(subdirName, isDirectory: true)
                 try createDirectory(at: subdirectory, withIntermediateDirectories: false)
                 createdSubdirectory = subdirectory
             } catch CocoaError.fileWriteFileExists {
@@ -148,7 +148,7 @@ extension FileManager {
                 counter += 1
             }
         } while createdSubdirectory == nil
-        
+
         let directory = createdSubdirectory!
         let deleteDirectory: () throws -> Void = {
             try self.removeItem(at: directory)
