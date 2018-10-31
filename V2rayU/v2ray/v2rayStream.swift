@@ -8,23 +8,23 @@
 
 import Foundation
 
-struct streamSettings: Codable {
-    var tcpSettings: tcpSettings?
-    var kcpSettings: kcpSettings?
-    var wsSettings: wsSettings?
-    var httpSettings: httpSettings?
-    var dsSettings: dsSettings?
+struct StreamSettings: Codable {
+    var tcpSettings: TcpSettings?
+    var kcpSettings: KcpSettings?
+    var wsSettings: WsSettings?
+    var httpSettings: HttpSettings?
+    var dsSettings: DsSettings?
 }
 
-struct tlsSettings: Codable {
+struct TlsSettings: Codable {
     var serverName: String?
     var alpn: String = "http/1.1"
     var allowInsecure: Bool // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
     var allowInsecureCiphers: Bool
-    var certificates: tlsCertificates?
+    var certificates: TlsCertificates?
 }
 
-struct tlsCertificates: Codable {
+struct TlsCertificates: Codable {
     enum usage: String, Codable {
         case encipherment
         case verify
@@ -38,18 +38,18 @@ struct tlsCertificates: Codable {
     var key: String
 }
 
-struct tcpSettings: Codable {
+struct TcpSettings: Codable {
 
 }
 
-struct kcpSettings: Codable {
+struct KcpSettings: Codable {
     var mtu, tti, uplinkCapacity, downlinkCapacity: Int
     var congestion: Bool
     var readBufferSize, writeBufferSize: Int
-    var header: kcpSettingsHeader
+    var header: KcpSettingsHeader
 }
 
-struct kcpSettingsHeader: Codable {
+struct KcpSettingsHeader: Codable {
     enum type: String, Codable {
         case none
         case srtp
@@ -62,25 +62,25 @@ struct kcpSettingsHeader: Codable {
     var type: type
 }
 
-struct wsSettings: Codable {
+struct WsSettings: Codable {
     var path: String
-    var headers: wsSettingsHeader
+    var headers: WsSettingsHeader
 }
 
-struct wsSettingsHeader: Codable {
+struct WsSettingsHeader: Codable {
     var host: String
 }
 
-struct httpSettings: Codable {
+struct HttpSettings: Codable {
     var host: [String]
     var path: String
 }
 
-struct dsSettings: Codable {
+struct DsSettings: Codable {
     var path: String
 }
 
-struct sockopt: Codable {
+struct Sockopt: Codable {
     enum tproxy:String,Codable {
         case redirect
         case tproxy

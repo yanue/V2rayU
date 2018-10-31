@@ -20,13 +20,13 @@ class V2rayUTests: XCTestCase {
 //        // Put teardown code here. This method is called after the invocation of each test method in the class.
 //    }
     func testInbound() {
-        var inbound = v2rayInbound()
-        inbound.protocol = v2rayProtocol.vmess
-        inbound.settingHttp = v2rayInboundHttp()
-        inbound.settingSocks = v2rayInboundSock()
-        inbound.settingShadowsocks = v2rayInboundShandowsocks()
-        inbound.settingVMess = v2rayInboundVMess()
-//        inbound.streamSettings = v2rayStreamSettings()
+        var inbound = V2rayInbound()
+        inbound.protocol = V2rayProtocolInbound.vmess
+        inbound.settingHttp = V2rayInboundHttp()
+        inbound.settingSocks = V2rayInboundSocks()
+        inbound.settingShadowsocks = V2rayInboundShadowsocks()
+        inbound.settingVMess = V2rayInboundVMess()
+//        inbound.streamSettings = V2rayStreamSettings()
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted //输出格式好看点
@@ -36,16 +36,16 @@ class V2rayUTests: XCTestCase {
     }
 
     func testOutbound() {
-        var outbound = v2rayOutbound()
-        outbound.protocol = v2rayProtocolOutbound.vmess
-        outbound.settingSocks = v2rayOutboundSocks()
-        outbound.settingShadowsocks = v2rayOutboundShadowsocks()
-        var v2next = v2rayOutboundVMessItem(
+        var outbound = V2rayOutbound()
+        outbound.protocol = V2rayProtocolOutbound.vmess
+        outbound.settingSocks = V2rayOutboundSocks()
+        outbound.settingShadowsocks = V2rayOutboundShadowsocks()
+        let v2next = V2rayOutboundVMessItem(
                 address: "",
                 port: "",
-                users: [v2rayOutboundVMessUser(id: "aaa", alterId: 0, level: 0, security: "")]
+                users: [V2rayOutboundVMessUser(id: "aaa", alterId: 0, level: 0, security: "")]
         )
-        outbound.settingVMess = v2rayOutboundVMess(vnext: [v2next])
+        outbound.settingVMess = V2rayOutboundVMess(vnext: [v2next])
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted //输出格式好看点
@@ -55,39 +55,16 @@ class V2rayUTests: XCTestCase {
     }
 
     func testV2ray() {
-
-        return
-        var v2ray = v2rayStruct()
-        v2ray.inbound = v2rayInbound()
-        v2ray.inboundDetour = [v2rayInboundDetour()]
-//        var outbound = v2rayOutbound()
-        var v2next = v2rayOutboundVMessItem(
-                address: "",
-                port: "",
-                users: [v2rayOutboundVMessUser(id: "aaa", alterId: 0, level: 0, security: "String?")]
-        )
-        var vmess = v2rayOutboundVMess(
-                vnext: [v2next]
-        )
-//
-//        outbound.protocol = .freedom
-//        outbound.settings = v2rayOutboundSettings()
-////        outbound.settings?.Vmess_vnext = [vmess]
-//        outbound.settings?.blackhole_Response = blackhole_Response()
-
-//        print("outbound",outbound)
-//        v2ray.outbound = outbound
-        v2ray.outboundDetour = [v2rayOutboundDetour()]
-
+        let V2rayCfg = V2rayConfig()
+        let errmsg = V2rayCfg.saveByJson(jsonText: jsonTxt)
+        if errmsg != "" {
+            print("err:", errmsg)
+            return
+        }
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted //输出格式好看点
-        let data = try! encoder.encode(v2ray)
+        let data = try! encoder.encode(V2rayCfg.v2ray)
         print(String(data: data, encoding: .utf8)!)
-
-    }
-
-    func testDecode() {
-
     }
 
     func testExample() {
@@ -103,6 +80,6 @@ class V2rayUTests: XCTestCase {
         let data = try! encoder.encode(ming)
         print(String(data: data, encoding: .utf8)!)
 
-//        print(v2ray.toJSONString(prettyPrint:true) ?? "") // 序列化为格式化后的JSON字符串
+//        print(V2ray.toJSONString(prettyPrint:true) ?? "") // 序列化为格式化后的JSON字符串
     }
 }

@@ -1,5 +1,5 @@
 //
-//  v2rayStruct.swift
+//  V2rayStruct.swift
 //  V2rayU
 //
 //  Created by yanue on 2018/10/26.
@@ -8,40 +8,32 @@
 
 import Foundation
 
-let outboundDetourTag = "direct"
+let OutboundDetourTag = "direct"
 
-struct v2rayStruct: Codable {
-    var log: v2rayLog? = v2rayLog()
-    var api: v2rayApi?
-    var dns: v2rayDns? = v2rayDns()
-    var stats: v2rayStats?
-    var routing: v2rayRouting? = v2rayRouting()
-    var policy: v2rayPolicy?
-    var inbound: v2rayInbound?
-    var inboundDetour: [v2rayInboundDetour]?
-    var outbound: v2rayOutboundVMess?
-    var outboundDetour: [v2rayOutboundDetour]?
-    var transport: v2rayTransport?
+struct V2rayStruct: Codable {
+    var log: V2rayLog? = V2rayLog()
+    var api: V2rayApi?
+    var dns: V2rayDns? = V2rayDns()
+    var stats: V2rayStats?
+    var routing: V2rayRouting? = V2rayRouting()
+    var policy: V2rayPolicy?
+    var inbound: V2rayInbound?
+    var inboundDetour: [V2rayInboundDetour]?
+    var outbound: V2rayOutbound?
+    var outboundDetour: [V2rayOutboundDetour]?
+    var transport: V2rayTransport?
 }
 
 // protocol
-enum v2rayProtocol: String, Codable {
-    case blackhole
-    case dokodemoDoor
-    case freedom
+enum V2rayProtocolInbound: String, CaseIterable, Codable {
     case http
-    case mtproto
     case shadowsocks
     case socks
     case vmess
-
-    enum CodingKeys: String, CodingKey {
-        case dokodemoDoor = "dokodemo-door"
-    }
 }
 
 // log
-struct v2rayLog: Codable {
+struct V2rayLog: Codable {
     enum logLevel: String, Codable {
         case debug
         case info
@@ -55,24 +47,24 @@ struct v2rayLog: Codable {
     var access: String? = ""
 }
 
-struct v2rayApi: Codable {
+struct V2rayApi: Codable {
 
 }
 
-struct v2rayDns: Codable {
+struct V2rayDns: Codable {
     var servers: [String]? = ["1.1.1.1", "8.8.8.8", "8.8.4.4", "119.29.29.29", "114.114.114.114", "223.5.5.5", "223.6.6.6"]
 }
 
-struct v2rayStats: Codable {
+struct V2rayStats: Codable {
 
 }
 
-struct v2rayRouting: Codable {
+struct V2rayRouting: Codable {
     var strategy: String = "rules"
-    var settings: v2rayRoutingSetting = v2rayRoutingSetting()
+    var settings: V2rayRoutingSetting = V2rayRoutingSetting()
 }
 
-struct v2rayRoutingSetting: Codable {
+struct V2rayRoutingSetting: Codable {
     enum domainStrategy: String, Codable {
         case AsIs
         case IPIfNonMatch
@@ -80,10 +72,10 @@ struct v2rayRoutingSetting: Codable {
     }
 
     var domainStrategy: domainStrategy = .IPIfNonMatch
-    var rules: [v2rayRoutingSettingRule] = [v2rayRoutingSettingRule()]
+    var rules: [V2rayRoutingSettingRule] = [V2rayRoutingSettingRule()]
 }
 
-struct v2rayRoutingSettingRule: Codable {
+struct V2rayRoutingSettingRule: Codable {
     var type: String? = "field"
     var domain: [String]? = ["geosite:cn", "geosite:speedtest"]
     var ip: [String]? = ["geoip:cn", "geoip:private"]
@@ -93,17 +85,17 @@ struct v2rayRoutingSettingRule: Codable {
     var user: [String]?
     var inboundTag: [String]?
     var `protocol`: [String]? // ["http", "tls", "bittorrent"]
-    var outboundTag: String? = outboundDetourTag
+    var outboundTag: String? = OutboundDetourTag
 }
 
-struct v2rayPolicy: Codable {
+struct V2rayPolicy: Codable {
 }
 
-struct v2rayTransport: Codable {
-    var tlsSettings: tlsSettings?
-    var tcpSettings: tcpSettings?
-    var kcpSettings: kcpSettings?
-    var wsSettings: wsSettings?
-    var httpSettings: httpSettings?
-    var dsSettings: dsSettings?
+struct V2rayTransport: Codable {
+    var tlsSettings: TlsSettings?
+    var tcpSettings: TcpSettings?
+    var kcpSettings: KcpSettings?
+    var wsSettings: WsSettings?
+    var httpSettings: HttpSettings?
+    var dsSettings: DsSettings?
 }

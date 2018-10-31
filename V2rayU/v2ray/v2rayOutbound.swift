@@ -1,5 +1,5 @@
 //
-//  v2rayOutbound.swift
+//  V2rayOutbound.swift
 //  V2rayU
 //
 //  Created by yanue on 2018/10/26.
@@ -9,28 +9,27 @@
 import Foundation
 
 // protocol
-enum v2rayProtocolOutbound: String, Codable {
+enum V2rayProtocolOutbound: String, Codable {
     case blackhole
     case freedom
-    case mtproto
     case shadowsocks
     case socks
     case vmess
 }
 
-struct v2rayOutbound: Codable {
+struct V2rayOutbound: Codable {
     var sendThrough: String?
-    var `protocol`: v2rayProtocolOutbound = .freedom
-    var tag: String? = outboundDetourTag
+    var `protocol`: V2rayProtocolOutbound = .freedom
+    var tag: String? = OutboundDetourTag
 //    var streamSettings: streamSettings?
-    var proxySettings: proxySettings?
-    var mux: v2rayOutboundMux?
+    var proxySettings: ProxySettings?
+    var mux: V2rayOutboundMux?
 
-    var settingBlackhole: v2rayOutboundBlackhole?
-    var settingFreedom: v2rayOutboundFreedom?
-    var settingShadowsocks: v2rayOutboundShadowsocks?
-    var settingSocks: v2rayOutboundSocks?
-    var settingVMess: v2rayOutboundVMess?
+    var settingBlackhole: V2rayOutboundBlackhole?
+    var settingFreedom: V2rayOutboundFreedom?
+    var settingShadowsocks: V2rayOutboundShadowsocks?
+    var settingSocks: V2rayOutboundSocks?
+    var settingVMess: V2rayOutboundVMess?
 
     enum CodingKeys: String, CodingKey {
         case sendThrough
@@ -43,11 +42,11 @@ struct v2rayOutbound: Codable {
     }
 }
 
-extension v2rayOutbound {
+extension V2rayOutbound {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        `protocol` = try container.decode(v2rayProtocolOutbound.self, forKey: CodingKeys.`protocol`)
+        `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: CodingKeys.`protocol`)
         tag = try container.decode(String.self, forKey: CodingKeys.tag)
 
         // ignore nil
@@ -58,21 +57,19 @@ extension v2rayOutbound {
         // decode settings depends on `protocol`
         switch `protocol` {
         case .blackhole:
-            settingBlackhole = try container.decode(v2rayOutboundBlackhole.self, forKey: CodingKeys.settings)
+            settingBlackhole = try container.decode(V2rayOutboundBlackhole.self, forKey: CodingKeys.settings)
             break
         case .freedom:
-            settingFreedom = try container.decode(v2rayOutboundFreedom.self, forKey: CodingKeys.settings)
+            settingFreedom = try container.decode(V2rayOutboundFreedom.self, forKey: CodingKeys.settings)
             break
         case .shadowsocks:
-            settingShadowsocks = try container.decode(v2rayOutboundShadowsocks.self, forKey: CodingKeys.settings)
+            settingShadowsocks = try container.decode(V2rayOutboundShadowsocks.self, forKey: CodingKeys.settings)
             break
         case .socks:
-            settingSocks = try container.decode(v2rayOutboundSocks.self, forKey: CodingKeys.settings)
-            break
-        case .mtproto:
+            settingSocks = try container.decode(V2rayOutboundSocks.self, forKey: CodingKeys.settings)
             break
         case .vmess:
-            settingVMess = try container.decode(v2rayOutboundVMess.self, forKey: CodingKeys.settings)
+            settingVMess = try container.decode(V2rayOutboundVMess.self, forKey: CodingKeys.settings)
             break
         }
     }
@@ -104,33 +101,31 @@ extension v2rayOutbound {
         case .freedom:
             try container.encode(self.settingFreedom, forKey: .settings)
             break
-        case .mtproto:
-            break
         }
     }
 }
 
-struct v2rayOutboundDetour: Codable {
+struct V2rayOutboundDetour: Codable {
     var sendThrough: String?
-    var `protocol`: v2rayProtocolOutbound = .freedom
-    var tag: String? = outboundDetourTag
-    var streamSettings: streamSettings?
-    var proxySettings: proxySettings?
-    var Mux: v2rayOutboundMux?
+    var `protocol`: V2rayProtocolOutbound = .freedom
+    var tag: String? = OutboundDetourTag
+    var streamSettings: StreamSettings?
+    var proxySettings: ProxySettings?
+    var Mux: V2rayOutboundMux?
 }
 
-struct v2rayOutboundMux: Codable {
+struct V2rayOutboundMux: Codable {
     var enabled: Bool = false
     var concurrency: Int = 8
 }
 
 // protocol
 // Blackhole
-struct v2rayOutboundBlackhole: Codable {
-    var response: v2rayOutboundBlackholeResponse?
+struct V2rayOutboundBlackhole: Codable {
+    var response: V2rayOutboundBlackholeResponse?
 }
 
-struct v2rayOutboundBlackholeResponse: Codable {
+struct V2rayOutboundBlackholeResponse: Codable {
     enum type: String, Codable {
         case none
         case http
@@ -139,18 +134,18 @@ struct v2rayOutboundBlackholeResponse: Codable {
     var type: type = .none
 }
 
-struct v2rayOutboundFreedom: Codable {
+struct V2rayOutboundFreedom: Codable {
     // Freedom
     var domainStrategy: String = "AsIs"// UseIP | AsIs
     var redirect: String?
     var userLevel: Int = 0
 }
 
-struct v2rayOutboundShadowsocks: Codable {
-    var servers: [v2rayOutboundShadowsockServer]?
+struct V2rayOutboundShadowsocks: Codable {
+    var servers: [V2rayOutboundShadowsockServer]?
 }
 
-struct v2rayOutboundShadowsockServer: Codable {
+struct V2rayOutboundShadowsockServer: Codable {
     var email: String?
     var address: String?
     var port: Int?
@@ -160,29 +155,29 @@ struct v2rayOutboundShadowsockServer: Codable {
     var level: Int = 0
 }
 
-struct v2rayOutboundSocks: Codable {
+struct V2rayOutboundSocks: Codable {
     var address: String?
     var port: String?
-    var users: [v2rayOutboundSockUser]?
+    var users: [V2rayOutboundSockUser]?
 }
 
-struct v2rayOutboundSockUser: Codable {
+struct V2rayOutboundSockUser: Codable {
     var user: String?
     var pass: String?
     var level: Int = 0
 }
 
-struct v2rayOutboundVMess: Codable {
-    var vnext: [v2rayOutboundVMessItem]
+struct V2rayOutboundVMess: Codable {
+    var vnext: [V2rayOutboundVMessItem]?
 }
 
-struct v2rayOutboundVMessItem: Codable {
+struct V2rayOutboundVMessItem: Codable {
     var address: String?
     var port: String?
-    var users: [v2rayOutboundVMessUser]?
+    var users: [V2rayOutboundVMessUser]?
 }
 
-struct v2rayOutboundVMessUser: Codable {
+struct V2rayOutboundVMessUser: Codable {
     var id: String?
     var alterId: Int? // 0-65535
     var level: Int?

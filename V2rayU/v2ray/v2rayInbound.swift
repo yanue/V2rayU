@@ -1,5 +1,5 @@
 //
-//  v2rayInbound.swift
+//  V2rayInbound.swift
 //  V2rayU
 //
 //  Created by yanue on 2018/10/26.
@@ -9,17 +9,17 @@
 import Foundation
 
 // Inbound
-struct v2rayInbound: Codable {
+struct V2rayInbound: Codable {
     var port: String = "1080"
     var listen: String = "127.0.0.1"
-    var `protocol`: v2rayProtocol = .socks
+    var `protocol`: V2rayProtocolInbound = .socks
     var tag: String? = ""
-    var streamSettings: v2rayStreamSettings?
-    var sniffing: v2rayInboundSniffing?
-    var settingHttp: v2rayInboundHttp?
-    var settingSocks: v2rayInboundSock?
-    var settingShadowsocks: v2rayInboundShandowsocks?
-    var settingVMess: v2rayInboundVMess?
+    var streamSettings: V2rayStreamSettings?
+    var sniffing: V2rayInboundSniffing?
+    var settingHttp: V2rayInboundHttp?
+    var settingSocks: V2rayInboundSocks?
+    var settingShadowsocks: V2rayInboundShadowsocks?
+    var settingVMess: V2rayInboundVMess?
 
     enum CodingKeys: String, CodingKey {
         case port
@@ -32,46 +32,38 @@ struct v2rayInbound: Codable {
     }
 }
 
-extension v2rayInbound {
+extension V2rayInbound {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         port = try container.decode(String.self, forKey: CodingKeys.port)
         listen = try container.decode(String.self, forKey: CodingKeys.listen)
-        `protocol` = try container.decode(v2rayProtocol.self, forKey: CodingKeys.`protocol`)
+        `protocol` = try container.decode(V2rayProtocolInbound.self, forKey: CodingKeys.`protocol`)
         tag = try container.decode(String.self, forKey: CodingKeys.tag)
 
         // ignore nil
         if !(try container.decodeNil(forKey: .streamSettings)) {
-            streamSettings = try container.decode(v2rayStreamSettings.self, forKey: CodingKeys.streamSettings)
+            streamSettings = try container.decode(V2rayStreamSettings.self, forKey: CodingKeys.streamSettings)
         }
 
         // ignore nil
         if !(try container.decodeNil(forKey: .sniffing)) {
-            sniffing = try container.decode(v2rayInboundSniffing.self, forKey: CodingKeys.sniffing)
+            sniffing = try container.decode(V2rayInboundSniffing.self, forKey: CodingKeys.sniffing)
         }
 
         // decode settings depends on `protocol`
         switch `protocol` {
         case .http:
-            settingHttp = try container.decode(v2rayInboundHttp.self, forKey: CodingKeys.settings)
+            settingHttp = try container.decode(V2rayInboundHttp.self, forKey: CodingKeys.settings)
             break
         case .shadowsocks:
-            settingShadowsocks = try container.decode(v2rayInboundShandowsocks.self, forKey: CodingKeys.settings)
+            settingShadowsocks = try container.decode(V2rayInboundShadowsocks.self, forKey: CodingKeys.settings)
             break
         case .socks:
-            settingSocks = try container.decode(v2rayInboundSock.self, forKey: CodingKeys.settings)
+            settingSocks = try container.decode(V2rayInboundSocks.self, forKey: CodingKeys.settings)
             break
         case .vmess:
-            settingVMess = try container.decode(v2rayInboundVMess.self, forKey: CodingKeys.settings)
-            break
-        case .blackhole:
-            break
-        case .dokodemoDoor:
-            break
-        case .freedom:
-            break
-        case .mtproto:
+            settingVMess = try container.decode(V2rayInboundVMess.self, forKey: CodingKeys.settings)
             break
         }
     }
@@ -95,7 +87,7 @@ extension v2rayInbound {
 
         // encode settings depends on `protocol`
         switch `protocol` {
-        case v2rayProtocol.http:
+        case .http:
             try container.encode(self.settingHttp, forKey: .settings)
             break
         case .shadowsocks:
@@ -107,19 +99,11 @@ extension v2rayInbound {
         case .vmess:
             try container.encode(self.settingVMess, forKey: .settings)
             break
-        case .blackhole:
-            break
-        case .dokodemoDoor:
-            break
-        case .freedom:
-            break
-        case .mtproto:
-            break
         }
     }
 }
 
-struct v2rayStreamSettings: Codable {
+struct V2rayStreamSettings: Codable {
     enum network: String, Codable {
         case tcp
         case kcp
@@ -136,27 +120,27 @@ struct v2rayStreamSettings: Codable {
 
     var network: network = .tcp
     var security: security = .none
-    var tlsSettings: tlsSettings?
-    var tcpSettings: tcpSettings?
-    var kcpSettings: kcpSettings?
-    var wsSettings: wsSettings?
-    var httpSettings: httpSettings?
-    var dsSettings: dsSettings?
-    var sockopt: sockopt?
+    var tlsSettings: TlsSettings?
+    var tcpSettings: TcpSettings?
+    var kcpSettings: KcpSettings?
+    var wsSettings: WsSettings?
+    var httpSettings: HttpSettings?
+    var dsSettings: DsSettings?
+    var sockopt: Sockopt?
 }
 
-struct v2rayInboundDetour: Codable {
+struct V2rayInboundDetour: Codable {
     var port: String = "1087"
     var listen: String = "127.0.0.1"
-    var `protocol`: v2rayProtocol = .http
+    var `protocol`: V2rayProtocolInbound = .http
     var tag: String?
-//    var settings:v2rayInboundSettings?
-//    var streamSettings:v2rayInboundSettings?
-    var sniffing: v2rayInboundSniffing?
-    var allocate: v2rayInboundDetourAllocate?
+//    var settings:V2rayInboundSettings?
+//    var streamSettings:V2rayInboundSettings?
+    var sniffing: V2rayInboundSniffing?
+    var allocate: V2rayInboundDetourAllocate?
 }
 
-struct v2rayInboundDetourAllocate: Codable {
+struct V2rayInboundDetourAllocate: Codable {
     enum strategy: String, Codable {
         case always
         case random
@@ -167,7 +151,7 @@ struct v2rayInboundDetourAllocate: Codable {
     var concurrency: Int = 3 // suggest 3, min 1
 }
 
-struct v2rayInboundSniffing: Codable {
+struct V2rayInboundSniffing: Codable {
     enum dest: String, Codable {
         case tls
         case http
@@ -177,54 +161,57 @@ struct v2rayInboundSniffing: Codable {
     var destOverride: [dest] = [.tls, .http]
 }
 
-struct proxySettings: Codable {
+struct ProxySettings: Codable {
     var Tag: String?
 }
 
-struct v2rayInboundHttp: Codable {
+struct V2rayInboundHttp: Codable {
     var timeout: Int?
-    var allowTransparent: Bool = false
-    var userLevel: Int = 0
+    var allowTransparent: Bool?
+    var userLevel: Int?
 }
 
-struct v2rayInboundShandowsocks: Codable {
-    enum auth: String, Codable {
-        case noauth
-        case password
-    }
-
-    var auth: auth = .noauth
-    var udp: Bool = true
-    var userLevel: Int = 0
-    var timeout: Int? // 默认300
-    var accounts: [v2rayInboundShandowsockAccount]?
+struct V2rayInboundShadowsocks: Codable {
+    var email, method, password: String?
+    var udp: Bool = false
+    var level: Int = 0
+    var ota: Bool = true
+    var network: String = "tcp" // "tcp" | "udp" | "tcp,udp"
 }
 
-struct v2rayInboundShandowsockAccount: Codable {
-    var user: String?
-    var pass: String?
-}
-
-struct v2rayInboundSock: Codable {
-    enum auth: String, Codable {
-        case noauth
-        case password
-    }
-
-    var auth: auth = .noauth
-    var accounts: [v2rayInboundSockAccount]?
+struct V2rayInboundSocks: Codable {
+    var auth: String = "noauth" // noauth | password
+    var accounts: [V2rayInboundSockAccount]?
     var udp: Bool?
     var ip: String?
     var timeout: Int?
     var userLevel: Int?
 }
 
-struct v2rayInboundSockAccount: Codable {
+struct V2rayInboundSockAccount: Codable {
     var user: String?
     var pass: String?
 }
 
-struct v2rayInboundVMess: Codable {
-    var user: String?
-    var pass: String?
+struct V2rayInboundVMess: Codable {
+    var clients: [V2RayInboundVMessClient]?
+    var `default`: V2RayInboundVMessDefault?
+    var detour: V2RayInboundVMessDetour?
+    var disableInsecureEncryption: Bool = false
+}
+
+struct V2RayInboundVMessClient: Codable {
+    var id: String?
+    var level: Int = 0
+    var alterId: Int = 64
+    var email: String?
+}
+
+struct V2RayInboundVMessDetour: Codable {
+    var to: String?
+}
+
+struct V2RayInboundVMessDefault: Codable {
+    var level: Int = 0
+    var alterId: Int = 32
 }

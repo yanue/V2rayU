@@ -114,7 +114,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         // todo save
         let text = self.configText.string
 
-        self.errTip.stringValue = V2rayConfig.saveByJson(jsonText: text)
+        self.errTip.stringValue = V2rayConfig().saveByJson(jsonText: text)
         return
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)

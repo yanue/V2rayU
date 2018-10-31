@@ -8,28 +8,139 @@
 
 import Foundation
 
+let jsonTxt = """
+{
+	"log": {
+		"loglevel": "info",
+		"access": "",
+		"error": ""
+	},
+	"dns": {
+		"servers": ""
+	},
+	"inbound": {
+		"port": "1080",
+		"listen": "localhost",
+		"protocol": "http",
+		"tab":"aaaa",
+		"settings": {
+			"timeout": 360
+		}
+	},
+	"inboundDetour": [
+		{
+			"port": 1080,
+			"listen": "127.0.0.1",
+			"protocol": "socks",
+			"settings": {
+				"auth": "noauth",
+				"timeout": 360,
+				"udp": true
+			}
+		}
+	],
+	"outbound": {
+		"tag": "agentout",
+		"protocol": "vmess",
+		"streamSettings": {
+			"network": "h2",
+			"httpSettings": {
+				"host": [
+					"ssl.miwukeji.net"
+				],
+				"path": "/ssl"
+			},
+			"tlsSettings": {},
+			"security": "tls"
+		},
+		"settings": {
+			"vnext": [
+				{
+					"users": [
+						{
+							"alterId": 64,
+							"id": "29f1ae2e-e29d-d804-7bcd-e01b5dfcf26a"
+						}
+					],
+					"port": 443,
+					"address": "ssl.miwukeji.net"
+				}
+			]
+		}
+	},
+	"outboundDetour": [
+		{
+			"tag": "direct",
+			"protocol": "freedom",
+			"settings": {
+				"response": null
+			}
+		},
+		{
+			"tag": "blockout",
+			"protocol": "blackhole",
+			"settings": {
+				"response": {
+					"type": "http"
+				}
+			}
+		}
+	],
+	"routing": {
+		"strategy": "rules",
+		"settings": {
+			"domainStrategy": "IPIfNonMatch",
+			"rules": [
+				{
+					"type": "field",
+					"outboundTag": "direct",
+					"ip": [
+						"geoip:private"
+					]
+				},
+				{
+					"type": "field",
+					"outboundTag": "direct",
+					"domain": [
+						"geosite:cn"
+					]
+				},
+				{
+					"type": "field",
+					"outboundTag": "direct",
+					"ip": [
+						"geoip:cn"
+					]
+				}
+			]
+		}
+	}
+}
+"""
+
 struct PersonProfile1: Codable {
-    var desc:String = "aaa"
+    var desc: String = "aaa"
 }
 
 struct PersonProfile2: Codable {
-    var intro:String = "aaa"
+    var intro: String = "aaa"
 }
 
 struct Person: Codable {
     var name: String = "bbb"
-    
-    var profile1:PersonProfile1?
-    var profile2:PersonProfile2?
-    
+
+    var profile1: PersonProfile1?
+    var profile2: PersonProfile2?
+
     enum CodingKeys: String, CodingKey {
         case name = "title"
         case setting
     }
 }
+
 extension Person {
     init(from decoder: Decoder) throws {
-        
+
         let vals = try decoder.container(keyedBy: CodingKeys.self)
         name = try vals.decode(String.self, forKey: CodingKeys.name)
         if name == "aa" {
@@ -38,7 +149,7 @@ extension Person {
             try vals.decode(PersonProfile2.self, forKey: .setting)
         }
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
@@ -49,6 +160,6 @@ extension Person {
         } else {
             try container.encode(self.profile2, forKey: .setting)
         }
-        
+
     }
 }
