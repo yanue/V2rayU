@@ -32,6 +32,7 @@
 		66FEAD4A217D7874009DECF9 /* appcast.inc in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD49217D7874009DECF9 /* appcast.inc */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
+		6D6DF1C91CE4692DB81B3D91 /* test.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFA785590D1AE17A29FAE /* test.json */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +96,7 @@
 		66FEAD49217D7874009DECF9 /* appcast.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = appcast.inc; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		66FEAD51217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceGeneral.xib; sourceTree = "<group>"; };
+		6D6DFA785590D1AE17A29FAE /* test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = test.json; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -209,6 +211,7 @@
 				66FEAD46217D7612009DECF9 /* bump.sh */,
 				66FEAD47217D7852009DECF9 /* appcast.xml */,
 				66FEAD49217D7874009DECF9 /* appcast.inc */,
+				6D6DFA785590D1AE17A29FAE /* test.json */,
 			);
 			path = Build;
 			sourceTree = "<group>";
@@ -365,6 +368,7 @@
 				66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
+				6D6DF1C91CE4692DB81B3D91 /* test.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

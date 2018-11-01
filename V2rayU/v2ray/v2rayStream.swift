@@ -18,9 +18,9 @@ struct StreamSettings: Codable {
 
 struct TlsSettings: Codable {
     var serverName: String?
-    var alpn: String = "http/1.1"
-    var allowInsecure: Bool // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
-    var allowInsecureCiphers: Bool
+    var alpn: String? = "http/1.1"
+    var allowInsecure: Bool? // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
+    var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
 }
 
@@ -31,57 +31,94 @@ struct TlsCertificates: Codable {
         case issue
     }
 
-    var usage: usage = .encipherment
-    var certificateFile: String
-    var keyFile: String
-    var certificate: String
-    var key: String
+    var usage: usage? = .encipherment
+    var certificateFile: String?
+    var keyFile: String?
+    var certificate: String?
+    var key: String?
 }
 
 struct TcpSettings: Codable {
+    var header: TcpSettingHeader? = TcpSettingHeader()
+}
 
+struct TcpSettingHeader: Codable {
+    var type: String? = "none"
+    var request: TcpSettingHeaderRequest?
+    var response: TcpSettingHeaderResponse?
+}
+
+struct TcpSettingHeaderRequest: Codable {
+    var version: String?
+    var method: String?
+    var path: [String]?
+    var headers: TcpSettingHeaderRequestHeaders?
+}
+
+struct TcpSettingHeaderRequestHeaders: Codable {
+    var host, userAgent, acceptEncoding, connection: [String]?
+    var pragma: String?
+
+    enum CodingKeys: String, CodingKey {
+        case host = "Host"
+        case userAgent = "User-Agent"
+        case acceptEncoding = "Accept-Encoding"
+        case connection = "Connection"
+        case pragma = "Pragma"
+    }
+}
+
+struct TcpSettingHeaderResponse: Codable {
+    var version, status, reason: String?
+    var headers: TcpSettingHeaderResponseHeaders?
+}
+
+struct TcpSettingHeaderResponseHeaders: Codable {
+    var contentType, transferEncoding, connection: [String]?
+    var pragma: String?
+
+    enum CodingKeys: String, CodingKey {
+        case contentType = "Content-Type"
+        case transferEncoding = "Transfer-Encoding"
+        case connection = "Connection"
+        case pragma = "Pragma"
+    }
 }
 
 struct KcpSettings: Codable {
-    var mtu, tti, uplinkCapacity, downlinkCapacity: Int
-    var congestion: Bool
-    var readBufferSize, writeBufferSize: Int
-    var header: KcpSettingsHeader
+    var mtu, tti, uplinkCapacity, downlinkCapacity: Int?
+    var congestion: Bool?
+    var readBufferSize, writeBufferSize: Int?
+    var header: KcpSettingsHeader?
 }
 
-struct KcpSettingsHeader: Codable {
-    enum type: String, Codable {
-        case none
-        case srtp
-        case utp
-//        case `wechat-video`
-        case dtls
-        case wireguard
-    }
+var KcpSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
 
-    var type: type
+struct KcpSettingsHeader: Codable {
+    // KcpSettingsHeaderType
+    var type: String? = "none"
 }
 
 struct WsSettings: Codable {
-    var path: String
-    var headers: WsSettingsHeader
+    var path: String?
+    var headers: WsSettingsHeader = WsSettingsHeader()
 }
 
 struct WsSettingsHeader: Codable {
-    var host: String
+    var host: String?
 }
 
 struct HttpSettings: Codable {
-    var host: [String]
-    var path: String
+    var host: [String]?
+    var path: String?
 }
 
 struct DsSettings: Codable {
-    var path: String
+    var path: String?
 }
 
-struct Sockopt: Codable {
-    enum tproxy:String,Codable {
+struct V2rayStreamSettingSockopt: Codable {
+    enum tproxy: String, Codable {
         case redirect
         case tproxy
         case off

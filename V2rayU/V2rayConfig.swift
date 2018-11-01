@@ -108,71 +108,293 @@ class V2rayConfig: NSObject {
             switch v2rayInbound.protocol {
 
             case .http:
-                var settingHttp = V2rayInboundHttp()
+                var settings = V2rayInboundHttp()
 
                 if jsonParams["settings"]["timeout"].exists() {
-                    settingHttp.timeout = jsonParams["settings"]["timeout"].intValue
+                    settings.timeout = jsonParams["settings"]["timeout"].intValue
                 }
 
                 if jsonParams["settings"]["allowTransparent"].exists() {
-                    settingHttp.allowTransparent = jsonParams["settings"]["allowTransparent"].boolValue
+                    settings.allowTransparent = jsonParams["settings"]["allowTransparent"].boolValue
                 }
 
                 if jsonParams["settings"]["userLevel"].exists() {
-                    settingHttp.userLevel = jsonParams["settings"]["userLevel"].intValue
+                    settings.userLevel = jsonParams["settings"]["userLevel"].intValue
                 }
-
+                // accounts
+                if jsonParams["settings"]["accounts"].exists() {
+                    var accounts: [V2rayInboundHttpAccount] = []
+                    for subJson in jsonParams["settings"]["accounts"].arrayValue {
+                        var account = V2rayInboundHttpAccount()
+                        account.user = subJson["user"].stringValue
+                        account.pass = subJson["pass"].stringValue
+                        accounts.append(account)
+                    }
+                    settings.accounts = accounts
+                }
                 // set into inbound
-                v2rayInbound.settingHttp = settingHttp
+                v2rayInbound.settingHttp = settings
                 break
 
             case .shadowsocks:
-                var settingShadowsocks = V2rayInboundShadowsocks()
-                settingShadowsocks.email = jsonParams["settings"]["timeout"].stringValue
-                settingShadowsocks.password = jsonParams["settings"]["password"].stringValue
-                settingShadowsocks.method = jsonParams["settings"]["method"].stringValue
-                settingShadowsocks.udp = jsonParams["settings"]["udp"].boolValue
-                settingShadowsocks.level = jsonParams["settings"]["level"].intValue
-                settingShadowsocks.ota = jsonParams["settings"]["ota"].boolValue
+                var settings = V2rayInboundShadowsocks()
+                settings.email = jsonParams["settings"]["timeout"].stringValue
+                settings.password = jsonParams["settings"]["password"].stringValue
+                settings.method = jsonParams["settings"]["method"].stringValue
+                settings.udp = jsonParams["settings"]["udp"].boolValue
+                settings.level = jsonParams["settings"]["level"].intValue
+                settings.ota = jsonParams["settings"]["ota"].boolValue
 
                 // set into inbound
-                v2rayInbound.settingShadowsocks = settingShadowsocks
+                v2rayInbound.settingShadowsocks = settings
                 break
 
             case .socks:
-                var settingSocks = V2rayInboundSocks()
-                settingSocks.auth = jsonParams["settings"]["auth"].stringValue
-                if settingSocks.auth == "password" {
-                    // todo
+                var settings = V2rayInboundSocks()
+                settings.auth = jsonParams["settings"]["auth"].stringValue
+                // accounts
+                if jsonParams["settings"]["accounts"].exists() {
+                    var accounts: [V2rayInboundSockAccount] = []
+                    for subJson in jsonParams["settings"]["accounts"].arrayValue {
+                        var account = V2rayInboundSockAccount()
+                        account.user = subJson["user"].stringValue
+                        account.pass = subJson["pass"].stringValue
+                        accounts.append(account)
+                    }
+                    settings.accounts = accounts
                 }
-                settingSocks.udp = jsonParams["settings"]["udp"].boolValue
-                settingSocks.ip = jsonParams["settings"]["ip"].stringValue
-                settingSocks.timeout = jsonParams["settings"]["timeout"].intValue
-                settingSocks.userLevel = jsonParams["settings"]["userLevel"].intValue
+
+                settings.udp = jsonParams["settings"]["udp"].boolValue
+                settings.ip = jsonParams["settings"]["ip"].stringValue
+                settings.timeout = jsonParams["settings"]["timeout"].intValue
+                settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
                 // set into inbound
-                v2rayInbound.settingSocks = settingSocks
+                v2rayInbound.settingSocks = settings
                 break
 
             case .vmess:
-                var settingVMess = V2rayInboundVMess()
-                settingVMess.disableInsecureEncryption = jsonParams["settings"]["disableInsecureEncryption"].boolValue
-                // todo
+                var settings = V2rayInboundVMess()
+                settings.disableInsecureEncryption = jsonParams["settings"]["disableInsecureEncryption"].boolValue
+                // clients
+                if jsonParams["settings"]["clients"].exists() {
+                    var clients: [V2RayInboundVMessClient] = []
+                    for subJson in jsonParams["settings"]["clients"].arrayValue {
+                        var client = V2RayInboundVMessClient()
+                        client.id = subJson["id"].stringValue
+                        client.level = subJson["level"].intValue
+                        client.alterId = subJson["alterId"].intValue
+                        client.email = subJson["email"].stringValue
+                        clients.append(client)
+                    }
+                    settings.clients = clients
+                }
+
+                if jsonParams["settings"]["default"].exists() {
+                    settings.`default`?.level = jsonParams["settings"]["default"]["level"].intValue
+                    settings.`default`?.alterId = jsonParams["settings"]["default"]["alterId"].intValue
+                }
+
+                if jsonParams["settings"]["detour"].exists() {
+                    var detour = V2RayInboundVMessDetour()
+                    detour.to = jsonParams["settings"]["detour"]["to"].stringValue
+                    settings.detour = detour
+                }
+
                 // set into inbound
-                v2rayInbound.settingVMess = settingVMess
+                v2rayInbound.settingVMess = settings
                 break
             }
         }
 
         // stream settings
-        // todo
         if jsonParams["streamSettings"].exists() {
-
+            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
+            if errmsg != "" {
+                return errmsg
+            }
+            v2rayInbound.streamSettings = stream
         }
 
         // set into v2ray
         v2ray.inbound = v2rayInbound
         return ""
+    }
+
+    // parse steamSettings
+    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> (errmsg: String, stream: V2rayStreamSettings) {
+        var errmsg = ""
+        var stream = V2rayStreamSettings()
+
+        if (V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue) == nil) {
+            errmsg = "invalid " + preTxt + ".streamSettings.network"
+            return (errmsg: errmsg, stream: stream)
+        }
+        // set network
+        stream.network = V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue)!
+
+        if (V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue) == nil) {
+            errmsg = "invalid " + preTxt + ".streamSettings.security"
+            return (errmsg: errmsg, stream: stream)
+        }
+        // set security
+        stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
+
+        if steamJson["sockopt"].dictionaryValue.count > 0 {
+            var sockopt = V2rayStreamSettingSockopt()
+
+            // tproxy
+            if (V2rayStreamSettingSockopt.tproxy(rawValue: steamJson["sockopt"]["tproxy"].stringValue) != nil) {
+                sockopt.tproxy = V2rayStreamSettingSockopt.tproxy(rawValue: steamJson["sockopt"]["tproxy"].stringValue)!
+            }
+
+            sockopt.tcpFastOpen = steamJson["sockopt"]["tcpFastOpen"].boolValue
+            sockopt.mark = steamJson["sockopt"]["mark"].intValue
+            print("sockopt",sockopt)
+            stream.sockopt = sockopt
+        }
+
+        // tlsSettings
+        if steamJson["tlsSettings"].dictionaryValue.count > 0 {
+            var tlsSettings = TlsSettings()
+            tlsSettings.serverName = steamJson["tlsSettings"]["serverName"].stringValue
+            tlsSettings.alpn = steamJson["tlsSettings"]["alpn"].stringValue
+            tlsSettings.allowInsecure = steamJson["tlsSettings"]["allowInsecure"].boolValue
+            tlsSettings.allowInsecureCiphers = steamJson["tlsSettings"]["allowInsecureCiphers"].boolValue
+            // certificates
+            if steamJson["tlsSettings"]["certificates"].dictionaryValue.count > 0 {
+                var certificates = TlsCertificates()
+                let usage = TlsCertificates.usage(rawValue: steamJson["tlsSettings"]["certificates"]["usage"].stringValue)
+                if (usage != nil) {
+                    certificates.usage = usage!
+                }
+                certificates.certificateFile = steamJson["tlsSettings"]["certificates"]["certificateFile"].stringValue
+                certificates.keyFile = steamJson["tlsSettings"]["certificates"]["keyFile"].stringValue
+                certificates.certificate = steamJson["tlsSettings"]["certificates"]["certificate"].stringValue
+                certificates.key = steamJson["tlsSettings"]["certificates"]["key"].stringValue
+                tlsSettings.certificates = certificates
+            }
+            stream.tlsSettings = tlsSettings
+        }
+
+        // tcpSettings
+        if steamJson["tlsSettings"].dictionaryValue.count > 0 {
+            var tcpSettings = TcpSettings()
+            var tcpHeader = TcpSettingHeader()
+
+            // type
+            if steamJson["tcpSettings"]["header"]["type"].stringValue == "http" {
+                tcpHeader.type = "http"
+            } else {
+                tcpHeader.type = "none"
+            }
+
+            // request
+            if steamJson["tcpSettings"]["header"]["request"].dictionaryValue.count > 0 {
+                var requestJson = steamJson["tcpSettings"]["header"]["request"]
+                var tcpRequest = TcpSettingHeaderRequest()
+                tcpRequest.version = requestJson["version"].stringValue
+                tcpRequest.method = requestJson["method"].stringValue
+                tcpRequest.path = requestJson["path"].arrayValue.map {
+                    $0.stringValue
+                }
+
+                if requestJson["headers"].dictionaryValue.count > 0 {
+                    var tcpRequestHeaders = TcpSettingHeaderRequestHeaders()
+                    tcpRequestHeaders.host = requestJson["headers"]["Host"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpRequestHeaders.userAgent = requestJson["headers"]["User-Agent"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpRequestHeaders.acceptEncoding = requestJson["headers"]["Accept-Encoding"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpRequestHeaders.connection = requestJson["headers"]["Connection"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpRequestHeaders.pragma = requestJson["headers"]["Pragma"].stringValue
+                    tcpRequest.headers = tcpRequestHeaders
+                }
+                tcpHeader.request = tcpRequest
+            }
+
+            // response
+            if steamJson["tcpSettings"]["header"]["response"].dictionaryValue.count > 0 {
+                var responseJson = steamJson["tcpSettings"]["header"]["response"]
+                var tcpResponse = TcpSettingHeaderResponse()
+
+                tcpResponse.version = responseJson["version"].stringValue
+                tcpResponse.status = responseJson["status"].stringValue
+
+                if responseJson["headers"].dictionaryValue.count > 0 {
+                    var tcpResponseHeaders = TcpSettingHeaderResponseHeaders()
+                    // contentType, transferEncoding, connection
+                    tcpResponseHeaders.contentType = responseJson["headers"]["Content-Type"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpResponseHeaders.transferEncoding = responseJson["headers"]["Transfer-Encoding"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpResponseHeaders.connection = responseJson["headers"]["Connection"].arrayValue.map {
+                        $0.stringValue
+                    }
+                    tcpResponseHeaders.pragma = responseJson["headers"]["Pragma"].stringValue
+                    tcpResponse.headers = tcpResponseHeaders
+                }
+                tcpHeader.response = tcpResponse
+            }
+
+            tcpSettings.header = tcpHeader
+
+            stream.tcpSettings = tcpSettings
+        }
+
+        // kcpSettings see: https://www.v2ray.com/chapter_02/transport/mkcp.html
+        if steamJson["kcpSettings"].dictionaryValue.count > 0 {
+            var kcpSettings = KcpSettings()
+            kcpSettings.mtu = steamJson["kcpSettings"]["mtu"].intValue
+            kcpSettings.tti = steamJson["kcpSettings"]["tti"].intValue
+            kcpSettings.uplinkCapacity = steamJson["kcpSettings"]["uplinkCapacity"].intValue
+            kcpSettings.downlinkCapacity = steamJson["kcpSettings"]["downlinkCapacity"].intValue
+            kcpSettings.congestion = steamJson["kcpSettings"]["congestion"].boolValue
+            kcpSettings.readBufferSize = steamJson["kcpSettings"]["readBufferSize"].intValue
+            kcpSettings.writeBufferSize = steamJson["kcpSettings"]["writeBufferSize"].intValue
+            // "none"
+            if KcpSettingsHeaderType.firstIndex(of: steamJson["kcpSettings"]["type"].stringValue) != nil {
+                kcpSettings.header?.type = steamJson["kcpSettings"]["type"].stringValue
+            }
+            stream.kcpSettings = kcpSettings
+        }
+
+        // wsSettings see: https://www.v2ray.com/chapter_02/transport/websocket.html
+        if steamJson["wsSettings"].dictionaryValue.count > 0 {
+            var wsSettings = WsSettings()
+            wsSettings.path = steamJson["wsSettings"]["path"].stringValue
+            wsSettings.headers.host = steamJson["wsSettings"]["header"]["host"].stringValue
+
+            stream.wsSettings = wsSettings
+        }
+
+        // (HTTP/2)httpSettings see: https://www.v2ray.com/chapter_02/transport/websocket.html
+        if steamJson["httpSettings"].exists() && steamJson["httpSettings"].dictionaryValue.count > 0 {
+            var httpSettings = HttpSettings()
+            httpSettings.host = steamJson["httpSettings"]["host"].arrayValue.map {
+                $0.stringValue
+            }
+            httpSettings.path = steamJson["httpSettings"]["path"].stringValue
+
+            stream.httpSettings = httpSettings
+        }
+
+        // dsSettings
+        if steamJson["dsSettings"].exists() && steamJson["dsSettings"].dictionaryValue.count > 0 {
+            var dsSettings = DsSettings()
+            dsSettings.path = steamJson["dsSettings"]["path"].stringValue
+            stream.dsSettings = dsSettings
+        }
+
+        return (errmsg: errmsg, stream: stream)
     }
 
     // parse inbound from json

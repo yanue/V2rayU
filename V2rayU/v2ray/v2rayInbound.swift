@@ -126,7 +126,7 @@ struct V2rayStreamSettings: Codable {
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
-    var sockopt: Sockopt?
+    var sockopt: V2rayStreamSettingSockopt?
 }
 
 struct V2rayInboundDetour: Codable {
@@ -169,6 +169,12 @@ struct V2rayInboundHttp: Codable {
     var timeout: Int?
     var allowTransparent: Bool?
     var userLevel: Int?
+    var accounts:[V2rayInboundHttpAccount]?
+}
+
+struct V2rayInboundHttpAccount: Codable {
+    var user: String?
+    var pass: String?
 }
 
 struct V2rayInboundShadowsocks: Codable {
@@ -195,7 +201,7 @@ struct V2rayInboundSockAccount: Codable {
 
 struct V2rayInboundVMess: Codable {
     var clients: [V2RayInboundVMessClient]?
-    var `default`: V2RayInboundVMessDefault?
+    var `default`: V2RayInboundVMessDefault? = V2RayInboundVMessDefault()
     var detour: V2RayInboundVMessDetour?
     var disableInsecureEncryption: Bool = false
 }
@@ -213,5 +219,5 @@ struct V2RayInboundVMessDetour: Codable {
 
 struct V2RayInboundVMessDefault: Codable {
     var level: Int = 0
-    var alterId: Int = 32
+    var alterId: Int = 64
 }

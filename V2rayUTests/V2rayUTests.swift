@@ -62,6 +62,7 @@ class V2rayUTests: XCTestCase {
             return
         }
         let encoder = JSONEncoder()
+//        encoder.outputFormatting = .sortedKeys
         encoder.outputFormatting = .prettyPrinted //输出格式好看点
         let data = try! encoder.encode(V2rayCfg.v2ray)
         print(String(data: data, encoding: .utf8)!)
