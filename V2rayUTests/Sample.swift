@@ -10,14 +10,6 @@ import Foundation
 
 let jsonTxt = """
 {
-  "log": {
-    "loglevel": "info",
-    "access": "",
-    "error": ""
-  },
-  "dns": {
-    "servers": ""
-  },
   "inbound": {
     "port": "1080",
     "listen": "localhost",

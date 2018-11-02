@@ -22,7 +22,7 @@ class V2rayConfig: NSObject {
     }
 
     func saveByJson(jsonText: String) -> String {
-        guard let json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
+        guard var json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
             return "invalid json"
         }
 
@@ -31,14 +31,14 @@ class V2rayConfig: NSObject {
         }
 
         // get dns data
-        if json["dns"].exists() && json["dns"]["servers"].exists() {
+        if json["dns"].dictionaryValue.count > 0 {
             let dnsServers = json["dns"]["servers"].array?.compactMap({ $0.string })
             if ((dnsServers?.count) != nil) {
                 self.v2ray.dns?.servers = dnsServers
             }
         }
         var errmsg: String
-        if !json["inbound"].exists() {
+        if json["inbound"].dictionaryValue.count > 0 {
             return "missing inbound"
         }
 
@@ -47,7 +47,7 @@ class V2rayConfig: NSObject {
             return errmsg
         }
 
-        if !json["outbound"].exists() {
+        if json["outbound"].dictionaryValue.count > 0 {
             return "missing outbound"
         }
 
@@ -56,7 +56,7 @@ class V2rayConfig: NSObject {
             return errmsg
         }
 
-        if !json["routing"].exists() {
+        if json["routing"].dictionaryValue.count > 0 {
             return "missing routing"
         }
 
@@ -69,7 +69,7 @@ class V2rayConfig: NSObject {
 
         var v2rayInbound = V2rayInbound()
 
-        if !(jsonParams["protocol"].exists()) {
+        if !jsonParams["protocol"].exists() {
             return "missing inbound.protocol"
         }
 
@@ -91,38 +91,38 @@ class V2rayConfig: NSObject {
         // set port
         v2rayInbound.port = String(jsonParams["port"].intValue)
 
-        if jsonParams["listen"].exists() && jsonParams["listen"].stringValue.count > 0 {
+        if jsonParams["listen"].stringValue.count > 0 {
             // set listen
             // todo valid
             v2rayInbound.listen = jsonParams["listen"].stringValue
         }
 
-        if jsonParams["tag"].exists() && jsonParams["tag"].stringValue.count > 0 {
+        if jsonParams["tag"].stringValue.count > 0 {
             // set tag
             v2rayInbound.tag = jsonParams["tag"].stringValue
         }
 
         // settings depends on protocol
-        if jsonParams["settings"].exists() {
+        if jsonParams["settings"].dictionaryValue.count > 0 {
 
             switch v2rayInbound.protocol {
 
             case .http:
                 var settings = V2rayInboundHttp()
 
-                if jsonParams["settings"]["timeout"].exists() {
+                if jsonParams["settings"]["timeout"].dictionaryValue.count > 0 {
                     settings.timeout = jsonParams["settings"]["timeout"].intValue
                 }
 
-                if jsonParams["settings"]["allowTransparent"].exists() {
+                if jsonParams["settings"]["allowTransparent"].dictionaryValue.count > 0 {
                     settings.allowTransparent = jsonParams["settings"]["allowTransparent"].boolValue
                 }
 
-                if jsonParams["settings"]["userLevel"].exists() {
+                if jsonParams["settings"]["userLevel"].dictionaryValue.count > 0 {
                     settings.userLevel = jsonParams["settings"]["userLevel"].intValue
                 }
                 // accounts
-                if jsonParams["settings"]["accounts"].exists() {
+                if jsonParams["settings"]["accounts"].dictionaryValue.count > 0 {
                     var accounts: [V2rayInboundHttpAccount] = []
                     for subJson in jsonParams["settings"]["accounts"].arrayValue {
                         var account = V2rayInboundHttpAccount()
@@ -153,7 +153,7 @@ class V2rayConfig: NSObject {
                 var settings = V2rayInboundSocks()
                 settings.auth = jsonParams["settings"]["auth"].stringValue
                 // accounts
-                if jsonParams["settings"]["accounts"].exists() {
+                if jsonParams["settings"]["accounts"].dictionaryValue.count > 0 {
                     var accounts: [V2rayInboundSockAccount] = []
                     for subJson in jsonParams["settings"]["accounts"].arrayValue {
                         var account = V2rayInboundSockAccount()
@@ -177,7 +177,7 @@ class V2rayConfig: NSObject {
                 var settings = V2rayInboundVMess()
                 settings.disableInsecureEncryption = jsonParams["settings"]["disableInsecureEncryption"].boolValue
                 // clients
-                if jsonParams["settings"]["clients"].exists() {
+                if jsonParams["settings"]["clients"].dictionaryValue.count > 0 {
                     var clients: [V2RayInboundVMessClient] = []
                     for subJson in jsonParams["settings"]["clients"].arrayValue {
                         var client = V2RayInboundVMessClient()
@@ -190,12 +190,12 @@ class V2rayConfig: NSObject {
                     settings.clients = clients
                 }
 
-                if jsonParams["settings"]["default"].exists() {
+                if jsonParams["settings"]["default"].dictionaryValue.count > 0 {
                     settings.`default`?.level = jsonParams["settings"]["default"]["level"].intValue
                     settings.`default`?.alterId = jsonParams["settings"]["default"]["alterId"].intValue
                 }
 
-                if jsonParams["settings"]["detour"].exists() {
+                if jsonParams["settings"]["detour"].dictionaryValue.count > 0 {
                     var detour = V2RayInboundVMessDetour()
                     detour.to = jsonParams["settings"]["detour"]["to"].stringValue
                     settings.detour = detour
@@ -208,7 +208,7 @@ class V2rayConfig: NSObject {
         }
 
         // stream settings
-        if jsonParams["streamSettings"].exists() {
+        if jsonParams["streamSettings"].dictionaryValue.count > 0 {
             let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
             if errmsg != "" {
                 return errmsg
@@ -250,7 +250,7 @@ class V2rayConfig: NSObject {
 
             sockopt.tcpFastOpen = steamJson["sockopt"]["tcpFastOpen"].boolValue
             sockopt.mark = steamJson["sockopt"]["mark"].intValue
-            print("sockopt",sockopt)
+
             stream.sockopt = sockopt
         }
 
@@ -377,7 +377,7 @@ class V2rayConfig: NSObject {
         }
 
         // (HTTP/2)httpSettings see: https://www.v2ray.com/chapter_02/transport/websocket.html
-        if steamJson["httpSettings"].exists() && steamJson["httpSettings"].dictionaryValue.count > 0 {
+        if steamJson["httpSettings"].dictionaryValue.count > 0 && steamJson["httpSettings"].dictionaryValue.count > 0 {
             var httpSettings = HttpSettings()
             httpSettings.host = steamJson["httpSettings"]["host"].arrayValue.map {
                 $0.stringValue
@@ -388,7 +388,7 @@ class V2rayConfig: NSObject {
         }
 
         // dsSettings
-        if steamJson["dsSettings"].exists() && steamJson["dsSettings"].dictionaryValue.count > 0 {
+        if steamJson["dsSettings"].dictionaryValue.count > 0 && steamJson["dsSettings"].dictionaryValue.count > 0 {
             var dsSettings = DsSettings()
             dsSettings.path = steamJson["dsSettings"]["path"].stringValue
             stream.dsSettings = dsSettings
@@ -415,7 +415,7 @@ class V2rayConfig: NSObject {
         v2rayOutbound.protocol = V2rayProtocolOutbound(rawValue: jsonParams["protocol"].stringValue)!
 
         // settings depends on protocol
-        if jsonParams["settings"].exists() {
+        if jsonParams["settings"].dictionaryValue.count > 0 {
             switch v2rayOutbound.protocol {
             case .blackhole:
                 var settingBlackhole = V2rayOutboundBlackhole()
