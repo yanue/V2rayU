@@ -37,36 +37,72 @@ class V2rayConfig: NSObject {
                 self.v2ray.dns?.servers = dnsServers
             }
         }
+
         var errmsg: String
-        if json["inbound"].dictionaryValue.count > 0 {
+        // check inbound or inbounds
+        if json["inbound"].dictionaryValue.count == 0 && json["inbounds"].arrayValue.count == 0 {
             return "missing inbound"
         }
+        self.v2ray.inbounds = []
+        self.v2ray.outbounds = []
 
-        errmsg = self.parseInbound(json: json)
-        if errmsg != "" {
-            return errmsg
+        // less than 4.0
+        if json["inbound"].exists() {
+            errmsg = self.parseInbound(jsonParams: json["inbound"])
+            if errmsg != "" {
+                return errmsg
+            }
         }
 
-        if json["outbound"].dictionaryValue.count > 0 {
+        // less than 4.0
+        json["inboundDetour"].arrayValue.forEach { val in
+            // todo
+            self.parseInbound(jsonParams: val)
+        }
+
+        // above 4.0
+        json["inbounds"].arrayValue.forEach { val in
+            // todo
+            self.parseInbound(jsonParams: val)
+        }
+
+        // check outbound or outbounds
+        if json["outbound"].dictionaryValue.count == 0 && json["outbounds"].arrayValue.count == 0 {
             return "missing outbound"
         }
 
-        errmsg = self.parseOutbound(json: json)
-        if errmsg != "" {
-            return errmsg
+
+        // less than 4.0
+        if json["inbound"].exists() {
+            errmsg = self.parseOutbound(jsonParams: json["outbound"])
+            if errmsg != "" {
+                return errmsg
+            }
+        }
+
+        // less than 4.0
+        json["outboundDetour"].arrayValue.forEach { val in
+            // todo
+            self.parseOutbound(jsonParams: val)
+        }
+
+        // above 4.0
+        json["outbounds"].arrayValue.forEach { val in
+            // todo
+            self.parseOutbound(jsonParams: val)
         }
 
         if json["routing"].dictionaryValue.count > 0 {
-            return "missing routing"
+//            return "missing routing"
         }
+
+        v2ray.transport = self.parseTransport(steamJson: json["transport"])
 
         return ""
     }
 
     // parse inbound from json
-    func parseInbound(json: JSON) -> String {
-        let jsonParams = json["inbound"]
-
+    func parseInbound(jsonParams: JSON) -> String {
         var v2rayInbound = V2rayInbound()
 
         if !jsonParams["protocol"].exists() {
@@ -217,7 +253,7 @@ class V2rayConfig: NSObject {
         }
 
         // set into v2ray
-        v2ray.inbound = v2rayInbound
+        self.v2ray.inbounds?.append(v2rayInbound)
         return ""
     }
 
@@ -254,6 +290,20 @@ class V2rayConfig: NSObject {
             stream.sockopt = sockopt
         }
 
+        // steamSettings (same as global transport)
+        let transport = self.parseTransport(steamJson: steamJson["streamSettings"])
+        stream.tlsSettings = transport.tlsSettings
+        stream.tcpSettings = transport.tcpSettings
+        stream.kcpSettings = transport.kcpSettings
+        stream.wsSettings = transport.wsSettings
+        stream.httpSettings = transport.httpSettings
+        stream.dsSettings = transport.dsSettings
+
+        return (errmsg: errmsg, stream: stream)
+    }
+
+    func parseTransport(steamJson: JSON) -> V2rayTransport {
+        var stream = V2rayTransport()
         // tlsSettings
         if steamJson["tlsSettings"].dictionaryValue.count > 0 {
             var tlsSettings = TlsSettings()
@@ -394,13 +444,11 @@ class V2rayConfig: NSObject {
             stream.dsSettings = dsSettings
         }
 
-        return (errmsg: errmsg, stream: stream)
+        return stream
     }
 
     // parse inbound from json
-    func parseOutbound(json: JSON) -> String {
-        let jsonParams = json["outbound"]
-
+    func parseOutbound(jsonParams: JSON) -> String {
         var v2rayOutbound = V2rayOutbound()
 
         if !(jsonParams["protocol"].exists()) {
@@ -410,48 +458,122 @@ class V2rayConfig: NSObject {
         if (V2rayProtocolOutbound(rawValue: jsonParams["protocol"].stringValue) == nil) {
             return "invalid outbound.protocol"
         }
-
         // set protocol
         v2rayOutbound.protocol = V2rayProtocolOutbound(rawValue: jsonParams["protocol"].stringValue)!
+
+        v2rayOutbound.sendThrough = jsonParams["sendThrough"].stringValue
+        v2rayOutbound.tag = jsonParams["tag"].stringValue
+
+        if jsonParams["mux"].dictionaryValue.count > 0 {
+            var mux = V2rayOutboundMux()
+            mux.enabled = jsonParams["mux"]["enabled"].boolValue
+            mux.concurrency = jsonParams["mux"]["concurrency"].intValue
+            v2rayOutbound.mux = mux
+        }
 
         // settings depends on protocol
         if jsonParams["settings"].dictionaryValue.count > 0 {
             switch v2rayOutbound.protocol {
             case .blackhole:
                 var settingBlackhole = V2rayOutboundBlackhole()
-                // todo
+                settingBlackhole.response.type = jsonParams["settings"]["response"]["type"].stringValue
                 // set into outbound
                 v2rayOutbound.settingBlackhole = settingBlackhole
                 break
+
             case .freedom:
                 var settingFreedom = V2rayOutboundFreedom()
-                // todo
+                settingFreedom.domainStrategy = jsonParams["settings"]["domainStrategy"].stringValue
+                settingFreedom.userLevel = jsonParams["settings"]["userLevel"].intValue
+                settingFreedom.redirect = jsonParams["settings"]["redirect"].stringValue
                 // set into outbound
                 v2rayOutbound.settingFreedom = settingFreedom
                 break
+
             case .shadowsocks:
                 var settingShadowsocks = V2rayOutboundShadowsocks()
-                // todo
+                var servers: [V2rayOutboundShadowsockServer] = []
+                // servers
+                jsonParams["settings"]["servers"].arrayValue.forEach { val in
+                    var server = V2rayOutboundShadowsockServer()
+                    server.port = val["port"].intValue
+                    server.email = val["email"].stringValue
+                    server.address = val["address"].stringValue
+                    server.method = val["method"].stringValue
+                    server.password = val["password"].stringValue
+                    server.ota = val["ota"].boolValue
+                    server.level = val["level"].intValue
+                    // append
+                    servers.append(server)
+                }
+                settingShadowsocks.servers = servers
                 // set into outbound
                 v2rayOutbound.settingShadowsocks = settingShadowsocks
                 break
+
             case .socks:
                 var settingSocks = V2rayOutboundSocks()
-                // todo
+                settingSocks.address = jsonParams["settings"]["address"].stringValue
+                settingSocks.port = jsonParams["settings"]["port"].stringValue
+
+                var users: [V2rayOutboundSockUser] = []
+                jsonParams["settings"]["users"].arrayValue.forEach { val in
+                    var user = V2rayOutboundSockUser()
+                    user.user = val["user"].stringValue
+                    user.pass = val["pass"].stringValue
+                    user.level = val["level"].intValue
+                    // append
+                    users.append(user)
+                }
+                settingSocks.users = users
+
                 // set into outbound
                 v2rayOutbound.settingSocks = settingSocks
                 break
+
             case .vmess:
                 var settingVMess = V2rayOutboundVMess()
-                // todo
+                var vnext: [V2rayOutboundVMessItem] = []
+
+                jsonParams["settings"]["users"].arrayValue.forEach { val in
+                    var item = V2rayOutboundVMessItem()
+
+                    item.address = val["address"].stringValue
+                    item.port = val["port"].stringValue
+
+                    var users: [V2rayOutboundVMessUser] = []
+                    val["users"].arrayValue.forEach { val in
+                        var user = V2rayOutboundVMessUser()
+                        user.id = val["id"].stringValue
+                        user.alterId = val["alterId"].intValue
+                        user.level = val["level"].intValue
+                        user.security = val["security"].stringValue
+                        users.append(user)
+                    }
+                    item.users = users
+                    // append
+                    vnext.append(item)
+                }
+
+                settingVMess.vnext = vnext
+
                 // set into outbound
                 v2rayOutbound.settingVMess = settingVMess
                 break
             }
         }
 
+        // stream settings
+        if jsonParams["streamSettings"].dictionaryValue.count > 0 {
+            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
+            if errmsg != "" {
+                return errmsg
+            }
+            v2rayOutbound.streamSettings = stream
+        }
+
         // set into v2ray
-        v2ray.outbound = v2rayOutbound
+        v2ray.outbounds?.append(v2rayOutbound)
         return ""
     }
 

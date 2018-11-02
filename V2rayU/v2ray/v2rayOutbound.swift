@@ -21,7 +21,7 @@ struct V2rayOutbound: Codable {
     var sendThrough: String?
     var `protocol`: V2rayProtocolOutbound = .freedom
     var tag: String? = OutboundDetourTag
-//    var streamSettings: streamSettings?
+    var streamSettings: V2rayStreamSettings?
     var proxySettings: ProxySettings?
     var mux: V2rayOutboundMux?
 
@@ -105,15 +105,6 @@ extension V2rayOutbound {
     }
 }
 
-struct V2rayOutboundDetour: Codable {
-    var sendThrough: String?
-    var `protocol`: V2rayProtocolOutbound = .freedom
-    var tag: String? = OutboundDetourTag
-    var streamSettings: StreamSettings?
-    var proxySettings: ProxySettings?
-    var Mux: V2rayOutboundMux?
-}
-
 struct V2rayOutboundMux: Codable {
     var enabled: Bool = false
     var concurrency: Int = 8
@@ -122,16 +113,11 @@ struct V2rayOutboundMux: Codable {
 // protocol
 // Blackhole
 struct V2rayOutboundBlackhole: Codable {
-    var response: V2rayOutboundBlackholeResponse?
+    var response: V2rayOutboundBlackholeResponse = V2rayOutboundBlackholeResponse()
 }
 
 struct V2rayOutboundBlackholeResponse: Codable {
-    enum type: String, Codable {
-        case none
-        case http
-    }
-
-    var type: type = .none
+    var type: String? = "none" // none | http
 }
 
 struct V2rayOutboundFreedom: Codable {

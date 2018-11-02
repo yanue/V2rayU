@@ -16,6 +16,8 @@ struct V2rayInbound: Codable {
     var tag: String? = ""
     var streamSettings: V2rayStreamSettings?
     var sniffing: V2rayInboundSniffing?
+    var allocate: V2rayInboundAllocate?
+
     var settingHttp: V2rayInboundHttp?
     var settingSocks: V2rayInboundSocks?
     var settingShadowsocks: V2rayInboundShadowsocks?
@@ -103,44 +105,7 @@ extension V2rayInbound {
     }
 }
 
-struct V2rayStreamSettings: Codable {
-    enum network: String, Codable {
-        case tcp
-        case kcp
-        case ws
-        case http
-        case h2
-        case domainsocket
-    }
-
-    enum security: String, Codable {
-        case none
-        case tls
-    }
-
-    var network: network = .tcp
-    var security: security = .none
-    var tlsSettings: TlsSettings?
-    var tcpSettings: TcpSettings?
-    var kcpSettings: KcpSettings?
-    var wsSettings: WsSettings?
-    var httpSettings: HttpSettings?
-    var dsSettings: DsSettings?
-    var sockopt: V2rayStreamSettingSockopt?
-}
-
-struct V2rayInboundDetour: Codable {
-    var port: String = "1087"
-    var listen: String = "127.0.0.1"
-    var `protocol`: V2rayProtocolInbound = .http
-    var tag: String?
-//    var settings:V2rayInboundSettings?
-//    var streamSettings:V2rayInboundSettings?
-    var sniffing: V2rayInboundSniffing?
-    var allocate: V2rayInboundDetourAllocate?
-}
-
-struct V2rayInboundDetourAllocate: Codable {
+struct V2rayInboundAllocate: Codable {
     enum strategy: String, Codable {
         case always
         case random

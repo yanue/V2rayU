@@ -10,6 +10,8 @@ import Foundation
 
 let OutboundDetourTag = "direct"
 
+// doc: https://www.v2ray.com/chapter_02/01_overview.html
+
 struct V2rayStruct: Codable {
     var log: V2rayLog? = V2rayLog()
     var api: V2rayApi?
@@ -17,10 +19,8 @@ struct V2rayStruct: Codable {
     var stats: V2rayStats?
     var routing: V2rayRouting? = V2rayRouting()
     var policy: V2rayPolicy?
-    var inbound: V2rayInbound?
-    var inboundDetour: [V2rayInboundDetour]?
-    var outbound: V2rayOutbound?
-    var outboundDetour: [V2rayOutboundDetour]?
+    var inbounds: [V2rayInbound]?
+    var outbounds: [V2rayOutbound]?
     var transport: V2rayTransport?
 }
 
@@ -89,13 +89,4 @@ struct V2rayRoutingSettingRule: Codable {
 }
 
 struct V2rayPolicy: Codable {
-}
-
-struct V2rayTransport: Codable {
-    var tlsSettings: TlsSettings?
-    var tcpSettings: TcpSettings?
-    var kcpSettings: KcpSettings?
-    var wsSettings: WsSettings?
-    var httpSettings: HttpSettings?
-    var dsSettings: DsSettings?
 }

@@ -8,7 +8,34 @@
 
 import Foundation
 
-struct StreamSettings: Codable {
+struct V2rayTransport: Codable {
+    var tlsSettings: TlsSettings?
+    var tcpSettings: TcpSettings?
+    var kcpSettings: KcpSettings?
+    var wsSettings: WsSettings?
+    var httpSettings: HttpSettings?
+    var dsSettings: DsSettings?
+}
+
+struct V2rayStreamSettings: Codable {
+    enum network: String, Codable {
+        case tcp
+        case kcp
+        case ws
+        case http
+        case h2
+        case domainsocket
+    }
+
+    enum security: String, Codable {
+        case none
+        case tls
+    }
+
+    var network: network = .tcp
+    var security: security = .none
+    var sockopt: V2rayStreamSettingSockopt?
+    var tlsSettings: TlsSettings?
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
