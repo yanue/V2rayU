@@ -29,7 +29,75 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var jsonUrl: NSTextField!
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
+    
+    @IBOutlet weak var sockPort: NSTextField!
+    @IBOutlet weak var httpPort: NSTextField!
+    @IBOutlet weak var dnsServers: NSTextField!
+    @IBOutlet weak var enableUdp: NSButton!
+    @IBOutlet weak var enableMux: NSButton!
+    @IBOutlet weak var muxConcurrent: NSTextField!
 
+    @IBOutlet weak var switchProtocol: NSPopUpButton!
+    
+    @IBOutlet weak var serverView: NSView!
+    @IBOutlet weak var VmessView: NSView!
+    @IBOutlet weak var ShadowsocksView: NSView!
+    @IBOutlet weak var SocksView: NSView!
+    
+    // vmess
+    @IBOutlet weak var vmessAddr: NSTextField!
+    @IBOutlet weak var vmessPort: NSTextField!
+    @IBOutlet weak var vmessAlterId: NSTextField!
+    @IBOutlet weak var vmessLevel: NSTextField!
+    @IBOutlet weak var vmessUserId: NSTextField!
+    @IBOutlet weak var vmessSecurity: NSPopUpButton!
+    
+    // shadowsocks
+    @IBOutlet weak var shadowsockAddr: NSTextField!
+    @IBOutlet weak var shadowsockPort: NSTextField!
+    @IBOutlet weak var shadowsockPass: NSTextField!
+    @IBOutlet weak var shadowsockSecurity: NSPopUpButton!
+
+    // socks5
+    @IBOutlet weak var socksAddr: NSTextField!
+    @IBOutlet weak var socksPort: NSTextField!
+    @IBOutlet weak var socksUser: NSTextField!
+    @IBOutlet weak var socksPass: NSTextField!
+
+    @IBOutlet weak var networkView: NSView!
+
+    @IBOutlet weak var tcpView: NSView!
+    @IBOutlet weak var kcpView: NSView!
+    @IBOutlet weak var dsView: NSView!
+    @IBOutlet weak var wsView: NSView!
+    @IBOutlet weak var h2View: NSView!
+
+    @IBOutlet weak var switchNetwork: NSPopUpButton!
+    
+    // kcp setting
+    @IBOutlet weak var kcpMtu: NSTextField!
+    @IBOutlet weak var kcpTti: NSTextField!
+    @IBOutlet weak var kcpUplinkCapacity: NSTextField!
+    @IBOutlet weak var kcpDownlinkCapacity: NSTextField!
+    @IBOutlet weak var kcpReadBufferSize: NSTextField!
+    @IBOutlet weak var kcpWriteBufferSize: NSTextField!
+    @IBOutlet weak var kcpHeader: NSPopUpButton!
+    @IBOutlet weak var kcpSuggest: NSButton!
+    
+    @IBOutlet weak var tcpHeaderType: NSPopUpButton!
+    
+    @IBOutlet weak var wsHost: NSTextField!
+    @IBOutlet weak var wsPath: NSTextField!
+    
+    @IBOutlet weak var h2Host: NSTextField!
+    @IBOutlet weak var h2Path: NSTextField!
+
+    @IBOutlet weak var dsPath: NSTextField!
+    
+    @IBOutlet weak var streamSecurity: NSPopUpButton!
+    @IBOutlet weak var streamAllowSecure: NSButton!
+    @IBOutlet weak var streamTlsServerName: NSTextField!
+    
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
@@ -186,6 +254,84 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
+    @IBAction func goTcpHelp(_ sender: NSButtonCell) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/tcp.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
+    @IBAction func goDsHelp(_ sender: Any) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/domainsocket.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
+    @IBAction func goProtocolHelp(_ sender: NSButton) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/protocols/vmess.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
+    @IBAction func goStreamHelp(_ sender: Any) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
+    @IBAction func switchSteamNetwork(_ sender: NSPopUpButtonCell) {
+        networkView.subviews.forEach { $0.isHidden = true }
+        
+        if let item = switchNetwork.selectedItem {
+            print("item",item.title)
+            
+            switch item.title {
+            case "tcp":
+                self.tcpView.isHidden = false
+                break;
+            case "kcp":
+                self.kcpView.isHidden = false
+                break;
+            case "domainsocket":
+                self.dsView.isHidden = false
+                break;
+            case "ws":
+                self.wsView.isHidden = false
+                break;
+            case "h2":
+                self.h2View.isHidden = false
+                break;
+            default: // vmess
+                self.tcpView.isHidden = false
+                break
+            }
+        }
+    }
+    
+    @IBAction func switchOutboundProtocol(_ sender: NSPopUpButtonCell) {
+        serverView.subviews.forEach { $0.isHidden = true }
+        
+        if let item = switchProtocol.selectedItem {
+            switch item.title {
+            case "vmess":
+                self.VmessView.isHidden = false
+                break;
+            case "shadowsocks":
+                self.ShadowsocksView.isHidden = false
+                break;
+            case "socks5":
+                self.SocksView.isHidden = false
+                break;
+            default: // vmess
+                self.SocksView.isHidden = true
+                break
+            }
+        }
+    }
+    
     @IBAction func switchUri(_ sender: NSPopUpButton) {
         guard let item = sender.selectedItem else {
             return
