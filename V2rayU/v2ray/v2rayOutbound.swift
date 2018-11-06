@@ -132,40 +132,40 @@ struct V2rayOutboundShadowsocks: Codable {
 }
 
 struct V2rayOutboundShadowsockServer: Codable {
-    var email: String?
-    var address: String?
-    var port: Int?
-    var method: String?
-    var password: String?
-    var ota: Bool? = false
+    var email: String = ""
+    var address: String = ""
+    var port: Int = 0
+    var method: String = ""
+    var password: String = ""
+    var ota: Bool = false
     var level: Int = 0
 }
 
 struct V2rayOutboundSocks: Codable {
-    var address: String?
-    var port: String?
-    var users: [V2rayOutboundSockUser]?
+    var address: String = ""
+    var port: String = ""
+    var users: [V2rayOutboundSockUser] = [V2rayOutboundSockUser()]
 }
 
 struct V2rayOutboundSockUser: Codable {
-    var user: String?
-    var pass: String?
+    var user: String = ""
+    var pass: String = ""
     var level: Int = 0
 }
 
 struct V2rayOutboundVMess: Codable {
-    var vnext: [V2rayOutboundVMessItem]?
+    var vnext: [V2rayOutboundVMessItem] = [V2rayOutboundVMessItem()]
 }
 
 struct V2rayOutboundVMessItem: Codable {
-    var address: String?
-    var port: String?
-    var users: [V2rayOutboundVMessUser]?
+    var address: String = ""
+    var port: String = ""
+    var users: [V2rayOutboundVMessUser] = [V2rayOutboundVMessUser()]
 }
 
 struct V2rayOutboundVMessUser: Codable {
-    var id: String?
-    var alterId: Int? // 0-65535
-    var level: Int?
-    var security: String? // aes-128-gcm/chacha20-poly1305/auto/none
+    var id: String = ""
+    var alterId: Int = 64// 0-65535
+    var level: Int = 0
+    var security: String = "auto" // aes-128-gcm/chacha20-poly1305/auto/none
 }

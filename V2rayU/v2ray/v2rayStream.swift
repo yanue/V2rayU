@@ -44,11 +44,11 @@ struct V2rayStreamSettings: Codable {
 }
 
 struct TlsSettings: Codable {
-    var serverName: String?
-    var alpn: String? = "http/1.1"
-    var allowInsecure: Bool? // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
-    var allowInsecureCiphers: Bool?
-    var certificates: TlsCertificates?
+    var serverName: String = ""
+    var alpn: String = "http/1.1"
+    var allowInsecure: Bool = true // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
+    var allowInsecureCiphers: Bool = false
+    var certificates: TlsCertificates = TlsCertificates()
 }
 
 struct TlsCertificates: Codable {
@@ -66,25 +66,28 @@ struct TlsCertificates: Codable {
 }
 
 struct TcpSettings: Codable {
-    var header: TcpSettingHeader? = TcpSettingHeader()
+    var header: TcpSettingHeader = TcpSettingHeader()
 }
 
 struct TcpSettingHeader: Codable {
-    var type: String? = "none"
-    var request: TcpSettingHeaderRequest?
-    var response: TcpSettingHeaderResponse?
+    var type: String = "none"
+    var request: TcpSettingHeaderRequest = TcpSettingHeaderRequest()
+    var response: TcpSettingHeaderResponse = TcpSettingHeaderResponse()
 }
 
 struct TcpSettingHeaderRequest: Codable {
-    var version: String?
-    var method: String?
-    var path: [String]?
-    var headers: TcpSettingHeaderRequestHeaders?
+    var version: String = ""
+    var method: String = ""
+    var path: [String] = []
+    var headers: TcpSettingHeaderRequestHeaders = TcpSettingHeaderRequestHeaders()
 }
 
 struct TcpSettingHeaderRequestHeaders: Codable {
-    var host, userAgent, acceptEncoding, connection: [String]?
-    var pragma: String?
+    var host: [String] = []
+    var userAgent: [String] = []
+    var acceptEncoding: [String] = []
+    var connection: [String] = []
+    var pragma: String = ""
 
     enum CodingKeys: String, CodingKey {
         case host = "Host"
@@ -113,35 +116,39 @@ struct TcpSettingHeaderResponseHeaders: Codable {
 }
 
 struct KcpSettings: Codable {
-    var mtu, tti, uplinkCapacity, downlinkCapacity: Int?
-    var congestion: Bool?
-    var readBufferSize, writeBufferSize: Int?
-    var header: KcpSettingsHeader?
+    var mtu: Int = 1350
+    var tti: Int = 20
+    var uplinkCapacity: Int = 50
+    var downlinkCapacity: Int = 20
+    var congestion: Bool = false
+    var readBufferSize: Int = 1
+    var writeBufferSize: Int = 1
+    var header: KcpSettingsHeader = KcpSettingsHeader()
 }
 
 var KcpSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
 
 struct KcpSettingsHeader: Codable {
     // KcpSettingsHeaderType
-    var type: String? = "none"
+    var type: String = "none"
 }
 
 struct WsSettings: Codable {
-    var path: String?
+    var path: String = ""
     var headers: WsSettingsHeader = WsSettingsHeader()
 }
 
 struct WsSettingsHeader: Codable {
-    var host: String?
+    var host: String = ""
 }
 
 struct HttpSettings: Codable {
-    var host: [String]?
-    var path: String?
+    var host: [String] = []
+    var path: String = ""
 }
 
 struct DsSettings: Codable {
-    var path: String?
+    var path: String = ""
 }
 
 struct V2rayStreamSettingSockopt: Codable {
@@ -151,7 +158,7 @@ struct V2rayStreamSettingSockopt: Codable {
         case off
     }
 
-    var mark: Int?
-    var tcpFastOpen: Bool? // 是否启用 TCP Fast Open。
+    var mark: Int = 0
+    var tcpFastOpen: Bool = false // 是否启用 TCP Fast Open。
     var tproxy: tproxy = .off // 是否开启透明代理 (仅适用于 Linux)。
 }

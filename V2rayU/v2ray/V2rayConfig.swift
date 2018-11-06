@@ -10,8 +10,37 @@ import Foundation
 import SwiftyJSON
 
 class V2rayConfig: NSObject {
-
     var v2ray: V2rayStruct = V2rayStruct()
+
+    // base
+    var httpPort = "1080"
+    var socksPort = "1087"
+    var ennableUdp = true
+    var ennableMux = true
+    var mux = 8
+    var dns =
+            """
+            "8.8.8.8","1.1.1.1","114.114.114.114"
+            """
+
+    // server
+    var serverProtocol = V2rayProtocolOutbound.vmess.rawValue
+    var serverVmess = V2rayOutboundVMessItem()
+    var serverSocks5 = V2rayOutboundSocks()
+    var serverShadowsocks = V2rayOutboundShadowsockServer()
+
+    // transfor
+    var streamNetwork = V2rayStreamSettings.network.tcp.rawValue
+    var streamTcp = TcpSettings()
+    var streamKcp = KcpSettings()
+    var streamDs = DsSettings()
+    var streamWs = WsSettings()
+    var streamH2 = HttpSettings()
+
+    // tls
+    var streamTlsSecurity = "none"
+    var streamTlsAllowInsecure = true
+    var streamTlsServerName = ""
 
     // import by url
     static func importByUrl(jsonUrl: String) {
@@ -21,7 +50,11 @@ class V2rayConfig: NSObject {
     func output() {
     }
 
-    func saveByJson(jsonText: String) -> String {
+    func saveJson(jsonText: String) -> String {
+        return ""
+    }
+
+    func parseJson(jsonText: String) -> String {
         guard var json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
             return "invalid json"
         }
@@ -73,7 +106,7 @@ class V2rayConfig: NSObject {
 
 
         // less than 4.0
-        if json["inbound"].exists() {
+        if json["outbound"].exists() {
             errmsg = self.parseOutbound(jsonParams: json["outbound"])
             if errmsg != "" {
                 return errmsg
@@ -268,6 +301,8 @@ class V2rayConfig: NSObject {
         }
         // set network
         stream.network = V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue)!
+        self.streamNetwork = stream.network.rawValue
+        print("stream.network", self.streamNetwork)
 
         if (V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue) == nil) {
             errmsg = "invalid " + preTxt + ".streamSettings.security"
@@ -275,6 +310,8 @@ class V2rayConfig: NSObject {
         }
         // set security
         stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
+        self.streamTlsSecurity = stream.security.rawValue
+        print("stream.network", self.streamTlsSecurity)
 
         if steamJson["sockopt"].dictionaryValue.count > 0 {
             var sockopt = V2rayStreamSettingSockopt()
@@ -291,7 +328,7 @@ class V2rayConfig: NSObject {
         }
 
         // steamSettings (same as global transport)
-        let transport = self.parseTransport(steamJson: steamJson["streamSettings"])
+        let transport = self.parseTransport(steamJson: steamJson)
         stream.tlsSettings = transport.tlsSettings
         stream.tcpSettings = transport.tcpSettings
         stream.kcpSettings = transport.kcpSettings
@@ -299,10 +336,41 @@ class V2rayConfig: NSObject {
         stream.httpSettings = transport.httpSettings
         stream.dsSettings = transport.dsSettings
 
+        if preTxt == "outbound" {
+            print("preTxt", transport, transport.wsSettings)
+            if transport.tlsSettings != nil {
+                // set data
+                self.streamTlsServerName = transport.tlsSettings!.serverName
+                self.streamTlsAllowInsecure = transport.tlsSettings!.allowInsecure
+            }
+
+            if transport.tcpSettings != nil {
+                self.streamTcp = transport.tcpSettings!
+            }
+
+            if transport.kcpSettings != nil {
+                self.streamKcp = transport.kcpSettings!
+            }
+
+            if transport.wsSettings != nil {
+                print("wsSettings", transport.wsSettings)
+                self.streamWs = transport.wsSettings!
+            }
+
+            if transport.httpSettings != nil {
+                self.streamH2 = transport.httpSettings!
+            }
+
+            if transport.dsSettings != nil {
+                self.streamDs = transport.dsSettings!
+            }
+        }
+
         return (errmsg: errmsg, stream: stream)
     }
 
     func parseTransport(steamJson: JSON) -> V2rayTransport {
+        print("steamJson", steamJson)
         var stream = V2rayTransport()
         // tlsSettings
         if steamJson["tlsSettings"].dictionaryValue.count > 0 {
@@ -328,7 +396,7 @@ class V2rayConfig: NSObject {
         }
 
         // tcpSettings
-        if steamJson["tlsSettings"].dictionaryValue.count > 0 {
+        if steamJson["tcpSettings"].dictionaryValue.count > 0 {
             var tcpSettings = TcpSettings()
             var tcpHeader = TcpSettingHeader()
 
@@ -412,7 +480,7 @@ class V2rayConfig: NSObject {
             kcpSettings.writeBufferSize = steamJson["kcpSettings"]["writeBufferSize"].intValue
             // "none"
             if KcpSettingsHeaderType.firstIndex(of: steamJson["kcpSettings"]["type"].stringValue) != nil {
-                kcpSettings.header?.type = steamJson["kcpSettings"]["type"].stringValue
+                kcpSettings.header.type = steamJson["kcpSettings"]["type"].stringValue
             }
             stream.kcpSettings = kcpSettings
         }
@@ -565,7 +633,8 @@ class V2rayConfig: NSObject {
 
         // stream settings
         if jsonParams["streamSettings"].dictionaryValue.count > 0 {
-            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
+            print("stream")
+            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "outbound")
             if errmsg != "" {
                 return errmsg
             }

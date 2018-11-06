@@ -13,6 +13,7 @@ import Alamofire
 class ConfigWindowController: NSWindowController, NSWindowDelegate {
     // closed by window 'x' button
     var closedByWindowButton: Bool = false
+    var v2rayConfig: V2rayConfig = V2rayConfig()
 
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
@@ -29,7 +30,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var jsonUrl: NSTextField!
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
-    
+
     @IBOutlet weak var sockPort: NSTextField!
     @IBOutlet weak var httpPort: NSTextField!
     @IBOutlet weak var dnsServers: NSTextField!
@@ -38,12 +39,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var muxConcurrent: NSTextField!
 
     @IBOutlet weak var switchProtocol: NSPopUpButton!
-    
+
     @IBOutlet weak var serverView: NSView!
     @IBOutlet weak var VmessView: NSView!
     @IBOutlet weak var ShadowsocksView: NSView!
     @IBOutlet weak var SocksView: NSView!
-    
+
     // vmess
     @IBOutlet weak var vmessAddr: NSTextField!
     @IBOutlet weak var vmessPort: NSTextField!
@@ -51,18 +52,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var vmessLevel: NSTextField!
     @IBOutlet weak var vmessUserId: NSTextField!
     @IBOutlet weak var vmessSecurity: NSPopUpButton!
-    
+
     // shadowsocks
     @IBOutlet weak var shadowsockAddr: NSTextField!
     @IBOutlet weak var shadowsockPort: NSTextField!
     @IBOutlet weak var shadowsockPass: NSTextField!
-    @IBOutlet weak var shadowsockSecurity: NSPopUpButton!
+    @IBOutlet weak var shadowsockMethod: NSPopUpButton!
 
     // socks5
-    @IBOutlet weak var socksAddr: NSTextField!
-    @IBOutlet weak var socksPort: NSTextField!
-    @IBOutlet weak var socksUser: NSTextField!
-    @IBOutlet weak var socksPass: NSTextField!
+    @IBOutlet weak var socks5Addr: NSTextField!
+    @IBOutlet weak var socks5Port: NSTextField!
+    @IBOutlet weak var socks5User: NSTextField!
+    @IBOutlet weak var socks5Pass: NSTextField!
 
     @IBOutlet weak var networkView: NSView!
 
@@ -73,7 +74,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var h2View: NSView!
 
     @IBOutlet weak var switchNetwork: NSPopUpButton!
-    
+
     // kcp setting
     @IBOutlet weak var kcpMtu: NSTextField!
     @IBOutlet weak var kcpTti: NSTextField!
@@ -82,22 +83,22 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var kcpReadBufferSize: NSTextField!
     @IBOutlet weak var kcpWriteBufferSize: NSTextField!
     @IBOutlet weak var kcpHeader: NSPopUpButton!
-    @IBOutlet weak var kcpSuggest: NSButton!
-    
+    @IBOutlet weak var kcpCongestion: NSButton!
+
     @IBOutlet weak var tcpHeaderType: NSPopUpButton!
-    
+
     @IBOutlet weak var wsHost: NSTextField!
     @IBOutlet weak var wsPath: NSTextField!
-    
+
     @IBOutlet weak var h2Host: NSTextField!
     @IBOutlet weak var h2Path: NSTextField!
 
     @IBOutlet weak var dsPath: NSTextField!
-    
+
     @IBOutlet weak var streamSecurity: NSPopUpButton!
     @IBOutlet weak var streamAllowSecure: NSButton!
     @IBOutlet weak var streamTlsServerName: NSTextField!
-    
+
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
@@ -117,6 +118,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
             logLevel.selectItem(withTitle: level)
         }
+
+        // load default data
     }
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -154,7 +157,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
                 rowIndex = cnt - 1
             }
             if rowIndex >= 0 {
-                self.loadJsonFile(rowIndex: rowIndex)
+                self.loadJsonData(rowIndex: rowIndex)
             } else {
                 self.serversTableView.becomeFirstResponder()
             }
@@ -169,20 +172,108 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
-    func loadJsonFile(rowIndex: Int) {
+    func bindData() {
+        print("bindData")
+        // ========================== base start =======================
+        // base
+        self.httpPort.stringValue = v2rayConfig.httpPort
+        self.sockPort.stringValue = v2rayConfig.socksPort
+        self.enableUdp.intValue = v2rayConfig.ennableUdp ? 1 : 0
+        self.enableMux.intValue = v2rayConfig.ennableMux ? 1 : 0
+        self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
+        self.dnsServers.stringValue = v2rayConfig.dns
+        // ========================== base end =======================
+
+        // ========================== server start =======================
+        self.switchProtocol.selectItem(withTitle: v2rayConfig.serverProtocol)
+        self.switchOutboundView(protocolTitle: v2rayConfig.serverProtocol)
+
+        // vmess
+        self.vmessAddr.stringValue = v2rayConfig.serverVmess.address
+        self.vmessPort.stringValue = v2rayConfig.serverVmess.port
+        if v2rayConfig.serverVmess.users.count > 0 {
+            let user = v2rayConfig.serverVmess.users[0]
+            self.vmessAlterId.intValue = Int32(user.alterId)
+            self.vmessLevel.intValue = Int32(user.level)
+            self.vmessUserId.stringValue = user.id
+            self.vmessSecurity.indexOfItem(withTitle: user.security)
+        }
+
+        // shadowsocks
+        self.shadowsockAddr.stringValue = v2rayConfig.serverShadowsocks.address
+        if v2rayConfig.serverShadowsocks.port > 0 {
+            self.shadowsockPort.stringValue = String(v2rayConfig.serverShadowsocks.port)
+        }
+        self.shadowsockPass.stringValue = v2rayConfig.serverShadowsocks.password
+        self.shadowsockMethod.indexOfItem(withTitle: v2rayConfig.serverShadowsocks.method)
+
+        // socks5
+        self.socks5Addr.stringValue = v2rayConfig.serverSocks5.address
+        self.socks5Port.stringValue = v2rayConfig.serverSocks5.port
+        self.socks5User.stringValue = v2rayConfig.serverSocks5.users[0].user
+        self.socks5Pass.stringValue = v2rayConfig.serverSocks5.users[0].pass
+        // ========================== server end =======================
+
+        // ========================== stream start =======================
+        self.switchNetwork.selectItem(withTitle: v2rayConfig.streamNetwork)
+        self.switchSteamView(network: v2rayConfig.streamNetwork)
+
+        self.streamAllowSecure.intValue = v2rayConfig.streamTlsAllowInsecure ? 1 : 0
+        self.streamSecurity.selectItem(withTitle: v2rayConfig.streamTlsSecurity)
+        self.streamTlsServerName.stringValue = v2rayConfig.streamTlsServerName
+
+        // tcp
+        self.tcpHeaderType.selectItem(withTitle: v2rayConfig.streamTcp.header.type)
+
+        // kcp
+        self.kcpHeader.selectItem(withTitle: v2rayConfig.streamKcp.header.type)
+        self.kcpMtu.intValue = Int32(v2rayConfig.streamKcp.mtu)
+        self.kcpTti.intValue = Int32(v2rayConfig.streamKcp.tti)
+        self.kcpUplinkCapacity.intValue = Int32(v2rayConfig.streamKcp.uplinkCapacity)
+        self.kcpDownlinkCapacity.intValue = Int32(v2rayConfig.streamKcp.downlinkCapacity)
+        self.kcpReadBufferSize.intValue = Int32(v2rayConfig.streamKcp.readBufferSize)
+        self.kcpWriteBufferSize.intValue = Int32(v2rayConfig.streamKcp.writeBufferSize)
+        self.kcpCongestion.intValue = v2rayConfig.streamKcp.congestion ? 1 : 0
+
+        // h2
+        self.h2Host.stringValue = v2rayConfig.streamH2.host.count > 0 ? v2rayConfig.streamH2.host[0] : ""
+        self.h2Path.stringValue = v2rayConfig.streamH2.path
+
+        // ws
+        self.wsPath.stringValue = v2rayConfig.streamWs.path
+        self.wsHost.stringValue = v2rayConfig.streamWs.headers.host
+
+        // domainsocket
+        self.dsPath.stringValue = v2rayConfig.streamDs.path
+        // ========================== stream end =======================
+    }
+
+    func loadJsonData(rowIndex: Int) {
+        defer {
+            self.bindData()
+        }
+
+        // reset
+        self.v2rayConfig = V2rayConfig()
         if rowIndex < 0 {
             return
         }
 
-        let v2ray = V2rayServer.loadV2rayItem(idx: rowIndex)
-        self.configText.string = v2ray?.json ?? ""
+        let v2rayItem = V2rayServer.loadV2rayItem(idx: rowIndex)
+        self.configText.string = v2rayItem?.json ?? ""
+        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if errmsg != "" {
+            print("parse json: ", errmsg)
+            self.errTip.stringValue = errmsg
+            return
+        }
     }
 
     func saveConfig() {
         // todo save
         let text = self.configText.string
 
-        self.errTip.stringValue = V2rayConfig().saveByJson(jsonText: text)
+//        self.errTip.stringValue = V2rayConfig().saveByJson(jsonText: text)
         return
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
@@ -260,78 +351,88 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         }
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func goDsHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/domainsocket.html") else {
             return
         }
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func goProtocolHelp(_ sender: NSButton) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/protocols/vmess.html") else {
             return
         }
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func goStreamHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
             return
         }
         NSWorkspace.shared.open(url)
     }
-    
+
+    func switchSteamView(network: String) {
+        networkView.subviews.forEach {
+            $0.isHidden = true
+        }
+
+        switch network {
+        case "tcp":
+            self.tcpView.isHidden = false
+            break;
+        case "kcp":
+            self.kcpView.isHidden = false
+            break;
+        case "domainsocket":
+            self.dsView.isHidden = false
+            break;
+        case "ws":
+            self.wsView.isHidden = false
+            break;
+        case "h2":
+            self.h2View.isHidden = false
+            break;
+        default: // vmess
+            self.tcpView.isHidden = false
+            break
+        }
+    }
+
+    func switchOutboundView(protocolTitle: String) {
+        serverView.subviews.forEach {
+            $0.isHidden = true
+        }
+
+        switch protocolTitle {
+        case "vmess":
+            self.VmessView.isHidden = false
+            break;
+        case "shadowsocks":
+            self.ShadowsocksView.isHidden = false
+            break;
+        case "socks5":
+            self.SocksView.isHidden = false
+            break;
+        default: // vmess
+            self.SocksView.isHidden = true
+            break
+        }
+    }
+
     @IBAction func switchSteamNetwork(_ sender: NSPopUpButtonCell) {
-        networkView.subviews.forEach { $0.isHidden = true }
-        
         if let item = switchNetwork.selectedItem {
-            print("item",item.title)
-            
-            switch item.title {
-            case "tcp":
-                self.tcpView.isHidden = false
-                break;
-            case "kcp":
-                self.kcpView.isHidden = false
-                break;
-            case "domainsocket":
-                self.dsView.isHidden = false
-                break;
-            case "ws":
-                self.wsView.isHidden = false
-                break;
-            case "h2":
-                self.h2View.isHidden = false
-                break;
-            default: // vmess
-                self.tcpView.isHidden = false
-                break
-            }
+            self.switchSteamView(network: item.title)
         }
     }
-    
+
     @IBAction func switchOutboundProtocol(_ sender: NSPopUpButtonCell) {
-        serverView.subviews.forEach { $0.isHidden = true }
-        
         if let item = switchProtocol.selectedItem {
-            switch item.title {
-            case "vmess":
-                self.VmessView.isHidden = false
-                break;
-            case "shadowsocks":
-                self.ShadowsocksView.isHidden = false
-                break;
-            case "socks5":
-                self.SocksView.isHidden = false
-                break;
-            default: // vmess
-                self.SocksView.isHidden = true
-                break
-            }
+            self.switchOutboundView(protocolTitle: item.title)
         }
     }
-    
+
     @IBAction func switchUri(_ sender: NSPopUpButton) {
         guard let item = sender.selectedItem else {
             return
@@ -420,7 +521,7 @@ extension ConfigWindowController: NSTableViewDataSource {
 extension ConfigWindowController: NSTableViewDelegate {
     // For NSTableViewDelegate
     func tableViewSelectionDidChange(_ notification: Notification) {
-        self.loadJsonFile(rowIndex: self.serversTableView.selectedRow)
+        self.loadJsonData(rowIndex: self.serversTableView.selectedRow)
         self.errTip.stringValue = ""
     }
 
