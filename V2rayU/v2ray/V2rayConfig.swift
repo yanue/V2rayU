@@ -11,6 +11,7 @@ import SwiftyJSON
 
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
+    var isValid = false
 
     // base
     var httpPort = ""
@@ -53,6 +54,17 @@ class V2rayConfig: NSObject {
 
     func saveJson(jsonText: String) -> String {
         return ""
+    }
+
+    func saveByManual() {
+        print("self.v2ray", self.v2ray)
+        if self.isValid {
+            // replace
+
+        } else {
+            // add
+            self.v2ray = V2rayConfig()
+        }
     }
 
     func parseJson(jsonText: String) -> String {
@@ -362,6 +374,8 @@ class V2rayConfig: NSObject {
             mux.enabled = jsonParams["mux"]["enabled"].boolValue
             mux.concurrency = jsonParams["mux"]["concurrency"].intValue
             v2rayOutbound.mux = mux
+            self.ennableMux = mux.enabled
+            self.mux = mux.concurrency
         }
 
         // settings depends on protocol
@@ -465,7 +479,6 @@ class V2rayConfig: NSObject {
             v2rayOutbound.streamSettings = stream
         }
 
-        print("v2rayOutbound", v2rayOutbound)
         // set main server protocol
         if !self.foundServerProtocol && [V2rayProtocolOutbound.socks.rawValue, V2rayProtocolOutbound.vmess.rawValue, V2rayProtocolOutbound.shadowsocks.rawValue].contains(v2rayOutbound.protocol.rawValue) {
             self.serverProtocol = v2rayOutbound.protocol.rawValue

@@ -39,6 +39,7 @@
                 <outlet property="logLevel" destination="IJz-CK-aob" id="JVy-4E-4yM"/>
                 <outlet property="muxConcurrent" destination="uKK-uM-ZtJ" id="h0p-SK-Bbl"/>
                 <outlet property="networkView" destination="2EB-Eo-645" id="OdK-My-CAX"/>
+                <outlet property="okBtn" destination="qgX-1j-8WD" id="4iT-yK-dLJ"/>
                 <outlet property="selectFileBtn" destination="DZV-jy-fjg" id="FFd-fZ-lm8"/>
                 <outlet property="serverView" destination="WFH-OH-xrz" id="nYy-th-oU7"/>
                 <outlet property="serversTableView" destination="iEj-cB-TDD" id="5vp-u9-fUZ"/>
@@ -56,6 +57,7 @@
                 <outlet property="streamTlsServerName" destination="0fs-AE-NdV" id="mde-Ib-BDD"/>
                 <outlet property="switchNetwork" destination="sg5-nL-iZ1" id="9kh-1C-lXN"/>
                 <outlet property="switchProtocol" destination="4MQ-ve-Uc0" id="eY6-ur-zgD"/>
+                <outlet property="tabView" destination="ppK-ei-cOI" id="UoC-e5-a6l"/>
                 <outlet property="tcpHeaderType" destination="jBp-uN-mlt" id="74X-GP-Wt3"/>
                 <outlet property="tcpView" destination="vg1-BH-8Xk" id="6Ok-D2-5D2"/>
                 <outlet property="vmessAddr" destination="hqK-5N-9PN" id="8mF-4E-ZQK"/>
@@ -152,11 +154,9 @@ Gw
                     <button toolTip="Restart V2Ray and connected to the selected server above" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iD8-Fu-9D9">
                         <rect key="frame" x="24" y="213" width="135" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qgX-1j-8WD">
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qgX-1j-8WD">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent">s</string>
-                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                         </buttonCell>
                         <connections>
                             <action selector="ok:" target="-2" id="VQa-fP-dxw"/>
@@ -167,8 +167,8 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="Import" identifier="" id="BS9-X1-ueN">
-                                <view key="view" id="Ab3-ML-cu8">
+                            <tabViewItem label="Import" identifier="Import" id="BS9-X1-ueN">
+                                <view key="view" ambiguous="YES" id="Ab3-ML-cu8">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -247,7 +247,7 @@ Gw
                                                         <rect key="frame" x="0.0" y="0.0" width="379" height="426"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="minSize" width="375" height="426"/>
                                                         <size key="maxSize" width="400" height="10000000"/>
                                                         <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -261,19 +261,19 @@ Gw
                                             </scroller>
                                         </scrollView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyE-Zy-64R">
-                                            <rect key="frame" x="5" y="0.0" width="381" height="16"/>
+                                            <rect key="frame" x="5" y="-5" width="381" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" id="wIV-Kw-tAz">
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Manual" identifier="" id="qq1-yV-VsK">
-                                <view key="view" ambiguous="YES" id="YXI-Uw-7SR">
+                            <tabViewItem label="Manual" identifier="Manual" id="qq1-yV-VsK">
+                                <view key="view" id="YXI-Uw-7SR">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1451,7 +1451,6 @@ Gw
             </view>
             <point key="canvasLocation" x="197.5" y="227"/>
         </window>
-        <objectController id="qfZ-zF-fcl"/>
     </objects>
     <resources>
         <image name="NSAddTemplate" width="11" height="11"/>

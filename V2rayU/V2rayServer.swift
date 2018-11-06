@@ -35,7 +35,7 @@ class V2rayServer: NSObject {
         if list == nil {
             list = ["default"]
             // store default
-            let model = v2rayItem(name: self.defaultV2rayName, remark: "default", usable: false)
+            let model = v2rayItem(name: self.defaultV2rayName, remark: "default", isValid: false)
             model.store()
         }
 
@@ -110,7 +110,7 @@ class V2rayServer: NSObject {
         // name is : config. + current time str
         let name = "config." + dateStr
 
-        let v2ray = v2rayItem(name: name, remark: "new server", usable: false)
+        let v2ray = v2rayItem(name: name, remark: "new server", isValid: false)
         // save to v2ray UserDefaults
         v2ray.store()
 
@@ -183,7 +183,7 @@ class V2rayServer: NSObject {
         // if default server not fould
         if v2ray == nil {
             for item in self.v2rayItemList {
-                if item.usable {
+                if item.isValid {
                     v2ray = v2rayItem.load(name: item.name)
                     break
                 }
@@ -205,7 +205,7 @@ class V2rayServer: NSObject {
 
         defer {
             // store
-            v2ray.usable = isUsable
+            v2ray.isValid = isUsable
             v2ray.json = jsonData
             v2ray.store()
 
@@ -213,11 +213,11 @@ class V2rayServer: NSObject {
             self.v2rayItemList[idx] = v2ray
 
             if isUsable {
-                // if just one usable server
+                // if just one isValid server
                 // set as default server
                 var usableCount = 0
                 for item in v2rayItemList {
-                    if item.usable {
+                    if item.isValid {
                         usableCount += 1
                     }
                 }
@@ -268,14 +268,14 @@ class v2rayItem: NSObject, NSCoding {
     var name: String
     var remark: String
     var json: String
-    var usable: Bool
+    var isValid: Bool
 
     // init
-    required init(name: String, remark: String, usable: Bool, json: String = "") {
+    required init(name: String, remark: String, isValid: Bool, json: String = "") {
         self.name = name
         self.remark = remark
         self.json = json
-        self.usable = usable
+        self.isValid = isValid
     }
 
     // decode
@@ -283,7 +283,7 @@ class v2rayItem: NSObject, NSCoding {
         self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
         self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
         self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
-        self.usable = decoder.decodeBool(forKey: "Usable")
+        self.isValid = decoder.decodeBool(forKey: "IsValid")
     }
 
     // object encode
@@ -291,7 +291,7 @@ class v2rayItem: NSObject, NSCoding {
         coder.encode(name, forKey: "Name")
         coder.encode(remark, forKey: "Remark")
         coder.encode(json, forKey: "Json")
-        coder.encode(usable, forKey: "Usable")
+        coder.encode(isValid, forKey: "IsValid")
     }
 
     // store into UserDefaults

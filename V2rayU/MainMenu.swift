@@ -95,7 +95,7 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        if !v2ray.usable {
+        if !v2ray.isValid {
             NSLog("invid v2ray config")
             return
         }
@@ -145,7 +145,7 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        if !obj.usable {
+        if !obj.isValid {
             NSLog("current server is invaid", obj.remark)
             return
         }
@@ -204,7 +204,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // add new
         for item in V2rayServer.list() {
-            if !item.usable {
+            if !item.isValid {
                 continue
             }
 

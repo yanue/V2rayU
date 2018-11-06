@@ -10,7 +10,7 @@ import Cocoa
 import WebKit
 import Alamofire
 
-class ConfigWindowController: NSWindowController, NSWindowDelegate {
+class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
     // closed by window 'x' button
     var closedByWindowButton: Bool = false
     var v2rayConfig: V2rayConfig = V2rayConfig()
@@ -22,6 +22,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     let tableViewDragType: String = "v2ray.item"
 
+    @IBOutlet weak var tabView: NSTabView!
+    @IBOutlet weak var okBtn: NSButtonCell!
     @IBOutlet weak var errTip: NSTextField!
     @IBOutlet weak var configText: NSTextView!
     @IBOutlet weak var serversTableView: NSTableView!
@@ -109,17 +111,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
 
     override func windowDidLoad() {
         super.windowDidLoad()
-//        comboUri.selectItem(at: 0)
 
+        // table view
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
 
+        // tab view
+        self.tabView.delegate = self
+
+        // log level
         if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
             logLevel.selectItem(withTitle: level)
         }
-
-        // load default data
     }
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -170,6 +174,42 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         default:
             return
         }
+    }
+
+    // switch tab view
+    func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
+        guard let item = tabViewItem else {
+            print("not found tab view")
+            return
+        }
+
+        let tab = item.identifier! as! String
+        if tab == "Manual" {
+            self.switchToManualView()
+        } else {
+            self.switchToImportView()
+        }
+    }
+
+    func switchToManualView() {
+        defer {
+            self.bindData()
+        }
+
+        self.v2rayConfig = V2rayConfig()
+
+        // re parse json
+        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if errmsg != "" {
+            print("parse json: ", errmsg)
+            self.errTip.stringValue = errmsg
+            return
+        }
+    }
+
+    func switchToImportView() {
+        print("switchToImportView")
+        v2rayConfig.saveByManual()
     }
 
     func bindData() {
@@ -261,6 +301,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
 
         let v2rayItem = V2rayServer.loadV2rayItem(idx: rowIndex)
         self.configText.string = v2rayItem?.json ?? ""
+        self.v2rayConfig.isValid = v2rayItem?.isValid ?? false
+
         let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
         if errmsg != "" {
             print("parse json: ", errmsg)
@@ -295,6 +337,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
     }
 
     @IBAction func ok(_ sender: NSButton) {
+        // set always on
+        self.okBtn.state = .on
         self.saveConfig()
     }
 
@@ -437,8 +481,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate {
         guard let item = sender.selectedItem else {
             return
         }
-        // Url
-        if item.title == "Url" {
+        // url
+        if item.title == "url" {
             jsonUrl.stringValue = ""
             selectFileBtn.isHidden = true
             importBtn.isHidden = false
