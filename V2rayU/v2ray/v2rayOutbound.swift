@@ -128,7 +128,7 @@ struct V2rayOutboundFreedom: Codable {
 }
 
 struct V2rayOutboundShadowsocks: Codable {
-    var servers: [V2rayOutboundShadowsockServer]?
+    var servers: [V2rayOutboundShadowsockServer] = [V2rayOutboundShadowsockServer()]
 }
 
 struct V2rayOutboundShadowsockServer: Codable {

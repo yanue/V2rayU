@@ -19,8 +19,12 @@ struct V2rayStruct: Codable {
     var stats: V2rayStats?
     var routing: V2rayRouting? = V2rayRouting()
     var policy: V2rayPolicy?
-    var inbounds: [V2rayInbound]?
-    var outbounds: [V2rayOutbound]?
+    var inbound: V2rayInbound?
+    var inboundDetour: [V2rayInbound]?
+    var inbounds: [V2rayInbound]? // > 4.0
+    var outbound: V2rayOutbound?
+    var outboundDetour: [V2rayOutbound]?
+    var outbounds: [V2rayOutbound]? // > 4.0
     var transport: V2rayTransport?
 }
 
