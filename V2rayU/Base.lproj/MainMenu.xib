@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -38,10 +38,17 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
+                <menuItem title="Configure..." id="YoX-II-o27" userLabel="Configure">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openConfig:" target="hcZ-V7-Dui" id="cu6-mU-Y02"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Servers" id="cio-ej-HL5" userLabel="ServerItems">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
                 <menuItem title="Generate QR code" id="eG7-US-3LU">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -55,10 +62,10 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="6DA-yz-9jm"/>
-                <menuItem title="Preferences..." id="YoX-II-o27" userLabel="Preference">
+                <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openPreference:" target="hcZ-V7-Dui" id="NV6-3j-EiH"/>
+                        <action selector="openPreference:" target="hcZ-V7-Dui" id="XyD-cr-oYi"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Show Logs..." id="eLc-0G-7He">

@@ -39,16 +39,17 @@ class MenuController: NSObject, NSMenuDelegate {
         // show server list
         self.showServers()
 
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            // start
-            self.startV2rayCore()
-        } else {
-            self.setStatusOff()
-        }
-
         statusItem.menu = statusMenu
 
         configWindow = ConfigWindowController()
+
+        // show off status
+        self.setStatusOff()
+
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            // start
+            self.startV2rayCore()
+        }
     }
 
     @IBAction func openLogs(_ sender: NSMenuItem) {
@@ -191,18 +192,19 @@ class MenuController: NSObject, NSMenuDelegate {
         serverItems.submenu?.removeAllItems()
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
 
-        // servers preferences...
-        let menuItem: NSMenuItem = NSMenuItem()
-        menuItem.title = "servers preferences..."
-        menuItem.action = #selector(self.openConfig(_:))
-        menuItem.target = self
-        menuItem.isEnabled = true
-        serverItems.submenu?.addItem(menuItem)
-
-        // separator
-        serverItems.submenu?.addItem(NSMenuItem.separator())
+//        // servers preferences...
+//        let menuItem: NSMenuItem = NSMenuItem()
+//        menuItem.title = "servers preferences..."
+//        menuItem.action = #selector(self.openConfig(_:))
+//        menuItem.target = self
+//        menuItem.isEnabled = true
+//        serverItems.submenu?.addItem(menuItem)
+//
+//        // separator
+//        serverItems.submenu?.addItem(NSMenuItem.separator())
 
         // add new
+        var validCount = 0
         for item in V2rayServer.list() {
             if !item.isValid {
                 continue
@@ -219,6 +221,14 @@ class MenuController: NSObject, NSMenuDelegate {
                 menuItem.state = NSControl.StateValue.on
             }
 
+            serverItems.submenu?.addItem(menuItem)
+            validCount += 1
+        }
+
+        if validCount == 0 {
+            let menuItem: NSMenuItem = NSMenuItem()
+            menuItem.title = "no available servers."
+            menuItem.isEnabled = false
             serverItems.submenu?.addItem(menuItem)
         }
     }

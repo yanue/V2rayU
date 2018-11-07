@@ -194,70 +194,36 @@ class V2rayServer: NSObject {
     }
 
     // save json data
-    static func save(idx: Int, jsonData: String) -> String {
-        var isUsable = false
-
+    static func save(idx: Int, isValid: Bool, jsonData: String) -> String {
         if !self.v2rayItemList.indices.contains(idx) {
             return "index out of range"
         }
 
         let v2ray = self.v2rayItemList[idx]
 
-        defer {
-            // store
-            v2ray.isValid = isUsable
-            v2ray.json = jsonData
-            v2ray.store()
+        // store
+        v2ray.isValid = isValid
+        v2ray.json = jsonData
+        v2ray.store()
 
-            // update current
-            self.v2rayItemList[idx] = v2ray
+        // update current
+        self.v2rayItemList[idx] = v2ray
+        var usableCount = 0
 
-            if isUsable {
-                // if just one isValid server
-                // set as default server
-                var usableCount = 0
-                for item in v2rayItemList {
-                    if item.isValid {
-                        usableCount += 1
-                    }
-                }
-
-                // contain self
-                if usableCount <= 1 {
-                    UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
+        if isValid {
+            // if just one isValid server
+            // set as default server
+            for item in v2rayItemList {
+                if item.isValid {
+                    usableCount += 1
                 }
             }
-        }
 
-        if v2ray.name == "" {
-            return "name is empty"
+            // contain self
+            if usableCount <= 1 {
+                UserDefaults.set(forKey: .v2rayCurrentServerName, value: v2ray.name)
+            }
         }
-
-        guard let json = try? JSON(data: jsonData.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
-            return "invalid json"
-        }
-
-        if !json.exists() {
-            return "invalid json"
-        }
-
-        if !json["dns"].exists() {
-//            return "missing dns"
-        }
-
-        if !json["inbound"].exists() {
-            return "missing inbound"
-        }
-
-        if !json["outbound"].exists() {
-            return "missing outbound"
-        }
-
-        if !json["routing"].exists() {
-            return "missing routing"
-        }
-
-        isUsable = true
 
         return ""
     }

@@ -205,11 +205,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             self.errTip.stringValue = errmsg
             return
         }
+
+        self.saveConfig()
     }
 
     func switchToImportView() {
-        print("switchToImportView")
-        v2rayConfig.saveByManual()
+        let jsonText = v2rayConfig.combineManual()
+        self.configText.string = jsonText
+        self.saveConfig()
     }
 
     func bindData() {
@@ -312,13 +315,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     }
 
     func saveConfig() {
-        // todo save
         let text = self.configText.string
 
-//        self.errTip.stringValue = V2rayConfig().saveByJson(jsonText: text)
-        return
+        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if errmsg != "" {
+            print("parse json: ", errmsg)
+            self.errTip.stringValue = errmsg
+            return
+        }
+
+        print("isValid", self.v2rayConfig.isValid)
+
         // save
-        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: text)
+        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
         self.errTip.stringValue = errMsg
 
         // refresh menu
@@ -379,12 +388,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
             if DataResponse.value != nil {
                 self.configText.string = DataResponse.value ?? text
-
-                // save
-                let msg = V2rayServer.save(idx: self.serversTableView.selectedRow, jsonData: self.configText.string)
-                if msg != "" {
-                    self.saveConfig()
-                }
             }
         }
     }

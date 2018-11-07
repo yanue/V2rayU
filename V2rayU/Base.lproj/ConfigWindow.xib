@@ -155,8 +155,10 @@ Gw
                         <rect key="frame" x="24" y="213" width="135" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qgX-1j-8WD">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                             <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent">s</string>
+                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                         </buttonCell>
                         <connections>
                             <action selector="ok:" target="-2" id="VQa-fP-dxw"/>
@@ -574,7 +576,7 @@ Gw
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                         <popUpButtonCell key="cell" type="push" title="auto (suggested)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="hCD-ZD-xad" id="Ikf-53-LUn">
                                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                            <font key="font" metaFont="system"/>
+                                                                            <font key="font" metaFont="menu"/>
                                                                             <menu key="menu" id="WhF-NB-ypf">
                                                                                 <items>
                                                                                     <menuItem title="auto (suggested)" state="on" id="hCD-ZD-xad">
@@ -1349,15 +1351,15 @@ Gw
                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sg5-nL-iZ1" userLabel="networkMenu">
                                                     <rect key="frame" x="272" y="151" width="100" height="26"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <popUpButtonCell key="cell" type="push" title="tcp" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="xQb-ln-txV" id="aIA-4d-4lU">
+                                                    <popUpButtonCell key="cell" type="push" title="tcp" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="xQb-ln-txV" id="aIA-4d-4lU">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="menu"/>
                                                         <menu key="menu" id="9jA-pc-0EN">
                                                             <items>
-                                                                <menuItem title="tcp" id="xQb-ln-txV">
+                                                                <menuItem title="tcp" state="on" id="xQb-ln-txV">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                 </menuItem>
-                                                                <menuItem title="h2" state="on" id="pvP-oo-89T">
+                                                                <menuItem title="h2" id="pvP-oo-89T">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                 </menuItem>
                                                                 <menuItem title="ws" id="SWq-B5-cMW">

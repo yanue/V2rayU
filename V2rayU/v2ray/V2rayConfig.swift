@@ -8,6 +8,50 @@
 
 import Foundation
 import SwiftyJSON
+import JavaScriptCore
+
+let jsSourceFormatConfig =
+        """
+        /**
+         * V2ray Config Format
+         * @return {string}
+         */
+        var V2rayConfigFormat = function (encodeStr) {
+            var deStr = decodeURIComponent(encodeStr);
+            if (!deStr) {
+                return "error: cannot decode uri"
+            }
+        
+            try {
+                var obj = JSON.parse(deStr);
+                if (!obj) {
+                    return "error: cannot parse json"
+                }
+        
+                var v2rayConfig = {};
+                // ordered keys
+                v2rayConfig["log"] = obj.log;
+                v2rayConfig["inbounds"] = obj.inbounds;
+                v2rayConfig["inbound"] = obj.inbound;
+                v2rayConfig["inboundDetour"] = obj.inboundDetour;
+                v2rayConfig["outbounds"] = obj.outbounds;
+                v2rayConfig["outbound"] = obj.outbound;
+                v2rayConfig["outboundDetour"] = obj.outboundDetour;
+                v2rayConfig["api"] = obj.api;
+                v2rayConfig["dns"] = obj.dns;
+                v2rayConfig["stats"] = obj.stats;
+                v2rayConfig["routing"] = obj.routing;
+                v2rayConfig["policy"] = obj.policy;
+                v2rayConfig["reverse"] = obj.reverse;
+                v2rayConfig["transport"] = obj.transport;
+                
+                return JSON.stringify(v2rayConfig, null, 2);
+            } catch (e) {
+                console.log("error", e);
+                return "error: " + e.toString()
+            }
+        };
+        """
 
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
@@ -44,29 +88,48 @@ class V2rayConfig: NSObject {
     private var foundSockPort = false
     private var foundServerProtocol = false
 
-    // import by url
-    static func importByUrl(jsonUrl: String) {
+    // combine manual edited data
+    // by manual tab view
+    func combineManual() -> String {
 
-    }
-
-    func output() {
-    }
-
-    func saveJson(jsonText: String) -> String {
-        return ""
-    }
-
-    func saveByManual() {
-        print("self.v2ray", self.v2ray)
         if self.isValid {
             // replace
 
         } else {
             // add
-            self.v2ray = V2rayConfig()
+            self.v2ray = V2rayStruct()
         }
+
+        // 1. encode to json text
+        let encoder = JSONEncoder()
+        let data = try! encoder.encode(self.v2ray)
+        var jsonStr = String(data: data, encoding: .utf8)!
+
+        // 2. format json text by javascript
+        if let context = JSContext() {
+            context.evaluateScript(jsSourceFormatConfig)
+            // call js func
+            if let formatFunction = context.objectForKeyedSubscript("V2rayConfigFormat"),
+               let escapedString = jsonStr.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                if let result = formatFunction.call(withArguments: [escapedString]) {
+                    // error occurred with prefix "error:"
+                    if let reStr = result.toString(), reStr.count > 0 && !reStr.hasPrefix("error:") {
+                        // replace json str
+                        jsonStr = reStr
+                    }
+                }
+            }
+        }
+
+        return jsonStr
     }
 
+    func combineManualData() {
+
+    }
+
+    // parse imported or edited json text
+    // by import tab view
     func parseJson(jsonText: String) -> String {
         guard var json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
             return "invalid json"
@@ -183,6 +246,7 @@ class V2rayConfig: NSObject {
         }
 
         v2ray.transport = self.parseTransport(steamJson: json["transport"])
+        self.isValid = true
 
         return ""
     }
@@ -745,13 +809,4 @@ class V2rayConfig: NSObject {
             NSLog("save json file fail: \(error)")
         }
     }
-
-    func valid() {
-
-    }
-
-    func replaceRegular() {
-
-    }
-
 }
