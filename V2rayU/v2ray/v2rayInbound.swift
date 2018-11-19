@@ -18,8 +18,8 @@ struct V2rayInbound: Codable {
     var sniffing: V2rayInboundSniffing?
     var allocate: V2rayInboundAllocate?
 
-    var settingHttp: V2rayInboundHttp?
-    var settingSocks: V2rayInboundSocks?
+    var settingHttp: V2rayInboundHttp = V2rayInboundHttp()
+    var settingSocks: V2rayInboundSocks = V2rayInboundSocks()
     var settingShadowsocks: V2rayInboundShadowsocks?
     var settingVMess: V2rayInboundVMess?
 

@@ -56,12 +56,15 @@ let jsSourceFormatConfig =
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
+    var isNewVersion = false
+    var isEmptyInput = false
 
     // base
+    var logLevel = "info"
     var httpPort = ""
     var socksPort = ""
-    var ennableUdp = true
-    var ennableMux = true
+    var enableUdp = true
+    var enableMux = true
     var mux = 8
     var dns = ""
 
@@ -91,6 +94,7 @@ class V2rayConfig: NSObject {
     // combine manual edited data
     // by manual tab view
     func combineManual() -> String {
+        self.combineManualData()
 
         if self.isValid {
             // replace
@@ -125,7 +129,84 @@ class V2rayConfig: NSObject {
     }
 
     func combineManualData() {
+        // base
+        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel)!
 
+        // ------------------------------------- inbound start ---------------------------------------------
+        var inHttp = V2rayInbound()
+        inHttp.port = self.httpPort
+        inHttp.protocol = V2rayProtocolInbound.http
+        var inSocks = V2rayInbound()
+        inSocks.port = self.socksPort
+        inSocks.protocol = V2rayProtocolInbound.socks
+
+        if self.isNewVersion {
+            // inbounds
+            if (!self.isEmptyInput && self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
+                var inbounds: [V2rayInbound] = []
+                for var (_, item) in self.v2ray.inbounds!.enumerated() {
+                    if item.protocol == V2rayProtocolInbound.http {
+                        item.port = self.httpPort
+                    }
+                    if item.protocol == V2rayProtocolInbound.socks {
+                        item.port = self.httpPort
+                        item.settingSocks.udp = self.enableUdp
+                    }
+                    inbounds.append(item)
+                }
+                self.v2ray.inbounds = inbounds
+            } else {
+                // new add
+                let inbounds: [V2rayInbound] = [inSocks, inHttp]
+                self.v2ray.inbounds = inbounds
+            }
+        } else {
+            // inbound
+            var inType: V2rayProtocolInbound = V2rayProtocolInbound.socks
+            if self.v2ray.inbound != nil {
+                if self.v2ray.inbound!.protocol == V2rayProtocolInbound.http {
+                    self.v2ray.inbound!.port = self.httpPort
+                    inType = V2rayProtocolInbound.http
+                }
+                if self.v2ray.inbound!.protocol == V2rayProtocolInbound.socks {
+                    self.v2ray.inbound!.port = self.socksPort
+                    self.v2ray.inbound!.settingSocks.udp = self.enableUdp
+                }
+            } else {
+                self.v2ray.inbound = inSocks
+            }
+
+            // inboundDetour
+            if (self.v2ray.inboundDetour != nil && self.v2ray.inboundDetour!.count > 0) {
+                var inboundDetour: [V2rayInbound] = []
+
+                for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
+                    if item.protocol == V2rayProtocolInbound.http {
+                        item.port = self.httpPort
+                    }
+                    if item.protocol == V2rayProtocolInbound.socks {
+                        item.port = self.httpPort
+                        item.settingSocks.udp = self.enableUdp
+                    }
+                    inboundDetour.append(item)
+                }
+
+                self.v2ray.inboundDetour = inboundDetour
+            } else {
+                if inType == V2rayProtocolInbound.http {
+                    self.v2ray.inboundDetour = [inSocks]
+                }
+                if inType == V2rayProtocolInbound.socks {
+                    self.v2ray.inboundDetour = [inHttp]
+                }
+            }
+        }
+        // ------------------------------------- inbound end ----------------------------------------------
+
+        // ------------------------------------- outbound start -------------------------------------------
+
+
+        // ------------------------------------- outbound end ---------------------------------------------
     }
 
     // parse imported or edited json text
@@ -143,7 +224,7 @@ class V2rayConfig: NSObject {
         if json["dns"].dictionaryValue.count > 0 {
             let dnsServers = json["dns"]["servers"].array?.compactMap({ $0.string })
             if ((dnsServers?.count) != nil) {
-                self.v2ray.dns?.servers = dnsServers
+                self.v2ray.dns.servers = dnsServers!
                 self.dns = dnsServers!.joined(separator: ",")
             }
         }
@@ -438,7 +519,7 @@ class V2rayConfig: NSObject {
             mux.enabled = jsonParams["mux"]["enabled"].boolValue
             mux.concurrency = jsonParams["mux"]["concurrency"].intValue
             v2rayOutbound.mux = mux
-            self.ennableMux = mux.enabled
+            self.enableMux = mux.enabled
             self.mux = mux.concurrency
         }
 

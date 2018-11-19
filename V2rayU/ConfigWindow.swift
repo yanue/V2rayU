@@ -210,9 +210,98 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     }
 
     func switchToImportView() {
+        self.exportData()
+
         let jsonText = v2rayConfig.combineManual()
         self.configText.string = jsonText
-        self.saveConfig()
+//        self.saveConfig()
+    }
+
+    // export data to V2rayConfig
+    func exportData() {
+        // ========================== base start =======================
+        // base
+        v2rayConfig.httpPort = self.httpPort.stringValue
+        v2rayConfig.socksPort = self.sockPort.stringValue
+        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
+        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
+        v2rayConfig.dns = self.dnsServers.stringValue
+        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
+        // ========================== base end =======================
+
+        // ========================== server start =======================
+        if self.switchProtocol.indexOfSelectedItem >= 0 {
+            v2rayConfig.serverProtocol = self.switchProtocol.titleOfSelectedItem!
+        }
+
+        // vmess
+        v2rayConfig.serverVmess.address = self.vmessAddr.stringValue
+        v2rayConfig.serverVmess.port = self.vmessPort.stringValue
+        var user = V2rayOutboundVMessUser()
+        user.alterId = Int(self.vmessAlterId.intValue)
+        user.level = Int(self.vmessLevel.intValue)
+        user.id = self.vmessUserId.stringValue
+        if self.vmessSecurity.indexOfSelectedItem >= 0 {
+            user.security = self.vmessSecurity.titleOfSelectedItem!
+        }
+        v2rayConfig.serverVmess.users[0] = user
+
+        // shadowsocks
+        v2rayConfig.serverShadowsocks.address = self.shadowsockAddr.stringValue
+        v2rayConfig.serverShadowsocks.port = Int(self.shadowsockPort.intValue)
+        v2rayConfig.serverShadowsocks.password = self.shadowsockPass.stringValue
+        if self.vmessSecurity.indexOfSelectedItem >= 0 {
+            v2rayConfig.serverShadowsocks.method = self.shadowsockMethod.titleOfSelectedItem!
+        }
+
+        // socks5
+        v2rayConfig.serverSocks5.address = self.socks5Addr.stringValue
+        v2rayConfig.serverSocks5.port = self.socks5Port.stringValue
+
+        var sockUser = V2rayOutboundSockUser()
+        sockUser.user = self.socks5User.stringValue
+        sockUser.pass = self.socks5Pass.stringValue
+        v2rayConfig.serverSocks5.users[0] = sockUser
+        // ========================== server end =======================
+
+        // ========================== stream start =======================
+        if self.switchNetwork.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamNetwork = self.switchNetwork.titleOfSelectedItem!
+        }
+        v2rayConfig.streamTlsAllowInsecure = self.streamAllowSecure.state.rawValue > 0
+        if self.streamSecurity.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamTlsSecurity = self.streamSecurity.titleOfSelectedItem!
+        }
+        v2rayConfig.streamTlsServerName = self.streamTlsServerName.stringValue
+
+        // tcp
+        if self.tcpHeaderType.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamTcp.header.type = self.tcpHeaderType.titleOfSelectedItem!
+        }
+
+        // kcp
+        if self.kcpHeader.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamKcp.header.type = self.kcpHeader.titleOfSelectedItem!
+        }
+        v2rayConfig.streamKcp.mtu = Int(self.kcpMtu.intValue)
+        v2rayConfig.streamKcp.tti = Int(self.kcpTti.intValue)
+        v2rayConfig.streamKcp.uplinkCapacity = Int(self.kcpUplinkCapacity.intValue)
+        v2rayConfig.streamKcp.downlinkCapacity = Int(self.kcpDownlinkCapacity.intValue)
+        v2rayConfig.streamKcp.readBufferSize = Int(self.kcpReadBufferSize.intValue)
+        v2rayConfig.streamKcp.writeBufferSize = Int(self.kcpWriteBufferSize.intValue)
+        v2rayConfig.streamKcp.congestion = self.kcpCongestion.state.rawValue > 0
+
+        // h2
+        v2rayConfig.streamH2.host[0] = self.h2Host.stringValue
+        v2rayConfig.streamH2.path = self.h2Path.stringValue
+
+        // ws
+        v2rayConfig.streamWs.path = self.wsPath.stringValue
+        v2rayConfig.streamWs.headers.host = self.wsHost.stringValue
+
+        // domainsocket
+        v2rayConfig.streamDs.path = self.dsPath.stringValue
+        // ========================== stream end =======================
     }
 
     func bindData() {
@@ -221,8 +310,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // base
         self.httpPort.stringValue = v2rayConfig.httpPort
         self.sockPort.stringValue = v2rayConfig.socksPort
-        self.enableUdp.intValue = v2rayConfig.ennableUdp ? 1 : 0
-        self.enableMux.intValue = v2rayConfig.ennableMux ? 1 : 0
+        self.enableUdp.intValue = v2rayConfig.enableUdp ? 1 : 0
+        self.enableMux.intValue = v2rayConfig.enableMux ? 1 : 0
         self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
         self.dnsServers.stringValue = v2rayConfig.dns
         // ========================== base end =======================

@@ -143,7 +143,7 @@ struct WsSettingsHeader: Codable {
 }
 
 struct HttpSettings: Codable {
-    var host: [String] = []
+    var host: [String] = [""]
     var path: String = ""
 }
 

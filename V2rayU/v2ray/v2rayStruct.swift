@@ -13,13 +13,13 @@ let OutboundDetourTag = "direct"
 // doc: https://www.v2ray.com/chapter_02/01_overview.html
 
 struct V2rayStruct: Codable {
-    var log: V2rayLog? = V2rayLog()
+    var log: V2rayLog = V2rayLog()
     var api: V2rayApi?
-    var dns: V2rayDns? = V2rayDns()
+    var dns: V2rayDns = V2rayDns()
     var stats: V2rayStats?
     var routing: V2rayRouting? = V2rayRouting()
     var policy: V2rayPolicy?
-    var inbound: V2rayInbound?
+    var inbound: V2rayInbound? = V2rayInbound()
     var inboundDetour: [V2rayInbound]?
     var inbounds: [V2rayInbound]? // > 4.0
     var outbound: V2rayOutbound?
@@ -46,9 +46,9 @@ struct V2rayLog: Codable {
         case none
     }
 
-    var loglevel: logLevel? = .info
-    var error: String? = ""
-    var access: String? = ""
+    var loglevel: logLevel = .info
+    var error: String = ""
+    var access: String = ""
 }
 
 struct V2rayApi: Codable {
@@ -56,7 +56,7 @@ struct V2rayApi: Codable {
 }
 
 struct V2rayDns: Codable {
-    var servers: [String]? = ["1.1.1.1", "8.8.8.8", "8.8.4.4", "119.29.29.29", "114.114.114.114", "223.5.5.5", "223.6.6.6"]
+    var servers: [String] = ["1.1.1.1", "8.8.8.8", "8.8.4.4", "119.29.29.29", "114.114.114.114", "223.5.5.5", "223.6.6.6"]
 }
 
 struct V2rayStats: Codable {

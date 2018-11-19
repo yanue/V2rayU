@@ -55,16 +55,23 @@ class V2rayUTests: XCTestCase {
     }
 
     func testV2ray() {
-        let V2rayCfg = V2rayConfig()
-        let errmsg = V2rayCfg.saveByJson(jsonText: jsonTxt)
+        let v2rayCfg = V2rayConfig()
+        let errmsg = v2rayCfg.parseJson(jsonText: jsonTxt)
         if errmsg != "" {
             print("err:", errmsg)
             return
         }
+
+        v2rayCfg.isNewVersion = false;
+        v2rayCfg.httpPort = "8080"
+        v2rayCfg.socksPort = "1990"
+
+        v2rayCfg.combineManualData()
+
         let encoder = JSONEncoder()
 //        encoder.outputFormatting = .sortedKeys
         encoder.outputFormatting = .prettyPrinted //输出格式好看点
-        let data = try! encoder.encode(V2rayCfg.v2ray)
+        let data = try! encoder.encode(v2rayCfg.v2ray)
         print(String(data: data, encoding: .utf8)!)
     }
 
