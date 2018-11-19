@@ -204,8 +204,64 @@ class V2rayConfig: NSObject {
         // ------------------------------------- inbound end ----------------------------------------------
 
         // ------------------------------------- outbound start -------------------------------------------
+        var outbound = V2rayOutbound()
+        outbound.protocol = V2rayProtocolOutbound(rawValue: self.serverProtocol)!
+        switch outbound.protocol {
+        case V2rayProtocolOutbound.vmess:
+            var vmess = V2rayOutboundVMess()
+            vmess.vnext = [self.serverVmess]
+            outbound.settingVMess = vmess
+            break
+        case V2rayProtocolOutbound.shadowsocks:
+            var ss = V2rayOutboundShadowsocks()
+            ss.servers = [self.serverShadowsocks]
+            outbound.settingShadowsocks = ss
+            break
+        case V2rayProtocolOutbound.socks:
+            outbound.settingSocks = self.serverSocks5
+            break
+        default:
+            break
+        }
 
+        // mux
+        var mux = V2rayOutboundMux()
+        mux.enabled = self.enableMux
+        mux.concurrency = self.mux
+        outbound.mux = mux
 
+        // streamSettings
+        var streamSettings = V2rayStreamSettings()
+        streamSettings.tcpSettings = self.streamTcp
+        streamSettings.kcpSettings = self.streamKcp
+        streamSettings.wsSettings = self.streamWs
+        streamSettings.httpSettings = self.streamH2
+        streamSettings.dsSettings = self.streamDs
+        streamSettings.network = V2rayStreamSettings.network(rawValue: self.streamNetwork)!
+        streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
+        var tls = TlsSettings()
+        tls.allowInsecure = self.streamTlsAllowInsecure
+        tls.serverName = self.streamTlsServerName
+        streamSettings.tlsSettings = tls
+
+        outbound.streamSettings = streamSettings
+
+        // outbound Freedom
+        var outboundFreedom = V2rayOutbound()
+        outboundFreedom.protocol = V2rayProtocolOutbound.freedom
+        outboundFreedom.settingFreedom = V2rayOutboundFreedom()
+
+        // outbound Blackhole
+        var outboundBlackhole = V2rayOutbound()
+        outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
+        outboundBlackhole.settingBlackhole = V2rayOutboundBlackhole()
+
+        if self.isNewVersion {
+            self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
+        } else {
+            self.v2ray.outbound = outbound
+            self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
+        }
         // ------------------------------------- outbound end ---------------------------------------------
     }
 
