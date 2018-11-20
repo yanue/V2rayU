@@ -141,7 +141,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // switch server
     @IBAction func switchServer(_ sender: NSMenuItem) {
-        guard let obj = sender.representedObject as? v2rayItem else {
+        guard let obj = sender.representedObject as? V2rayItem else {
             NSLog("switchServer err")
             return
         }

@@ -197,7 +197,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.v2rayConfig = V2rayConfig()
 
         defer {
-            print("v2rayConfig.serverProtocol", v2rayConfig.serverProtocol, self.v2rayConfig.isValid, self.v2rayConfig.errors)
             if self.configText.string.count > 0 && self.v2rayConfig.isValid {
                 self.bindDataToView()
             }
@@ -205,6 +204,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // re parse json
         self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        print("parse errors:", self.v2rayConfig.errors, self.v2rayConfig.isValid)
         if self.v2rayConfig.errors.count > 0 {
             self.errTip.stringValue = self.v2rayConfig.errors[0]
             return
@@ -219,6 +219,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         v2rayConfig.checkManualValid()
 
+        print("v2rayConfig.isValid", v2rayConfig.isValid)
         if v2rayConfig.isValid {
             let jsonText = v2rayConfig.combineManual()
             self.configText.string = jsonText
@@ -407,9 +408,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             return
         }
 
-        let v2rayItem = V2rayServer.loadV2rayItem(idx: rowIndex)
-        self.configText.string = v2rayItem?.json ?? ""
-        self.v2rayConfig.isValid = v2rayItem?.isValid ?? false
+        let item = V2rayServer.loadV2rayItem(idx: rowIndex)
+        self.configText.string = item?.json ?? ""
+        self.v2rayConfig.isValid = item?.isValid ?? false
+        self.jsonUrl.stringValue = item?.url ?? ""
 
         self.v2rayConfig.parseJson(jsonText: self.configText.string)
         if self.v2rayConfig.errors.count > 0 {
@@ -479,7 +481,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     func importJson() {
         let text = self.configText.string
-
+        // edit item remark
+        V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: jsonUrl.stringValue)
         // download json file
         Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
             if (DataResponse.error != nil) {
@@ -656,7 +659,7 @@ extension ConfigWindowController: NSTableViewDataSource {
             NSLog("remark is nil")
             return
         }
-        // edit item
+        // edit item remark
         V2rayServer.edit(rowIndex: row, remark: remark)
         // reload table
         tableView.reloadData()

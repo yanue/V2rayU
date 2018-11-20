@@ -244,7 +244,7 @@ Gw
                                             <autoresizingMask key="autoresizingMask"/>
                                             <clipView key="contentView" ambiguous="YES" id="0rS-HW-TeI">
                                                 <rect key="frame" x="1" y="1" width="375" height="426"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" allowsUndo="YES" usesRuler="YES" smartInsertDelete="YES" id="dNK-7u-GUm">
                                                         <rect key="frame" x="0.0" y="0.0" width="379" height="426"/>
@@ -592,12 +592,13 @@ Gw
                                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Pj0-ZW-RX6">
                                                                         <rect key="frame" x="73" y="9" width="182" height="25"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                        <popUpButtonCell key="cell" type="push" title="auto (suggested)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="hCD-ZD-xad" id="Ikf-53-LUn">
+                                                                        <popUpButtonCell key="cell" type="push" title="auto" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="hCD-ZD-xad" id="Ikf-53-LUn">
                                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                             <font key="font" metaFont="menu"/>
                                                                             <menu key="menu" id="WhF-NB-ypf">
                                                                                 <items>
-                                                                                    <menuItem title="auto (suggested)" state="on" id="hCD-ZD-xad">
+                                                                                    <menuItem title="auto" state="on" id="hCD-ZD-xad">
+                                                                                        <attributedString key="attributedTitle"/>
                                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                                     </menuItem>
                                                                                     <menuItem title="aes-128-cfb" id="KlG-Se-6jg">

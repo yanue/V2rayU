@@ -168,7 +168,10 @@ class V2rayConfig: NSObject {
                 let inbounds: [V2rayInbound] = [inSocks, inHttp]
                 self.v2ray.inbounds = inbounds
             }
+            self.v2ray.inboundDetour = nil
+            self.v2ray.inbound = nil
         } else {
+            self.v2ray.inbounds = nil
             // inbound
             var inType: V2rayProtocolInbound = V2rayProtocolInbound.socks
             if self.v2ray.inbound != nil {
@@ -230,7 +233,10 @@ class V2rayConfig: NSObject {
         if self.isEmptyInput {
             if self.isNewVersion {
                 self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
+                self.v2ray.outbound = nil
+                self.v2ray.outboundDetour = nil
             } else {
+                self.v2ray.outbounds = nil
                 self.v2ray.outbound = outbound
                 self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
             }
@@ -249,7 +255,12 @@ class V2rayConfig: NSObject {
                 } else {
                     self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
                 }
+                self.v2ray.outboundDetour = nil
+                self.v2ray.outbound = nil
             } else {
+                // if has outbounds
+                self.v2ray.outbounds = nil
+
                 // outbound
                 if self.v2ray.outbound != nil {
                     self.v2ray.outbound = self.replaceOutbound(item: self.v2ray.outbound!)
@@ -543,10 +554,11 @@ class V2rayConfig: NSObject {
             // check outbounds
             if json["outbounds"].arrayValue.count > 0 {
                 // outbounds
+                var outbounds: [V2rayOutbound] = []
                 json["outbounds"].arrayValue.forEach { val in
-                    // set into v2ray
-                    self.v2ray.outbounds?.append(self.parseOutbound(jsonParams: val))
+                    outbounds += [self.parseOutbound(jsonParams: val)]
                 }
+                self.v2ray.outbounds = outbounds
             } else {
                 self.errors += ["missing outbounds"]
             }
@@ -560,9 +572,14 @@ class V2rayConfig: NSObject {
             }
 
             // outboundDetour
-            json["outboundDetour"].arrayValue.forEach { val in
-                // set into v2ray
-                self.v2ray.outboundDetour?.append(self.parseOutbound(jsonParams: val))
+            if json["outboundDetour"].arrayValue.count > 0 {
+                var outboundDetour: [V2rayOutbound] = []
+
+                json["outboundDetour"].arrayValue.forEach { val in
+                    outboundDetour += [self.parseOutbound(jsonParams: val)]
+                }
+
+                self.v2ray.outboundDetour = outboundDetour
             }
         }
         // ------------ parse outbound end -------------------------------------------
@@ -1105,7 +1122,7 @@ class V2rayConfig: NSObject {
     }
 
     // create current v2ray server json file
-    static func createJsonFile(item: v2rayItem) {
+    static func createJsonFile(item: V2rayItem) {
         let jsonText = item.json
 
         // path: /Application/V2rayU.app/Contents/Resources/config.json
