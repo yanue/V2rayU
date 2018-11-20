@@ -39,6 +39,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
     @IBOutlet weak var muxConcurrent: NSTextField!
+    @IBOutlet weak var version4: NSButton!
 
     @IBOutlet weak var switchProtocol: NSPopUpButton!
 
@@ -191,42 +192,53 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
     }
 
+    // switch to manual
     func switchToManualView() {
-        defer {
-            self.bindData()
-        }
-
         self.v2rayConfig = V2rayConfig()
 
+        defer {
+            print("v2rayConfig.serverProtocol", v2rayConfig.serverProtocol, self.v2rayConfig.isValid, self.v2rayConfig.errors)
+            if self.configText.string.count > 0 && self.v2rayConfig.isValid {
+                self.bindDataToView()
+            }
+        }
+
         // re parse json
-        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if errmsg != "" {
-            print("parse json: ", errmsg)
-            self.errTip.stringValue = errmsg
+        self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if self.v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = self.v2rayConfig.errors[0]
             return
         }
 
         self.saveConfig()
     }
 
+    // switch to import
     func switchToImportView() {
         self.exportData()
 
-        let jsonText = v2rayConfig.combineManual()
-        self.configText.string = jsonText
-//        self.saveConfig()
+        v2rayConfig.checkManualValid()
+
+        if v2rayConfig.isValid {
+            let jsonText = v2rayConfig.combineManual()
+            self.configText.string = jsonText
+            self.saveConfig()
+        } else {
+            self.errTip.stringValue = v2rayConfig.error
+        }
     }
 
     // export data to V2rayConfig
     func exportData() {
         // ========================== base start =======================
         // base
-        v2rayConfig.httpPort = self.httpPort.stringValue
-        v2rayConfig.socksPort = self.sockPort.stringValue
+        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
+        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
         v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
         v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
         v2rayConfig.dns = self.dnsServers.stringValue
         v2rayConfig.mux = Int(self.muxConcurrent.intValue)
+        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
         // ========================== base end =======================
 
         // ========================== server start =======================
@@ -236,7 +248,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // vmess
         v2rayConfig.serverVmess.address = self.vmessAddr.stringValue
-        v2rayConfig.serverVmess.port = self.vmessPort.stringValue
+        v2rayConfig.serverVmess.port = self.vmessPort.stringValue.replacingOccurrences(of: ",", with: "")
         var user = V2rayOutboundVMessUser()
         user.alterId = Int(self.vmessAlterId.intValue)
         user.level = Int(self.vmessLevel.intValue)
@@ -261,7 +273,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         var sockUser = V2rayOutboundSockUser()
         sockUser.user = self.socks5User.stringValue
         sockUser.pass = self.socks5Pass.stringValue
-        v2rayConfig.serverSocks5.users[0] = sockUser
+        v2rayConfig.serverSocks5.users = [sockUser]
         // ========================== server end =======================
 
         // ========================== stream start =======================
@@ -304,8 +316,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // ========================== stream end =======================
     }
 
-    func bindData() {
-        print("bindData")
+    func bindDataToView() {
+        print("bind")
         // ========================== base start =======================
         // base
         self.httpPort.stringValue = v2rayConfig.httpPort
@@ -314,6 +326,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.enableMux.intValue = v2rayConfig.enableMux ? 1 : 0
         self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
         self.dnsServers.stringValue = v2rayConfig.dns
+        self.version4.intValue = v2rayConfig.isNewVersion ? 1 : 0
         // ========================== base end =======================
 
         // ========================== server start =======================
@@ -342,8 +355,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // socks5
         self.socks5Addr.stringValue = v2rayConfig.serverSocks5.address
         self.socks5Port.stringValue = v2rayConfig.serverSocks5.port
-        self.socks5User.stringValue = v2rayConfig.serverSocks5.users[0].user
-        self.socks5Pass.stringValue = v2rayConfig.serverSocks5.users[0].pass
+        if v2rayConfig.serverSocks5.users.count > 0 {
+            self.socks5User.stringValue = v2rayConfig.serverSocks5.users[0].user
+            self.socks5Pass.stringValue = v2rayConfig.serverSocks5.users[0].pass
+        }
+
         // ========================== server end =======================
 
         // ========================== stream start =======================
@@ -382,7 +398,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     func loadJsonData(rowIndex: Int) {
         defer {
-            self.bindData()
+            self.bindDataToView()
         }
 
         // reset
@@ -395,10 +411,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.configText.string = v2rayItem?.json ?? ""
         self.v2rayConfig.isValid = v2rayItem?.isValid ?? false
 
-        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if errmsg != "" {
-            print("parse json: ", errmsg)
-            self.errTip.stringValue = errmsg
+        self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if self.v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = self.v2rayConfig.errors[0]
             return
         }
     }
@@ -406,14 +421,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func saveConfig() {
         let text = self.configText.string
 
-        let errmsg = self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if errmsg != "" {
-            print("parse json: ", errmsg)
-            self.errTip.stringValue = errmsg
+        self.v2rayConfig.parseJson(jsonText: self.configText.string)
+        if self.v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = self.v2rayConfig.errors[0]
             return
         }
-
-        print("isValid", self.v2rayConfig.isValid)
 
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
@@ -476,7 +488,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             }
 
             if DataResponse.value != nil {
-                self.configText.string = DataResponse.value ?? text
+                self.configText.string = self.v2rayConfig.formatJson(json: DataResponse.value ?? text)
             }
         }
     }
@@ -548,7 +560,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         case "shadowsocks":
             self.ShadowsocksView.isHidden = false
             break;
-        case "socks5":
+        case "socks":
             self.SocksView.isHidden = false
             break;
         default: // vmess

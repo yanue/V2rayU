@@ -66,13 +66,7 @@ class V2rayUTests: XCTestCase {
         v2rayCfg.httpPort = "8080"
         v2rayCfg.socksPort = "1990"
 
-        v2rayCfg.combineManualData()
-
-        let encoder = JSONEncoder()
-//        encoder.outputFormatting = .sortedKeys
-        encoder.outputFormatting = .prettyPrinted //输出格式好看点
-        let data = try! encoder.encode(v2rayCfg.v2ray)
-        print(String(data: data, encoding: .utf8)!)
+        print("js", v2rayCfg.combineManual())
     }
 
     func testExample() {

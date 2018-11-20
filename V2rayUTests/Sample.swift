@@ -25,21 +25,6 @@ let jsonTxt = """
       ],
       "allowTransparent": false,
       "userLevel": 0
-    },
-    "streamSettings": {
-      "network": "tcp",
-      "security": "none",
-      "tlsSettings": {},
-      "tcpSettings": {},
-      "kcpSettings": {},
-      "wsSettings": {},
-      "httpSettings": {},
-      "dsSettings": {},
-      "sockopt": {
-        "mark": 0,
-        "tcpFastOpen": false,
-        "tproxy": "off"
-      }
     }
   },
   "inboundDetour": [

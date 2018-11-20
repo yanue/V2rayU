@@ -59,10 +59,13 @@ class V2rayConfig: NSObject {
     var isNewVersion = false
     var isEmptyInput = false
 
+    var error = ""
+    var errors: [String] = []
+
     // base
     var logLevel = "info"
-    var httpPort = ""
-    var socksPort = ""
+    var socksPort = "1080"
+    var httpPort = "1087"
     var enableUdp = true
     var enableMux = true
     var mux = 8
@@ -94,15 +97,8 @@ class V2rayConfig: NSObject {
     // combine manual edited data
     // by manual tab view
     func combineManual() -> String {
+        // combine data
         self.combineManualData()
-
-        if self.isValid {
-            // replace
-
-        } else {
-            // add
-            self.v2ray = V2rayStruct()
-        }
 
         // 1. encode to json text
         let encoder = JSONEncoder()
@@ -110,6 +106,13 @@ class V2rayConfig: NSObject {
         var jsonStr = String(data: data, encoding: .utf8)!
 
         // 2. format json text by javascript
+        jsonStr = self.formatJson(json: jsonStr)
+
+        return jsonStr
+    }
+
+    func formatJson(json: String) -> String {
+        var jsonStr = json
         if let context = JSContext() {
             context.evaluateScript(jsSourceFormatConfig)
             // call js func
@@ -117,9 +120,13 @@ class V2rayConfig: NSObject {
                let escapedString = jsonStr.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
                 if let result = formatFunction.call(withArguments: [escapedString]) {
                     // error occurred with prefix "error:"
-                    if let reStr = result.toString(), reStr.count > 0 && !reStr.hasPrefix("error:") {
-                        // replace json str
-                        jsonStr = reStr
+                    if let reStr = result.toString(), reStr.count > 0 {
+                        if !reStr.hasPrefix("error:") {
+                            // replace json str
+                            jsonStr = reStr
+                        } else {
+                            self.error = reStr
+                        }
                     }
                 }
             }
@@ -131,6 +138,7 @@ class V2rayConfig: NSObject {
     func combineManualData() {
         // base
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel)!
+        self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
 
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
@@ -146,10 +154,10 @@ class V2rayConfig: NSObject {
                 var inbounds: [V2rayInbound] = []
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http {
-                        item.port = self.httpPort
+                        item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
-                        item.port = self.httpPort
+                        item.port = self.socksPort.count > 0 ? self.socksPort : "1080"
                         item.settingSocks.udp = self.enableUdp
                     }
                     inbounds.append(item)
@@ -204,8 +212,209 @@ class V2rayConfig: NSObject {
         // ------------------------------------- inbound end ----------------------------------------------
 
         // ------------------------------------- outbound start -------------------------------------------
+        // outbound Freedom
+        var outboundFreedom = V2rayOutbound()
+        outboundFreedom.protocol = V2rayProtocolOutbound.freedom
+        outboundFreedom.tag = "direct"
+        outboundFreedom.settingFreedom = V2rayOutboundFreedom()
+
+        // outbound Blackhole
+        var outboundBlackhole = V2rayOutbound()
+        outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
+        outboundBlackhole.tag = "blockout"
+        outboundBlackhole.settingBlackhole = V2rayOutboundBlackhole()
+
+        // outbound
+        let outbound = self.getOutbound()
+
+        if self.isEmptyInput {
+            if self.isNewVersion {
+                self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
+            } else {
+                self.v2ray.outbound = outbound
+                self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
+            }
+        } else {
+            if self.isNewVersion {
+                if (self.v2ray.outbounds != nil && self.v2ray.outbounds!.count > 0) {
+                    var outbounds: [V2rayOutbound] = []
+                    for var (_, item) in self.v2ray.outbounds!.enumerated() {
+                        if self.serverProtocol == item.protocol.rawValue {
+                            // replace data
+                            item = self.replaceOutbound(item: item)
+                        }
+                        outbounds.append(item)
+                    }
+                    self.v2ray.outbounds = outbounds
+                } else {
+                    self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
+                }
+            } else {
+                // outbound
+                if self.v2ray.outbound != nil {
+                    self.v2ray.outbound = self.replaceOutbound(item: self.v2ray.outbound!)
+                } else {
+                    self.v2ray.outbound = outbound
+                }
+
+                // outboundDetour
+                if !(self.v2ray.outboundDetour != nil && self.v2ray.outboundDetour!.count > 0) {
+                    self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
+                }
+            }
+        }
+
+        // ------------------------------------- outbound end ---------------------------------------------
+    }
+
+    private func replaceOutbound(item: V2rayOutbound) -> V2rayOutbound {
+        var outbound = item
+        switch outbound.protocol {
+        case V2rayProtocolOutbound.vmess:
+            var vmess = outbound.settingVMess
+            if vmess == nil {
+                vmess = V2rayOutboundVMess()
+            }
+            vmess!.vnext = [self.serverVmess]
+            outbound.settingVMess = vmess
+            break
+        case V2rayProtocolOutbound.shadowsocks:
+            var ss = outbound.settingShadowsocks
+            if ss == nil {
+                ss = V2rayOutboundShadowsocks()
+            }
+            ss!.servers = [self.serverShadowsocks]
+            outbound.settingShadowsocks = ss
+            break
+        case V2rayProtocolOutbound.socks:
+            outbound.settingSocks = self.serverSocks5
+            break
+        default:
+            break
+        }
+
+        // mux
+        var mux = V2rayOutboundMux()
+        mux.enabled = self.enableMux
+        mux.concurrency = self.mux
+        outbound.mux = mux
+
+        outbound.streamSettings = self.getStreamSettings()
+        return outbound
+    }
+
+    func checkManualValid() {
+        defer {
+            if self.error != "" {
+                self.isValid = false
+            } else {
+                self.isValid = true
+            }
+        }
+        // check main outbound
+        switch self.serverProtocol {
+        case V2rayProtocolOutbound.vmess.rawValue:
+            if self.serverVmess.address.count == 0 {
+                self.error = "missing vmess.address";
+                return
+            }
+            if self.serverVmess.port.count == 0 {
+                self.error = "missing vmess.port";
+                return
+            }
+            if self.serverVmess.users.count > 0 {
+                if self.serverVmess.users[0].id.count == 0 {
+                    self.error = "missing vmess.users[0].id";
+                    return
+                }
+            } else {
+                self.error = "missing vmess.users";
+                return
+            }
+            break
+        case V2rayProtocolOutbound.shadowsocks.rawValue:
+            if self.serverShadowsocks.address.count == 0 {
+                self.error = "missing shadowsocks.address";
+                return
+            }
+            if self.serverShadowsocks.port == 0 {
+                self.error = "missing shadowsocks.port";
+                return
+            }
+            if self.serverShadowsocks.password.count > 0 {
+                self.error = "missing shadowsocks.password";
+                return
+            }
+            if self.serverShadowsocks.method.count > 0 {
+                self.error = "missing shadowsocks.method";
+                return
+            }
+            break
+        case V2rayProtocolOutbound.socks.rawValue:
+            if self.serverSocks5.address.count == 0 {
+                self.error = "missing socks.address";
+                return
+            }
+            if self.serverSocks5.port.count == 0 {
+                self.error = "missing socks.port";
+                return
+            }
+            if self.serverSocks5.users.count > 0 {
+                if self.serverSocks5.users[0].user.count == 0 {
+                    self.error = "missing socks.users[0].user";
+                    return
+                }
+                if self.serverSocks5.users[0].pass.count == 0 {
+                    self.error = "missing socks.users[0].pass";
+                    return
+                }
+            } else {
+                self.error = "missing socks.users";
+                return
+            }
+            break
+        default:
+            self.error = "missing outbound.protocol";
+            return
+        }
+
+        // check stream setting
+        switch self.streamNetwork {
+        case V2rayStreamSettings.network.h2.rawValue:
+            if self.streamH2.host.count > 0 {
+                if self.streamH2.host[0].count == 0 {
+                    self.error = "missing streamSettings.httpSettings.host";
+                    return
+                }
+            } else {
+                self.error = "missing streamSettings.httpSettings.host";
+                return
+            }
+            if self.streamH2.path.count == 0 {
+                self.error = "missing streamSettings.httpSettings.path";
+                return
+            }
+            break
+        case V2rayStreamSettings.network.ws.rawValue:
+            if self.streamWs.path.count == 0 {
+                self.error = "missing streamSettings.wsSettings.path";
+                return
+            }
+            if self.streamWs.headers.host.count == 0 {
+                self.error = "missing streamSettings.httpSettings.host";
+                return
+            }
+            break
+        default:
+            break
+        }
+    }
+
+    private func getOutbound() -> V2rayOutbound {
         var outbound = V2rayOutbound()
         outbound.protocol = V2rayProtocolOutbound(rawValue: self.serverProtocol)!
+        outbound.tag = "agentout"
+
         switch outbound.protocol {
         case V2rayProtocolOutbound.vmess:
             var vmess = V2rayOutboundVMess()
@@ -230,50 +439,62 @@ class V2rayConfig: NSObject {
         mux.concurrency = self.mux
         outbound.mux = mux
 
+        outbound.streamSettings = self.getStreamSettings()
+
+        return outbound
+    }
+
+    private func getStreamSettings() -> V2rayStreamSettings {
         // streamSettings
         var streamSettings = V2rayStreamSettings()
-        streamSettings.tcpSettings = self.streamTcp
-        streamSettings.kcpSettings = self.streamKcp
-        streamSettings.wsSettings = self.streamWs
-        streamSettings.httpSettings = self.streamH2
-        streamSettings.dsSettings = self.streamDs
         streamSettings.network = V2rayStreamSettings.network(rawValue: self.streamNetwork)!
+        switch streamSettings.network {
+        case .tcp:
+            streamSettings.tcpSettings = self.streamTcp
+            break
+        case .kcp:
+            streamSettings.kcpSettings = self.streamKcp
+            break
+        case .http, .h2:
+            streamSettings.httpSettings = self.streamH2
+            break
+        case .ws:
+            streamSettings.wsSettings = self.streamWs
+            break
+        case .domainsocket:
+            streamSettings.dsSettings = self.streamDs
+            break
+        }
         streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
         var tls = TlsSettings()
         tls.allowInsecure = self.streamTlsAllowInsecure
         tls.serverName = self.streamTlsServerName
         streamSettings.tlsSettings = tls
 
-        outbound.streamSettings = streamSettings
-
-        // outbound Freedom
-        var outboundFreedom = V2rayOutbound()
-        outboundFreedom.protocol = V2rayProtocolOutbound.freedom
-        outboundFreedom.settingFreedom = V2rayOutboundFreedom()
-
-        // outbound Blackhole
-        var outboundBlackhole = V2rayOutbound()
-        outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
-        outboundBlackhole.settingBlackhole = V2rayOutboundBlackhole()
-
-        if self.isNewVersion {
-            self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
-        } else {
-            self.v2ray.outbound = outbound
-            self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
-        }
-        // ------------------------------------- outbound end ---------------------------------------------
+        return streamSettings
     }
 
     // parse imported or edited json text
     // by import tab view
-    func parseJson(jsonText: String) -> String {
+    func parseJson(jsonText: String) {
+        defer {
+            if self.errors.count > 0 {
+                self.isValid = false
+            } else {
+                self.isValid = true
+            }
+        }
+
+        self.errors = []
+
         guard var json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
-            return "invalid json"
+            self.errors += ["invalid json"]
+            return
         }
 
         if !json.exists() {
-            return "invalid json"
+            self.errors += ["invalid json"]
+            return
         }
 
         // get dns data
@@ -288,45 +509,29 @@ class V2rayConfig: NSObject {
         // ============ parse inbound start =========================================
         // > 4.0
         if json["inbounds"].exists() {
+            self.isNewVersion = true
             // check inbounds
-            if json["inbounds"].arrayValue.count == 0 {
-                return "missing inbounds"
-            }
-
-            json["inbounds"].arrayValue.forEach { val in
-                let (v2rayInbound, errmsg) = self.parseInbound(jsonParams: val)
-                if errmsg != "" {
-                    print("errmsg", errmsg)
-                    return
+            if json["inbounds"].arrayValue.count > 0 {
+                json["inbounds"].arrayValue.forEach { val in
+                    // set into v2ray
+                    self.v2ray.inbounds?.append(self.parseInbound(jsonParams: val))
                 }
-
-                // set into v2ray
-                self.v2ray.inbounds?.append(v2rayInbound)
+            } else {
+                self.error = "missing inbounds"
             }
         } else {
             // old version
             // 1. inbound
-            if json["inbound"].dictionaryValue.count == 0 {
-                return "missing inbound"
+            if json["inbound"].dictionaryValue.count > 0 {
+                self.v2ray.inbound = self.parseInbound(jsonParams: json["inbound"])
+            } else {
+                self.error = "missing inbound"
             }
-
-            let (v2rayInbound, errmsg) = self.parseInbound(jsonParams: json["inbound"])
-            if errmsg != "" {
-                return errmsg
-            }
-
-            self.v2ray.inbound = v2rayInbound
 
             // 2. inboundDetour
             json["inboundDetour"].arrayValue.forEach { val in
-                let (v2rayInbound, errmsg) = self.parseInbound(jsonParams: val)
-                if errmsg != "" {
-                    print("errmsg", errmsg)
-                    return
-                }
-
                 // set into v2ray
-                self.v2ray.inboundDetour?.append(v2rayInbound)
+                self.v2ray.inboundDetour?.append(self.parseInbound(jsonParams: val))
             }
         }
         // ------------ parse inbound end -------------------------------------------
@@ -334,46 +539,30 @@ class V2rayConfig: NSObject {
         // ============ parse outbound start =========================================
         // > 4.0
         if json["outbounds"].exists() {
+            self.isNewVersion = true
             // check outbounds
-            if json["outbounds"].arrayValue.count == 0 {
-                return "missing outbounds"
-            }
-
-            // outbounds
-            json["outbounds"].arrayValue.forEach { val in
-                let (v2rayOutbound, errmsg) = self.parseOutbound(jsonParams: val)
-                if errmsg != "" {
-                    print("errmsg", errmsg)
-                    return
+            if json["outbounds"].arrayValue.count > 0 {
+                // outbounds
+                json["outbounds"].arrayValue.forEach { val in
+                    // set into v2ray
+                    self.v2ray.outbounds?.append(self.parseOutbound(jsonParams: val))
                 }
-
-                // set into v2ray
-                self.v2ray.outbounds?.append(v2rayOutbound)
+            } else {
+                self.errors += ["missing outbounds"]
             }
         } else {
             // check outbounds
             // 1. outbound
-            if json["outbound"].dictionaryValue.count == 0 {
-                return "missing outbound"
+            if json["outbound"].dictionaryValue.count > 0 {
+                self.v2ray.outbound = self.parseOutbound(jsonParams: json["outbound"])
+            } else {
+                self.errors += ["missing outbound"]
             }
-
-            let (v2rayOutbound, errmsg) = self.parseOutbound(jsonParams: json["outbound"])
-            if errmsg != "" {
-                return errmsg
-            }
-
-            self.v2ray.outbound = v2rayOutbound
 
             // outboundDetour
             json["outboundDetour"].arrayValue.forEach { val in
-                let (v2rayOutbound, errmsg) = self.parseOutbound(jsonParams: val)
-                if errmsg != "" {
-                    print("errmsg", errmsg)
-                    return
-                }
-
                 // set into v2ray
-                self.v2ray.outboundDetour?.append(v2rayOutbound)
+                self.v2ray.outboundDetour?.append(self.parseOutbound(jsonParams: val))
             }
         }
         // ------------ parse outbound end -------------------------------------------
@@ -383,32 +572,31 @@ class V2rayConfig: NSObject {
         }
 
         v2ray.transport = self.parseTransport(steamJson: json["transport"])
-        self.isValid = true
-
-        return ""
     }
 
     // parse inbound from json
-    func parseInbound(jsonParams: JSON) -> (V2rayInbound, String) {
+    func parseInbound(jsonParams: JSON) -> (V2rayInbound) {
         var v2rayInbound = V2rayInbound()
 
         if !jsonParams["protocol"].exists() {
-            return (v2rayInbound, "missing inbound.protocol")
+            self.errors += ["missing inbound.protocol"]
+            return (v2rayInbound)
         }
 
         if (V2rayProtocolInbound(rawValue: jsonParams["protocol"].stringValue) == nil) {
-            return (v2rayInbound, "invalid inbound.protocol")
+            self.errors += ["invalid inbound.protocol"]
+            return (v2rayInbound)
         }
 
         // set protocol
         v2rayInbound.protocol = V2rayProtocolInbound(rawValue: jsonParams["protocol"].stringValue)!
 
         if !jsonParams["port"].exists() {
-            return (v2rayInbound, "missing inbound.port")
+            self.errors += ["missing inbound.port"]
         }
 
         if !(jsonParams["port"].intValue > 1024 && jsonParams["port"].intValue < 65535) {
-            return (v2rayInbound, "invalid inbound.port")
+            self.errors += ["invalid inbound.port"]
         }
 
         // set port
@@ -531,11 +719,7 @@ class V2rayConfig: NSObject {
 
         // stream settings
         if jsonParams["streamSettings"].dictionaryValue.count > 0 {
-            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
-            if errmsg != "" {
-                return (v2rayInbound, errmsg)
-            }
-            v2rayInbound.streamSettings = stream
+            v2rayInbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
         }
 
         // set local socks5 port
@@ -550,20 +734,23 @@ class V2rayConfig: NSObject {
             self.foundHttpPort = true
         }
 
-        return (v2rayInbound, "")
+        return (v2rayInbound)
     }
 
     // parse outbound from json
-    func parseOutbound(jsonParams: JSON) -> (V2rayOutbound, String) {
+    func parseOutbound(jsonParams: JSON) -> (V2rayOutbound) {
         var v2rayOutbound = V2rayOutbound()
 
         if !(jsonParams["protocol"].exists()) {
-            return (v2rayOutbound, "missing outbound.protocol")
+            self.errors += ["missing outbound.protocol"]
+            return (v2rayOutbound)
         }
 
         if (V2rayProtocolOutbound(rawValue: jsonParams["protocol"].stringValue) == nil) {
-            return (v2rayOutbound, "invalid outbound.protocol")
+            self.errors += ["invalid outbound.protocol"]
+            return (v2rayOutbound)
         }
+
         // set protocol
         v2rayOutbound.protocol = V2rayProtocolOutbound(rawValue: jsonParams["protocol"].stringValue)!
 
@@ -673,11 +860,7 @@ class V2rayConfig: NSObject {
 
         // stream settings
         if jsonParams["streamSettings"].dictionaryValue.count > 0 {
-            let (errmsg, stream) = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "outbound")
-            if errmsg != "" {
-                return (v2rayOutbound, errmsg)
-            }
-            v2rayOutbound.streamSettings = stream
+            v2rayOutbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "outbound")
         }
 
         // set main server protocol
@@ -698,29 +881,28 @@ class V2rayConfig: NSObject {
             self.serverShadowsocks = v2rayOutbound.settingShadowsocks!.servers[0]
         }
 
-        return (v2rayOutbound, "")
+        return (v2rayOutbound)
     }
 
     // parse steamSettings
-    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> (errmsg: String, stream: V2rayStreamSettings) {
-        var errmsg = ""
+    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> (V2rayStreamSettings) {
         var stream = V2rayStreamSettings()
 
         if (V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue) == nil) {
-            errmsg = "invalid " + preTxt + ".streamSettings.network"
-            return (errmsg: errmsg, stream: stream)
+            self.errors += ["invalid " + preTxt + ".streamSettings.network"]
+        } else {
+            // set network
+            stream.network = V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue)!
+            self.streamNetwork = stream.network.rawValue
         }
-        // set network
-        stream.network = V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue)!
-        self.streamNetwork = stream.network.rawValue
 
         if (V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue) == nil) {
-            errmsg = "invalid " + preTxt + ".streamSettings.security"
-            return (errmsg: errmsg, stream: stream)
+            self.errors += ["invalid " + preTxt + ".streamSettings.security"]
+        } else {
+            // set security
+            stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
+            self.streamTlsSecurity = stream.security.rawValue
         }
-        // set security
-        stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
-        self.streamTlsSecurity = stream.security.rawValue
 
         if steamJson["sockopt"].dictionaryValue.count > 0 {
             var sockopt = V2rayStreamSettingSockopt()
@@ -774,7 +956,7 @@ class V2rayConfig: NSObject {
             }
         }
 
-        return (errmsg: errmsg, stream: stream)
+        return (stream)
     }
 
     func parseTransport(steamJson: JSON) -> V2rayTransport {

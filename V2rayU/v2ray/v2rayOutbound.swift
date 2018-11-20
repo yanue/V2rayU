@@ -20,7 +20,7 @@ enum V2rayProtocolOutbound: String, Codable {
 struct V2rayOutbound: Codable {
     var sendThrough: String?
     var `protocol`: V2rayProtocolOutbound = .freedom
-    var tag: String? = OutboundDetourTag
+    var tag: String? = ""
     var streamSettings: V2rayStreamSettings?
     var proxySettings: ProxySettings?
     var mux: V2rayOutboundMux?
@@ -50,9 +50,9 @@ extension V2rayOutbound {
         tag = try container.decode(String.self, forKey: CodingKeys.tag)
 
         // ignore nil
-//        if !(try container.decodeNil(forKey: .streamSettings)) {
-//            streamSettings = try container.decode(streamSettings.self, forKey: CodingKeys.streamSettings)
-//        }
+        if !(try container.decodeNil(forKey: .streamSettings)) {
+            streamSettings = try container.decode(V2rayStreamSettings.self, forKey: CodingKeys.streamSettings)
+        }
 
         // decode settings depends on `protocol`
         switch `protocol` {
@@ -80,9 +80,9 @@ extension V2rayOutbound {
         try container.encode(tag, forKey: .tag)
 
         // ignore nil
-//        if streamSettings != nil {
-//            try container.encode(streamSettings, forKey: .streamSettings)
-//        }
+        if streamSettings != nil {
+            try container.encode(streamSettings, forKey: .streamSettings)
+        }
 
         // encode settings depends on `protocol`
         switch `protocol` {

@@ -8,8 +8,6 @@
 
 import Foundation
 
-let OutboundDetourTag = "direct"
-
 // doc: https://www.v2ray.com/chapter_02/01_overview.html
 
 struct V2rayStruct: Codable {
@@ -19,7 +17,7 @@ struct V2rayStruct: Codable {
     var stats: V2rayStats?
     var routing: V2rayRouting? = V2rayRouting()
     var policy: V2rayPolicy?
-    var inbound: V2rayInbound? = V2rayInbound()
+    var inbound: V2rayInbound?
     var inboundDetour: [V2rayInbound]?
     var inbounds: [V2rayInbound]? // > 4.0
     var outbound: V2rayOutbound?
@@ -89,7 +87,7 @@ struct V2rayRoutingSettingRule: Codable {
     var user: [String]?
     var inboundTag: [String]?
     var `protocol`: [String]? // ["http", "tls", "bittorrent"]
-    var outboundTag: String? = OutboundDetourTag
+    var outboundTag: String? = "direct"
 }
 
 struct V2rayPolicy: Codable {
