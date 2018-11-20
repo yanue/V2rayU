@@ -219,7 +219,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         v2rayConfig.checkManualValid()
 
-        print("v2rayConfig.isValid", v2rayConfig.isValid)
         if v2rayConfig.isValid {
             let jsonText = v2rayConfig.combineManual()
             self.configText.string = jsonText
@@ -249,7 +248,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // vmess
         v2rayConfig.serverVmess.address = self.vmessAddr.stringValue
-        v2rayConfig.serverVmess.port = self.vmessPort.stringValue.replacingOccurrences(of: ",", with: "")
+        v2rayConfig.serverVmess.port = Int(self.vmessPort.intValue)
         var user = V2rayOutboundVMessUser()
         user.alterId = Int(self.vmessAlterId.intValue)
         user.level = Int(self.vmessLevel.intValue)
@@ -318,7 +317,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     }
 
     func bindDataToView() {
-        print("bind")
         // ========================== base start =======================
         // base
         self.httpPort.stringValue = v2rayConfig.httpPort
@@ -336,7 +334,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // vmess
         self.vmessAddr.stringValue = v2rayConfig.serverVmess.address
-        self.vmessPort.stringValue = v2rayConfig.serverVmess.port
+        self.vmessPort.intValue = Int32(v2rayConfig.serverVmess.port)
         if v2rayConfig.serverVmess.users.count > 0 {
             let user = v2rayConfig.serverVmess.users[0]
             self.vmessAlterId.intValue = Int32(user.alterId)
@@ -426,7 +424,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.v2rayConfig.parseJson(jsonText: self.configText.string)
         if self.v2rayConfig.errors.count > 0 {
             self.errTip.stringValue = self.v2rayConfig.errors[0]
-            return
         }
 
         // save
@@ -451,7 +448,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func ok(_ sender: NSButton) {
         // set always on
         self.okBtn.state = .on
-        self.saveConfig()
+        // in Manual tab view
+        if "Manual" == self.tabView.selectedTabViewItem?.identifier as! String {
+            self.switchToImportView()
+        } else {
+            self.saveConfig()
+        }
     }
 
     @IBAction func cancel(_ sender: NSButton) {

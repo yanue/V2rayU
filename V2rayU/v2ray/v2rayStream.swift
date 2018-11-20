@@ -44,10 +44,10 @@ struct V2rayStreamSettings: Codable {
 }
 
 struct TlsSettings: Codable {
-    var serverName: String = ""
-    var alpn: String = ""
-    var allowInsecure: Bool = true // 是否允许不安全连接（用于客户端）。当值为 true 时，V2Ray 不会检查远端主机所提供的 TLS 证书的有效性。
-    var allowInsecureCiphers: Bool = false
+    var serverName: String?
+    var alpn: String?
+    var allowInsecure: Bool?
+    var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
 }
 

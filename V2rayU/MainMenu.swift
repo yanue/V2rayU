@@ -42,13 +42,13 @@ class MenuController: NSObject, NSMenuDelegate {
         statusItem.menu = statusMenu
 
         configWindow = ConfigWindowController()
-
-        // show off status
-        self.setStatusOff()
-
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start
+            // on status
             self.startV2rayCore()
+        } else {
+            // show off status
+            self.setStatusOff()
         }
     }
 

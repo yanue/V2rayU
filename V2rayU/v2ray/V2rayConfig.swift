@@ -329,7 +329,7 @@ class V2rayConfig: NSObject {
                 self.error = "missing vmess.address";
                 return
             }
-            if self.serverVmess.port.count == 0 {
+            if self.serverVmess.port == 0 {
                 self.error = "missing vmess.port";
                 return
             }
@@ -352,11 +352,11 @@ class V2rayConfig: NSObject {
                 self.error = "missing shadowsocks.port";
                 return
             }
-            if self.serverShadowsocks.password.count > 0 {
+            if self.serverShadowsocks.password.count == 0 {
                 self.error = "missing shadowsocks.password";
                 return
             }
-            if self.serverShadowsocks.method.count > 0 {
+            if self.serverShadowsocks.method.count == 0 {
                 self.error = "missing shadowsocks.method";
                 return
             }
@@ -478,8 +478,11 @@ class V2rayConfig: NSObject {
         }
         streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
         var tls = TlsSettings()
-        tls.allowInsecure = self.streamTlsAllowInsecure
-        tls.serverName = self.streamTlsServerName
+        if self.streamTlsServerName.count > 0 {
+            tls.allowInsecure = self.streamTlsAllowInsecure
+            tls.serverName = self.streamTlsServerName
+        }
+
         streamSettings.tlsSettings = tls
 
         return streamSettings
@@ -851,7 +854,7 @@ class V2rayConfig: NSObject {
                     var item = V2rayOutboundVMessItem()
 
                     item.address = val["address"].stringValue
-                    item.port = val["port"].stringValue
+                    item.port = val["port"].intValue
 
                     var users: [V2rayOutboundVMessUser] = []
                     val["users"].arrayValue.forEach { val in
@@ -948,8 +951,12 @@ class V2rayConfig: NSObject {
         if preTxt == "outbound" {
             if transport.tlsSettings != nil {
                 // set data
-                self.streamTlsServerName = transport.tlsSettings!.serverName
-                self.streamTlsAllowInsecure = transport.tlsSettings!.allowInsecure
+                if transport.tlsSettings?.serverName != nil {
+                    self.streamTlsServerName = transport.tlsSettings!.serverName!
+                }
+                if transport.tlsSettings?.serverName != nil {
+                    self.streamTlsAllowInsecure = transport.tlsSettings!.allowInsecure!
+                }
             }
 
             if transport.tcpSettings != nil {
@@ -1132,6 +1139,7 @@ class V2rayConfig: NSObject {
         }
 
         do {
+
             let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
 
             // delete before config

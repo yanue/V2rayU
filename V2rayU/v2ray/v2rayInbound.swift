@@ -13,7 +13,7 @@ struct V2rayInbound: Codable {
     var port: String = "1080"
     var listen: String = "127.0.0.1"
     var `protocol`: V2rayProtocolInbound = .socks
-    var tag: String? = ""
+    var tag: String?
     var streamSettings: V2rayStreamSettings?
     var sniffing: V2rayInboundSniffing?
     var allocate: V2rayInboundAllocate?
@@ -131,7 +131,7 @@ struct ProxySettings: Codable {
 }
 
 struct V2rayInboundHttp: Codable {
-    var timeout: Int?
+    var timeout: Int = 360
     var allowTransparent: Bool?
     var userLevel: Int?
     var accounts:[V2rayInboundHttpAccount]?
@@ -153,9 +153,9 @@ struct V2rayInboundShadowsocks: Codable {
 struct V2rayInboundSocks: Codable {
     var auth: String = "noauth" // noauth | password
     var accounts: [V2rayInboundSockAccount]?
-    var udp: Bool?
+    var udp: Bool = true
     var ip: String?
-    var timeout: Int?
+    var timeout: Int = 360
     var userLevel: Int?
 }
 

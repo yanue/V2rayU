@@ -49,19 +49,6 @@
                     <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
-                <menuItem title="Generate QR code" id="eG7-US-3LU">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="generateQRCode:" target="hcZ-V7-Dui" id="lfg-Eq-VHT"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Scan QR Code from Screen" id="eEW-X9-KYU">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="scanQRCode:" target="hcZ-V7-Dui" id="l4e-c8-gnv"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="6DA-yz-9jm"/>
                 <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

@@ -159,7 +159,7 @@ struct V2rayOutboundVMess: Codable {
 
 struct V2rayOutboundVMessItem: Codable {
     var address: String = ""
-    var port: String = ""
+    var port: Int = 443
     var users: [V2rayOutboundVMessUser] = [V2rayOutboundVMessUser()]
 }
 
