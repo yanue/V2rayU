@@ -526,10 +526,11 @@ class V2rayConfig: NSObject {
             self.isNewVersion = true
             // check inbounds
             if json["inbounds"].arrayValue.count > 0 {
+                var inbounds: [V2rayInbound] = []
                 json["inbounds"].arrayValue.forEach { val in
-                    // set into v2ray
-                    self.v2ray.inbounds?.append(self.parseInbound(jsonParams: val))
+                    inbounds += [self.parseInbound(jsonParams: val)]
                 }
+                self.v2ray.inbounds = inbounds
             } else {
                 self.error = "missing inbounds"
             }
@@ -543,9 +544,12 @@ class V2rayConfig: NSObject {
             }
 
             // 2. inboundDetour
-            json["inboundDetour"].arrayValue.forEach { val in
-                // set into v2ray
-                self.v2ray.inboundDetour?.append(self.parseInbound(jsonParams: val))
+            if json["inboundDetour"].arrayValue.count > 0 {
+                var inboundDetour: [V2rayInbound] = []
+                json["inboundDetour"].arrayValue.forEach { val in
+                    inboundDetour += [self.parseInbound(jsonParams: val)]
+                }
+                self.v2ray.inboundDetour = inboundDetour
             }
         }
         // ------------ parse inbound end -------------------------------------------
@@ -596,6 +600,7 @@ class V2rayConfig: NSObject {
 
     // parse inbound from json
     func parseInbound(jsonParams: JSON) -> (V2rayInbound) {
+        print("parseInbound")
         var v2rayInbound = V2rayInbound()
 
         if !jsonParams["protocol"].exists() {
@@ -749,6 +754,7 @@ class V2rayConfig: NSObject {
         }
 
         // set local http port
+        print("v2rayInbound.protocol parse", v2rayInbound.protocol, self.foundHttpPort, v2rayInbound.port)
         if v2rayInbound.protocol == V2rayProtocolInbound.http && !self.foundHttpPort {
             self.httpPort = v2rayInbound.port
             self.foundHttpPort = true

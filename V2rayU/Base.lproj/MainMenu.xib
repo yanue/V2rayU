@@ -20,9 +20,11 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="hcZ-V7-Dui" userLabel="MenuController" customClass="MenuController" customModule="V2rayU" customModuleProvider="target">
             <connections>
+                <outlet property="globalMode" destination="sZL-Iu-xAt" id="Iz8-oL-8dU"/>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="0Z8-41-eCi"/>
                 <outlet property="statusMenu" destination="9n3-TW-9ur" id="Hgg-sa-fM8"/>
                 <outlet property="toggleV2rayItem" destination="SML-EF-rdT" id="am7-ue-GN3"/>
+                <outlet property="v2rayRulesMode" destination="9EU-Qp-aR6" id="0O8-K6-2eP"/>
                 <outlet property="v2rayStatusItem" destination="P34-uO-Vwf" id="F8I-tt-922"/>
             </connections>
         </customObject>
@@ -35,6 +37,19 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="q2e-iz-ozm"/>
+                <menuItem title="V2ray Rules" state="on" id="9EU-Qp-aR6">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="disableGlobalProxy:" target="hcZ-V7-Dui" id="cpv-nK-Got"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Global Mode" id="sZL-Iu-xAt">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="enableGlobalProxy:" target="hcZ-V7-Dui" id="12Y-dt-StO"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>

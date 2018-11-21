@@ -25,6 +25,8 @@ extension UserDefaults {
         case autoCheckVersion
         // auto launch after login
         case autoLaunch
+        // global mode system proxy
+        case globalMode
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
