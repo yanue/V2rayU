@@ -34,7 +34,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // check version
-            ShiftyUpdater.checkForUpdatesInBackground()
+            V2rayUpdater.checkForUpdatesInBackground()
         }
     }
 

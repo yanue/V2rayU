@@ -20,6 +20,9 @@
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* ConfigWindow.swift */; };
+		664FC05221A6EDF000048FE3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664FC05121A6EDF000048FE3 /* Sparkle.framework */; };
+		664FC05521A70C4300048FE3 /* build.plist in Resources */ = {isa = PBXBuildFile; fileRef = 664FC05321A70C4300048FE3 /* build.plist */; };
+		664FC05621A70C4300048FE3 /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 664FC05421A70C4300048FE3 /* build.sh */; };
 		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
@@ -50,6 +53,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		664FC05021A6EDB500048FE3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		668D0F4E21A59984006874D5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -93,6 +105,9 @@
 		664EB379216C9A5F00B6AE0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		664EB37B216C9A5F00B6AE0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		664EB390216CA9E800B6AE0D /* ConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWindow.swift; sourceTree = "<group>"; };
+		664FC05121A6EDF000048FE3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.20.0/Sparkle.framework"; sourceTree = "<group>"; };
+		664FC05321A70C4300048FE3 /* build.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = build.plist; sourceTree = "<group>"; };
+		664FC05421A70C4300048FE3 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		6650AAAC21771E11000909D8 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
@@ -136,6 +151,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */,
+				664FC05221A6EDF000048FE3 /* Sparkle.framework in Frameworks */,
 				F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -222,11 +238,11 @@
 				660D0E59216E0158000C2922 /* V2rayServer.swift */,
 				66784AFF21704E1300AD307F /* V2rayCore.swift */,
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
-				664EB37B216C9A5F00B6AE0D /* Info.plist */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				6650AAAC21771E11000909D8 /* unzip.sh */,
 				6D6DF821D34F8B06A62F1936 /* Authorization.swift */,
 				6D6DF87840CDA04AF0E9D36E /* Scanner.swift */,
+				664EB37B216C9A5F00B6AE0D /* Info.plist */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -234,6 +250,8 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				664FC05321A70C4300048FE3 /* build.plist */,
+				664FC05421A70C4300048FE3 /* build.sh */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
 				66FEAD46217D7612009DECF9 /* bump.sh */,
 				66FEAD47217D7852009DECF9 /* appcast.xml */,
@@ -246,6 +264,7 @@
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				664FC05121A6EDF000048FE3 /* Sparkle.framework */,
 				66973EB621797719001FEA1E /* ServiceManagement.framework */,
 				66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */,
 				664B95DD217062A500DBC941 /* Alamofire */,
@@ -310,6 +329,7 @@
 				664EB36F216C9A5E00B6AE0D /* Resources */,
 				83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */,
 				66973ECA21797A6B001FEA1E /* CopyFiles */,
+				664FC05021A6EDB500048FE3 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -410,11 +430,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				664FC05621A70C4300048FE3 /* build.sh in Resources */,
 				66FEAD48217D7852009DECF9 /* appcast.xml in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
+				664FC05521A70C4300048FE3 /* build.plist in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6D6DF1C91CE4692DB81B3D91 /* test.json in Resources */,
 			);

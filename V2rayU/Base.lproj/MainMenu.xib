@@ -53,15 +53,15 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
+                <menuItem title="Servers" id="cio-ej-HL5" userLabel="ServerItems">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
+                </menuItem>
                 <menuItem title="Configure..." id="YoX-II-o27" userLabel="Configure">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openConfig:" target="hcZ-V7-Dui" id="cu6-mU-Y02"/>
                     </connections>
-                </menuItem>
-                <menuItem title="Servers" id="cio-ej-HL5" userLabel="ServerItems">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
                 <menuItem title="Scan QR Code From Screen" id="XHn-5w-qWM">
                     <modifierMask key="keyEquivalentModifierMask"/>

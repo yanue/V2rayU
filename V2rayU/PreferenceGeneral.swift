@@ -11,7 +11,7 @@ import Preferences
 import ServiceManagement
 import Sparkle
 
-let ShiftyUpdater = SUUpdater()
+let V2rayUpdater = SUUpdater()
 
 final class PreferenceGeneralViewController: NSViewController, Preferenceable {
     let toolbarItemTitle = "General"
@@ -81,7 +81,7 @@ final class PreferenceGeneralViewController: NSViewController, Preferenceable {
 
     @IBAction func checkVersion(_ sender: NSButton) {
         // need set SUFeedURL into plist
-        ShiftyUpdater.checkForUpdates(sender)
+        V2rayUpdater.checkForUpdates(sender)
     }
 }
 

@@ -6,7 +6,6 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
 import Alamofire
 import SwiftyJSON
 
