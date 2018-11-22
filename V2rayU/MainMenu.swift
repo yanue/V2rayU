@@ -10,11 +10,9 @@ import Foundation
 import Cocoa
 import ServiceManagement
 import Preferences
-import SystemConfiguration
 
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
-    var authRef: AuthorizationRef?
     var configWindow: ConfigWindowController!
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -37,7 +35,7 @@ class MenuController: NSObject, NSMenuDelegate {
     override func awakeFromNib() {
         // Do any additional setup after loading the view.
         // initial auth ref
-        let error = AuthorizationCreate(nil, nil, [], &authRef)
+        let error = AuthorizationCreate(nil, nil, [], &V2rayLaunch.authRef)
         assert(error == errAuthorizationSuccess)
 
         if UserDefaults.getBool(forKey: .globalMode) {
@@ -101,11 +99,6 @@ class MenuController: NSObject, NSMenuDelegate {
         self.setStatusOff()
         // stop launch
         V2rayLaunch.Stop()
-        // if enable system proxy
-        if UserDefaults.getBool(forKey: .globalMode) {
-            // close system proxy
-            self.setSystemProxy(enabled: false)
-        }
     }
 
     // start v2ray core
@@ -113,7 +106,7 @@ class MenuController: NSObject, NSMenuDelegate {
         NSLog("start v2ray-core begin")
 
         guard let v2ray = V2rayServer.loadSelectedItem() else {
-            NSLog("v2ray config not fould")
+            NSLog("v2ray config not found")
             return
         }
 
@@ -267,7 +260,7 @@ class MenuController: NSObject, NSMenuDelegate {
         // save
         UserDefaults.setBool(forKey: .globalMode, value: false)
         // disable
-        self.setSystemProxy(enabled: false)
+        V2rayLaunch.setSystemProxy(enabled: false)
     }
 
     // MARK: - actions
@@ -295,77 +288,15 @@ class MenuController: NSObject, NSMenuDelegate {
             httpPort = cfg.httpPort
         }
 
-        print("httpPort", httpPort, sockPort)
-        self.setSystemProxy(enabled: true, httpPort: httpPort, sockPort: sockPort)
+        V2rayLaunch.setSystemProxy(enabled: true, httpPort: httpPort, sockPort: sockPort)
     }
 
-    func setSystemProxy(enabled: Bool, httpPort: String = "", sockPort: String = "") {
-        Swift.print("Socks proxy set: \(enabled)")
+    @IBAction func scanQrcode(_ sender: Any) {
+        let qrStr: String = Scanner.scanQRCodeFromScreen()
+        print("scanQrcode", qrStr)
+    }
 
-        // setup policy database db
-        CommonAuthorization.shared.setupAuthorizationRights(authRef: self.authRef!)
-
-        // copy rights
-        let rightName: String = CommonAuthorization.systemProxyAuthRightName
-        var authItem = AuthorizationItem(name: (rightName as NSString).utf8String!, valueLength: 0, value: UnsafeMutableRawPointer(bitPattern: 0), flags: 0)
-        var authRight: AuthorizationRights = AuthorizationRights(count: 1, items: &authItem)
-
-        let copyRightStatus = AuthorizationCopyRights(self.authRef!, &authRight, nil, [.extendRights, .interactionAllowed, .preAuthorize, .partialRights], nil)
-
-        Swift.print("AuthorizationCopyRights result: \(copyRightStatus), right name: \(rightName)")
-        assert(copyRightStatus == errAuthorizationSuccess)
-
-        // set system proxy
-        let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "systemProxySet" as CFString, nil, self.authRef)!
-        let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices)!
-
-        var proxies = [NSObject: AnyObject]()
-
-        // proxy enabled set
-        if enabled {
-            // socks
-            if sockPort != "" && Int(sockPort) ?? 0 > 1024 {
-                proxies[kCFNetworkProxiesSOCKSEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesSOCKSProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesSOCKSPort] = Int(sockPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-            }
-
-            // check http port
-            if httpPort != "" && Int(httpPort) ?? 0 > 1024 {
-                // http
-                proxies[kCFNetworkProxiesHTTPEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesHTTPProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesHTTPPort] = Int(httpPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-
-                // https
-                proxies[kCFNetworkProxiesHTTPSEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesHTTPSProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesHTTPSPort] = Int(httpPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-            }
-        } else {
-            // set enable 0
-            proxies[kCFNetworkProxiesSOCKSEnable] = 0 as NSNumber
-            proxies[kCFNetworkProxiesHTTPEnable] = 0 as NSNumber
-            proxies[kCFNetworkProxiesHTTPSEnable] = 0 as NSNumber
-        }
-
-        sets.allKeys!.forEach { (key) in
-            let dict = sets.object(forKey: key)!
-            let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
-
-            if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
-                SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetProxies)" as CFString, proxies as CFDictionary)
-            }
-        }
-
-        // commit to system preferences.
-        let commitRet = SCPreferencesCommitChanges(prefRef)
-        let applyRet = SCPreferencesApplyChanges(prefRef)
-        SCPreferencesSynchronize(prefRef)
-
-        Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
+    @IBAction func generateQrcode(_ sender: Any) {
+        print("generateQrcode")
     }
 }

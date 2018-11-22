@@ -1,11 +1,15 @@
 PODS:
   - Alamofire (4.7.3)
+  - EFQRCode (4.4.2):
+    - swift_qrcodejs (~> 1.0.1)
   - Preferences (0.2.0)
   - Sparkle (1.20.0)
+  - swift_qrcodejs (1.0.1)
   - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire
+  - EFQRCode
   - Preferences
   - Sparkle
   - SwiftyJSON
@@ -13,16 +17,20 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - EFQRCode
     - Preferences
     - Sparkle
+    - swift_qrcodejs
     - SwiftyJSON
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
   Preferences: ebc036a176a298cde835155c73251173768a2f8d
   Sparkle: 48999e7ee032f05ca05e28451eadf4af8ede6b44
+  swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
   SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: c850e11102e92e0f0eb893059c542650d60ac5ef
+PODFILE CHECKSUM: fde745e82410567a545d4aa0c3f453959d468f5b
 
 COCOAPODS: 1.6.0.beta.1

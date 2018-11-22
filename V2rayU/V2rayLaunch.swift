@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SystemConfiguration
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
@@ -18,6 +19,8 @@ let v2rayCoreFile = "v2ray-core/v2ray"
 let v2rayCoreFullPath = AppResourcesPath + "/" + v2rayCoreFile
 
 class V2rayLaunch: NSObject {
+    static var authRef: AuthorizationRef?
+
     static func generateLauchAgentPlist() {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
@@ -60,6 +63,12 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("Stop v2ray-core failed.")
         }
+
+        // if enable system proxy
+        if UserDefaults.getBool(forKey: .globalMode) {
+            // close system proxy
+            V2rayLaunch.setSystemProxy(enabled: false)
+        }
     }
 
     static func OpenLogs() {
@@ -75,5 +84,75 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("open logs failed.")
         }
+    }
+
+    static func setSystemProxy(enabled: Bool, httpPort: String = "", sockPort: String = "") {
+        Swift.print("Socks proxy set: \(enabled)")
+
+        // setup policy database db
+        CommonAuthorization.shared.setupAuthorizationRights(authRef: self.authRef!)
+
+        // copy rights
+        let rightName: String = CommonAuthorization.systemProxyAuthRightName
+        var authItem = AuthorizationItem(name: (rightName as NSString).utf8String!, valueLength: 0, value: UnsafeMutableRawPointer(bitPattern: 0), flags: 0)
+        var authRight: AuthorizationRights = AuthorizationRights(count: 1, items: &authItem)
+
+        let copyRightStatus = AuthorizationCopyRights(self.authRef!, &authRight, nil, [.extendRights, .interactionAllowed, .preAuthorize, .partialRights], nil)
+
+        Swift.print("AuthorizationCopyRights result: \(copyRightStatus), right name: \(rightName)")
+        assert(copyRightStatus == errAuthorizationSuccess)
+
+        // set system proxy
+        let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "systemProxySet" as CFString, nil, self.authRef)!
+        let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices)!
+
+        var proxies = [NSObject: AnyObject]()
+
+        // proxy enabled set
+        if enabled {
+            // socks
+            if sockPort != "" && Int(sockPort) ?? 0 > 1024 {
+                proxies[kCFNetworkProxiesSOCKSEnable] = 1 as NSNumber
+                proxies[kCFNetworkProxiesSOCKSProxy] = "127.0.0.1" as AnyObject?
+                proxies[kCFNetworkProxiesSOCKSPort] = Int(sockPort)! as NSNumber
+                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
+            }
+
+            // check http port
+            if httpPort != "" && Int(httpPort) ?? 0 > 1024 {
+                // http
+                proxies[kCFNetworkProxiesHTTPEnable] = 1 as NSNumber
+                proxies[kCFNetworkProxiesHTTPProxy] = "127.0.0.1" as AnyObject?
+                proxies[kCFNetworkProxiesHTTPPort] = Int(httpPort)! as NSNumber
+                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
+
+                // https
+                proxies[kCFNetworkProxiesHTTPSEnable] = 1 as NSNumber
+                proxies[kCFNetworkProxiesHTTPSProxy] = "127.0.0.1" as AnyObject?
+                proxies[kCFNetworkProxiesHTTPSPort] = Int(httpPort)! as NSNumber
+                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
+            }
+        } else {
+            // set enable 0
+            proxies[kCFNetworkProxiesSOCKSEnable] = 0 as NSNumber
+            proxies[kCFNetworkProxiesHTTPEnable] = 0 as NSNumber
+            proxies[kCFNetworkProxiesHTTPSEnable] = 0 as NSNumber
+        }
+
+        sets.allKeys!.forEach { (key) in
+            let dict = sets.object(forKey: key)!
+            let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
+
+            if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
+                SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetProxies)" as CFString, proxies as CFDictionary)
+            }
+        }
+
+        // commit to system preferences.
+        let commitRet = SCPreferencesCommitChanges(prefRef)
+        let applyRet = SCPreferencesApplyChanges(prefRef)
+        SCPreferencesSynchronize(prefRef)
+
+        Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
     }
 }

@@ -12,5 +12,6 @@ target 'V2rayU' do
   pod 'SwiftyJSON'
   pod 'Preferences'
   pod 'Sparkle'
+  pod 'EFQRCode'
 
 end

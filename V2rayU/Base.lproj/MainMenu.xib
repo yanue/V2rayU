@@ -63,6 +63,18 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
+                <menuItem title="Scan QR Code From Screen" id="XHn-5w-qWM">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="scanQrcode:" target="hcZ-V7-Dui" id="URj-Vl-1TY"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Generate QR Code" id="0vX-fS-8FW">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="generateQrcode:" target="hcZ-V7-Dui" id="cUu-eO-w0Z"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
                 <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>

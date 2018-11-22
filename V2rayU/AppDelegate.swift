@@ -43,5 +43,3 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         V2rayLaunch.Stop()
     }
 }
-
-
