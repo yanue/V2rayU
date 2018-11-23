@@ -144,10 +144,10 @@ N | n ) echo
         exit;;
 esac
 
-build
-createDmg
+#build
+#createDmg
 read -p "请输入版本描述: " release_note
-pushRelease ${release_note}
+#pushRelease ${release_note}
 generateAppcast ${release_note}
 
 echo "Done"
