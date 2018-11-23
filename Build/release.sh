@@ -101,7 +101,7 @@ function createDmg() {
 function generateAppcast() {
     echo "generate appcast"
     description=$1
-    if [ -z "$description" ]; then
+    if [[ -z "$description" ]]; then
         description="bug fix"
     fi
     downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
@@ -117,13 +117,18 @@ function generateAppcast() {
 }
 
 function pushRelease() {
+    description=$1
+    if [[ -z "$description" ]]; then
+        description="bug fix"
+    fi
+
     echo "github-release tag"
     github-release release\
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
         --name "${APP_Version}"\
-        --description $1\
+        --description "${description}"\
 
     echo "github-release upload"
     github-release upload\
@@ -147,6 +152,18 @@ function commit() {
     cd ${BUILD_DIR}
 }
 
+function downloadV2ray() {
+    rm -fr v2ray-macos.zip v2ray-core
+    tag=$(curl --silent "https://api.github.com/repos/v2ray/v2ray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo "v2ray-core version: ${tag}"
+    url="https://github.com/v2ray/v2ray-core/releases/download/${tag}/v2ray-macos.zip"
+    wget ${url}
+
+    unzip -o v2ray-macos.zip -d v2ray-core
+    mv v2ray-core "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources"
+    rm -fr v2ray-macos.zip v2ray-core
+}
+
 echo "正在打包版本: V"${APP_Version}
 read -n1 -r -p "请确认版本号是否正确 [Y/N]? " answer
 case ${answer} in
@@ -162,15 +179,15 @@ N | n ) echo
         exit;;
 esac
 
+rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
 
-#updatePlistVersion
-#build
-#createDmg
+updatePlistVersion
+build
+downloadV2ray
+createDmg
 read -p "请输入版本描述: " release_note
-#pushRelease ${release_note}
+pushRelease ${release_note}
 generateAppcast ${release_note}
 commit
-
-rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
 
 echo "Done"
