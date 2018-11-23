@@ -49,8 +49,6 @@ function createDmg() {
     echo "Created DMG: ${DMG_TMP}"
 
     ############# 2 #############
-    echo "${DMG_BACKGROUND_IMG}";
-
     DEVICE=$(hdiutil attach -readwrite -noverify "${DMG_TMP}"| egrep '^/dev/' | sed 1q | awk '{print $1}')
 
     # 拷贝背景图片
@@ -90,7 +88,7 @@ function createDmg() {
     hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
 
     # 清理文件夹
-    rm -rf "${DMG_TMP}"
+    rm -rf "${DMG_TMP}" "${APP_PATH}"
 }
 
 function generateAppcast() {
