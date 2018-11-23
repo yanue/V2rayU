@@ -19,6 +19,14 @@ class V2rayUTests: XCTestCase {
 //    override func tearDown() {
 //        // Put teardown code here. This method is called after the invocation of each test method in the class.
 //    }
+
+    func testDecodeUrl() {
+        let url = "ss://=="
+        let ss = ShadowsockUri()
+        ss.Init(url: URL(string: url)!)
+        print("ss", ss, "host", ss.host, ss.port, ss.method, ss.password, ss.remark, ss.error)
+    }
+
     func testInbound() {
         var inbound = V2rayInbound()
         inbound.protocol = V2rayProtocolInbound.vmess
@@ -42,7 +50,7 @@ class V2rayUTests: XCTestCase {
         outbound.settingShadowsocks = V2rayOutboundShadowsocks()
         let v2next = V2rayOutboundVMessItem(
                 address: "",
-                port: "",
+                port: 0,
                 users: [V2rayOutboundVMessUser(id: "aaa", alterId: 0, level: 0, security: "")]
         )
         outbound.settingVMess = V2rayOutboundVMess(vnext: [v2next])
@@ -56,9 +64,9 @@ class V2rayUTests: XCTestCase {
 
     func testV2ray() {
         let v2rayCfg = V2rayConfig()
-        let errmsg = v2rayCfg.parseJson(jsonText: jsonTxt)
-        if errmsg != "" {
-            print("err:", errmsg)
+        v2rayCfg.parseJson(jsonText: jsonTxt)
+        if v2rayCfg.errors.count > 0 {
+            print("err:", v2rayCfg.errors)
             return
         }
 

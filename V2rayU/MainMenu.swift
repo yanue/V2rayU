@@ -294,6 +294,30 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func scanQrcode(_ sender: Any) {
         let qrStr: String = Scanner.scanQRCodeFromScreen()
         print("scanQrcode", qrStr)
+        if qrStr.count > 0 {
+            if qrStr.contains("ss://") && URL(string: qrStr) != nil {
+                let ss = ShadowsockUri()
+                ss.Init(url: URL(string: qrStr)!)
+                var v2ray = V2rayConfig()
+                var ssServer = V2rayOutboundShadowsockServer()
+                ssServer.address = ss.host
+                ssServer.port = ss.port
+                ssServer.password = ss.password
+                ssServer.method = ss.method
+                v2ray.serverShadowsocks = ssServer
+                v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
+                v2ray.isNewVersion = true
+                v2ray.isValid = true
+                var str = v2ray.combineManual()
+                print("remark", ss.remark)
+                if v2ray.error == "" {
+                    V2rayServer.add(remark: ss.remark, json: str, isValid: true, url: qrStr)
+                    // todo tip
+                    // todo refresh server list
+                }
+            }
+        }
+
     }
 
     @IBAction func generateQrcode(_ sender: Any) {

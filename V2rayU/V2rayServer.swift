@@ -113,20 +113,41 @@ class V2rayServer: NSObject {
 
     // add v2ray server (tmp)
     static func add() {
-        if self.v2rayItemList.count > 20 {
+        if self.v2rayItemList.count > 50 {
             NSLog("over max len")
             return
         }
 
-        let now = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateStr = dateFormatter.string(from: now)
-
-        // name is : config. + current time str
-        let name = "config." + dateStr
+        // name is : config. + uuid
+        let name = "config." + UUID().uuidString
 
         let v2ray = V2rayItem(name: name, remark: "new server", isValid: false)
+        // save to v2ray UserDefaults
+        v2ray.store()
+
+        // just add to mem
+        self.v2rayItemList.append(v2ray)
+
+        // update server list UserDefaults
+        self.saveItemList()
+    }
+
+    // add v2ray server (by scan qrcode)
+    static func add(remark: String, json: String, isValid: Bool, url: String = "") {
+        if self.v2rayItemList.count > 50 {
+            NSLog("over max len")
+            return
+        }
+
+        var remark_ = remark
+        if remark.count == 0 {
+            remark_ = "new server"
+        }
+
+        // name is : config. + uuid
+        let name = "config." + UUID().uuidString
+
+        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json)
         // save to v2ray UserDefaults
         v2ray.store()
 
