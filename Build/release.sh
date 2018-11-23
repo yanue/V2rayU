@@ -95,6 +95,7 @@ function createDmg() {
 
 function generateAppcast() {
     echo "pushRelease"
+    // https://github.com/c9s/appcast.git
     appcast -append -title=${APP_TITLE}\
         -description=$1 -file ${DMG_FINAL} -url ${V2rayU_RELEASE}\
         -version ${APP_Version} -dsaSignature="blah"\
@@ -136,7 +137,7 @@ esac
 #createDmg
 
 read -p "请输入版本描述: " release_note
-#pushRelease ${release_note}
+pushRelease ${release_note}
 generateAppcast ${release_note}
 
 echo "Done"

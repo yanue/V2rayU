@@ -22,7 +22,6 @@
 		664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* ConfigWindow.swift */; };
 		664FC05221A6EDF000048FE3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664FC05121A6EDF000048FE3 /* Sparkle.framework */; };
 		664FC05521A70C4300048FE3 /* build.plist in Resources */ = {isa = PBXBuildFile; fileRef = 664FC05321A70C4300048FE3 /* build.plist */; };
-		664FC05621A70C4300048FE3 /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 664FC05421A70C4300048FE3 /* build.sh */; };
 		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
@@ -106,7 +105,6 @@
 		664EB390216CA9E800B6AE0D /* ConfigWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWindow.swift; sourceTree = "<group>"; };
 		664FC05121A6EDF000048FE3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.20.0/Sparkle.framework"; sourceTree = "<group>"; };
 		664FC05321A70C4300048FE3 /* build.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = build.plist; sourceTree = "<group>"; };
-		664FC05421A70C4300048FE3 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		6650AAAC21771E11000909D8 /* unzip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = unzip.sh; sourceTree = "<group>"; };
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
@@ -249,7 +247,6 @@
 			isa = PBXGroup;
 			children = (
 				664FC05321A70C4300048FE3 /* build.plist */,
-				664FC05421A70C4300048FE3 /* build.sh */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
 				66FEAD46217D7612009DECF9 /* bump.sh */,
 				66FEAD47217D7852009DECF9 /* appcast.xml */,
@@ -427,7 +424,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				664FC05621A70C4300048FE3 /* build.sh in Resources */,
 				66FEAD48217D7852009DECF9 /* appcast.xml in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
