@@ -10,6 +10,12 @@ V2rayU_RELEASE=${BUILD_DIR}/release
 APP_Version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/${APP_NAME}/${INFOPLIST_FILE}")
 DMG_FINAL="${APP_NAME}.dmg"
 APP_TITLE="${APP_NAME} - V${APP_Version}"
+AppCastDir=$HOME/swift/appcast
+
+function updatePlistVersion() {
+    buildString=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}")
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $buildString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}"
+}
 
 function build() {
     echo "Building V2rayU."${APP_Version}
@@ -94,18 +100,20 @@ function createDmg() {
 
 function generateAppcast() {
     echo "generate appcast"
+    description=$1
+    if [ -z "$description" ]; then
+        description="bug fix"
+    fi
     downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
     # https://github.com/c9s/appcast.git
     appcast -append\
         -title="${APP_TITLE}"\
-        -description="$1"\
+        -description="${description}"\
         -file "${DMG_FINAL}"\
         -url "${downloadUrl}"\
         -version "${APP_Version}"\
-        -dsaSignature="blah"\
         -versionShortString="${APP_Version}"\
-        ./appcast.xml
-
+        ${AppCastDir}/appcast.xml
 }
 
 function pushRelease() {
@@ -129,11 +137,14 @@ function pushRelease() {
 }
 
 function commit() {
+    cd ${AppCastDir}
       # commit
     echo "commit push"
-    git add ${BUILD_DIR}/appcast.xml
+    git add appcast.xml
     git commit -a -m "update version: ${APP_Version}"
     git push
+
+    cd ${BUILD_DIR}
 }
 
 echo "正在打包版本: V"${APP_Version}
@@ -151,11 +162,15 @@ N | n ) echo
         exit;;
 esac
 
+
+#updatePlistVersion
 #build
 #createDmg
 read -p "请输入版本描述: " release_note
 #pushRelease ${release_note}
 generateAppcast ${release_note}
-#commit
+commit
+
+rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
 
 echo "Done"

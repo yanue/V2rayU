@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>0.9.6</string>
 	<key>CFBundleVersion</key>
-	<string>20181122002</string>
+	<string>0.9.6</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -33,8 +33,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/yanue/V2rayU/master/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>dsa_pub.pem</string>
+	<string>https://gitee.com/yanue/appcast/raw/master/appcast.xml</string>
 </dict>
 </plist>

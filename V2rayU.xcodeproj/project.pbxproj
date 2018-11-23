@@ -21,7 +21,6 @@
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
 		664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* ConfigWindow.swift */; };
 		664FC05221A6EDF000048FE3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664FC05121A6EDF000048FE3 /* Sparkle.framework */; };
-		664FC05521A70C4300048FE3 /* build.plist in Resources */ = {isa = PBXBuildFile; fileRef = 664FC05321A70C4300048FE3 /* build.plist */; };
 		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
@@ -29,10 +28,8 @@
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
-		66FEAD48217D7852009DECF9 /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD47217D7852009DECF9 /* appcast.xml */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
-		6D6DF5F11F85F81FAE01404B /* format.js in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB0110E2442FC8337A5 /* format.js */; };
 		6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF821D34F8B06A62F1936 /* Authorization.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
@@ -50,24 +47,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		664FC05021A6EDB500048FE3 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		668D0F4E21A59984006874D5 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		66973ECA21797A6B001FEA1E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -108,14 +87,11 @@
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
-		668D0F5021A59984006874D5 /* proxyHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = proxyHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
-		66FEAD46217D7612009DECF9 /* bump.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = bump.sh; sourceTree = "<group>"; };
-		66FEAD47217D7852009DECF9 /* appcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		66FEAD51217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceGeneral.xib; sourceTree = "<group>"; };
 		6D6DF821D34F8B06A62F1936 /* Authorization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
@@ -147,13 +123,6 @@
 				66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */,
 				664FC05221A6EDF000048FE3 /* Sparkle.framework in Frameworks */,
 				F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		668D0F4D21A59984006874D5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,7 +181,6 @@
 				664EB371216C9A5E00B6AE0D /* V2rayU.app */,
 				6604E43921798F2900E54AE1 /* V2rayULauncher.app */,
 				660C8C9F2181CBAA00896361 /* V2rayUTests.xctest */,
-				668D0F5021A59984006874D5 /* proxyHelper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -246,8 +214,6 @@
 			children = (
 				664FC05321A70C4300048FE3 /* build.plist */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
-				66FEAD46217D7612009DECF9 /* bump.sh */,
-				66FEAD47217D7852009DECF9 /* appcast.xml */,
 			);
 			path = Build;
 			sourceTree = "<group>";
@@ -320,7 +286,6 @@
 				664EB36F216C9A5E00B6AE0D /* Resources */,
 				83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */,
 				66973ECA21797A6B001FEA1E /* CopyFiles */,
-				664FC05021A6EDB500048FE3 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -330,23 +295,6 @@
 			productName = V2rayU;
 			productReference = 664EB371216C9A5E00B6AE0D /* V2rayU.app */;
 			productType = "com.apple.product-type.application";
-		};
-		668D0F4F21A59984006874D5 /* proxyHelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 668D0F5621A59985006874D5 /* Build configuration list for PBXNativeTarget "proxyHelper" */;
-			buildPhases = (
-				668D0F4C21A59984006874D5 /* Sources */,
-				668D0F4D21A59984006874D5 /* Frameworks */,
-				668D0F4E21A59984006874D5 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = proxyHelper;
-			productName = proxyHelper;
-			productReference = 668D0F5021A59984006874D5 /* proxyHelper */;
-			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -376,9 +324,6 @@
 							};
 						};
 					};
-					668D0F4F21A59984006874D5 = {
-						CreatedOnToolsVersion = 10.1;
-					};
 				};
 			};
 			buildConfigurationList = 664EB36C216C9A5E00B6AE0D /* Build configuration list for PBXProject "V2rayU" */;
@@ -397,7 +342,6 @@
 				664EB370216C9A5E00B6AE0D /* V2rayU */,
 				6604E43821798F2900E54AE1 /* V2rayULauncher */,
 				660C8C9E2181CBAA00896361 /* V2rayUTests */,
-				668D0F4F21A59984006874D5 /* proxyHelper */,
 			);
 		};
 /* End PBXProject section */
@@ -421,12 +365,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66FEAD48217D7852009DECF9 /* appcast.xml in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
-				664FC05521A70C4300048FE3 /* build.plist in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -525,16 +467,8 @@
 				66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
 				6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */,
-				6D6DF5F11F85F81FAE01404B /* format.js in Sources */,
 				6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */,
 				6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		668D0F4C21A59984006874D5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,30 +763,6 @@
 			};
 			name = Release;
 		};
-		668D0F5421A59985006874D5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		668D0F5521A59985006874D5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -888,15 +798,6 @@
 			buildConfigurations = (
 				664EB380216C9A5F00B6AE0D /* Debug */,
 				664EB381216C9A5F00B6AE0D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		668D0F5621A59985006874D5 /* Build configuration list for PBXNativeTarget "proxyHelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				668D0F5421A59985006874D5 /* Debug */,
-				668D0F5521A59985006874D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
