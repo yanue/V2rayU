@@ -1,4 +1,5 @@
 #!/bin/bash
+# 打包,发布
 
 APP_NAME="V2rayU"
 INFOPLIST_FILE="Info.plist"
@@ -93,20 +94,18 @@ function createDmg() {
 
 function generateAppcast() {
     echo "generate appcast"
-    url="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
-
+    downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
     # https://github.com/c9s/appcast.git
-    appcast -append -title=${APP_TITLE}\
-        -description=$1 -file ${DMG_FINAL} -url ${url}\
-        -version ${APP_Version} -dsaSignature="blah"\
-        -versionShortString=${APP_Version}\
-        ./appcast.xml\
+    appcast -append\
+        -title="${APP_TITLE}"\
+        -description="$1"\
+        -file "${DMG_FINAL}"\
+        -url "${downloadUrl}"\
+        -version "${APP_Version}"\
+        -dsaSignature="blah"\
+        -versionShortString="${APP_Version}"\
+        ./appcast.xml
 
-    # commit
-    echo "commit push"
-    git add ${BUILD_DIR}/appcast.xml
-    git commit -a -m "update version: ${APP_Version}"
-    git push
 }
 
 function pushRelease() {
@@ -115,7 +114,7 @@ function pushRelease() {
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
-        --name "${APP_TITLE}"\
+        --name "${APP_Version}"\
         --description $1\
 
     echo "github-release upload"
@@ -127,6 +126,14 @@ function pushRelease() {
         --file "${DMG_FINAL}"\
 
     echo "github-release done."
+}
+
+function commit() {
+      # commit
+    echo "commit push"
+    git add ${BUILD_DIR}/appcast.xml
+    git commit -a -m "update version: ${APP_Version}"
+    git push
 }
 
 echo "正在打包版本: V"${APP_Version}
@@ -149,5 +156,6 @@ esac
 read -p "请输入版本描述: " release_note
 #pushRelease ${release_note}
 generateAppcast ${release_note}
+#commit
 
 echo "Done"
