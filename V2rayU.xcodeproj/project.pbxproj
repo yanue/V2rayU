@@ -34,7 +34,6 @@
 		66FEAD4A217D7874009DECF9 /* appcast.inc in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD49217D7874009DECF9 /* appcast.inc */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
-		6D6DF1C91CE4692DB81B3D91 /* test.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFA785590D1AE17A29FAE /* test.json */; };
 		6D6DF5F11F85F81FAE01404B /* format.js in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB0110E2442FC8337A5 /* format.js */; };
 		6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF821D34F8B06A62F1936 /* Authorization.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
@@ -125,7 +124,6 @@
 		66FEAD51217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceGeneral.xib; sourceTree = "<group>"; };
 		6D6DF821D34F8B06A62F1936 /* Authorization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
-		6D6DFA785590D1AE17A29FAE /* test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = test.json; sourceTree = "<group>"; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		6D6DFFB0110E2442FC8337A5 /* format.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = format.js; sourceTree = "<group>"; };
 		BFFA695DC7DEF8BE79A4CECE /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
@@ -256,7 +254,6 @@
 				66FEAD46217D7612009DECF9 /* bump.sh */,
 				66FEAD47217D7852009DECF9 /* appcast.xml */,
 				66FEAD49217D7874009DECF9 /* appcast.inc */,
-				6D6DFA785590D1AE17A29FAE /* test.json */,
 			);
 			path = Build;
 			sourceTree = "<group>";
@@ -438,7 +435,6 @@
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				664FC05521A70C4300048FE3 /* build.plist in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
-				6D6DF1C91CE4692DB81B3D91 /* test.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

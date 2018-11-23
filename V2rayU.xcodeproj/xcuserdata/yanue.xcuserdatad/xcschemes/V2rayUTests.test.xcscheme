@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   version = "1.3">
+   <BuildAction>
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForRunning = "YES"
+            buildForTesting = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "660C8C9E2181CBAA00896361"
+               BuildableName = "V2rayUTests.xctest"
+               BlueprintName = "V2rayUTests"
+               ReferencedContainer = "container:V2rayU.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug">
+      <Testables>
+         <TestableReference>
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "660C8C9E2181CBAA00896361"
+               BuildableName = "V2rayUTests.xctest"
+               BlueprintName = "V2rayUTests"
+               ReferencedContainer = "container:V2rayU.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "V2rayUTests/testExample">
+               </Test>
+               <Test
+                  Identifier = "V2rayUTests/testInbound">
+               </Test>
+               <Test
+                  Identifier = "V2rayUTests/testOutbound">
+               </Test>
+               <Test
+                  Identifier = "V2rayUTests/testV2ray">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      useCustomWorkingDirectory = "NO"
+      allowLocationSimulation = "YES">
+   </LaunchAction>
+</Scheme>

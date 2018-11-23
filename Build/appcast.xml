@@ -1,20 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <channel>
-        <title>V2rayU Changelog</title>
-        <description>pre release.</description>
-        <language>en</language>
-        <item>
-            <title>Version 1.0</title>
-            <description><![CDATA[
-                <ul style="list-style-type:disc">
-                    <li>基础测试版本</li>
-                </ul>
-            ]]>
-            </description>
-            <pubDate>Sun, 7 Oct 2018 02:30:00 -0500</pubDate>
-            <enclosure url="https://github.com/thompsonate/Shifty/releases/download/v1.0/Shifty-1.0.zip" sparkle:version="53" sparkle:shortVersionString="1.0" length="1623481" type="application/octet-stream" />
-            <sparkle:minimumSystemVersion>10.12.4</sparkle:minimumSystemVersion>
-        </item>
-    </channel>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" sparkle:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:_="http://purl.org/dc/elements/1.1" _:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>V2rayU Changelog</title>
+    <link></link>
+    <description>V2ray Release</description>
+    <language>en</language>
+    <lastBuildDate></lastBuildDate>
+    <item>
+      <title>V2rayU - 0.9</title>
+      <pubDate>23 Nov 18 12:29 +0800</pubDate>
+      <description>初版测试</description>
+      <enclosure url="" type="application/x-apple-diskimage" length="10950639" sparkle:version="1.1" sparkle:versionShortString="1.1" sparkle:dsaSignature="blah"></enclosure>
+    </item>
+  </channel>
 </rss>
