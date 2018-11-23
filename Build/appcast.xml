@@ -9,7 +9,7 @@
       <title>V2rayU - V0.9.6</title>
       <pubDate>23 Nov 18 15:30 +0800</pubDate>
       <description>测试版本</description>
-      <enclosure url="https://github.com/yanue/V2rayU/releases/download/0.9.6/V2rayU.dmg" type="application/x-apple-diskimage" length="10902003" sparkle:version="0.9.6" sparkle:versionShortString="0.9.6" sparkle:dsaSignature="blah"></enclosure>
+      <enclosure url="https://github.com/yanue/V2rayU/releases/download/0.9.6/V2rayU.dmg" type="application/x-apple-diskimage" length="10902003" sparkle:version=960 sparkle:versionShortString="0.9.6" sparkle:dsaSignature="blah"></enclosure>
     </item>
   </channel>
 </rss>
