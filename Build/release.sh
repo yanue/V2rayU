@@ -111,12 +111,12 @@ function pushRelease() {
         --name ${APP_TITLE}\
         --description $1
 
-    github-release upload
-        --user yanue
-        --repo ${APP_NAME}
-        --tag ${APP_Version}
-        --name ${DMG_FINAL}
-        --file ${DMG_FINAL}
+    github-release upload\
+        --user yanue\
+        --repo ${APP_NAME}\
+        --tag ${APP_Version}\
+        --name ${DMG_FINAL}\
+        --file ${DMG_FINAL}\
 
     git add Build/appcast.xml
     git commit -a -m "update version: "${APP_Version}
