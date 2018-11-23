@@ -7,7 +7,7 @@ BUILD_DIR=${BASE_DIR}/Build
 V2rayU_ARCHIVE=${BUILD_DIR}/V2rayU.xcarchive
 V2rayU_RELEASE=${BUILD_DIR}/release
 APP_Version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/${APP_NAME}/${INFOPLIST_FILE}")
-DMG_FINAL="${APP_NAME}-${APP_Version}.dmg"
+DMG_FINAL="${APP_NAME}.dmg"
 APP_TITLE="${APP_NAME} - V${APP_Version}"
 
 function build() {
@@ -94,33 +94,41 @@ function createDmg() {
 }
 
 function generateAppcast() {
-    echo "pushRelease"
-    // https://github.com/c9s/appcast.git
+    echo "generate appcast"
+    url="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
+
+    # https://github.com/c9s/appcast.git
     appcast -append -title=${APP_TITLE}\
-        -description=$1 -file ${DMG_FINAL} -url ${V2rayU_RELEASE}\
+        -description=$1 -file ${DMG_FINAL} -url ${url}\
         -version ${APP_Version} -dsaSignature="blah"\
         -versionShortString=${APP_Version}\
-        ./appcast.xml
-}
+        ./appcast.xml\
 
-function pushRelease() {
-    github-release release\
-        --user yanue\
-        --repo ${APP_NAME}\
-        --tag ${APP_Version}\
-        --name ${APP_TITLE}\
-        --description $1\
-
-    github-release upload\
-        --user yanue\
-        --repo ${APP_NAME}\
-        --tag ${APP_Version}\
-        --name ${DMG_FINAL}\
-        --file ${DMG_FINAL}\
-
+    # commit
+    echo "commit push"
     git add Build/appcast.xml
     git commit -a -m "update version: "${APP_Version}
     git push
+}
+
+function pushRelease() {
+    echo "github-release tag"
+    github-release release\
+        --user "yanue"\
+        --repo "${APP_NAME}"\
+        --tag "${APP_Version}"\
+        --name "${APP_TITLE}"\
+        --description $1\
+
+    echo "github-release upload"
+    github-release upload\
+        --user "yanue"\
+        --repo "${APP_NAME}"\
+        --tag "${APP_Version}"\
+        --name "${DMG_FINAL}"\
+        --file "${DMG_FINAL}"\
+
+    echo "github-release done."
 }
 
 echo "正在打包版本: V"${APP_Version}
@@ -134,11 +142,9 @@ case ${answer} in
 esac
 
 #build
-#createDmg
-
+createDmg
 read -p "请输入版本描述: " release_note
-pushRelease ${release_note}
+#pushRelease ${release_note}
 generateAppcast ${release_note}
 
 echo "Done"
-exit 0
