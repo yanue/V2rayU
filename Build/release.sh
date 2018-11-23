@@ -109,7 +109,7 @@ function pushRelease() {
         --repo ${APP_NAME}\
         --tag ${APP_Version}\
         --name ${APP_TITLE}\
-        --description $1
+        --description $1\
 
     github-release upload\
         --user yanue\
