@@ -104,8 +104,8 @@ function generateAppcast() {
 
     # commit
     echo "commit push"
-    git add Build/appcast.xml
-    git commit -a -m "update version: "${APP_Version}
+    git add ${BUILD_DIR}/appcast.xml
+    git commit -a -m "update version: ${APP_Version}"
     git push
 }
 
@@ -130,19 +130,24 @@ function pushRelease() {
 }
 
 echo "正在打包版本: V"${APP_Version}
-read -n1 -p "请确认版本号是否正确 [Y/N]? " answer
+read -n1 -r -p "请确认版本号是否正确 [Y/N]? " answer
 case ${answer} in
-    Y | y ) echo
-            echo "你选择了Y";;
-    N | n ) echo
-            echo OK, goodbye
-            exit;;
+Y | y ) echo
+        echo "你选择了Y";;
+N | n ) echo
+        echo ""
+        echo "OK, goodbye"
+        exit;;
+*)
+        echo ""
+        echo "请输入Y|N"
+        exit;;
 esac
 
-#build
+build
 createDmg
 read -p "请输入版本描述: " release_note
-#pushRelease ${release_note}
+pushRelease ${release_note}
 generateAppcast ${release_note}
 
 echo "Done"
