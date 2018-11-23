@@ -20,13 +20,6 @@ class V2rayUTests: XCTestCase {
 //        // Put teardown code here. This method is called after the invocation of each test method in the class.
 //    }
 
-    func testDecodeUrl() {
-        let url = "ss://=="
-        let ss = ShadowsockUri()
-        ss.Init(url: URL(string: url)!)
-        print("ss", ss, "host", ss.host, ss.port, ss.method, ss.password, ss.remark, ss.error)
-    }
-
     func testInbound() {
         var inbound = V2rayInbound()
         inbound.protocol = V2rayProtocolInbound.vmess

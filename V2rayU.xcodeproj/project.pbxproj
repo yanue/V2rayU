@@ -30,6 +30,7 @@
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
+		6D6DF4711EE7CB7CA552CC89 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF04B14482D1536ADDA7D /* Test.swift */; };
 		6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF821D34F8B06A62F1936 /* Authorization.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
@@ -94,6 +95,7 @@
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		66FEAD51217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceGeneral.xib; sourceTree = "<group>"; };
+		6D6DF04B14482D1536ADDA7D /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		6D6DF821D34F8B06A62F1936 /* Authorization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				66406AF32183320000B56041 /* Sample.swift */,
 				660C8CA12181CBAA00896361 /* V2rayUTests.swift */,
 				660C8CA32181CBAA00896361 /* Info.plist */,
+				6D6DF04B14482D1536ADDA7D /* Test.swift */,
 			);
 			path = V2rayUTests;
 			sourceTree = "<group>";
@@ -469,6 +472,7 @@
 				6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */,
 				6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */,
 				6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */,
+				6D6DF4711EE7CB7CA552CC89 /* Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
