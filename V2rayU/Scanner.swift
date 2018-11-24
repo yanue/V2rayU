@@ -8,6 +8,100 @@ import CoreGraphics
 import CoreImage
 import SwiftyJSON
 
+class ImportUri {
+    var isValid: Bool = false
+    var json: String = ""
+    var remark: String = ""
+    var error: String = ""
+
+    func importSSUri(uri: String) {
+        let ss = ShadowsockUri()
+        ss.Init(url: URL(string: uri)!)
+        if ss.error.count > 0 {
+            self.error = ss.error
+            self.isValid = false
+            return
+        }
+        self.remark = ss.remark
+
+        let v2ray = V2rayConfig()
+        var ssServer = V2rayOutboundShadowsockServer()
+        ssServer.address = ss.host
+        ssServer.port = ss.port
+        ssServer.password = ss.password
+        ssServer.method = ss.method
+        v2ray.serverShadowsocks = ssServer
+        v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
+        // check is valid
+        v2ray.checkManualValid()
+        if v2ray.isValid {
+            self.isValid = true
+            self.json = v2ray.combineManual()
+        } else {
+            self.error = v2ray.error
+            self.isValid = false
+        }
+    }
+
+    func importVmessUri(uri: String) {
+        var vmess = VmessUri()
+        vmess.parseType2(url: URL(string: uri)!)
+        if vmess.error.count > 0 {
+            vmess = VmessUri()
+            vmess.parseType1(url: URL(string: uri)!)
+            if vmess.error.count > 0 {
+                print("error", vmess.error)
+                self.isValid = false;
+                self.error = vmess.error
+                return
+            }
+        }
+        self.remark = vmess.remark
+
+        let v2ray = V2rayConfig()
+
+        var vmessItem = V2rayOutboundVMessItem()
+        vmessItem.address = vmess.address
+        vmessItem.port = vmess.port
+        var user = V2rayOutboundVMessUser()
+        user.id = vmess.id
+        user.alterId = vmess.alterId
+        user.security = vmess.security
+        vmessItem.users = [user]
+        v2ray.serverVmess = vmessItem
+        v2ray.serverProtocol = V2rayProtocolOutbound.vmess.rawValue
+
+        // stream
+        v2ray.streamNetwork = vmess.network
+        v2ray.streamTlsAllowInsecure = vmess.allowInsecure
+        v2ray.streamTlsSecurity = vmess.tls
+        v2ray.streamTlsServerName = vmess.tlsServer
+
+        // kcp
+        v2ray.streamKcp.header.type = vmess.kcpHeader
+        v2ray.streamKcp.uplinkCapacity = vmess.uplinkCapacity
+        v2ray.streamKcp.downlinkCapacity = vmess.downlinkCapacity
+
+        // h2
+        v2ray.streamH2.host[0] = vmess.netHost
+        v2ray.streamH2.path = vmess.netPath
+
+        // ws
+        v2ray.streamWs.path = vmess.netPath
+        v2ray.streamWs.headers.host = vmess.netHost
+
+        // check is valid
+        v2ray.checkManualValid()
+        if v2ray.isValid {
+            self.isValid = true
+            self.json = v2ray.combineManual()
+        } else {
+            self.error = v2ray.error
+            self.isValid = false
+        }
+    }
+}
+
 // see: https://github.com/v2ray/v2ray-core/issues/1139
 class VmessUri {
     var error: String = ""
@@ -24,7 +118,9 @@ class VmessUri {
     var netPath: String = ""
     var tls: String = ""
     var type: String = ""
-
+    var kcpHeader: String = "none"
+    var uplinkCapacity: Int = 50
+    var downlinkCapacity: Int = 20
     var allowInsecure: Bool = true
     var tlsServer: String = ""
     var mux: Bool = true
@@ -70,17 +166,25 @@ class VmessUri {
         }
 
         // main
+        var uuid_ = ""
+        var host_ = ""
         let mainArr = decodeStr.components(separatedBy: "@")
-        let uuid_ = mainArr[0]
-        let host_ = mainArr[1]
+        if mainArr.count > 1 {
+            uuid_ = mainArr[0]
+            host_ = mainArr[1]
+        }
 
         let uuid_security = uuid_.components(separatedBy: ":")
-        self.security = uuid_security[0]
-        self.id = uuid_security[1]
+        if uuid_security.count > 1 {
+            self.security = uuid_security[0]
+            self.id = uuid_security[1]
+        }
 
         let host_port = host_.components(separatedBy: ":")
-        self.address = host_port[0]
-        self.port = Int(host_port[1]) ?? 0
+        if host_port.count > 1 {
+            self.address = host_port[0]
+            self.port = Int(host_port[1]) ?? 0
+        }
 
         // params
         let params = paramsStr.components(separatedBy: "&")
@@ -110,6 +214,15 @@ class VmessUri {
                 break
             case "muxConcurrency":
                 self.muxConcurrency = Int(param[1]) ?? 8
+                break
+            case "kcpHeader":
+                self.kcpHeader = param[1]
+                break
+            case "uplinkCapacity":
+                self.uplinkCapacity = Int(param[1]) ?? 50
+                break
+            case "downlinkCapacity":
+                self.downlinkCapacity = Int(param[1]) ?? 20
                 break
             case "remark":
                 self.remark = param[1]
@@ -197,7 +310,6 @@ class ShadowsockUri {
             self.error = "error: decodeUrl"
             return
         }
-        print("_decodedUrl", _decodedUrl)
         guard var parsedUrl = URLComponents(string: decodedUrl) else {
             self.error = "error: parsedUrl"
             return
@@ -242,16 +354,6 @@ class ShadowsockUri {
         }
     }
 
-    private func padBase64(string: String) -> String {
-        var length = string.utf8.count
-        if length % 4 == 0 {
-            return string
-        } else {
-            length = 4 - length % 4 + length
-            return string.padding(toLength: length, withPad: "=", startingAt: 0)
-        }
-    }
-
     private func decodeUrl(url: URL) -> (String?, String?) {
         let urlStr = url.absoluteString
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 5)
@@ -275,6 +377,16 @@ class ShadowsockUri {
             return ("ss://\(s)", fragment)
         }
         return ("ss://\(s)", nil)
+    }
+
+    private func padBase64(string: String) -> String {
+        var length = string.utf8.count
+        if length % 4 == 0 {
+            return string
+        } else {
+            length = 4 - length % 4 + length
+            return string.padding(toLength: length, withPad: "=", startingAt: 0)
+        }
     }
 }
 

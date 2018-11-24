@@ -204,10 +204,10 @@ Gw
                                                             <action selector="browseFile:" target="-2" id="cfx-wb-sdZ"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cY-nr-cxd">
+                                                    <textField toolTip="vmess:// or ss:// or http:// or file://" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cY-nr-cxd">
                                                         <rect key="frame" x="70" y="11" width="198" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="v2ray config url or file path" usesSingleLineMode="YES" bezelStyle="round" id="MHF-nm-HG8">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="vmess:// or ss:// or http://" usesSingleLineMode="YES" bezelStyle="round" id="MHF-nm-HG8">
                                                             <font key="font" usesAppearanceFont="YES"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -224,7 +224,7 @@ Gw
                                                                     <menuItem title="url" state="on" id="oGz-AN-skf">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="file" id="Z5g-9l-OWS">
+                                                                    <menuItem title="file" id="Cj0-4e-gUx">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                 </items>

@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict />
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>Tests.testDecodeUrl.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false />
+			<key>orderHint</key>
+			<integer>15</integer>
+		</dict>
+		<key>Tests.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false />
+			<key>orderHint</key>
+			<integer>16</integer>
+		</dict>
+	</dict>
+</dict>
 </plist>

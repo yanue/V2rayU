@@ -473,7 +473,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBAction func importConfig(_ sender: NSButton) {
         self.configText.string = ""
-        if jsonUrl.stringValue == "" {
+        if jsonUrl.stringValue.trimmingCharacters(in: .whitespaces) == "" {
             self.errTip.stringValue = "error: invaid url"
             return
         }
@@ -483,17 +483,36 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     func importJson() {
         let text = self.configText.string
+        let uri = jsonUrl.stringValue.trimmingCharacters(in: .whitespaces)
         // edit item remark
-        V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: jsonUrl.stringValue)
-        // download json file
-        Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
-            if (DataResponse.error != nil) {
-                self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
-                return
+        V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
+        if uri.contains("vmess://") {
+            let importUri = ImportUri()
+            importUri.importVmessUri(uri: uri)
+            if importUri.isValid {
+                self.configText.string = importUri.json
+            } else {
+                self.errTip.stringValue = importUri.error
             }
+        } else if uri.contains("ss://") {
+            let importUri = ImportUri()
+            importUri.importSSUri(uri: uri)
+            if importUri.isValid {
+                self.configText.string = importUri.json
+            } else {
+                self.errTip.stringValue = importUri.error
+            }
+        } else {
+            // download json file
+            Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
+                if (DataResponse.error != nil) {
+                    self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
+                    return
+                }
 
-            if DataResponse.value != nil {
-                self.configText.string = self.v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                if DataResponse.value != nil {
+                    self.configText.string = self.v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                }
             }
         }
     }

@@ -291,36 +291,58 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.setSystemProxy(enabled: true, httpPort: httpPort, sockPort: sockPort)
     }
 
-    @IBAction func scanQrcode(_ sender: Any) {
-        let qrStr: String = Scanner.scanQRCodeFromScreen()
-        print("scanQrcode", qrStr)
-        if qrStr.count > 0 {
-            if qrStr.contains("ss://") && URL(string: qrStr) != nil {
-                let ss = ShadowsockUri()
-                ss.Init(url: URL(string: qrStr)!)
-                var v2ray = V2rayConfig()
-                var ssServer = V2rayOutboundShadowsockServer()
-                ssServer.address = ss.host
-                ssServer.port = ss.port
-                ssServer.password = ss.password
-                ssServer.method = ss.method
-                v2ray.serverShadowsocks = ssServer
-                v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
-                v2ray.isNewVersion = true
-                v2ray.isValid = true
-                var str = v2ray.combineManual()
-                print("remark", ss.remark)
-                if v2ray.error == "" {
-                    V2rayServer.add(remark: ss.remark, json: str, isValid: true, url: qrStr)
-                    // todo tip
-                    // todo refresh server list
-                }
+    @IBAction func scanQrcode(_ sender: NSMenuItem) {
+        let uri: String = Scanner.scanQRCodeFromScreen()
+        print("scanQrcode", uri)
+        if uri.count > 0 {
+            self.importUri(url: uri)
+        } else {
+            print("not found")
+        }
+    }
+
+    @IBAction func ImportFromPasteboard(_ sender: NSMenuItem) {
+        if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
+            self.importUri(url: uri)
+        } else {
+            print("not found")
+        }
+    }
+
+    @IBAction func generateQrcode(_ sender: NSMenuItem) {
+        print("generateQrcode")
+    }
+
+    func importUri(url: String) {
+        let uri = url.trimmingCharacters(in: .whitespaces)
+
+        if uri.count == 0 {
+            print("import error: uri not found")
+            return
+        }
+
+        if uri.contains("ss://") && URL(string: uri) != nil {
+            let importUri = ImportUri()
+            importUri.importSSUri(uri: uri)
+            if importUri.isValid {
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: uri)
+                // todo tip
+                // todo refresh server list
+            } else {
+                print("import error", importUri.error)
             }
         }
 
-    }
-
-    @IBAction func generateQrcode(_ sender: Any) {
-        print("generateQrcode")
+        if uri.contains("vmess://") && URL(string: uri) != nil {
+            let importUri = ImportUri()
+            importUri.importVmessUri(uri: uri)
+            if importUri.isValid {
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: uri)
+                // todo tip
+                // todo refresh server list
+            } else {
+                print("import error", importUri.error)
+            }
+        }
     }
 }
