@@ -8,13 +8,133 @@ import CoreGraphics
 import CoreImage
 import SwiftyJSON
 
+struct VmessShare: Codable {
+    var v: String = "2"
+    var ps: String = ""
+    var add: String = ""
+    var port: String = ""
+    var id: String = ""
+    var aid: String = ""
+    var net: String = ""
+    var type: String = "none"
+    var host: String = ""
+    var path: String = ""
+    var tls: String = "none"
+}
+
+class ShareUri {
+    var error = ""
+    var remark = ""
+    var uri: String = ""
+    var v2ray = V2rayConfig()
+    var share = VmessShare()
+
+    func qrcode(item: V2rayItem) {
+        v2ray.parseJson(jsonText: item.json)
+        if !v2ray.isValid {
+            self.error = v2ray.errors[0]
+            return
+        }
+
+        self.remark = item.remark
+
+        if v2ray.serverProtocol == V2rayProtocolOutbound.vmess.rawValue {
+            self.genVmessUri()
+
+            let encoder = JSONEncoder()
+            if let data = try? encoder.encode(self.share) {
+                let uri = String(data: data, encoding: .utf8)!
+                self.uri = "vmess://" + uri.base64Encoded()!
+                print("vmess", self.uri)
+            } else {
+                self.error = "encode uri error"
+            }
+            return
+        }
+
+        if v2ray.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
+            print("share shadowsocks")
+            self.genShadowsocksUri()
+            return
+        }
+
+        self.error = "not support"
+    }
+
+    /**s
+    分享的链接（二维码）格式：vmess://(Base64编码的json格式服务器数据
+    json数据如下
+    {
+    "v": "2",
+    "ps": "备注别名",
+    "add": "111.111.111.111",
+    "port": "32000",
+    "id": "1386f85e-657b-4d6e-9d56-78badb75e1fd",
+    "aid": "100",
+    "net": "tcp",
+    "type": "none",
+    "host": "www.bbb.com",
+    "path": "/",
+    "tls": "tls"
+    }
+    v:配置文件版本号,主要用来识别当前配置
+    net ：传输协议（tcp\kcp\ws\h2)
+    type:伪装类型（none\http\srtp\utp\wechat-video）
+    host：伪装的域名
+    1)http host中间逗号(,)隔开
+    2)ws host
+    3)h2 host
+    path:path(ws/h2)
+    tls：底层传输安全（tls)
+    */
+    private func genVmessUri() {
+        self.share.add = self.v2ray.serverVmess.address
+        self.share.ps = self.remark
+        self.share.port = String(self.v2ray.serverVmess.port)
+        self.share.id = self.v2ray.serverVmess.users[0].id
+        self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
+        self.share.net = self.v2ray.streamNetwork
+
+        if self.v2ray.streamNetwork == "h2" {
+            self.share.host = self.v2ray.streamH2.host[0]
+            self.share.path = self.v2ray.streamH2.path
+        }
+
+        if self.v2ray.streamNetwork == "ws" {
+            self.share.host = self.v2ray.streamWs.headers.host
+            self.share.path = self.v2ray.streamWs.path
+        }
+
+        self.share.tls = self.v2ray.streamTlsSecurity
+    }
+
+    // Shadowsocks
+    func genShadowsocksUri() {
+        var ss = ShadowsockUri()
+        ss.host = self.v2ray.serverShadowsocks.address
+        ss.port = self.v2ray.serverShadowsocks.port
+        ss.password = self.v2ray.serverShadowsocks.password
+        ss.method = self.v2ray.serverShadowsocks.method
+        ss.remark = self.remark
+        self.uri = ss.encode()
+        self.error = ss.error
+    }
+}
+
 class ImportUri {
     var isValid: Bool = false
     var json: String = ""
     var remark: String = ""
     var error: String = ""
+    var uri: String = ""
 
     func importSSUri(uri: String) {
+        if URL(string: uri) == nil {
+            self.error = "invail ss url"
+            return
+        }
+        self.uri = uri
+
         let ss = ShadowsockUri()
         ss.Init(url: URL(string: uri)!)
         if ss.error.count > 0 {
@@ -44,6 +164,12 @@ class ImportUri {
     }
 
     func importVmessUri(uri: String) {
+        if URL(string: uri) == nil {
+            self.error = "invail vmess url"
+            return
+        }
+        self.uri = uri
+
         var vmess = VmessUri()
         vmess.parseType2(url: URL(string: uri)!)
         if vmess.error.count > 0 {
@@ -290,6 +416,7 @@ class VmessUri {
         self.tls = json["tls"].stringValue
         // type:伪装类型（none\http\srtp\utp\wechat-video）
         self.type = json["type"].stringValue
+        print("json", json)
     }
 }
 
@@ -303,6 +430,17 @@ class ShadowsockUri {
     var remark: String = ""
 
     var error: String = ""
+
+    // ss://bf-cfb:test@192.168.100.1:8888#remark
+    func encode() -> String {
+        let base64 = self.method + ":" + self.password + "@" + self.host + ":" + String(self.port)
+        var ss = base64.base64Encoded()
+        if ss != nil {
+            return "ss://" + ss! + "#" + self.remark
+        }
+        self.error = "encode base64 fail"
+        return ""
+    }
 
     func Init(url: URL) {
         let (_decodedUrl, _tag) = self.decodeUrl(url: url)

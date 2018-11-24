@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import WebKit
 import Alamofire
 
 class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
@@ -430,16 +429,20 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
         self.errTip.stringValue = errMsg
 
+        self.refreshServerList(ok: errMsg.count > 0)
+    }
+
+    func refreshServerList(ok: Bool = true) {
         // refresh menu
         menuController.showServers()
         // if server is current
         if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
             let v2rayItemList = V2rayServer.list()
             if curName == v2rayItemList[self.serversTableView.selectedRow].name {
-                if errMsg != "" {
-                    menuController.stopV2rayCore()
-                } else {
+                if ok {
                     menuController.startV2rayCore()
+                } else {
+                    menuController.stopV2rayCore()
                 }
             }
         }
@@ -481,6 +484,20 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.importJson()
     }
 
+    func saveImport(importUri: ImportUri) {
+        if importUri.isValid {
+            self.configText.string = importUri.json
+            if importUri.remark.count > 0 {
+                V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, remark: importUri.remark)
+            }
+
+            // refresh
+            self.refreshServerList(ok: true)
+        } else {
+            self.errTip.stringValue = importUri.error
+        }
+    }
+
     func importJson() {
         let text = self.configText.string
         let uri = jsonUrl.stringValue.trimmingCharacters(in: .whitespaces)
@@ -489,19 +506,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if uri.contains("vmess://") {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)
-            if importUri.isValid {
-                self.configText.string = importUri.json
-            } else {
-                self.errTip.stringValue = importUri.error
-            }
+            self.saveImport(importUri: importUri)
         } else if uri.contains("ss://") {
             let importUri = ImportUri()
             importUri.importSSUri(uri: uri)
-            if importUri.isValid {
-                self.configText.string = importUri.json
-            } else {
-                self.errTip.stringValue = importUri.error
-            }
+            self.saveImport(importUri: importUri)
         } else {
             // download json file
             Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in

@@ -56,6 +56,7 @@ class MenuController: NSObject, NSMenuDelegate {
         statusItem.menu = statusMenu
 
         configWindow = ConfigWindowController()
+
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start
             // on status
@@ -291,13 +292,33 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.setSystemProxy(enabled: true, httpPort: httpPort, sockPort: sockPort)
     }
 
+    @IBAction func generateQrcode(_ sender: NSMenuItem) {
+        guard let v2ray = V2rayServer.loadSelectedItem() else {
+            NSLog("v2ray config not found")
+            self.notice(title: "generate Qrcode fail", subtitle: "", informativeText: "no available servers")
+            return
+        }
+
+        let share = ShareUri()
+        share.qrcode(item: v2ray)
+        if share.error.count > 0 {
+            self.notice(title: "generate Qrcode fail", subtitle: "", informativeText: share.error)
+            return
+        }
+
+        let qrcodeWindow = QrcodeWindowController()
+        qrcodeWindow.showWindow(nil)
+        qrcodeWindow.setShareUri(uri: share.uri)
+        // bring to front
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     @IBAction func scanQrcode(_ sender: NSMenuItem) {
         let uri: String = Scanner.scanQRCodeFromScreen()
-        print("scanQrcode", uri)
         if uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            print("not found")
+            self.notice(title: "import server fail", subtitle: "", informativeText: "no found qrcode")
         }
     }
 
@@ -305,44 +326,57 @@ class MenuController: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            print("not found")
+            self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess:// from Pasteboard")
         }
-    }
-
-    @IBAction func generateQrcode(_ sender: NSMenuItem) {
-        print("generateQrcode")
     }
 
     func importUri(url: String) {
         let uri = url.trimmingCharacters(in: .whitespaces)
 
         if uri.count == 0 {
-            print("import error: uri not found")
+            self.notice(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
             return
         }
 
         if uri.contains("ss://") && URL(string: uri) != nil {
             let importUri = ImportUri()
             importUri.importSSUri(uri: uri)
-            if importUri.isValid {
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: uri)
-                // todo tip
-                // todo refresh server list
-            } else {
-                print("import error", importUri.error)
-            }
+            self.saveServer(importUri: importUri)
+            return
         }
 
         if uri.contains("vmess://") && URL(string: uri) != nil {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)
-            if importUri.isValid {
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: uri)
-                // todo tip
-                // todo refresh server list
-            } else {
-                print("import error", importUri.error)
-            }
+            self.saveServer(importUri: importUri)
+            return
+        }
+
+        self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
+    }
+
+    func notice(title: String = "", subtitle: String = "", informativeText: String = "") {
+        // 定义NSUserNotification
+        let userNotification = NSUserNotification()
+        userNotification.title = title
+        userNotification.subtitle = subtitle
+        userNotification.informativeText = informativeText
+        // 使用NSUserNotificationCenter发送NSUserNotification
+        let userNotificationCenter = NSUserNotificationCenter.default
+        userNotificationCenter.scheduleNotification(userNotification)
+    }
+
+    func saveServer(importUri: ImportUri) {
+        if importUri.isValid {
+            // add server
+            V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
+            // refresh server
+            self.showServers()
+
+            self.notice(title: "import server success", subtitle: "", informativeText: importUri.remark)
+        } else {
+            self.notice(title: "import server fail", subtitle: "", informativeText: importUri.error)
         }
     }
+
 }
