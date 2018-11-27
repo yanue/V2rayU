@@ -338,16 +338,21 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        if uri.contains("ss://") && URL(string: uri) != nil {
+        if URL(string: uri) == nil {
+            self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
+            return
+        }
+        
+        if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
+            importUri.importVmessUri(uri: uri)
             self.saveServer(importUri: importUri)
             return
         }
 
-        if uri.contains("vmess://") && URL(string: uri) != nil {
+        if uri.hasPrefix("ss://") {
             let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
+            importUri.importSSUri(uri: uri)
             self.saveServer(importUri: importUri)
             return
         }

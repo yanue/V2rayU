@@ -45,7 +45,6 @@ class ShareUri {
             if let data = try? encoder.encode(self.share) {
                 let uri = String(data: data, encoding: .utf8)!
                 self.uri = "vmess://" + uri.base64Encoded()!
-                print("vmess", self.uri)
             } else {
                 self.error = "encode uri error"
             }
@@ -452,8 +451,16 @@ class ShadowsockUri {
             self.error = "error: parsedUrl"
             return
         }
-        guard let host = parsedUrl.host, let port = parsedUrl.port, let user = parsedUrl.user else {
-            self.error = "error: host,port,user"
+        guard let host = parsedUrl.host else {
+            self.error = "error:missing host"
+            return
+        }
+        guard let port = parsedUrl.port else {
+            self.error = "error:missing port"
+            return
+        }
+        guard let user = parsedUrl.user else {
+            self.error = "error:missing user"
             return
         }
 
@@ -550,7 +557,7 @@ class Scanner {
         for i in 0..<displayCount {
             let str = self.getQrcodeStr(displayID: activeDisplays[Int(i)])
             // support: ss:// | ssr:// | vmess://
-            if str.contains("ss://") || str.contains("ssr://") || str.contains("vmess://") {
+            if str.hasPrefix("ss://") || str.hasPrefix("ssr://") || str.hasPrefix("vmess://") {
                 qrStr = str
                 break
             }
