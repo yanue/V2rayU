@@ -33,6 +33,8 @@ function build() {
 }
 
 function createDmg() {
+    umount "/Volumes/${APP_NAME}"
+
     ############# 1 #############
     APP_PATH="${V2rayU_RELEASE}/${APP_NAME}.app"
     DMG_BACKGROUND_IMG="dmg-bg@2x.png"
@@ -93,6 +95,8 @@ function createDmg() {
     ############# 3 #############
     echo "Creating compressed image"
     hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
+
+    umount "/Volumes/${APP_NAME}"
 }
 
 function generateAppcast() {
@@ -103,7 +107,7 @@ function generateAppcast() {
     fi
     downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
     # https://github.com/c9s/appcast.git
-    appcast -append\
+    ${AppCastDir}/appcast -append\
         -title="${APP_TITLE}"\
         -description="${description}"\
         -file "${DMG_FINAL}"\
@@ -147,6 +151,8 @@ function commit() {
     git push
 
     cd ${BUILD_DIR}
+    git commit -a -m "update version: ${APP_Version}"
+    git push
 }
 
 function downloadV2ray() {

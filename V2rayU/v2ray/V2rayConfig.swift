@@ -65,7 +65,7 @@ class V2rayConfig: NSObject {
     // base
     var logLevel = "info"
     var socksPort = "1080"
-    var httpPort = "1087"
+    var httpPort = "1086"
     var enableUdp = true
     var enableMux = true
     var mux = 8
@@ -139,7 +139,6 @@ class V2rayConfig: NSObject {
         // base
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel)!
         self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
-
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
         inHttp.port = self.httpPort
@@ -147,6 +146,11 @@ class V2rayConfig: NSObject {
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
         inSocks.protocol = V2rayProtocolInbound.socks
+        inSocks.settingSocks.udp = self.enableUdp
+
+        if self.httpPort == self.socksPort {
+            self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
+        }
 
         if self.isNewVersion {
             // inbounds
@@ -154,7 +158,7 @@ class V2rayConfig: NSObject {
                 var inbounds: [V2rayInbound] = []
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http {
-                        item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
+                        item.port = self.httpPort.count > 0 ? self.httpPort : "1086"
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
                         item.port = self.socksPort.count > 0 ? self.socksPort : "1080"
@@ -196,7 +200,7 @@ class V2rayConfig: NSObject {
                         item.port = self.httpPort
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
-                        item.port = self.httpPort
+                        item.port = self.socksPort
                         item.settingSocks.udp = self.enableUdp
                     }
                     inboundDetour.append(item)
@@ -600,7 +604,6 @@ class V2rayConfig: NSObject {
 
     // parse inbound from json
     func parseInbound(jsonParams: JSON) -> (V2rayInbound) {
-        print("parseInbound")
         var v2rayInbound = V2rayInbound()
 
         if !jsonParams["protocol"].exists() {
@@ -754,10 +757,13 @@ class V2rayConfig: NSObject {
         }
 
         // set local http port
-        print("v2rayInbound.protocol parse", v2rayInbound.protocol, self.foundHttpPort, v2rayInbound.port)
         if v2rayInbound.protocol == V2rayProtocolInbound.http && !self.foundHttpPort {
             self.httpPort = v2rayInbound.port
             self.foundHttpPort = true
+        }
+
+        if foundHttpPort && foundSockPort && self.httpPort == self.socksPort {
+            self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
         }
 
         return (v2rayInbound)
