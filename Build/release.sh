@@ -124,7 +124,7 @@ function pushRelease() {
     fi
 
     echo "github-release tag"
-    github-release release\
+    ${AppCastDir}/github-release release\
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
@@ -132,7 +132,7 @@ function pushRelease() {
         --description "${description}"\
 
     echo "github-release upload"
-    github-release upload\
+    ${AppCastDir}/github-release upload\
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
