@@ -69,15 +69,15 @@ function createDmg() {
                set current view of container window to icon view
                set toolbar visible of container window to false
                set statusbar visible of container window to false
-               set the bounds of container window to {0, 0, 640, 400}
+               set the bounds of container window to {0, 0, 560, 297}
                set viewOptions to the icon view options of container window
                set arrangement of viewOptions to not arranged
-               set icon size of viewOptions to 128
+               set icon size of viewOptions to 80
                set background picture of viewOptions to file ".background:'${DMG_BACKGROUND_IMG}'"
                make new alias file at container window to POSIX file "/Applications" with properties {name:"Applications"}
                delay 1
-               set position of item "'${APP_NAME}'.app" of container window to {152, 256}
-               set position of item "Applications" of container window to {460, 256}
+               set position of item "'${APP_NAME}'.app" of container window to {120, 120}
+               set position of item "Applications" of container window to {380, 120}
                close
                open
                update without registering applications
@@ -93,9 +93,6 @@ function createDmg() {
     ############# 3 #############
     echo "Creating compressed image"
     hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
-
-    # 清理文件夹
-    rm -rf "${DMG_TMP}" "${APP_PATH}"
 }
 
 function generateAppcast() {
@@ -190,4 +187,6 @@ pushRelease ${release_note}
 generateAppcast ${release_note}
 commit
 
+# 清理文件夹
+rm -rf "${DMG_TMP}" "${APP_PATH}" "${V2rayU_RELEASE}"
 echo "Done"
