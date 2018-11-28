@@ -40,6 +40,10 @@ V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2
 	全局模式: 有别于vpn,只是将代理信息更新到系统代理http,https,socks,若需要真正全局模式, 推荐搭配使用Proxifier
 	rules模式: 浏览器推荐搭配使用Proxy SwitchyOmega
 
+### 软件使用问题
+	1. 安装包显示文件已损坏的解决方案: sudo spctl --master-disable
+	2. 有其他问题请提issue
+
 ### 感谢
 	参考: ShadowsocksX-NG V2RayX
 	logo: @小文
