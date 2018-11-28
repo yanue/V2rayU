@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "V2rayUTests/V2rayUTests.swift"
-            timestampString = "565023108.968184"
+            timestampString = "565071332.018975"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "32"
             endingLineNumber = "32"
-            landmarkName = "testDecodeVmess()"
+            landmarkName = "testInbound()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,13 +26,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "V2rayUTests/V2rayUTests.swift"
-            timestampString = "565023108.968578"
+            timestampString = "565071332.019052"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "37"
             endingLineNumber = "37"
-            landmarkName = "V2rayUTests"
-            landmarkType = "3">
+            landmarkName = "testInbound()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -42,12 +42,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "V2rayUTests/V2rayUTests.swift"
-            timestampString = "565023108.968672"
+            timestampString = "565071332.019107"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "27"
             endingLineNumber = "27"
-            landmarkName = "testDecodeVmess()"
+            landmarkName = "testInbound()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

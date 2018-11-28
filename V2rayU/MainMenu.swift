@@ -107,12 +107,12 @@ class MenuController: NSObject, NSMenuDelegate {
         NSLog("start v2ray-core begin")
 
         guard let v2ray = V2rayServer.loadSelectedItem() else {
-            NSLog("v2ray config not found")
+            self.notice(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
             return
         }
 
         if !v2ray.isValid {
-            NSLog("invid v2ray config")
+            self.notice(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
             return
         }
 
@@ -124,7 +124,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // launch
         V2rayLaunch.Start()
-        NSLog("start v2ray-core end.")
+        NSLog("start v2ray-core done.")
 
         // if enable system proxy
         if UserDefaults.getBool(forKey: .globalMode) {

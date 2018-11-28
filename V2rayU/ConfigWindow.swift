@@ -107,6 +107,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         serversTableView.allowsMultipleSelection = true
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
+
+        if V2rayServer.count() == 0 {
+            // add default
+            V2rayServer.add(remark: "default", json: "", isValid: false)
+        }
     }
 
     override func windowDidLoad() {
