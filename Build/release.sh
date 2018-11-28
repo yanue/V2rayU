@@ -164,6 +164,7 @@ function downloadV2ray() {
 
     unzip -o v2ray-macos.zip -d v2ray-core
     mv v2ray-core "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources"
+    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
     rm -fr v2ray-macos.zip v2ray-core
 }
 
