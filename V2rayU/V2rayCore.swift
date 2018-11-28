@@ -25,7 +25,7 @@ class V2rayCore {
         }
 
         let fileMgr = FileManager.default
-        if !fileMgr.fileExists(atPath: v2rayCoreFullPath) {
+        if !fileMgr.fileExists(atPath: v2rayCoreFile) {
             self.download();
         }
     }

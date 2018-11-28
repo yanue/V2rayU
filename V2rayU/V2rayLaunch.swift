@@ -15,8 +15,8 @@ let logFilePath = NSHomeDirectory() + "/Library/Logs/V2rayU.log"
 let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
-let v2rayCoreFile = "v2ray-core/v2ray"
-let v2rayCoreFullPath = AppResourcesPath + "/" + v2rayCoreFile
+let v2rayCorePath = AppResourcesPath + "/v2ray-core"
+let v2rayCoreFile = v2rayCorePath + "/v2ray"
 
 class V2rayLaunch: NSObject {
     static var authRef: AuthorizationRef?
@@ -44,6 +44,9 @@ class V2rayLaunch: NSObject {
     }
 
     static func Start() {
+        // permission: make v2ray execable
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod 777 ./v2ray-core"])
+
         // cmd: /bin/launchctl load -wF /Users/xxx/Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
         task.waitUntilExit()
