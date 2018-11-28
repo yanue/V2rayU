@@ -342,7 +342,7 @@ class MenuController: NSObject, NSMenuDelegate {
             self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
             return
         }
-        
+
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)

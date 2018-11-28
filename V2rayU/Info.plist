@@ -32,7 +32,22 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUFeedURL</key>
-	<string>https://gitee.com/yanue/appcast/raw/master/appcast.xml</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>CFBundleURLName</key>
+            <string>net.yanue.V2rayU</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>vmess</string>
+                <string>ss</string>
+                <string>ssr</string>
+            </array>
+        </dict>
+    </array>
+    <key>SUFeedURL</key>
+    <string>https://gitee.com/yanue/appcast/raw/master/appcast.xml</string>
 </dict>
 </plist>

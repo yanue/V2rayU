@@ -18,6 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        NSAppleEventManager.shared().setEventHandler(self, andSelector: #selector(self.handleAppleEvent(event:replyEvent:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
+
         // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == launcherAppIdentifier
@@ -55,6 +57,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
         }
+    }
+
+    @objc func handleAppleEvent(event: NSAppleEventDescriptor, replyEvent: NSAppleEventDescriptor) {
+        guard let appleEventDescription = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject)) else {
+            return
+        }
+
+        guard let appleEventURLString = appleEventDescription.stringValue else {
+            return
+        }
+
+        let appleEventURL = URL(string: appleEventURLString)
+
+        print("Received Apple Event URL: \(appleEventURL)")
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

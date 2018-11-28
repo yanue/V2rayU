@@ -412,12 +412,12 @@ class V2rayConfig: NSObject {
             break
         case V2rayStreamSettings.network.ws.rawValue:
             if self.streamWs.path.count == 0 {
-                self.error = "missing streamSettings.wsSettings.path";
-                return
+//                self.error = "missing streamSettings.wsSettings.path";
+//                return
             }
             if self.streamWs.headers.host.count == 0 {
-                self.error = "missing streamSettings.httpSettings.host";
-                return
+//                self.error = "missing streamSettings.httpSettings.host";
+//                return
             }
             break
         default:

@@ -147,7 +147,7 @@ class V2rayServer: NSObject {
         // name is : config. + uuid
         let name = "config." + UUID().uuidString
 
-        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json)
+        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url)
         // save to v2ray UserDefaults
         v2ray.store()
 
