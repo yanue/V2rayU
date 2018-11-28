@@ -22,8 +22,8 @@ V2rayU 是一款mac平台科学上网客户端,使用swift4.2编写,基于v2ray�
 ### 功能预览
 ----
 ![](https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true)
-![](https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true)
-![](https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true)
+![](https://github.com/yanue/V2rayU/blob/master/screenshot/2.png?raw=true)
+![](https://github.com/yanue/V2rayU/blob/master/screenshot/3.png?raw=true)
 
 ### v2ray服务器搭建推荐
 	Caddy+h2脚本: https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git
