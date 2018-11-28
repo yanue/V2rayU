@@ -14,20 +14,27 @@ V2rayU 是一款mac平台科学上网客户端,使用swift4.2编写,基于v2ray�
 - **全局模式**: 支持全局代理(有别于vpn,只是将代理信息更新到系统代理http,https,socks)
 
 ### v2ray简介
-	V2Ray 是 Project V 下的一个工具。Project V 包含一系列工具，帮助你打造专属的定制网络体系。而 V2Ray 属于最核心的一个。
-	简单地说，V2Ray 是一个与 Shadowsocks 类似的代理软件，但比Shadowsocks更具优势
-	V2Ray 用户手册：https://www.v2ray.com
-	V2Ray 项目地址：https://github.com/v2ray/v2ray-core
+   V2Ray 是 Project V 下的一个工具。Project V 包含一系列工具，帮助你打造专属的定制网络体系。而 V2Ray 属于最核心的一个。
+简单地说，V2Ray 是一个与 Shadowsocks 类似的代理软件，但比Shadowsocks更具优势
+
+V2Ray 用户手册：[https://www.v2ray.com](https://www.v2ray.com)
+
+V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2ray/v2ray-core)
 
 ### 功能预览
 ----
-![](https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true)
-![](https://github.com/yanue/V2rayU/blob/master/screenshot/2.png?raw=true)
-![](https://github.com/yanue/V2rayU/blob/master/screenshot/3.png?raw=true)
+<p>
+<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true" height="300"/> 
+<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/4.png?raw=true" height="300"/> 
+</p>
+<p>
+
+<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/2.png?raw=true" width="400"/> <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/3.png?raw=true"  width="400"/>
+</p>
 
 ### v2ray服务器搭建推荐
-	Caddy+h2脚本: https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git
-	v2ray模板: https://github.com/KiriKira/vTemplate
+	Caddy+h2脚本: [https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git](https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git)
+	v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira/vTemplate)
 
 ### 代理模式
 	全局模式: 有别于vpn,只是将代理信息更新到系统代理http,https,socks,若需要真正全局模式, 推荐搭配使用Proxifier
