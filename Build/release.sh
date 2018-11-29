@@ -30,6 +30,9 @@ function build() {
 
     echo "Cleaning up archive..."
     rm -rf ${V2rayU_ARCHIVE}
+
+    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
+    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
 }
 
 function createDmg() {
@@ -95,6 +98,9 @@ function createDmg() {
     ############# 3 #############
     echo "Creating compressed image"
     hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
+
+    # appcast sign update
+    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
 
     umount "/Volumes/${APP_NAME}"
 }
@@ -163,10 +169,7 @@ function downloadV2ray() {
     wget ${url}
 
     unzip -o v2ray-macos.zip -d v2ray-core
-    mv v2ray-core "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources"
-    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
-    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
-    rm -fr v2ray-macos.zip v2ray-core
+    rm -fr v2ray-macos.zip
 }
 
 echo "正在打包版本: V"${APP_Version}
@@ -185,16 +188,13 @@ N | n ) echo
 esac
 
 rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
-
 updatePlistVersion
-build
 downloadV2ray
+build
 createDmg
 read -p "请输入版本描述: " release_note
 pushRelease ${release_note}
 generateAppcast ${release_note}
 commit
-
-# 清理文件夹
 rm -rf "${DMG_TMP}" "${APP_PATH}" "${V2rayU_RELEASE}"
 echo "Done"
