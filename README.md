@@ -26,6 +26,7 @@ V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2
 <p>
 <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true" height="300"/> 
 <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/4.png?raw=true" height="300"/> 
+<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/5.png?raw=true" height="300"/> 
 </p>
 <p>
 
