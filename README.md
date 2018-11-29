@@ -35,6 +35,8 @@ V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2
 
 ### v2ray服务器搭建推荐
 
+v2ray配置指南: [https://toutyrater.github.io/](https://toutyrater.github.io/)
+
 Caddy+h2脚本: [https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git](https://github.com/dylanbai8/V2Ray_h2-tls_Website_onekey.git)
 
 v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira/vTemplate)
