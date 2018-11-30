@@ -19,6 +19,14 @@ class V2rayUTests: XCTestCase {
 //    override func tearDown() {
 //        // Put teardown code here. This method is called after the invocation of each test method in the class.
 //    }
+    
+    func testImportVmess() {
+        let url = "vmess://eyJhZGQiOiJhLnYycmF5LndvcmxkIiwiYWRkZGF0ZSI6bnVsbCwiYWlkIjoiNjQiLCJjb3VudHJ5IjpudWxsLCJkYXRhIjpudWxsLCJlcnJvcmNvdW50IjpudWxsLCJob3N0IjoiIiwiaWQiOiJjNzYwYTkzYi1iNjUyLTQ0YTAtOTdkOC0yNGI3YTg4OWM5MmMiLCJtX3N0YXRpb25fY25fbXMiOm51bGwsIm1fc3RhdGlvbl9jbl9zdGF0dXMiOm51bGwsIm1zIjpudWxsLCJuZXQiOiJoMiIsInBhdGgiOiIvZmdxIiwicG9ydCI6NDQzLCJwcyI6IlNTUlNIQVJFLkNPTSIsInN0YXR1cyI6bnVsbCwidGxzIjoidGxzIiwidHlwZSI6Im5vbmUiLCJ2IjoiMiJ9"
+        let importUri = ImportUri()
+        importUri.importVmessUri(uri: url)
+        print("vmess1", importUri.error, importUri.json)
+    }
+    
 
     func testInbound() {
         var inbound = V2rayInbound()

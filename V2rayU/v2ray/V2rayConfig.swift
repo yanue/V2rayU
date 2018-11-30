@@ -397,13 +397,13 @@ class V2rayConfig: NSObject {
         switch self.streamNetwork {
         case V2rayStreamSettings.network.h2.rawValue:
             if self.streamH2.host.count > 0 {
-                if self.streamH2.host[0].count == 0 {
-                    self.error = "missing streamSettings.httpSettings.host";
-                    return
-                }
+//                if self.streamH2.host[0].count == 0 {
+//                    self.error = "missing streamSettings.httpSettings.host";
+//                    return
+//                }
             } else {
-                self.error = "missing streamSettings.httpSettings.host";
-                return
+//                self.error = "missing streamSettings.httpSettings.host";
+//                return
             }
             if self.streamH2.path.count == 0 {
                 self.error = "missing streamSettings.httpSettings.path";

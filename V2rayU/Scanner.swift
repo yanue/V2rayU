@@ -52,7 +52,6 @@ class ShareUri {
         }
 
         if v2ray.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
-            print("share shadowsocks")
             self.genShadowsocksUri()
             return
         }
@@ -391,6 +390,7 @@ class VmessUri {
         let base64End = urlStr.firstIndex(of: "?")
         let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])
         guard let decodeStr = encodedStr.base64Decoded() else {
+            self.error = "decode vmess error"
             return
         }
 
@@ -433,7 +433,7 @@ class ShadowsockUri {
     // ss://bf-cfb:test@192.168.100.1:8888#remark
     func encode() -> String {
         let base64 = self.method + ":" + self.password + "@" + self.host + ":" + String(self.port)
-        var ss = base64.base64Encoded()
+        let ss = base64.base64Encoded()
         if ss != nil {
             return "ss://" + ss! + "#" + self.remark
         }
@@ -506,11 +506,12 @@ class ShadowsockUri {
         let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])
 
         guard let data = Data(base64Encoded: self.padBase64(string: encodedStr)) else {
+            self.error = "decode ss error"
             return (url.absoluteString, nil)
         }
 
         guard let decoded = String(data: data, encoding: String.Encoding.utf8) else {
-            print("decode error")
+            self.error = "decode ss error"
             return (nil, nil)
         }
 

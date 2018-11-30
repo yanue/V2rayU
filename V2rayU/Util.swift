@@ -70,7 +70,7 @@ extension String {
                     Int.init($0) ?? 0
                 }
     }
-
+    
     //: ### Base64 encoding a string
     func base64Encoded() -> String? {
         if let data = self.data(using: .utf8) {
@@ -78,11 +78,16 @@ extension String {
         }
         return nil
     }
-
+    
     //: ### Base64 decoding a string
     func base64Decoded() -> String? {
-        if let data = Data(base64Encoded: self) {
-            return String(data: data, encoding: .utf8)
+        if let _ = self.range(of: ":")?.lowerBound {
+            return self
+        }
+        let base64String = self.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        let padding = base64String.count + (base64String.count % 4 != 0 ? (4 - base64String.count % 4) : 0)
+        if let decodedData = Data(base64Encoded: base64String.padding(toLength: padding, withPad: "=", startingAt: 0), options: NSData.Base64DecodingOptions(rawValue: 0)), let decodedString = NSString(data: decodedData, encoding: String.Encoding.utf8.rawValue) {
+            return decodedString as String
         }
         return nil
     }
