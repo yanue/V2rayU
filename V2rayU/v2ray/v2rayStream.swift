@@ -15,6 +15,7 @@ struct V2rayTransport: Codable {
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
+    var quicSettings: QuicSettings?
 }
 
 struct V2rayStreamSettings: Codable {
@@ -25,6 +26,7 @@ struct V2rayStreamSettings: Codable {
         case http
         case h2
         case domainsocket
+        case quic
     }
 
     enum security: String, Codable {
@@ -41,6 +43,7 @@ struct V2rayStreamSettings: Codable {
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
+    var quicSettings: QuicSettings?
 }
 
 struct TlsSettings: Codable {
@@ -161,4 +164,21 @@ struct V2rayStreamSettingSockopt: Codable {
     var mark: Int = 0
     var tcpFastOpen: Bool = false // 是否启用 TCP Fast Open。
     var tproxy: tproxy = .off // 是否开启透明代理 (仅适用于 Linux)。
+}
+
+
+var QuicSettingsSecurity = ["none", "aes-128-gcm", "chacha20-poly1305"]
+
+struct QuicSettings: Codable {
+    //  QuicSettingsSecurity
+    var security: String = "none"
+    var key: String = ""
+    var header: QuicSettingHeader = QuicSettingHeader()
+}
+
+var QuicSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
+
+struct QuicSettingHeader: Codable {
+    // QuicSettingsHeaderType
+    var type: String = "none"
 }

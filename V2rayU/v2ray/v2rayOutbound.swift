@@ -131,11 +131,14 @@ struct V2rayOutboundShadowsocks: Codable {
     var servers: [V2rayOutboundShadowsockServer] = [V2rayOutboundShadowsockServer()]
 }
 
+let V2rayOutboundShadowsockMethod = ["aes-256-cfb", "aes-128-cfb", "chacha20", "chacha20-ietf", "chacha20-poly1305", "aes-256-gcm", "aes-128-gcm"]
+
 struct V2rayOutboundShadowsockServer: Codable {
     var email: String = ""
     var address: String = ""
     var port: Int = 0
-    var method: String = ""
+    // V2rayOutboundShadowsockMethod
+    var method: String = "aes-256-cfb"
     var password: String = ""
     var ota: Bool = false
     var level: Int = 0
@@ -163,9 +166,12 @@ struct V2rayOutboundVMessItem: Codable {
     var users: [V2rayOutboundVMessUser] = [V2rayOutboundVMessUser()]
 }
 
+let V2rayOutboundVMessSecurity = ["aes-128-gcm", "chacha20-poly1305", "auto", "none"]
+
 struct V2rayOutboundVMessUser: Codable {
     var id: String = ""
     var alterId: Int = 64// 0-65535
     var level: Int = 0
+    // V2rayOutboundVMessSecurity
     var security: String = "auto" // aes-128-gcm/chacha20-poly1305/auto/none
 }

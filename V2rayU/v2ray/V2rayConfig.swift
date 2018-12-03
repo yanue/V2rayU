@@ -84,6 +84,7 @@ class V2rayConfig: NSObject {
     var streamDs = DsSettings()
     var streamWs = WsSettings()
     var streamH2 = HttpSettings()
+    var streamQuic = QuicSettings()
 
     // tls
     var streamTlsSecurity = "none"
@@ -479,6 +480,9 @@ class V2rayConfig: NSObject {
         case .domainsocket:
             streamSettings.dsSettings = self.streamDs
             break
+        case .quic:
+            streamSettings.quicSettings = self.streamQuic
+            break
         }
         streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
         var tls = TlsSettings()
@@ -679,6 +683,11 @@ class V2rayConfig: NSObject {
                 settings.email = jsonParams["settings"]["timeout"].stringValue
                 settings.password = jsonParams["settings"]["password"].stringValue
                 settings.method = jsonParams["settings"]["method"].stringValue
+                if V2rayOutboundShadowsockMethod.firstIndex(of: jsonParams["settings"]["method"].stringValue) != nil {
+                    settings.method = jsonParams["settings"]["method"].stringValue
+                } else {
+                    settings.method = V2rayOutboundShadowsockMethod[0]
+                }
                 settings.udp = jsonParams["settings"]["udp"].boolValue
                 settings.level = jsonParams["settings"]["level"].intValue
                 settings.ota = jsonParams["settings"]["ota"].boolValue
@@ -826,7 +835,13 @@ class V2rayConfig: NSObject {
                     server.port = val["port"].intValue
                     server.email = val["email"].stringValue
                     server.address = val["address"].stringValue
-                    server.method = val["method"].stringValue
+
+                    if V2rayOutboundShadowsockMethod.firstIndex(of: val["method"].stringValue) != nil {
+                        server.method = val["method"].stringValue
+                    } else {
+                        server.method = V2rayOutboundShadowsockMethod[0]
+                    }
+
                     server.password = val["password"].stringValue
                     server.ota = val["ota"].boolValue
                     server.level = val["level"].intValue
@@ -874,7 +889,9 @@ class V2rayConfig: NSObject {
                         user.id = val["id"].stringValue
                         user.alterId = val["alterId"].intValue
                         user.level = val["level"].intValue
-                        user.security = val["security"].stringValue
+                        if V2rayOutboundVMessSecurity.firstIndex(of: val["security"].stringValue) != nil {
+                            user.security = val["security"].stringValue
+                        }
                         users.append(user)
                     }
                     item.users = users
@@ -989,6 +1006,10 @@ class V2rayConfig: NSObject {
 
             if transport.dsSettings != nil {
                 self.streamDs = transport.dsSettings!
+            }
+
+            if transport.quicSettings != nil {
+                self.streamQuic = transport.quicSettings!
             }
         }
 
@@ -1135,6 +1156,20 @@ class V2rayConfig: NSObject {
             var dsSettings = DsSettings()
             dsSettings.path = steamJson["dsSettings"]["path"].stringValue
             stream.dsSettings = dsSettings
+        }
+
+        // quicSettings
+        if steamJson["quicSettings"].dictionaryValue.count > 0 && steamJson["quicSettings"].dictionaryValue.count > 0 {
+            var quicSettings = QuicSettings()
+            quicSettings.key = steamJson["quicSettings"]["key"].stringValue
+            // "none"
+            if QuicSettingsHeaderType.firstIndex(of: steamJson["quicSettings"]["header"]["type"].stringValue) != nil {
+                quicSettings.header.type = steamJson["quicSettings"]["header"]["type"].stringValue
+            }
+            if QuicSettingsSecurity.firstIndex(of: steamJson["quicSettings"]["security"].stringValue) != nil {
+                quicSettings.security = steamJson["quicSettings"]["security"].stringValue
+            }
+            stream.quicSettings = quicSettings
         }
 
         return stream

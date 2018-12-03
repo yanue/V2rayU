@@ -74,6 +74,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var dsView: NSView!
     @IBOutlet weak var wsView: NSView!
     @IBOutlet weak var h2View: NSView!
+    @IBOutlet weak var quicView: NSView!
 
     @IBOutlet weak var switchNetwork: NSPopUpButton!
 
@@ -96,6 +97,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var h2Path: NSTextField!
 
     @IBOutlet weak var dsPath: NSTextField!
+
+    @IBOutlet weak var quicKey: NSTextField!
+    @IBOutlet weak var quicSecurity: NSPopUpButton!
+    @IBOutlet weak var quicHeaderType: NSPopUpButton!
 
     @IBOutlet weak var streamSecurity: NSPopUpButton!
     @IBOutlet weak var streamAllowSecure: NSButton!
@@ -267,7 +272,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.serverShadowsocks.port = Int(self.shadowsockPort.intValue)
         v2rayConfig.serverShadowsocks.password = self.shadowsockPass.stringValue
         if self.vmessSecurity.indexOfSelectedItem >= 0 {
-            v2rayConfig.serverShadowsocks.method = self.shadowsockMethod.titleOfSelectedItem!
+            v2rayConfig.serverShadowsocks.method = self.shadowsockMethod.titleOfSelectedItem ?? "aes-256-cfb"
         }
 
         // socks5
@@ -317,6 +322,16 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // domainsocket
         v2rayConfig.streamDs.path = self.dsPath.stringValue
+
+        // quic
+        v2rayConfig.streamQuic.key = self.quicKey.stringValue
+        if self.quicHeaderType.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamQuic.header.type = self.quicHeaderType.titleOfSelectedItem!
+        }
+        if self.quicSecurity.indexOfSelectedItem >= 0 {
+            v2rayConfig.streamQuic.security = self.quicSecurity.titleOfSelectedItem!
+        }
+
         // ========================== stream end =======================
     }
 
@@ -344,7 +359,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             self.vmessAlterId.intValue = Int32(user.alterId)
             self.vmessLevel.intValue = Int32(user.level)
             self.vmessUserId.stringValue = user.id
-            self.vmessSecurity.indexOfItem(withTitle: user.security)
+            self.vmessSecurity.selectItem(withTitle: user.security)
         }
 
         // shadowsocks
@@ -353,7 +368,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             self.shadowsockPort.stringValue = String(v2rayConfig.serverShadowsocks.port)
         }
         self.shadowsockPass.stringValue = v2rayConfig.serverShadowsocks.password
-        self.shadowsockMethod.indexOfItem(withTitle: v2rayConfig.serverShadowsocks.method)
+        self.shadowsockMethod.selectItem(withTitle: v2rayConfig.serverShadowsocks.method)
 
         // socks5
         self.socks5Addr.stringValue = v2rayConfig.serverSocks5.address
@@ -396,6 +411,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // domainsocket
         self.dsPath.stringValue = v2rayConfig.streamDs.path
+
+        // quic
+        self.quicKey.stringValue = v2rayConfig.streamQuic.key
+        print(" v2rayConfig.streamQuic.security", v2rayConfig.streamQuic.security, v2rayConfig.streamQuic.header.type)
+        self.quicSecurity.selectItem(withTitle: v2rayConfig.streamQuic.security)
+        self.quicHeaderType.selectItem(withTitle: v2rayConfig.streamQuic.header.type)
+
         // ========================== stream end =======================
     }
 
@@ -545,6 +567,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         NSWorkspace.shared.open(url)
     }
 
+    @IBAction func goQuicHelp(_ sender: Any) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/quic.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
     @IBAction func goProtocolHelp(_ sender: NSButton) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/protocols/vmess.html") else {
             return
@@ -579,6 +608,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             break;
         case "h2":
             self.h2View.isHidden = false
+            break;
+        case "quic":
+            self.quicView.isHidden = false
             break;
         default: // vmess
             self.tcpView.isHidden = false
