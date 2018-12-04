@@ -28,7 +28,7 @@ class V2rayLaunch: NSObject {
             try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
         }
 
-        let arguments = [v2rayCoreFile, "-config", "config.json"]
+        let arguments = ["./v2ray-core/v2ray", "-config", "config.json"]
 
         let dict: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_PLIST.replacingOccurrences(of: ".plist", with: ""),
@@ -40,14 +40,19 @@ class V2rayLaunch: NSObject {
             "RunAtLoad": true,
         ]
 
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
+
         dict.write(toFile: launchAgentPlistFile, atomically: true)
     }
 
     static func Start() {
         // permission: make v2ray execable
-        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod 777 ./v2ray-core"])
+        // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
 
-        // cmd: /bin/launchctl load -wF /Users/xxx/Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+        // unload first
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
+
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
         task.waitUntilExit()
         if task.terminationStatus == 0 {

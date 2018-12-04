@@ -414,7 +414,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // quic
         self.quicKey.stringValue = v2rayConfig.streamQuic.key
-        print(" v2rayConfig.streamQuic.security", v2rayConfig.streamQuic.security, v2rayConfig.streamQuic.header.type)
         self.quicSecurity.selectItem(withTitle: v2rayConfig.streamQuic.security)
         self.quicHeaderType.selectItem(withTitle: v2rayConfig.streamQuic.header.type)
 

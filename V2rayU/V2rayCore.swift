@@ -134,7 +134,7 @@ class V2rayCore {
 
                         // unzip v2ray-core
                         // cmd: /bin/bash -c 'cd path && ./unzip.sh '
-                        let sh = "cd " + AppResourcesPath + " && ./unzip.sh && /bin/chmod 777 ./v2ray-core"
+                        let sh = "cd " + AppResourcesPath + " && ./unzip.sh && /bin/chmod -R 777 ./v2ray-core"
                         // exec shell
                         let res = shell(launchPath: "/bin/bash", arguments: ["-c", sh])
                         NSLog("res:", res!)
