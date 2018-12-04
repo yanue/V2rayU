@@ -18,8 +18,8 @@
                 <outlet property="dnsServers" destination="DZZ-M1-IsQ" id="DsL-JX-4mJ"/>
                 <outlet property="dsPath" destination="TCB-Zt-6Kj" id="Z96-3X-0GX"/>
                 <outlet property="dsView" destination="egb-Ng-zBi" id="qOy-Qv-H23"/>
-                <outlet property="enableMux" destination="b08-0E-wBy" id="TzZ-cF-pd0"/>
-                <outlet property="enableUdp" destination="b08-0E-wBy" id="dga-Hp-Eih"/>
+                <outlet property="enableMux" destination="b08-0E-wBy" id="5rz-xE-1Rt"/>
+                <outlet property="enableUdp" destination="9VY-Vq-dPG" id="haE-dE-Qoc"/>
                 <outlet property="errTip" destination="gyE-Zy-64R" id="3zX-d3-ZL0"/>
                 <outlet property="h2Host" destination="oNO-uC-5aA" id="Sk9-pP-UP9"/>
                 <outlet property="h2Path" destination="72t-oS-N1H" id="5OL-Xr-CNm"/>

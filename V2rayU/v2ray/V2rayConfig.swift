@@ -716,6 +716,7 @@ class V2rayConfig: NSObject {
                 settings.timeout = jsonParams["settings"]["timeout"].intValue
                 settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
+                self.enableUdp = jsonParams["settings"]["udp"].boolValue
                 // set into inbound
                 v2rayInbound.settingSocks = settings
                 break

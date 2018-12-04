@@ -50,8 +50,23 @@ extension V2rayOutbound {
         tag = try container.decode(String.self, forKey: CodingKeys.tag)
 
         // ignore nil
+        if !(try container.decodeNil(forKey: .sendThrough)) {
+            sendThrough = try container.decode(String.self, forKey: CodingKeys.sendThrough)
+        }
+
+        // ignore nil
+        if !(try container.decodeNil(forKey: .proxySettings)) {
+            proxySettings = try container.decode(ProxySettings.self, forKey: CodingKeys.proxySettings)
+        }
+
+        // ignore nil
         if !(try container.decodeNil(forKey: .streamSettings)) {
             streamSettings = try container.decode(V2rayStreamSettings.self, forKey: CodingKeys.streamSettings)
+        }
+
+        // ignore nil
+        if !(try container.decodeNil(forKey: .mux)) {
+            mux = try container.decode(V2rayOutboundMux.self, forKey: CodingKeys.mux)
         }
 
         // decode settings depends on `protocol`
@@ -82,6 +97,21 @@ extension V2rayOutbound {
         // ignore nil
         if streamSettings != nil {
             try container.encode(streamSettings, forKey: .streamSettings)
+        }
+
+        // ignore nil
+        if sendThrough != nil && sendThrough!.count > 0 {
+            try container.encode(sendThrough, forKey: .sendThrough)
+        }
+
+        // ignore nil
+        if proxySettings != nil {
+            try container.encode(proxySettings, forKey: .proxySettings)
+        }
+
+        // ignore nil
+        if mux != nil {
+            try container.encode(mux, forKey: .mux)
         }
 
         // encode settings depends on `protocol`
