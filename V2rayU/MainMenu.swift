@@ -11,18 +11,20 @@ import Cocoa
 import ServiceManagement
 import Preferences
 
+let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
+let preferencesWindowController = PreferencesWindowController(
+        viewControllers: [
+            PreferenceGeneralViewController(),
+        ]
+)
+var configWindow = ConfigWindowController()
+var qrcodeWindow = QrcodeWindowController()
+
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
-    var configWindow: ConfigWindowController!
-
+    var closedByConfigWindow: Bool = false
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var statusItemClicked: (() -> Void)?
-
-    let preferencesWindowController = PreferencesWindowController(
-            viewControllers: [
-                PreferenceGeneralViewController(),
-            ]
-    )
 
     @IBOutlet weak var v2rayRulesMode: NSMenuItem!
     @IBOutlet weak var globalMode: NSMenuItem!
@@ -55,7 +57,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
         statusItem.menu = statusMenu
 
-        configWindow = ConfigWindowController()
+//        self.configWindow = ConfigWindowController()
 
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start
@@ -65,6 +67,9 @@ class MenuController: NSObject, NSMenuDelegate {
             // show off status
             self.setStatusOff()
         }
+
+        // windowWillClose Notification
+        NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
     }
 
     @IBAction func openLogs(_ sender: NSMenuItem) {
@@ -157,7 +162,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func openPreference(_ sender: NSMenuItem) {
-        self.preferencesWindowController.showWindow()
+        preferencesWindowController.showWindow()
     }
 
     // switch server
@@ -183,22 +188,41 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // open config window
     @IBAction func openConfig(_ sender: NSMenuItem) {
-        if configWindow != nil {
-            // close by window `x` button
-            if configWindow.closedByWindowButton {
-                configWindow.close()
-                // need renew
-                configWindow = ConfigWindowController()
-            }
-        } else {
-            configWindow = ConfigWindowController()
-        }
-
+        // close before
+        configWindow.close()
+        // renew
+        configWindow = ConfigWindowController()
+        // show window
         configWindow.showWindow(self)
+        // center
+        configWindow.window?.center()
+        // show dock icon
+        NSApp.setActivationPolicy(.regular)
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
-        // show dock icon
-//        NSApp.setActivationPolicy(.regular)
+    }
+
+    /// When a window was closed this methods takes care of releasing its controller.
+    ///
+    /// - parameter notification: The notification.
+    @objc private func configWindowWillClose(notification: Notification) {
+        guard let object = notification.object as? NSWindow else {
+            return
+        }
+
+        // config window title is "V2rayU"
+        if object.title == "V2rayU" {
+            self.hideDock()
+        }
+    }
+
+    func hideDock() {
+        // hide dock icon and close all opened windows
+        NSApp.setActivationPolicy(.accessory)
+        // close by config window
+        self.closedByConfigWindow = true
+        // close
+        configWindow.close()
     }
 
     @IBAction func goHelp(_ sender: NSMenuItem) {
@@ -212,17 +236,6 @@ class MenuController: NSObject, NSMenuDelegate {
         // reomve old items
         serverItems.submenu?.removeAllItems()
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
-
-//        // servers preferences...
-//        let menuItem: NSMenuItem = NSMenuItem()
-//        menuItem.title = "servers preferences..."
-//        menuItem.action = #selector(self.openConfig(_:))
-//        menuItem.target = self
-//        menuItem.isEnabled = true
-//        serverItems.submenu?.addItem(menuItem)
-//
-//        // separator
-//        serverItems.submenu?.addItem(NSMenuItem.separator())
 
         // add new
         var validCount = 0
@@ -306,8 +319,15 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        let qrcodeWindow = QrcodeWindowController()
+        // close before
+        qrcodeWindow.close()
+        // renew
+        qrcodeWindow = QrcodeWindowController()
+        // show window
         qrcodeWindow.showWindow(nil)
+        // center
+        qrcodeWindow.window?.center()
+        // set uri
         qrcodeWindow.setShareUri(uri: share.uri)
         // bring to front
         NSApp.activate(ignoringOtherApps: true)

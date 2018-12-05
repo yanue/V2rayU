@@ -1584,6 +1584,7 @@ Gw
                     </textField>
                 </subviews>
             </view>
+            <accessibility identifier="ConfigWindow"/>
             <point key="canvasLocation" x="197.5" y="227"/>
         </window>
     </objects>

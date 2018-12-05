@@ -14,13 +14,6 @@ class QrcodeWindowController: NSWindowController {
     @IBOutlet weak var shareUri: NSTextField!
     @IBOutlet weak var shareQrcode: NSImageView!
 
-    override func awakeFromNib() {
-    }
-
-    override func windowDidLoad() {
-        super.windowDidLoad()
-    }
-
     func setShareUri(uri: String) {
         self.shareUri.stringValue = uri
         let generator = QRCodeGenerator()

@@ -10,15 +10,12 @@ import Cocoa
 import Alamofire
 
 class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
-    // closed by window 'x' button
-    var closedByWindowButton: Bool = false
     var v2rayConfig: V2rayConfig = V2rayConfig()
 
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
     }
 
-    let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
     let tableViewDragType: String = "v2ray.item"
 
     @IBOutlet weak var tabView: NSTabView!
@@ -110,8 +107,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
         serversTableView.allowsMultipleSelection = true
-        // windowWillClose Notification
-        NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
 
         if V2rayServer.count() == 0 {
             // add default
@@ -126,7 +121,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
         self.serversTableView.reloadData()
-
         // tab view
         self.tabView.delegate = self
 
@@ -455,7 +449,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
         self.errTip.stringValue = errMsg
 
-        self.refreshServerList(ok: errMsg.count > 0)
+        self.refreshServerList(ok: errMsg.count == 0)
     }
 
     func refreshServerList(ok: Bool = true) {
@@ -483,13 +477,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         } else {
             self.saveConfig()
         }
-    }
-
-    @IBAction func cancel(_ sender: NSButton) {
-        // self close
-        self.close()
-        // hide dock icon and close all opened windows
-//        NSApp.setActivationPolicy(.accessory)
     }
 
     @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
@@ -698,11 +685,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         V2rayLaunch.OpenLogs()
     }
 
-    func windowWillClose(_ notification: Notification) {
-        // closed by window 'x' button
-        self.closedByWindowButton = true
+    @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-//        NSApp.setActivationPolicy(.accessory)
+        menuController.hideDock()
     }
 }
 
