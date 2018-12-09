@@ -138,7 +138,7 @@ class V2rayConfig: NSObject {
 
     func combineManualData() {
         // base
-        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel)!
+        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")!
         self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
@@ -1126,8 +1126,8 @@ class V2rayConfig: NSObject {
             kcpSettings.readBufferSize = steamJson["kcpSettings"]["readBufferSize"].intValue
             kcpSettings.writeBufferSize = steamJson["kcpSettings"]["writeBufferSize"].intValue
             // "none"
-            if KcpSettingsHeaderType.firstIndex(of: steamJson["kcpSettings"]["type"].stringValue) != nil {
-                kcpSettings.header.type = steamJson["kcpSettings"]["type"].stringValue
+            if KcpSettingsHeaderType.firstIndex(of: steamJson["kcpSettings"]["header"]["type"].stringValue) != nil {
+                kcpSettings.header.type = steamJson["kcpSettings"]["header"]["type"].stringValue
             }
             stream.kcpSettings = kcpSettings
         }

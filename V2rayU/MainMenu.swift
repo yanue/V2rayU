@@ -17,7 +17,6 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceGeneralViewController(),
         ]
 )
-var configWindow = ConfigWindowController()
 var qrcodeWindow = QrcodeWindowController()
 
 // menu controller
@@ -25,6 +24,7 @@ class MenuController: NSObject, NSMenuDelegate {
     var closedByConfigWindow: Bool = false
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var statusItemClicked: (() -> Void)?
+    var configWindow: ConfigWindowController!
 
     @IBOutlet weak var v2rayRulesMode: NSMenuItem!
     @IBOutlet weak var globalMode: NSMenuItem!
@@ -112,12 +112,12 @@ class MenuController: NSObject, NSMenuDelegate {
         NSLog("start v2ray-core begin")
 
         guard let v2ray = V2rayServer.loadSelectedItem() else {
-            self.notice(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
+            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
             return
         }
 
         if !v2ray.isValid {
-            self.notice(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
+            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
             return
         }
 
@@ -153,14 +153,6 @@ class MenuController: NSObject, NSMenuDelegate {
         NSApplication.shared.terminate(self)
     }
 
-    @IBAction func generateQRCode(_ sender: NSMenuItem) {
-        NSLog("GenerateQRCode")
-    }
-
-    @IBAction func scanQRCode(_ sender: NSMenuItem) {
-        NSLog("ScanQRCode")
-    }
-
     @IBAction func openPreference(_ sender: NSMenuItem) {
         preferencesWindowController.showWindow()
     }
@@ -188,14 +180,21 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // open config window
     @IBAction func openConfig(_ sender: NSMenuItem) {
-        // close before
-        configWindow.close()
-        // renew
-        configWindow = ConfigWindowController()
+        if configWindow != nil {
+            // close before
+            if closedByConfigWindow {
+                configWindow.close()
+                // renew
+                configWindow = ConfigWindowController()
+            }
+        } else {
+            // renew
+            configWindow = ConfigWindowController()
+        }
+
         // show window
-        configWindow.showWindow(self)
-        // center
-        configWindow.window?.center()
+        configWindow.showWindow(nil)
+        configWindow.window?.makeKeyAndOrderFront(self)
         // show dock icon
         NSApp.setActivationPolicy(.regular)
         // bring to front
@@ -308,14 +307,14 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func generateQrcode(_ sender: NSMenuItem) {
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             NSLog("v2ray config not found")
-            self.notice(title: "generate Qrcode fail", subtitle: "", informativeText: "no available servers")
+            noticeTip(title: "generate Qrcode fail", subtitle: "", informativeText: "no available servers")
             return
         }
 
         let share = ShareUri()
         share.qrcode(item: v2ray)
         if share.error.count > 0 {
-            self.notice(title: "generate Qrcode fail", subtitle: "", informativeText: share.error)
+            noticeTip(title: "generate Qrcode fail", subtitle: "", informativeText: share.error)
             return
         }
 
@@ -338,7 +337,7 @@ class MenuController: NSObject, NSMenuDelegate {
         if uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            self.notice(title: "import server fail", subtitle: "", informativeText: "no found qrcode")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found qrcode")
         }
     }
 
@@ -346,7 +345,7 @@ class MenuController: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess:// from Pasteboard")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess:// from Pasteboard")
         }
     }
 
@@ -354,12 +353,12 @@ class MenuController: NSObject, NSMenuDelegate {
         let uri = url.trimmingCharacters(in: .whitespaces)
 
         if uri.count == 0 {
-            self.notice(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
             return
         }
 
         if URL(string: uri) == nil {
-            self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
             return
         }
 
@@ -377,18 +376,7 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        self.notice(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
-    }
-
-    func notice(title: String = "", subtitle: String = "", informativeText: String = "") {
-        // 定义NSUserNotification
-        let userNotification = NSUserNotification()
-        userNotification.title = title
-        userNotification.subtitle = subtitle
-        userNotification.informativeText = informativeText
-        // 使用NSUserNotificationCenter发送NSUserNotification
-        let userNotificationCenter = NSUserNotificationCenter.default
-        userNotificationCenter.scheduleNotification(userNotification)
+        noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
     }
 
     func saveServer(importUri: ImportUri) {
@@ -398,10 +386,20 @@ class MenuController: NSObject, NSMenuDelegate {
             // refresh server
             self.showServers()
 
-            self.notice(title: "import server success", subtitle: "", informativeText: importUri.remark)
+            noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)
         } else {
-            self.notice(title: "import server fail", subtitle: "", informativeText: importUri.error)
+            noticeTip(title: "import server fail", subtitle: "", informativeText: importUri.error)
         }
     }
 
+    func noticeTip(title: String = "", subtitle: String = "", informativeText: String = "") {
+        // 定义NSUserNotification
+        let userNotification = NSUserNotification()
+        userNotification.title = title
+        userNotification.subtitle = subtitle
+        userNotification.informativeText = informativeText
+        // 使用NSUserNotificationCenter发送NSUserNotification
+        let userNotificationCenter = NSUserNotificationCenter.default
+        userNotificationCenter.scheduleNotification(userNotification)
+    }
 }

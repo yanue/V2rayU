@@ -417,6 +417,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func loadJsonData(rowIndex: Int) {
         defer {
             self.bindDataToView()
+            // replace current
+            self.switchToImportView()
         }
 
         // reset
@@ -447,9 +449,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // save
         let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
-        self.errTip.stringValue = errMsg
-
-        self.refreshServerList(ok: errMsg.count == 0)
+        if errMsg.count == 0 {
+            if self.errTip.stringValue == "" {
+                self.errTip.stringValue = "save success"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    // your code here
+                    self.errTip.stringValue = ""
+                }
+            }
+            self.refreshServerList(ok: errMsg.count == 0)
+        } else {
+            self.errTip.stringValue = errMsg
+        }
     }
 
     func refreshServerList(ok: Bool = true) {
@@ -482,6 +493,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
         if let item = logLevel.selectedItem {
             UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
+            // replace current
+            self.switchToImportView()
             // restart service
             menuController.startV2rayCore()
         }

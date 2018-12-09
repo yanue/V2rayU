@@ -18,8 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        NSAppleEventManager.shared().setEventHandler(self, andSelector: #selector(self.handleAppleEvent(event:replyEvent:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
-
         // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == launcherAppIdentifier
@@ -40,6 +38,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
+
+        // wake and sleep
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onWakeNote(note:)), name: NSWorkspace.willSleepNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onSleepNote(note:)), name: NSWorkspace.didWakeNotification, object: nil)
+        // url scheme
+        NSAppleEventManager.shared().setEventHandler(self, andSelector: #selector(self.handleAppleEvent(event:replyEvent:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
     }
 
     func checkDefault() {
@@ -69,8 +73,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let appleEventURL = URL(string: appleEventURLString)
+        // todo
+    }
 
-        print("Received Apple Event URL: \(appleEventURL)")
+    @objc func onWakeNote(note: NSNotification) {
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            V2rayLaunch.Start()
+        }
+    }
+
+    @objc func onSleepNote(note: NSNotification) {
+        V2rayLaunch.Stop()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
