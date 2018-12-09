@@ -80,6 +80,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             V2rayLaunch.Start()
         }
+        // check v2ray core
+        V2rayCore().check()
+        // auto check updates
+        if UserDefaults.getBool(forKey: .autoCheckVersion) {
+            // check version
+            V2rayUpdater.checkForUpdatesInBackground()
+        }
     }
 
     @objc func onSleepNote(note: NSNotification) {
