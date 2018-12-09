@@ -53,11 +53,16 @@ v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira
 	当前启动服务配置: /Applications/V2rayU.app/Contents/Resources/config.json
 	其他服务配置信息: ~/Library/Preferences/net.yanue.V2rayU.plist
 
+
 	如果启动无反应可以尝试从命令行手动启动,查看原因
 ```
 cd /Applications/V2rayU.app/Contents/Resources/
 ./v2ray-core/v2ray -config ./config.json
 ```
+### 待实现功能:
+	pac模式/manual模式
+	ADBlock-Rules
+	订阅功能
 
 ### 软件使用问题
 	1. 安装包显示文件已损坏的解决方案: sudo spctl --master-disable
