@@ -59,10 +59,18 @@ v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira
 cd /Applications/V2rayU.app/Contents/Resources/
 ./v2ray-core/v2ray -config ./config.json
 ```
+
 ### 待实现功能:
 	pac模式/manual模式
 	ADBlock-Rules
 	订阅功能
+	速度测试
+
+### 欢迎贡献代码:
+	1. fork 然后 git clone
+	2. pod install
+	3. 下载最新版v2ray-core,如: https://github.com/v2ray/v2ray-core/releases/download/v4.8.0/v2ray-macos.zip,解压到Build目录,重命名为v2ray-core
+	4. 运行xcode即可
 
 ### 软件使用问题
 	1. 安装包显示文件已损坏的解决方案: sudo spctl --master-disable
