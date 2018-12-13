@@ -101,6 +101,12 @@
                         <action selector="editUserRulesForPAC:" target="hcZ-V7-Dui" id="VTZ-pq-Itb"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Show Pac File" id="Lib-Oz-o5W">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="showPacFile:" target="hcZ-V7-Dui" id="QEm-Fq-Vmt"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
                 <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>

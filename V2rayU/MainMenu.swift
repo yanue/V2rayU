@@ -324,13 +324,25 @@ class MenuController: NSObject, NSMenuDelegate {
         // pac mode
         if runMode == .pac {
             // generate pac file
-           _ = GeneratePACFile()
+            _ = GeneratePACFile()
         }
 
         V2rayLaunch.setSystemProxy(mode: runMode)
     }
 
+    @IBAction func showPacFile(_ sender: NSMenuItem) {
+        let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [PACRulesDirPath])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("showPacFile succeeded.")
+        } else {
+            NSLog("showPacFile failed.")
+        }
+    }
+
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
+        // need set SUFeedURL into plist
+        V2rayUpdater.checkForUpdates(sender)
     }
 
     @IBAction func updateGFWList(_ sender: NSMenuItem) {
