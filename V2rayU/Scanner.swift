@@ -108,7 +108,7 @@ class ShareUri {
 
     // Shadowsocks
     func genShadowsocksUri() {
-        var ss = ShadowsockUri()
+        let ss = ShadowsockUri()
         ss.host = self.v2ray.serverShadowsocks.address
         ss.port = self.v2ray.serverShadowsocks.port
         ss.password = self.v2ray.serverShadowsocks.password

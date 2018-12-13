@@ -25,8 +25,8 @@ extension UserDefaults {
         case autoCheckVersion
         // auto launch after login
         case autoLaunch
-        // global mode system proxy
-        case globalMode
+        // pac|manual|global
+        case runMode
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
@@ -70,7 +70,7 @@ extension String {
                     Int.init($0) ?? 0
                 }
     }
-    
+
     //: ### Base64 encoding a string
     func base64Encoded() -> String? {
         if let data = self.data(using: .utf8) {
@@ -78,7 +78,7 @@ extension String {
         }
         return nil
     }
-    
+
     //: ### Base64 decoding a string
     func base64Decoded() -> String? {
         if let _ = self.range(of: ":")?.lowerBound {

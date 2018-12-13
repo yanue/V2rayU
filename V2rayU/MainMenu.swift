@@ -18,6 +18,7 @@ let preferencesWindowController = PreferencesWindowController(
         ]
 )
 var qrcodeWindow = QrcodeWindowController()
+var editUserRulesWinCtrl = UserRulesWindowController()
 
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
@@ -26,7 +27,8 @@ class MenuController: NSObject, NSMenuDelegate {
     var statusItemClicked: (() -> Void)?
     var configWindow: ConfigWindowController!
 
-    @IBOutlet weak var v2rayRulesMode: NSMenuItem!
+    @IBOutlet weak var pacMode: NSMenuItem!
+    @IBOutlet weak var manualMode: NSMenuItem!
     @IBOutlet weak var globalMode: NSMenuItem!
     @IBOutlet weak var statusMenu: NSMenu!
     @IBOutlet weak var toggleV2rayItem: NSMenuItem!
@@ -39,13 +41,26 @@ class MenuController: NSObject, NSMenuDelegate {
         // initial auth ref
         let error = AuthorizationCreate(nil, nil, [], &V2rayLaunch.authRef)
         assert(error == errAuthorizationSuccess)
-
-        if UserDefaults.getBool(forKey: .globalMode) {
-            self.globalMode.state = .on
-            self.v2rayRulesMode.state = .off
-        } else {
+        let runMode = UserDefaults.get(forKey: .runMode) ?? "pac"
+        switch runMode {
+        case "pac":
+            self.pacMode.state = .on
             self.globalMode.state = .off
-            self.v2rayRulesMode.state = .on
+            self.manualMode.state = .off
+            break
+
+        case "global":
+            self.pacMode.state = .off
+            self.globalMode.state = .on
+            self.manualMode.state = .off
+            break
+
+        default: //manual
+            self.pacMode.state = .off
+            self.globalMode.state = .off
+            self.manualMode.state = .on
+
+            break
         }
 
         statusMenu.delegate = self
@@ -131,11 +146,9 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.Start()
         NSLog("start v2ray-core done.")
 
-        // if enable system proxy
-        if UserDefaults.getBool(forKey: .globalMode) {
-            // reset system proxy
-            self.enableSystemProxy()
-        }
+        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
+        // switch run mode
+        self.switchRunMode(runMode: runMode)
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
@@ -266,28 +279,29 @@ class MenuController: NSObject, NSMenuDelegate {
         }
     }
 
-    @IBAction func disableGlobalProxy(_ sender: NSMenuItem) {
-        // state
-        self.globalMode.state = .off
-        self.v2rayRulesMode.state = .on
-        // save
-        UserDefaults.setBool(forKey: .globalMode, value: false)
+    @IBAction func switchManualMode(_ sender: NSMenuItem) {
         // disable
-        V2rayLaunch.setSystemProxy(enabled: false)
+        switchRunMode(runMode: .manual)
+    }
+
+    @IBAction func switchPacMode(_ sender: NSMenuItem) {
+        // switch mode
+        switchRunMode(runMode: .pac)
     }
 
     // MARK: - actions
-    @IBAction func enableGlobalProxy(_ sender: NSMenuItem) {
-        enableSystemProxy()
+    @IBAction func switchGlobalMode(_ sender: NSMenuItem) {
+        // switch mode
+        switchRunMode(runMode: .global)
     }
 
-    func enableSystemProxy() {
+    func switchRunMode(runMode: RunMode) {
         // save
-        UserDefaults.setBool(forKey: .globalMode, value: true)
+        UserDefaults.set(forKey: .runMode, value: runMode.rawValue)
         // state
-        self.globalMode.state = .on
-        self.v2rayRulesMode.state = .off
-
+        self.globalMode.state = runMode == .global ? .on : .off
+        self.pacMode.state = runMode == .pac ? .on : .off
+        self.manualMode.state = runMode == .manual ? .on : .off
         // enable
         var sockPort = ""
         var httpPort = ""
@@ -301,7 +315,38 @@ class MenuController: NSObject, NSMenuDelegate {
             httpPort = cfg.httpPort
         }
 
-        V2rayLaunch.setSystemProxy(enabled: true, httpPort: httpPort, sockPort: sockPort)
+        // global
+        if runMode == .global {
+            V2rayLaunch.setSystemProxy(mode: .global, httpPort: httpPort, sockPort: sockPort)
+            return
+        }
+
+        // pac mode
+        if runMode == .pac {
+            // generate pac file
+           _ = GeneratePACFile()
+        }
+
+        V2rayLaunch.setSystemProxy(mode: runMode)
+    }
+
+    @IBAction func checkForUpdate(_ sender: NSMenuItem) {
+    }
+
+    @IBAction func updateGFWList(_ sender: NSMenuItem) {
+        UpdatePACFromGFWList()
+    }
+
+    @IBAction func editUserRulesForPAC(_ sender: NSMenuItem) {
+        if editUserRulesWinCtrl != nil {
+            editUserRulesWinCtrl.close()
+        }
+        let ctrl = UserRulesWindowController()
+        editUserRulesWinCtrl = ctrl
+
+        ctrl.showWindow(self)
+        NSApp.activate(ignoringOtherApps: true)
+        ctrl.window?.makeKeyAndOrderFront(self)
     }
 
     @IBAction func generateQrcode(_ sender: NSMenuItem) {

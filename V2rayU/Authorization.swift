@@ -51,7 +51,7 @@ class CommonAuthorization: NSObject {
                     "system_proxy_set":
                     [AuthorizationRightKey.rightName : CommonAuthorization.systemProxyAuthRightName,
                      AuthorizationRightKey.rightDefaultRule : ruleAdminRightsExtended,
-                     AuthorizationRightKey.rightDescription : "Codinn App want to change system proxy settings."]
+                     AuthorizationRightKey.rightDescription : "V2rayU App want to change system proxy settings."]
                 ]
         return sCommandInfo
     }

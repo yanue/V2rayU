@@ -32,7 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // check v2ray core
         V2rayCore().check()
         // generate plist
-        V2rayLaunch.generateLauchAgentPlist()
+        V2rayLaunch.generateLaunchAgentPlist()
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // check version
@@ -56,6 +56,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .autoLaunch) == nil {
             SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
             UserDefaults.setBool(forKey: .v2rayCoreVersion, value: true)
+        }
+        if UserDefaults.get(forKey: .runMode) == nil {
+            UserDefaults.set(forKey: .runMode, value: RunMode.manual.rawValue)
         }
         if V2rayServer.count() == 0 {
             // add default

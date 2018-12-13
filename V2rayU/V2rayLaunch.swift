@@ -8,6 +8,7 @@
 
 import Foundation
 import SystemConfiguration
+import Alamofire
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
@@ -18,10 +19,17 @@ let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 
+enum RunMode: String {
+    case global
+    case off
+    case manual
+    case pac
+}
+
 class V2rayLaunch: NSObject {
     static var authRef: AuthorizationRef?
 
-    static func generateLauchAgentPlist() {
+    static func generateLaunchAgentPlist() {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: launchAgentDirPath) {
@@ -73,9 +81,11 @@ class V2rayLaunch: NSObject {
         }
 
         // if enable system proxy
-        if UserDefaults.getBool(forKey: .globalMode) {
+        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
+
+        if runMode == .global || runMode == .pac {
             // close system proxy
-            V2rayLaunch.setSystemProxy(enabled: false)
+            V2rayLaunch.setSystemProxy(mode: .off)
         }
     }
 
@@ -94,8 +104,7 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func setSystemProxy(enabled: Bool, httpPort: String = "", sockPort: String = "") {
-        Swift.print("Socks proxy set: \(enabled)")
+    static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
 
         // setup policy database db
         CommonAuthorization.shared.setupAuthorizationRights(authRef: self.authRef!)
@@ -116,8 +125,8 @@ class V2rayLaunch: NSObject {
 
         var proxies = [NSObject: AnyObject]()
 
-        // proxy enabled set
-        if enabled {
+        // global proxy
+        if mode == .global {
             // socks
             if sockPort != "" && Int(sockPort) ?? 0 > 1024 {
                 proxies[kCFNetworkProxiesSOCKSEnable] = 1 as NSNumber
@@ -140,7 +149,17 @@ class V2rayLaunch: NSObject {
                 proxies[kCFNetworkProxiesHTTPSPort] = Int(httpPort)! as NSNumber
                 proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
             }
-        } else {
+        }
+
+        if mode == .pac {
+            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = "file://" + PACFilePath as AnyObject?
+            proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 1 as NSNumber
+        }
+
+        // restore system proxy setting in off or manual
+        if mode == .off || mode == .manual {
+            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = "" as AnyObject?
+            proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 0 as NSNumber
             // set enable 0
             proxies[kCFNetworkProxiesSOCKSEnable] = 0 as NSNumber
             proxies[kCFNetworkProxiesHTTPEnable] = 0 as NSNumber

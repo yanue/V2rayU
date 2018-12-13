@@ -21,10 +21,11 @@
         <customObject id="hcZ-V7-Dui" userLabel="MenuController" customClass="MenuController" customModule="V2rayU" customModuleProvider="target">
             <connections>
                 <outlet property="globalMode" destination="sZL-Iu-xAt" id="Iz8-oL-8dU"/>
+                <outlet property="manualMode" destination="hTu-27-5OL" id="lHt-aQ-ZNU"/>
+                <outlet property="pacMode" destination="NrZ-oB-7yd" id="d3C-wO-jAI"/>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="0Z8-41-eCi"/>
                 <outlet property="statusMenu" destination="9n3-TW-9ur" id="Hgg-sa-fM8"/>
                 <outlet property="toggleV2rayItem" destination="SML-EF-rdT" id="am7-ue-GN3"/>
-                <outlet property="v2rayRulesMode" destination="9EU-Qp-aR6" id="0O8-K6-2eP"/>
                 <outlet property="v2rayStatusItem" destination="P34-uO-Vwf" id="F8I-tt-922"/>
             </connections>
         </customObject>
@@ -40,16 +41,22 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="q2e-iz-ozm"/>
-                <menuItem title="V2ray Rules" state="on" id="9EU-Qp-aR6">
+                <menuItem title="Pac Mode" state="on" id="NrZ-oB-7yd">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="disableGlobalProxy:" target="hcZ-V7-Dui" id="cpv-nK-Got"/>
+                        <action selector="switchPacMode:" target="hcZ-V7-Dui" id="2bg-F0-a6l"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Global Mode" id="sZL-Iu-xAt">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="enableGlobalProxy:" target="hcZ-V7-Dui" id="12Y-dt-StO"/>
+                        <action selector="switchGlobalMode:" target="hcZ-V7-Dui" id="PFj-0a-XpI"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Manual Mode" id="hTu-27-5OL">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="switchManualMode:" target="hcZ-V7-Dui" id="xZS-LX-cKQ"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
@@ -82,25 +89,44 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
+                <menuItem title="Update PAC from GFW list" id="dwO-ij-CcR">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="updateGFWList:" target="hcZ-V7-Dui" id="L5I-SS-MDC"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Edit User Rules for Pac" id="eLc-0G-7He">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="editUserRulesForPAC:" target="hcZ-V7-Dui" id="VTZ-pq-Itb"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
                 <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openPreference:" target="hcZ-V7-Dui" id="XyD-cr-oYi"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Show Logs..." id="eLc-0G-7He">
+                <menuItem title="Show Logs..." id="52m-v5-TzY">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openLogs:" target="hcZ-V7-Dui" id="bGW-eH-KTP"/>
+                        <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
+                <menuItem title="Check for Updates..." id="adw-ht-RC4">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="checkForUpdate:" target="hcZ-V7-Dui" id="D9u-jO-ZhW"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Help" id="hWR-vJ-0Au">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="goHelp:" target="hcZ-V7-Dui" id="nSk-K4-IVg"/>
                     </connections>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="1fy-ix-7Ac"/>
                 <menuItem title="Quit" keyEquivalent="q" id="28U-8z-8lS" userLabel="Quit">
                     <connections>
                         <action selector="quitClicked:" target="hcZ-V7-Dui" id="eyG-94-Avh"/>

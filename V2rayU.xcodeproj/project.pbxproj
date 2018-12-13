@@ -27,15 +27,19 @@
 		667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667029D121AFB86E0079EF41 /* QrcodeWindow.xib */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
+		6683B1EC21C2AD33004A1C5F /* pac in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
+		6D6DF06E32A1DC263EDF1A8E /* PacUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF62A40417837EA751D88 /* PacUtils.swift */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF821D34F8B06A62F1936 /* Authorization.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
+		6D6DFB41BC9692C90A47F31B /* UserRulesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF587B6AF8CEE029E48BC /* UserRulesWindow.swift */; };
+		6D6DFD4A3A226788760150F8 /* UserRulesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF010124783F31646A895 /* UserRulesWindow.xib */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +60,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				6683B1EC21C2AD33004A1C5F /* pac in CopyFiles */,
 				667029D021AFB5730079EF41 /* v2ray-core in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +107,7 @@
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
+		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
@@ -109,7 +115,13 @@
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		66FEAD51217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceGeneral.xib; sourceTree = "<group>"; };
+		6D6DF085C3C411989C416D0D /* user-rule.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
 		6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QrcodeWindow.swift; sourceTree = "<group>"; };
+		6D6DF3C1564D0EBC5A99C9C1 /* gfwlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
+		6D6DF57E4CB6D7998F746068 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/UserRulesWindow.xib; sourceTree = "<group>"; };
+		6D6DF587B6AF8CEE029E48BC /* UserRulesWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserRulesWindow.swift; sourceTree = "<group>"; };
+		6D6DF62A40417837EA751D88 /* PacUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacUtils.swift; sourceTree = "<group>"; };
+		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF821D34F8B06A62F1936 /* Authorization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
@@ -181,6 +193,7 @@
 		664EB368216C9A5E00B6AE0D = {
 			isa = PBXGroup;
 			children = (
+				6683B1EA21C2AD1A004A1C5F /* pac */,
 				667029CF21AFB5730079EF41 /* v2ray-core */,
 				66FEAD44217D75D7009DECF9 /* Build */,
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
@@ -224,6 +237,9 @@
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
 				667029D121AFB86E0079EF41 /* QrcodeWindow.xib */,
 				6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */,
+				6D6DF62A40417837EA751D88 /* PacUtils.swift */,
+				6D6DF587B6AF8CEE029E48BC /* UserRulesWindow.swift */,
+				6D6DF010124783F31646A895 /* UserRulesWindow.xib */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -233,8 +249,19 @@
 			children = (
 				664FC05321A70C4300048FE3 /* build.plist */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
+				6D6DFD93CE866018306A090E /* pac */,
 			);
 			path = Build;
+			sourceTree = "<group>";
+		};
+		6D6DFD93CE866018306A090E /* pac */ = {
+			isa = PBXGroup;
+			children = (
+				6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */,
+				6D6DF3C1564D0EBC5A99C9C1 /* gfwlist.txt */,
+				6D6DF085C3C411989C416D0D /* user-rule.txt */,
+			);
+			path = pac;
 			sourceTree = "<group>";
 		};
 		956412AC8DEB3D3D182A5D49 /* Frameworks */ = {
@@ -391,6 +418,7 @@
 				66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
+				6D6DFD4A3A226788760150F8 /* UserRulesWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +517,8 @@
 				6D6DF6AEAA13C0DB0065BE3B /* Authorization.swift in Sources */,
 				6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */,
 				6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */,
+				6D6DF06E32A1DC263EDF1A8E /* PacUtils.swift in Sources */,
+				6D6DFB41BC9692C90A47F31B /* UserRulesWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,6 +563,14 @@
 				66FEAD51217EE14C009DECF9 /* Base */,
 			);
 			name = PreferenceGeneral.xib;
+			sourceTree = "<group>";
+		};
+		6D6DF010124783F31646A895 /* UserRulesWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DF57E4CB6D7998F746068 /* Base */,
+			);
+			name = UserRulesWindow.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
