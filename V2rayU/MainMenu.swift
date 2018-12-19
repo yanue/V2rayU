@@ -331,13 +331,10 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func showPacFile(_ sender: NSMenuItem) {
-        let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [PACRulesDirPath])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("showPacFile succeeded.")
-        } else {
-            NSLog("showPacFile failed.")
+        guard let url = URL(string: PACUrl) else {
+            return
         }
+        NSWorkspace.shared.open(url)
     }
 
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {

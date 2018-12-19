@@ -12,12 +12,15 @@ import Alamofire
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
+let LAUNCH_HTTP_PLIST = "yanue.v2rayu.http.plist" // simple http server
 let logFilePath = NSHomeDirectory() + "/Library/Logs/V2rayU.log"
 let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
+let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
+let httpServerPort = 18765
 
 enum RunMode: String {
     case global
@@ -36,21 +39,38 @@ class V2rayLaunch: NSObject {
             try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
         }
 
-        let arguments = ["./v2ray-core/v2ray", "-config", "config.json"]
+        // write launch agent
+        let agentArguments = ["./v2ray-core/v2ray", "-config", "config.json"]
 
-        let dict: NSMutableDictionary = [
+        let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_PLIST.replacingOccurrences(of: ".plist", with: ""),
             "WorkingDirectory": AppResourcesPath,
             "StandardOutPath": logFilePath,
             "StandardErrorPath": logFilePath,
-            "ProgramArguments": arguments,
+            "ProgramArguments": agentArguments,
             "KeepAlive": true,
             "RunAtLoad": true,
         ]
 
-        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
+        dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
 
-        dict.write(toFile: launchAgentPlistFile, atomically: true)
+        // write http simple server plist
+        let httpArguments = ["/usr/bin/python", "-m", "SimpleHTTPServer", String(httpServerPort)]
+
+        let dictHttp: NSMutableDictionary = [
+            "Label": LAUNCH_HTTP_PLIST.replacingOccurrences(of: ".plist", with: ""),
+            "WorkingDirectory": AppResourcesPath,
+            "StandardOutPath": logFilePath,
+            "StandardErrorPath": logFilePath,
+            "ProgramArguments": httpArguments,
+            "KeepAlive": true,
+            "RunAtLoad": true,
+        ]
+
+        dictHttp.write(toFile: launchHttpPlistFile, atomically: true)
+
+        // permission
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
     }
 
     static func Start() {
@@ -60,6 +80,7 @@ class V2rayLaunch: NSObject {
 
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchHttpPlistFile])
 
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
         task.waitUntilExit()
@@ -71,6 +92,8 @@ class V2rayLaunch: NSObject {
     }
 
     static func Stop() {
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+
         // cmd: /bin/launchctl unload /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
         task.waitUntilExit()
@@ -152,7 +175,7 @@ class V2rayLaunch: NSObject {
         }
 
         if mode == .pac {
-            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = "file://" + PACFilePath as AnyObject?
+            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = PACUrl as AnyObject
             proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 1 as NSNumber
         }
 
