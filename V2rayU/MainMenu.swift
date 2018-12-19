@@ -39,8 +39,6 @@ class MenuController: NSObject, NSMenuDelegate {
     override func awakeFromNib() {
         // Do any additional setup after loading the view.
         // initial auth ref
-        let error = AuthorizationCreate(nil, nil, [], &V2rayLaunch.authRef)
-        assert(error == errAuthorizationSuccess)
         let runMode = UserDefaults.get(forKey: .runMode) ?? "pac"
         switch runMode {
         case "pac":

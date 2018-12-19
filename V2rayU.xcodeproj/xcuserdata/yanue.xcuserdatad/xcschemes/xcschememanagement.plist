@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>V2rayUCmd.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 		<key>V2rayUHelper.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -32,21 +37,21 @@
 		<key>V2rayUTests.test.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<key>V2rayUTests.testDecodeUrl.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>4</integer>
 		</dict>
 		<key>V2rayUTests.testDecodeVmess.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
-			<integer>4</integer>
+			<integer>7</integer>
 		</dict>
 		<key>V2rayUTests.testInbound.xcscheme</key>
 		<dict>
@@ -71,6 +76,19 @@
 		<dict>
 			<key>orderHint</key>
 			<integer>18</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>66F4119A21CA33D1007AAC10</key>
+		<dict>
+			<key>primary</key>
+			<true />
+		</dict>
+		<key>66F411A521CA472A007AAC10</key>
+		<dict>
+			<key>primary</key>
+			<true />
 		</dict>
 	</dict>
 </dict>

@@ -30,8 +30,6 @@ enum RunMode: String {
 }
 
 class V2rayLaunch: NSObject {
-    static var authRef: AuthorizationRef?
-
     static func generateLaunchAgentPlist() {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
@@ -78,9 +76,12 @@ class V2rayLaunch: NSObject {
         // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
 
+        // reload
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchHttpPlistFile])
+
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchHttpPlistFile])
 
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
         task.waitUntilExit()
@@ -128,81 +129,12 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
-
-        // setup policy database db
-        CommonAuthorization.shared.setupAuthorizationRights(authRef: self.authRef!)
-
-        // copy rights
-        let rightName: String = CommonAuthorization.systemProxyAuthRightName
-        var authItem = AuthorizationItem(name: (rightName as NSString).utf8String!, valueLength: 0, value: UnsafeMutableRawPointer(bitPattern: 0), flags: 0)
-        var authRight: AuthorizationRights = AuthorizationRights(count: 1, items: &authItem)
-
-        let copyRightStatus = AuthorizationCopyRights(self.authRef!, &authRight, nil, [.extendRights, .interactionAllowed, .preAuthorize, .partialRights], nil)
-
-        Swift.print("AuthorizationCopyRights result: \(copyRightStatus), right name: \(rightName)")
-        assert(copyRightStatus == errAuthorizationSuccess)
-
-        // set system proxy
-        let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "systemProxySet" as CFString, nil, self.authRef)!
-        let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices)!
-
-        var proxies = [NSObject: AnyObject]()
-
-        // global proxy
-        if mode == .global {
-            // socks
-            if sockPort != "" && Int(sockPort) ?? 0 > 1024 {
-                proxies[kCFNetworkProxiesSOCKSEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesSOCKSProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesSOCKSPort] = Int(sockPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-            }
-
-            // check http port
-            if httpPort != "" && Int(httpPort) ?? 0 > 1024 {
-                // http
-                proxies[kCFNetworkProxiesHTTPEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesHTTPProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesHTTPPort] = Int(httpPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-
-                // https
-                proxies[kCFNetworkProxiesHTTPSEnable] = 1 as NSNumber
-                proxies[kCFNetworkProxiesHTTPSProxy] = "127.0.0.1" as AnyObject?
-                proxies[kCFNetworkProxiesHTTPSPort] = Int(httpPort)! as NSNumber
-                proxies[kCFNetworkProxiesExcludeSimpleHostnames] = 1 as NSNumber
-            }
+        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUCmd", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("setSystemProxy succeeded.")
+        } else {
+            NSLog("setSystemProxy failed.")
         }
-
-        if mode == .pac {
-            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = PACUrl as AnyObject
-            proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 1 as NSNumber
-        }
-
-        // restore system proxy setting in off or manual
-        if mode == .off || mode == .manual {
-            proxies[kCFNetworkProxiesProxyAutoConfigURLString] = "" as AnyObject?
-            proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 0 as NSNumber
-            // set enable 0
-            proxies[kCFNetworkProxiesSOCKSEnable] = 0 as NSNumber
-            proxies[kCFNetworkProxiesHTTPEnable] = 0 as NSNumber
-            proxies[kCFNetworkProxiesHTTPSEnable] = 0 as NSNumber
-        }
-
-        sets.allKeys!.forEach { (key) in
-            let dict = sets.object(forKey: key)!
-            let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
-
-            if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
-                SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetProxies)" as CFString, proxies as CFDictionary)
-            }
-        }
-
-        // commit to system preferences.
-        let commitRet = SCPreferencesCommitChanges(prefRef)
-        let applyRet = SCPreferencesApplyChanges(prefRef)
-        SCPreferencesSynchronize(prefRef)
-
-        Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
     }
 }
