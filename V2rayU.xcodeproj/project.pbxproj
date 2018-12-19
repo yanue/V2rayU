@@ -32,8 +32,8 @@
 		66F411AE21CA4771007AAC10 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F411AD21CA4771007AAC10 /* Auth.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66F411B221CA49F4007AAC10 /* v2ray-core in CopyFiles */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
-		66F411B321CA49FC007AAC10 /* V2rayUCmd in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F411A621CA472A007AAC10 /* V2rayUCmd */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
+		66F411B821CAB194007AAC10 /* V2rayUCmd in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F411A621CA472A007AAC10 /* V2rayUCmd */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
@@ -83,7 +83,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66F411B321CA49FC007AAC10 /* V2rayUCmd in CopyFiles */,
+				66F411B821CAB194007AAC10 /* V2rayUCmd in CopyFiles */,
 				66F411B221CA49F4007AAC10 /* v2ray-core in CopyFiles */,
 				66F411B121CA49EE007AAC10 /* pac in CopyFiles */,
 			);
@@ -902,6 +902,7 @@
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
@@ -914,6 +915,7 @@
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;

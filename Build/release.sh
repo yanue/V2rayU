@@ -29,10 +29,12 @@ function build() {
     xcodebuild -archivePath ${V2rayU_ARCHIVE} -exportArchive -exportPath ${V2rayU_RELEASE} -exportOptionsPlist ./build.plist
 
     echo "Cleaning up archive..."
-    rm -rf ${V2rayU_ARCHIVE}
+#    rm -rf ${V2rayU_ARCHIVE}
 
     chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
     chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
+    sudo chown root:admin "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/V2rayUCmd"
+    sudo chmod 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/V2rayUCmd"
 }
 
 function createDmg() {

@@ -139,17 +139,18 @@ class V2rayLaunch: NSObject {
 
         let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUCmd | awk '{print $3,$4}'"])
         NSLog("Permission is " + (res ?? ""))
-        if res == "root admin"{
+        if res == "root admin" {
             NSLog("Permission is ok")
             return
         }
 
         var error: NSDictionary?
         if let scriptObject = NSAppleScript(source: cmdAppleScript) {
-            if let output = scriptObject.executeAndReturnError(&error) {
-                NSLog("chmodPermission: " + (output.stringValue ?? ""))
+            if let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(
+                    &error) {
+                print(output.stringValue)
             } else if (error != nil) {
-                print("chmodPermission error: \(String(describing: error))")
+                print("error: \(error)")
             }
         } else {
             print("error scriptObject")

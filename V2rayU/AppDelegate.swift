@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let appleEventURL = URL(string: appleEventURLString)
+        _ = URL(string: appleEventURLString)
         // todo
     }
 

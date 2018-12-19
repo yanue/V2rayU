@@ -5,6 +5,6 @@
     <key>compileBitcode</key>  
     <false/>  
     <key>method</key>  
-    <string>mac-application</string>  
+    <string>development</string>
 </dict>  
 </plist>  
