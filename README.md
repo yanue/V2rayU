@@ -11,7 +11,7 @@ V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基�
 - **手动配置**: 支持在导入或未导入情况下手动配置主要参数
 - **分享二维码**: 支持v2ray及shadowsocks协议格式分享
 - **主动更新**: 支持主动更新到最新版
-- **全局模式**: 支持全局代理(有别于vpn,只是将代理信息更新到系统代理http,https,socks)
+- **支持模式**: 支持pac模式,手动代理模式,支持全局代理(有别于vpn,只是将代理信息更新到系统代理http,https,socks)
 - **支持4.0**: 支持手动切换到v2ray-core 4.0以上配置格式
 
 ### v2ray简介
@@ -61,7 +61,6 @@ cd /Applications/V2rayU.app/Contents/Resources/
 ```
 
 ### 待实现功能:
-	pac模式/manual模式
 	ADBlock-Rules
 	订阅功能
 	速度测试
