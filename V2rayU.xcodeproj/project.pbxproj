@@ -33,6 +33,7 @@
 		66F411B121CA49EE007AAC10 /* pac in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66F411B221CA49F4007AAC10 /* v2ray-core in CopyFiles */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B321CA49FC007AAC10 /* V2rayUCmd in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F411A621CA472A007AAC10 /* V2rayUCmd */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD432179A969009DECF9 /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD50217EE14C009DECF9 /* PreferenceGeneral.xib */; };
@@ -66,15 +67,6 @@
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		66F4119921CA33D1007AAC10 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
 		};
 		66F411A421CA472A007AAC10 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -133,10 +125,10 @@
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
-		66F4119B21CA33D1007AAC10 /* V2rayUHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		66F411A621CA472A007AAC10 /* V2rayUCmd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUCmd; sourceTree = BUILT_PRODUCTS_DIR; };
 		66F411A821CA472A007AAC10 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		66F411AD21CA4771007AAC10 /* Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
+		66F411B421CA8921007AAC10 /* cmd.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = cmd.sh; sourceTree = "<group>"; };
 		66FEAD422179A969009DECF9 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
@@ -176,13 +168,6 @@
 				667029CA21AF8E7A0079EF41 /* Sparkle.framework in Frameworks */,
 				66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */,
 				F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		66F4119821CA33D1007AAC10 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,7 +236,6 @@
 				664EB371216C9A5E00B6AE0D /* V2rayU.app */,
 				6604E43921798F2900E54AE1 /* V2rayULauncher.app */,
 				660C8C9F2181CBAA00896361 /* V2rayUTests.xctest */,
-				66F4119B21CA33D1007AAC10 /* V2rayUHelper */,
 				66F411A621CA472A007AAC10 /* V2rayUCmd */,
 			);
 			name = Products;
@@ -260,6 +244,7 @@
 		664EB373216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				66F411B421CA8921007AAC10 /* cmd.sh */,
 				6608D9B82182BBAC00A0E0DD /* v2ray */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
@@ -393,23 +378,6 @@
 			productReference = 664EB371216C9A5E00B6AE0D /* V2rayU.app */;
 			productType = "com.apple.product-type.application";
 		};
-		66F4119A21CA33D1007AAC10 /* V2rayUHelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 66F411A121CA33D1007AAC10 /* Build configuration list for PBXNativeTarget "V2rayUHelper" */;
-			buildPhases = (
-				66F4119721CA33D1007AAC10 /* Sources */,
-				66F4119821CA33D1007AAC10 /* Frameworks */,
-				66F4119921CA33D1007AAC10 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = V2rayUHelper;
-			productName = V2rayUHelper;
-			productReference = 66F4119B21CA33D1007AAC10 /* V2rayUHelper */;
-			productType = "com.apple.product-type.tool";
-		};
 		66F411A521CA472A007AAC10 /* V2rayUCmd */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66F411AC21CA472A007AAC10 /* Build configuration list for PBXNativeTarget "V2rayUCmd" */;
@@ -455,9 +423,6 @@
 							};
 						};
 					};
-					66F4119A21CA33D1007AAC10 = {
-						CreatedOnToolsVersion = 10.1;
-					};
 					66F411A521CA472A007AAC10 = {
 						CreatedOnToolsVersion = 10.1;
 					};
@@ -479,7 +444,6 @@
 				664EB370216C9A5E00B6AE0D /* V2rayU */,
 				6604E43821798F2900E54AE1 /* V2rayULauncher */,
 				660C8C9E2181CBAA00896361 /* V2rayUTests */,
-				66F4119A21CA33D1007AAC10 /* V2rayUHelper */,
 				66F411A521CA472A007AAC10 /* V2rayUCmd */,
 			);
 		};
@@ -507,6 +471,7 @@
 				667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
+				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
 				66FEAD54217EE14C009DECF9 /* PreferenceGeneral.xib in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
@@ -610,13 +575,6 @@
 				6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */,
 				6D6DF06E32A1DC263EDF1A8E /* PacUtils.swift in Sources */,
 				6D6DFB41BC9692C90A47F31B /* UserRulesWindow.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		66F4119721CA33D1007AAC10 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,30 +894,6 @@
 			};
 			name = Release;
 		};
-		66F4119F21CA33D1007AAC10 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		66F411A021CA33D1007AAC10 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
 		66F411AA21CA472A007AAC10 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1019,15 +953,6 @@
 			buildConfigurations = (
 				664EB380216C9A5F00B6AE0D /* Debug */,
 				664EB381216C9A5F00B6AE0D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		66F411A121CA33D1007AAC10 /* Build configuration list for PBXNativeTarget "V2rayUHelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				66F4119F21CA33D1007AAC10 /* Debug */,
-				66F411A021CA33D1007AAC10 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

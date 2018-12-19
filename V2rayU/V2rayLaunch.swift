@@ -22,6 +22,9 @@ let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let httpServerPort = 18765
 
+let cmdSh = AppResourcesPath + "/cmd.sh"
+let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
+
 enum RunMode: String {
     case global
     case off
@@ -125,6 +128,31 @@ class V2rayLaunch: NSObject {
             NSLog("open logs succeeded.")
         } else {
             NSLog("open logs failed.")
+        }
+    }
+
+    static func chmodCmdPermission() {
+        // Ensure launch agent directory is existed.
+        if !FileManager.default.fileExists(atPath: cmdSh) {
+            return
+        }
+
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUCmd | awk '{print $3,$4}'"])
+        NSLog("Permission is " + (res ?? ""))
+        if res == "root admin"{
+            NSLog("Permission is ok")
+            return
+        }
+
+        var error: NSDictionary?
+        if let scriptObject = NSAppleScript(source: cmdAppleScript) {
+            if let output = scriptObject.executeAndReturnError(&error) {
+                NSLog("chmodPermission: " + (output.stringValue ?? ""))
+            } else if (error != nil) {
+                print("chmodPermission error: \(String(describing: error))")
+            }
+        } else {
+            print("error scriptObject")
         }
     }
 

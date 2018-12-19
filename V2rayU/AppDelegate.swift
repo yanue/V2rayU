@@ -18,6 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        V2rayLaunch.chmodCmdPermission()
+
         // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == launcherAppIdentifier
