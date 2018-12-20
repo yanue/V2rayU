@@ -345,9 +345,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func editUserRulesForPAC(_ sender: NSMenuItem) {
-        if editUserRulesWinCtrl != nil {
-            editUserRulesWinCtrl.close()
-        }
+        editUserRulesWinCtrl.close()
         let ctrl = UserRulesWindowController()
         editUserRulesWinCtrl = ctrl
 

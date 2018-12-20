@@ -137,7 +137,7 @@ class V2rayLaunch: NSObject {
             return
         }
 
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUCmd | awk '{print $3,$4}'"])
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUTool | awk '{print $3,$4}'"])
         NSLog("Permission is " + (res ?? ""))
         if res == "root admin" {
             NSLog("Permission is ok")
@@ -146,11 +146,10 @@ class V2rayLaunch: NSObject {
 
         var error: NSDictionary?
         if let scriptObject = NSAppleScript(source: cmdAppleScript) {
-            if let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(
-                    &error) {
-                print(output.stringValue)
-            } else if (error != nil) {
-                print("error: \(error)")
+            let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(&error)
+            print(output.stringValue ?? "")
+            if (error != nil) {
+                print("error: \(String(describing: error))")
             }
         } else {
             print("error scriptObject")
@@ -158,7 +157,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
-        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUCmd", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
             NSLog("setSystemProxy succeeded.")

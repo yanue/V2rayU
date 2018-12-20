@@ -8,7 +8,7 @@
 
 cd `dirname "${BASH_SOURCE[0]}"`
 
-cmd="./V2rayUCmd"
+cmd="./V2rayUTool"
 
 sudo chown root:admin ${cmd}
 sudo chmod a+rx ${cmd}
