@@ -486,8 +486,9 @@ class V2rayConfig: NSObject {
         }
         streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
         var tls = TlsSettings()
+
+        tls.allowInsecure = self.streamTlsAllowInsecure
         if self.streamTlsServerName.count > 0 {
-            tls.allowInsecure = self.streamTlsAllowInsecure
             tls.serverName = self.streamTlsServerName
         }
 
