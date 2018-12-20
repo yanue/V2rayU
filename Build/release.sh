@@ -31,11 +31,8 @@ function build() {
     echo "Cleaning up archive..."
     rm -rf ${V2rayU_ARCHIVE}
 
-    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
-    chmod -R 777 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
-    sudo chown root:admin "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/V2rayUTool"
-    sudo chmod a+rx "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/V2rayUTool"
-    sudo chmod +s "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/V2rayUTool"
+    chmod -R 755 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
+    chmod -R 755 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
 }
 
 function createDmg() {
