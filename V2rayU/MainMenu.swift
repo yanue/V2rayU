@@ -382,6 +382,31 @@ class MenuController: NSObject, NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    @IBAction func copyExportCommand(_ sender: NSMenuItem) {
+        // Get the Http proxy config.
+        var httpPort = ""
+
+        let v2ray = V2rayServer.loadSelectedItem()
+
+        if v2ray != nil && v2ray!.isValid {
+            let cfg = V2rayConfig()
+            cfg.parseJson(jsonText: v2ray!.json)
+            httpPort = cfg.httpPort
+        } else {
+            return
+        }
+
+        // Format an export string.
+        let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);"
+
+        // Copy to paste board.
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(command, forType: NSPasteboard.PasteboardType.string)
+
+        // Show a toast notification.
+        noticeTip(title: "Export Command Copied.", subtitle: "", informativeText: command)
+    }
+
     @IBAction func scanQrcode(_ sender: NSMenuItem) {
         let uri: String = Scanner.scanQRCodeFromScreen()
         if uri.count > 0 {

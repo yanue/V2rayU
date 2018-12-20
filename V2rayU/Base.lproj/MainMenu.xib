@@ -89,6 +89,12 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
+                <menuItem title="Copy HTTP Proxy Shell Export Line" id="tBG-YP-XJr">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyExportCommand:" target="hcZ-V7-Dui" id="RET-i4-2bl"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Update PAC from GFW list" id="dwO-ij-CcR">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -114,16 +120,16 @@
                         <action selector="openPreference:" target="hcZ-V7-Dui" id="XyD-cr-oYi"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Show Logs..." id="52m-v5-TzY">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>
-                    </connections>
-                </menuItem>
                 <menuItem title="Check for Updates..." id="adw-ht-RC4">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="checkForUpdate:" target="hcZ-V7-Dui" id="D9u-jO-ZhW"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Show Logs..." id="52m-v5-TzY">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Help" id="hWR-vJ-0Au">

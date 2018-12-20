@@ -32,7 +32,7 @@
 		<key>V2rayULauncher.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>12</integer>
+			<integer>13</integer>
 		</dict>
 		<key>V2rayUTests.test.xcscheme</key>
 		<dict>
@@ -42,35 +42,35 @@
 		<key>V2rayUTests.testDecodeUrl.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<false />
 			<key>orderHint</key>
 			<integer>4</integer>
 		</dict>
 		<key>V2rayUTests.testDecodeVmess.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<false />
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
 		<key>V2rayUTests.testInbound.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<false />
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
 		<key>V2rayUTests.testOutbound.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<false />
 			<key>orderHint</key>
 			<integer>16</integer>
 		</dict>
 		<key>V2rayUTool.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>13</integer>
+			<integer>15</integer>
 		</dict>
 		<key>V2rayuHelper.xcscheme</key>
 		<dict>
@@ -88,12 +88,12 @@
 		<key>66F4119A21CA33D1007AAC10</key>
 		<dict>
 			<key>primary</key>
-			<true/>
+			<true />
 		</dict>
 		<key>66F411A521CA472A007AAC10</key>
 		<dict>
 			<key>primary</key>
-			<true/>
+			<true />
 		</dict>
 	</dict>
 </dict>
