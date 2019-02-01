@@ -18,7 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        V2rayLaunch.chmodCmdPermission()
 
         // Insert code here to initialize your application        
         let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
@@ -101,5 +100,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
         V2rayLaunch.Stop()
+        // restore system proxy
+        V2rayLaunch.setSystemProxy(mode: .restore)
     }
 }

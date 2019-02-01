@@ -26,6 +26,7 @@ class MenuController: NSObject, NSMenuDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var statusItemClicked: (() -> Void)?
     var configWindow: ConfigWindowController!
+    var lastRunMode: String = ""; // for backup system proxy
 
     @IBOutlet weak var pacMode: NSMenuItem!
     @IBOutlet weak var manualMode: NSMenuItem!
@@ -37,6 +38,11 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // when menu.xib loaded
     override func awakeFromNib() {
+        V2rayLaunch.chmodCmdPermission()
+
+        // backup system proxy when init
+        V2rayLaunch.setSystemProxy(mode: .backup)
+
         // Do any additional setup after loading the view.
         // initial auth ref
         let runMode = UserDefaults.get(forKey: .runMode) ?? "pac"
@@ -118,6 +124,8 @@ class MenuController: NSObject, NSMenuDelegate {
         self.setStatusOff()
         // stop launch
         V2rayLaunch.Stop()
+        // restore system proxy
+        V2rayLaunch.setSystemProxy(mode: .restore)
     }
 
     // start v2ray core
@@ -280,17 +288,20 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func switchManualMode(_ sender: NSMenuItem) {
         // disable
         switchRunMode(runMode: .manual)
+        lastRunMode = RunMode.manual.rawValue
     }
 
     @IBAction func switchPacMode(_ sender: NSMenuItem) {
         // switch mode
         switchRunMode(runMode: .pac)
+        lastRunMode = RunMode.pac.rawValue
     }
 
     // MARK: - actions
     @IBAction func switchGlobalMode(_ sender: NSMenuItem) {
         // switch mode
         switchRunMode(runMode: .global)
+        lastRunMode = RunMode.global.rawValue
     }
 
     func switchRunMode(runMode: RunMode) {
@@ -311,6 +322,12 @@ class MenuController: NSObject, NSMenuDelegate {
             cfg.parseJson(jsonText: v2ray!.json)
             sockPort = cfg.socksPort
             httpPort = cfg.httpPort
+        }
+
+        // manual mode
+        if lastRunMode == RunMode.manual.rawValue {
+            // backup first
+            V2rayLaunch.setSystemProxy(mode: .backup)
         }
 
         // global

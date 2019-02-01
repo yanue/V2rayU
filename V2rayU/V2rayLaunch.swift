@@ -30,6 +30,8 @@ enum RunMode: String {
     case off
     case manual
     case pac
+    case backup
+    case restore
 }
 
 class V2rayLaunch: NSObject {
@@ -106,14 +108,6 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("Stop v2ray-core failed.")
         }
-
-        // if enable system proxy
-        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
-
-        if runMode == .global || runMode == .pac {
-            // close system proxy
-            V2rayLaunch.setSystemProxy(mode: .off)
-        }
     }
 
     static func OpenLogs() {
@@ -160,9 +154,9 @@ class V2rayLaunch: NSObject {
         let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
-            NSLog("setSystemProxy succeeded.")
+            NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
         } else {
-            NSLog("setSystemProxy failed.")
+            NSLog("setSystemProxy " + mode.rawValue + " failed.")
         }
     }
 }
