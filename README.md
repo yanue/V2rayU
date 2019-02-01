@@ -14,6 +14,13 @@ V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基�
 - **支持模式**: 支持pac模式,手动代理模式,支持全局代理(有别于vpn,只是将代理信息更新到系统代理http,https,socks)
 - **支持4.0**: 支持手动切换到v2ray-core 4.0以上配置格式
 
+### 下载安装
+- 方式一: 使用homebrew命令安装
+```
+  brew cask install v2rayu
+```
+- 方式二: 下载最新版安装: [https://github.com/yanue/V2rayU/releases](https://github.com/yanue/V2rayU/releases)
+
 ### v2ray简介
    V2Ray 是 Project V 下的一个工具。Project V 包含一系列工具，帮助你打造专属的定制网络体系。而 V2Ray 属于最核心的一个。
 简单地说，V2Ray 是一个与 Shadowsocks 类似的代理软件，但比Shadowsocks更具优势
