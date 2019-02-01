@@ -21,13 +21,13 @@ let jsSourceFormatConfig =
             if (!deStr) {
                 return "error: cannot decode uri"
             }
-        
+
             try {
                 var obj = JSON.parse(deStr);
                 if (!obj) {
                     return "error: cannot parse json"
                 }
-        
+
                 var v2rayConfig = {};
                 // ordered keys
                 v2rayConfig["log"] = obj.log;
@@ -85,6 +85,7 @@ class V2rayConfig: NSObject {
     var streamWs = WsSettings()
     var streamH2 = HttpSettings()
     var streamQuic = QuicSettings()
+    var routing = V2rayRouting()
 
     // tls
     var streamTlsSecurity = "none"
@@ -601,10 +602,83 @@ class V2rayConfig: NSObject {
         // ------------ parse outbound end -------------------------------------------
 
         if json["routing"].dictionaryValue.count > 0 {
-//            return "missing routing"
+            v2ray.routing = self.parseRouting(jsonParams: json["routing"]);
         }
 
         v2ray.transport = self.parseTransport(steamJson: json["transport"])
+    }
+
+    func parseRouting(jsonParams: JSON) -> (V2rayRouting) {
+        var routing = V2rayRouting()
+        routing.settings.rules = []
+
+        if jsonParams["strategy"].stringValue.count > 0 {
+            routing.strategy = jsonParams["strategy"].stringValue;
+        }
+
+        if jsonParams["settings"].exists() {
+
+            if (V2rayRoutingSetting.domainStrategy(rawValue: jsonParams["settings"]["domainStrategy"].stringValue) != nil) {
+                routing.settings.domainStrategy = V2rayRoutingSetting.domainStrategy(rawValue: jsonParams["settings"]["domainStrategy"].stringValue)!
+            }
+
+            if jsonParams["settings"]["rules"].arrayValue.count > 0 {
+                for subJson in jsonParams["settings"]["rules"].arrayValue {
+                    var rule = V2rayRoutingSettingRule()
+                    // reset
+                    rule.type = nil;
+                    rule.outboundTag = nil;
+                    rule.domain = nil;
+                    rule.ip = nil;
+
+                    if (subJson["type"].stringValue.count > 0) {
+                        rule.type = subJson["type"].stringValue
+                    }
+                    if (subJson["outboundTag"].stringValue.count > 0) {
+                        rule.outboundTag = subJson["outboundTag"].stringValue
+                    }
+                    if (subJson["domain"].arrayValue.count > 0) {
+                        rule.domain = subJson["domain"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    if (subJson["ip"].arrayValue.count > 0) {
+                        rule.ip = subJson["ip"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    if (subJson["port"].stringValue.count > 0) {
+                        rule.port = subJson["port"].stringValue
+                    }
+                    if (subJson["network"].stringValue.count > 0) {
+                        rule.network = subJson["network"].stringValue
+                    }
+                    if (subJson["source"].arrayValue.count > 0) {
+                        rule.source = subJson["source"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    if (subJson["user"].arrayValue.count > 0) {
+                        rule.user = subJson["user"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    if (subJson["inboundTag"].arrayValue.count > 0) {
+                        rule.inboundTag = subJson["inboundTag"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    if (subJson["protocol"].arrayValue.count > 0) {
+                        rule.`protocol` = subJson["protocol"].arrayValue.map {
+                            $0.stringValue
+                        }
+                    }
+                    routing.settings.rules.append(rule)
+                }
+            }
+        }
+
+        return routing
     }
 
     // parse inbound from json

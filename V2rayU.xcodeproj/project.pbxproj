@@ -39,6 +39,8 @@
 		6D6DF06E32A1DC263EDF1A8E /* PacUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF62A40417837EA751D88 /* PacUtils.swift */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
+		6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFCE2F5044A1164CB14E3 /* tmp1.json */; };
+		6D6DF872C0DECC082122D783 /* tmp.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8E42F7E29CCBEFF5468 /* tmp.json */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
 		6D6DFB41BC9692C90A47F31B /* UserRulesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF587B6AF8CEE029E48BC /* UserRulesWindow.swift */; };
 		6D6DFD4A3A226788760150F8 /* UserRulesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF010124783F31646A895 /* UserRulesWindow.xib */; };
@@ -148,6 +150,8 @@
 		6D6DF62A40417837EA751D88 /* PacUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacUtils.swift; sourceTree = "<group>"; };
 		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
+		6D6DF8E42F7E29CCBEFF5468 /* tmp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp.json; sourceTree = "<group>"; };
+		6D6DFCE2F5044A1164CB14E3 /* tmp1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp1.json; sourceTree = "<group>"; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		6D6DFFB0110E2442FC8337A5 /* format.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = format.js; sourceTree = "<group>"; };
 		8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
@@ -242,6 +246,8 @@
 				664EB372216C9A5E00B6AE0D /* Products */,
 				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
+				6D6DF8E42F7E29CCBEFF5468 /* tmp.json */,
+				6D6DFCE2F5044A1164CB14E3 /* tmp1.json */,
 			);
 			sourceTree = "<group>";
 		};
@@ -486,6 +492,8 @@
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6D6DFD4A3A226788760150F8 /* UserRulesWindow.xib in Resources */,
+				6D6DF872C0DECC082122D783 /* tmp.json in Resources */,
+				6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

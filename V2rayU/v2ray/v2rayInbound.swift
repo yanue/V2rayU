@@ -75,7 +75,11 @@ extension V2rayInbound {
         try container.encode(port, forKey: .port)
         try container.encode(listen, forKey: .listen)
         try container.encode(`protocol`, forKey: .`protocol`)
-        try container.encode(tag, forKey: .tag)
+
+        // ignore nil
+        if tag != nil {
+            try container.encode(tag, forKey: .tag)
+        }
 
         // ignore nil
         if streamSettings != nil {
@@ -134,7 +138,7 @@ struct V2rayInboundHttp: Codable {
     var timeout: Int = 360
     var allowTransparent: Bool?
     var userLevel: Int?
-    var accounts:[V2rayInboundHttpAccount]?
+    var accounts: [V2rayInboundHttpAccount]?
 }
 
 struct V2rayInboundHttpAccount: Codable {

@@ -112,6 +112,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
         }
+
+        self.configText.isAutomaticQuoteSubstitutionEnabled = false
     }
 
     override func windowDidLoad() {
