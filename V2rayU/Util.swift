@@ -27,6 +27,8 @@ extension UserDefaults {
         case autoLaunch
         // pac|manual|global
         case runMode
+        // use rules
+        case userRules
     }
 
     static func setBool(forKey key: KEY, value: Bool) {

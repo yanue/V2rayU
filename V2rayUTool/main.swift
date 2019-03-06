@@ -126,7 +126,7 @@ class V2rayUTool: NSObject {
             let commitRet = SCPreferencesCommitChanges(prefRef)
             let applyRet = SCPreferencesApplyChanges(prefRef)
             SCPreferencesSynchronize(prefRef)
-            //            AuthorizationFree(authRef, kAuthorizationFlagDefaults)
+            // AuthorizationFree(authRef, kAuthorizationFlagDefaults)
             Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
         }
     }

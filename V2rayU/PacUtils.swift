@@ -39,6 +39,12 @@ func GeneratePACFile() -> Bool {
             let str = String(data: data, encoding: String.Encoding.utf8)
             var lines = str!.components(separatedBy: CharacterSet.newlines)
 
+            // read userRules from UserDefaults
+            let userRules = UserDefaults.get(forKey: .userRules)
+            if userRules != nil {
+                try userRules!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
+            }
+
             do {
                 let userRuleStr = try String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
                 let userRuleLines = userRuleStr.components(separatedBy: CharacterSet.newlines)
@@ -47,7 +53,6 @@ func GeneratePACFile() -> Bool {
             } catch {
                 NSLog("Not found user-rule.txt")
             }
-
             // Filter empty and comment lines
             lines = lines.filter({ (s: String) -> Bool in
                 if s.isEmpty {

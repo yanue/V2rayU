@@ -18,8 +18,14 @@ class UserRulesWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
 
-        let str = try? String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
-        userRulesView.string = str!
+        // read userRules from UserDefaults
+        let txt = UserDefaults.get(forKey: .userRules)
+        if txt != nil {
+            userRulesView.string = txt!
+        } else {
+            let str = try? String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
+            userRulesView.string = str!
+        }
     }
 
     @IBAction func didCancel(_ sender: AnyObject) {
@@ -29,6 +35,9 @@ class UserRulesWindowController: NSWindowController {
     @IBAction func didOK(_ sender: AnyObject) {
         if let str = userRulesView?.string {
             do {
+                // save user rules into UserDefaults
+                UserDefaults.set(forKey: .userRules, value: str)
+
                 try str.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
 
                 if GeneratePACFile() {
