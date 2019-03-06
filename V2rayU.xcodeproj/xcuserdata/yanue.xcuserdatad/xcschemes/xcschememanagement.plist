@@ -27,7 +27,7 @@
 		<key>V2rayULauncher.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>12</integer>
+			<integer>13</integer>
 		</dict>
 		<key>V2rayUTests.test.xcscheme</key>
 		<dict>
@@ -62,6 +62,11 @@
 			<key>orderHint</key>
 			<integer>16</integer>
 		</dict>
+		<key>V2rayUTests.testV2ray.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
 		<key>V2rayUTool.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
@@ -76,11 +81,6 @@
 		<dict>
 			<key>orderHint</key>
 			<integer>20</integer>
-		</dict>
-		<key>V2rayUTests.testV2ray.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>3</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>

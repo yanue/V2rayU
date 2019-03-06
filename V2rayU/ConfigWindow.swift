@@ -153,19 +153,21 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         case 1:
             // get seleted index
             let idx = self.serversTableView.selectedRow
-
             // remove
             V2rayServer.remove(idx: idx)
-
-            // reload
-            self.serversTableView.reloadData()
 
             // selected prev row
             let cnt: Int = V2rayServer.count()
             var rowIndex: Int = idx - 1
-            if rowIndex < 0 {
-                rowIndex = cnt - 1
+            if idx > 0 && idx < cnt {
+                rowIndex = idx
             }
+
+            // selected row
+            self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+            // reload
+            self.serversTableView.reloadData()
+
             if rowIndex >= 0 {
                 self.loadJsonData(rowIndex: rowIndex)
             } else {
@@ -220,6 +222,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     // switch to import
     func switchToImportView() {
+        // reset error
+        self.errTip.stringValue = ""
+
         self.exportData()
 
         v2rayConfig.checkManualValid()

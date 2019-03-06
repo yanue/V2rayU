@@ -65,7 +65,7 @@ class V2rayConfig: NSObject {
     // base
     var logLevel = "info"
     var socksPort = "1080"
-    var httpPort = "1086"
+    var httpPort = "1087"
     var enableUdp = true
     var enableMux = true
     var mux = 8
@@ -160,7 +160,7 @@ class V2rayConfig: NSObject {
                 var inbounds: [V2rayInbound] = []
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http {
-                        item.port = self.httpPort.count > 0 ? self.httpPort : "1086"
+                        item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
                         item.port = self.socksPort.count > 0 ? self.socksPort : "1080"
@@ -328,6 +328,8 @@ class V2rayConfig: NSObject {
                 self.isValid = true
             }
         }
+        // reset error first
+        self.error = ""
         // check main outbound
         switch self.serverProtocol {
         case V2rayProtocolOutbound.vmess.rawValue:
