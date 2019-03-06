@@ -163,8 +163,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 rowIndex = idx
             }
 
-            // selected row
-            self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+            // fix
+            if cnt > 1 {
+                // selected row
+                self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+            }
+
             // reload
             self.serversTableView.reloadData()
 
