@@ -134,11 +134,13 @@ class MenuController: NSObject, NSMenuDelegate {
 
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
+            setStatusOff()
             return
         }
 
         if !v2ray.isValid {
             noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
+            setStatusOff()
             return
         }
 
