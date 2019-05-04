@@ -13,8 +13,9 @@ import Sparkle
 
 let V2rayUpdater = SUUpdater()
 
-final class PreferenceGeneralViewController: NSViewController, Preferenceable {
-    let toolbarItemTitle = "General"
+final class PreferenceGeneralViewController: NSViewController, PreferencePane {
+    let preferencePaneIdentifier = PreferencePane.Identifier.generalTab
+    let preferencePaneTitle = "General"
     let toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
 
     @IBOutlet weak var CopyrightLabel: NSTextField!
@@ -82,15 +83,5 @@ final class PreferenceGeneralViewController: NSViewController, Preferenceable {
     @IBAction func checkVersion(_ sender: NSButton) {
         // need set SUFeedURL into plist
         V2rayUpdater.checkForUpdates(sender)
-    }
-}
-
-class LinkButton: NSButton {
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    override func resetCursorRects() {
-        addCursorRect(self.bounds, cursor: .pointingHand)
     }
 }

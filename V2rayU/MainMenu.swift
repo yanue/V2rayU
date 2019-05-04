@@ -12,9 +12,18 @@ import ServiceManagement
 import Preferences
 
 let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
+
+extension PreferencePane.Identifier {
+    static let generalTab = Identifier("generalTab")
+    static let subscriptTab = Identifier("subscriptTab")
+    static let pacTab = Identifier("pacTab")
+}
+
 let preferencesWindowController = PreferencesWindowController(
-        viewControllers: [
+        preferencePanes: [
             PreferenceGeneralViewController(),
+            PreferenceSubscriptViewController(),
+            PreferencePacController()
         ]
 )
 var qrcodeWindow = QrcodeWindowController()
@@ -174,8 +183,16 @@ class MenuController: NSObject, NSMenuDelegate {
         NSApplication.shared.terminate(self)
     }
 
-    @IBAction func openPreference(_ sender: NSMenuItem) {
-        preferencesWindowController.showWindow()
+    @IBAction func openPreferenceGeneral(_ sender: NSMenuItem) {
+        preferencesWindowController.show(preferencePane: .generalTab)
+    }
+
+    @IBAction func openPreferenceSubscript(_ sender: NSMenuItem) {
+        preferencesWindowController.show(preferencePane: .subscriptTab)
+    }
+
+    @IBAction func openPreferencePac(_ sender: NSMenuItem) {
+        preferencesWindowController.show(preferencePane: .pacTab)
     }
 
     // switch server
@@ -347,30 +364,9 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.setSystemProxy(mode: runMode)
     }
 
-    @IBAction func showPacFile(_ sender: NSMenuItem) {
-        guard let url = URL(string: PACUrl) else {
-            return
-        }
-        NSWorkspace.shared.open(url)
-    }
-
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
         // need set SUFeedURL into plist
         V2rayUpdater.checkForUpdates(sender)
-    }
-
-    @IBAction func updateGFWList(_ sender: NSMenuItem) {
-        UpdatePACFromGFWList()
-    }
-
-    @IBAction func editUserRulesForPAC(_ sender: NSMenuItem) {
-        editUserRulesWinCtrl.close()
-        let ctrl = UserRulesWindowController()
-        editUserRulesWinCtrl = ctrl
-
-        ctrl.showWindow(self)
-        NSApp.activate(ignoringOtherApps: true)
-        ctrl.window?.makeKeyAndOrderFront(self)
     }
 
     @IBAction func generateQrcode(_ sender: NSMenuItem) {

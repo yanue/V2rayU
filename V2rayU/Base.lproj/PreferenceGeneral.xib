@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -274,7 +274,7 @@
                 <constraint firstItem="e05-pp-m5L" firstAttribute="top" secondItem="Te4-BT-hGI" secondAttribute="bottom" constant="6" id="zwg-kq-8dg"/>
                 <constraint firstItem="Te4-BT-hGI" firstAttribute="centerY" secondItem="5SZ-ig-pGf" secondAttribute="centerY" id="zzA-NQ-YsC"/>
             </constraints>
-            <point key="canvasLocation" x="-207" y="-183.5"/>
+            <point key="canvasLocation" x="-190" y="-175"/>
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <userDefaultsController representsSharedInstance="YES" id="HAt-Ds-MVV"/>

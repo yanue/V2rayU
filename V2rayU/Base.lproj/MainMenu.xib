@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -70,6 +70,19 @@
                         <action selector="openConfig:" target="hcZ-V7-Dui" id="cu6-mU-Y02"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Subscribe..." id="JuC-lf-LpQ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openPreferenceSubscript:" target="hcZ-V7-Dui" id="Xax-Nj-ygb"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Pac File..." id="8ps-CD-zNp">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openPreferencePac:" target="hcZ-V7-Dui" id="q2a-9U-SCe"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="4r0-fk-xMy"/>
                 <menuItem title="Import Server From Pasteboard" toolTip="ss:// or vmess://" id="Kct-KD-qPN">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -88,6 +101,7 @@
                         <action selector="generateQrcode:" target="hcZ-V7-Dui" id="cUu-eO-w0Z"/>
                     </connections>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="gWJ-yg-BaW"/>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
                 <menuItem title="Copy HTTP Proxy Shell Export Line" id="tBG-YP-XJr">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -95,29 +109,11 @@
                         <action selector="copyExportCommand:" target="hcZ-V7-Dui" id="RET-i4-2bl"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Update PAC from GFW list" id="dwO-ij-CcR">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="updateGFWList:" target="hcZ-V7-Dui" id="L5I-SS-MDC"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Edit User Rules for Pac" id="eLc-0G-7He">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="editUserRulesForPAC:" target="hcZ-V7-Dui" id="VTZ-pq-Itb"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Show Pac File" id="Lib-Oz-o5W">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="showPacFile:" target="hcZ-V7-Dui" id="QEm-Fq-Vmt"/>
-                    </connections>
-                </menuItem>
                 <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
                 <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openPreference:" target="hcZ-V7-Dui" id="XyD-cr-oYi"/>
+                        <action selector="openPreferenceGeneral:" target="hcZ-V7-Dui" id="ak7-LN-QXy"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Check for Updates..." id="adw-ht-RC4">

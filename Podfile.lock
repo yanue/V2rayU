@@ -1,13 +1,13 @@
 PODS:
   - Alamofire (4.7.3)
-  - Preferences (0.2.0)
+  - Preferences (0.2.1)
   - QRCoder (1.0.0)
   - Sparkle (1.20.0)
   - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire
-  - Preferences
+  - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
   - SwiftyJSON
@@ -15,18 +15,26 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
-    - Preferences
     - QRCoder
     - Sparkle
     - SwiftyJSON
 
+EXTERNAL SOURCES:
+  Preferences:
+    :git: https://github.com/sindresorhus/Preferences.git
+
+CHECKOUT OPTIONS:
+  Preferences:
+    :commit: fe835d32555e0d42d712980d821e75599eeabdbb
+    :git: https://github.com/sindresorhus/Preferences.git
+
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  Preferences: ebc036a176a298cde835155c73251173768a2f8d
+  Preferences: e56d1ec401c0403921c2afd5dba1fd7c3550cfe2
   QRCoder: 488f6869fb89ffcc3de3b4de2dabd200a6573f3c
   Sparkle: 48999e7ee032f05ca05e28451eadf4af8ede6b44
   SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: c8bfc44adeae40100cae3f20ce703eaa6666d947
+PODFILE CHECKSUM: ff613ddf19e8680a09a0c3fe80f114482d26b8fc
 
-COCOAPODS: 1.6.0.beta.1
+COCOAPODS: 1.6.1
