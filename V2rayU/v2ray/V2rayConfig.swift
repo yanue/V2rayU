@@ -378,19 +378,6 @@ class V2rayConfig: NSObject {
                 self.error = "missing socks.port";
                 return
             }
-            if self.serverSocks5.users.count > 0 {
-                if self.serverSocks5.users[0].user.count == 0 {
-                    self.error = "missing socks.users[0].user";
-                    return
-                }
-                if self.serverSocks5.users[0].pass.count == 0 {
-                    self.error = "missing socks.users[0].pass";
-                    return
-                }
-            } else {
-                self.error = "missing socks.users";
-                return
-            }
             break
         default:
             self.error = "missing outbound.protocol";
@@ -400,29 +387,12 @@ class V2rayConfig: NSObject {
         // check stream setting
         switch self.streamNetwork {
         case V2rayStreamSettings.network.h2.rawValue:
-            if self.streamH2.host.count > 0 {
-//                if self.streamH2.host[0].count == 0 {
-//                    self.error = "missing streamSettings.httpSettings.host";
-//                    return
-//                }
-            } else {
-//                self.error = "missing streamSettings.httpSettings.host";
-//                return
-            }
             if self.streamH2.path.count == 0 {
                 self.error = "missing streamSettings.httpSettings.path";
                 return
             }
             break
         case V2rayStreamSettings.network.ws.rawValue:
-            if self.streamWs.path.count == 0 {
-//                self.error = "missing streamSettings.wsSettings.path";
-//                return
-            }
-            if self.streamWs.headers.host.count == 0 {
-//                self.error = "missing streamSettings.httpSettings.host";
-//                return
-            }
             break
         default:
             break
@@ -902,6 +872,15 @@ class V2rayConfig: NSObject {
                 settingFreedom.redirect = jsonParams["settings"]["redirect"].stringValue
                 // set into outbound
                 v2rayOutbound.settingFreedom = settingFreedom
+                break
+
+            case .dns:
+                var settingDns = V2rayOutboundDns()
+                settingDns.network = jsonParams["settings"]["network"].stringValue
+                settingDns.address = jsonParams["settings"]["address"].stringValue
+                settingDns.port = jsonParams["settings"]["port"].intValue
+                // set into outbound
+                v2rayOutbound.settingDns = settingDns
                 break
 
             case .shadowsocks:

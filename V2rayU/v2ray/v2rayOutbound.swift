@@ -15,6 +15,7 @@ enum V2rayProtocolOutbound: String, Codable {
     case shadowsocks
     case socks
     case vmess
+    case dns
 }
 
 struct V2rayOutbound: Codable {
@@ -30,6 +31,7 @@ struct V2rayOutbound: Codable {
     var settingShadowsocks: V2rayOutboundShadowsocks?
     var settingSocks: V2rayOutboundSocks?
     var settingVMess: V2rayOutboundVMess?
+    var settingDns: V2rayOutboundDns?
 
     enum CodingKeys: String, CodingKey {
         case sendThrough
@@ -86,6 +88,9 @@ extension V2rayOutbound {
         case .vmess:
             settingVMess = try container.decode(V2rayOutboundVMess.self, forKey: CodingKeys.settings)
             break
+        case .dns:
+            settingDns = try container.decode(V2rayOutboundDns.self, forKey: CodingKeys.settings)
+            break
         }
     }
 
@@ -130,6 +135,9 @@ extension V2rayOutbound {
             break
         case .freedom:
             try container.encode(self.settingFreedom, forKey: .settings)
+            break
+        case .dns:
+            try container.encode(self.settingDns, forKey: .settings)
             break
         }
     }
@@ -204,4 +212,10 @@ struct V2rayOutboundVMessUser: Codable {
     var level: Int = 0
     // V2rayOutboundVMessSecurity
     var security: String = "auto" // aes-128-gcm/chacha20-poly1305/auto/none
+}
+
+struct V2rayOutboundDns: Codable {
+    var network: String = "" // "tcp" | "udp" | ""
+    var address: String = ""
+    var port: Int?
 }
