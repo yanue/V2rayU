@@ -125,6 +125,11 @@ class V2rayLaunch: NSObject {
         }
     }
 
+    static func ClearLogs(){
+        let txt = ""
+        try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+    }
+    
     static func chmodCmdPermission() {
         // Ensure launch agent directory is existed.
         if !FileManager.default.fileExists(atPath: cmdSh) {

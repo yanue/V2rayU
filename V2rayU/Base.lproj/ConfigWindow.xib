@@ -1560,7 +1560,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="76o-eU-kIf">
-                        <rect key="frame" x="60" y="117" width="62" height="17"/>
+                        <rect key="frame" x="60" y="100" width="62" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="show log" bezelStyle="inline" alignment="center" borderStyle="border" inset="2" id="OQK-lm-eg7">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1588,6 +1588,17 @@ Gw
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7QJ-vW-5cA">
+                        <rect key="frame" x="59" y="68" width="63" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="roundRect" title="clear log" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="vIh-Rv-xOy">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="cellTitle"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearLogs:" target="-2" id="9eR-ps-K8R"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <accessibility identifier="ConfigWindow"/>

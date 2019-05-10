@@ -708,7 +708,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func openLogs(_ sender: NSButton) {
         V2rayLaunch.OpenLogs()
     }
-
+    
+    @IBAction func clearLogs(_ sender: NSButton) {
+        V2rayLaunch.ClearLogs()
+    }
+    
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
         menuController.hideDock()
