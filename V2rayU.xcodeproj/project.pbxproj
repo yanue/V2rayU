@@ -40,6 +40,7 @@
 		6D6DF1435448FBC0AB7C4F38 /* PreferencePac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF673FFA882C3BA020E81 /* PreferencePac.swift */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF3134D758ABD6291E441 /* PreferenceSubscript.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFFD4C4B97F802A8DD696 /* PreferenceSubscript.xib */; };
+		6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8F5112A8407EE959998 /* .gitignore */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
 		6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFCE2F5044A1164CB14E3 /* tmp1.json */; };
 		6D6DF872C0DECC082122D783 /* tmp.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8E42F7E29CCBEFF5468 /* tmp.json */; };
@@ -157,6 +158,7 @@
 		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		6D6DF8E42F7E29CCBEFF5468 /* tmp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp.json; sourceTree = "<group>"; };
+		6D6DF8F5112A8407EE959998 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
 		6D6DFCE2F5044A1164CB14E3 /* tmp1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp1.json; sourceTree = "<group>"; };
 		6D6DFD2AAFDE4C3FC0C9273A /* PreferenceSubscript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSubscript.swift; sourceTree = "<group>"; };
 		6D6DFD8CCE8EAB98D197FAA9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencePac.xib; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
 				6D6DF8E42F7E29CCBEFF5468 /* tmp.json */,
 				6D6DFCE2F5044A1164CB14E3 /* tmp1.json */,
+				6D6DF8F5112A8407EE959998 /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -508,6 +511,7 @@
 				6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */,
 				6D6DF3134D758ABD6291E441 /* PreferenceSubscript.xib in Resources */,
 				6D6DF87A7E73D9096A72160D /* PreferencePac.xib in Resources */,
+				6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

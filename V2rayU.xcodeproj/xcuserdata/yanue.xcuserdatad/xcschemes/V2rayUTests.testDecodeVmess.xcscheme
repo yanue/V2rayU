@@ -37,6 +37,11 @@
                BlueprintName = "V2rayUTests"
                ReferencedContainer = "container:V2rayU.xcodeproj">
             </BuildableReference>
+            <SelectedTests>
+               <Test
+                  Identifier = "V2rayUTests/testDecodeVmess">
+               </Test>
+            </SelectedTests>
          </TestableReference>
       </Testables>
       <AdditionalOptions>
