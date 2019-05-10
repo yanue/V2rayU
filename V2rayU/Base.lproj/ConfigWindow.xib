@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -174,7 +174,7 @@ Gw
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Import" identifier="Import" id="BS9-X1-ueN">
-                                <view key="view" ambiguous="YES" id="Ab3-ML-cu8">
+                                <view key="view" id="Ab3-ML-cu8">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -261,6 +261,10 @@ Gw
                                                 </subviews>
                                                 <color key="backgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
+                                            <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="vUW-Td-Jdj">
+                                                <rect key="frame" x="-100" y="-100" width="375" height="16"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </scroller>
                                             <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="PcW-ea-yMr">
                                                 <rect key="frame" x="360" y="1" width="16" height="426"/>
                                                 <autoresizingMask key="autoresizingMask"/>
@@ -270,7 +274,7 @@ Gw
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Manual" identifier="Manual" id="qq1-yV-VsK">
-                                <view key="view" id="YXI-Uw-7SR">
+                                <view key="view" ambiguous="YES" id="YXI-Uw-7SR">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -686,6 +690,12 @@ Gw
                                                                                     <menuItem title="aes-128-cfb" id="vPW-Ad-9zp">
                                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                                     </menuItem>
+                                                                                    <menuItem title="aes-256-gcm" id="2v4-52-Fmt">
+                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                    </menuItem>
+                                                                                    <menuItem title="aes-128-gcm" id="a2I-6n-wib">
+                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                    </menuItem>
                                                                                     <menuItem title="chacha20" id="crU-Me-t3P">
                                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                                     </menuItem>
@@ -695,10 +705,7 @@ Gw
                                                                                     <menuItem title="chacha20-poly1305" id="ZUt-KW-7Y9">
                                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                                     </menuItem>
-                                                                                    <menuItem title="aes-256-gcm" id="2v4-52-Fmt">
-                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                                                    </menuItem>
-                                                                                    <menuItem title="aes-128-gcm" id="a2I-6n-wib">
+                                                                                    <menuItem title="chacha20-ietf-poly1305" id="E1v-Ow-KhB">
                                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                                     </menuItem>
                                                                                 </items>
