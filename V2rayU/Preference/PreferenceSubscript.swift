@@ -14,7 +14,8 @@ import Sparkle
 final class PreferenceSubscriptViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.subscriptTab
     let preferencePaneTitle = "Subscript"
-    let toolbarItemIcon = NSImage(named: NSImage.advancedName)!
+//    let toolbarItemIcon = NSImage(named: NSImage.multipleDocumentsName)!
+    let toolbarItemIcon = NSImage(named: NSImage.userAccountsName)!
 
     override var nibName: NSNib.Name? {
         return "PreferenceSubscript"
@@ -22,5 +23,7 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // fix: https://github.com/sindresorhus/Preferences/issues/31
+        self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
     }
 }

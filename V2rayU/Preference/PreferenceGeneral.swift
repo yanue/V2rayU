@@ -9,18 +9,11 @@
 import Foundation
 import Preferences
 import ServiceManagement
-import Sparkle
-
-let V2rayUpdater = SUUpdater()
 
 final class PreferenceGeneralViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.generalTab
     let preferencePaneTitle = "General"
     let toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
-
-    @IBOutlet weak var CopyrightLabel: NSTextField!
-    @IBOutlet weak var VersionLabel: NSTextField!
-    @IBOutlet weak var V2rayCoreVersion: NSTextField!
 
     override var nibName: NSNib.Name? {
         return "PreferenceGeneral"
@@ -31,14 +24,8 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] {
-            self.VersionLabel.stringValue = "version " + (version as? String ?? "1.0")
-        }
-
-        if let v2rayCoreVersion = UserDefaults.get(forKey: .v2rayCoreVersion) {
-            self.V2rayCoreVersion.stringValue = "based on v2ray-core " + v2rayCoreVersion
-        }
+        // fix: https://github.com/sindresorhus/Preferences/issues/31
+        self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
 
         let autoLaunchState = UserDefaults.getBool(forKey: .autoLaunch)
         let autoCheckVersionState = UserDefaults.getBool(forKey: .autoCheckVersion)

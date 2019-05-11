@@ -14,7 +14,7 @@ import Sparkle
 final class PreferencePacController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.pacTab
     let preferencePaneTitle = "Pac File"
-    let toolbarItemIcon = NSImage(named: NSImage.advancedName)!
+    let toolbarItemIcon = NSImage(named: NSImage.bookmarksTemplateName)!
 
     override var nibName: NSNib.Name? {
         return "PreferencePac"
@@ -22,5 +22,7 @@ final class PreferencePacController: NSViewController, PreferencePane {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // fix: https://github.com/sindresorhus/Preferences/issues/31
+        self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
     }
 }

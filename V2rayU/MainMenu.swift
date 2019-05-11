@@ -10,20 +10,26 @@ import Foundation
 import Cocoa
 import ServiceManagement
 import Preferences
+import Sparkle
 
 let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
+let V2rayUpdater = SUUpdater()
 
 extension PreferencePane.Identifier {
     static let generalTab = Identifier("generalTab")
+    static let advanceTab = Identifier("advanceTab")
     static let subscriptTab = Identifier("subscriptTab")
     static let pacTab = Identifier("pacTab")
+    static let aboutTab = Identifier("aboutTab")
 }
 
 let preferencesWindowController = PreferencesWindowController(
         preferencePanes: [
             PreferenceGeneralViewController(),
+            PreferenceAdvanceViewController(),
             PreferenceSubscriptViewController(),
-            PreferencePacController()
+            PreferencePacController(),
+            PreferenceAboutController(),
         ]
 )
 var qrcodeWindow = QrcodeWindowController()
