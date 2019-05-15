@@ -6,7 +6,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="PreferenceAboutController" customModule="V2rayU" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="PreferenceAboutViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
                 <outlet property="V2rayCoreVersion" destination="gws-ge-QLa" id="0Gu-lx-VkO"/>
                 <outlet property="VersionLabel" destination="GfP-Xl-Rdf" id="tPf-dh-zDO"/>
@@ -112,6 +112,5 @@
             <point key="canvasLocation" x="-190" y="-220.5"/>
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <userDefaultsController representsSharedInstance="YES" id="HAt-Ds-MVV"/>
     </objects>
 </document>

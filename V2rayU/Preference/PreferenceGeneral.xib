@@ -52,20 +52,26 @@
                     </customSpacing>
                 </stackView>
                 <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-Na-pRr">
-                    <rect key="frame" x="14" y="143" width="165" height="32"/>
+                    <rect key="frame" x="80" y="70" width="165" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="Check for Updates..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2p9-GL-XZ9">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="checkVersion:" target="-2" id="4u0-Zb-Xfz"/>
+                    </connections>
                 </button>
                 <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="liJ-Uu-8HQ">
-                    <rect key="frame" x="14" y="110" width="111" height="32"/>
+                    <rect key="frame" x="269" y="70" width="111" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="Feedback..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QjX-NH-23u">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="goFeedback:" target="-2" id="dvI-qJ-3yN"/>
+                    </connections>
                 </button>
             </subviews>
             <point key="canvasLocation" x="-143" y="-199"/>

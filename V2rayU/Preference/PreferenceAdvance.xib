@@ -6,7 +6,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="PreferenceGeneralViewController" customModule="V2rayU" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="PreferenceAdvanceViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>

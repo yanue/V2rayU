@@ -17,14 +17,14 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mta-JC-Ywa">
-                    <rect key="frame" x="20" y="85" width="420" height="226"/>
+                    <rect key="frame" x="20" y="38" width="420" height="273"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" ambiguous="YES" id="4aC-gI-mNs">
-                        <rect key="frame" x="1" y="0.0" width="418" height="225"/>
+                        <rect key="frame" x="1" y="0.0" width="418" height="272"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="yUk-I2-XZb" viewBased="YES" id="fYa-dn-wCU">
-                                <rect key="frame" x="0.0" y="0.0" width="418" height="200"/>
+                                <rect key="frame" x="0.0" y="0.0" width="418" height="247"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -123,9 +123,9 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3pd-DD-jIz">
-                    <rect key="frame" x="300" y="316" width="146" height="32"/>
+                    <rect key="frame" x="308" y="316" width="131" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="update servers ..." bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZPU-gS-0li">
+                    <buttonCell key="cell" type="push" title="update servers" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZPU-gS-0li">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>

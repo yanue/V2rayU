@@ -28,12 +28,11 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceGeneralViewController(),
             PreferenceAdvanceViewController(),
             PreferenceSubscriptViewController(),
-            PreferencePacController(),
-            PreferenceAboutController(),
+            PreferencePacViewController(),
+            PreferenceAboutViewController(),
         ]
 )
 var qrcodeWindow = QrcodeWindowController()
-var editUserRulesWinCtrl = UserRulesWindowController()
 
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {

@@ -11,7 +11,7 @@ import Preferences
 import ServiceManagement
 import Sparkle
 
-final class PreferenceAboutController: NSViewController, PreferencePane {
+final class PreferenceAboutViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.aboutTab
     let preferencePaneTitle = "About"
     let toolbarItemIcon = NSImage(named: NSImage.infoName)!

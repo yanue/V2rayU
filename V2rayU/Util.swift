@@ -29,6 +29,8 @@ extension UserDefaults {
         case runMode
         // use rules
         case userRules
+        // gfw pac list url
+        case gfwPacListUrl
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
