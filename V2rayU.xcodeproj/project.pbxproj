@@ -31,6 +31,7 @@
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66BC2B87228C537F00FBB716 /* PreferencePac.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66BC2B86228C537F00FBB716 /* PreferencePac.xib */; };
+		66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscript.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
@@ -144,6 +145,7 @@
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		66BC2B86228C537F00FBB716 /* PreferencePac.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferencePac.xib; sourceTree = "<group>"; };
+		66BC2B88228C589E00FBB716 /* V2raySubscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscript.swift; sourceTree = "<group>"; };
 		66F411B421CA8921007AAC10 /* cmd.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = cmd.sh; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				660D0E59216E0158000C2922 /* V2rayServer.swift */,
 				66784AFF21704E1300AD307F /* V2rayCore.swift */,
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
+				66BC2B88228C589E00FBB716 /* V2raySubscript.swift */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				6650AAAC21771E11000909D8 /* unzip.sh */,
 				6D6DF87840CDA04AF0E9D36E /* Scanner.swift */,
@@ -632,6 +635,7 @@
 				6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */,
 				6D6DF2F2DFB2234541488BBD /* PreferenceSubscript.swift in Sources */,
 				6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */,
+				66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */,
 				6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
