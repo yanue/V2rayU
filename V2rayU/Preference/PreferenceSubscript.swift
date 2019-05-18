@@ -15,14 +15,12 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
     let preferencePaneTitle = "Subscript"
     let toolbarItemIcon = NSImage(named: NSImage.userAccountsName)!
     let tableViewDragType: String = "v2ray.subscript"
-    
-    @IBOutlet weak var addRemoveButton: NSSegmentedControl!
 
+    @IBOutlet weak var remark: NSTextField!
+    @IBOutlet weak var url: NSTextField!
     @IBOutlet var tableView: NSTableView!
-    
+
     // our variable
-    var data: [[String: String]] = [[:]]
-    
     override var nibName: NSNib.Name? {
         return "PreferenceSubscript"
     }
@@ -31,42 +29,95 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
         self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
-        
-        // adding people
-        data = [
-            [
-                "firstName" : "Ragnar",
-                "lastName" : "Lothbrok",
-            ],
-            [
-                "firstName" : "Bjorn",
-                "lastName" : "Lothbrok",
-            ],
-            [
-                "firstName" : "Harald",
-                "lastName" : "Finehair",
-            ]
-        ]
-        
+
+        // reload tableview
+        V2raySubscript.loadConfig()
+    }
+
+    @IBAction func addSubscript(_ sender: Any) {
+        var url = self.url.stringValue
+        var remark = self.remark.stringValue
+        // trim
+        url = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        remark = remark.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if url.count == 0 {
+            self.url.becomeFirstResponder()
+            return
+        }
+
+        if !url.isValidUrl() {
+            self.url.becomeFirstResponder()
+            print("url is invalid")
+            return
+        }
+
+        if remark.count == 0 {
+            self.remark.becomeFirstResponder()
+            return
+        }
+
+        // add to server
+        V2raySubscript.add(remark: remark, url: url)
+
+        // reset
+        self.remark.stringValue = ""
+        self.url.stringValue = ""
+
         // reload tableview
         self.tableView.reloadData()
+    }
+
+    @IBAction func removeSubscript(_ sender: Any) {
+        let idx = self.tableView.selectedRow
+        if self.tableView.selectedRow > -1 {
+            // remove
+            V2raySubscript.remove(idx: idx)
+
+            // selected prev row
+            let cnt: Int = V2raySubscript.count()
+            var rowIndex: Int = idx - 1
+            if idx > 0 && idx < cnt {
+                rowIndex = idx
+            }
+            print("rowIndex", rowIndex, cnt)
+            // fix
+            if cnt > 1 {
+                // selected row
+                self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+                print("tableView selected row", rowIndex, cnt)
+
+            }
+
+        }
+        // reload tableview
+        self.tableView.reloadData()
+    }
+    
+    // update servers from subscript url list
+    @IBAction func updateSubscript(_ sender: Any) {
+        print("updateSubscript")
     }
 }
 
 extension PreferenceSubscriptViewController: NSTableViewDataSource, NSTableViewDelegate {
-    
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return (data.count)
-    }
-    
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let person = data[row]
-        print("person",person)
 
-        guard let cell = tableView.makeView(withIdentifier: tableColumn!.identifier, owner: self) as? NSTableCellView else { return nil }
-        print("cell",person)
-//        cell.textField?.stringValue = person[tableColumn!.identifier.rawValue]!
-        
-        return cell
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return V2raySubscript.count()
+    }
+
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        let identifier = tableColumn?.identifier as NSString?
+        var data = V2raySubscript.list()
+        if (identifier == "remarkCell") {
+            let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "remarkCell"), owner: self) as! NSTableCellView
+            cell.textField?.stringValue = data[row].remark
+            return cell
+        } else if (identifier == "urlCell") {
+            let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "urlCell"), owner: self) as! NSTableCellView
+            cell.textField?.stringValue = data[row].url
+            return cell
+        }
+        return nil
     }
 }

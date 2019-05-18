@@ -15,6 +15,8 @@ extension UserDefaults {
         case v2rayCoreVersion
         // v2ray server item list
         case v2rayServerList
+        // v2ray subscript item list
+        case v2raySubList
         // current v2ray server name
         case v2rayCurrentServerName
         // v2ray-core turn on status
@@ -94,6 +96,14 @@ extension String {
             return decodedString as String
         }
         return nil
+    }
+
+    //: isValidUrl
+    func isValidUrl() -> Bool {
+        let urlRegEx = "^(https?://)?(www\\.)?([-a-z0-9]{1,63}\\.)*?[a-z0-9][-a-z0-9]{0,61}[a-z0-9]\\.[a-z]{2,6}(/[-\\w@\\+\\.~#\\?&/=%]*)?$"
+        let urlTest = NSPredicate(format: "SELF MATCHES %@", urlRegEx)
+        let result = urlTest.evaluate(with: self)
+        return result
     }
 }
 
