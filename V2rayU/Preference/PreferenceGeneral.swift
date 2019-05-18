@@ -21,7 +21,8 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     @IBOutlet weak var autoLaunch: NSButtonCell!
     @IBOutlet weak var autoCheckVersion: NSButtonCell!
-
+    @IBOutlet weak var autoClearLog: NSButtonCell!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
@@ -29,11 +30,15 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
         let autoLaunchState = UserDefaults.getBool(forKey: .autoLaunch)
         let autoCheckVersionState = UserDefaults.getBool(forKey: .autoCheckVersion)
+        let autoClearLogState = UserDefaults.getBool(forKey: .autoClearLog)
         if autoLaunchState {
             autoLaunch.state = .on
         }
         if autoCheckVersionState {
             autoCheckVersion.state = .on
+        }
+        if autoClearLogState {
+            autoClearLog.state = .on
         }
     }
 
@@ -46,20 +51,10 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
         UserDefaults.setBool(forKey: .autoCheckVersion, value: sender.state == .on)
     }
 
-    @IBAction func goWebsite(_ sender: NSButton) {
-        guard let url = URL(string: "https://yanue.github.io/V2rayU/") else {
-            return
-        }
-        NSWorkspace.shared.open(url)
+    @IBAction func SetAutoClearLogs(_ sender: NSButtonCell) {
+        UserDefaults.setBool(forKey: .autoClearLog, value: sender.state == .on)
     }
-
-    @IBAction func goV2ray(_ sender: NSButton) {
-        guard let url = URL(string: "https://github.com/v2ray/v2ray-core") else {
-            return
-        }
-        NSWorkspace.shared.open(url)
-    }
-
+    
     @IBAction func goFeedback(_ sender: NSButton) {
         guard let url = URL(string: "https://github.com/yanue/v2rayu/issues") else {
             return
@@ -70,5 +65,13 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
     @IBAction func checkVersion(_ sender: NSButton) {
         // need set SUFeedURL into plist
         V2rayUpdater.checkForUpdates(sender)
+    }
+    
+    @IBAction func openLogs(_ sender: NSButton) {
+        V2rayLaunch.OpenLogs()
+    }
+    
+    @IBAction func clearLogs(_ sender: NSButton) {
+        V2rayLaunch.ClearLogs()
     }
 }

@@ -29,12 +29,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
 
-    @IBOutlet weak var sockPort: NSTextField!
-    @IBOutlet weak var httpPort: NSTextField!
-    @IBOutlet weak var dnsServers: NSTextField!
+    @IBOutlet weak var sockPort: NSButton!
+    @IBOutlet weak var httpPort: NSButton!
+    @IBOutlet weak var dnsServers: NSButton!
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
-    @IBOutlet weak var muxConcurrent: NSTextField!
+    @IBOutlet weak var muxConcurrent: NSButton!
     @IBOutlet weak var version4: NSButton!
 
     @IBOutlet weak var switchProtocol: NSPopUpButton!
@@ -125,11 +125,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.serversTableView.reloadData()
         // tab view
         self.tabView.delegate = self
-
-        // log level
-        if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
-            logLevel.selectItem(withTitle: level)
-        }
     }
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -246,13 +241,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func exportData() {
         // ========================== base start =======================
         // base
-        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
-        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
-        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
-        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
-        v2rayConfig.dns = self.dnsServers.stringValue
-        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
-        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
+//        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
+//        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
+//        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
+//        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
+//        v2rayConfig.dns = self.dnsServers.stringValue
+//        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
+//        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
         // ========================== base end =======================
 
         // ========================== server start =======================
@@ -343,12 +338,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func bindDataToView() {
         // ========================== base start =======================
         // base
-        self.httpPort.stringValue = v2rayConfig.httpPort
-        self.sockPort.stringValue = v2rayConfig.socksPort
+        print("bindDataToView", v2rayConfig.httpPort, v2rayConfig.socksPort, v2rayConfig.dns)
+        self.httpPort.title = v2rayConfig.httpPort
+        self.sockPort.title = v2rayConfig.socksPort
         self.enableUdp.intValue = v2rayConfig.enableUdp ? 1 : 0
         self.enableMux.intValue = v2rayConfig.enableMux ? 1 : 0
         self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
-        self.dnsServers.stringValue = v2rayConfig.dns
+        self.dnsServers.title = v2rayConfig.dns
         self.version4.intValue = v2rayConfig.isNewVersion ? 1 : 0
         // ========================== base end =======================
 
@@ -591,6 +587,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         NSWorkspace.shared.open(url)
     }
 
+    @IBAction func goVersionHelp(_ sender: Any) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/01_overview.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
     @IBAction func goStreamHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
             return
@@ -708,14 +711,22 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func openLogs(_ sender: NSButton) {
         V2rayLaunch.OpenLogs()
     }
-    
+
     @IBAction func clearLogs(_ sender: NSButton) {
         V2rayLaunch.ClearLogs()
     }
-    
+
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
         menuController.hideDock()
+    }
+
+    @IBAction func goAdvanceSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .advanceTab)
+    }
+    
+    @IBAction func goSubscriptSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .subscriptTab)
     }
 }
 

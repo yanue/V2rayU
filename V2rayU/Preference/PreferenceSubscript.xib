@@ -79,7 +79,7 @@
                                         </textFieldCell>
                                         <prototypeCellViews>
                                             <tableCellView id="FLk-I9-55S">
-                                                <rect key="frame" x="103" y="1" width="312" height="16"/>
+                                                <rect key="frame" x="102.5" y="1" width="312" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9CU-oY-puz">
