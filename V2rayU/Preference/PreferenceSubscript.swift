@@ -80,23 +80,25 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
             if idx > 0 && idx < cnt {
                 rowIndex = idx
             }
-            print("rowIndex", rowIndex, cnt)
-            // fix
-            if cnt > 1 {
-                // selected row
-                self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
-                print("tableView selected row", rowIndex, cnt)
-
+            if rowIndex == -1 {
+                rowIndex = 0
             }
 
+            // reload tableview
+            self.tableView.reloadData()
+
+            // fix
+            if cnt > 0 {
+                // selected row
+                self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: true)
+            }
         }
-        // reload tableview
-        self.tableView.reloadData()
     }
-    
+
     // update servers from subscript url list
     @IBAction func updateSubscript(_ sender: Any) {
         print("updateSubscript")
+        self.tableView.selectRowIndexes(NSIndexSet(index: 0) as IndexSet, byExtendingSelection: true)
     }
 }
 
