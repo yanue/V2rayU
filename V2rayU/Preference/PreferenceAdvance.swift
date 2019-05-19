@@ -14,14 +14,18 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
     let preferencePaneTitle = "Advance"
     let toolbarItemIcon = NSImage(named: NSImage.advancedName)!
 
+    @IBOutlet weak var saveBtn: NSButtonCell!
     @IBOutlet weak var sockPort: NSTextField!
     @IBOutlet weak var httpPort: NSTextField!
-    @IBOutlet weak var dnsServers: NSTextField!
     @IBOutlet weak var pacPort: NSTextField!
+
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
+
     @IBOutlet weak var muxConcurrent: NSTextField!
-    
+    @IBOutlet weak var logLevel: NSPopUpButton!
+    @IBOutlet weak var dnsServers: NSTextField!
+
     override var nibName: NSNib.Name? {
         return "PreferenceAdvance"
     }
@@ -30,7 +34,75 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
         self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
+
+        let enableMuxState = UserDefaults.getBool(forKey: .enableMux)
+        let enableUdpState = UserDefaults.getBool(forKey: .enableUdp)
+
+        let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1089"
+
+        let dnsServers = UserDefaults.get(forKey: .dnsServers) ?? ""
+        let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
+
+        // select item
+        self.logLevel.selectItem(withTitle: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")
+
+        self.enableUdp.state = enableUdpState ? .on : .off
+        self.enableMux.state = enableMuxState ? .on : .off
+        self.sockPort.stringValue = localSockPort
+        self.httpPort.stringValue = localHttpPort
+        self.pacPort.stringValue = localPacPort
+        self.dnsServers.stringValue = dnsServers
+        self.muxConcurrent.intValue = Int32(muxConcurrent) ?? 8;
     }
 
+    @IBAction func saveSettings(_ sender: Any) {
+        self.saveBtn.state = .on
+        saveSettingsAndReload()
+    }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+
+        saveSettingsAndReload()
+    }
+
+    func saveSettingsAndReload() {
+
+        let httpPortVal = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
+        let sockPortVal = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
+        let pacPortVal = self.pacPort.stringValue.replacingOccurrences(of: ",", with: "")
+
+        let enableUdpVal = self.enableUdp.state.rawValue > 0
+        let enableMuxVal = self.enableMux.state.rawValue > 0
+
+        let dnsServersVal = self.dnsServers.stringValue
+        let muxConcurrentVal = self.muxConcurrent.intValue
+        let logLevelVal = self.logLevel.stringValue
+
+        // save
+        UserDefaults.setBool(forKey: .enableUdp, value: enableUdpVal)
+        UserDefaults.setBool(forKey: .enableMux, value: enableMuxVal)
+
+        UserDefaults.set(forKey: .localHttpPort, value: httpPortVal)
+        UserDefaults.set(forKey: .localSockPort, value: sockPortVal)
+        UserDefaults.set(forKey: .localPacPort, value: pacPortVal)
+
+        UserDefaults.set(forKey: .dnsServers, value: dnsServersVal)
+        UserDefaults.set(forKey: .muxConcurrent, value: String(muxConcurrentVal))
+
+        // replace
+        v2rayConfig.httpPort = httpPortVal
+        v2rayConfig.socksPort = sockPortVal
+        v2rayConfig.enableUdp = enableUdpVal
+        v2rayConfig.enableMux = enableMuxVal
+        v2rayConfig.dns = dnsServersVal
+        v2rayConfig.mux = Int(muxConcurrentVal)
+        v2rayConfig.logLevel = logLevelVal
+
+        // pac port
+        // todo pac
+        // todo change current server config and reload
+    }
 }

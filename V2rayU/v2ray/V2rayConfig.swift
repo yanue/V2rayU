@@ -96,6 +96,22 @@ class V2rayConfig: NSObject {
     private var foundSockPort = false
     private var foundServerProtocol = false
 
+    // Initialization
+    override init() {
+        super.init()
+
+        self.enableMux = UserDefaults.getBool(forKey: .enableMux)
+        self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
+
+        self.httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+
+        self.dns = UserDefaults.get(forKey: .dnsServers) ?? ""
+        self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
+
+        self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
+    }
+
     // combine manual edited data
     // by manual tab view
     func combineManual() -> String {

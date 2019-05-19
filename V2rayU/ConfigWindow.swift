@@ -9,8 +9,9 @@
 import Cocoa
 import Alamofire
 
+var v2rayConfig: V2rayConfig = V2rayConfig()
+
 class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
-    var v2rayConfig: V2rayConfig = V2rayConfig()
 
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
@@ -200,19 +201,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     // switch to manual
     func switchToManualView() {
-        self.v2rayConfig = V2rayConfig()
+        v2rayConfig = V2rayConfig()
 
         defer {
-            if self.configText.string.count > 0 && self.v2rayConfig.isValid {
+            if self.configText.string.count > 0 && v2rayConfig.isValid {
                 self.bindDataToView()
             }
         }
 
         // re parse json
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        print("parse errors:", self.v2rayConfig.errors, self.v2rayConfig.isValid)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        print("parse errors:", v2rayConfig.errors, v2rayConfig.isValid)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
             return
         }
 
@@ -429,19 +430,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
 
         // reset
-        self.v2rayConfig = V2rayConfig()
+        v2rayConfig = V2rayConfig()
         if rowIndex < 0 {
             return
         }
 
         let item = V2rayServer.loadV2rayItem(idx: rowIndex)
         self.configText.string = item?.json ?? ""
-        self.v2rayConfig.isValid = item?.isValid ?? false
+        v2rayConfig.isValid = item?.isValid ?? false
         self.jsonUrl.stringValue = item?.url ?? ""
 
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
             return
         }
     }
@@ -449,13 +450,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func saveConfig() {
         let text = self.configText.string
 
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
         }
 
         // save
-        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
+        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: v2rayConfig.isValid, jsonData: text)
         if errMsg.count == 0 {
             if self.errTip.stringValue == "" {
                 self.errTip.stringValue = "save success"
@@ -553,7 +554,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 }
 
                 if DataResponse.value != nil {
-                    self.configText.string = self.v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                    self.configText.string = v2rayConfig.formatJson(json: DataResponse.value ?? text)
                 }
             }
         }

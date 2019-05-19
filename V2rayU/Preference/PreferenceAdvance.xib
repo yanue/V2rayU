@@ -8,23 +8,25 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferenceAdvanceViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
-                <outlet property="dnsServers" destination="13S-5w-YMH" id="3vA-Ug-eJE"/>
+                <outlet property="dnsServers" destination="XVQ-M0-Vkn" id="90i-Yt-KlG"/>
                 <outlet property="enableMux" destination="fTO-ou-DVb" id="0Tk-sT-T3M"/>
                 <outlet property="enableUdp" destination="dIr-EM-YaL" id="O3O-2X-nzu"/>
                 <outlet property="httpPort" destination="C6N-2x-WVg" id="EFO-IN-1Oh"/>
+                <outlet property="logLevel" destination="RkL-Hx-uyr" id="qFb-PC-Iil"/>
                 <outlet property="muxConcurrent" destination="13S-5w-YMH" id="ijT-5C-kyu"/>
                 <outlet property="pacPort" destination="SRQ-zG-lEW" id="jKr-ys-fLS"/>
+                <outlet property="saveBtn" destination="YJf-A4-mgF" id="k7j-Ly-8Uq"/>
                 <outlet property="sockPort" destination="uGr-b9-5AH" id="yYa-iP-cqG"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <view wantsLayer="YES" id="bXz-rK-jao">
-            <rect key="frame" x="0.0" y="0.0" width="460" height="250"/>
+            <rect key="frame" x="0.0" y="0.0" width="460" height="280"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <box fixedFrame="YES" borderType="none" title="Local" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="tMz-nM-arv">
-                    <rect key="frame" x="40" y="27" width="380" height="193"/>
+                    <rect key="frame" x="40" y="57" width="380" height="193"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" ambiguous="YES" id="gv1-0o-CYL">
                         <rect key="frame" x="0.0" y="0.0" width="380" height="193"/>
@@ -59,6 +61,9 @@
                                         <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                     </allowedInputSourceLocales>
                                 </textFieldCell>
+                                <connections>
+                                    <outlet property="delegate" destination="-2" id="GnE-8z-kEw"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C6N-2x-WVg">
                                 <rect key="frame" x="175" y="136" width="56" height="22"/>
@@ -152,7 +157,7 @@
                                 </popUpButtonCell>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JVs-KU-cs6">
-                                <rect key="frame" x="15" y="48" width="133" height="17"/>
+                                <rect key="frame" x="16" y="48" width="133" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="V2ray Core Log level:" id="Ctq-lX-cuA">
                                     <font key="font" metaFont="system"/>
@@ -185,8 +190,19 @@
                         </subviews>
                     </view>
                 </box>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RAu-YE-AEZ">
+                    <rect key="frame" x="164" y="13" width="120" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="push" title="save settings" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YJf-A4-mgF">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="saveSettings:" target="-2" id="Xtw-GK-sKT"/>
+                    </connections>
+                </button>
             </subviews>
-            <point key="canvasLocation" x="-143" y="-235"/>
+            <point key="canvasLocation" x="-143" y="-275"/>
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
     </objects>

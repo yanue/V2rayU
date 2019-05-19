@@ -35,6 +35,22 @@ extension UserDefaults {
         case userRules
         // gfw pac list url
         case gfwPacListUrl
+
+        // base settings
+        // http port
+        case localHttpPort
+        // sock port
+        case localSockPort
+        // dns servers
+        case dnsServers
+        // enable udp
+        case enableUdp
+        // enable mux
+        case enableMux
+        // mux Concurrent
+        case muxConcurrent
+        // pacPort
+        case localPacPort
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
