@@ -131,6 +131,12 @@ class ImportUri {
             self.error = "invail ss url"
             return
         }
+
+        if V2rayServer.exist(url: uri) {
+            self.error = "url is exist"
+            return
+        }
+
         self.uri = uri
 
         let ss = ShadowsockUri()
@@ -166,6 +172,12 @@ class ImportUri {
             self.error = "invail vmess url"
             return
         }
+
+        if V2rayServer.exist(url: uri) {
+            self.error = "url is exist"
+            return
+        }
+
         self.uri = uri
 
         var vmess = VmessUri()

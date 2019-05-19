@@ -5,8 +5,10 @@
 //  Created by yanue on 2019/5/15.
 //  Copyright © 2019 yanue. All rights reserved.
 //
+
 import Foundation
 import SwiftyJSON
+import Alamofire
 
 // ----- v2ray subscript manager -----
 class V2raySubscript: NSObject {
@@ -29,7 +31,7 @@ class V2raySubscript: NSObject {
 
         // load name list from UserDefaults
         let list = UserDefaults.getArray(forKey: .v2raySubList)
-        print("loadConfig",list)
+        print("loadConfig", list)
 
         if list == nil {
             return
@@ -242,5 +244,42 @@ class V2raySubItem: NSObject, NSCoding {
     // remove from UserDefaults
     static func remove(name: String) {
         UserDefaults.standard.removeObject(forKey: name)
+    }
+}
+
+class V2raySubscriptUpdater {
+    public static func sync() {
+        var list = V2raySubscript.list()
+        for item in list {
+            print("item", item)
+            self.dlFromUrl(url: item.url)
+        }
+    }
+
+    public static func dlFromUrl(url: String) {
+        Alamofire.request(url).responseString { response in
+            switch (response.result) {
+            case .success(_):
+                if let data = response.result.value {
+                    self.handle(base64Str: data)
+                }
+
+            case .failure(_):
+                print("Error message:", response.result.error)
+                break
+            }
+        }
+    }
+
+    public static func handle(base64Str: String) {
+        let strTmp = base64Str.base64Decoded()
+        if strTmp == nil {
+            return
+        }
+        let list = strTmp!.components(separatedBy: "\n")
+        for item in list {
+            // import every server
+            menuController.importUri(url: item)
+        }
     }
 }

@@ -19,7 +19,8 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
     @IBOutlet weak var remark: NSTextField!
     @IBOutlet weak var url: NSTextField!
     @IBOutlet var tableView: NSTableView!
-
+    @IBOutlet weak var upBtn: NSButton!
+    
     // our variable
     override var nibName: NSNib.Name? {
         return "PreferenceSubscript"
@@ -97,8 +98,9 @@ final class PreferenceSubscriptViewController: NSViewController, PreferencePane 
 
     // update servers from subscript url list
     @IBAction func updateSubscript(_ sender: Any) {
-        print("updateSubscript")
-        self.tableView.selectRowIndexes(NSIndexSet(index: 0) as IndexSet, byExtendingSelection: true)
+        self.upBtn.state = .on
+        // update Subscript
+        V2raySubscriptUpdater.sync()
     }
 }
 

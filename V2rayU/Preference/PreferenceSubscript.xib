@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="remark" destination="G8V-7i-NEX" id="lXJ-yI-aZX"/>
                 <outlet property="tableView" destination="41h-DL-Lmq" id="MCv-Wr-WMm"/>
+                <outlet property="upBtn" destination="3pd-DD-jIz" id="7qt-nK-HEx"/>
                 <outlet property="url" destination="mlO-5h-gcH" id="O96-2B-8PL"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
@@ -79,7 +80,7 @@
                                         </textFieldCell>
                                         <prototypeCellViews>
                                             <tableCellView id="FLk-I9-55S">
-                                                <rect key="frame" x="102.5" y="1" width="312" height="16"/>
+                                                <rect key="frame" x="103" y="1" width="312" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9CU-oY-puz">
@@ -181,7 +182,7 @@
                     <rect key="frame" x="312" y="13" width="134" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="update servers " bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZPU-gS-0li">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>

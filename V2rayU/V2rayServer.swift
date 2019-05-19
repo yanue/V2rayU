@@ -193,6 +193,17 @@ class V2rayServer: NSObject {
         UserDefaults.setArray(forKey: .v2rayServerList, value: v2rayServerList)
     }
 
+    // check url is exists
+    static func exist(url: String) -> Bool {
+        for item in self.v2rayItemList {
+            if item.url == url {
+                return true
+            }
+        }
+
+        return false
+    }
+
     // get json file url
     static func getJsonFile() -> String? {
         return Bundle.main.url(forResource: "unzip", withExtension: "sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
