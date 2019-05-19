@@ -20,7 +20,7 @@ let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
-let httpServerPort = 18765
+var HttpServerPacPort = 18765
 
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
@@ -58,7 +58,7 @@ class V2rayLaunch: NSObject {
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
 
         // write http simple server plist
-        let httpArguments = ["/usr/bin/python", "-m", "SimpleHTTPServer", String(httpServerPort)]
+        let httpArguments = ["/usr/bin/python", "-m", "SimpleHTTPServer", String(HttpServerPacPort)]
 
         let dictHttp: NSMutableDictionary = [
             "Label": LAUNCH_HTTP_PLIST.replacingOccurrences(of: ".plist", with: ""),

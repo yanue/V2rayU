@@ -217,7 +217,7 @@ class V2rayServer: NSObject {
             v2ray = V2rayItem.load(name: curName)
         }
 
-        // if default server not fould
+        // if default server not found
         if v2ray == nil {
             for item in self.v2rayItemList {
                 if item.isValid {
@@ -263,6 +263,16 @@ class V2rayServer: NSObject {
         }
 
         return ""
+    }
+
+    // get by name
+    static func getIndex(name: String) -> Int {
+        for (idx, item) in self.v2rayItemList.enumerated() {
+            if item.name == name {
+                return idx
+            }
+        }
+        return -1
     }
 }
 

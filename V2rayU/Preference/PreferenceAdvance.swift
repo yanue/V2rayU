@@ -40,7 +40,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
-        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1089"
+        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 
         let dnsServers = UserDefaults.get(forKey: .dnsServers) ?? ""
         let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
@@ -91,6 +91,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         UserDefaults.set(forKey: .dnsServers, value: dnsServersVal)
         UserDefaults.set(forKey: .muxConcurrent, value: String(muxConcurrentVal))
+        UserDefaults.set(forKey: .v2rayLogLevel, value: logLevelVal)
 
         // replace
         v2rayConfig.httpPort = httpPortVal
@@ -101,8 +102,19 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         v2rayConfig.mux = Int(muxConcurrentVal)
         v2rayConfig.logLevel = logLevelVal
 
-        // pac port
-        // todo pac
-        // todo change current server config and reload
+        // set current server item and reload v2ray-core
+        let item = V2rayServer.loadSelectedItem()
+        if item != nil {
+            // parse json
+            v2rayConfig.parseJson(jsonText: item!.json)
+            // combine with new settings and save
+            _ = V2rayServer.save(idx: V2rayServer.getIndex(name: item!.name), isValid: v2rayConfig.isValid, jsonData: v2rayConfig.combineManual())
+            // restart service
+            menuController.startV2rayCore()
+            // todo reload configWindow
+        }
+
+        // set HttpServerPacPort
+        HttpServerPacPort = Int(pacPortVal) ?? 1085
     }
 }

@@ -155,7 +155,7 @@ class V2rayConfig: NSObject {
 
     func combineManualData() {
         // base
-        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")!
+        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel) ?? V2rayLog.logLevel.info
         self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
@@ -509,14 +509,7 @@ class V2rayConfig: NSObject {
             return
         }
 
-        // get dns data
-        if json["dns"].dictionaryValue.count > 0 {
-            let dnsServers = json["dns"]["servers"].array?.compactMap({ $0.string })
-            if ((dnsServers?.count) != nil) {
-                self.v2ray.dns.servers = dnsServers!
-                self.dns = dnsServers!.joined(separator: ",")
-            }
-        }
+        // ignore dns,  use default
 
         // ============ parse inbound start =========================================
         // > 4.0
@@ -737,6 +730,8 @@ class V2rayConfig: NSObject {
                     }
                     settings.accounts = accounts
                 }
+                // use default setting
+                v2rayInbound.port =  self.httpPort
                 // set into inbound
                 v2rayInbound.settingHttp = settings
                 break
@@ -780,6 +775,9 @@ class V2rayConfig: NSObject {
                 settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
                 self.enableUdp = jsonParams["settings"]["udp"].boolValue
+                // use default setting
+                settings.udp = self.enableUdp
+                v2rayInbound.port =  self.socksPort
                 // set into inbound
                 v2rayInbound.settingSocks = settings
                 break
@@ -823,22 +821,6 @@ class V2rayConfig: NSObject {
             v2rayInbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
         }
 
-        // set local socks5 port
-        if v2rayInbound.protocol == V2rayProtocolInbound.socks && !self.foundSockPort {
-            self.socksPort = v2rayInbound.port
-            self.foundSockPort = true
-        }
-
-        // set local http port
-        if v2rayInbound.protocol == V2rayProtocolInbound.http && !self.foundHttpPort {
-            self.httpPort = v2rayInbound.port
-            self.foundHttpPort = true
-        }
-
-        if foundHttpPort && foundSockPort && self.httpPort == self.socksPort {
-            self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
-        }
-
         return (v2rayInbound)
     }
 
@@ -862,14 +844,10 @@ class V2rayConfig: NSObject {
         v2rayOutbound.sendThrough = jsonParams["sendThrough"].stringValue
         v2rayOutbound.tag = jsonParams["tag"].stringValue
 
-        if jsonParams["mux"].dictionaryValue.count > 0 {
-            var mux = V2rayOutboundMux()
-            mux.enabled = jsonParams["mux"]["enabled"].boolValue
-            mux.concurrency = jsonParams["mux"]["concurrency"].intValue
-            v2rayOutbound.mux = mux
-            self.enableMux = mux.enabled
-            self.mux = mux.concurrency
-        }
+        var mux = V2rayOutboundMux()
+        mux.enabled = self.enableMux
+        mux.concurrency = self.mux
+        v2rayOutbound.mux = mux
 
         // settings depends on protocol
         if jsonParams["settings"].dictionaryValue.count > 0 {
