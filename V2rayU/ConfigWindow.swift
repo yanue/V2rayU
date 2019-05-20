@@ -548,6 +548,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             let importUri = ImportUri()
             importUri.importSSUri(uri: uri)
             self.saveImport(importUri: importUri)
+        } else if uri.hasPrefix("ssr://") {
+            let importUri = ImportUri()
+            importUri.importSSRUri(uri: uri)
+            self.saveImport(importUri: importUri)
         } else {
             // download json file
             Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
