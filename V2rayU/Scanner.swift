@@ -520,7 +520,7 @@ class ShadowsockUri {
 
         if let index = base64End {
             let i = urlStr.index(index, offsetBy: 1)
-            let fragment = String(urlStr[i...])
+            let fragment = String(urlStr[i...]).removingPercentEncoding
             return ("ss://\(s)", fragment)
         }
         return ("ss://\(s)", nil)
