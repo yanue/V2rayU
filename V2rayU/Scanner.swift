@@ -149,6 +149,7 @@ class ImportUri {
         ssServer.password = ss.password
         ssServer.method = ss.method
         v2ray.serverShadowsocks = ssServer
+        v2ray.enableMux = false
         v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
         // check is valid
         v2ray.checkManualValid()
