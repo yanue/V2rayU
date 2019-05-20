@@ -163,14 +163,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 rowIndex = idx
             }
 
+            // reload
+            self.serversTableView.reloadData()
+
             // fix
             if cnt > 1 {
                 // selected row
                 self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
             }
-
-            // reload
-            self.serversTableView.reloadData()
 
             if rowIndex >= 0 {
                 self.loadJsonData(rowIndex: rowIndex)
@@ -729,7 +729,10 @@ extension ConfigWindowController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let v2rayItemList = V2rayServer.list()
         // set cell data
-        return v2rayItemList[row].remark
+        if v2rayItemList.count >= row {
+            return v2rayItemList[row].remark
+        }
+        return nil
     }
 
     // edit cell
