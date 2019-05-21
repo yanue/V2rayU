@@ -439,7 +439,7 @@ class MenuController: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess:// from Pasteboard")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess:// from Pasteboard")
         }
     }
 
@@ -452,25 +452,16 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         if URL(string: uri) == nil {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
             return
         }
 
-        if uri.hasPrefix("vmess://") {
-            let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
+        if let importUri = ImportUri.importUri(uri: uri) {
             self.saveServer(importUri: importUri)
             return
         }
 
-        if uri.hasPrefix("ss://") {
-            let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
-            self.saveServer(importUri: importUri)
-            return
-        }
-
-        noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// or vmess://")
+        noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
     }
 
     func saveServer(importUri: ImportUri) {

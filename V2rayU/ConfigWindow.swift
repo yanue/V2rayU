@@ -540,13 +540,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         let uri = jsonUrl.stringValue.trimmingCharacters(in: .whitespaces)
         // edit item remark
         V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
-        if uri.hasPrefix("vmess://") {
-            let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
-            self.saveImport(importUri: importUri)
-        } else if uri.hasPrefix("ss://") {
-            let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
+
+        if let importUri = ImportUri.importUri(uri: uri) {
             self.saveImport(importUri: importUri)
         } else {
             // download json file
