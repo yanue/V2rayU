@@ -20,7 +20,7 @@ let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwli
 
 final class PreferencePacViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.pacTab
-    let preferencePaneTitle = "Pac File"
+    let preferencePaneTitle = "Pac"
     let toolbarItemIcon = NSImage(named: NSImage.bookmarksTemplateName)!
 
     override var nibName: NSNib.Name? {
@@ -60,6 +60,13 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             }
         }
         userRulesView.string = userRuleTxt
+    }
+    
+    @IBAction func viewPacFile(_ sender: Any) {
+        guard let url = URL(string: PACUrl) else {
+            return
+        }
+        NSWorkspace.shared.open(url)
     }
     
     @IBAction func updatePac(_ sender: Any) {

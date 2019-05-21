@@ -48,14 +48,14 @@
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Cg-gM-BHl">
-                            <rect key="frame" x="243" y="74" width="203" height="32"/>
+                            <rect key="frame" x="326" y="70" width="120" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="push" title="Update Pac From GFW List" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fkx-pu-mTv">
+                            <buttonCell key="cell" type="push" title="View Pac File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fkx-pu-mTv">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
                             <connections>
-                                <action selector="updatePac:" target="-2" id="0Ka-zt-S7w"/>
+                                <action selector="viewPacFile:" target="-2" id="NR8-ht-U4L"/>
                             </connections>
                         </button>
                     </subviews>
@@ -100,6 +100,17 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
+                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c8w-uA-Ajx">
+                            <rect key="frame" x="182" y="199" width="264" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <buttonCell key="cell" type="push" title="Save And Update Pac From GFW List" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6OV-Jq-2Ue">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="updatePac:" target="-2" id="BNR-xp-UFi"/>
+                            </connections>
+                        </button>
                     </subviews>
                 </customView>
             </subviews>

@@ -18,7 +18,7 @@ let V2rayUpdater = SUUpdater()
 extension PreferencePane.Identifier {
     static let generalTab = Identifier("generalTab")
     static let advanceTab = Identifier("advanceTab")
-    static let subscriptTab = Identifier("subscriptTab")
+    static let subscribeTab = Identifier("subscribeTab")
     static let pacTab = Identifier("pacTab")
     static let aboutTab = Identifier("aboutTab")
 }
@@ -27,7 +27,7 @@ let preferencesWindowController = PreferencesWindowController(
         preferencePanes: [
             PreferenceGeneralViewController(),
             PreferenceAdvanceViewController(),
-            PreferenceSubscriptViewController(),
+            PreferenceSubscribeViewController(),
             PreferencePacViewController(),
             PreferenceAboutViewController(),
         ]
@@ -192,8 +192,8 @@ class MenuController: NSObject, NSMenuDelegate {
         preferencesWindowController.show(preferencePane: .generalTab)
     }
 
-    @IBAction func openPreferenceSubscript(_ sender: NSMenuItem) {
-        preferencesWindowController.show(preferencePane: .subscriptTab)
+    @IBAction func openPreferenceSubscribe(_ sender: NSMenuItem) {
+        preferencesWindowController.show(preferencePane: .subscribeTab)
     }
 
     @IBAction func openPreferencePac(_ sender: NSMenuItem) {

@@ -73,10 +73,10 @@
                 <menuItem title="Subscribe..." id="JuC-lf-LpQ">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openPreferenceSubscript:" target="hcZ-V7-Dui" id="Xax-Nj-ygb"/>
+                        <action selector="openPreferenceSubscribe:" target="hcZ-V7-Dui" id="Xax-Nj-ygb"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Pac File..." id="8ps-CD-zNp">
+                <menuItem title="Pac..." id="8ps-CD-zNp">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openPreferencePac:" target="hcZ-V7-Dui" id="q2a-9U-SCe"/>

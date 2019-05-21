@@ -15,7 +15,7 @@ extension UserDefaults {
         case v2rayCoreVersion
         // v2ray server item list
         case v2rayServerList
-        // v2ray subscript item list
+        // v2ray subscribe item list
         case v2raySubList
         // current v2ray server name
         case v2rayCurrentServerName

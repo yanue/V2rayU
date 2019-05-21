@@ -1,5 +1,5 @@
 //
-//  V2raySubscript.swift
+//  V2raySubscribe.swift
 //  V2rayU
 //
 //  Created by yanue on 2019/5/15.
@@ -8,23 +8,22 @@
 
 import Foundation
 import SwiftyJSON
-import Alamofire
 
-// ----- v2ray subscript manager -----
-class V2raySubscript: NSObject {
-    static var shared = V2raySubscript()
+// ----- v2ray subscribe manager -----
+class V2raySubscribe: NSObject {
+    static var shared = V2raySubscribe()
 
     // Initialization
     override init() {
         super.init()
-        print("V2raySubscript init")
-        V2raySubscript.loadConfig()
+        print("V2raySubscribe init")
+        V2raySubscribe.loadConfig()
     }
 
-    // v2ray subscript list
+    // v2ray subscribe list
     static private var v2raySubList: [V2raySubItem] = []
 
-    // (init) load v2ray subscript list from UserDefaults
+    // (init) load v2ray subscribe list from UserDefaults
     static func loadConfig() {
         // static reset
         self.v2raySubList = []
@@ -48,12 +47,12 @@ class V2raySubscript: NSObject {
         }
     }
 
-    // get list from v2ray subscript list
+    // get list from v2ray subscribe list
     static func list() -> [V2raySubItem] {
         return self.v2raySubList
     }
 
-    // get count from v2ray subscript list
+    // get count from v2ray subscribe list
     static func count() -> Int {
         return self.v2raySubList.count
     }
@@ -90,11 +89,11 @@ class V2raySubscript: NSObject {
 
     // move item to new index
     static func move(oldIndex: Int, newIndex: Int) {
-        if !V2raySubscript.v2raySubList.indices.contains(oldIndex) {
+        if !V2raySubscribe.v2raySubList.indices.contains(oldIndex) {
             NSLog("index out of range", oldIndex)
             return
         }
-        if !V2raySubscript.v2raySubList.indices.contains(newIndex) {
+        if !V2raySubscribe.v2raySubList.indices.contains(newIndex) {
             NSLog("index out of range", newIndex)
             return
         }
@@ -103,19 +102,19 @@ class V2raySubscript: NSObject {
         self.v2raySubList.remove(at: oldIndex)
         self.v2raySubList.insert(o, at: newIndex)
 
-        // update subscript list UserDefaults
+        // update subscribe list UserDefaults
         self.saveItemList()
     }
 
-    // add v2ray subscript (by scan qrcode)
+    // add v2ray subscribe (by scan qrcode)
     static func add(remark: String, url: String) {
         if self.v2raySubList.count > 50 {
-            NSLog("over max len")
-            return
+//            NSLog("over max len")
+//            return
         }
 
-        // name is : subscript. + uuid
-        let name = "subscript." + UUID().uuidString
+        // name is : subscribe. + uuid
+        let name = "subscribe." + UUID().uuidString
 
         let v2ray = V2raySubItem(name: name, remark: remark, url: url)
         // save to v2ray UserDefaults
@@ -124,18 +123,18 @@ class V2raySubscript: NSObject {
         // just add to mem
         self.v2raySubList.append(v2ray)
 
-        // update subscript list UserDefaults
+        // update subscribe list UserDefaults
         self.saveItemList()
     }
 
-    // remove v2ray subscript (tmp and UserDefaults and config json file)
+    // remove v2ray subscribe (tmp and UserDefaults and config json file)
     static func remove(idx: Int) {
-        if !V2raySubscript.v2raySubList.indices.contains(idx) {
+        if !V2raySubscribe.v2raySubList.indices.contains(idx) {
             NSLog("index out of range", idx)
             return
         }
 
-        let v2ray = V2raySubscript.v2raySubList[idx]
+        let v2ray = V2raySubscribe.v2raySubList[idx]
 
         // delete from tmp
         self.v2raySubList.remove(at: idx)
@@ -143,14 +142,14 @@ class V2raySubscript: NSObject {
         // delete from v2ray UserDefaults
         V2raySubItem.remove(name: v2ray.name)
 
-        // update subscript list UserDefaults
+        // update subscribe list UserDefaults
         self.saveItemList()
     }
 
-    // update subscript list UserDefaults
+    // update subscribe list UserDefaults
     static private func saveItemList() {
         var v2raySubList: Array<String> = []
-        for item in V2raySubscript.list() {
+        for item in V2raySubscribe.list() {
             v2raySubList.append(item.name)
         }
 
@@ -159,7 +158,7 @@ class V2raySubscript: NSObject {
 
     // load json file data
     static func loadV2rayItem(idx: Int) -> V2raySubItem? {
-        if !V2raySubscript.v2raySubList.indices.contains(idx) {
+        if !V2raySubscribe.v2raySubList.indices.contains(idx) {
             NSLog("index out of range", idx)
             return nil
         }
@@ -176,7 +175,7 @@ class V2raySubscript: NSObject {
             v2ray = V2raySubItem.load(name: curName)
         }
 
-        // if default subscript not fould
+        // if default subscribe not fould
         if v2ray == nil {
             for item in self.v2raySubList {
                 if item.isValid {
@@ -190,7 +189,7 @@ class V2raySubscript: NSObject {
     }
 }
 
-// ----- v2ray subscript item -----
+// ----- v2ray subscribe item -----
 class V2raySubItem: NSObject, NSCoding {
     var name: String
     var remark: String
@@ -244,42 +243,5 @@ class V2raySubItem: NSObject, NSCoding {
     // remove from UserDefaults
     static func remove(name: String) {
         UserDefaults.standard.removeObject(forKey: name)
-    }
-}
-
-class V2raySubscriptUpdater {
-    public static func sync() {
-        var list = V2raySubscript.list()
-        for item in list {
-            print("item", item)
-            self.dlFromUrl(url: item.url)
-        }
-    }
-
-    public static func dlFromUrl(url: String) {
-        Alamofire.request(url).responseString { response in
-            switch (response.result) {
-            case .success(_):
-                if let data = response.result.value {
-                    self.handle(base64Str: data)
-                }
-
-            case .failure(_):
-                print("Error message:", response.result.error)
-                break
-            }
-        }
-    }
-
-    public static func handle(base64Str: String) {
-        let strTmp = base64Str.base64Decoded()
-        if strTmp == nil {
-            return
-        }
-        let list = strTmp!.components(separatedBy: "\n")
-        for item in list {
-            // import every server
-            menuController.importUri(url: item)
-        }
     }
 }

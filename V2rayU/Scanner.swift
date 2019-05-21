@@ -127,6 +127,13 @@ class ImportUri {
     var uri: String = ""
     
     static func importUri(uri: String) -> ImportUri? {
+        if V2rayServer.exist(url: uri) {
+            let importUri = ImportUri()
+            importUri.isValid = false
+            importUri.error = "Url already exists"
+            return importUri
+        }
+
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)
@@ -152,12 +159,7 @@ class ImportUri {
 
     func importSSUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail ss url"
-            return
-        }
-
-        if V2rayServer.exist(url: uri) {
-            self.error = "url is exist"
+            self.error = "invalid ss url"
             return
         }
 
@@ -194,7 +196,7 @@ class ImportUri {
 
     func importSSRUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail ssr url"
+            self.error = "invalid ssr url"
             return
         }
         self.uri = uri
@@ -230,12 +232,7 @@ class ImportUri {
 
     func importVmessUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail vmess url"
-            return
-        }
-
-        if V2rayServer.exist(url: uri) {
-            self.error = "url is exist"
+            self.error = "invalid vmess url"
             return
         }
 

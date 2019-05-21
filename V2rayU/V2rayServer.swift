@@ -114,8 +114,8 @@ class V2rayServer: NSObject {
     // add v2ray server (tmp)
     static func add() {
         if self.v2rayItemList.count > 50 {
-            NSLog("over max len")
-            return
+//            NSLog("over max len")
+//            return
         }
 
         // name is : config. + uuid
@@ -135,8 +135,8 @@ class V2rayServer: NSObject {
     // add v2ray server (by scan qrcode)
     static func add(remark: String, json: String, isValid: Bool, url: String = "") {
         if self.v2rayItemList.count > 50 {
-            NSLog("over max len")
-            return
+//            NSLog("over max len")
+//            return
         }
 
         var remark_ = remark

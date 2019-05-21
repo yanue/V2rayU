@@ -721,8 +721,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         preferencesWindowController.show(preferencePane: .advanceTab)
     }
     
-    @IBAction func goSubscriptSetting(_ sender: Any) {
-        preferencesWindowController.show(preferencePane: .subscriptTab)
+    @IBAction func goSubscribeSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .subscribeTab)
     }
 }
 
