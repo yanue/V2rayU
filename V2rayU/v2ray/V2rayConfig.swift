@@ -56,7 +56,7 @@ let jsSourceFormatConfig =
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
-    var isNewVersion = false
+    var isNewVersion = true
     var isEmptyInput = false
 
     var error = ""
