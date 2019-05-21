@@ -231,7 +231,7 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         // config window title is "V2rayU"
-        if object.title == "V2rayU" {
+        if object.title == "V2rayU" && self.closedByConfigWindow == false {
             self.hideDock()
         }
     }

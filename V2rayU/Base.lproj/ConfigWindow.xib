@@ -71,6 +71,7 @@
                 <outlet property="vmessPort" destination="UVC-X3-LD3" id="2qh-18-ZrZ"/>
                 <outlet property="vmessSecurity" destination="Pj0-ZW-RX6" id="Uv5-eV-LQH"/>
                 <outlet property="vmessUserId" destination="fBB-vZ-Uij" id="ecR-Iy-tgA"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="QkV-hM-UcI"/>
                 <outlet property="wsHost" destination="J2o-zN-FBt" id="gAT-ZQ-W96"/>
                 <outlet property="wsPath" destination="Anc-Zc-Ixg" id="MRm-gH-Exm"/>
                 <outlet property="wsView" destination="EDO-0J-rK1" id="vRX-kZ-tQm"/>

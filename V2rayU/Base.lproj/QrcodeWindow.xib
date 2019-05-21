@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="shareQrcode" destination="A7n-ua-0nz" id="osg-S9-FM3"/>
                 <outlet property="shareUri" destination="u9M-IA-5nP" id="jNY-gA-XtE"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="cqA-r1-G1j"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
