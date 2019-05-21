@@ -125,6 +125,30 @@ class ImportUri {
     var remark: String = ""
     var error: String = ""
     var uri: String = ""
+    
+    static func importUri(uri: String) -> ImportUri? {
+        if uri.hasPrefix("vmess://") {
+            let importUri = ImportUri()
+            importUri.importVmessUri(uri: uri)
+            return importUri
+        } else if uri.hasPrefix("ss://") {
+            let importUri = ImportUri()
+            importUri.importSSUri(uri: uri)
+            return importUri
+        } else if uri.hasPrefix("ssr://") {
+            let importUri = ImportUri()
+            importUri.importSSRUri(uri: uri)
+            return importUri
+        }
+        return nil
+    }
+    
+    static func supportProtocol(uri: String) -> Bool {
+        if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") {
+            return true
+        }
+        return false
+    }
 
     func importSSUri(uri: String) {
         if URL(string: uri) == nil {
@@ -668,7 +692,7 @@ class Scanner {
         for i in 0..<displayCount {
             let str = self.getQrcodeStr(displayID: activeDisplays[Int(i)])
             // support: ss:// | ssr:// | vmess://
-            if str.hasPrefix("ss://") || str.hasPrefix("ssr://") || str.hasPrefix("vmess://") {
+            if ImportUri.supportProtocol(uri: str) {
                 qrStr = str
                 break
             }

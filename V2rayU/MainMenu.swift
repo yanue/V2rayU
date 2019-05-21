@@ -456,19 +456,7 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        if uri.hasPrefix("vmess://") {
-            let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
-            self.saveServer(importUri: importUri)
-            return
-        } else if uri.hasPrefix("ss://") {
-            let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
-            self.saveServer(importUri: importUri)
-            return
-        } else if uri.hasPrefix("ssr://") {
-            let importUri = ImportUri()
-            importUri.importSSRUri(uri: uri)
+        if let importUri = ImportUri.importUri(uri: uri) {
             self.saveServer(importUri: importUri)
             return
         }
