@@ -159,14 +159,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 rowIndex = idx
             }
 
+            // reload
+            self.serversTableView.reloadData()
+
             // fix
             if cnt > 1 {
                 // selected row
                 self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
             }
-
-            // reload
-            self.serversTableView.reloadData()
 
             if rowIndex >= 0 {
                 self.loadJsonData(rowIndex: rowIndex)
@@ -537,13 +537,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         let uri = jsonUrl.stringValue.trimmingCharacters(in: .whitespaces)
         // edit item remark
         V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
-        if uri.hasPrefix("vmess://") {
-            let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
-            self.saveImport(importUri: importUri)
-        } else if uri.hasPrefix("ss://") {
-            let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
+
+        if let importUri = ImportUri.importUri(uri: uri) {
             self.saveImport(importUri: importUri)
         } else {
             // download json file
@@ -741,7 +736,10 @@ extension ConfigWindowController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let v2rayItemList = V2rayServer.list()
         // set cell data
-        return v2rayItemList[row].remark
+        if v2rayItemList.count >= row {
+            return v2rayItemList[row].remark
+        }
+        return nil
     }
 
     // edit cell

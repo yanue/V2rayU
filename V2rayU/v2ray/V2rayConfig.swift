@@ -155,7 +155,7 @@ class V2rayConfig: NSObject {
 
     func combineManualData() {
         // base
-        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: self.logLevel) ?? V2rayLog.logLevel.info
+        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
         self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()

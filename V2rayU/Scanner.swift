@@ -125,6 +125,30 @@ class ImportUri {
     var remark: String = ""
     var error: String = ""
     var uri: String = ""
+    
+    static func importUri(uri: String) -> ImportUri? {
+        if uri.hasPrefix("vmess://") {
+            let importUri = ImportUri()
+            importUri.importVmessUri(uri: uri)
+            return importUri
+        } else if uri.hasPrefix("ss://") {
+            let importUri = ImportUri()
+            importUri.importSSUri(uri: uri)
+            return importUri
+        } else if uri.hasPrefix("ssr://") {
+            let importUri = ImportUri()
+            importUri.importSSRUri(uri: uri)
+            return importUri
+        }
+        return nil
+    }
+    
+    static func supportProtocol(uri: String) -> Bool {
+        if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") {
+            return true
+        }
+        return false
+    }
 
     func importSSUri(uri: String) {
         if URL(string: uri) == nil {
@@ -155,6 +179,43 @@ class ImportUri {
         ssServer.password = ss.password
         ssServer.method = ss.method
         v2ray.serverShadowsocks = ssServer
+        v2ray.enableMux = false
+        v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
+        // check is valid
+        v2ray.checkManualValid()
+        if v2ray.isValid {
+            self.isValid = true
+            self.json = v2ray.combineManual()
+        } else {
+            self.error = v2ray.error
+            self.isValid = false
+        }
+    }
+
+    func importSSRUri(uri: String) {
+        if URL(string: uri) == nil {
+            self.error = "invail ssr url"
+            return
+        }
+        self.uri = uri
+
+        let ssr = ShadowsockRUri()
+        ssr.Init(url: URL(string: uri)!)
+        if ssr.error.count > 0 {
+            self.error = ssr.error
+            self.isValid = false
+            return
+        }
+        self.remark = ssr.remark
+
+        let v2ray = V2rayConfig()
+        var ssServer = V2rayOutboundShadowsockServer()
+        ssServer.address = ssr.host
+        ssServer.port = ssr.port
+        ssServer.password = ssr.password
+        ssServer.method = ssr.method
+        v2ray.serverShadowsocks = ssServer
+        v2ray.enableMux = false
         v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
         // check is valid
         v2ray.checkManualValid()
@@ -511,7 +572,7 @@ class ShadowsockUri {
         }
     }
 
-    private func decodeUrl(url: URL) -> (String?, String?) {
+    func decodeUrl(url: URL) -> (String?, String?) {
         let urlStr = url.absoluteString
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 5)
         let base64End = urlStr.firstIndex(of: "#")
@@ -531,13 +592,13 @@ class ShadowsockUri {
 
         if let index = base64End {
             let i = urlStr.index(index, offsetBy: 1)
-            let fragment = String(urlStr[i...])
+            let fragment = String(urlStr[i...]).removingPercentEncoding
             return ("ss://\(s)", fragment)
         }
         return ("ss://\(s)", nil)
     }
 
-    private func padBase64(string: String) -> String {
+    func padBase64(string: String) -> String {
         var length = string.utf8.count
         if length % 4 == 0 {
             return string
@@ -545,6 +606,79 @@ class ShadowsockUri {
             length = 4 - length % 4 + length
             return string.padding(toLength: length, withPad: "=", startingAt: 0)
         }
+    }
+}
+
+// link: https://coderschool.cn/2498.html
+class ShadowsockRUri : ShadowsockUri {
+
+    override func Init(url: URL) {
+        let (_decodedUrl, _tag) = self.decodeUrl(url: url)
+        guard let decodedUrl = _decodedUrl else {
+            self.error = "error: decodeUrl"
+            return
+        }
+
+        let parts: Array<Substring> = decodedUrl.split(separator: ":")
+        if parts.count != 6 {
+            self.error = "error:url"
+            return
+        }
+
+        let host: String = String(parts[0])
+        let port = String(parts[1])
+        let method = String(parts[3])
+        let passwordBase64 = String(parts[5])
+
+        self.host = host
+        if let aPort = Int(port) {
+            self.port = aPort
+        }
+
+        self.method = method.lowercased()
+        if let tag = _tag {
+            self.remark = tag
+        }
+
+        guard let data = Data(base64Encoded: self.padBase64(string: passwordBase64)), let password = String(data: data, encoding: .utf8) else {
+            self.error = "URL: password decode error"
+            return
+        }
+        self.password = password
+    }
+
+    override func decodeUrl(url: URL) -> (String?, String?) {
+        let urlStr = url.absoluteString
+        // remove left ssr://
+        let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 6)
+        let encodedStr = String(urlStr[base64Begin...])
+        
+        guard let data = Data(base64Encoded: self.padBase64(string: encodedStr)) else {
+            self.error = "decode ssr error"
+            return (url.absoluteString, nil)
+        }
+
+        guard let decoded = String(data: data, encoding: String.Encoding.utf8) else {
+            self.error = "decode ssr error"
+            return (nil, nil)
+        }
+
+        let raw = decoded.trimmingCharacters(in: CharacterSet(charactersIn: "\n"))
+
+        let sep = raw.range(of: "/?")
+        let s = String(raw[..<(sep?.lowerBound ?? raw.endIndex)])
+        if let iBeg = raw.range(of: "remarks=")?.upperBound {
+            let fragment = String(raw[iBeg...])
+            let iEnd = fragment.firstIndex(of: "&")
+            let aRemarks = String(fragment[..<(iEnd ?? raw.endIndex)])
+            guard let data = Data(base64Encoded: self.padBase64(string: aRemarks)), let tag = String(data: data, encoding: .utf8) else {
+//                self.error = "decode ssr error remarks is not base64"
+                return (s, aRemarks)
+            }
+            return (s, tag)
+        }
+
+        return (s, nil)
     }
 }
 
@@ -570,7 +704,7 @@ class Scanner {
         for i in 0..<displayCount {
             let str = self.getQrcodeStr(displayID: activeDisplays[Int(i)])
             // support: ss:// | ssr:// | vmess://
-            if str.hasPrefix("ss://") || str.hasPrefix("ssr://") || str.hasPrefix("vmess://") {
+            if ImportUri.supportProtocol(uri: str) {
                 qrStr = str
                 break
             }

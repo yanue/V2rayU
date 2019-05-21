@@ -1,7 +1,5 @@
-*.xcuserstate  
-project.xcworkspace  
-xcuserdata  
-UserInterfaceState.xcuserstate  
-project.xcworkspace/  
-xcuserdata/  
-UserInterface.xcuserstate
+V2rayU.xcodeproj/project.xcworkspace/xcuserdata
+V2rayU.xcodeproj/xcuserdata
+Pods
+V2rayU.xcworkspace/xcuserdata
+Build/v2ray-core

@@ -70,6 +70,7 @@
                 <outlet property="vmessPort" destination="UVC-X3-LD3" id="2qh-18-ZrZ"/>
                 <outlet property="vmessSecurity" destination="Pj0-ZW-RX6" id="Uv5-eV-LQH"/>
                 <outlet property="vmessUserId" destination="fBB-vZ-Uij" id="ecR-Iy-tgA"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="QkV-hM-UcI"/>
                 <outlet property="wsHost" destination="J2o-zN-FBt" id="gAT-ZQ-W96"/>
                 <outlet property="wsPath" destination="Anc-Zc-Ixg" id="MRm-gH-Exm"/>
                 <outlet property="wsView" destination="EDO-0J-rK1" id="vRX-kZ-tQm"/>
@@ -206,10 +207,10 @@ Gw
                                                             <action selector="browseFile:" target="-2" id="cfx-wb-sdZ"/>
                                                         </connections>
                                                     </button>
-                                                    <textField toolTip="vmess:// or ss:// or http:// or file://" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cY-nr-cxd">
+                                                    <textField toolTip="vmess:// or ss:// or ssr:// or http:// or file://" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cY-nr-cxd">
                                                         <rect key="frame" x="70" y="11" width="198" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="vmess:// or ss:// or http://" usesSingleLineMode="YES" bezelStyle="round" id="MHF-nm-HG8">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="vmess:// or ss:// or ssr:// or http://" usesSingleLineMode="YES" bezelStyle="round" id="MHF-nm-HG8">
                                                             <font key="font" usesAppearanceFont="YES"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
