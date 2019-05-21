@@ -1,11 +1,11 @@
 # V2rayU
 ![](https://github.com/yanue/V2rayU/blob/master/V2rayU/Assets.xcassets/AppIcon.appiconset/128.png?raw=true)
 
-V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基于v2ray项目,支持vmess,shadowsocks,socks5等服务协议(推荐搭建**v2ray服务**,可伪装成正常网站,防封锁), 支持二维码,剪贴板导入,手动配置,二维码分享等, 项目地址: https://github.com/yanue/V2rayU
+V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基于v2ray项目,支持vmess,shadowsocks,socks5等服务协议(推荐搭建**v2ray服务**,可伪装成正常网站,防封锁), 支持二维码,剪贴板导入,手动配置,二维码分享等, 支持订阅, 项目地址: https://github.com/yanue/V2rayU
 
 ### 主要特性
 ----
-- **支持协议:** vmess:// 和 ss:// 协议,支持socks5协议
+- **支持协议:** vmess:// 和 ss:// 和 ssr:// 协议,支持socks5协议
 - **支持导入**: 支持二维码,粘贴板导入,本地文件及url导入
 - **支持编辑**: 导入配置后可以手动更改配置信息
 - **手动配置**: 支持在导入或未导入情况下手动配置主要参数
@@ -13,6 +13,7 @@ V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基�
 - **主动更新**: 支持主动更新到最新版
 - **支持模式**: 支持pac模式,手动代理模式,支持全局代理(有别于vpn,只是将代理信息更新到系统代理http,https,socks)
 - **支持4.0**: 支持手动切换到v2ray-core 4.0以上配置格式
+- **支持订阅**: <span style="color: red">支持v2ray和ss及ssr订阅</span>
 
 ### 下载安装
 - 方式一: 使用homebrew命令安装
@@ -32,13 +33,21 @@ V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2
 ### 功能预览
 ----
 <p>
-<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/1.png?raw=true" height="300"/> 
-<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/4.png?raw=true" height="300"/> 
-<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/5.png?raw=true" height="300"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/menu.png?raw=true" height="300"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/share.png?raw=true" height="300"/> 
+    <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/about.png?raw=true" height="300"/> 
 </p>
 <p>
-
-<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/2.png?raw=true" width="400"/> <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/3.png?raw=true"  width="400"/>
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/general.png?raw=true" height="300"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/advance.png?raw=true" height="300"/> 
+</p>
+<p>
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/subscribe.png?raw=true" height="300"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/pac.png?raw=true" height="300"/> 
+</p>
+<p>
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/import.png?raw=true" width="400"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/manual.png?raw=true"  width="400"/>
 </p>
 
 ### v2ray服务器搭建推荐
@@ -68,8 +77,6 @@ cd /Applications/V2rayU.app/Contents/Resources/
 ```
 
 ### 待实现功能:
-	ADBlock-Rules
-	订阅功能
 	速度测试
 
 ### 欢迎贡献代码:
