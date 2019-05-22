@@ -13,7 +13,7 @@ import Alamofire
 let PACRulesDirPath = AppResourcesPath + "/pac/"
 let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
 let PACFilePath = PACRulesDirPath + "pac.js"
-let PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
+var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
 let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"

@@ -538,7 +538,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // edit item remark
         V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
 
-        if let importUri = ImportUri.importUri(uri: uri) {
+        if let importUri = ImportUri.importUri(uri: uri, checkExist: false) {
             self.saveImport(importUri: importUri)
         } else {
             // download json file

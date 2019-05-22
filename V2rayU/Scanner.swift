@@ -126,8 +126,8 @@ class ImportUri {
     var error: String = ""
     var uri: String = ""
     
-    static func importUri(uri: String) -> ImportUri? {
-        if V2rayServer.exist(url: uri) {
+    static func importUri(uri: String,checkExist:Bool = true) -> ImportUri? {
+        if checkExist && V2rayServer.exist(url: uri) {
             let importUri = ImportUri()
             importUri.isValid = false
             importUri.error = "Url already exists"

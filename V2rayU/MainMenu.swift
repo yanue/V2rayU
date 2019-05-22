@@ -404,17 +404,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     @IBAction func copyExportCommand(_ sender: NSMenuItem) {
         // Get the Http proxy config.
-        var httpPort = ""
-
-        let v2ray = V2rayServer.loadSelectedItem()
-
-        if v2ray != nil && v2ray!.isValid {
-            let cfg = V2rayConfig()
-            cfg.parseJson(jsonText: v2ray!.json)
-            httpPort = cfg.httpPort
-        } else {
-            return
-        }
+        let httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
 
         // Format an export string.
         let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);"

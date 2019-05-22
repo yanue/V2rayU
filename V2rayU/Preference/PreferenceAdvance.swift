@@ -46,6 +46,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
 
         // select item
+        print("logLevel",UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")
         self.logLevel.selectItem(withTitle: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")
 
         self.enableUdp.state = enableUdpState ? .on : .off
@@ -79,8 +80,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         let dnsServersVal = self.dnsServers.stringValue
         let muxConcurrentVal = self.muxConcurrent.intValue
-        let logLevelVal = self.logLevel.stringValue
-
+        
         // save
         UserDefaults.setBool(forKey: .enableUdp, value: enableUdpVal)
         UserDefaults.setBool(forKey: .enableMux, value: enableMuxVal)
@@ -91,8 +91,14 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         UserDefaults.set(forKey: .dnsServers, value: dnsServersVal)
         UserDefaults.set(forKey: .muxConcurrent, value: String(muxConcurrentVal))
-        UserDefaults.set(forKey: .v2rayLogLevel, value: logLevelVal)
-
+        
+        var logLevelName = "info"
+        
+        if let logLevelVal = self.logLevel.selectedItem {
+            print("logLevelVal",logLevelVal)
+            logLevelName = logLevelVal.title
+            UserDefaults.set(forKey: .v2rayLogLevel, value: logLevelVal.title)
+        }
         // replace
         v2rayConfig.httpPort = httpPortVal
         v2rayConfig.socksPort = sockPortVal
@@ -100,7 +106,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         v2rayConfig.enableMux = enableMuxVal
         v2rayConfig.dns = dnsServersVal
         v2rayConfig.mux = Int(muxConcurrentVal)
-        v2rayConfig.logLevel = logLevelVal
+        v2rayConfig.logLevel = logLevelName
 
         // set current server item and reload v2ray-core
         let item = V2rayServer.loadSelectedItem()
@@ -115,6 +121,10 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         }
 
         // set HttpServerPacPort
-        HttpServerPacPort = Int(pacPortVal) ?? 1085
+        HttpServerPacPort = pacPortVal
+        PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
+        GeneratePACFile()
+        // generate plist
+        V2rayLaunch.generateLaunchAgentPlist()
     }
 }
