@@ -20,7 +20,8 @@ V2rayU 是一款v2ray mac客户端,用于科学上网,使用swift4.2编写,基�
 ```
   brew cask install v2rayu
 ```
-- 方式二: 下载最新版安装: [https://github.com/yanue/V2rayU/releases](https://github.com/yanue/V2rayU/releases)
+- 方式二: 下载最新版安装
+> [https://github.com/yanue/V2rayU/releases](https://github.com/yanue/V2rayU/releases)
 
 ### v2ray简介
    V2Ray 是 Project V 下的一个工具。Project V 包含一系列工具，帮助你打造专属的定制网络体系。而 V2Ray 属于最核心的一个。
@@ -38,16 +39,16 @@ V2Ray 项目地址：[https://github.com/v2ray/v2ray-core](https://github.com/v2
     <img src="https://github.com/yanue/V2rayU/blob/master/screenshot/about.png?raw=true" height="300"/> 
 </p>
 <p>
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/import.png?raw=true" width="400"/> 
+	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/manual.png?raw=true"  width="400"/>
+</p>
+<p>
 	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/general.png?raw=true" height="300"/> 
 	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/advance.png?raw=true" height="300"/> 
 </p>
 <p>
 	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/subscribe.png?raw=true" height="300"/> 
 	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/pac.png?raw=true" height="300"/> 
-</p>
-<p>
-	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/import.png?raw=true" width="400"/> 
-	<img src="https://github.com/yanue/V2rayU/blob/master/screenshot/manual.png?raw=true"  width="400"/>
 </p>
 
 ### v2ray服务器搭建推荐
