@@ -158,7 +158,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         if strTmp == nil {
             return
         }
-        let list = strTmp!.components(separatedBy: "\n")
+        let list = strTmp!.components(separatedBy: CharacterSet.newline)
         for item in list {
             // import every server
             self.importUri(uri: item)
