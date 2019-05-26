@@ -30,27 +30,25 @@
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
-		66BC2B87228C537F00FBB716 /* PreferencePac.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66BC2B86228C537F00FBB716 /* PreferencePac.xib */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscript.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
-		6D6DF16BC49BBF5F3D4B12CF /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFD8EB18FBEA30274ED0D /* PreferenceGeneral.xib */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */; };
-		6D6DF43A6898B0A8CB50C241 /* PreferenceAdvance.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF4CCA47DCA0A592BCE60 /* PreferenceAdvance.xib */; };
+		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */; };
 		6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8F5112A8407EE959998 /* .gitignore */; };
 		6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
-		6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFCE2F5044A1164CB14E3 /* tmp1.json */; };
 		6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */; };
-		6D6DF872C0DECC082122D783 /* tmp.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8E42F7E29CCBEFF5468 /* tmp.json */; };
 		6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
 		6D6DF93B58B654D86ACC490E /* PreferenceAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */; };
-		6D6DFBB73E90918ED212F138 /* PreferenceAbout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFCD202C8F28474E9ED3C /* PreferenceAbout.xib */; };
-		6D6DFD181802BAFE2933B9C9 /* PreferenceSubscribe.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFBD3C6A7344A44DDE16D /* PreferenceSubscribe.xib */; };
+		6D6DF95B4749491F1D600B05 /* PreferenceAdvance.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */; };
+		6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */; };
+		6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */; };
+		6D6DFFD18860EBE148F6DF1F /* PreferencePac.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -144,28 +142,28 @@
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
-		66BC2B86228C537F00FBB716 /* PreferencePac.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferencePac.xib; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscript.swift; sourceTree = "<group>"; };
 		66F411B421CA8921007AAC10 /* cmd.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = cmd.sh; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		6D6DF085C3C411989C416D0D /* user-rule.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
 		6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QrcodeWindow.swift; sourceTree = "<group>"; };
+		6D6DF181C5D472DBBB71B72A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferencePac.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencePac.swift; sourceTree = "<group>"; };
+		6D6DF3A2857899778B719CE1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAbout.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF3C1564D0EBC5A99C9C1 /* gfwlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
-		6D6DF4CCA47DCA0A592BCE60 /* PreferenceAdvance.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceAdvance.xib; sourceTree = "<group>"; };
 		6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSubscribe.swift; sourceTree = "<group>"; };
 		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAdvance.swift; sourceTree = "<group>"; };
+		6D6DF81E59907A2C7579BFE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceGeneral.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAbout.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		6D6DF8E42F7E29CCBEFF5468 /* tmp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp.json; sourceTree = "<group>"; };
 		6D6DF8F5112A8407EE959998 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
-		6D6DFBD3C6A7344A44DDE16D /* PreferenceSubscribe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceSubscribe.xib; sourceTree = "<group>"; };
-		6D6DFCD202C8F28474E9ED3C /* PreferenceAbout.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceAbout.xib; sourceTree = "<group>"; };
 		6D6DFCE2F5044A1164CB14E3 /* tmp1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp1.json; sourceTree = "<group>"; };
-		6D6DFD8EB18FBEA30274ED0D /* PreferenceGeneral.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceGeneral.xib; sourceTree = "<group>"; };
+		6D6DFD730D8572B1FCAB1FFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceSubscribe.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
+		6D6DFE1CDFAD9828F2FDE1A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAdvance.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFFB0110E2442FC8337A5 /* format.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = format.js; sourceTree = "<group>"; };
 		6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
@@ -317,15 +315,15 @@
 			isa = PBXGroup;
 			children = (
 				6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */,
-				6D6DFCD202C8F28474E9ED3C /* PreferenceAbout.xib */,
 				6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */,
-				66BC2B86228C537F00FBB716 /* PreferencePac.xib */,
 				6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */,
-				6D6DFBD3C6A7344A44DDE16D /* PreferenceSubscribe.xib */,
 				6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */,
-				6D6DFD8EB18FBEA30274ED0D /* PreferenceGeneral.xib */,
 				6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */,
-				6D6DF4CCA47DCA0A592BCE60 /* PreferenceAdvance.xib */,
+				6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */,
+				6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */,
+				6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */,
+				6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */,
+				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */,
 			);
 			path = Preference;
 			sourceTree = "<group>";
@@ -519,14 +517,12 @@
 				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
-				6D6DF872C0DECC082122D783 /* tmp.json in Resources */,
-				6D6DF7C2F627A8BABECA4C32 /* tmp1.json in Resources */,
 				6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */,
-				6D6DF16BC49BBF5F3D4B12CF /* PreferenceGeneral.xib in Resources */,
-				6D6DFD181802BAFE2933B9C9 /* PreferenceSubscribe.xib in Resources */,
-				66BC2B87228C537F00FBB716 /* PreferencePac.xib in Resources */,
-				6D6DFBB73E90918ED212F138 /* PreferenceAbout.xib in Resources */,
-				6D6DF43A6898B0A8CB50C241 /* PreferenceAdvance.xib in Resources */,
+				6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.xib in Resources */,
+				6D6DF95B4749491F1D600B05 /* PreferenceAdvance.xib in Resources */,
+				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.xib in Resources */,
+				6D6DFFD18860EBE148F6DF1F /* PreferencePac.xib in Resources */,
+				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -680,6 +676,46 @@
 			name = ConfigWindow.xib;
 			sourceTree = "<group>";
 		};
+		6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DFD730D8572B1FCAB1FFE /* Base */,
+			);
+			name = PreferenceSubscribe.xib;
+			sourceTree = "<group>";
+		};
+		6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DFE1CDFAD9828F2FDE1A5 /* Base */,
+			);
+			name = PreferenceAdvance.xib;
+			sourceTree = "<group>";
+		};
+		6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DF3A2857899778B719CE1 /* Base */,
+			);
+			name = PreferenceAbout.xib;
+			sourceTree = "<group>";
+		};
+		6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DF81E59907A2C7579BFE2 /* Base */,
+			);
+			name = PreferenceGeneral.xib;
+			sourceTree = "<group>";
+		};
+		6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6D6DF181C5D472DBBB71B72A /* Base */,
+			);
+			name = PreferencePac.xib;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -701,7 +737,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -723,7 +759,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -744,7 +780,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayUTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/V2rayU.app/Contents/MacOS/V2rayU";
 			};
 			name = Debug;
@@ -766,7 +802,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayUTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/V2rayU.app/Contents/MacOS/V2rayU";
 			};
 			name = Release;
@@ -780,7 +816,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -793,7 +829,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -935,7 +971,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -958,7 +994,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
