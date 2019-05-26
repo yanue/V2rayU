@@ -99,13 +99,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 func GeneratePACFile() -> Bool {
     let socks5Address = "127.0.0.1"
     
-    let v2ray = V2rayServer.loadSelectedItem()
-    var sockPort = "1080"
-    if v2ray != nil && v2ray!.isValid {
-        let cfg = V2rayConfig()
-        cfg.parseJson(jsonText: v2ray!.json)
-        sockPort = cfg.socksPort
-    }
+    let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
     
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./pac"])

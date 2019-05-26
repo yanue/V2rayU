@@ -40,6 +40,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2rayUpdater.checkForUpdatesInBackground()
         }
 
+        // start http server for pac
+        V2rayLaunch.startHttpServer()
+
         // wake and sleep
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onSleepNote(note:)), name: NSWorkspace.willSleepNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onWakeNote(note:)), name: NSWorkspace.didWakeNotification, object: nil)

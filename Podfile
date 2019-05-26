@@ -14,5 +14,6 @@ target 'V2rayU' do
   pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
   pod 'Sparkle'
   pod 'QRCoder'
+  pod "GCDWebServer"
 
 end

@@ -3,3 +3,6 @@ V2rayU.xcodeproj/xcuserdata
 Pods
 V2rayU.xcworkspace/xcuserdata
 Build/v2ray-core
+Podfile.lock
+.DS_Store
+.idea

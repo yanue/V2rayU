@@ -112,8 +112,8 @@ class V2rayUTool: NSObject {
 
                 if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
                     // restore system proxy setting in off or manual or restore
-                    if (mode == .off || mode == .manual || mode == .restore) && originalSets != nil && originalSets!.keys.contains(key as! String) {
-                        if let nowSet = originalSets![key as! String] {
+                    if (mode == .off || mode == .manual || mode == .restore) && originalSets != nil && originalSets!.keys.contains(key) {
+                        if let nowSet = originalSets![key] {
                             proxies = nowSet["Proxies"] as! [NSObject: AnyObject];
                         }
                     }

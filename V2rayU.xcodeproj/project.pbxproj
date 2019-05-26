@@ -158,9 +158,7 @@
 		6D6DF81E59907A2C7579BFE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceGeneral.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAbout.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
-		6D6DF8E42F7E29CCBEFF5468 /* tmp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp.json; sourceTree = "<group>"; };
 		6D6DF8F5112A8407EE959998 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
-		6D6DFCE2F5044A1164CB14E3 /* tmp1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tmp1.json; sourceTree = "<group>"; };
 		6D6DFD730D8572B1FCAB1FFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceSubscribe.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		6D6DFE1CDFAD9828F2FDE1A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAdvance.xib; sourceTree = SOURCE_ROOT; };
@@ -258,8 +256,6 @@
 				664EB372216C9A5E00B6AE0D /* Products */,
 				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
-				6D6DF8E42F7E29CCBEFF5468 /* tmp.json */,
-				6D6DFCE2F5044A1164CB14E3 /* tmp1.json */,
 				6D6DF8F5112A8407EE959998 /* .gitignore */,
 			);
 			sourceTree = "<group>";
@@ -539,6 +535,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/GCDWebServer/GCDWebServer.framework",
 				"${BUILT_PRODUCTS_DIR}/Preferences/Preferences.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCoder/QRCoder.framework",
 				"${PODS_ROOT}/Sparkle/Sparkle.framework",
@@ -549,6 +546,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GCDWebServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Preferences.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCoder.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",

@@ -1,12 +1,16 @@
 PODS:
   - Alamofire (4.7.3)
-  - Preferences (0.2.1)
+  - GCDWebServer (3.4.2):
+    - GCDWebServer/Core (= 3.4.2)
+  - GCDWebServer/Core (3.4.2)
+  - Preferences (0.3.0)
   - QRCoder (1.0.0)
   - Sparkle (1.20.0)
   - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire
+  - GCDWebServer
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
@@ -15,6 +19,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - GCDWebServer
     - QRCoder
     - Sparkle
     - SwiftyJSON
@@ -25,16 +30,17 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Preferences:
-    :commit: fe835d32555e0d42d712980d821e75599eeabdbb
+    :commit: e2e2aaba41b531a642934a17c9b37149dd1c294c
     :git: https://github.com/sindresorhus/Preferences.git
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  Preferences: e56d1ec401c0403921c2afd5dba1fd7c3550cfe2
+  GCDWebServer: 8d67ee9f634b4bb91eb4b8aee440318a5fc6debd
+  Preferences: 865793c3914c4de086c809a504a4157b8968cb90
   QRCoder: 488f6869fb89ffcc3de3b4de2dabd200a6573f3c
   Sparkle: 48999e7ee032f05ca05e28451eadf4af8ede6b44
   SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: ff613ddf19e8680a09a0c3fe80f114482d26b8fc
+PODFILE CHECKSUM: efe1d5761f445cd3b9cf0d742a67c364a492fc56
 
 COCOAPODS: 1.6.1

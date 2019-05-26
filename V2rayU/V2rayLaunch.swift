@@ -9,6 +9,7 @@
 import Cocoa
 import SystemConfiguration
 import Alamofire
+import GCDWebServer
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
@@ -21,9 +22,10 @@ let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
-
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
+
+let webServer = GCDWebServer()
 
 enum RunMode: String {
     case global
@@ -57,20 +59,12 @@ class V2rayLaunch: NSObject {
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
 
-        // write http simple server plist
-        let httpArguments = ["/usr/bin/python", "-m", "SimpleHTTPServer", HttpServerPacPort]
-
-        let dictHttp: NSMutableDictionary = [
-            "Label": LAUNCH_HTTP_PLIST.replacingOccurrences(of: ".plist", with: ""),
-            "WorkingDirectory": AppResourcesPath,
-            "StandardOutPath": logFilePath,
-            "StandardErrorPath": logFilePath,
-            "ProgramArguments": httpArguments,
-            "KeepAlive": true,
-            "RunAtLoad": true,
-        ]
-
-        dictHttp.write(toFile: launchHttpPlistFile, atomically: true)
+        // if old launchHttpPlistFile exist
+        if fileMgr.fileExists(atPath: launchHttpPlistFile) {
+            print("launchHttpPlistFile exist", launchHttpPlistFile)
+            _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+            try! fileMgr.removeItem(atPath: launchHttpPlistFile)
+        }
 
         // permission
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
@@ -81,9 +75,7 @@ class V2rayLaunch: NSObject {
         // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
 
-        // reload
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchHttpPlistFile])
+        self.startHttpServer()
 
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
@@ -108,6 +100,9 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("Stop v2ray-core failed.")
         }
+
+        // stop http server
+        webServer.stop()
     }
 
     static func OpenLogs() {
@@ -125,11 +120,11 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func ClearLogs(){
+    static func ClearLogs() {
         let txt = ""
         try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
     }
-    
+
     static func chmodCmdPermission() {
         // Ensure launch agent directory is existed.
         if !FileManager.default.fileExists(atPath: cmdSh) {
@@ -163,5 +158,20 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("setSystemProxy " + mode.rawValue + " failed.")
         }
+    }
+
+    // start http server for pac
+    static func startHttpServer() {
+        if webServer.isRunning {
+           webServer.stop()
+        }
+        
+        _ = GeneratePACFile()
+        
+        let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
+
+        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
+
+        webServer.start(withPort: UInt(pacPort) ?? 1085, bonjourName: "GCD Web Server")
     }
 }

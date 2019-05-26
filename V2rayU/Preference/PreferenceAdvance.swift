@@ -63,12 +63,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         saveSettingsAndReload()
     }
 
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-
-        saveSettingsAndReload()
-    }
-
     func saveSettingsAndReload() {
 
         let httpPortVal = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
@@ -123,8 +117,9 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         // set HttpServerPacPort
         HttpServerPacPort = pacPortVal
         PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
-        GeneratePACFile()
-        // generate plist
-        V2rayLaunch.generateLaunchAgentPlist()
+
+        _ = GeneratePACFile()
+        // restart pac http server
+        V2rayLaunch.startHttpServer()
     }
 }
