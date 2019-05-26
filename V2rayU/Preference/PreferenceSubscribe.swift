@@ -129,7 +129,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     public func sync() {
         let list = V2raySubscribe.list()
 
-        if list.count==0{
+        if list.count == 0 {
             logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url ")
         }
 
@@ -161,7 +161,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         let list = strTmp!.components(separatedBy: CharacterSet.newlines)
         for item in list {
             // import every server
-            self.importUri(uri: item)
+            self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
 
