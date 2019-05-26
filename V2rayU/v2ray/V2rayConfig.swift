@@ -67,7 +67,7 @@ class V2rayConfig: NSObject {
     var socksPort = "1080"
     var httpPort = "1087"
     var enableUdp = true
-    var enableMux = true
+    var enableMux = false
     var mux = 8
     var dns = ""
 
@@ -310,6 +310,14 @@ class V2rayConfig: NSObject {
             }
             vmess!.vnext = [self.serverVmess]
             outbound.settingVMess = vmess
+
+            // enable mux only vmess
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+
+            outbound.mux = mux
+
             break
         case V2rayProtocolOutbound.shadowsocks:
             var ss = outbound.settingShadowsocks
@@ -325,12 +333,6 @@ class V2rayConfig: NSObject {
         default:
             break
         }
-
-        // mux
-        var mux = V2rayOutboundMux()
-        mux.enabled = self.enableMux
-        mux.concurrency = self.mux
-        outbound.mux = mux
 
         outbound.streamSettings = self.getStreamSettings()
         return outbound
@@ -425,6 +427,13 @@ class V2rayConfig: NSObject {
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [self.serverVmess]
             outbound.settingVMess = vmess
+
+            // enable mux only vmess
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+            outbound.mux = mux
+
             break
         case V2rayProtocolOutbound.shadowsocks:
             var ss = V2rayOutboundShadowsocks()
@@ -437,12 +446,6 @@ class V2rayConfig: NSObject {
         default:
             break
         }
-
-        // mux
-        var mux = V2rayOutboundMux()
-        mux.enabled = self.enableMux
-        mux.concurrency = self.mux
-        outbound.mux = mux
 
         outbound.streamSettings = self.getStreamSettings()
 
@@ -731,7 +734,7 @@ class V2rayConfig: NSObject {
                     settings.accounts = accounts
                 }
                 // use default setting
-                v2rayInbound.port =  self.httpPort
+                v2rayInbound.port = self.httpPort
                 // set into inbound
                 v2rayInbound.settingHttp = settings
                 break
@@ -777,7 +780,7 @@ class V2rayConfig: NSObject {
                 self.enableUdp = jsonParams["settings"]["udp"].boolValue
                 // use default setting
                 settings.udp = self.enableUdp
-                v2rayInbound.port =  self.socksPort
+                v2rayInbound.port = self.socksPort
                 // set into inbound
                 v2rayInbound.settingSocks = settings
                 break
@@ -843,11 +846,6 @@ class V2rayConfig: NSObject {
 
         v2rayOutbound.sendThrough = jsonParams["sendThrough"].stringValue
         v2rayOutbound.tag = jsonParams["tag"].stringValue
-
-        var mux = V2rayOutboundMux()
-        mux.enabled = self.enableMux
-        mux.concurrency = self.mux
-        v2rayOutbound.mux = mux
 
         // settings depends on protocol
         if jsonParams["settings"].dictionaryValue.count > 0 {
@@ -954,6 +952,13 @@ class V2rayConfig: NSObject {
 
                 // set into outbound
                 v2rayOutbound.settingVMess = settingVMess
+
+                // enable mux only vmess
+                var mux = V2rayOutboundMux()
+                mux.enabled = self.enableMux
+                mux.concurrency = self.mux
+                v2rayOutbound.mux = mux
+
                 break
             }
         }
