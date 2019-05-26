@@ -6,7 +6,7 @@
 //  Copyright © 2019 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import SwiftyJSON
 
 // ----- v2ray subscribe manager -----

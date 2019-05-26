@@ -5,5 +5,5 @@
 //
 
 
-import Foundation
+import Cocoa
 import Alamofire

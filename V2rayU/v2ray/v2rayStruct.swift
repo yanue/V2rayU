@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 
 // doc: https://www.v2ray.com/chapter_02/01_overview.html
 

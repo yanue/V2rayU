@@ -3,7 +3,7 @@
 // Copyright (c) 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import Cocoa
 import QRCoder
 
