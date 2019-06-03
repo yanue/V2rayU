@@ -41,6 +41,7 @@
 		6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8F5112A8407EE959998 /* .gitignore */; };
 		6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
+		6D6DF70EA6ADC7628931E630 /* HttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF1B2E4D0B61B7390F1B1 /* HttpServer.swift */; };
 		6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */; };
 		6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
@@ -149,6 +150,7 @@
 		6D6DF085C3C411989C416D0D /* user-rule.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
 		6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QrcodeWindow.swift; sourceTree = "<group>"; };
 		6D6DF181C5D472DBBB71B72A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferencePac.xib; sourceTree = SOURCE_ROOT; };
+		6D6DF1B2E4D0B61B7390F1B1 /* HttpServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpServer.swift; sourceTree = "<group>"; };
 		6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencePac.swift; sourceTree = "<group>"; };
 		6D6DF3A2857899778B719CE1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAbout.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF3C1564D0EBC5A99C9C1 /* gfwlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 				667029D121AFB86E0079EF41 /* QrcodeWindow.xib */,
 				6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */,
 				6D6DFBED570A0D1FDED0BD53 /* Preference */,
+				6D6DF1B2E4D0B61B7390F1B1 /* HttpServer.swift */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -631,6 +634,7 @@
 				6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */,
 				66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */,
 				6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */,
+				6D6DF70EA6ADC7628931E630 /* HttpServer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -808,6 +812,7 @@
 		6646669521CBC0860094F0B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
@@ -821,6 +826,7 @@
 		6646669621CBC0860094F0B7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
@@ -834,6 +840,7 @@
 		664EB37D216C9A5F00B6AE0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -897,6 +904,7 @@
 		664EB37E216C9A5F00B6AE0D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;

@@ -165,13 +165,18 @@ class V2rayLaunch: NSObject {
         if webServer.isRunning {
            webServer.stop()
         }
-        
+
         _ = GeneratePACFile()
-        
+
         let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 
         webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
 
-        webServer.start(withPort: UInt(pacPort) ?? 1085, bonjourName: "GCD Web Server")
+//        webServer.start(options: <#T##[AnyHashable : Any]?#>)
+        // Start
+        try!  webServer.start(options: [
+            "Port": UInt(pacPort) ?? 1085,
+            "BindToLocalhost": true
+            ] );
     }
 }
