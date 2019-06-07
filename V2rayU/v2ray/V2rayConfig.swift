@@ -1191,7 +1191,7 @@ class V2rayConfig: NSObject {
         if steamJson["wsSettings"].dictionaryValue.count > 0 {
             var wsSettings = WsSettings()
             wsSettings.path = steamJson["wsSettings"]["path"].stringValue
-            wsSettings.headers.host = steamJson["wsSettings"]["header"]["host"].stringValue
+            wsSettings.headers.host = steamJson["wsSettings"]["headers"]["host"].stringValue
 
             stream.wsSettings = wsSettings
         }

@@ -25,7 +25,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var configText: NSTextView!
     @IBOutlet weak var serversTableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
-    @IBOutlet weak var logLevel: NSPopUpButton!
     @IBOutlet weak var jsonUrl: NSTextField!
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
@@ -339,7 +338,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func bindDataToView() {
         // ========================== base start =======================
         // base
-        print("bindDataToView", v2rayConfig.httpPort, v2rayConfig.socksPort, v2rayConfig.dns)
         self.httpPort.title = v2rayConfig.httpPort
         self.sockPort.title = v2rayConfig.socksPort
         self.enableUdp.intValue = v2rayConfig.enableUdp ? 1 : 0
@@ -495,16 +493,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             self.switchToImportView()
         } else {
             self.saveConfig()
-        }
-    }
-
-    @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
-        if let item = logLevel.selectedItem {
-            UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
-            // replace current
-            self.switchToImportView()
-            // restart service
-            menuController.startV2rayCore()
         }
     }
 

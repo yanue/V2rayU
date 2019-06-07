@@ -58,11 +58,7 @@ class V2rayUTool: NSObject {
 
             // backup system proxy
             if mode == .backup {
-                do {
-                    _ = (sets as! NSDictionary).write(toFile: SysProxyBackupPlist, atomically: true)
-                } catch {
-                    print(error)
-                }
+                (sets as! NSDictionary).write(toFile: SysProxyBackupPlist, atomically: true)
                 return
             }
 
