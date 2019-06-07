@@ -1,0 +1,15 @@
+
+/* Class = "NSButtonCell"; title = "Save And Update Pac From GFW List"; ObjectID = "6OV-Jq-2Ue"; */
+"6OV-Jq-2Ue.title" = "Save And Update Pac From GFW List";
+
+/* Class = "NSTextFieldCell"; title = "GFW List URL"; ObjectID = "L8s-Y6-NP1"; */
+"L8s-Y6-NP1.title" = "GFW List URL";
+
+/* Class = "CocoaBindingsConnection"; ibShadowedDisplayPattern = "%{value1}@"; ObjectID = "Mxg-5a-CDL"; */
+"Mxg-5a-CDL.ibShadowedDisplayPattern" = "%{value1}@";
+
+/* Class = "NSTextFieldCell"; title = "User Rules"; ObjectID = "W0g-B7-neT"; */
+"W0g-B7-neT.title" = "User Rules";
+
+/* Class = "NSButtonCell"; title = "View Pac File"; ObjectID = "fkx-pu-mTv"; */
+"fkx-pu-mTv.title" = "View Pac File";

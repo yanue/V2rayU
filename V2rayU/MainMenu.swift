@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import Cocoa
 import ServiceManagement
 import Preferences
 import Sparkle
