@@ -93,4 +93,22 @@ class V2rayUTests: XCTestCase {
 
 //        print(V2ray.toJSONString(prettyPrint:true) ?? "") // 序列化为格式化后的JSON字符串
     }
+    
+    func testUrl(){
+        let url = "http://奥/奥神队"
+        let charSet = NSMutableCharacterSet()
+        charSet.formUnion(with: CharacterSet.urlQueryAllowed)
+        charSet.addCharacters(in: "#")
+        let url1 = url.addingPercentEncoding(withAllowedCharacters:  charSet as CharacterSet)!
+        print("url1",url1);
+        guard let rUrl = URL(string: url1) else {
+            print("not url")
+            return
+        }
+        if rUrl.scheme == nil || rUrl.host == nil {
+            print("not url 1")
+        }
+        print("url",rUrl.scheme,rUrl.host,rUrl.baseURL,rUrl.path)
+
+    }
 }

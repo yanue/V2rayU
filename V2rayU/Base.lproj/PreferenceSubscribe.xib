@@ -88,21 +88,21 @@
                                 <rect key="frame" x="1" y="0.0" width="418" height="218"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" rowSizeStyle="automatic" headerView="LDv-zp-onq" viewBased="YES" id="41h-DL-Lmq">
+                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" rowSizeStyle="automatic" headerView="LDv-zp-onq" viewBased="YES" id="41h-DL-Lmq">
                                         <rect key="frame" x="0.0" y="0.0" width="418" height="193"/>
-                                        <autoresizingMask key="autoresizingMask"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <size key="intercellSpacing" width="2" height="2"/>
                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                         <tableColumns>
                                             <tableColumn identifier="remarkCell" editable="NO" width="99.5" minWidth="40" maxWidth="1000" id="PPw-B0-d3E">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Remark">
-                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <font key="font" metaFont="label" size="11"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                 </tableHeaderCell>
                                                 <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="hEv-CH-Vqi">
-                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <font key="font" metaFont="label" size="11"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -130,12 +130,12 @@
                                             </tableColumn>
                                             <tableColumn identifier="urlCell" editable="NO" width="312.5" minWidth="40" maxWidth="1000" id="kc4-bL-WBd" userLabel="Subscribe Url">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Subscription Url ">
-                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <font key="font" metaFont="label" size="11"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                 </tableHeaderCell>
                                                 <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="1zb-8D-Kha">
-                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <font key="font" metaFont="label" size="11"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>

@@ -28,7 +28,7 @@
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
-		66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscript.swift */; };
+		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
 		66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F3029922AA9C0900FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
@@ -145,7 +145,7 @@
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
-		66BC2B88228C589E00FBB716 /* V2raySubscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscript.swift; sourceTree = "<group>"; };
+		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66F3029922AA9C0900FCA4E2 /* V2rayUTool */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUTool; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		66F3029D22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
@@ -299,7 +299,7 @@
 				660D0E59216E0158000C2922 /* V2rayServer.swift */,
 				66784AFF21704E1300AD307F /* V2rayCore.swift */,
 				6650AAAF21774A72000909D8 /* V2rayLaunch.swift */,
-				66BC2B88228C589E00FBB716 /* V2raySubscript.swift */,
+				66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				6650AAAC21771E11000909D8 /* unzip.sh */,
 				6D6DF87840CDA04AF0E9D36E /* Scanner.swift */,
@@ -641,7 +641,7 @@
 				6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */,
 				6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */,
 				6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */,
-				66BC2B89228C589E00FBB716 /* V2raySubscript.swift in Sources */,
+				66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */,
 				6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */,
 				6D6DF70EA6ADC7628931E630 /* HttpServer.swift in Sources */,
 			);

@@ -55,9 +55,18 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
             return
         }
 
-        if !url.isValidUrl() {
+        // special char
+        let charSet = NSMutableCharacterSet()
+        charSet.formUnion(with: CharacterSet.urlQueryAllowed)
+        charSet.addCharacters(in: "#")
+
+        guard let rUrl = URL(string: url.addingPercentEncoding(withAllowedCharacters: charSet as CharacterSet)!) else {
             self.url.becomeFirstResponder()
-            print("url is invalid")
+            return
+        }
+
+        if rUrl.scheme == nil || rUrl.host == nil {
+            self.url.becomeFirstResponder()
             return
         }
 
@@ -139,6 +148,8 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     }
 
     public func dlFromUrl(url: String) {
+        logTip(title: "loading from : ", uri: "", informativeText: url)
+
         Alamofire.request(url).responseString { response in
             switch (response.result) {
             case .success(_):
@@ -147,7 +158,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
                 }
 
             case .failure(_):
-                print("Error message:", response.result.error ?? "")
+                self.logTip(title: "loading fail : ", uri: "", informativeText: url)
                 break
             }
         }
@@ -199,7 +210,9 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
 
     func logTip(title: String = "", uri: String = "", informativeText: String = "") {
         self.logArea.string += title + informativeText + "\n"
-        self.logArea.string += "url: " + uri
+        if uri != "" {
+            self.logArea.string += "url: " + uri
+        }
         self.logArea.string += "\n\n"
         self.logArea.scrollPageDown("")
 
