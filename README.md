@@ -77,9 +77,54 @@ cd /Applications/V2rayU.app/Contents/Resources/
 ./v2ray-core/v2ray -config ./config.json
 ```
 
-### 待实现功能:
-	速度测试
+### 相关问题
+**1. 闪退**
 
+> 大多因为读取配置文件问题,删除以下文件重新配置即可
+
+```
+ ~/Library/Preferences/net.yanue.V2rayU.plist
+```
+另外, 可以通过 command + 空格 搜索 console.app , 打开后搜索 V2rayU 定位具体闪退错误日志
+
+ **2. 无法启动v2ray服务**
+
+> 多数情况为端口被占用,可以通过 show logs... 查看日志进行排查, 如端口被占用,请更改后重试
+
+ **3. 正常启动却无法翻墙访问**
+
+> 确保配置是正确的,然后确认启动的模式,在到网络->高级里面查看是否写入对应的代理信息(manual模式需要配合浏览器插件使用)
+
+**4. 报错: open config.json: no such file or directory**
+
+> 请严格按照 dmg 文件,拖动到 Applications 里面试下
+
+### 问题排查方法
+
+1. 不能使用
+>  如果之前有用过,更新或更改配置导致不能使用, 请彻底卸载试下,包含上面的相关文件(推荐使用appcleaner)
+   
+2. 无法启动或启动后无法翻墙: 
+  ##### a. 检查配置是否正确(主要是outbound和stream)
+  ##### b. 查看日志
+```
+	v2ray自身日志: V2rayU -> Show logs...
+	V2rayU日志: command + 空格 搜索 console.app , 打开后搜索 V2rayU 定位错误日志
+```
+  #####   c. 手动启动
+```
+cd /Applications/V2rayU.app/Contents/Resources/
+./v2ray-core/v2ray -config ./config.json
+```
+  #####  d. 查看网络配置: 启动V2rayU后查看: 网络 -> 高级 -> 代理 是否生效
+
+  #####  e. 以上都解决不了,提交issue
+
+### 待实现功能:
+	中文
+	路由规则配置
+	速度测试
+	
 ### 欢迎贡献代码:
 	1. fork 然后 git clone
 	2. pod install
