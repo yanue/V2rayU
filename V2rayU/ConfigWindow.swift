@@ -702,7 +702,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-        menuController.hideDock()
+      _ = menuController.showDock(state: false)
     }
 
     @IBAction func goAdvanceSetting(_ sender: Any) {

@@ -234,12 +234,11 @@ class MenuController: NSObject, NSMenuDelegate {
             configWindow = ConfigWindowController()
         }
 
-        // show window
+        self.showDock(state: true)
+//        // show window
         configWindow.showWindow(nil)
         configWindow.window?.makeKeyAndOrderFront(self)
-        // show dock icon
-        NSApp.setActivationPolicy(.regular)
-        // bring to front
+//        // bring to front
         NSApp.activate(ignoringOtherApps: true)
     }
 
@@ -252,18 +251,25 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         // config window title is "V2rayU"
-        if object.title == "V2rayU" && self.closedByConfigWindow == false {
-            self.hideDock()
+        if object.title == "V2rayU" {
+            _ = self.showDock(state: false)
         }
     }
 
-    func hideDock() {
-        // hide dock icon and close all opened windows
-        NSApp.setActivationPolicy(.accessory)
-        // close by config window
-        self.closedByConfigWindow = true
-        // close
-        configWindow.close()
+    func showDock(state: Bool) -> Bool {
+        // Get transform state.
+        var transformState: ProcessApplicationTransformState
+        if state {
+            transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
+        } else {
+            transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+        }
+
+        // Show / hide dock icon.
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        let transformStatus: OSStatus = TransformProcessType(&psn, transformState)
+
+        return transformStatus == 0
     }
 
     @IBAction func goHelp(_ sender: NSMenuItem) {

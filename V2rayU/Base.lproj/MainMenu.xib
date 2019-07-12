@@ -95,7 +95,7 @@
                         <action selector="scanQrcode:" target="hcZ-V7-Dui" id="URj-Vl-1TY"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Generate QR Code" id="0vX-fS-8FW">
+                <menuItem title="Share QR Code" id="0vX-fS-8FW">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="generateQrcode:" target="hcZ-V7-Dui" id="cUu-eO-w0Z"/>

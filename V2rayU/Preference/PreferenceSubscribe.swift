@@ -177,7 +177,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         // remove old v2ray servers by subscribe
         V2rayServer.remove(subscribe: subscribe)
 
-        let list = strTmp!.components(separatedBy: CharacterSet.newlines)
+        let list = strTmp!.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
         for item in list {
             // import every server
             self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe)
