@@ -89,7 +89,12 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     @IBAction func removeSubscribe(_ sender: Any) {
         let idx = self.tableView.selectedRow
         if self.tableView.selectedRow > -1 {
-            // remove
+            if let item = V2raySubscribe.loadSubItem(idx: idx) {
+                print("remove sub item", item.name, item.url)
+                // remove old v2ray servers by subscribe
+                V2rayServer.remove(subscribe: item.name)
+            }
+            // remove subscribe
             V2raySubscribe.remove(idx: idx)
 
             // selected prev row
@@ -127,11 +132,6 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
 
         // update Subscribe
         self.sync()
-
-        // restore view
-//        self.logView.isHidden = true
-//        self.subscribeView.isHidden = false
-//        self.logArea.string = ""
     }
 
     // sync from Subscribe list
@@ -143,40 +143,48 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         }
 
         for item in list {
-            self.dlFromUrl(url: item.url)
+            self.dlFromUrl(url: item.url, subscribe: item.name)
         }
     }
 
-    public func dlFromUrl(url: String) {
+    public func dlFromUrl(url: String, subscribe: String) {
         logTip(title: "loading from : ", uri: "", informativeText: url)
 
         Alamofire.request(url).responseString { response in
             switch (response.result) {
             case .success(_):
                 if let data = response.result.value {
-                    self.handle(base64Str: data)
+                    self.handle(base64Str: data, subscribe: subscribe, url: url)
                 }
 
             case .failure(_):
+                print("dlFromUrl error:", url, " -- ", response.result.error ?? "")
                 self.logTip(title: "loading fail : ", uri: "", informativeText: url)
                 break
             }
         }
     }
 
-    func handle(base64Str: String) {
-        let strTmp = base64Str.base64Decoded()
+    func handle(base64Str: String, subscribe: String, url: String) {
+        let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded()
         if strTmp == nil {
+            self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
             return
         }
+
+        self.logTip(title: "del old from url : ", uri: "", informativeText: url)
+
+        // remove old v2ray servers by subscribe
+        V2rayServer.remove(subscribe: subscribe)
+
         let list = strTmp!.components(separatedBy: CharacterSet.newlines)
         for item in list {
             // import every server
-            self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines))
+            self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe)
         }
     }
 
-    func importUri(uri: String) {
+    func importUri(uri: String, subscribe: String) {
         if uri.count == 0 {
             logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
             return
@@ -190,7 +198,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         if let importUri = ImportUri.importUri(uri: uri) {
             if importUri.isValid {
                 // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
                 // refresh server
                 menuController.showServers()
 
@@ -215,8 +223,6 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         }
         self.logArea.string += "\n\n"
         self.logArea.scrollPageDown("")
-
-        print("log", title + informativeText + " -- uri:" + uri)
     }
 }
 

@@ -164,7 +164,7 @@ class V2rayLaunch: NSObject {
     // start http server for pac
     static func startHttpServer() {
         if webServer.isRunning {
-           webServer.stop()
+            webServer.stop()
         }
 
         _ = GeneratePACFile()
@@ -173,11 +173,13 @@ class V2rayLaunch: NSObject {
 
         webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
 
-//        webServer.start(options: <#T##[AnyHashable : Any]?#>)
-        // Start
-        try!  webServer.start(options: [
-            "Port": UInt(pacPort) ?? 1085,
-            "BindToLocalhost": true
-            ] );
+        do {
+            try webServer.start(options: [
+                "Port": UInt(pacPort) ?? 1085,
+                "BindToLocalhost": true
+            ]);
+        } catch let error {
+            print("error:\(error)")
+        }
     }
 }

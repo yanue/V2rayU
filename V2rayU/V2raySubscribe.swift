@@ -157,35 +157,13 @@ class V2raySubscribe: NSObject {
     }
 
     // load json file data
-    static func loadV2rayItem(idx: Int) -> V2raySubItem? {
+    static func loadSubItem(idx: Int) -> V2raySubItem? {
         if !V2raySubscribe.v2raySubList.indices.contains(idx) {
             NSLog("index out of range", idx)
             return nil
         }
 
         return self.v2raySubList[idx]
-    }
-
-    // load selected v2ray item
-    static func loadSelectedItem() -> V2raySubItem? {
-
-        var v2ray: V2raySubItem? = nil
-
-        if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
-            v2ray = V2raySubItem.load(name: curName)
-        }
-
-        // if default subscribe not fould
-        if v2ray == nil {
-            for item in self.v2raySubList {
-                if item.isValid {
-                    v2ray = V2raySubItem.load(name: item.name)
-                    break
-                }
-            }
-        }
-
-        return v2ray
     }
 }
 
