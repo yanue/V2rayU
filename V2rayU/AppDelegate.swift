@@ -19,13 +19,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
-        // Insert code here to initialize your application        
-        let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
-            $0.bundleIdentifier == launcherAppIdentifier
-        }
+        // auto launch
+        if UserDefaults.getBool(forKey: .autoLaunch) {
+            // Insert code here to initialize your application
+            let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
+                $0.bundleIdentifier == launcherAppIdentifier
+            }
 
-        if startedAtLogin {
-            DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
+            if startedAtLogin {
+                DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
+            }
         }
 
         self.checkDefault()
