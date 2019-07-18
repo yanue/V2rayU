@@ -15,6 +15,7 @@
 		6608D9E22182C9C100A0E0DD /* v2rayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6608D9E12182C9C100A0E0DD /* v2rayStream.swift */; };
 		660C8CA22181CBAA00896361 /* V2rayUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660C8CA12181CBAA00896361 /* V2rayUTests.swift */; };
 		660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660D0E59216E0158000C2922 /* V2rayServer.swift */; };
+		66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 66107B8822DEDBE4002FFB60 /* Localizable.strings */; };
 		6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* MainMenu.xib */; };
 		66406AF42183320000B56041 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66406AF32183320000B56041 /* Sample.swift */; };
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
@@ -123,6 +124,8 @@
 		660C8CA12181CBAA00896361 /* V2rayUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayUTests.swift; sourceTree = "<group>"; };
 		660C8CA32181CBAA00896361 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		660D0E59216E0158000C2922 /* V2rayServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = V2rayServer.swift; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 0; };
+		66107B8722DEDBE4002FFB60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		66107B8922DEE445002FFB60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		66406AF32183320000B56041 /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		6646669221CBC0860094F0B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		664666A021CBD6C60094F0B7 /* libPods-V2rayUTool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-V2rayUTool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +313,7 @@
 				6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */,
 				6D6DFBED570A0D1FDED0BD53 /* Preference */,
 				6D6DF1B2E4D0B61B7390F1B1 /* HttpServer.swift */,
+				66107B8822DEDBE4002FFB60 /* Localizable.strings */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -531,6 +535,7 @@
 				667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
+				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
 				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
@@ -669,6 +674,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		66107B8822DEDBE4002FFB60 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66107B8722DEDBE4002FFB60 /* zh-Hans */,
+				66107B8922DEE445002FFB60 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		664EB378216C9A5F00B6AE0D /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

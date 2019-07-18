@@ -112,6 +112,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
         }
+        
+        self.shadowsockMethod.removeAllItems()
+        self.shadowsockMethod.addItems(withTitles: V2rayOutboundShadowsockMethod)
 
         self.configText.isAutomaticQuoteSubstitutionEnabled = false
     }
@@ -210,7 +213,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // re parse json
         v2rayConfig.parseJson(jsonText: self.configText.string)
-        print("parse errors:", v2rayConfig.errors, v2rayConfig.isValid)
         if v2rayConfig.errors.count > 0 {
             self.errTip.stringValue = v2rayConfig.errors[0]
             return
@@ -331,7 +333,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if self.quicSecurity.indexOfSelectedItem >= 0 {
             v2rayConfig.streamQuic.security = self.quicSecurity.titleOfSelectedItem!
         }
-
         // ========================== stream end =======================
     }
 

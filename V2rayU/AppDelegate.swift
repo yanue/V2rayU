@@ -10,6 +10,7 @@ import Cocoa
 import ServiceManagement
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
+var appVersion = "1.3.4"
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -18,7 +19,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-
         // auto launch
         if UserDefaults.getBool(forKey: .autoLaunch) {
             // Insert code here to initialize your application
@@ -30,7 +30,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
             }
         }
-
+        
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] {
+            appVersion = (version as? String ?? "1.3.4")
+        }
+        
         self.checkDefault()
 
         // check v2ray core

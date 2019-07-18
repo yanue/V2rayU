@@ -23,6 +23,8 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
     let preferencePaneTitle = "Pac"
     let toolbarItemIcon = NSImage(named: NSImage.bookmarksTemplateName)!
 
+    @IBOutlet weak var tips: NSTextField!
+    
     override var nibName: NSNib.Name? {
         return "PreferencePac"
     }
@@ -34,6 +36,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
         self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
+        self.tips.stringValue = ""
         
         let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl)
         if gfwUrl != nil {
@@ -70,24 +73,27 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
     }
     
     @IBAction func updatePac(_ sender: Any) {
+        self.tips.stringValue = "Updating Pac Rules ..."
+
         if let str = userRulesView?.string {
             do {
                 // save user rules into UserDefaults
                 UserDefaults.set(forKey: .userRules, value: str)
-                print("updatePac str",str)
+
                 try str.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
                 
                 UpdatePACFromGFWList()
-                
+
                 if GeneratePACFile() {
                     // Popup a user notification
-                    let notification = NSUserNotification()
-                    notification.title = "PAC has been updated by User Rules."
-                    NSUserNotificationCenter.default.deliver(notification)
+                    self.tips.stringValue = "PAC has been updated by User Rules."
                 } else {
-                    let notification = NSUserNotification()
-                    notification.title = "It's failed to update PAC by User Rules."
-                    NSUserNotificationCenter.default.deliver(notification)
+                    self.tips.stringValue = "It's failed to update PAC by User Rules."
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    // your code here
+                    self.tips.stringValue = ""
                 }
             } catch {
             }

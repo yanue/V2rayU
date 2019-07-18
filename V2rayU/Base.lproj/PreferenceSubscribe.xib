@@ -97,12 +97,12 @@
                                         <tableColumns>
                                             <tableColumn identifier="remarkCell" editable="NO" width="99.5" minWidth="40" maxWidth="1000" id="PPw-B0-d3E">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Remark">
-                                                    <font key="font" metaFont="label" size="11"/>
+                                                    <font key="font" metaFont="controlContent" size="11"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                 </tableHeaderCell>
                                                 <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="hEv-CH-Vqi">
-                                                    <font key="font" metaFont="label" size="11"/>
+                                                    <font key="font" metaFont="controlContent" size="11"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -130,12 +130,12 @@
                                             </tableColumn>
                                             <tableColumn identifier="urlCell" editable="NO" width="312.5" minWidth="40" maxWidth="1000" id="kc4-bL-WBd" userLabel="Subscribe Url">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Subscription Url ">
-                                                    <font key="font" metaFont="label" size="11"/>
+                                                    <font key="font" metaFont="controlContent" size="11"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                 </tableHeaderCell>
                                                 <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="1zb-8D-Kha">
-                                                    <font key="font" metaFont="label" size="11"/>
+                                                    <font key="font" metaFont="controlContent" size="11"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -184,7 +184,7 @@
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NPq-js-UOI">
                             <rect key="frame" x="18" y="286" width="47" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <textFieldCell key="cell" lineBreakMode="clipping" title="remark" id="8Lu-YS-kql">
+                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="remark" id="8Lu-YS-kql">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -200,9 +200,9 @@
                             </textFieldCell>
                         </textField>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Kr-tk-3lE">
-                            <rect key="frame" x="43" y="316" width="20" height="17"/>
+                            <rect key="frame" x="18" y="316" width="45" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <textFieldCell key="cell" lineBreakMode="clipping" title="url" id="J2v-eb-RUX">
+                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="url" id="J2v-eb-RUX">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -218,7 +218,7 @@
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Fw-kK-3sH">
-                            <rect key="frame" x="361" y="276" width="85" height="32"/>
+                            <rect key="frame" x="361" y="275" width="85" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" title="remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vjP-63-MVL">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -240,7 +240,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="liT-e1-XbM">
-                            <rect key="frame" x="285" y="276" width="63" height="32"/>
+                            <rect key="frame" x="253" y="275" width="95" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="push" title="add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="amB-JP-utV">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

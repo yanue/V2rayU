@@ -109,8 +109,8 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     func setStatusOff() {
-        v2rayStatusItem.title = "V2ray-Core: Off"
-        toggleV2rayItem.title = "Turn V2ray-Core On"
+        v2rayStatusItem.title = "v2ray-core: Off" + ("  (v" + appVersion + ")")
+        toggleV2rayItem.title = "Turn v2ray-core On"
 
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("IconOff"))
@@ -121,8 +121,8 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     func setStatusOn() {
-        v2rayStatusItem.title = "V2ray-Core: On"
-        toggleV2rayItem.title = "Turn V2ray-Core Off"
+        v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
+        toggleV2rayItem.title = "Turn v2ray-core Off"
 
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name("IconOn"))

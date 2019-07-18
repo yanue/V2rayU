@@ -25,7 +25,8 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
     @IBOutlet weak var muxConcurrent: NSTextField!
     @IBOutlet weak var logLevel: NSPopUpButton!
     @IBOutlet weak var dnsServers: NSTextField!
-
+    @IBOutlet weak var tips: NSTextField!
+    
     override var nibName: NSNib.Name? {
         return "PreferenceAdvance"
     }
@@ -34,6 +35,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
         self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
+        self.tips.stringValue = ""
 
         let enableMuxState = UserDefaults.getBool(forKey: .enableMux)
         let enableUdpState = UserDefaults.getBool(forKey: .enableUdp)
@@ -121,5 +123,12 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         _ = GeneratePACFile()
         // restart pac http server
         V2rayLaunch.startHttpServer()
+        
+        self.tips.stringValue = "save success."
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            // your code here
+            self.tips.stringValue = ""
+        }
     }
 }

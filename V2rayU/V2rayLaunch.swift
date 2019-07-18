@@ -164,7 +164,11 @@ class V2rayLaunch: NSObject {
     // start http server for pac
     static func startHttpServer() {
         if webServer.isRunning {
-            webServer.stop()
+            do {
+                try webServer.stop()
+            } catch let error {
+                print("webServer.stop:\(error)")
+            }
         }
 
         _ = GeneratePACFile()
@@ -179,7 +183,7 @@ class V2rayLaunch: NSObject {
                 "BindToLocalhost": true
             ]);
         } catch let error {
-            print("error:\(error)")
+            print("webServer.start:\(error)")
         }
     }
 }

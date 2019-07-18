@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencePacViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
                 <outlet property="gfwPacListUrl" destination="zr7-bd-EAE" id="Bb8-mK-cmI"/>
+                <outlet property="tips" destination="D20-Eu-3f8" id="Fbo-j7-S8j"/>
                 <outlet property="userRulesView" destination="TVW-6s-N8F" id="f19-R4-Xf5"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
@@ -58,6 +59,15 @@
                                 <action selector="viewPacFile:" target="-2" id="NR8-ht-U4L"/>
                             </connections>
                         </button>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D20-Eu-3f8">
+                            <rect key="frame" x="98" y="99" width="251" height="17"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="NE5-JO-Q74">
+                                <font key="font" metaFont="system" size="12"/>
+                                <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
                     </subviews>
                 </customView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8NJ-ru-j3U">
