@@ -251,3 +251,7 @@ func releaseTcpPort(socket: Int32) {
 func descriptionOfLastError() -> String {
     return String.init(cString: (UnsafePointer(strerror(errno))))
 }
+
+func getAppVersion() -> String {
+    return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
+}

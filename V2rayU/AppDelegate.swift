@@ -10,7 +10,7 @@ import Cocoa
 import ServiceManagement
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
-var appVersion = "1.3.4"
+let appVersion = getAppVersion()
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -29,10 +29,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if startedAtLogin {
                 DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
             }
-        }
-        
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] {
-            appVersion = (version as? String ?? "1.3.4")
         }
         
         self.checkDefault()
