@@ -10,6 +10,7 @@ V2rayU_RELEASE=${BUILD_DIR}/release
 APP_Version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/${APP_NAME}/${INFOPLIST_FILE}")
 DMG_FINAL="${APP_NAME}.dmg"
 APP_TITLE="${APP_NAME} - V${APP_Version}"
+AppCastDir=$HOME/swift/appcast
 
 function updatePlistVersion() {
     buildString=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}")
@@ -104,19 +105,6 @@ function createDmg() {
     umount "/Volumes/${APP_NAME}"
 }
 
-function downloadV2ray() {
-    echo "正在查询最新版v2ray ..."
-    rm -fr v2ray-macos.zip v2ray-core
-    tag=$(curl --silent "https://api.github.com/repos/v2ray/v2ray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    echo "v2ray-core version: ${tag}"
-    url="https://github.com/v2ray/v2ray-core/releases/download/${tag}/v2ray-macos.zip"
-    echo "正在下载最新版v2ray: ${tag}"
-    curl -Lo v2ray-macos.zip ${url}
-
-    unzip -o v2ray-macos.zip -d v2ray-core
-    rm -fr v2ray-macos.zip
-}
-
 function generateAppcast() {
     echo "generate appcast"
     description=$1
@@ -172,6 +160,20 @@ function commit() {
     git commit -a -m "update version: ${APP_Version}"
     git push
 }
+
+function downloadV2ray() {
+    echo "正在查询最新版v2ray ..."
+    rm -fr v2ray-macos.zip v2ray-core
+    tag=$(curl --silent "https://api.github.com/repos/v2ray/v2ray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo "v2ray-core version: ${tag}"
+    url="https://github.com/v2ray/v2ray-core/releases/download/${tag}/v2ray-macos.zip"
+    echo "正在下载最新版v2ray: ${tag}"
+    curl -Lo v2ray-macos.zip ${url}
+
+    unzip -o v2ray-macos.zip -d v2ray-core
+    rm -fr v2ray-macos.zip
+}
+
 
 function makeDmg() {
     echo "正在打包版本: V"${APP_Version}
