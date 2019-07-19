@@ -116,6 +116,8 @@ class MenuController: NSObject, NSMenuDelegate {
             button.image = NSImage(named: NSImage.Name("IconOff"))
         }
 
+        statusItem.title = ""
+
         // set off
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
     }
@@ -130,6 +132,16 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // set on
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+    }
+
+    func setStatusMode(mode: String) {
+        let state = UserDefaults.getBool(forKey: .v2rayTurnOn)
+
+        if state {
+            statusItem.title = mode
+        } else {
+            statusItem.title = ""
+        }
     }
 
     func stopV2rayCore() {
@@ -353,15 +365,24 @@ class MenuController: NSObject, NSMenuDelegate {
             httpPort = cfg.httpPort
         }
 
+        setStatusMode(mode: "")
+
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first
             V2rayLaunch.setSystemProxy(mode: .backup)
         }
 
+        if runMode == .manual {
+            setStatusMode(mode: "M")
+        }
+
         // global
         if runMode == .global {
             V2rayLaunch.setSystemProxy(mode: .global, httpPort: httpPort, sockPort: sockPort)
+
+            setStatusMode(mode: "G")
+
             return
         }
 
