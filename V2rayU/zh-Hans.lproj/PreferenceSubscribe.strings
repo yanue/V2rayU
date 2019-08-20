@@ -1,0 +1,39 @@
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1zb-8D-Kha"; */
+"1zb-8D-Kha.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "2SR-49-K11"; */
+"2SR-49-K11.title" = "Table View Cell";
+
+/* Class = "NSTextFieldCell"; title = "Update Logs"; ObjectID = "7e8-mr-923"; */
+"7e8-mr-923.title" = "订阅更新日志";
+
+/* Class = "NSTextFieldCell"; title = "remark"; ObjectID = "8Lu-YS-kql"; */
+"8Lu-YS-kql.title" = "备注";
+
+/* Class = "NSTextFieldCell"; title = "url"; ObjectID = "J2v-eb-RUX"; */
+"J2v-eb-RUX.title" = "地址";
+
+/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "OER-yL-Osv"; */
+"OER-yL-Osv.title" = "Table View Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Remark"; ObjectID = "PPw-B0-d3E"; */
+"PPw-B0-d3E.headerCell.title" = "备注";
+
+/* Class = "NSButtonCell"; title = "update servers "; ObjectID = "ZPU-gS-0li"; */
+"ZPU-gS-0li.title" = "更新";
+
+/* Class = "NSButtonCell"; title = "add"; ObjectID = "amB-JP-utV"; */
+"amB-JP-utV.title" = "添加";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "hEv-CH-Vqi"; */
+"hEv-CH-Vqi.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Subscription Url "; ObjectID = "kc4-bL-WBd"; */
+"kc4-bL-WBd.headerCell.title" = "订阅地址";
+
+/* Class = "NSButtonCell"; title = "Hide Logs"; ObjectID = "mu1-6b-dmM"; */
+"mu1-6b-dmM.title" = "隐藏日志";
+
+/* Class = "NSButtonCell"; title = "remove"; ObjectID = "vjP-63-MVL"; */
+"vjP-63-MVL.title" = "移除";

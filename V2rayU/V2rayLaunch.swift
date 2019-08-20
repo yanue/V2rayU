@@ -6,9 +6,10 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import SystemConfiguration
 import Alamofire
+import GCDWebServer
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
@@ -18,12 +19,14 @@ let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
 let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
+let AppMacOsPath = Bundle.main.bundlePath + "/Contents/MacOS"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
-let httpServerPort = 18765
-
+var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
+
+let webServer = GCDWebServer()
 
 enum RunMode: String {
     case global
@@ -57,20 +60,12 @@ class V2rayLaunch: NSObject {
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
 
-        // write http simple server plist
-        let httpArguments = ["/usr/bin/python", "-m", "SimpleHTTPServer", String(httpServerPort)]
-
-        let dictHttp: NSMutableDictionary = [
-            "Label": LAUNCH_HTTP_PLIST.replacingOccurrences(of: ".plist", with: ""),
-            "WorkingDirectory": AppResourcesPath,
-            "StandardOutPath": logFilePath,
-            "StandardErrorPath": logFilePath,
-            "ProgramArguments": httpArguments,
-            "KeepAlive": true,
-            "RunAtLoad": true,
-        ]
-
-        dictHttp.write(toFile: launchHttpPlistFile, atomically: true)
+        // if old launchHttpPlistFile exist
+        if fileMgr.fileExists(atPath: launchHttpPlistFile) {
+            print("launchHttpPlistFile exist", launchHttpPlistFile)
+            _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+            try! fileMgr.removeItem(atPath: launchHttpPlistFile)
+        }
 
         // permission
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
@@ -81,9 +76,7 @@ class V2rayLaunch: NSObject {
         // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
 
-        // reload
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchHttpPlistFile])
+        self.startHttpServer()
 
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
@@ -108,6 +101,9 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("Stop v2ray-core failed.")
         }
+
+        // stop http server
+        webServer.stop()
     }
 
     static func OpenLogs() {
@@ -125,18 +121,18 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func ClearLogs(){
+    static func ClearLogs() {
         let txt = ""
         try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
     }
-    
+
     static func chmodCmdPermission() {
         // Ensure launch agent directory is existed.
         if !FileManager.default.fileExists(atPath: cmdSh) {
             return
         }
 
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUTool | awk '{print $3,$4}'"])
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppMacOsPath + " && ls -la ./V2rayUTool | awk '{print $3,$4}'"])
         NSLog("Permission is " + (res ?? ""))
         if res == "root admin" {
             NSLog("Permission is ok")
@@ -156,12 +152,38 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
-        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        let task = Process.launchedProcess(launchPath: AppMacOsPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
             NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
         } else {
             NSLog("setSystemProxy " + mode.rawValue + " failed.")
+        }
+    }
+
+    // start http server for pac
+    static func startHttpServer() {
+        if webServer.isRunning {
+            do {
+                try webServer.stop()
+            } catch let error {
+                print("webServer.stop:\(error)")
+            }
+        }
+
+        _ = GeneratePACFile()
+
+        let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
+
+        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
+
+        do {
+            try webServer.start(options: [
+                "Port": UInt(pacPort) ?? 1085,
+                "BindToLocalhost": true
+            ]);
+        } catch let error {
+            print("webServer.start:\(error)")
         }
     }
 }

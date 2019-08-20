@@ -9,8 +9,9 @@
 import Cocoa
 import Alamofire
 
+var v2rayConfig: V2rayConfig = V2rayConfig()
+
 class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
-    var v2rayConfig: V2rayConfig = V2rayConfig()
 
     override var windowNibName: String? {
         return "ConfigWindow" // no extension .xib here
@@ -24,17 +25,16 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var configText: NSTextView!
     @IBOutlet weak var serversTableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
-    @IBOutlet weak var logLevel: NSPopUpButton!
     @IBOutlet weak var jsonUrl: NSTextField!
     @IBOutlet weak var selectFileBtn: NSButton!
     @IBOutlet weak var importBtn: NSButton!
 
-    @IBOutlet weak var sockPort: NSTextField!
-    @IBOutlet weak var httpPort: NSTextField!
-    @IBOutlet weak var dnsServers: NSTextField!
+    @IBOutlet weak var sockPort: NSButton!
+    @IBOutlet weak var httpPort: NSButton!
+    @IBOutlet weak var dnsServers: NSButton!
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
-    @IBOutlet weak var muxConcurrent: NSTextField!
+    @IBOutlet weak var muxConcurrent: NSButton!
     @IBOutlet weak var version4: NSButton!
 
     @IBOutlet weak var switchProtocol: NSPopUpButton!
@@ -112,6 +112,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
         }
+        
+        self.shadowsockMethod.removeAllItems()
+        self.shadowsockMethod.addItems(withTitles: V2rayOutboundShadowsockMethod)
 
         self.configText.isAutomaticQuoteSubstitutionEnabled = false
     }
@@ -125,11 +128,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.serversTableView.reloadData()
         // tab view
         self.tabView.delegate = self
-
-        // log level
-        if let level = UserDefaults.get(forKey: .v2rayLogLevel) {
-            logLevel.selectItem(withTitle: level)
-        }
     }
 
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
@@ -205,19 +203,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     // switch to manual
     func switchToManualView() {
-        self.v2rayConfig = V2rayConfig()
+        v2rayConfig = V2rayConfig()
 
         defer {
-            if self.configText.string.count > 0 && self.v2rayConfig.isValid {
+            if self.configText.string.count > 0 && v2rayConfig.isValid {
                 self.bindDataToView()
             }
         }
 
         // re parse json
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        print("parse errors:", self.v2rayConfig.errors, self.v2rayConfig.isValid)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
             return
         }
 
@@ -246,13 +243,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func exportData() {
         // ========================== base start =======================
         // base
-        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
-        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
-        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
-        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
-        v2rayConfig.dns = self.dnsServers.stringValue
-        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
-        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
+//        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
+//        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
+//        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
+//        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
+//        v2rayConfig.dns = self.dnsServers.stringValue
+//        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
+//        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
         // ========================== base end =======================
 
         // ========================== server start =======================
@@ -336,19 +333,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if self.quicSecurity.indexOfSelectedItem >= 0 {
             v2rayConfig.streamQuic.security = self.quicSecurity.titleOfSelectedItem!
         }
-
         // ========================== stream end =======================
     }
 
     func bindDataToView() {
         // ========================== base start =======================
         // base
-        self.httpPort.stringValue = v2rayConfig.httpPort
-        self.sockPort.stringValue = v2rayConfig.socksPort
+        self.httpPort.title = v2rayConfig.httpPort
+        self.sockPort.title = v2rayConfig.socksPort
         self.enableUdp.intValue = v2rayConfig.enableUdp ? 1 : 0
         self.enableMux.intValue = v2rayConfig.enableMux ? 1 : 0
         self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
-        self.dnsServers.stringValue = v2rayConfig.dns
+        self.dnsServers.title = v2rayConfig.dns
         self.version4.intValue = v2rayConfig.isNewVersion ? 1 : 0
         // ========================== base end =======================
 
@@ -433,19 +429,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
 
         // reset
-        self.v2rayConfig = V2rayConfig()
+        v2rayConfig = V2rayConfig()
         if rowIndex < 0 {
             return
         }
 
         let item = V2rayServer.loadV2rayItem(idx: rowIndex)
         self.configText.string = item?.json ?? ""
-        self.v2rayConfig.isValid = item?.isValid ?? false
+        v2rayConfig.isValid = item?.isValid ?? false
         self.jsonUrl.stringValue = item?.url ?? ""
 
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
             return
         }
     }
@@ -453,13 +449,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func saveConfig() {
         let text = self.configText.string
 
-        self.v2rayConfig.parseJson(jsonText: self.configText.string)
-        if self.v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = self.v2rayConfig.errors[0]
+        v2rayConfig.parseJson(jsonText: self.configText.string)
+        if v2rayConfig.errors.count > 0 {
+            self.errTip.stringValue = v2rayConfig.errors[0]
         }
 
         // save
-        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: self.v2rayConfig.isValid, jsonData: text)
+        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: v2rayConfig.isValid, jsonData: text)
         if errMsg.count == 0 {
             if self.errTip.stringValue == "" {
                 self.errTip.stringValue = "save success"
@@ -501,16 +497,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
     }
 
-    @IBAction func setV2rayLogLevel(_ sender: NSPopUpButton) {
-        if let item = logLevel.selectedItem {
-            UserDefaults.set(forKey: .v2rayLogLevel, value: item.title)
-            // replace current
-            self.switchToImportView()
-            // restart service
-            menuController.startV2rayCore()
-        }
-    }
-
     @IBAction func importConfig(_ sender: NSButton) {
         self.configText.string = ""
         if jsonUrl.stringValue.trimmingCharacters(in: .whitespaces) == "" {
@@ -541,7 +527,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // edit item remark
         V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
 
-        if let importUri = ImportUri.importUri(uri: uri) {
+        if let importUri = ImportUri.importUri(uri: uri, checkExist: false) {
             self.saveImport(importUri: importUri)
         } else {
             // download json file
@@ -552,7 +538,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 }
 
                 if DataResponse.value != nil {
-                    self.configText.string = self.v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                    self.configText.string = v2rayConfig.formatJson(json: DataResponse.value ?? text)
                 }
             }
         }
@@ -586,6 +572,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         NSWorkspace.shared.open(url)
     }
 
+    @IBAction func goVersionHelp(_ sender: Any) {
+        guard let url = URL(string: "https://www.v2ray.com/chapter_02/01_overview.html") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+    
     @IBAction func goStreamHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
             return
@@ -703,14 +696,22 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func openLogs(_ sender: NSButton) {
         V2rayLaunch.OpenLogs()
     }
-    
+
     @IBAction func clearLogs(_ sender: NSButton) {
         V2rayLaunch.ClearLogs()
     }
-    
+
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-        menuController.hideDock()
+      _ = menuController.showDock(state: false)
+    }
+
+    @IBAction func goAdvanceSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .advanceTab)
+    }
+    
+    @IBAction func goSubscribeSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .subscribeTab)
     }
 }
 

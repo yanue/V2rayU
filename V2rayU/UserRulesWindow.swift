@@ -4,7 +4,7 @@
 // copy from shadowsocksX-NG
 //
 
-import Foundation
+import Cocoa
 import Cocoa
 
 class UserRulesWindowController: NSWindowController {

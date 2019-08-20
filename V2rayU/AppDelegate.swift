@@ -10,6 +10,7 @@ import Cocoa
 import ServiceManagement
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
+let appVersion = getAppVersion()
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -18,16 +19,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // auto launch
+        if UserDefaults.getBool(forKey: .autoLaunch) {
+            // Insert code here to initialize your application
+            let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
+                $0.bundleIdentifier == launcherAppIdentifier
+            }
 
-        // Insert code here to initialize your application        
-        let startedAtLogin = NSWorkspace.shared.runningApplications.contains {
-            $0.bundleIdentifier == launcherAppIdentifier
+            if startedAtLogin {
+                DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
+            }
         }
-
-        if startedAtLogin {
-            DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
-        }
-
+        
         self.checkDefault()
 
         // check v2ray core
@@ -39,6 +42,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
+
+        // start http server for pac
+        V2rayLaunch.startHttpServer()
 
         // wake and sleep
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onSleepNote(note:)), name: NSWorkspace.willSleepNotification, object: nil)

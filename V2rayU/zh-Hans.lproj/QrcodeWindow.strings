@@ -1,0 +1,6 @@
+
+/* Class = "NSTextFieldCell"; ibShadowedToolTip = "share server uri"; ObjectID = "PMU-Ca-6qA"; */
+"PMU-Ca-6qA.ibShadowedToolTip" = "二维码内容";
+
+/* Class = "NSWindow"; title = "Share QRCode"; ObjectID = "QvC-M9-y7g"; */
+"QvC-M9-y7g.title" = "分享二维码";

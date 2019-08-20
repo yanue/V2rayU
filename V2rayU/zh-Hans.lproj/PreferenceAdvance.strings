@@ -1,0 +1,60 @@
+
+/* Class = "NSMenuItem"; title = "error"; ObjectID = "12u-HY-IPV"; */
+"12u-HY-IPV.title" = "error";
+
+/* Class = "NSTextFieldCell"; title = "V2ray Core Log level:"; ObjectID = "Ctq-lX-cuA"; */
+"Ctq-lX-cuA.title" = "v2ray-core日志等级:";
+
+/* Class = "NSTextFieldCell"; placeholderString = " 1087"; ObjectID = "U2E-Gk-3e0"; */
+"U2E-Gk-3e0.placeholderString" = " 1087";
+
+/* Class = "NSButtonCell"; title = "save settings"; ObjectID = "YJf-A4-mgF"; */
+"YJf-A4-mgF.title" = "保存设置";
+
+/* Class = "NSTextFieldCell"; title = "Local Http Listen Port:"; ObjectID = "Yih-X2-qBl"; */
+"Yih-X2-qBl.title" = "本机HTTP监听端口:";
+
+/* Class = "NSButtonCell"; title = "Enable UDP"; ObjectID = "afR-MR-aoQ"; */
+"afR-MR-aoQ.title" = "启用UDP";
+
+/* Class = "NSTextFieldCell"; title = "Mux:"; ObjectID = "aux-FG-ubc"; */
+"aux-FG-ubc.title" = "Mux:";
+
+/* Class = "NSTextFieldCell"; title = "Dns:"; ObjectID = "c7W-6e-soa"; */
+"c7W-6e-soa.title" = "Dns:";
+
+/* Class = "NSTextFieldCell"; placeholderString = " 1080"; ObjectID = "cEB-VU-kcL"; */
+"cEB-VU-kcL.placeholderString" = " 1080";
+
+/* Class = "NSTextFieldCell"; placeholderString = " 1087"; ObjectID = "cs0-w0-4jp"; */
+"cs0-w0-4jp.placeholderString" = " 1087";
+
+/* Class = "NSTextFieldCell"; title = "Local Sock Listen Port:"; ObjectID = "dy9-2h-EIe"; */
+"dy9-2h-EIe.title" = "本机Sock监听端口:";
+
+/* Class = "NSTextFieldCell"; placeholderString = " 8"; ObjectID = "gO2-cn-1bj"; */
+"gO2-cn-1bj.placeholderString" = " 8";
+
+/* Class = "NSMenuItem"; title = "none"; ObjectID = "hwH-DG-b6w"; */
+"hwH-DG-b6w.title" = "none";
+
+/* Class = "NSButtonCell"; title = "Enable Mux"; ObjectID = "k2J-Q7-yOi"; */
+"k2J-Q7-yOi.title" = "启用Mux";
+
+/* Class = "NSMenuItem"; title = "info"; ObjectID = "kHt-j0-6zV"; */
+"kHt-j0-6zV.title" = "info";
+
+/* Class = "NSTextFieldCell"; title = "8.8.8.8,1.1.1.1,114.114.114.114,119.29.29.29"; ObjectID = "lKP-40-S8o"; */
+"lKP-40-S8o.title" = "8.8.8.8,1.1.1.1,114.114.114.114,119.29.29.29";
+
+/* Class = "NSMenuItem"; title = "debug"; ObjectID = "qDP-Eo-IWC"; */
+"qDP-Eo-IWC.title" = "debug";
+
+/* Class = "NSBox"; title = "Local"; ObjectID = "tMz-nM-arv"; */
+"tMz-nM-arv.title" = "本机";
+
+/* Class = "NSTextFieldCell"; title = "Pac Server Listen Port:"; ObjectID = "you-iw-OS5"; */
+"you-iw-OS5.title" = "Pac监听端口:";
+
+/* Class = "NSMenuItem"; title = "warning"; ObjectID = "z4S-wG-fyc"; */
+"z4S-wG-fyc.title" = "warning";

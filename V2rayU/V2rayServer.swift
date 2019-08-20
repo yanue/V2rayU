@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import SwiftyJSON
 
 // ----- v2ray server manager -----
@@ -113,11 +113,6 @@ class V2rayServer: NSObject {
 
     // add v2ray server (tmp)
     static func add() {
-        if self.v2rayItemList.count > 50 {
-            NSLog("over max len")
-            return
-        }
-
         // name is : config. + uuid
         let name = "config." + UUID().uuidString
 
@@ -133,12 +128,7 @@ class V2rayServer: NSObject {
     }
 
     // add v2ray server (by scan qrcode)
-    static func add(remark: String, json: String, isValid: Bool, url: String = "") {
-        if self.v2rayItemList.count > 50 {
-            NSLog("over max len")
-            return
-        }
-
+    static func add(remark: String, json: String, isValid: Bool, url: String = "", subscribe: String = "") {
         var remark_ = remark
         if remark.count == 0 {
             remark_ = "new server"
@@ -147,7 +137,7 @@ class V2rayServer: NSObject {
         // name is : config. + uuid
         let name = "config." + UUID().uuidString
 
-        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url)
+        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url, subscribe: subscribe)
         // save to v2ray UserDefaults
         v2ray.store()
 
@@ -183,6 +173,36 @@ class V2rayServer: NSObject {
         }
     }
 
+    // remove v2ray server by subscribe
+    static func remove(subscribe: String) {
+        let curName = UserDefaults.get(forKey: .v2rayCurrentServerName)
+
+        for item in V2rayServer.v2rayItemList {
+            print("remove item: ", subscribe, item.subscribe)
+            if item.subscribe == subscribe {
+                V2rayItem.remove(name: item.name)
+                // if cuerrent item is default
+                if curName != nil && item.name == curName {
+                    UserDefaults.del(forKey: .v2rayCurrentServerName)
+                }
+            }
+        }
+
+        // update server list UserDefaults
+        self.saveItemList()
+
+        // reload
+        V2rayServer.loadConfig()
+
+        // reload config
+        if menuController.configWindow != nil {
+            menuController.configWindow.serversTableView.reloadData()
+        }
+
+        // refresh server
+        menuController.showServers()
+    }
+
     // update server list UserDefaults
     static private func saveItemList() {
         var v2rayServerList: Array<String> = []
@@ -191,6 +211,17 @@ class V2rayServer: NSObject {
         }
 
         UserDefaults.setArray(forKey: .v2rayServerList, value: v2rayServerList)
+    }
+
+    // check url is exists
+    static func exist(url: String) -> Bool {
+        for item in self.v2rayItemList {
+            if item.url == url {
+                return true
+            }
+        }
+
+        return false
     }
 
     // get json file url
@@ -217,7 +248,7 @@ class V2rayServer: NSObject {
             v2ray = V2rayItem.load(name: curName)
         }
 
-        // if default server not fould
+        // if default server not found
         if v2ray == nil {
             for item in self.v2rayItemList {
                 if item.isValid {
@@ -264,6 +295,16 @@ class V2rayServer: NSObject {
 
         return ""
     }
+
+    // get by name
+    static func getIndex(name: String) -> Int {
+        for (idx, item) in self.v2rayItemList.enumerated() {
+            if item.name == name {
+                return idx
+            }
+        }
+        return -1
+    }
 }
 
 // ----- v2ray server item -----
@@ -273,14 +314,16 @@ class V2rayItem: NSObject, NSCoding {
     var json: String
     var isValid: Bool
     var url: String
+    var subscribe: String // subscript name: uuid
 
     // init
-    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "") {
+    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "", subscribe: String = "") {
         self.name = name
         self.remark = remark
         self.json = json
         self.isValid = isValid
         self.url = url
+        self.subscribe = subscribe
     }
 
     // decode
@@ -290,6 +333,7 @@ class V2rayItem: NSObject, NSCoding {
         self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
         self.isValid = decoder.decodeBool(forKey: "IsValid")
         self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
+        self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? ""
     }
 
     // object encode
@@ -299,6 +343,7 @@ class V2rayItem: NSObject, NSCoding {
         coder.encode(json, forKey: "Json")
         coder.encode(isValid, forKey: "IsValid")
         coder.encode(url, forKey: "Url")
+        coder.encode(subscribe, forKey: "Subscribe")
     }
 
     // store into UserDefaults

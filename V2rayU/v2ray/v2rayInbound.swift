@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 
 // Inbound
 struct V2rayInbound: Codable {

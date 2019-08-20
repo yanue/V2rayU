@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import SystemConfiguration
 
 var authRef: AuthorizationRef?
@@ -58,11 +58,7 @@ class V2rayUTool: NSObject {
 
             // backup system proxy
             if mode == .backup {
-                do {
-                    _ = (sets as! NSDictionary).write(toFile: SysProxyBackupPlist, atomically: true)
-                } catch {
-                    print(error)
-                }
+                (sets as! NSDictionary).write(toFile: SysProxyBackupPlist, atomically: true)
                 return
             }
 
@@ -112,8 +108,8 @@ class V2rayUTool: NSObject {
 
                 if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
                     // restore system proxy setting in off or manual or restore
-                    if (mode == .off || mode == .manual || mode == .restore) && originalSets != nil && originalSets!.keys.contains(key as! String) {
-                        if let nowSet = originalSets![key as! String] {
+                    if (mode == .off || mode == .manual || mode == .restore) && originalSets != nil && originalSets!.keys.contains(key) {
+                        if let nowSet = originalSets![key] {
                             proxies = nowSet["Proxies"] as! [NSObject: AnyObject];
                         }
                     }

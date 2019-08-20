@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 
 extension UserDefaults {
 
@@ -15,6 +15,8 @@ extension UserDefaults {
         case v2rayCoreVersion
         // v2ray server item list
         case v2rayServerList
+        // v2ray subscribe item list
+        case v2raySubList
         // current v2ray server name
         case v2rayCurrentServerName
         // v2ray-core turn on status
@@ -25,10 +27,30 @@ extension UserDefaults {
         case autoCheckVersion
         // auto launch after login
         case autoLaunch
+        // auto clear logs
+        case autoClearLog
         // pac|manual|global
         case runMode
         // use rules
         case userRules
+        // gfw pac list url
+        case gfwPacListUrl
+
+        // base settings
+        // http port
+        case localHttpPort
+        // sock port
+        case localSockPort
+        // dns servers
+        case dnsServers
+        // enable udp
+        case enableUdp
+        // enable mux
+        case enableMux
+        // mux Concurrent
+        case muxConcurrent
+        // pacPort
+        case localPacPort
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
@@ -92,6 +114,14 @@ extension String {
             return decodedString as String
         }
         return nil
+    }
+
+    //: isValidUrl
+    func isValidUrl() -> Bool {
+        let urlRegEx = "(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]"
+        let urlTest = NSPredicate(format: "SELF MATCHES %@", urlRegEx)
+        let result = urlTest.evaluate(with: self)
+        return result
     }
 }
 
@@ -180,4 +210,48 @@ extension FileManager {
         }
         return (directory, deleteDirectory)
     }
+}
+
+func checkTcpPortForListen(port: in_port_t) -> (Bool, descr: String) {
+
+    let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
+    if socketFileDescriptor == -1 {
+        return (false, "SocketCreationFailed, \(descriptionOfLastError())")
+    }
+
+    var addr = sockaddr_in()
+    let sizeOfSockkAddr = MemoryLayout<sockaddr_in>.size
+    addr.sin_len = __uint8_t(sizeOfSockkAddr)
+    addr.sin_family = sa_family_t(AF_INET)
+    addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
+    addr.sin_addr = in_addr(s_addr: inet_addr("0.0.0.0"))
+    addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
+    var bind_addr = sockaddr()
+    memcpy(&bind_addr, &addr, Int(sizeOfSockkAddr))
+
+    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockkAddr)) == -1 {
+        let details = descriptionOfLastError()
+        releaseTcpPort(socket: socketFileDescriptor)
+        return (false, "\(port), BindFailed, \(details)")
+    }
+    if listen(socketFileDescriptor, SOMAXCONN ) == -1 {
+        let details = descriptionOfLastError()
+        releaseTcpPort(socket: socketFileDescriptor)
+        return (false, "\(port), ListenFailed, \(details)")
+    }
+    releaseTcpPort(socket: socketFileDescriptor)
+    return (true, "\(port) is free for use")
+}
+
+func releaseTcpPort(socket: Int32) {
+    Darwin.shutdown(socket, SHUT_RDWR)
+    close(socket)
+}
+
+func descriptionOfLastError() -> String {
+    return String.init(cString: (UnsafePointer(strerror(errno))))
+}
+
+func getAppVersion() -> String {
+    return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
 }

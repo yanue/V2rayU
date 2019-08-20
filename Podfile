@@ -10,8 +10,10 @@ target 'V2rayU' do
   # Pods for V2rayU
   pod 'Alamofire'
   pod 'SwiftyJSON'
-  pod 'Preferences'
+  # master branch
+  pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
   pod 'Sparkle'
   pod 'QRCoder'
+  pod "GCDWebServer", '~> 3.5.2'
 
 end

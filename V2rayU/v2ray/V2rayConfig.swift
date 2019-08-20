@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import SwiftyJSON
 import JavaScriptCore
 
@@ -56,7 +56,7 @@ let jsSourceFormatConfig =
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
-    var isNewVersion = false
+    var isNewVersion = true
     var isEmptyInput = false
 
     var error = ""
@@ -67,7 +67,7 @@ class V2rayConfig: NSObject {
     var socksPort = "1080"
     var httpPort = "1087"
     var enableUdp = true
-    var enableMux = true
+    var enableMux = false
     var mux = 8
     var dns = ""
 
@@ -95,6 +95,22 @@ class V2rayConfig: NSObject {
     private var foundHttpPort = false
     private var foundSockPort = false
     private var foundServerProtocol = false
+
+    // Initialization
+    override init() {
+        super.init()
+
+        self.enableMux = UserDefaults.getBool(forKey: .enableMux)
+        self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
+
+        self.httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+
+        self.dns = UserDefaults.get(forKey: .dnsServers) ?? ""
+        self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
+
+        self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
+    }
 
     // combine manual edited data
     // by manual tab view
@@ -139,7 +155,7 @@ class V2rayConfig: NSObject {
 
     func combineManualData() {
         // base
-        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")!
+        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
         self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
@@ -294,6 +310,14 @@ class V2rayConfig: NSObject {
             }
             vmess!.vnext = [self.serverVmess]
             outbound.settingVMess = vmess
+
+            // enable mux only vmess
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+
+            outbound.mux = mux
+
             break
         case V2rayProtocolOutbound.shadowsocks:
             var ss = outbound.settingShadowsocks
@@ -309,12 +333,6 @@ class V2rayConfig: NSObject {
         default:
             break
         }
-
-        // mux
-        var mux = V2rayOutboundMux()
-        mux.enabled = self.enableMux
-        mux.concurrency = self.mux
-        outbound.mux = mux
 
         outbound.streamSettings = self.getStreamSettings()
         return outbound
@@ -409,6 +427,13 @@ class V2rayConfig: NSObject {
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [self.serverVmess]
             outbound.settingVMess = vmess
+
+            // enable mux only vmess
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+            outbound.mux = mux
+
             break
         case V2rayProtocolOutbound.shadowsocks:
             var ss = V2rayOutboundShadowsocks()
@@ -421,12 +446,6 @@ class V2rayConfig: NSObject {
         default:
             break
         }
-
-        // mux
-        var mux = V2rayOutboundMux()
-        mux.enabled = self.enableMux
-        mux.concurrency = self.mux
-        outbound.mux = mux
 
         outbound.streamSettings = self.getStreamSettings()
 
@@ -493,14 +512,7 @@ class V2rayConfig: NSObject {
             return
         }
 
-        // get dns data
-        if json["dns"].dictionaryValue.count > 0 {
-            let dnsServers = json["dns"]["servers"].array?.compactMap({ $0.string })
-            if ((dnsServers?.count) != nil) {
-                self.v2ray.dns.servers = dnsServers!
-                self.dns = dnsServers!.joined(separator: ",")
-            }
-        }
+        // ignore dns,  use default
 
         // ============ parse inbound start =========================================
         // > 4.0
@@ -721,6 +733,8 @@ class V2rayConfig: NSObject {
                     }
                     settings.accounts = accounts
                 }
+                // use default setting
+                v2rayInbound.port = self.httpPort
                 // set into inbound
                 v2rayInbound.settingHttp = settings
                 break
@@ -764,6 +778,9 @@ class V2rayConfig: NSObject {
                 settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
                 self.enableUdp = jsonParams["settings"]["udp"].boolValue
+                // use default setting
+                settings.udp = self.enableUdp
+                v2rayInbound.port = self.socksPort
                 // set into inbound
                 v2rayInbound.settingSocks = settings
                 break
@@ -807,22 +824,6 @@ class V2rayConfig: NSObject {
             v2rayInbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
         }
 
-        // set local socks5 port
-        if v2rayInbound.protocol == V2rayProtocolInbound.socks && !self.foundSockPort {
-            self.socksPort = v2rayInbound.port
-            self.foundSockPort = true
-        }
-
-        // set local http port
-        if v2rayInbound.protocol == V2rayProtocolInbound.http && !self.foundHttpPort {
-            self.httpPort = v2rayInbound.port
-            self.foundHttpPort = true
-        }
-
-        if foundHttpPort && foundSockPort && self.httpPort == self.socksPort {
-            self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
-        }
-
         return (v2rayInbound)
     }
 
@@ -845,15 +846,6 @@ class V2rayConfig: NSObject {
 
         v2rayOutbound.sendThrough = jsonParams["sendThrough"].stringValue
         v2rayOutbound.tag = jsonParams["tag"].stringValue
-
-        if jsonParams["mux"].dictionaryValue.count > 0 {
-            var mux = V2rayOutboundMux()
-            mux.enabled = jsonParams["mux"]["enabled"].boolValue
-            mux.concurrency = jsonParams["mux"]["concurrency"].intValue
-            v2rayOutbound.mux = mux
-            self.enableMux = mux.enabled
-            self.mux = mux.concurrency
-        }
 
         // settings depends on protocol
         if jsonParams["settings"].dictionaryValue.count > 0 {
@@ -960,6 +952,13 @@ class V2rayConfig: NSObject {
 
                 // set into outbound
                 v2rayOutbound.settingVMess = settingVMess
+
+                // enable mux only vmess
+                var mux = V2rayOutboundMux()
+                mux.enabled = self.enableMux
+                mux.concurrency = self.mux
+                v2rayOutbound.mux = mux
+
                 break
             }
         }
@@ -1192,7 +1191,7 @@ class V2rayConfig: NSObject {
         if steamJson["wsSettings"].dictionaryValue.count > 0 {
             var wsSettings = WsSettings()
             wsSettings.path = steamJson["wsSettings"]["path"].stringValue
-            wsSettings.headers.host = steamJson["wsSettings"]["header"]["host"].stringValue
+            wsSettings.headers.host = steamJson["wsSettings"]["headers"]["host"].stringValue
 
             stream.wsSettings = wsSettings
         }

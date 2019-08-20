@@ -3,7 +3,7 @@
 // Copyright (c) 2018 yanue. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 import CoreGraphics
 import CoreImage
 import SwiftyJSON
@@ -125,8 +125,15 @@ class ImportUri {
     var remark: String = ""
     var error: String = ""
     var uri: String = ""
-    
-    static func importUri(uri: String) -> ImportUri? {
+
+    static func importUri(uri: String, checkExist: Bool = true) -> ImportUri? {
+        if checkExist && V2rayServer.exist(url: uri) {
+            let importUri = ImportUri()
+            importUri.isValid = false
+            importUri.error = "Url already exists"
+            return importUri
+        }
+
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)
@@ -142,7 +149,7 @@ class ImportUri {
         }
         return nil
     }
-    
+
     static func supportProtocol(uri: String) -> Bool {
         if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") {
             return true
@@ -152,9 +159,10 @@ class ImportUri {
 
     func importSSUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail ss url"
+            self.error = "invalid ss url"
             return
         }
+
         self.uri = uri
 
         let ss = ShadowsockUri()
@@ -188,7 +196,7 @@ class ImportUri {
 
     func importSSRUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail ssr url"
+            self.error = "invalid ssr url"
             return
         }
         self.uri = uri
@@ -224,9 +232,10 @@ class ImportUri {
 
     func importVmessUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invail vmess url"
+            self.error = "invalid vmess url"
             return
         }
+
         self.uri = uri
 
         var vmess = VmessUri()
@@ -566,17 +575,12 @@ class ShadowsockUri {
         let base64End = urlStr.firstIndex(of: "#")
         let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])
 
-        guard let data = Data(base64Encoded: self.padBase64(string: encodedStr)) else {
+        guard let decoded = encodedStr.base64Decoded() else {
             self.error = "decode ss error"
             return (url.absoluteString, nil)
         }
 
-        guard let decoded = String(data: data, encoding: String.Encoding.utf8) else {
-            self.error = "decode ss error"
-            return (nil, nil)
-        }
-
-        let s = decoded.trimmingCharacters(in: CharacterSet(charactersIn: "\n"))
+        let s = decoded.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let index = base64End {
             let i = urlStr.index(index, offsetBy: 1)
@@ -598,7 +602,7 @@ class ShadowsockUri {
 }
 
 // link: https://coderschool.cn/2498.html
-class ShadowsockRUri : ShadowsockUri {
+class ShadowsockRUri: ShadowsockUri {
 
     override func Init(url: URL) {
         let (_decodedUrl, _tag) = self.decodeUrl(url: url)
@@ -640,18 +644,13 @@ class ShadowsockRUri : ShadowsockUri {
         // remove left ssr://
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 6)
         let encodedStr = String(urlStr[base64Begin...])
-        
-        guard let data = Data(base64Encoded: self.padBase64(string: encodedStr)) else {
+
+        guard let decoded = encodedStr.base64Decoded() else {
             self.error = "decode ssr error"
             return (url.absoluteString, nil)
         }
 
-        guard let decoded = String(data: data, encoding: String.Encoding.utf8) else {
-            self.error = "decode ssr error"
-            return (nil, nil)
-        }
-
-        let raw = decoded.trimmingCharacters(in: CharacterSet(charactersIn: "\n"))
+        let raw = decoded.trimmingCharacters(in: .whitespacesAndNewlines)
 
         let sep = raw.range(of: "/?")
         let s = String(raw[..<(sep?.lowerBound ?? raw.endIndex)])
@@ -659,8 +658,7 @@ class ShadowsockRUri : ShadowsockUri {
             let fragment = String(raw[iBeg...])
             let iEnd = fragment.firstIndex(of: "&")
             let aRemarks = String(fragment[..<(iEnd ?? raw.endIndex)])
-            guard let data = Data(base64Encoded: self.padBase64(string: aRemarks)), let tag = String(data: data, encoding: .utf8) else {
-//                self.error = "decode ssr error remarks is not base64"
+            guard let tag = aRemarks.base64Decoded() else {
                 return (s, aRemarks)
             }
             return (s, tag)

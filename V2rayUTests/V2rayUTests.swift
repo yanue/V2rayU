@@ -93,4 +93,32 @@ class V2rayUTests: XCTestCase {
 
 //        print(V2ray.toJSONString(prettyPrint:true) ?? "") // 序列化为格式化后的JSON字符串
     }
+    
+    func testBase64() {
+      let str = """
+vmess://eyJ2IjogIjIiLCAicHMiOiAiIiwgImFkZCI6ICIxMDguMTYwLjEzMS4xMiIsICJwb3J0IjogMjE2OTYsICJhaWQiOiAxNiwgInR5cGUiOiAidXRwIiwgIm5ldCI6ICJrY3AiLCAicGF0aCI6ICIiLCAiaG9zdCI6ICIiLCAiaWQiOiAiNTMxNjVlMWUtNDBjMS0xMWU5LTlmMzEtNTYwMDAxZTA2YzY5IiwgInRscyI6ICJub25lIn0=               
+vmess://eyJhZGQiOiJmci5zYW5neXUudHciLCJhaWQiOiIyMzMiLCJncm91cCI6Ind3dy5zc3JzaGFyZS5jb20iLCJob3N0IjoiZnIuc2FuZ3l1LnR3IiwiaWQiOiJjZTE0ZDc4OC0wZjc5LTQ5MWUtODVjYS0wNTI0MDYxMmYyOGEiLCJtcyI6MjM2LCJuZXQiOiJ3cyIsInBhdGgiOiIvIiwicG9ydCI6NDQzLCJwcyI6IkBTU1JPT0xfZnIuc2FuZ3l1LnR3Iiwic3RhdHVzIjoidHJ1ZSIsInRscyI6InRscyIsInR5cGUiOiJub25lIiwidiI6IjIiLCJ2MnJheWlkIjoiNTQ2MTAwMjQtMmE4Ny00NGIxLWJjYjgtMmRkODhkMjVjMWZiIn0=
+"""
+        print(str.base64Encoded())
+        let st1 = "c3NyOi8vTlM0eE1ERXVORGt1TVRrNk1UWTJNRFU2YjNKcFoybHVPbUZsY3kweU5UWXRZMlppT25Cc1lXbHVPbUpWWkZsTlZscHNZV3BHVUZKck9ESXZQM0psYldGeWEzTTlWVEZPVTFaRk9WQlVSamwxWkZkNGMweFVSVEpPYWtFeFQycEJkeVpuY205MWNEMVdNV1JZVEd4T1ZGVnNVbEJVTUhkMVVUQTVUZwpzc3I6Ly9OUzR4TURFdU5Ea3VNVGs2TVRZMk1EUTZiM0pwWjJsdU9tRmxjeTB5TlRZdFkyWmlPbkJzWVdsdU9tSlZaRmxOVmxwc1lXcEdVRkpyT0RJdlAzSmxiV0Z5YTNNOVZURk9VMVpGT1ZCVVJqbDFaRmQ0YzB4VVJUSk9ha0V3VDJwQmVDWm5jbTkxY0QxV01XUllUR3hPVkZWc1VsQlVNSGQxVVRBNVRn".base64Decoded()
+        print(st1)
+    }
+    
+    func testUrl(){
+        let url = "http://奥/奥神队"
+        let charSet = NSMutableCharacterSet()
+        charSet.formUnion(with: CharacterSet.urlQueryAllowed)
+        charSet.addCharacters(in: "#")
+        let url1 = url.addingPercentEncoding(withAllowedCharacters:  charSet as CharacterSet)!
+        print("url1",url1);
+        guard let rUrl = URL(string: url1) else {
+            print("not url")
+            return
+        }
+        if rUrl.scheme == nil || rUrl.host == nil {
+            print("not url 1")
+        }
+        print("url",rUrl.scheme,rUrl.host,rUrl.baseURL,rUrl.path)
+
+    }
 }
