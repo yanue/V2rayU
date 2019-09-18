@@ -99,7 +99,7 @@
 "GBr-yR-BZv.title" = "downlinkCapacity";
 
 /* Class = "NSButtonCell"; title = "subscribe"; ObjectID = "H9t-q7-Sop"; */
-"H9t-q7-Sop.title" = "定义设置";
+"H9t-q7-Sop.title" = "订阅设置";
 
 /* Class = "NSTextFieldCell"; title = "response:"; ObjectID = "HMZ-z3-aYN"; */
 "HMZ-z3-aYN.title" = "response:";
