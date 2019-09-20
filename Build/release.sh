@@ -205,7 +205,6 @@ function publish() {
     commit
 
     rm -rf "${DMG_TMP}" "${APP_PATH}" "${V2rayU_RELEASE}"
-    echo "Done"
 }
 
 
@@ -215,3 +214,4 @@ then
 else
     makeDmg
 fi
+echo 'done'
