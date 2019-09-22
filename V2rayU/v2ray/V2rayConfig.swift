@@ -122,6 +122,7 @@ class V2rayConfig: NSObject {
         let encoder = JSONEncoder()
         let data = try! encoder.encode(self.v2ray)
         var jsonStr = String(data: data, encoding: .utf8)!
+        print("jsonStr",jsonStr)
 
         // 2. format json text by javascript
         jsonStr = self.formatJson(json: jsonStr)
@@ -774,7 +775,6 @@ class V2rayConfig: NSObject {
 
                 settings.udp = jsonParams["settings"]["udp"].boolValue
                 settings.ip = jsonParams["settings"]["ip"].stringValue
-                settings.timeout = jsonParams["settings"]["timeout"].intValue
                 settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
                 self.enableUdp = jsonParams["settings"]["udp"].boolValue
