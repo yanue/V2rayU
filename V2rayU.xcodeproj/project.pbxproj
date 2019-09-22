@@ -147,6 +147,15 @@
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		669A73A7233776B800807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		669A73A8233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
+		669A73A9233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/QrcodeWindow.strings"; sourceTree = "<group>"; };
+		669A73AA233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceAbout.strings"; sourceTree = "<group>"; };
+		669A73AB233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceAdvance.strings"; sourceTree = "<group>"; };
+		669A73AC233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceGeneral.strings"; sourceTree = "<group>"; };
+		669A73AD233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferencePac.strings"; sourceTree = "<group>"; };
+		669A73AE233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceSubscribe.strings"; sourceTree = "<group>"; };
+		669A73AF233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
@@ -498,6 +507,7 @@
 				en,
 				Base,
 				"zh-Hans",
+				"zh-HK",
 			);
 			mainGroup = 664EB368216C9A5E00B6AE0D;
 			productRefGroup = 664EB372216C9A5E00B6AE0D /* Products */;
@@ -677,6 +687,7 @@
 			children = (
 				66107B8722DEDBE4002FFB60 /* zh-Hans */,
 				66107B8922DEE445002FFB60 /* en */,
+				669A73AF233776B900807CF9 /* zh-HK */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -686,6 +697,7 @@
 			children = (
 				664EB379216C9A5F00B6AE0D /* Base */,
 				66F3029C22AAA0A600FCA4E2 /* zh-Hans */,
+				669A73A7233776B800807CF9 /* zh-HK */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -695,6 +707,7 @@
 			children = (
 				667029D221AFB86E0079EF41 /* Base */,
 				66F3029E22AAA0A600FCA4E2 /* zh-Hans */,
+				669A73A9233776B900807CF9 /* zh-HK */,
 			);
 			name = QrcodeWindow.xib;
 			sourceTree = "<group>";
@@ -704,6 +717,7 @@
 			children = (
 				66FEAD4F217EE14C009DECF9 /* Base */,
 				66F3029D22AAA0A600FCA4E2 /* zh-Hans */,
+				669A73A8233776B900807CF9 /* zh-HK */,
 			);
 			name = ConfigWindow.xib;
 			sourceTree = "<group>";
@@ -713,6 +727,7 @@
 			children = (
 				6D6DFD730D8572B1FCAB1FFE /* Base */,
 				66F302A322AAA0A700FCA4E2 /* zh-Hans */,
+				669A73AE233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceSubscribe.xib;
 			sourceTree = "<group>";
@@ -722,6 +737,7 @@
 			children = (
 				6D6DFE1CDFAD9828F2FDE1A5 /* Base */,
 				66F302A022AAA0A600FCA4E2 /* zh-Hans */,
+				669A73AB233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceAdvance.xib;
 			sourceTree = "<group>";
@@ -731,6 +747,7 @@
 			children = (
 				6D6DF3A2857899778B719CE1 /* Base */,
 				66F3029F22AAA0A600FCA4E2 /* zh-Hans */,
+				669A73AA233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceAbout.xib;
 			sourceTree = "<group>";
@@ -740,6 +757,7 @@
 			children = (
 				6D6DF81E59907A2C7579BFE2 /* Base */,
 				66F302A122AAA0A600FCA4E2 /* zh-Hans */,
+				669A73AC233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceGeneral.xib;
 			sourceTree = "<group>";
@@ -749,6 +767,7 @@
 			children = (
 				6D6DF181C5D472DBBB71B72A /* Base */,
 				66F302A222AAA0A700FCA4E2 /* zh-Hans */,
+				669A73AD233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferencePac.xib;
 			sourceTree = "<group>";
