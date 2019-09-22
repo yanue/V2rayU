@@ -122,7 +122,6 @@ class V2rayConfig: NSObject {
         let encoder = JSONEncoder()
         let data = try! encoder.encode(self.v2ray)
         var jsonStr = String(data: data, encoding: .utf8)!
-        print("jsonStr",jsonStr)
 
         // 2. format json text by javascript
         jsonStr = self.formatJson(json: jsonStr)
