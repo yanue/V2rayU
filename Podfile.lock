@@ -17,7 +17,7 @@ DEPENDENCIES:
   - SwiftyJSON
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - GCDWebServer
     - QRCoder
@@ -36,11 +36,11 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   GCDWebServer: ead88cd14596dd4eae4f5830b8877c87c8728990
-  Preferences: 865793c3914c4de086c809a504a4157b8968cb90
+  Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   Sparkle: 3f75576db8b0265adef36c43249d747f22d0b708
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
 PODFILE CHECKSUM: 58098d0825211da73cdc15b835005b970bed1875
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.1

@@ -120,12 +120,25 @@ class MenuController: NSObject, NSMenuDelegate {
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
     }
 
-    func setStatusOn() {
+    func setStatusOn(runMode: RunMode) {
         v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
         toggleV2rayItem.title = "Turn v2ray-core Off"
 
+        var iconName = "IconOn"
+        
+        switch runMode {
+        case .global:
+            iconName = "IconOnG"
+        case .manual:
+            iconName = "IconOnM"
+        case .pac:
+            iconName = "IconOnP"
+        default:
+            break
+        }
+        
         if let button = statusItem.button {
-            button.image = NSImage(named: NSImage.Name("IconOn"))
+            button.image = NSImage(named: NSImage.Name(iconName))
         }
 
         // set on
@@ -156,18 +169,19 @@ class MenuController: NSObject, NSMenuDelegate {
             setStatusOff()
             return
         }
-
+        
+        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
+        
         // create json file
         V2rayConfig.createJsonFile(item: v2ray)
 
         // set status
-        setStatusOn()
+        setStatusOn(runMode: runMode)
 
         // launch
         V2rayLaunch.Start()
         NSLog("start v2ray-core done.")
 
-        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
         // switch run mode
         self.switchRunMode(runMode: runMode)
     }
@@ -352,7 +366,10 @@ class MenuController: NSObject, NSMenuDelegate {
             sockPort = cfg.socksPort
             httpPort = cfg.httpPort
         }
-
+        
+        // set icon
+        setStatusOn(runMode: runMode)
+        
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first
