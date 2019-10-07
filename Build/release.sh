@@ -79,7 +79,8 @@ function createDmg() {
                set arrangement of viewOptions to not arranged
                set icon size of viewOptions to 80
                set background picture of viewOptions to file ".background:'${DMG_BACKGROUND_IMG}'"
-               make new alias file at container window to POSIX file "/Applications" with properties {name:"Applications"}
+               set appHome to path to applications folder from user domain
+               make new alias file at container window to appHome with properties {name:"Applications"}
                delay 1
                set position of item "'${APP_NAME}'.app" of container window to {120, 120}
                set position of item "Applications" of container window to {380, 120}
