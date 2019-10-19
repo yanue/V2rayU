@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import SwiftyJSON
 
 // ----- v2ray subscribe manager -----
 class V2raySubscribe: NSObject {
