@@ -406,8 +406,8 @@ class V2rayConfig: NSObject {
         switch self.streamNetwork {
         case V2rayStreamSettings.network.h2.rawValue:
             if self.streamH2.path.count == 0 {
-                self.error = "missing streamSettings.httpSettings.path";
-                return
+//                self.error = "missing streamSettings.httpSettings.path";
+//                return
             }
             break
         case V2rayStreamSettings.network.ws.rawValue:

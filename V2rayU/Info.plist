@@ -51,5 +51,10 @@
 	<string>https://gitee.com/yanue/appcast/raw/master/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
