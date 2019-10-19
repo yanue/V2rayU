@@ -9,6 +9,7 @@
 import Cocoa
 import Preferences
 import Alamofire
+import SwiftyJSON
 
 final class PreferenceSubscribeViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.subscribeTab
@@ -177,14 +178,20 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         // remove old v2ray servers by subscribe
         V2rayServer.remove(subscribe: subscribe)
 
+        let id : String  = String(url.suffix(32));
+        
         let list = strTmp!.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
         for item in list {
             // import every server
-            self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe)
+            if (item.count == 0) {
+                continue;
+            } else {
+                self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id)
+            }
         }
     }
 
-    func importUri(uri: String, subscribe: String) {
+    func importUri(uri: String, subscribe: String, id: String) {
         if uri.count == 0 {
             logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
             return
@@ -195,7 +202,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
             return
         }
 
-        if let importUri = ImportUri.importUri(uri: uri) {
+        if let importUri = ImportUri.importUri(uri: uri, id: id) {
             if importUri.isValid {
                 // add server
                 V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)

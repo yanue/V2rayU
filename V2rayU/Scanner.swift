@@ -126,7 +126,7 @@ class ImportUri {
     var error: String = ""
     var uri: String = ""
 
-    static func importUri(uri: String, checkExist: Bool = true) -> ImportUri? {
+    static func importUri(uri: String, id: String = "", checkExist: Bool = true) -> ImportUri? {
         if checkExist && V2rayServer.exist(url: uri) {
             let importUri = ImportUri()
             importUri.isValid = false
@@ -136,7 +136,7 @@ class ImportUri {
 
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri)
+            importUri.importVmessUri(uri: uri, id: id)
             return importUri
         } else if uri.hasPrefix("ss://") {
             let importUri = ImportUri()
@@ -230,7 +230,7 @@ class ImportUri {
         }
     }
 
-    func importVmessUri(uri: String) {
+    func importVmessUri(uri: String, id: String = "") {
         if URL(string: uri) == nil {
             self.error = "invalid vmess url"
             return
@@ -258,7 +258,8 @@ class ImportUri {
         vmessItem.address = vmess.address
         vmessItem.port = vmess.port
         var user = V2rayOutboundVMessUser()
-        user.id = vmess.id
+        vmess.id = id
+        user.id = id
         user.alterId = vmess.alterId
         user.security = vmess.security
         vmessItem.users = [user]
