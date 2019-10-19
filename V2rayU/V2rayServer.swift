@@ -226,7 +226,8 @@ class V2rayServer: NSObject {
 
     // get json file url
     static func getJsonFile() -> String? {
-        return Bundle.main.url(forResource: "unzip", withExtension: "sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
+//        return Bundle.main.url(forResource: "unzip", withExtension: "sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
+        return V2rayUHomeDir + "/config.json"
     }
 
     // load json file data

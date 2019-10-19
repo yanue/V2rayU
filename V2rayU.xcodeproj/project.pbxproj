@@ -79,7 +79,7 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 6;
+			dstSubfolderSpec = 7;
 			files = (
 				66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */,
 			);

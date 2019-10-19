@@ -11,6 +11,7 @@ import ServiceManagement
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
+let V2rayUHomeDir = NSHomeDirectory() + "/.V2rayU"
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -19,6 +20,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // Ensure V2rayU HomeDir is existed.
+        let fileMgr = FileManager.default
+        if !fileMgr.fileExists(atPath: V2rayUHomeDir) {
+            try! fileMgr.createDirectory(atPath: V2rayUHomeDir, withIntermediateDirectories: true, attributes: nil)
+        }
+
         // auto launch
         if UserDefaults.getBool(forKey: .autoLaunch) {
             // Insert code here to initialize your application
@@ -30,7 +37,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
             }
         }
-        
+
         self.checkDefault()
 
         // check v2ray core
