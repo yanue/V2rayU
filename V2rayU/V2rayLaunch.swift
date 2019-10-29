@@ -14,12 +14,11 @@ import GCDWebServer
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
 let LAUNCH_HTTP_PLIST = "yanue.v2rayu.http.plist" // simple http server
-let logFilePath = NSHomeDirectory() + "/Library/Logs/V2rayU.log"
+let logFilePath = V2rayUHomeDir + "/v2ray-core.log"
 let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
 let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
-let AppMacOsPath = Bundle.main.bundlePath + "/Contents/MacOS"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
@@ -46,7 +45,7 @@ class V2rayLaunch: NSObject {
         }
 
         // write launch agent
-        let agentArguments = ["./v2ray-core/v2ray", "-config", "config.json"]
+        let agentArguments = ["./v2ray-core/v2ray", "-config", V2rayUHomeDir + "/config.json"]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_PLIST.replacingOccurrences(of: ".plist", with: ""),
@@ -132,7 +131,7 @@ class V2rayLaunch: NSObject {
             return
         }
 
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppMacOsPath + " && ls -la ./V2rayUTool | awk '{print $3,$4}'"])
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ls -la ./V2rayUTool | awk '{print $3,$4}'"])
         NSLog("Permission is " + (res ?? ""))
         if res == "root admin" {
             NSLog("Permission is ok")
@@ -152,7 +151,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
-        let task = Process.launchedProcess(launchPath: AppMacOsPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
             NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
@@ -175,7 +174,7 @@ class V2rayLaunch: NSObject {
 
         let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 
-        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
+        webServer.addGETHandler(forBasePath: "/", directoryPath: V2rayUHomeDir, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
 
         do {
             try webServer.start(options: [

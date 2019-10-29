@@ -159,7 +159,6 @@ struct V2rayInboundSocks: Codable {
     var accounts: [V2rayInboundSockAccount]?
     var udp: Bool = true
     var ip: String?
-    var timeout: Int = 360
     var userLevel: Int?
 }
 

@@ -406,8 +406,8 @@ class V2rayConfig: NSObject {
         switch self.streamNetwork {
         case V2rayStreamSettings.network.h2.rawValue:
             if self.streamH2.path.count == 0 {
-                self.error = "missing streamSettings.httpSettings.path";
-                return
+//                self.error = "missing streamSettings.httpSettings.path";
+//                return
             }
             break
         case V2rayStreamSettings.network.ws.rawValue:
@@ -774,7 +774,6 @@ class V2rayConfig: NSObject {
 
                 settings.udp = jsonParams["settings"]["udp"].boolValue
                 settings.ip = jsonParams["settings"]["ip"].stringValue
-                settings.timeout = jsonParams["settings"]["timeout"].intValue
                 settings.userLevel = jsonParams["settings"]["userLevel"].intValue
 
                 self.enableUdp = jsonParams["settings"]["udp"].boolValue

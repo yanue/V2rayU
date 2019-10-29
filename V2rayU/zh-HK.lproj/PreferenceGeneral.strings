@@ -1,0 +1,21 @@
+
+/* Class = "NSButtonCell"; title = "show logs"; ObjectID = "0fD-xL-Tly"; */
+"0fD-xL-Tly.title" = "顯示日誌";
+
+/* Class = "NSButtonCell"; title = "Check for Updates..."; ObjectID = "2p9-GL-XZ9"; */
+"2p9-GL-XZ9.title" = "檢查更新";
+
+/* Class = "NSButtonCell"; title = "clear logs"; ObjectID = "2vr-uU-fMI"; */
+"2vr-uU-fMI.title" = "清除日誌";
+
+/* Class = "NSButtonCell"; title = "Launch V2rayU at login"; ObjectID = "NZE-cI-j04"; */
+"NZE-cI-j04.title" = "開機自動啟動";
+
+/* Class = "NSButtonCell"; title = "Feedback..."; ObjectID = "QjX-NH-23u"; */
+"QjX-NH-23u.title" = "問題反饋...";
+
+/* Class = "NSButtonCell"; title = "Clear Logs  Everyday Automutically"; ObjectID = "hIN-yp-Qul"; */
+"hIN-yp-Qul.title" = "每天自動清除日誌";
+
+/* Class = "NSButtonCell"; title = "Check for Updates automutically"; ObjectID = "m2S-Mu-rFM"; */
+"m2S-Mu-rFM.title" = "自動檢測版本更新";
