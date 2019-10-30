@@ -204,7 +204,7 @@ class V2rayServer: NSObject {
     }
 
     // update server list UserDefaults
-    static private func saveItemList() {
+    static func saveItemList() {
         var v2rayServerList: Array<String> = []
         for item in V2rayServer.list() {
             v2rayServerList.append(item.name)
@@ -227,7 +227,7 @@ class V2rayServer: NSObject {
     // get json file url
     static func getJsonFile() -> String? {
 //        return Bundle.main.url(forResource: "unzip", withExtension: "sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
-        return V2rayUHomeDir + "/config.json"
+        return JsonConfigFilePath
     }
 
     // load json file data
@@ -316,15 +316,17 @@ class V2rayItem: NSObject, NSCoding {
     var isValid: Bool
     var url: String
     var subscribe: String // subscript name: uuid
+    var speed: Int // unit ms
 
     // init
-    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "", subscribe: String = "") {
+    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "", subscribe: String = "", speed: Int = 0) {
         self.name = name
         self.remark = remark
         self.json = json
         self.isValid = isValid
         self.url = url
         self.subscribe = subscribe
+        self.speed = speed
     }
 
     // decode
@@ -335,6 +337,7 @@ class V2rayItem: NSObject, NSCoding {
         self.isValid = decoder.decodeBool(forKey: "IsValid")
         self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
         self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? ""
+        self.speed = decoder.decodeObject(forKey: "Speed") as? Int ?? 0
     }
 
     // object encode
@@ -345,6 +348,7 @@ class V2rayItem: NSObject, NSCoding {
         coder.encode(isValid, forKey: "IsValid")
         coder.encode(url, forKey: "Url")
         coder.encode(subscribe, forKey: "Subscribe")
+        coder.encode(speed, forKey: "Speed")
     }
 
     // store into UserDefaults

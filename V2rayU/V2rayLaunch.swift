@@ -24,6 +24,7 @@ let v2rayCoreFile = v2rayCorePath + "/v2ray"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
+let JsonConfigFilePath = V2rayUHomeDir + "/config.json"
 
 let webServer = GCDWebServer()
 
@@ -45,7 +46,7 @@ class V2rayLaunch: NSObject {
         }
 
         // write launch agent
-        let agentArguments = ["./v2ray-core/v2ray", "-config", V2rayUHomeDir + "/config.json"]
+        let agentArguments = ["./v2ray-core/v2ray", "-config", JsonConfigFilePath]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_PLIST.replacingOccurrences(of: ".plist", with: ""),

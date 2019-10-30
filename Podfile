@@ -15,5 +15,7 @@ target 'V2rayU' do
   pod 'Sparkle'
   pod 'QRCoder'
   pod "GCDWebServer", '~> 3.5.2'
+#  pod 'Socket.IO-Client-Swift'
+  pod 'SwiftSocket'
 
 end

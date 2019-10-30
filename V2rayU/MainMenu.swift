@@ -306,7 +306,7 @@ class MenuController: NSObject, NSMenuDelegate {
             }
 
             let menuItem: NSMenuItem = NSMenuItem()
-            menuItem.title = item.remark
+            menuItem.title = String(item.speed) + "ms\t    " + item.remark
             menuItem.action = #selector(self.switchServer(_:))
             menuItem.representedObject = item
             menuItem.target = self
@@ -454,6 +454,26 @@ class MenuController: NSObject, NSMenuDelegate {
         } else {
             noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess:// from Pasteboard")
         }
+    }
+    
+    @IBAction func pingSpeed(_ sender: NSMenuItem) {
+        let itemList = V2rayServer.list()
+        if itemList.count == 0 {
+            return
+        }
+
+        for item in itemList {
+            if !item.isValid {
+                continue
+            }
+            
+            let ping = Ping(item: item)
+            ping.pingProxySpeed()
+        }
+
+        V2rayServer.saveItemList()
+        // refresh server
+        self.showServers()
     }
 
     func importUri(url: String) {

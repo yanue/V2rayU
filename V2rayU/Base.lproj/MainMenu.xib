@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14868" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14868"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -82,6 +82,12 @@
                         <action selector="openPreferencePac:" target="hcZ-V7-Dui" id="q2a-9U-SCe"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Ping Speed..." id="Ow7-xo-xhV">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="pingSpeed:" target="hcZ-V7-Dui" id="S0e-Q3-a8R"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="4r0-fk-xMy"/>
                 <menuItem title="Import Server From Pasteboard" toolTip="ss:// or vmess://" id="Kct-KD-qPN">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -141,7 +147,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="-553" y="42"/>
+            <point key="canvasLocation" x="-553" y="52"/>
         </menu>
         <menu title="V2rayU" systemMenu="main" id="hzc-Fw-ODy">
             <items>
