@@ -455,7 +455,7 @@ class MenuController: NSObject, NSMenuDelegate {
             noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess:// from Pasteboard")
         }
     }
-    
+
     @IBAction func pingSpeed(_ sender: NSMenuItem) {
         let itemList = V2rayServer.list()
         if itemList.count == 0 {
@@ -478,7 +478,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func importUri(url: String) {
         let urls = url.split(separator: "\n")
-
+        
         for url in urls {
             let uri = url.trimmingCharacters(in: .whitespaces)
 
@@ -487,7 +487,9 @@ class MenuController: NSObject, NSMenuDelegate {
                 continue
             }
 
-            if URL(string: uri) == nil {
+            // ss://YWVzLTI1Ni1jZmI6ZUlXMERuazY5NDU0ZTZuU3d1c3B2OURtUzIwMXRRMERAMTcyLjEwNS43MS44Mjo4MDk5#翻墙党325.06美国 类型这种含中文的格式不是标准的URL格式
+//            if URL(string: uri) == nil {
+            if !ImportUri.supportProtocol(uri: uri) {
                 noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
                 continue
             }
