@@ -477,24 +477,28 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     func importUri(url: String) {
-        let uri = url.trimmingCharacters(in: .whitespaces)
+        let urls = url.split(separator: "\n")
 
-        if uri.count == 0 {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
-            return
-        }
+        for url in urls {
+            let uri = url.trimmingCharacters(in: .whitespaces)
 
-        if URL(string: uri) == nil {
+            if uri.count == 0 {
+                noticeTip(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
+                continue
+            }
+
+            if URL(string: uri) == nil {
+                noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
+                continue
+            }
+
+            if let importUri = ImportUri.importUri(uri: uri) {
+                self.saveServer(importUri: importUri)
+                continue
+            }
+
             noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
-            return
         }
-
-        if let importUri = ImportUri.importUri(uri: uri) {
-            self.saveServer(importUri: importUri)
-            return
-        }
-
-        noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
     }
 
     func saveServer(importUri: ImportUri) {
