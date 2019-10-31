@@ -258,8 +258,10 @@ class ImportUri {
         vmessItem.address = vmess.address
         vmessItem.port = vmess.port
         var user = V2rayOutboundVMessUser()
-        vmess.id = id
-        user.id = id
+        if id.count > 0 {
+            vmess.id = id
+        }
+        user.id = vmess.id
         user.alterId = vmess.alterId
         user.security = vmess.security
         vmessItem.users = [user]

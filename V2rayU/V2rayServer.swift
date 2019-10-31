@@ -337,7 +337,7 @@ class V2rayItem: NSObject, NSCoding {
         self.isValid = decoder.decodeBool(forKey: "IsValid")
         self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
         self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? ""
-        self.speed = decoder.decodeObject(forKey: "Speed") as? Int ?? 0
+        self.speed = decoder.decodeInteger(forKey: "Speed")
     }
 
     // object encode
