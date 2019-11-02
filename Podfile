@@ -16,6 +16,8 @@ target 'V2rayU' do
   pod 'QRCoder'
   pod "GCDWebServer", '~> 3.5.2'
 #  pod 'Socket.IO-Client-Swift'
-  pod 'SwiftSocket'
+#  pod 'SwiftSocket'
+  pod 'SwiftSocket', :git => 'https://github.com/odariusgeorge/SwiftSocket.git', :branch => 'patch-1'
+
 
 end

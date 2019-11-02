@@ -58,7 +58,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             }
         } else {
             let str = try? String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
-            if str!.count>0 {
+            if str?.count ?? 0 > 0 {
                 userRuleTxt = str!
             }
         }
