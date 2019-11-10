@@ -12,8 +12,8 @@ import Alamofire
 
 let PACRulesDirPath = AppResourcesPath + "/pac/"
 let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
-let PACFilePath = PACRulesDirPath + "pac.js"
-var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
+let PACFilePath = PACRulesDirPath + "proxy.pac"
+var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.pac"
 let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
@@ -102,9 +102,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 }
 
 // Because of LocalSocks5.ListenPort may be changed
-func GeneratePACFile(rewrite: bool = false) -> Bool {
+func GeneratePACFile() -> Bool {
     let socks5Address = "127.0.0.1"
-    
+
     let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
 
     // permission

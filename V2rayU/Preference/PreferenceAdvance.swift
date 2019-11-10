@@ -42,7 +42,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
-        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
+        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 
         let dnsServers = UserDefaults.get(forKey: .dnsServers) ?? ""
         let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
@@ -118,7 +118,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         // set HttpServerPacPort
         HttpServerPacPort = pacPortVal
-        PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
+        PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.pac"
 
         _ = GeneratePACFile()
         // restart pac http server

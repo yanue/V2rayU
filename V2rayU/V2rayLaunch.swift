@@ -21,7 +21,7 @@ let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
-var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
+var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
 let JsonConfigFilePath = AppResourcesPath + "/config.json"
@@ -173,13 +173,13 @@ class V2rayLaunch: NSObject {
 
         _ = GeneratePACFile()
 
-        let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
+        let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 
         webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
 
         do {
             try webServer.start(options: [
-                "Port": UInt(pacPort) ?? 1085,
+                "Port": UInt(pacPort) ?? 11085,
                 "BindToLocalhost": true
             ]);
         } catch let error {
