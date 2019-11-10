@@ -14,4 +14,4 @@ sudo chown root:admin ${cmd}
 sudo chmod a+rx ${cmd}
 sudo chmod +s ${cmd}
 
-echo done1
+echo 'done'

@@ -14,7 +14,7 @@ import GCDWebServer
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
 let LAUNCH_HTTP_PLIST = "yanue.v2rayu.http.plist" // simple http server
-let logFilePath = V2rayUHomeDir + "/v2ray-core.log"
+let logFilePath = NSHomeDirectory() + "/Library/Logs/v2ray-core.log"
 let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
 let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
@@ -24,7 +24,7 @@ let v2rayCoreFile = v2rayCorePath + "/v2ray"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
-let JsonConfigFilePath = V2rayUHomeDir + "/config.json"
+let JsonConfigFilePath = AppResourcesPath + "/config.json"
 
 let webServer = GCDWebServer()
 
@@ -175,7 +175,7 @@ class V2rayLaunch: NSObject {
 
         let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "1085"
 
-        webServer.addGETHandler(forBasePath: "/", directoryPath: V2rayUHomeDir, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
+        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
 
         do {
             try webServer.start(options: [

@@ -11,9 +11,9 @@ import Preferences
 import Alamofire
 
 let PACRulesDirPath = AppResourcesPath + "/pac/"
-let PACUserRuleFilePath = V2rayUHomeDir + "/user-rule.txt"
-let PACFilePath = V2rayUHomeDir + "/pac.js"
-var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac.js"
+let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
+let PACFilePath = PACRulesDirPath + "pac.js"
+var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/pac.js"
 let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
@@ -24,7 +24,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
     let toolbarItemIcon = NSImage(named: NSImage.bookmarksTemplateName)!
 
     @IBOutlet weak var tips: NSTextField!
-    
+
     override var nibName: NSNib.Name? {
         return "PreferencePac"
     }
@@ -37,7 +37,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         // fix: https://github.com/sindresorhus/Preferences/issues/31
         self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
         self.tips.stringValue = ""
-        
+
         let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl)
         if gfwUrl != nil {
             gfwPacListUrl.stringValue = gfwUrl!
@@ -48,12 +48,12 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         // read userRules from UserDefaults
         let txt = UserDefaults.get(forKey: .userRules)
         var userRuleTxt = """
-! Put user rules line by line in this file.
-! See https://adblockplus.org/en/filter-cheatsheet
+                          ! Put user rules line by line in this file.
+                          ! See https://adblockplus.org/en/filter-cheatsheet
 
-"""
+                          """
         if txt != nil {
-            if txt!.count>0 {
+            if txt!.count > 0 {
                 userRuleTxt = txt!
             }
         } else {
@@ -64,14 +64,14 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         }
         userRulesView.string = userRuleTxt
     }
-    
+
     @IBAction func viewPacFile(_ sender: Any) {
         guard let url = URL(string: PACUrl) else {
             return
         }
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func updatePac(_ sender: Any) {
         self.tips.stringValue = "Updating Pac Rules ..."
 
@@ -81,7 +81,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                 UserDefaults.set(forKey: .userRules, value: str)
 
                 try str.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
-                
+
                 UpdatePACFromGFWList()
 
                 if GeneratePACFile() {
@@ -90,7 +90,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                 } else {
                     self.tips.stringValue = "It's failed to update PAC by User Rules."
                 }
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     // your code here
                     self.tips.stringValue = ""
@@ -102,30 +102,30 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 }
 
 // Because of LocalSocks5.ListenPort may be changed
-func GeneratePACFile() -> Bool {
+func GeneratePACFile(rewrite: bool = false) -> Bool {
     let socks5Address = "127.0.0.1"
     
     let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
-    
+
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./pac"])
-    
+
     do {
         let gfwlist = try String(contentsOfFile: GFWListFilePath, encoding: String.Encoding.utf8)
         if let data = Data(base64Encoded: gfwlist, options: .ignoreUnknownCharacters) {
             let str = String(data: data, encoding: String.Encoding.utf8)
             var lines = str!.components(separatedBy: CharacterSet.newlines)
-            
+
             // read userRules from UserDefaults
             let userRules = UserDefaults.get(forKey: .userRules)
             if userRules != nil {
                 try userRules!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
             }
-            
+
             do {
                 let userRuleStr = try String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
                 let userRuleLines = userRuleStr.components(separatedBy: CharacterSet.newlines)
-                
+
                 lines = userRuleLines + lines
             } catch {
                 NSLog("Not found user-rule.txt")
@@ -141,16 +141,16 @@ func GeneratePACFile() -> Bool {
                 }
                 return true
             })
-            
+
             do {
                 // rule lines to json array
                 let rulesJsonData: Data = try JSONSerialization.data(withJSONObject: lines, options: .prettyPrinted)
                 let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8)
-                
+
                 // Get raw pac js
                 let jsData = try? Data(contentsOf: URL.init(fileURLWithPath: PACAbpFile))
                 var jsStr = String(data: jsData!, encoding: String.Encoding.utf8)
-                
+
                 // Replace rules placeholder in pac js
                 jsStr = jsStr!.replacingOccurrences(of: "__RULES__", with: rulesJsonStr!)
                 // Replace __SOCKS5PORT__ palcholder in pac js
@@ -162,15 +162,15 @@ func GeneratePACFile() -> Bool {
                 } else {
                     jsStr = jsStr!.replacingOccurrences(of: "__SOCKS5ADDR__", with: socks5Address)
                 }
-                
+
                 // Write the pac js to file.
                 try jsStr!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
                 return true
             } catch {
-                
+
             }
         }
-        
+
     } catch {
         NSLog("Not found gfwlist.txt")
     }
@@ -186,14 +186,14 @@ func UpdatePACFromGFWList() {
         } catch {
         }
     }
-    
+
     Alamofire.request(GFWListURL).responseString {
         response in
         if response.result.isSuccess {
             if let v = response.result.value {
                 do {
                     try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
-                    
+
                     if GeneratePACFile() {
                         // Popup a user notification
                         let notification = NSUserNotification()
@@ -201,7 +201,7 @@ func UpdatePACFromGFWList() {
                         NSUserNotificationCenter.default.deliver(notification)
                     }
                 } catch {
-                    
+
                 }
             }
         } else {
