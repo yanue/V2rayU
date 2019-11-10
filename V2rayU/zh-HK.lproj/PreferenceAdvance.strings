@@ -58,3 +58,9 @@
 
 /* Class = "NSMenuItem"; title = "warning"; ObjectID = "z4S-wG-fyc"; */
 "z4S-wG-fyc.title" = "warning";
+
+/* Class = "NSTextFieldCell"; title = "Local Sock Listen Host:"; ObjectID = "jwm-cF-Zeb"; */
+"jwm-cF-Zeb.title" = "本機Sock監聽Host:";
+
+/* Class = "NSTextFieldCell"; title = "Local Http Listen Host:"; ObjectID = "uWf-ty-nD8"; */
+"uWf-ty-nD8.title" = "本機http監聽Host:";

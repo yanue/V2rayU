@@ -37,8 +37,12 @@ extension UserDefaults {
         case gfwPacListUrl
 
         // base settings
+        // http host
+        case localHttpHost
         // http port
         case localHttpPort
+        // sock host
+        case localSockHost
         // sock port
         case localSockPort
         // dns servers

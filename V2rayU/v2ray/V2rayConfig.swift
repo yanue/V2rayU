@@ -11,47 +11,47 @@ import SwiftyJSON
 import JavaScriptCore
 
 let jsSourceFormatConfig =
-        """
-        /**
-         * V2ray Config Format
-         * @return {string}
-         */
-        var V2rayConfigFormat = function (encodeStr) {
-            var deStr = decodeURIComponent(encodeStr);
-            if (!deStr) {
-                return "error: cannot decode uri"
+    """
+    /**
+     * V2ray Config Format
+     * @return {string}
+     */
+    var V2rayConfigFormat = function (encodeStr) {
+        var deStr = decodeURIComponent(encodeStr);
+        if (!deStr) {
+            return "error: cannot decode uri"
+        }
+
+        try {
+            var obj = JSON.parse(deStr);
+            if (!obj) {
+                return "error: cannot parse json"
             }
 
-            try {
-                var obj = JSON.parse(deStr);
-                if (!obj) {
-                    return "error: cannot parse json"
-                }
-
-                var v2rayConfig = {};
-                // ordered keys
-                v2rayConfig["log"] = obj.log;
-                v2rayConfig["inbounds"] = obj.inbounds;
-                v2rayConfig["inbound"] = obj.inbound;
-                v2rayConfig["inboundDetour"] = obj.inboundDetour;
-                v2rayConfig["outbounds"] = obj.outbounds;
-                v2rayConfig["outbound"] = obj.outbound;
-                v2rayConfig["outboundDetour"] = obj.outboundDetour;
-                v2rayConfig["api"] = obj.api;
-                v2rayConfig["dns"] = obj.dns;
-                v2rayConfig["stats"] = obj.stats;
-                v2rayConfig["routing"] = obj.routing;
-                v2rayConfig["policy"] = obj.policy;
-                v2rayConfig["reverse"] = obj.reverse;
-                v2rayConfig["transport"] = obj.transport;
-                
-                return JSON.stringify(v2rayConfig, null, 2);
-            } catch (e) {
-                console.log("error", e);
-                return "error: " + e.toString()
-            }
-        };
-        """
+            var v2rayConfig = {};
+            // ordered keys
+            v2rayConfig["log"] = obj.log;
+            v2rayConfig["inbounds"] = obj.inbounds;
+            v2rayConfig["inbound"] = obj.inbound;
+            v2rayConfig["inboundDetour"] = obj.inboundDetour;
+            v2rayConfig["outbounds"] = obj.outbounds;
+            v2rayConfig["outbound"] = obj.outbound;
+            v2rayConfig["outboundDetour"] = obj.outboundDetour;
+            v2rayConfig["api"] = obj.api;
+            v2rayConfig["dns"] = obj.dns;
+            v2rayConfig["stats"] = obj.stats;
+            v2rayConfig["routing"] = obj.routing;
+            v2rayConfig["policy"] = obj.policy;
+            v2rayConfig["reverse"] = obj.reverse;
+            v2rayConfig["transport"] = obj.transport;
+            
+            return JSON.stringify(v2rayConfig, null, 2);
+        } catch (e) {
+            console.log("error", e);
+            return "error: " + e.toString()
+        }
+    };
+    """
 
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
@@ -65,7 +65,9 @@ class V2rayConfig: NSObject {
     // base
     var logLevel = "info"
     var socksPort = "1080"
+    var socksHost = "127.0.0.1"
     var httpPort = "1087"
+    var httpHost = "127.0.0.1"
     var enableUdp = true
     var enableMux = false
     var mux = 8
@@ -104,7 +106,9 @@ class V2rayConfig: NSObject {
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
 
         self.httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        self.httpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
         self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        self.socksHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
 
         self.dns = UserDefaults.get(forKey: .dnsServers) ?? ""
         self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
@@ -160,9 +164,11 @@ class V2rayConfig: NSObject {
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
         inHttp.port = self.httpPort
+        inHttp.listen = self.httpHost
         inHttp.protocol = V2rayProtocolInbound.http
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
+        inSocks.listen = self.socksHost
         inSocks.protocol = V2rayProtocolInbound.socks
         inSocks.settingSocks.udp = self.enableUdp
 
@@ -177,9 +183,11 @@ class V2rayConfig: NSObject {
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http {
                         item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
+                        item.listen = self.httpHost.count > 0 ? self.httpHost : "127.0.0.1"
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
                         item.port = self.socksPort.count > 0 ? self.socksPort : "1080"
+                        item.listen = self.socksHost.count > 0 ? self.socksHost : "127.0.0.1"
                         item.settingSocks.udp = self.enableUdp
                     }
                     inbounds.append(item)
@@ -199,10 +207,12 @@ class V2rayConfig: NSObject {
             if self.v2ray.inbound != nil {
                 if self.v2ray.inbound!.protocol == V2rayProtocolInbound.http {
                     self.v2ray.inbound!.port = self.httpPort
+                    self.v2ray.inbound!.listen = self.httpHost
                     inType = V2rayProtocolInbound.http
                 }
                 if self.v2ray.inbound!.protocol == V2rayProtocolInbound.socks {
                     self.v2ray.inbound!.port = self.socksPort
+                    self.v2ray.inbound!.listen = self.socksHost
                     self.v2ray.inbound!.settingSocks.udp = self.enableUdp
                 }
             } else {
@@ -216,9 +226,11 @@ class V2rayConfig: NSObject {
                 for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http {
                         item.port = self.httpPort
+                        item.listen = self.httpHost
                     }
                     if item.protocol == V2rayProtocolInbound.socks {
                         item.port = self.socksPort
+                        item.listen = self.socksHost
                         item.settingSocks.udp = self.enableUdp
                     }
                     inboundDetour.append(item)
@@ -735,6 +747,7 @@ class V2rayConfig: NSObject {
                 }
                 // use default setting
                 v2rayInbound.port = self.httpPort
+                v2rayInbound.port = self.httpHost
                 // set into inbound
                 v2rayInbound.settingHttp = settings
                 break
@@ -780,6 +793,7 @@ class V2rayConfig: NSObject {
                 // use default setting
                 settings.udp = self.enableUdp
                 v2rayInbound.port = self.socksPort
+                v2rayInbound.listen = self.socksHost
                 // set into inbound
                 v2rayInbound.settingSocks = settings
                 break

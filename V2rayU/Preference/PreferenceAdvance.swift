@@ -17,6 +17,8 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
     @IBOutlet weak var saveBtn: NSButtonCell!
     @IBOutlet weak var sockPort: NSTextField!
     @IBOutlet weak var httpPort: NSTextField!
+    @IBOutlet weak var sockHost: NSTextField!
+    @IBOutlet weak var httpHost: NSTextField!
     @IBOutlet weak var pacPort: NSTextField!
 
     @IBOutlet weak var enableUdp: NSButton!
@@ -41,20 +43,23 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         let enableUdpState = UserDefaults.getBool(forKey: .enableUdp)
 
         let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let localSockHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
         let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        let localHttpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
         let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
-
         let dnsServers = UserDefaults.get(forKey: .dnsServers) ?? ""
         let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
 
         // select item
-        print("logLevel",UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")
+        print("host",localSockHost,localHttpHost)
         self.logLevel.selectItem(withTitle: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info")
 
         self.enableUdp.state = enableUdpState ? .on : .off
         self.enableMux.state = enableMuxState ? .on : .off
         self.sockPort.stringValue = localSockPort
+        self.sockHost.stringValue = localSockHost
         self.httpPort.stringValue = localHttpPort
+        self.httpHost.stringValue = localHttpHost
         self.pacPort.stringValue = localPacPort
         self.dnsServers.stringValue = dnsServers
         self.muxConcurrent.intValue = Int32(muxConcurrent) ?? 8;
@@ -82,12 +87,14 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         UserDefaults.setBool(forKey: .enableMux, value: enableMuxVal)
 
         UserDefaults.set(forKey: .localHttpPort, value: httpPortVal)
+        UserDefaults.set(forKey: .localHttpHost, value: self.httpHost.stringValue)
         UserDefaults.set(forKey: .localSockPort, value: sockPortVal)
+        UserDefaults.set(forKey: .localSockHost, value: self.sockHost.stringValue)
         UserDefaults.set(forKey: .localPacPort, value: pacPortVal)
-
         UserDefaults.set(forKey: .dnsServers, value: dnsServersVal)
         UserDefaults.set(forKey: .muxConcurrent, value: String(muxConcurrentVal))
-        
+        print("self.sockHost.stringValue",self.sockHost.stringValue)
+
         var logLevelName = "info"
         
         if let logLevelVal = self.logLevel.selectedItem {

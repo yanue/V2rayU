@@ -3,22 +3,28 @@
 "12u-HY-IPV.title" = "error";
 
 /* Class = "NSTextFieldCell"; title = "V2ray Core Log level:"; ObjectID = "Ctq-lX-cuA"; */
-"Ctq-lX-cuA.title" = "v2ray-core日志等级:";
+"Ctq-lX-cuA.title" = "V2ray Core Log level:";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "GyI-8o-VH6"; */
+"GyI-8o-VH6.title" = "Label";
 
 /* Class = "NSTextFieldCell"; placeholderString = " 1087"; ObjectID = "U2E-Gk-3e0"; */
 "U2E-Gk-3e0.placeholderString" = " 1087";
 
 /* Class = "NSButtonCell"; title = "save settings"; ObjectID = "YJf-A4-mgF"; */
-"YJf-A4-mgF.title" = "保存设置";
+"YJf-A4-mgF.title" = "save settings";
 
 /* Class = "NSTextFieldCell"; title = "Local Http Listen Port:"; ObjectID = "Yih-X2-qBl"; */
-"Yih-X2-qBl.title" = "本机HTTP监听端口:";
+"Yih-X2-qBl.title" = "Local Http Listen Port:";
 
 /* Class = "NSButtonCell"; title = "Enable UDP"; ObjectID = "afR-MR-aoQ"; */
-"afR-MR-aoQ.title" = "启用UDP";
+"afR-MR-aoQ.title" = "Enable UDP";
 
 /* Class = "NSTextFieldCell"; title = "Mux:"; ObjectID = "aux-FG-ubc"; */
 "aux-FG-ubc.title" = "Mux:";
+
+/* Class = "NSTextFieldCell"; title = "127.0.0.1"; ObjectID = "az8-jb-B7A"; */
+"az8-jb-B7A.title" = "127.0.0.1";
 
 /* Class = "NSTextFieldCell"; title = "Dns:"; ObjectID = "c7W-6e-soa"; */
 "c7W-6e-soa.title" = "Dns:";
@@ -30,7 +36,7 @@
 "cs0-w0-4jp.placeholderString" = " 1087";
 
 /* Class = "NSTextFieldCell"; title = "Local Sock Listen Port:"; ObjectID = "dy9-2h-EIe"; */
-"dy9-2h-EIe.title" = "本机Sock监听端口:";
+"dy9-2h-EIe.title" = "Local Sock Listen Port:";
 
 /* Class = "NSTextFieldCell"; placeholderString = " 8"; ObjectID = "gO2-cn-1bj"; */
 "gO2-cn-1bj.placeholderString" = " 8";
@@ -38,8 +44,11 @@
 /* Class = "NSMenuItem"; title = "none"; ObjectID = "hwH-DG-b6w"; */
 "hwH-DG-b6w.title" = "none";
 
+/* Class = "NSTextFieldCell"; title = "Local Sock Listen Host:"; ObjectID = "jwm-cF-Zeb"; */
+"jwm-cF-Zeb.title" = "Local Sock Listen Host:";
+
 /* Class = "NSButtonCell"; title = "Enable Mux"; ObjectID = "k2J-Q7-yOi"; */
-"k2J-Q7-yOi.title" = "启用Mux";
+"k2J-Q7-yOi.title" = "Enable Mux";
 
 /* Class = "NSMenuItem"; title = "info"; ObjectID = "kHt-j0-6zV"; */
 "kHt-j0-6zV.title" = "info";
@@ -47,20 +56,20 @@
 /* Class = "NSTextFieldCell"; title = "8.8.8.8,1.1.1.1,114.114.114.114,119.29.29.29"; ObjectID = "lKP-40-S8o"; */
 "lKP-40-S8o.title" = "8.8.8.8,1.1.1.1,114.114.114.114,119.29.29.29";
 
+/* Class = "NSTextFieldCell"; title = "127.0.0.1"; ObjectID = "os8-UE-0fP"; */
+"os8-UE-0fP.title" = "127.0.0.1";
+
 /* Class = "NSMenuItem"; title = "debug"; ObjectID = "qDP-Eo-IWC"; */
 "qDP-Eo-IWC.title" = "debug";
 
 /* Class = "NSBox"; title = "Local"; ObjectID = "tMz-nM-arv"; */
-"tMz-nM-arv.title" = "本机";
+"tMz-nM-arv.title" = "Local";
+
+/* Class = "NSTextFieldCell"; title = "Local Http Listen Host:"; ObjectID = "uWf-ty-nD8"; */
+"uWf-ty-nD8.title" = "Local Http Listen Host:";
 
 /* Class = "NSTextFieldCell"; title = "Pac Server Listen Port:"; ObjectID = "you-iw-OS5"; */
-"you-iw-OS5.title" = "Pac监听端口:";
+"you-iw-OS5.title" = "Pac Server Listen Port:";
 
 /* Class = "NSMenuItem"; title = "warning"; ObjectID = "z4S-wG-fyc"; */
 "z4S-wG-fyc.title" = "warning";
-
-/* Class = "NSTextFieldCell"; title = "Local Sock Listen Host:"; ObjectID = "jwm-cF-Zeb"; */
-"jwm-cF-Zeb.title" = "本机Sock监听Host:";
-
-/* Class = "NSTextFieldCell"; title = "Local Http Listen Host:"; ObjectID = "uWf-ty-nD8"; */
-"uWf-ty-nD8.title" = "本机http监听Host:";
