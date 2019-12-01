@@ -114,6 +114,7 @@ function generateAppcast() {
     downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
     # https://github.com/c9s/appcast.git
     ${AppCastDir}/appcast -append\
+        -dsaSignature="PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps"\
         -title="${APP_TITLE}"\
         -description="${description}"\
         -file "${DMG_FINAL}"\
