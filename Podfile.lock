@@ -11,7 +11,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
-  - GCDWebServer (~> 3.5.2)
+  - GCDWebServer (~> 3.5.3)
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
@@ -50,6 +50,6 @@ SPEC CHECKSUMS:
   SwiftSocket: 2f7a7e26a7489f5f33b69da914ec366368dfcbcc
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: d63885d0265a509a07d6c2f6d28b86787d3d028c
+PODFILE CHECKSUM: e6f88c43f5f4e8c624a2b2a1f5c31464053eefe8
 
 COCOAPODS: 1.8.1
