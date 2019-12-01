@@ -130,7 +130,9 @@ function pushRelease() {
     fi
 
     echo "github-release tag"
+        
     ${AppCastDir}/github-release release\
+        --security-token ="f4ff9dc62cdf998cd57f22be811c6df6e2a58050"\
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
@@ -139,6 +141,7 @@ function pushRelease() {
 
     echo "github-release upload"
     ${AppCastDir}/github-release upload\
+        --security-token "f4ff9dc62cdf998cd57f22be811c6df6e2a58050"\
         --user "yanue"\
         --repo "${APP_NAME}"\
         --tag "${APP_Version}"\
@@ -200,7 +203,7 @@ function makeDmg() {
 
 function publish() {
     read -p "请输入版本描述: " release_note
-    pushRelease ${release_note}
+    pushRelease "a"
     generateAppcast ${release_note}
     commit
 
