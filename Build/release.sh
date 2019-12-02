@@ -204,7 +204,7 @@ function makeDmg() {
 
 function publish() {
     read -p "请输入版本描述: " release_note
-    pushRelease "a"
+#    pushRelease ${release_note}
     generateAppcast ${release_note}
     commit
 
