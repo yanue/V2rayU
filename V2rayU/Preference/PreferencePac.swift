@@ -12,8 +12,8 @@ import Alamofire
 
 let PACRulesDirPath = AppResourcesPath + "/pac/"
 let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
-let PACFilePath = PACRulesDirPath + "proxy.pac"
-var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.pac"
+let PACFilePath = PACRulesDirPath + "proxy.js"
+var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.js"
 let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
@@ -40,9 +40,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 
         let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl)
         if gfwUrl != nil {
-            gfwPacListUrl.stringValue = gfwUrl!
+            self.gfwPacListUrl.stringValue = gfwUrl!
         } else {
-            gfwPacListUrl.stringValue = GFWListURL
+            self.gfwPacListUrl.stringValue = GFWListURL
         }
 
         // read userRules from UserDefaults
@@ -66,6 +66,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
     }
 
     @IBAction func viewPacFile(_ sender: Any) {
+        print("viewPacFile PACUrl", PACUrl)
         guard let url = URL(string: PACUrl) else {
             return
         }
@@ -82,9 +83,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 
                 try str.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACUserRuleFilePath), options: .atomic)
 
-                UpdatePACFromGFWList()
+                UpdatePACFromGFWList(gfwPacListUrl: self.gfwPacListUrl.stringValue)
 
-                if GeneratePACFile() {
+                if GeneratePACFile(rewrite: true) {
                     // Popup a user notification
                     self.tips.stringValue = "PAC has been updated by User Rules."
                 } else {
@@ -99,16 +100,55 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             }
         }
     }
+
+    func UpdatePACFromGFWList(gfwPacListUrl: String) {
+        // Make the dir if rulesDirPath is not exesited.
+        if !FileManager.default.fileExists(atPath: PACRulesDirPath) {
+            do {
+                try FileManager.default.createDirectory(atPath: PACRulesDirPath, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+            }
+        }
+
+        Alamofire.request(gfwPacListUrl).responseString {
+            response in
+            if response.result.isSuccess {
+                if let v = response.result.value {
+                    do {
+                        try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
+
+                        if GeneratePACFile(rewrite: true) {
+                            // Popup a user notification
+                            self.tips.stringValue = "PAC has been updated by latest GFW List."
+                        }
+                    } catch {
+                        // Popup a user notification
+                        self.tips.stringValue = "Failed to Write latest GFW List."
+                    }
+                }
+            } else {
+                // Popup a user notification
+                self.tips.stringValue = "Failed to download latest GFW List."
+            }
+        }
+    }
 }
 
 // Because of LocalSocks5.ListenPort may be changed
-func GeneratePACFile() -> Bool {
+func GeneratePACFile(rewrite: Bool) -> Bool {
     let socks5Address = "127.0.0.1"
 
     let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
 
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./pac"])
+
+    // if PACFilePath exist and not need rewrite
+    if (!rewrite && FileManager.default.fileExists(atPath: PACFilePath)) {
+        return true
+    }
+
+    print("GeneratePACFile rewrite", sockPort)
 
     do {
         let gfwlist = try String(contentsOfFile: GFWListFilePath, encoding: String.Encoding.utf8)
@@ -162,6 +202,7 @@ func GeneratePACFile() -> Bool {
                 } else {
                     jsStr = jsStr!.replacingOccurrences(of: "__SOCKS5ADDR__", with: socks5Address)
                 }
+                print("PACFilePath", PACFilePath)
 
                 // Write the pac js to file.
                 try jsStr!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
@@ -175,40 +216,4 @@ func GeneratePACFile() -> Bool {
         NSLog("Not found gfwlist.txt")
     }
     return false
-}
-
-func UpdatePACFromGFWList() {
-    // Make the dir if rulesDirPath is not exesited.
-    if !FileManager.default.fileExists(atPath: PACRulesDirPath) {
-        do {
-            try FileManager.default.createDirectory(atPath: PACRulesDirPath
-                , withIntermediateDirectories: true, attributes: nil)
-        } catch {
-        }
-    }
-
-    Alamofire.request(GFWListURL).responseString {
-        response in
-        if response.result.isSuccess {
-            if let v = response.result.value {
-                do {
-                    try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
-
-                    if GeneratePACFile() {
-                        // Popup a user notification
-                        let notification = NSUserNotification()
-                        notification.title = "PAC has been updated by latest GFW List."
-                        NSUserNotificationCenter.default.deliver(notification)
-                    }
-                } catch {
-
-                }
-            }
-        } else {
-            // Popup a user notification
-            let notification = NSUserNotification()
-            notification.title = "Failed to download latest GFW List."
-            NSUserNotificationCenter.default.deliver(notification)
-        }
-    }
 }

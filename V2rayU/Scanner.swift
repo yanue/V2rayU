@@ -268,7 +268,7 @@ class ImportUri {
         vmessItem.port = vmess.port
         var user = V2rayOutboundVMessUser()
         if id.count > 0 {
-            vmess.id = id
+//            vmess.id = id
         }
         user.id = vmess.id
         user.alterId = vmess.alterId
@@ -370,7 +370,7 @@ class VmessUri {
             self.error = "error decode Str"
             return
         }
-
+        print("decodeStr", decodeStr)
         // main
         var uuid_ = ""
         var host_ = ""
@@ -391,6 +391,7 @@ class VmessUri {
             self.address = host_port[0]
             self.port = Int(host_port[1]) ?? 0
         }
+        print("VmessUri self",self)
 
         // params
         let params = paramsStr.components(separatedBy: "&")
@@ -431,7 +432,7 @@ class VmessUri {
                 self.downlinkCapacity = Int(param[1]) ?? 20
                 break
             case "remark":
-                self.remark = param[1]
+                self.remark = param[1].urlDecoded()
                 break
             default:
                 break

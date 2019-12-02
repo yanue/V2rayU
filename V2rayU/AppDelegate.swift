@@ -59,11 +59,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.set(forKey: .v2rayCoreVersion, value: V2rayCore.version)
         }
         if UserDefaults.get(forKey: .autoCheckVersion) == nil {
-            UserDefaults.setBool(forKey: .v2rayCoreVersion, value: true)
+            UserDefaults.setBool(forKey: .autoCheckVersion, value: true)
         }
         if UserDefaults.get(forKey: .autoLaunch) == nil {
             SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
-            UserDefaults.setBool(forKey: .v2rayCoreVersion, value: true)
+            UserDefaults.setBool(forKey: .autoLaunch, value: true)
         }
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.manual.rawValue)

@@ -171,11 +171,11 @@ class V2rayLaunch: NSObject {
             }
         }
 
-        _ = GeneratePACFile()
+        _ = GeneratePACFile(rewrite: false)
 
         let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 
-        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
+        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 0, allowRangeRequests: true)
 
         do {
             try webServer.start(options: [

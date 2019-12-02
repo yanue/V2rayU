@@ -8,7 +8,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencePacViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
-                <outlet property="gfwPacListUrl" destination="zr7-bd-EAE" id="Bb8-mK-cmI"/>
+                <outlet property="gfwPacListUrl" destination="Uoq-RS-CX7" id="XMz-bH-GHS"/>
                 <outlet property="tips" destination="D20-Eu-3f8" id="Fbo-j7-S8j"/>
                 <outlet property="userRulesView" destination="TVW-6s-N8F" id="f19-R4-Xf5"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
@@ -32,22 +32,6 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zr7-bd-EAE">
-                            <rect key="frame" x="20" y="20" width="420" height="45"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="RXK-Mf-gKW">
-                                <font key="font" metaFont="system"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="-2" name="displayPatternValue1" keyPath="self.gfwPacListUrl" id="Mxg-5a-CDL">
-                                        <dictionary key="options">
-                                            <string key="NSDisplayPattern">%{value1}@</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </textFieldCell>
-                        </textField>
                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Cg-gM-BHl">
                             <rect key="frame" x="326" y="70" width="120" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -63,8 +47,17 @@
                             <rect key="frame" x="98" y="99" width="251" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" id="NE5-JO-Q74">
-                                <font key="font" metaFont="system" size="12"/>
+                                <font key="font" metaFont="label" size="12"/>
                                 <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uoq-RS-CX7">
+                            <rect key="frame" x="20" y="20" width="420" height="43"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Mzi-Yb-HhA">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
