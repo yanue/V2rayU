@@ -670,7 +670,7 @@ class ShadowsockRUri: ShadowsockUri {
         if let iBeg = raw.range(of: "remarks=")?.upperBound {
             let fragment = String(raw[iBeg...])
             let iEnd = fragment.firstIndex(of: "&")
-            let aRemarks = String(fragment[..<(iEnd ?? raw.endIndex)])
+            let aRemarks = String(fragment[..<(iEnd ?? fragment.endIndex)])
             guard let tag = aRemarks.base64Decoded() else {
                 return (s, aRemarks)
             }
