@@ -166,11 +166,14 @@ class V2rayConfig: NSObject {
         inHttp.port = self.httpPort
         inHttp.listen = self.httpHost
         inHttp.protocol = V2rayProtocolInbound.http
+        inHttp.sniffing = V2rayInboundSniffing()
+
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
         inSocks.listen = self.socksHost
         inSocks.protocol = V2rayProtocolInbound.socks
         inSocks.settingSocks.udp = self.enableUdp
+        inSocks.sniffing = V2rayInboundSniffing()
 
         if self.httpPort == self.socksPort {
             self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
@@ -181,6 +184,7 @@ class V2rayConfig: NSObject {
             if (!self.isEmptyInput && self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
                 var inbounds: [V2rayInbound] = []
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
+                    item.sniffing = V2rayInboundSniffing()
                     if item.protocol == V2rayProtocolInbound.http {
                         item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
                         item.listen = self.httpHost.count > 0 ? self.httpHost : "127.0.0.1"
@@ -224,6 +228,8 @@ class V2rayConfig: NSObject {
                 var inboundDetour: [V2rayInbound] = []
 
                 for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
+                    item.sniffing = V2rayInboundSniffing()
+
                     if item.protocol == V2rayProtocolInbound.http {
                         item.port = self.httpPort
                         item.listen = self.httpHost

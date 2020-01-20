@@ -126,7 +126,7 @@ struct V2rayInboundSniffing: Codable {
         case http
     }
 
-    var enabled: Bool = false
+    var enabled: Bool = true
     var destOverride: [dest] = [.tls, .http]
 }
 

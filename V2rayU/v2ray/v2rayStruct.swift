@@ -73,7 +73,7 @@ struct V2rayRoutingSetting: Codable {
         case IPOnDemand
     }
 
-    var domainStrategy: domainStrategy = .IPIfNonMatch
+    var domainStrategy: domainStrategy = .AsIs
     var rules: [V2rayRoutingSettingRule] = [V2rayRoutingSettingRule()]
 }
 
