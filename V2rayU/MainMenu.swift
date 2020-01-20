@@ -457,23 +457,32 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func pingSpeed(_ sender: NSMenuItem) {
+        let normalTitle = sender.title
+        sender.title = "\(normalTitle) - In Testing"
+        
         let itemList = V2rayServer.list()
         if itemList.count == 0 {
             return
         }
 
-        for item in itemList {
-            if !item.isValid {
-                continue
+        let queue = DispatchQueue.global()
+        queue.async {
+            for item in itemList {
+                if !item.isValid {
+                    continue
+                }
+                
+                let ping = Ping(item: item)
+                ping.pingProxySpeed()
             }
+            V2rayServer.saveItemList()
             
-            let ping = Ping(item: item)
-            ping.pingProxySpeed()
+            DispatchQueue.main.async {
+                sender.title = normalTitle
+                // refresh server
+                self.showServers()
+            }
         }
-
-        V2rayServer.saveItemList()
-        // refresh server
-        self.showServers()
     }
 
     func importUri(url: String) {
