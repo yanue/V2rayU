@@ -519,6 +519,11 @@ class MenuController: NSObject, NSMenuDelegate {
             // refresh server
             self.showServers()
 
+            // reload server
+            if menuController.configWindow != nil {
+                menuController.configWindow.serversTableView.reloadData()
+            }
+
             noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)
         } else {
             noticeTip(title: "import server fail", subtitle: "", informativeText: importUri.error)

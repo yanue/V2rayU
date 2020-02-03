@@ -473,7 +473,7 @@ class V2rayConfig: NSObject {
     private func getStreamSettings() -> V2rayStreamSettings {
         // streamSettings
         var streamSettings = V2rayStreamSettings()
-        streamSettings.network = V2rayStreamSettings.network(rawValue: self.streamNetwork)!
+        streamSettings.network = V2rayStreamSettings.network(rawValue: self.streamNetwork) ?? V2rayStreamSettings.network.tcp
         switch streamSettings.network {
         case .tcp:
             streamSettings.tcpSettings = self.streamTcp

@@ -117,6 +117,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                     do {
                         try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
 
+                        // save to UserDefaults
+                        UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
+
                         if GeneratePACFile(rewrite: true) {
                             // Popup a user notification
                             self.tips.stringValue = "PAC has been updated by latest GFW List."
