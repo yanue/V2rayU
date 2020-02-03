@@ -54,7 +54,7 @@ struct V2rayApi: Codable {
 }
 
 struct V2rayDns: Codable {
-    var servers: [String] = ["1.1.1.1", "8.8.8.8", "8.8.4.4", "119.29.29.29", "114.114.114.114", "223.5.5.5", "223.6.6.6"]
+    var servers: [String]?
 }
 
 struct V2rayStats: Codable {
@@ -62,7 +62,7 @@ struct V2rayStats: Codable {
 }
 
 struct V2rayRouting: Codable {
-    var strategy: String = "rules"
+//    var strategy: String = "rules"
     var settings: V2rayRoutingSetting = V2rayRoutingSetting()
 }
 
@@ -74,7 +74,7 @@ struct V2rayRoutingSetting: Codable {
     }
 
     var domainStrategy: domainStrategy = .AsIs
-    var rules: [V2rayRoutingSettingRule] = [V2rayRoutingSettingRule()]
+    var rules: [V2rayRoutingSettingRule] = []
 }
 
 struct V2rayRoutingSettingRule: Codable {

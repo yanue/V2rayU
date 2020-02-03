@@ -87,7 +87,6 @@ let jsonTxt = """
     }
   ],
   "routing": {
-    "strategy": "rules",
     "settings": {
       "domainStrategy": "IPIfNonMatch",
       "rules": [

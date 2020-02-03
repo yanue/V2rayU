@@ -11,47 +11,47 @@ import SwiftyJSON
 import JavaScriptCore
 
 let jsSourceFormatConfig =
-    """
-    /**
-     * V2ray Config Format
-     * @return {string}
-     */
-    var V2rayConfigFormat = function (encodeStr) {
-        var deStr = decodeURIComponent(encodeStr);
-        if (!deStr) {
-            return "error: cannot decode uri"
-        }
-
-        try {
-            var obj = JSON.parse(deStr);
-            if (!obj) {
-                return "error: cannot parse json"
+        """
+        /**
+         * V2ray Config Format
+         * @return {string}
+         */
+        var V2rayConfigFormat = function (encodeStr) {
+            var deStr = decodeURIComponent(encodeStr);
+            if (!deStr) {
+                return "error: cannot decode uri"
             }
 
-            var v2rayConfig = {};
-            // ordered keys
-            v2rayConfig["log"] = obj.log;
-            v2rayConfig["inbounds"] = obj.inbounds;
-            v2rayConfig["inbound"] = obj.inbound;
-            v2rayConfig["inboundDetour"] = obj.inboundDetour;
-            v2rayConfig["outbounds"] = obj.outbounds;
-            v2rayConfig["outbound"] = obj.outbound;
-            v2rayConfig["outboundDetour"] = obj.outboundDetour;
-            v2rayConfig["api"] = obj.api;
-            v2rayConfig["dns"] = obj.dns;
-            v2rayConfig["stats"] = obj.stats;
-            v2rayConfig["routing"] = obj.routing;
-            v2rayConfig["policy"] = obj.policy;
-            v2rayConfig["reverse"] = obj.reverse;
-            v2rayConfig["transport"] = obj.transport;
-            
-            return JSON.stringify(v2rayConfig, null, 2);
-        } catch (e) {
-            console.log("error", e);
-            return "error: " + e.toString()
-        }
-    };
-    """
+            try {
+                var obj = JSON.parse(deStr);
+                if (!obj) {
+                    return "error: cannot parse json"
+                }
+
+                var v2rayConfig = {};
+                // ordered keys
+                v2rayConfig["log"] = obj.log;
+                v2rayConfig["inbounds"] = obj.inbounds;
+                v2rayConfig["inbound"] = obj.inbound;
+                v2rayConfig["inboundDetour"] = obj.inboundDetour;
+                v2rayConfig["outbounds"] = obj.outbounds;
+                v2rayConfig["outbound"] = obj.outbound;
+                v2rayConfig["outboundDetour"] = obj.outboundDetour;
+                v2rayConfig["api"] = obj.api;
+                v2rayConfig["dns"] = obj.dns;
+                v2rayConfig["stats"] = obj.stats;
+                v2rayConfig["routing"] = obj.routing;
+                v2rayConfig["policy"] = obj.policy;
+                v2rayConfig["reverse"] = obj.reverse;
+                v2rayConfig["transport"] = obj.transport;
+                
+                return JSON.stringify(v2rayConfig, null, 2);
+            } catch (e) {
+                console.log("error", e);
+                return "error: " + e.toString()
+            }
+        };
+        """
 
 class V2rayConfig: NSObject {
     var v2ray: V2rayStruct = V2rayStruct()
@@ -160,7 +160,9 @@ class V2rayConfig: NSObject {
     func combineManualData() {
         // base
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
-        self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
+        if self.dns.count > 0 {
+            self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
+        }
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
         inHttp.port = self.httpPort
@@ -614,9 +616,9 @@ class V2rayConfig: NSObject {
         var routing = V2rayRouting()
         routing.settings.rules = []
 
-        if jsonParams["strategy"].stringValue.count > 0 {
-            routing.strategy = jsonParams["strategy"].stringValue;
-        }
+//        if jsonParams["strategy"].stringValue.count > 0 {
+//            routing.strategy = jsonParams["strategy"].stringValue;
+//        }
 
         if jsonParams["settings"].exists() {
 
