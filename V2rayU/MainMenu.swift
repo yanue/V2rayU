@@ -91,6 +91,9 @@ class MenuController: NSObject, NSMenuDelegate {
 
 //        self.configWindow = ConfigWindowController()
 
+        // update config before 1.5.2
+        self.updateOldConfig()
+
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start
             // on status
@@ -102,6 +105,37 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
+
+        // ping
+        self.pingAtLaunch()
+    }
+
+    func updateOldConfig() {
+        // version before 1.5.2: res.rawValue is 0 or -1
+//        let isOldConfigVersion = appVersion.compare("1.5.2", options: .numeric).rawValue > 0
+//        if !isOldConfigVersion {
+//            return
+//        }
+
+        for (idx, item) in V2rayServer.list().enumerated() {
+            if !item.isValid {
+                continue
+            }
+
+            let vCfg = V2rayConfig()
+            vCfg.parseJson(jsonText: item.json)
+            // reset empty data
+            vCfg.dns = ""
+            vCfg.routing.settings.rules = []
+            vCfg.routing.settings.domainStrategy = .AsIs
+            vCfg.v2ray.routing.settings.rules = []
+            vCfg.v2ray.routing.settings.domainStrategy = .AsIs
+            print("vCfg", vCfg.routing)
+
+            let text = vCfg.combineManual()
+            print("new config text", text)
+            _ = V2rayServer.save(idx: idx, isValid: vCfg.isValid, jsonData: text)
+        }
     }
 
     @IBAction func openLogs(_ sender: NSMenuItem) {
@@ -125,7 +159,7 @@ class MenuController: NSObject, NSMenuDelegate {
         toggleV2rayItem.title = "Turn v2ray-core Off"
 
         var iconName = "IconOn"
-        
+
         switch runMode {
         case .global:
             iconName = "IconOnG"
@@ -136,7 +170,7 @@ class MenuController: NSObject, NSMenuDelegate {
         default:
             break
         }
-        
+
         if let button = statusItem.button {
             button.image = NSImage(named: NSImage.Name(iconName))
         }
@@ -169,9 +203,9 @@ class MenuController: NSObject, NSMenuDelegate {
             setStatusOff()
             return
         }
-        
+
         let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
-        
+
         // create json file
         V2rayConfig.createJsonFile(item: v2ray)
 
@@ -221,7 +255,7 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         if !obj.isValid {
-            NSLog("current server is invaid", obj.remark)
+            NSLog("current server is invalid", obj.remark)
             return
         }
         // set current
@@ -366,10 +400,10 @@ class MenuController: NSObject, NSMenuDelegate {
             sockPort = cfg.socksPort
             httpPort = cfg.httpPort
         }
-        
+
         // set icon
         setStatusOn(runMode: runMode)
-        
+
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first
@@ -459,7 +493,7 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func pingSpeed(_ sender: NSMenuItem) {
         let normalTitle = sender.title
         sender.title = "\(normalTitle) - In Testing"
-        
+
         let itemList = V2rayServer.list()
         if itemList.count == 0 {
             return
@@ -471,12 +505,12 @@ class MenuController: NSObject, NSMenuDelegate {
                 if !item.isValid {
                     continue
                 }
-                
+
                 let ping = Ping(item: item)
                 ping.pingProxySpeed()
             }
             V2rayServer.saveItemList()
-            
+
             DispatchQueue.main.async {
                 sender.title = normalTitle
                 // refresh server
@@ -485,9 +519,34 @@ class MenuController: NSObject, NSMenuDelegate {
         }
     }
 
+    func pingAtLaunch() {
+        let itemList = V2rayServer.list()
+        if itemList.count == 0 {
+            return
+        }
+
+        let queue = DispatchQueue.global()
+        queue.async {
+            for item in itemList {
+                if !item.isValid {
+                    continue
+                }
+
+                let ping = Ping(item: item)
+                ping.pingProxySpeed()
+            }
+            V2rayServer.saveItemList()
+
+            DispatchQueue.main.async {
+                // refresh server
+                self.showServers()
+            }
+        }
+    }
+
     func importUri(url: String) {
         let urls = url.split(separator: "\n")
-        
+
         for url in urls {
             let uri = url.trimmingCharacters(in: .whitespaces)
 

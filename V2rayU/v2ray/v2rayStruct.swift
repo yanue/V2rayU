@@ -15,7 +15,7 @@ struct V2rayStruct: Codable {
     var api: V2rayApi?
     var dns: V2rayDns = V2rayDns()
     var stats: V2rayStats?
-    var routing: V2rayRouting? = V2rayRouting()
+    var routing: V2rayRouting = V2rayRouting()
     var policy: V2rayPolicy?
     var inbound: V2rayInbound?
     var inboundDetour: [V2rayInbound]?
