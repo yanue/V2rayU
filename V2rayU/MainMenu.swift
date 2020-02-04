@@ -33,6 +33,18 @@ let preferencesWindowController = PreferencesWindowController(
 )
 var qrcodeWindow = QrcodeWindowController()
 
+var toastWindowCtrl: ToastWindowController!
+
+func makeToast(message: String, displayDuration: Double? = 2) {
+    if toastWindowCtrl != nil {
+        toastWindowCtrl.close()
+    }
+    toastWindowCtrl = ToastWindowController()
+    toastWindowCtrl.message = message
+    toastWindowCtrl.showWindow(Any.self)
+    toastWindowCtrl.fadeInHud(displayDuration)
+}
+
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
     var closedByConfigWindow: Bool = false
@@ -130,10 +142,8 @@ class MenuController: NSObject, NSMenuDelegate {
             vCfg.routing.settings.domainStrategy = .AsIs
             vCfg.v2ray.routing.settings.rules = []
             vCfg.v2ray.routing.settings.domainStrategy = .AsIs
-            print("vCfg", vCfg.routing)
 
             let text = vCfg.combineManual()
-            print("new config text", text)
             _ = V2rayServer.save(idx: idx, isValid: vCfg.isValid, jsonData: text)
         }
     }
@@ -591,12 +601,14 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func noticeTip(title: String = "", subtitle: String = "", informativeText: String = "") {
         // 定义NSUserNotification
-        let userNotification = NSUserNotification()
-        userNotification.title = title
-        userNotification.subtitle = subtitle
-        userNotification.informativeText = informativeText
-        // 使用NSUserNotificationCenter发送NSUserNotification
-        let userNotificationCenter = NSUserNotificationCenter.default
-        userNotificationCenter.scheduleNotification(userNotification)
+//        let userNotification = NSUserNotification()
+//        userNotification.title = title
+//        userNotification.subtitle = subtitle
+//        userNotification.informativeText = informativeText
+//        // 使用NSUserNotificationCenter发送NSUserNotification
+//        let userNotificationCenter = NSUserNotificationCenter.default
+//        userNotificationCenter.scheduleNotification(userNotification)
+
+        makeToast(message: title + (subtitle.count > 0 ? " - " + subtitle : "") + " : " + informativeText)
     }
 }

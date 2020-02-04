@@ -271,3 +271,20 @@ func descriptionOfLastError() -> String {
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
 }
+
+func shell(_ args: String...) -> String {
+    let task = Process()
+    task.launchPath = "/usr/bin/env"
+    task.arguments = args
+
+    let pipe = Pipe()
+    task.standardOutput = pipe
+
+    task.launch()
+    task.waitUntilExit()
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: String.Encoding.utf8)
+
+    return output ?? ""
+}
