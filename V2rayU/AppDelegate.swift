@@ -58,7 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // /Users/yanue/Library/Developer/Xcode/DerivedData/V2rayU-cqwhqdwsnxsplqgolfwfywalmjps/Build/Products/Debug
         // working dir must be: /Applications/V2rayU.app
-        if !(path.contains("Developer/Xcxode") || path.contains("/Applications/V2rayU.app")) {
+        if !(path.contains("Developer/Xcode") || path.contains("/Applications/V2rayU.app")) {
             makeToast(message: "Please drag 'V2rayU' to '/Applications' directory", displayDuration: 5.0)
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
                 NSApplication.shared.terminate(self)
