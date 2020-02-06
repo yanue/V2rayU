@@ -183,25 +183,17 @@ class V2rayConfig: NSObject {
 
         if self.isNewVersion {
             // inbounds
+            var inbounds: [V2rayInbound] = [inSocks, inHttp]
             if (!self.isEmptyInput && self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
-                var inbounds: [V2rayInbound] = []
                 for var (_, item) in self.v2ray.inbounds!.enumerated() {
-                    item.sniffing = V2rayInboundSniffing()
-                    if item.protocol == V2rayProtocolInbound.http {
-                        item.port = self.httpPort.count > 0 ? self.httpPort : "1087"
-                        item.listen = self.httpHost.count > 0 ? self.httpHost : "127.0.0.1"
-                    }
-                    if item.protocol == V2rayProtocolInbound.socks {
-                        item.port = self.socksPort.count > 0 ? self.socksPort : "1080"
-                        item.listen = self.socksHost.count > 0 ? self.socksHost : "127.0.0.1"
-                        item.settingSocks.udp = self.enableUdp
+                    if item.protocol == V2rayProtocolInbound.http || item.protocol == V2rayProtocolInbound.socks {
+                        continue
                     }
                     inbounds.append(item)
                 }
                 self.v2ray.inbounds = inbounds
             } else {
                 // new add
-                let inbounds: [V2rayInbound] = [inSocks, inHttp]
                 self.v2ray.inbounds = inbounds
             }
             self.v2ray.inboundDetour = nil
@@ -231,15 +223,11 @@ class V2rayConfig: NSObject {
 
                 for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
                     item.sniffing = V2rayInboundSniffing()
-
-                    if item.protocol == V2rayProtocolInbound.http {
-                        item.port = self.httpPort
-                        item.listen = self.httpHost
+                    if inType == V2rayProtocolInbound.http && item.protocol == V2rayProtocolInbound.http {
+                        continue
                     }
-                    if item.protocol == V2rayProtocolInbound.socks {
-                        item.port = self.socksPort
-                        item.listen = self.socksHost
-                        item.settingSocks.udp = self.enableUdp
+                    if inType == V2rayProtocolInbound.socks && item.protocol == V2rayProtocolInbound.socks {
+                        continue
                     }
                     inboundDetour.append(item)
                 }

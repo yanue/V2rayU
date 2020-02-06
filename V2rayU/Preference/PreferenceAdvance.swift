@@ -120,7 +120,11 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
             _ = V2rayServer.save(idx: V2rayServer.getIndex(name: item!.name), isValid: v2rayConfig.isValid, jsonData: v2rayConfig.combineManual())
             // restart service
             menuController.startV2rayCore()
-            // todo reload configWindow
+
+            // reload config
+            if menuController.configWindow != nil {
+                menuController.configWindow.serversTableView.reloadData()
+            }
         }
 
         // set HttpServerPacPort
