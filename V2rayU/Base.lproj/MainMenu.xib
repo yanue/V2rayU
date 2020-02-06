@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -64,8 +64,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Servers" id="NCx-DY-Hm4"/>
                 </menuItem>
-                <menuItem title="Configure..." id="YoX-II-o27" userLabel="Configure">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Configure..." keyEquivalent="c" id="YoX-II-o27" userLabel="Configure">
                     <connections>
                         <action selector="openConfig:" target="hcZ-V7-Dui" id="cu6-mU-Y02"/>
                     </connections>
@@ -101,8 +100,7 @@
                         <action selector="scanQrcode:" target="hcZ-V7-Dui" id="URj-Vl-1TY"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Share QR Code" id="0vX-fS-8FW">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Share QR Code" keyEquivalent="s" id="0vX-fS-8FW">
                     <connections>
                         <action selector="generateQrcode:" target="hcZ-V7-Dui" id="cUu-eO-w0Z"/>
                     </connections>
@@ -116,8 +114,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="FfA-RW-Poe"/>
-                <menuItem title="Preferences..." id="6jp-RJ-ww9" userLabel="Preference">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Preferences..." keyEquivalent="," id="6jp-RJ-ww9" userLabel="Preference">
                     <connections>
                         <action selector="openPreferenceGeneral:" target="hcZ-V7-Dui" id="ak7-LN-QXy"/>
                     </connections>

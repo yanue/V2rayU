@@ -45,6 +45,40 @@ func makeToast(message: String, displayDuration: Double? = 2) {
     toastWindowCtrl.fadeInHud(displayDuration)
 }
 
+func ToggleRunning() {
+    // turn off
+    if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+        menuController.stopV2rayCore()
+        makeToast(message: "v2ray-core: Off")
+        return
+    }
+
+    // start
+    menuController.startV2rayCore()
+    makeToast(message: "v2ray-core: On")
+}
+
+func SwitchProxyMode() {
+    let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
+
+    switch runMode {
+    case .pac:
+        menuController.switchRunMode(runMode: .global)
+        makeToast(message: "V2rayU: global Mode")
+        break
+    case .global:
+        menuController.switchRunMode(runMode: .manual)
+        makeToast(message: "V2rayU: manual Mode")
+        break
+    case .manual:
+        menuController.switchRunMode(runMode: .pac)
+        makeToast(message: "V2rayU: pac Mode")
+        break
+
+    default: break
+    }
+}
+
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
     var closedByConfigWindow: Bool = false
@@ -231,14 +265,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
-        // turn off
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            self.stopV2rayCore()
-            return
-        }
 
-        // start
-        self.startV2rayCore()
     }
 
     @IBAction func quitClicked(_ sender: NSMenuItem) {

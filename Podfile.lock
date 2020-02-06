@@ -3,6 +3,7 @@ PODS:
   - GCDWebServer (3.5.2):
     - GCDWebServer/Core (= 3.5.2)
   - GCDWebServer/Core (3.5.2)
+  - MASShortcut (2.3.6)
   - Preferences (0.3.0)
   - QRCoder (1.1.0)
   - Sparkle (1.21.3)
@@ -12,6 +13,7 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - GCDWebServer
+  - MASShortcut
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
@@ -22,6 +24,7 @@ SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - GCDWebServer
+    - MASShortcut
     - QRCoder
     - Sparkle
     - SwiftyJSON
@@ -44,12 +47,13 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   GCDWebServer: ead88cd14596dd4eae4f5830b8877c87c8728990
+  MASShortcut: 9c215e8a8a78f3d01ce56da48e2730ab66b538fa
   Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   Sparkle: 3f75576db8b0265adef36c43249d747f22d0b708
   SwiftSocket: 2f7a7e26a7489f5f33b69da914ec366368dfcbcc
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: 6a9efe1e965935629aec3f60f29e9a3968331249
+PODFILE CHECKSUM: 407a3efc71b95e99861a0c05290182ea384ac364
 
 COCOAPODS: 1.8.4

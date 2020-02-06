@@ -19,6 +19,7 @@
 		6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* MainMenu.xib */; };
 		6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6618372823E9BF1A000F7410 /* ToastWindow.swift */; };
 		6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6618372C23E9BF73000F7410 /* ToastWindow.xib */; };
+		66193A7C23EC5F1500289B6A /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66193A7B23EC5F1400289B6A /* Shortcut.m */; };
 		66406AF42183320000B56041 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66406AF32183320000B56041 /* Sample.swift */; };
 		664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB374216C9A5E00B6AE0D /* AppDelegate.swift */; };
 		664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664EB376216C9A5F00B6AE0D /* Assets.xcassets */; };
@@ -130,6 +131,9 @@
 		66107B8922DEE445002FFB60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6618372823E9BF1A000F7410 /* ToastWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
 		6618372D23E9BF73000F7410 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ToastWindow.xib; sourceTree = "<group>"; };
+		6618373D23EB03EC000F7410 /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
+		66193A7A23EC5EFA00289B6A /* Shortcut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shortcut.h; sourceTree = "<group>"; };
+		66193A7B23EC5F1400289B6A /* Shortcut.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66406AF32183320000B56041 /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		6646669221CBC0860094F0B7 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		664666A021CBD6C60094F0B7 /* libPods-V2rayUTool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-V2rayUTool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -332,6 +336,9 @@
 				6618372823E9BF1A000F7410 /* ToastWindow.swift */,
 				6618372C23E9BF73000F7410 /* ToastWindow.xib */,
 				66107B8822DEDBE4002FFB60 /* Localizable.strings */,
+				66193A7A23EC5EFA00289B6A /* Shortcut.h */,
+				66193A7B23EC5F1400289B6A /* Shortcut.m */,
+				6618373D23EB03EC000F7410 /* V2rayU-Bridging-header.h */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -643,6 +650,7 @@
 				6608D9DC2182C6D200A0E0DD /* v2rayInbound.swift in Sources */,
 				6608D9DE2182C92D00A0E0DD /* v2rayOutbound.swift in Sources */,
 				6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */,
+				66193A7C23EC5F1500289B6A /* Shortcut.m in Sources */,
 				6608D9DA2182C69D00A0E0DD /* v2rayStruct.swift in Sources */,
 				66F07CF9236D79540088A4AE /* ping.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */,
@@ -999,6 +1007,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1.5.0;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1010,6 +1019,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "V2rayU/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};
@@ -1025,6 +1035,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1.5.0;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1036,6 +1047,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "V2rayU/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};

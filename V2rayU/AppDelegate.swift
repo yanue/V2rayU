@@ -12,6 +12,9 @@ import ServiceManagement
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
 
+let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
+let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     // bar menu
@@ -64,6 +67,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 NSApplication.shared.terminate(self)
             }
         }
+
+        // set global hotkey
+        let notifyCenter = NotificationCenter.default
+        notifyCenter.addObserver(forName: NOTIFY_TOGGLE_RUNNING_SHORTCUT, object: nil, queue: nil, using: {
+            notice in
+            ToggleRunning()
+        })
+
+        notifyCenter.addObserver(forName: NOTIFY_SWITCH_PROXY_MODE_SHORTCUT, object: nil, queue: nil, using: {
+            notice in
+            SwitchProxyMode()
+        })
+
+        // Register global hotkey
+        ShortcutsController.bindShortcuts()
     }
 
     func checkDefault() {
@@ -117,6 +135,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
+        // unregister All shortcut
+        MASShortcutMonitor.shared().unregisterAllShortcuts()
         // Insert code here to tear down your application
         V2rayLaunch.Stop()
         // restore system proxy
