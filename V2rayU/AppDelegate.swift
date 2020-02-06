@@ -36,6 +36,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         self.checkDefault()
+        
+        // auto Clear Logs
+        if UserDefaults.getBool(forKey: .autoClearLog) {
+            print("ClearLogs")
+            V2rayLaunch.ClearLogs()
+        }
 
         // check v2ray core
         V2rayCore().check()

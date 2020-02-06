@@ -41,7 +41,7 @@
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */; };
-		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */; };
+		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */; };
 		6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8F5112A8407EE959998 /* .gitignore */; };
 		6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
@@ -50,10 +50,10 @@
 		6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */; };
 		6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */; };
 		6D6DF93B58B654D86ACC490E /* PreferenceAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */; };
-		6D6DF95B4749491F1D600B05 /* PreferenceAdvance.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */; };
-		6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */; };
-		6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */; };
-		6D6DFFD18860EBE148F6DF1F /* PreferencePac.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */; };
+		6D6DF95B4749491F1D600B05 /* PreferenceAdvance.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */; };
+		6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */; };
+		6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */; };
+		6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -331,7 +331,7 @@
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
 				667029D121AFB86E0079EF41 /* QrcodeWindow.xib */,
 				6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */,
-				6D6DFBED570A0D1FDED0BD53 /* Preference */,
+				6D6DFBED570A0D1FDED0BD53 /* preference */,
 				6D6DF1B2E4D0B61B7390F1B1 /* HttpServer.swift */,
 				6618372823E9BF1A000F7410 /* ToastWindow.swift */,
 				6618372C23E9BF73000F7410 /* ToastWindow.xib */,
@@ -355,7 +355,7 @@
 			path = Build;
 			sourceTree = "<group>";
 		};
-		6D6DFBED570A0D1FDED0BD53 /* Preference */ = {
+		6D6DFBED570A0D1FDED0BD53 /* preference */ = {
 			isa = PBXGroup;
 			children = (
 				6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */,
@@ -363,13 +363,13 @@
 				6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */,
 				6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */,
 				6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */,
-				6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */,
-				6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */,
-				6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */,
-				6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */,
-				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */,
+				6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */,
+				6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */,
+				6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */,
+				6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */,
+				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */,
 			);
-			path = Preference;
+			path = preference;
 			sourceTree = "<group>";
 		};
 		6D6DFD93CE866018306A090E /* pac */ = {
@@ -567,11 +567,11 @@
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */,
 				6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */,
-				6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.xib in Resources */,
-				6D6DF95B4749491F1D600B05 /* PreferenceAdvance.xib in Resources */,
-				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.xib in Resources */,
-				6D6DFFD18860EBE148F6DF1F /* PreferencePac.xib in Resources */,
-				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.xib in Resources */,
+				6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */,
+				6D6DF95B4749491F1D600B05 /* PreferenceAdvance.strings in Resources */,
+				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */,
+				6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */,
+				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -734,17 +734,17 @@
 			name = ConfigWindow.xib;
 			sourceTree = "<group>";
 		};
-		6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.xib */ = {
+		6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DFD730D8572B1FCAB1FFE /* Base */,
 				66F302A322AAA0A700FCA4E2 /* zh-Hans */,
 				669A73AE233776B900807CF9 /* zh-HK */,
 			);
-			name = PreferenceSubscribe.xib;
+			name = PreferenceSubscribe.strings;
 			sourceTree = "<group>";
 		};
-		6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.xib */ = {
+		6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DFE1CDFAD9828F2FDE1A5 /* Base */,
@@ -752,37 +752,37 @@
 				669A73AB233776B900807CF9 /* zh-HK */,
 				66E7807A23781DC000819DA8 /* en */,
 			);
-			name = PreferenceAdvance.xib;
+			name = PreferenceAdvance.strings;
 			sourceTree = "<group>";
 		};
-		6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.xib */ = {
+		6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DF3A2857899778B719CE1 /* Base */,
 				66F3029F22AAA0A600FCA4E2 /* zh-Hans */,
 				669A73AA233776B900807CF9 /* zh-HK */,
 			);
-			name = PreferenceAbout.xib;
+			name = PreferenceAbout.strings;
 			sourceTree = "<group>";
 		};
-		6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.xib */ = {
+		6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DF81E59907A2C7579BFE2 /* Base */,
 				66F302A122AAA0A600FCA4E2 /* zh-Hans */,
 				669A73AC233776B900807CF9 /* zh-HK */,
 			);
-			name = PreferenceGeneral.xib;
+			name = PreferenceGeneral.strings;
 			sourceTree = "<group>";
 		};
-		6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.xib */ = {
+		6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DF181C5D472DBBB71B72A /* Base */,
 				66F302A222AAA0A700FCA4E2 /* zh-Hans */,
 				669A73AD233776B900807CF9 /* zh-HK */,
 			);
-			name = PreferencePac.xib;
+			name = PreferencePac.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -937,6 +937,7 @@
 				SKIP_INSTALL = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -994,6 +995,7 @@
 				SKIP_INSTALL = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};

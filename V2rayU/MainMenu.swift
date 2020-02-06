@@ -45,17 +45,21 @@ func makeToast(message: String, displayDuration: Double? = 2) {
     toastWindowCtrl.fadeInHud(displayDuration)
 }
 
-func ToggleRunning() {
+func ToggleRunning(_ toast: Bool = true) {
     // turn off
     if UserDefaults.getBool(forKey: .v2rayTurnOn) {
         menuController.stopV2rayCore()
-        makeToast(message: "v2ray-core: Off")
+        if toast {
+            makeToast(message: "v2ray-core: Off")
+        }
         return
     }
 
     // start
     menuController.startV2rayCore()
-    makeToast(message: "v2ray-core: On")
+    if toast {
+        makeToast(message: "v2ray-core: On")
+    }
 }
 
 func SwitchProxyMode() {
@@ -265,7 +269,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
-
+        ToggleRunning(false)
     }
 
     @IBAction func quitClicked(_ sender: NSMenuItem) {

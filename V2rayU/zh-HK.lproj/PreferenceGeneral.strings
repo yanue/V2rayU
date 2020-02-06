@@ -15,7 +15,7 @@
 "QjX-NH-23u.title" = "問題反饋...";
 
 /* Class = "NSButtonCell"; title = "Clear Logs  Everyday Automutically"; ObjectID = "hIN-yp-Qul"; */
-"hIN-yp-Qul.title" = "每天自動清除日誌";
+"hIN-yp-Qul.title" = "每次启动自動清除日誌";
 
 /* Class = "NSButtonCell"; title = "Check for Updates automutically"; ObjectID = "m2S-Mu-rFM"; */
 "m2S-Mu-rFM.title" = "自動檢測版本更新";
