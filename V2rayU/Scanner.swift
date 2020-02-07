@@ -488,16 +488,16 @@ class VmessUri {
         }
 
         self.remark = json["ps"].stringValue
-        self.address = json["add"].stringValue
+        self.address = json["add"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         self.port = json["port"].intValue
-        self.id = json["id"].stringValue
+        self.id = json["id"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         self.alterId = json["aid"].intValue
-        self.network = json["net"].stringValue
-        self.netHost = json["host"].stringValue
+        self.network = json["net"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.netHost = json["host"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         self.netPath = json["path"].stringValue
-        self.tls = json["tls"].stringValue
+        self.tls = json["tls"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         // type:伪装类型（none\http\srtp\utp\wechat-video）
-        self.type = json["type"].stringValue
+        self.type = json["type"].stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         print("json", json)
     }
 }
