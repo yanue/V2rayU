@@ -16,6 +16,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     let preferencePaneTitle = "Subscribe"
     let toolbarItemIcon = NSImage(named: NSImage.userAccountsName)!
     let tableViewDragType: String = "v2ray.subscribe"
+    var tip: String = ""
 
     @IBOutlet weak var remark: NSTextField!
     @IBOutlet weak var url: NSTextField!
@@ -25,6 +26,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     @IBOutlet weak var subscribeView: NSView!
     @IBOutlet var logArea: NSTextView!
     @IBOutlet weak var hideLogs: NSButton!
+
 
     // our variable
     override var nibName: NSNib.Name? {
@@ -42,6 +44,16 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
 
         // reload tableview
         V2raySubscribe.loadConfig()
+
+        // set global hotkey
+        let notifyCenter = NotificationCenter.default
+        notifyCenter.addObserver(forName: NOTIFY_UPDATE_SubSync, object: nil, queue: nil, using: {
+            notice in
+            self.tip += notice.object as? String ?? ""
+
+            self.logArea.string = self.tip
+            self.logArea.scrollToEndOfDocument("")
+        })
     }
 
     @IBAction func addSubscribe(_ sender: Any) {
@@ -130,106 +142,10 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         self.subscribeView.isHidden = true
         self.logView.isHidden = false
         self.logArea.string = ""
+        self.tip = ""
 
         // update Subscribe
-        self.sync()
-    }
-
-    // sync from Subscribe list
-    public func sync() {
-        let list = V2raySubscribe.list()
-
-        if list.count == 0 {
-            logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url ")
-        }
-
-        for item in list {
-            self.dlFromUrl(url: item.url, subscribe: item.name)
-        }
-    }
-
-    public func dlFromUrl(url: String, subscribe: String) {
-        logTip(title: "loading from : ", uri: "", informativeText: url)
-
-        Alamofire.request(url).responseString { response in
-            switch (response.result) {
-            case .success(_):
-                if let data = response.result.value {
-                    self.handle(base64Str: data, subscribe: subscribe, url: url)
-                }
-
-            case .failure(_):
-                print("dlFromUrl error:", url, " -- ", response.result.error ?? "")
-                self.logTip(title: "loading fail : ", uri: "", informativeText: url)
-                break
-            }
-        }
-    }
-
-    func handle(base64Str: String, subscribe: String, url: String) {
-        let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded()
-        if strTmp == nil {
-            self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
-            return
-        }
-
-        self.logTip(title: "del old from url : ", uri: "", informativeText: url)
-
-        // remove old v2ray servers by subscribe
-        V2rayServer.remove(subscribe: subscribe)
-
-        let id : String  = String(url.suffix(32));
-        
-        let list = strTmp!.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
-        for item in list {
-            // import every server
-            if (item.count == 0) {
-                continue;
-            } else {
-                self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id)
-            }
-        }
-    }
-
-    func importUri(uri: String, subscribe: String, id: String) {
-        if uri.count == 0 {
-            logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
-            return
-        }
-
-        if URL(string: uri) == nil {
-            logTip(title: "fail: ", uri: uri, informativeText: "no found ss://, ssr://, vmess://")
-            return
-        }
-
-        if let importUri = ImportUri.importUri(uri: uri, id: id) {
-            if importUri.isValid {
-                // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
-                // refresh server
-                menuController.showServers()
-
-                // reload server
-                if menuController.configWindow != nil {
-                    menuController.configWindow.serversTableView.reloadData()
-                }
-
-                logTip(title: "success: ", uri: uri, informativeText: importUri.remark)
-            } else {
-                logTip(title: "fail: ", uri: uri, informativeText: importUri.error)
-            }
-
-            return
-        }
-    }
-
-    func logTip(title: String = "", uri: String = "", informativeText: String = "") {
-        self.logArea.string += title + informativeText + "\n"
-        if uri != "" {
-            self.logArea.string += "url: " + uri
-        }
-        self.logArea.string += "\n\n"
-        self.logArea.scrollPageDown("")
+        V2raySubSync().sync()
     }
 }
 

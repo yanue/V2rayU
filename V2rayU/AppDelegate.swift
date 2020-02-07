@@ -134,6 +134,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
+        // auto update subscribe servers
+        V2raySubSync().sync()
     }
 
     @objc func onSleepNote(note: NSNotification) {

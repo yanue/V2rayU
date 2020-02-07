@@ -284,7 +284,7 @@ class ImportUri {
         v2ray.streamTlsServerName = vmess.tlsServer
 
         // kcp
-        v2ray.streamKcp.header.type = vmess.kcpHeader
+        v2ray.streamKcp.header.type = vmess.type
         v2ray.streamKcp.uplinkCapacity = vmess.uplinkCapacity
         v2ray.streamKcp.downlinkCapacity = vmess.downlinkCapacity
 
@@ -295,6 +295,12 @@ class ImportUri {
         // ws
         v2ray.streamWs.path = vmess.netPath
         v2ray.streamWs.headers.host = vmess.netHost
+
+        // tcp
+        v2ray.streamTcp.header.type = vmess.type
+
+        // quic
+        v2ray.streamQuic.header.type = vmess.type
 
         // check is valid
         v2ray.checkManualValid()
@@ -323,8 +329,7 @@ class VmessUri {
     var netHost: String = ""
     var netPath: String = ""
     var tls: String = ""
-    var type: String = ""
-    var kcpHeader: String = "none"
+    var type: String = "none"
     var uplinkCapacity: Int = 50
     var downlinkCapacity: Int = 20
     var allowInsecure: Bool = true
@@ -391,7 +396,7 @@ class VmessUri {
             self.address = host_port[0]
             self.port = Int(host_port[1]) ?? 0
         }
-        print("VmessUri self",self)
+        print("VmessUri self", self)
 
         // params
         let params = paramsStr.components(separatedBy: "&")
@@ -423,7 +428,8 @@ class VmessUri {
                 self.muxConcurrency = Int(param[1]) ?? 8
                 break
             case "kcpHeader":
-                self.kcpHeader = param[1]
+                // type 是所有传输方式的伪装类型
+                self.type = param[1]
                 break
             case "uplinkCapacity":
                 self.uplinkCapacity = Int(param[1]) ?? 50

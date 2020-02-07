@@ -101,6 +101,9 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // when menu.xib loaded
     override func awakeFromNib() {
+        // windowWillClose Notification
+        NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
+
         V2rayLaunch.chmodCmdPermission()
 
         // backup system proxy when init
@@ -153,8 +156,8 @@ class MenuController: NSObject, NSMenuDelegate {
             self.setStatusOff()
         }
 
-        // windowWillClose Notification
-        NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
+        // auto update subscribe servers
+        V2raySubSync().sync()
 
         // ping
         self.pingAtLaunch()

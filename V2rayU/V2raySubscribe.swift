@@ -7,6 +7,8 @@
 //
 
 import Cocoa
+import Alamofire
+import SwiftyJSON
 
 // ----- v2ray subscribe manager -----
 class V2raySubscribe: NSObject {
@@ -222,3 +224,107 @@ class V2raySubItem: NSObject, NSCoding {
         UserDefaults.standard.removeObject(forKey: name)
     }
 }
+
+// ----- v2ray subscribe  updater -----
+let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
+
+class V2raySubSync: NSObject {
+    // sync from Subscribe list
+    public func sync() {
+        print("sync from Subscribe list")
+        V2raySubscribe.loadConfig()
+        let list = V2raySubscribe.list()
+
+        if list.count == 0 {
+            self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
+        }
+
+        for item in list {
+            self.dlFromUrl(url: item.url, subscribe: item.name)
+        }
+    }
+
+    public func dlFromUrl(url: String, subscribe: String) {
+        logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
+
+        Alamofire.request(url).responseString { response in
+            switch (response.result) {
+            case .success(_):
+                if let data = response.result.value {
+                    self.handle(base64Str: data, subscribe: subscribe, url: url)
+                }
+
+            case .failure(_):
+                print("dlFromUrl error:", url, " -- ", response.result.error ?? "")
+                self.logTip(title: "loading fail : ", uri: "", informativeText: url)
+                break
+            }
+        }
+    }
+
+    func handle(base64Str: String, subscribe: String, url: String) {
+        let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded()
+        if strTmp == nil {
+            self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
+            return
+        }
+
+        self.logTip(title: "del old from url : ", uri: "", informativeText: url + "\n\n")
+
+        // remove old v2ray servers by subscribe
+        V2rayServer.remove(subscribe: subscribe)
+
+        let id: String = String(url.suffix(32));
+
+        let list = strTmp!.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
+        for item in list {
+            // import every server
+            if (item.count == 0) {
+                continue;
+            } else {
+                self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id)
+            }
+        }
+    }
+
+    func importUri(uri: String, subscribe: String, id: String) {
+        if uri.count == 0 {
+            logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
+            return
+        }
+
+        if URL(string: uri) == nil {
+            logTip(title: "fail: ", uri: uri, informativeText: "no found ss://, ssr://, vmess://")
+            return
+        }
+
+        if let importUri = ImportUri.importUri(uri: uri, id: id) {
+            if importUri.isValid {
+                // add server
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
+                // refresh server
+                menuController.showServers()
+
+                // reload server
+                if menuController.configWindow != nil {
+                    menuController.configWindow.serversTableView.reloadData()
+                }
+
+                logTip(title: "success: ", uri: uri, informativeText: importUri.remark)
+            } else {
+                logTip(title: "fail: ", uri: uri, informativeText: importUri.error)
+            }
+
+            return
+        }
+    }
+
+    func logTip(title: String = "", uri: String = "", informativeText: String = "") {
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_SubSync, object: title + informativeText + "\n")
+        print("SubSync", title + informativeText)
+        if uri != "" {
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_SubSync, object: "url: " + uri + "\n\n\n")
+        }
+    }
+}
+

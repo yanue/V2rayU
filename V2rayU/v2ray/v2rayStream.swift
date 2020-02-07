@@ -73,7 +73,7 @@ struct TcpSettings: Codable {
 }
 
 struct TcpSettingHeader: Codable {
-    var type: String = "none"
+    var type: String = "none" // http or none
     var request: TcpSettingHeaderRequest?
     var response: TcpSettingHeaderResponse?
 }
