@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         self.checkDefault()
-        
+
         // auto Clear Logs
         if UserDefaults.getBool(forKey: .autoClearLog) {
             print("ClearLogs")
@@ -124,6 +124,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func onWakeNote(note: NSNotification) {
+        print("onWakeNote")
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             V2rayLaunch.Start()
         }
@@ -136,6 +137,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // auto update subscribe servers
         V2raySubSync().sync()
+        // ping
+        menuController.pingAtLaunch()
     }
 
     @objc func onSleepNote(note: NSNotification) {
