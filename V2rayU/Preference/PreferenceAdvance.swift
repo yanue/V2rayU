@@ -112,20 +112,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         v2rayConfig.logLevel = logLevelName
 
         // set current server item and reload v2ray-core
-        let item = V2rayServer.loadSelectedItem()
-        if item != nil {
-            // parse json
-            v2rayConfig.parseJson(jsonText: item!.json)
-            // combine with new settings and save
-            _ = V2rayServer.save(idx: V2rayServer.getIndex(name: item!.name), isValid: v2rayConfig.isValid, jsonData: v2rayConfig.combineManual())
-            // restart service
-            menuController.startV2rayCore()
-
-            // reload config
-            if menuController.configWindow != nil {
-                menuController.configWindow.serversTableView.reloadData()
-            }
-        }
+        regenerateAllConfig()
 
         // set HttpServerPacPort
         HttpServerPacPort = pacPortVal

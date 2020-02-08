@@ -163,21 +163,17 @@ class V2rayLaunch: NSObject {
 
     // start http server for pac
     static func startHttpServer() {
-        if webServer.isRunning {
-            do {
-                try webServer.stop()
-            } catch let error {
-                print("webServer.stop:\(error)")
-            }
-        }
-
-        _ = GeneratePACFile(rewrite: false)
-
-        let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
-
-        webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 0, allowRangeRequests: true)
-
         do {
+            if webServer.isRunning {
+                try webServer.stop()
+            }
+
+            _ = GeneratePACFile(rewrite: false)
+
+            let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
+
+            webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 0, allowRangeRequests: true)
+
             try webServer.start(options: [
                 "Port": UInt(pacPort) ?? 11085,
                 "BindToLocalhost": true

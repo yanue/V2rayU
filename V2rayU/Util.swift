@@ -55,6 +55,16 @@ extension UserDefaults {
         case muxConcurrent
         // pacPort
         case localPacPort
+
+        // for routing rule
+        case routingDomainStrategy
+        case routingRule
+        case routingProxyDomains
+        case routingProxyIps
+        case routingDirectDomains
+        case routingDirectIps
+        case routingBlockDomains
+        case routingBlockIps
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
@@ -250,7 +260,7 @@ func checkTcpPortForListen(port: in_port_t) -> (Bool, descr: String) {
         releaseTcpPort(socket: socketFileDescriptor)
         return (false, "\(port), BindFailed, \(details)")
     }
-    if listen(socketFileDescriptor, SOMAXCONN ) == -1 {
+    if listen(socketFileDescriptor, SOMAXCONN) == -1 {
         let details = descriptionOfLastError()
         releaseTcpPort(socket: socketFileDescriptor)
         return (false, "\(port), ListenFailed, \(details)")

@@ -34,12 +34,12 @@
                 <menuItem title="V2ray-Core: On" enabled="NO" id="P34-uO-Vwf">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="Turn v2ray-core Off" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Turn v2ray-core Off" keyEquivalent="t" id="SML-EF-rdT" userLabel="Turn v2ray-core On">
                     <connections>
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
                     </connections>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="K10-II-m5R"/>
                 <menuItem title="View config.json" id="b3o-tG-rp3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

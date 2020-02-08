@@ -78,9 +78,9 @@ struct V2rayRoutingSetting: Codable {
 }
 
 struct V2rayRoutingSettingRule: Codable {
-    var type: String? = "field"
-    var domain: [String]? = ["geosite:cn", "geosite:speedtest"]
-    var ip: [String]? = ["geoip:cn", "geoip:private"]
+    var type: String = "field"
+    var domain: [String]? = []
+    var ip: [String]? = []
     var port: String?
     var network: String?
     var source: [String]?

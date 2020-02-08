@@ -85,6 +85,36 @@ func SwitchProxyMode() {
     }
 }
 
+// regenerate All Config when base setting changed
+func regenerateAllConfig() {
+    for (idx, item) in V2rayServer.list().enumerated() {
+        if !item.isValid {
+            continue
+        }
+
+        // parse old
+        let vCfg = V2rayConfig()
+        vCfg.parseJson(jsonText: item.json)
+
+        // combine
+        let text = vCfg.combineManual()
+        _ = V2rayServer.save(idx: idx, isValid: vCfg.isValid, jsonData: text)
+
+        print("regenerate config", item.remark)
+    }
+
+    // restart service
+    let item = V2rayServer.loadSelectedItem()
+    if item != nil {
+        menuController.startV2rayCore()
+    }
+
+    // reload config window
+    if menuController.configWindow != nil {
+        menuController.configWindow.serversTableView.reloadData()
+    }
+}
+
 // menu controller
 class MenuController: NSObject, NSMenuDelegate {
     var closedByConfigWindow: Bool = false
@@ -144,10 +174,12 @@ class MenuController: NSObject, NSMenuDelegate {
 
         statusItem.menu = statusMenu
 
-//        self.configWindow = ConfigWindowController()
-
-        // update config before 1.5.2
-        self.updateOldConfig()
+        // version before 1.5.2: res.rawValue is 0 or -1
+        let isOldConfigVersion = appVersion.compare("1.5.2", options: .numeric).rawValue > 0
+        print("isOldConfigVersion", isOldConfigVersion)
+        if !isOldConfigVersion {
+            regenerateAllConfig()
+        }
 
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start
@@ -163,32 +195,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // ping
         self.pingAtLaunch()
-    }
-
-    func updateOldConfig() {
-        // version before 1.5.2: res.rawValue is 0 or -1
-//        let isOldConfigVersion = appVersion.compare("1.5.2", options: .numeric).rawValue > 0
-//        if !isOldConfigVersion {
-//            return
-//        }
-
-        for (idx, item) in V2rayServer.list().enumerated() {
-            if !item.isValid {
-                continue
-            }
-
-            let vCfg = V2rayConfig()
-            vCfg.parseJson(jsonText: item.json)
-            // reset empty data
-            vCfg.dns = ""
-            vCfg.routing.settings.rules = []
-            vCfg.routing.settings.domainStrategy = .AsIs
-            vCfg.v2ray.routing.settings.rules = []
-            vCfg.v2ray.routing.settings.domainStrategy = .AsIs
-
-            let text = vCfg.combineManual()
-            _ = V2rayServer.save(idx: idx, isValid: vCfg.isValid, jsonData: text)
-        }
     }
 
     @IBAction func openLogs(_ sender: NSMenuItem) {

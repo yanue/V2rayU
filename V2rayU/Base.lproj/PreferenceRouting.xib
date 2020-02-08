@@ -71,9 +71,9 @@
                         <menu key="menu" id="s7q-On-wcL">
                             <items>
                                 <menuItem title="Global" state="on" id="zLf-pT-xlm" userLabel="Global"/>
-                                <menuItem title="Bypassing the LAN Address" id="CoE-cp-7fn"/>
-                                <menuItem title="Bypassing mainland address" id="EaD-tR-ldB"/>
-                                <menuItem title="Bypassing LAN and mainland address" id="3qq-dt-TS9"/>
+                                <menuItem title="Bypassing the LAN Address" tag="1" id="CoE-cp-7fn"/>
+                                <menuItem title="Bypassing mainland address" tag="2" id="EaD-tR-ldB"/>
+                                <menuItem title="Bypassing LAN and mainland address" tag="3" id="3qq-dt-TS9"/>
                             </items>
                         </menu>
                     </popUpButtonCell>
@@ -193,10 +193,10 @@
                         </tabViewItem>
                     </tabViewItems>
                 </tabView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="abB-zF-WFz">
-                    <rect key="frame" x="18" y="20" width="245" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="abB-zF-WFz" userLabel="Set the rules line by line: domain or ip">
+                    <rect key="frame" x="18" y="20" width="241" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="* Set the rules, separated by commas(,)" id="ccq-gn-C6Z">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="* Set the rules line by line: domain or ip" id="ccq-gn-C6Z" userLabel="Set the rules line by line: domain or ip">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -205,8 +205,8 @@
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RRU-nZ-itS">
                     <rect key="frame" x="326" y="11" width="120" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8g2-Nj-m07">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                    <buttonCell key="cell" type="push" title="save" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8g2-Nj-m07">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
@@ -235,8 +235,25 @@
                         <action selector="saveRouting:" target="-2" id="wgs-Iq-RgT"/>
                     </connections>
                 </button>
+                <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uaE-tl-Qk5">
+                    <rect key="frame" x="297" y="14" width="25" height="25"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="198-iA-PZS">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="goHelp2:" target="-2" id="w5e-XR-QvL"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="-130" y="-187"/>
         </view>
+        <viewController id="dMU-r6-TOb" userLabel="Popover View Controller"/>
+        <popover id="MEw-lE-26R">
+            <connections>
+                <outlet property="contentViewController" destination="dMU-r6-TOb" id="yTL-Rg-nMY"/>
+            </connections>
+        </popover>
     </objects>
 </document>
