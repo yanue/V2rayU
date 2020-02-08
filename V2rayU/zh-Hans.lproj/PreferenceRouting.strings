@@ -1,24 +1,24 @@
 
 /* Class = "NSTextFieldCell"; title = "Domain Strategy:"; ObjectID = "22k-l7-G7a"; */
-"22k-l7-G7a.title" = "Domain Strategy:";
+"22k-l7-G7a.title" = "域名策略:";
 
 /* Class = "NSMenuItem"; title = "Bypassing LAN and mainland address"; ObjectID = "3qq-dt-TS9"; */
-"3qq-dt-TS9.title" = "Bypassing LAN and mainland address";
+"3qq-dt-TS9.title" = "绕过局域网和大陆地址";
 
 /* Class = "NSTextFieldCell"; title = "Routing Rule:"; ObjectID = "4rB-9k-291"; */
-"4rB-9k-291.title" = "Routing Rule:";
+"4rB-9k-291.title" = "路由模式:";
 
 /* Class = "NSButtonCell"; title = "save"; ObjectID = "8g2-Nj-m07"; */
-"8g2-Nj-m07.title" = "save";
+"8g2-Nj-m07.title" = "保存";
 
 /* Class = "NSMenuItem"; title = "IPIfNonMatch"; ObjectID = "92h-JU-wqn"; */
 "92h-JU-wqn.title" = "IPIfNonMatch";
 
 /* Class = "NSMenuItem"; title = "Bypassing the LAN Address"; ObjectID = "CoE-cp-7fn"; */
-"CoE-cp-7fn.title" = "Bypassing the LAN Address";
+"CoE-cp-7fn.title" = "绕过局域网地址";
 
 /* Class = "NSMenuItem"; title = "Bypassing mainland address"; ObjectID = "EaD-tR-ldB"; */
-"EaD-tR-ldB.title" = "Bypassing mainland address";
+"EaD-tR-ldB.title" = "绕过大陆地址";
 
 /* Class = "NSMenuItem"; title = "IPOnDemand"; ObjectID = "Js7-cb-bWa"; */
 "Js7-cb-bWa.title" = "IPOnDemand";
@@ -30,16 +30,16 @@
 "RSN-g5-vmP.title" = "load default";
 
 /* Class = "NSTextFieldCell"; title = "* Set the rules line by line: domain or ip"; ObjectID = "ccq-gn-C6Z"; */
-"ccq-gn-C6Z.title" = "* Set the rules line by line: domain or ip";
+"ccq-gn-C6Z.title" = "*按行设置域名或ip";
 
 /* Class = "NSTabViewItem"; label = "Block"; ObjectID = "nsT-BW-R2Z"; */
-"nsT-BW-R2Z.label" = "Block";
+"nsT-BW-R2Z.label" = "阻止ip或域名";
 
 /* Class = "NSTabViewItem"; label = "Proxy"; ObjectID = "pnL-Z8-fIK"; */
-"pnL-Z8-fIK.label" = "Proxy";
+"pnL-Z8-fIK.label" = "代理ip或域名";
 
 /* Class = "NSTabViewItem"; label = "Direct"; ObjectID = "yc0-Po-cG1"; */
-"yc0-Po-cG1.label" = "Direct";
+"yc0-Po-cG1.label" = "直连ip或域名";
 
 /* Class = "NSMenuItem"; title = "Global"; ObjectID = "zLf-pT-xlm"; */
-"zLf-pT-xlm.title" = "Global";
+"zLf-pT-xlm.title" = "全局";

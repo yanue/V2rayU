@@ -193,3 +193,6 @@
 
 /* Class = "NSMenuItem"; title = "Check Spelling While Typing"; ObjectID = "zAf-Lw-Sh2"; */
 "zAf-Lw-Sh2.title" = "Check Spelling While Typing";
+
+/* Class = "NSMenuItem"; title = "View config.json"; ObjectID = "b3o-tG-rp3"; */
+"b3o-tG-rp3.title" = "查看config.json";
