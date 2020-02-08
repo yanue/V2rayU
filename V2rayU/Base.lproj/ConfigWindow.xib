@@ -102,7 +102,7 @@
                                     <tableColumns>
                                         <tableColumn identifier="remark" width="128" minWidth="40" maxWidth="1000" id="2RG-jZ-YZ5">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                <font key="font" metaFont="menu" size="11"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -174,7 +174,7 @@ Gw
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Import" identifier="Import" id="BS9-X1-ueN">
-                                <view key="view" id="Ab3-ML-cu8">
+                                <view key="view" ambiguous="YES" id="Ab3-ML-cu8">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -274,7 +274,7 @@ Gw
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Manual" identifier="Manual" id="qq1-yV-VsK">
-                                <view key="view" ambiguous="YES" id="YXI-Uw-7SR">
+                                <view key="view" id="YXI-Uw-7SR">
                                     <rect key="frame" x="10" y="33" width="394" height="491"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1566,7 +1566,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1km-sW-rvx">
-                        <rect key="frame" x="17" y="97" width="150" height="32"/>
+                        <rect key="frame" x="17" y="101" width="150" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="routing rule" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tnn-Re-xYl">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

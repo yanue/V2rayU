@@ -373,3 +373,6 @@
 
 /* Class = "NSTextFieldCell"; title = "path:"; ObjectID = "zGx-1S-wvA"; */
 "zGx-1S-wvA.title" = "path:";
+
+/* Class = "NSButtonCell"; title = "routing rule"; ObjectID = "tnn-Re-xYl"; */
+"tnn-Re-xYl.title" = "路由设置";
