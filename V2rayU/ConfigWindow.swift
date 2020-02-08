@@ -713,6 +713,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func goSubscribeSetting(_ sender: Any) {
         preferencesWindowController.show(preferencePane: .subscribeTab)
     }
+    
+    @IBAction func goRoutingRuleSetting(_ sender: Any) {
+        preferencesWindowController.show(preferencePane: .routingTab)
+    }
 }
 
 // NSv2rayItemListSource

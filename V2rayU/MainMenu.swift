@@ -19,6 +19,7 @@ extension PreferencePane.Identifier {
     static let advanceTab = Identifier("advanceTab")
     static let subscribeTab = Identifier("subscribeTab")
     static let pacTab = Identifier("pacTab")
+    static let routingTab = Identifier("routingTab")
     static let aboutTab = Identifier("aboutTab")
 }
 
@@ -28,6 +29,7 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceAdvanceViewController(),
             PreferenceSubscribeViewController(),
             PreferencePacViewController(),
+            PreferenceRoutingViewController(),
             PreferenceAboutViewController(),
         ]
 )
@@ -563,6 +565,15 @@ class MenuController: NSObject, NSMenuDelegate {
         }
     }
 
+    @IBAction func viewConfig(_ sender: Any) {
+        let confUrl = PACUrl.replacingOccurrences(of: "pac/proxy.js", with: "config.json")
+        print("view config json ", PACUrl)
+        guard let url = URL(string: confUrl) else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
     func pingAtLaunch() {
         let itemList = V2rayServer.list()
         if itemList.count == 0 {
@@ -634,15 +645,6 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     func noticeTip(title: String = "", subtitle: String = "", informativeText: String = "") {
-        // 定义NSUserNotification
-//        let userNotification = NSUserNotification()
-//        userNotification.title = title
-//        userNotification.subtitle = subtitle
-//        userNotification.informativeText = informativeText
-//        // 使用NSUserNotificationCenter发送NSUserNotification
-//        let userNotificationCenter = NSUserNotificationCenter.default
-//        userNotificationCenter.scheduleNotification(userNotification)
-
         makeToast(message: title + (subtitle.count > 0 ? " - " + subtitle : "") + " : " + informativeText)
     }
 }

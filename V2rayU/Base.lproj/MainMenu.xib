@@ -40,6 +40,18 @@
                         <action selector="start:" target="hcZ-V7-Dui" id="XIR-lL-vV2"/>
                     </connections>
                 </menuItem>
+                <menuItem title="View config.json" id="b3o-tG-rp3">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="viewConfig:" target="hcZ-V7-Dui" id="wgb-Uh-Z1z"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="View Log" id="52m-v5-TzY">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="q2e-iz-ozm"/>
                 <menuItem title="Pac Mode" state="on" id="NrZ-oB-7yd">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -88,8 +100,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="4r0-fk-xMy"/>
-                <menuItem title="Import Server From Pasteboard" toolTip="ss:// or vmess://" id="Kct-KD-qPN">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Import Server From Pasteboard" keyEquivalent="p" toolTip="ss:// or vmess://" id="Kct-KD-qPN">
                     <connections>
                         <action selector="ImportFromPasteboard:" target="hcZ-V7-Dui" id="aP0-Ao-OTD"/>
                     </connections>
@@ -105,10 +116,8 @@
                         <action selector="generateQrcode:" target="hcZ-V7-Dui" id="cUu-eO-w0Z"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="gWJ-yg-BaW"/>
                 <menuItem isSeparatorItem="YES" id="mA5-79-fdw"/>
-                <menuItem title="Copy HTTP Proxy Shell Export Line" id="tBG-YP-XJr">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Copy HTTP Proxy Shell Export Line" keyEquivalent="e" id="tBG-YP-XJr">
                     <connections>
                         <action selector="copyExportCommand:" target="hcZ-V7-Dui" id="RET-i4-2bl"/>
                     </connections>
@@ -123,12 +132,6 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="checkForUpdate:" target="hcZ-V7-Dui" id="D9u-jO-ZhW"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Show Logs..." id="52m-v5-TzY">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Help" id="hWR-vJ-0Au">
