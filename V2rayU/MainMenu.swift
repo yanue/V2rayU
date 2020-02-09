@@ -87,6 +87,8 @@ func SwitchProxyMode() {
 
 // regenerate All Config when base setting changed
 func regenerateAllConfig() {
+    NSLog("regenerateAllConfig.")
+
     for (idx, item) in V2rayServer.list().enumerated() {
         if !item.isValid {
             continue

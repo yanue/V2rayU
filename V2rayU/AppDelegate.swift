@@ -62,11 +62,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // url scheme
         NSAppleEventManager.shared().setEventHandler(self, andSelector: #selector(self.handleAppleEvent(event:replyEvent:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
 
-        let path = FileManager.default.currentDirectoryPath
-        print("working dir", path)
-
+        let path = Bundle.main.bundlePath
         // /Users/yanue/Library/Developer/Xcode/DerivedData/V2rayU-cqwhqdwsnxsplqgolfwfywalmjps/Build/Products/Debug
         // working dir must be: /Applications/V2rayU.app
+        NSLog(String.init(format: "working dir:%@", path))
+
         if !(path.contains("Developer/Xcode") || path.contains("/Applications/V2rayU.app")) {
             makeToast(message: "Please drag 'V2rayU' to '/Applications' directory", displayDuration: 5.0)
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
