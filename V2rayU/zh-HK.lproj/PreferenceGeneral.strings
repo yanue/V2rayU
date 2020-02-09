@@ -19,3 +19,12 @@
 
 /* Class = "NSButtonCell"; title = "Check for Updates automutically"; ObjectID = "m2S-Mu-rFM"; */
 "m2S-Mu-rFM.title" = "自動檢測版本更新";
+
+/* Class = "NSTextFieldCell"; title = "Related file locations:"; ObjectID = "Oke-cL-DfS"; */
+"Oke-cL-DfS.title" = "相关文件路径:";
+
+/* Class = "NSTextFieldCell"; title = "Switch Proxy Mode:"; ObjectID = "Eu4-bo-oYs"; */
+"Eu4-bo-oYs.title" = "切换代理模式:";
+
+/* Class = "NSTextFieldCell"; title = "Toggle V2ray On/Off:"; ObjectID = "0rn-re-Wn3"; */
+"0rn-re-Wn3.title" = "打开关闭代理:";
