@@ -178,6 +178,22 @@ function downloadV2ray() {
     rm -fr v2ray-macos.zip
 }
 
+function createDmgByAppdmg() {
+    umount "/Volumes/${APP_NAME}"
+
+    rm -rf ${BUILD_DIR}/${APP_NAME}.app ${BUILD_DIR}/${DMG_FINAL}
+    \cp -Rf "${V2rayU_RELEASE}/${APP_NAME}.app" "${BUILD_DIR}/${APP_NAME}.app"
+
+    # https://github.com/LinusU/node-appdmg
+    # npm install -g appdmg
+    echo ${BUILD_DIR}/appdmg.json
+    appdmg appdmg.json ${DMG_FINAL}
+
+    # appcast sign update
+    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
+
+    umount "/Volumes/${APP_NAME}"
+}
 
 function makeDmg() {
     echo "正在打包版本: V"${APP_Version}
@@ -199,7 +215,7 @@ function makeDmg() {
     updatePlistVersion
     downloadV2ray
     build
-    createDmg
+    createDmgByAppdmg
 }
 
 function publish() {
