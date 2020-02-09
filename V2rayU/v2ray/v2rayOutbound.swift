@@ -183,6 +183,10 @@ struct V2rayOutboundShadowsockServer: Codable {
 }
 
 struct V2rayOutboundSocks: Codable {
+    var servers: [V2rayOutboundSockServer] = [V2rayOutboundSockServer()]
+}
+
+struct V2rayOutboundSockServer: Codable {
     var address: String = ""
     var port: String = ""
     var users: [V2rayOutboundSockUser] = [V2rayOutboundSockUser()]

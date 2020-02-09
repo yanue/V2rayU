@@ -494,11 +494,11 @@ class V2rayConfig: NSObject {
             }
             break
         case V2rayProtocolOutbound.socks.rawValue:
-            if self.serverSocks5.address.count == 0 {
+            if self.serverSocks5.servers[0].address.count == 0 {
                 self.error = "missing socks.address";
                 return
             }
-            if self.serverSocks5.port.count == 0 {
+            if self.serverSocks5.servers[0].port.count == 0 {
                 self.error = "missing socks.port";
                 return
             }
@@ -943,8 +943,8 @@ class V2rayConfig: NSObject {
 
             case .socks:
                 var settingSocks = V2rayOutboundSocks()
-                settingSocks.address = jsonParams["settings"]["address"].stringValue
-                settingSocks.port = jsonParams["settings"]["port"].stringValue
+                settingSocks.servers[0].address = jsonParams["settings"]["address"].stringValue
+                settingSocks.servers[0].port = jsonParams["settings"]["port"].stringValue
 
                 var users: [V2rayOutboundSockUser] = []
                 jsonParams["settings"]["users"].arrayValue.forEach { val in
@@ -955,7 +955,7 @@ class V2rayConfig: NSObject {
                     // append
                     users.append(user)
                 }
-                settingSocks.users = users
+                settingSocks.servers[0].users = users
 
                 // set into outbound
                 v2rayOutbound.settingSocks = settingSocks

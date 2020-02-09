@@ -278,13 +278,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
 
         // socks5
-        v2rayConfig.serverSocks5.address = self.socks5Addr.stringValue
-        v2rayConfig.serverSocks5.port = self.socks5Port.stringValue
+        v2rayConfig.serverSocks5.servers[0].address = self.socks5Addr.stringValue
+        v2rayConfig.serverSocks5.servers[0].port = self.socks5Port.stringValue
 
         var sockUser = V2rayOutboundSockUser()
         sockUser.user = self.socks5User.stringValue
         sockUser.pass = self.socks5Pass.stringValue
-        v2rayConfig.serverSocks5.users = [sockUser]
+        v2rayConfig.serverSocks5.servers[0].users = [sockUser]
         // ========================== server end =======================
 
         // ========================== stream start =======================
@@ -372,11 +372,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.shadowsockMethod.selectItem(withTitle: v2rayConfig.serverShadowsocks.method)
 
         // socks5
-        self.socks5Addr.stringValue = v2rayConfig.serverSocks5.address
-        self.socks5Port.stringValue = v2rayConfig.serverSocks5.port
-        if v2rayConfig.serverSocks5.users.count > 0 {
-            self.socks5User.stringValue = v2rayConfig.serverSocks5.users[0].user
-            self.socks5Pass.stringValue = v2rayConfig.serverSocks5.users[0].pass
+        self.socks5Addr.stringValue = v2rayConfig.serverSocks5.servers[0].address
+        self.socks5Port.stringValue = v2rayConfig.serverSocks5.servers[0].port
+        if v2rayConfig.serverSocks5.servers[0].users.count > 0 {
+            self.socks5User.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].user
+            self.socks5Pass.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].pass
         }
 
         // ========================== server end =======================

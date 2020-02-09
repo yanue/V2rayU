@@ -31,8 +31,8 @@ class Ping : NSObject {
             host = cfg.serverShadowsocks.address
             port = cfg.serverShadowsocks.port
         } else if cfg.serverProtocol == V2rayProtocolOutbound.socks.rawValue {
-            host = cfg.serverSocks5.address
-            port = Int(cfg.serverSocks5.port)!
+            host = cfg.serverSocks5.servers[0].address
+            port = Int(cfg.serverSocks5.servers[0].port) ?? 0
         } else {
             return
         }
