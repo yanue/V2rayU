@@ -105,7 +105,7 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane {
             }
 
             // is domain
-            if tmp.contains("domain:") || tmp.contains("geosite:") {
+            if tmp.contains("domain:") || tmp.contains("regexp:") || tmp.contains("full:") || tmp.contains("geosite:") {
                 domains.append(tmp)
                 continue
             }

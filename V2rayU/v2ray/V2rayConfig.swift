@@ -335,72 +335,68 @@ class V2rayConfig: NSObject {
         var rules: [V2rayRoutingSettingRule] = []
 
         // proxy
-        var routingProxy: V2rayRoutingSettingRule?
-        if self.routingProxyDomains.count > 0 || self.routingProxyIps.count > 0 {
-            routingProxy = V2rayRoutingSettingRule()
-            // tag is proxy
-            routingProxy?.outboundTag = "proxy"
-            routingProxy?.domain = self.routingProxyDomains
-            routingProxy?.ip = self.routingProxyIps
+        if self.routingProxyDomains.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "proxy"
+            routing.domain = self.routingProxyDomains
+            rules.append(routing)
+        }
+        if self.routingProxyIps.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "proxy"
+            routing.ip = self.routingProxyIps
+            rules.append(routing)
         }
 
         // direct
-        var routingDirect: V2rayRoutingSettingRule?
-        if self.routingDirectDomains.count > 0 || self.routingDirectIps.count > 0 {
-            routingDirect = V2rayRoutingSettingRule()
-            // tag is proxy
-            routingDirect?.outboundTag = "direct"
-            routingDirect?.domain = self.routingDirectDomains
-            routingDirect?.ip = self.routingDirectIps
+        var directDomains: [String] = self.routingDirectDomains
+        var directIps: [String] = self.routingDirectIps
+        switch self.routingRule {
+        case .RoutingRuleLAN:
+            directIps.append("geoip:private")
+            break
+        case .RoutingRuleCn:
+            directIps.append("geoip:cn")
+            directDomains.append("geosite:cn")
+            break
+        case .RoutingRuleLANAndCn:
+            directIps.append("geoip:private")
+            directIps.append("geoip:cn")
+            directDomains.append("geosite:cn")
+            break
+        case .RoutingRuleGlobal:
+            break
+        }
+
+        if directDomains.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "direct"
+            routing.domain = directDomains
+            rules.append(routing)
+        }
+        if directIps.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "direct"
+            routing.ip = directIps
+            rules.append(routing)
         }
 
         // block
-        var routingBlock: V2rayRoutingSettingRule?
-        if self.routingBlockDomains.count > 0 || self.routingBlockIps.count > 0 {
-            routingBlock = V2rayRoutingSettingRule()
-            // tag is proxy
-            routingBlock?.outboundTag = "block"
-            routingBlock?.domain = self.routingBlockDomains
-            routingBlock?.ip = self.routingBlockIps
+        if self.routingBlockDomains.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "block"
+            routing.domain = self.routingBlockDomains
+            rules.append(routing)
         }
-
-        if routingDirect == nil {
-            routingDirect = V2rayRoutingSettingRule()
-            // tag is proxy
-            routingDirect?.outboundTag = "direct"
-        }
-
-        switch self.routingRule {
-        case .RoutingRuleGlobal:
-            // all set to null
-            routingProxy = nil
-            routingDirect = nil
-            routingBlock = nil
-
-        case .RoutingRuleLAN:
-            routingDirect?.ip?.append("geoip:private")
-
-        case .RoutingRuleCn:
-            routingDirect?.ip?.append("geoip:cn")
-            routingDirect?.domain?.append("geosite:cn")
-
-        case .RoutingRuleLANAndCn:
-            routingDirect?.ip?.append("geoip:private")
-            routingDirect?.ip?.append("geoip:cn")
-            routingDirect?.domain?.append("geosite:cn")
-        }
-
-        if routingProxy != nil {
-            rules.append(routingProxy!)
-        }
-        if routingDirect != nil {
-            rules.append(routingDirect!)
-        }
-        if routingBlock != nil {
-            rules.append(routingBlock!)
+        if self.routingBlockIps.count > 0 {
+            var routing = V2rayRoutingSettingRule()
+            routing.outboundTag = "block"
+            routing.ip = self.routingBlockIps
+            rules.append(routing)
         }
 
         self.routing.settings.rules = rules
+
         // set v2ray routing
         self.v2ray.routing = self.routing
         // ------------------------------------- routing end ----------------------------------------------
