@@ -7,6 +7,7 @@ PODS:
   - Preferences (0.3.0)
   - QRCoder (1.1.0)
   - Sparkle (1.21.3)
+  - Swifter (1.4.7)
   - SwiftSocket (2.0.2)
   - SwiftyJSON (5.0.0)
 
@@ -17,6 +18,7 @@ DEPENDENCIES:
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
+  - Swifter (~> 1.4.7)
   - SwiftSocket (from `https://github.com/odariusgeorge/SwiftSocket.git`, branch `patch-1`)
   - SwiftyJSON
 
@@ -27,6 +29,7 @@ SPEC REPOS:
     - MASShortcut
     - QRCoder
     - Sparkle
+    - Swifter
     - SwiftyJSON
 
 EXTERNAL SOURCES:
@@ -51,9 +54,10 @@ SPEC CHECKSUMS:
   Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   Sparkle: 3f75576db8b0265adef36c43249d747f22d0b708
+  Swifter: 2327ef5d872c638aebab79646ce494af508b0c8f
   SwiftSocket: 2f7a7e26a7489f5f33b69da914ec366368dfcbcc
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: 407a3efc71b95e99861a0c05290182ea384ac364
+PODFILE CHECKSUM: 5f8ca0729788c399da041513b75057075032e5e1
 
 COCOAPODS: 1.8.4

@@ -86,6 +86,16 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         let dnsServersVal = self.dnsServers.stringValue
         let muxConcurrentVal = self.muxConcurrent.intValue
 
+        if httpPortVal == sockPortVal || httpPortVal == pacPortVal || sockPortVal == pacPortVal {
+            self.tips.stringValue = "the ports(http,sock,pac) cannot be the same"
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                // your code here
+                self.tips.stringValue = ""
+            }
+            return
+        }
+
         // save
         UserDefaults.setBool(forKey: .enableUdp, value: enableUdpVal)
         UserDefaults.setBool(forKey: .enableMux, value: enableMuxVal)

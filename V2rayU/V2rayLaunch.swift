@@ -9,7 +9,7 @@
 import Cocoa
 import SystemConfiguration
 import Alamofire
-import GCDWebServer
+import Swifter
 
 let LAUNCH_AGENT_DIR = "/Library/LaunchAgents/"
 let LAUNCH_AGENT_PLIST = "yanue.v2rayu.v2ray-core.plist"
@@ -26,7 +26,7 @@ let cmdSh = AppResourcesPath + "/cmd.sh"
 let cmdAppleScript = "do shell script \"" + cmdSh + "\" with administrator privileges"
 let JsonConfigFilePath = AppResourcesPath + "/config.json"
 
-let webServer = GCDWebServer()
+var webServer = HttpServer()
 
 enum RunMode: String {
     case global
@@ -55,7 +55,6 @@ class V2rayLaunch: NSObject {
             "StandardErrorPath": logFilePath,
             "ProgramArguments": agentArguments,
             "KeepAlive": true,
-            "RunAtLoad": true,
         ]
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
@@ -64,6 +63,7 @@ class V2rayLaunch: NSObject {
         if fileMgr.fileExists(atPath: launchHttpPlistFile) {
             print("launchHttpPlistFile exist", launchHttpPlistFile)
             _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+            _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
             try! fileMgr.removeItem(atPath: launchHttpPlistFile)
         }
 
@@ -79,6 +79,8 @@ class V2rayLaunch: NSObject {
         self.startHttpServer()
 
         // unload first
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
 
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
@@ -92,6 +94,8 @@ class V2rayLaunch: NSObject {
 
     static func Stop() {
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
+        _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
 
         // cmd: /bin/launchctl unload /Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
@@ -101,9 +105,6 @@ class V2rayLaunch: NSObject {
         } else {
             NSLog("Stop v2ray-core failed.")
         }
-
-        // stop http server
-        webServer.stop()
     }
 
     static func OpenLogs() {
@@ -164,22 +165,89 @@ class V2rayLaunch: NSObject {
     // start http server for pac
     static func startHttpServer() {
         do {
-            if webServer.isRunning {
-                try webServer.stop()
-            }
+            // stop first
+            webServer.stop()
 
-            _ = GeneratePACFile(rewrite: false)
+            // then new HttpServer
+            webServer = HttpServer()
+            webServer["/:path"] = shareFilesFromDirectory(AppResourcesPath)
+            webServer["/pac/:path"] = shareFilesFromDirectory(AppResourcesPath + "/pac")
 
-            let pacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
-
-            webServer.addGETHandler(forBasePath: "/", directoryPath: AppResourcesPath, indexFilename: nil, cacheAge: 0, allowRangeRequests: true)
-
-            try webServer.start(options: [
-                "Port": UInt(pacPort) ?? 11085,
-                "BindToLocalhost": true
-            ]);
+            let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+            try webServer.start(pacPort)
+            print("webServer.start at:\(pacPort)")
         } catch let error {
-            print("webServer.start:\(error)")
+            print("webServer.start error:\(error)")
         }
+    }
+
+    static func checkPorts() -> Bool {
+        let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
+
+        // check same port
+        if localSockPort == localHttpPort {
+            makeToast(message: "the ports (sock,http) cannot be the same: " + localHttpPort)
+            return false
+        }
+
+        if localHttpPort == localPacPort {
+            makeToast(message: "the ports (http,pac) cannot be the same:" + localPacPort)
+            return false
+        }
+
+        if localSockPort == localPacPort {
+            makeToast(message: "the ports (sock,pac) cannot be the same:" + localPacPort)
+            return false
+        }
+
+        // check port is used
+        print("UInt16(localSockPort)", UInt16(localSockPort) ?? 0)
+//        let (res, err) = self.checkTcpPort(port: UInt16(localSockPort) ?? 0)
+//        if !res {
+//            makeToast(message: "the sock port (" + localSockPort + ") has being used: (" + err + ")", displayDuration: 3)
+//            return false
+//        }
+
+        return true
+    }
+
+    static func checkTcpPort(port: in_port_t) -> (Bool, descr: String) {
+        let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
+        if socketFileDescriptor == -1 {
+            return (false, "SocketCreationFailed, \(V2rayLaunch.descrOfPortError())")
+        }
+        var addr = sockaddr_in()
+        let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
+        addr.sin_len = __uint8_t(sizeOfSockAddr)
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
+        addr.sin_addr = in_addr(s_addr: inet_addr("127.0.0.1"))
+        addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
+        var bind_addr = sockaddr()
+        memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
+
+        if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
+            let details = descrOfPortError()
+            release(socket: socketFileDescriptor)
+            return (false, "\(port), BindFailed, \(details)")
+        }
+        if listen(socketFileDescriptor, SOMAXCONN) == -1 {
+            let details = descrOfPortError()
+            release(socket: socketFileDescriptor)
+            return (false, "\(port), ListenFailed, \(details)")
+        }
+        release(socket: socketFileDescriptor)
+        return (true, "\(port) is free for use")
+    }
+
+    static func release(socket: Int32) {
+        Darwin.shutdown(socket, SHUT_RDWR)
+        close(socket)
+    }
+
+    static func descrOfPortError() -> String {
+        return String.init(cString: (UnsafePointer(strerror(errno))))
     }
 }

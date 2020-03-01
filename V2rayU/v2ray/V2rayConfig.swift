@@ -237,7 +237,7 @@ class V2rayConfig: NSObject {
                     inType = V2rayProtocolInbound.http
                 }
                 if self.v2ray.inbound!.protocol == V2rayProtocolInbound.socks {
-                
+
                     self.v2ray.inbound!.port = self.socksPort
                     self.v2ray.inbound!.listen = self.socksHost
                     self.v2ray.inbound!.settingSocks.udp = self.enableUdp
@@ -1331,7 +1331,15 @@ class V2rayConfig: NSObject {
 
     // create current v2ray server json file
     static func createJsonFile(item: V2rayItem) {
-        let jsonText = item.json
+        var jsonText = item.json
+
+        // parse old
+        let vCfg = V2rayConfig()
+        vCfg.parseJson(jsonText: item.json)
+
+        // combine new default config
+        jsonText = vCfg.combineManual()
+        _ = V2rayServer.save(v2ray: item, jsonData: jsonText)
 
         // path: /Application/V2rayU.app/Contents/Resources/config.json
         guard let jsonFile = V2rayServer.getJsonFile() else {

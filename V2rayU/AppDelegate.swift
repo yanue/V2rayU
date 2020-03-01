@@ -8,6 +8,7 @@
 
 import Cocoa
 import ServiceManagement
+import Swifter
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
@@ -25,6 +26,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // default settings
         self.checkDefault()
 
+        // auto Clear Logs
+        if UserDefaults.getBool(forKey: .autoClearLog) {
+            print("ClearLogs")
+            V2rayLaunch.ClearLogs()
+        }
+
         // auto launch
         if UserDefaults.getBool(forKey: .autoLaunch) {
             // Insert code here to initialize your application
@@ -35,12 +42,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if startedAtLogin {
                 DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
             }
-        }
-
-        // auto Clear Logs
-        if UserDefaults.getBool(forKey: .autoClearLog) {
-            print("ClearLogs")
-            V2rayLaunch.ClearLogs()
         }
 
         // check v2ray core
@@ -128,9 +129,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func onWakeNote(note: NSNotification) {
         print("onWakeNote")
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            V2rayLaunch.Start()
-        }
         // check v2ray core
         V2rayCore().check()
         // auto check updates
@@ -147,7 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func onSleepNote(note: NSNotification) {
-        V2rayLaunch.Stop()
+        print("onSleepNote")
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

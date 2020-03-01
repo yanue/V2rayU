@@ -17,6 +17,7 @@ target 'V2rayU' do
   pod "GCDWebServer"
   pod 'SwiftSocket', :git => 'https://github.com/odariusgeorge/SwiftSocket.git', :branch => 'patch-1'
   pod 'MASShortcut'
+  pod 'Swifter', '~> 1.4.7'
 
 
 end

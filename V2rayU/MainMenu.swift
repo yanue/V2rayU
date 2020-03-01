@@ -253,7 +253,12 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // start v2ray core
     func startV2rayCore() {
+        self.setStatusOff()
+
         NSLog("start v2ray-core begin")
+        if !V2rayLaunch.checkPorts() {
+            return
+        }
 
         guard let v2ray = V2rayServer.loadSelectedItem() else {
             noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")

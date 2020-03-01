@@ -246,26 +246,26 @@ func checkTcpPortForListen(port: in_port_t) -> (Bool, descr: String) {
 
     let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
     if socketFileDescriptor == -1 {
-        return (false, "SocketCreationFailed, \(descriptionOfLastError())")
+        return (false, "SocketCreationFailed, \(descrOfPortError())")
     }
 
     var addr = sockaddr_in()
-    let sizeOfSockkAddr = MemoryLayout<sockaddr_in>.size
-    addr.sin_len = __uint8_t(sizeOfSockkAddr)
+    let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
+    addr.sin_len = __uint8_t(sizeOfSockAddr)
     addr.sin_family = sa_family_t(AF_INET)
     addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
     addr.sin_addr = in_addr(s_addr: inet_addr("0.0.0.0"))
     addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
     var bind_addr = sockaddr()
-    memcpy(&bind_addr, &addr, Int(sizeOfSockkAddr))
+    memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
 
-    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockkAddr)) == -1 {
-        let details = descriptionOfLastError()
+    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
+        let details = descrOfPortError()
         releaseTcpPort(socket: socketFileDescriptor)
         return (false, "\(port), BindFailed, \(details)")
     }
     if listen(socketFileDescriptor, SOMAXCONN) == -1 {
-        let details = descriptionOfLastError()
+        let details = descrOfPortError()
         releaseTcpPort(socket: socketFileDescriptor)
         return (false, "\(port), ListenFailed, \(details)")
     }
@@ -278,7 +278,7 @@ func releaseTcpPort(socket: Int32) {
     close(socket)
 }
 
-func descriptionOfLastError() -> String {
+func descrOfPortError() -> String {
     return String.init(cString: (UnsafePointer(strerror(errno))))
 }
 
@@ -301,4 +301,29 @@ func shell(_ args: String...) -> String {
     let output = String(data: data, encoding: String.Encoding.utf8)
 
     return output ?? ""
+}
+
+func isPortOpen(port: in_port_t) -> Bool {
+    let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
+    if socketFileDescriptor == -1 {
+        return false
+    }
+
+    var addr = sockaddr_in()
+    let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
+    addr.sin_len = __uint8_t(sizeOfSockAddr)
+    addr.sin_family = sa_family_t(AF_INET)
+    addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
+    addr.sin_addr = in_addr(s_addr: inet_addr("0.0.0.0"))
+    addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
+    var bind_addr = sockaddr()
+    memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
+
+    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
+        return false
+    }
+    if listen(socketFileDescriptor, SOMAXCONN) == -1 {
+        return false
+    }
+    return true
 }

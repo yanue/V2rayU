@@ -297,6 +297,20 @@ class V2rayServer: NSObject {
         return ""
     }
 
+    static func save(v2ray: V2rayItem, jsonData: String) {
+        // store
+        v2ray.json = jsonData
+        v2ray.store()
+
+        // refresh data
+        for (idx, item) in self.v2rayItemList.enumerated() {
+            if item.name == v2ray.name {
+                self.v2rayItemList[idx].json = jsonData
+                break
+            }
+        }
+    }
+
     // get by name
     static func getIndex(name: String) -> Int {
         for (idx, item) in self.v2rayItemList.enumerated() {
