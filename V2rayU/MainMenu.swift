@@ -253,10 +253,9 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // start v2ray core
     func startV2rayCore() {
-        self.setStatusOff()
-
         NSLog("start v2ray-core begin")
         if !V2rayLaunch.checkPorts() {
+            setStatusOff()
             return
         }
 

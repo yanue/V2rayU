@@ -182,8 +182,15 @@ class V2rayLaunch: NSObject {
     }
 
     static func checkPorts() -> Bool {
+        // stop old v2ray process
+        self.Stop()
+        // stop pac server
+        webServer.stop()
+
         let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let localSockHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
         let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        let localHttpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
         let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 
         // check same port
@@ -203,13 +210,31 @@ class V2rayLaunch: NSObject {
         }
 
         // check port is used
-        print("UInt16(localSockPort)", UInt16(localSockPort) ?? 0)
-//        let (res, err) = self.checkTcpPort(port: UInt16(localSockPort) ?? 0)
-//        if !res {
-//            makeToast(message: "the sock port (" + localSockPort + ") has being used: (" + err + ")", displayDuration: 3)
-//            return false
-//        }
+        if !self.checkPort(host: localSockHost, port: localSockPort, tip: "socks") {
+            return false
+        }
 
+        if !self.checkPort(host: localHttpHost, port: localHttpPort, tip: "http") {
+            return false
+        }
+
+        if !self.checkPort(host: "0.0.0.0", port: localPacPort, tip: "pac") {
+            return false
+        }
+
+        // restart pac http server
+        startHttpServer()
+
+        return true
+    }
+
+    static func checkPort(host: String, port: String, tip: String) -> Bool {
+        // shell("/bin/bash",["-c","cd ~ && ls -la"])
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ./V2rayUPort -h " + host + " -p " + port])
+        if res != "ok" {
+            makeToast(message: tip + " error:    " + (res ?? ""), displayDuration: 5)
+            return false
+        }
         return true
     }
 
