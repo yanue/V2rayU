@@ -22,6 +22,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // default settings
+        self.checkDefault()
 
         // auto launch
         if UserDefaults.getBool(forKey: .autoLaunch) {
@@ -34,8 +36,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 DistributedNotificationCenter.default().post(name: Notification.Name("terminateV2rayU"), object: Bundle.main.bundleIdentifier!)
             }
         }
-
-        self.checkDefault()
 
         // auto Clear Logs
         if UserDefaults.getBool(forKey: .autoClearLog) {
@@ -97,12 +97,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .autoCheckVersion) == nil {
             UserDefaults.setBool(forKey: .autoCheckVersion, value: true)
         }
+        if UserDefaults.get(forKey: .autoUpdateServers) == nil {
+            UserDefaults.setBool(forKey: .autoUpdateServers, value: true)
+        }
         if UserDefaults.get(forKey: .autoLaunch) == nil {
             SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
             UserDefaults.setBool(forKey: .autoLaunch, value: true)
         }
         if UserDefaults.get(forKey: .runMode) == nil {
-            UserDefaults.set(forKey: .runMode, value: RunMode.manual.rawValue)
+            UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
         }
         if V2rayServer.count() == 0 {
             // add default
@@ -136,7 +139,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2rayUpdater.checkForUpdatesInBackground()
         }
         // auto update subscribe servers
-        V2raySubSync().sync()
+        if UserDefaults.getBool(forKey: .autoUpdateServers) {
+            V2raySubSync().sync()
+        }
         // ping
         menuController.pingAtLaunch()
     }

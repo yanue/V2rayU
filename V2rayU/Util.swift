@@ -29,6 +29,8 @@ extension UserDefaults {
         case autoLaunch
         // auto clear logs
         case autoClearLog
+        // auto update servers
+        case autoUpdateServers
         // pac|manual|global
         case runMode
         // use rules

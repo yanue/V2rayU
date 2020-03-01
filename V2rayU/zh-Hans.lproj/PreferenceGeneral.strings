@@ -28,3 +28,5 @@
 
 /* Class = "NSTextFieldCell"; title = "Toggle V2ray On/Off:"; ObjectID = "0rn-re-Wn3"; */
 "0rn-re-Wn3.title" = "打开关闭代理:";
+/* Class = "NSButtonCell"; title = "Automatically update servers from subscriptions"; ObjectID = "1FR-Yu-tqb"; */
+"1FR-Yu-tqb.title" = "启动或唤醒时自动从订阅中更新";

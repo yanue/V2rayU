@@ -193,7 +193,9 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         // auto update subscribe servers
-        V2raySubSync().sync()
+        if UserDefaults.getBool(forKey: .autoUpdateServers) {
+            V2raySubSync().sync()
+        }
 
         // ping
         self.pingAtLaunch()

@@ -237,6 +237,7 @@ class V2rayConfig: NSObject {
                     inType = V2rayProtocolInbound.http
                 }
                 if self.v2ray.inbound!.protocol == V2rayProtocolInbound.socks {
+                
                     self.v2ray.inbound!.port = self.socksPort
                     self.v2ray.inbound!.listen = self.socksHost
                     self.v2ray.inbound!.settingSocks.udp = self.enableUdp

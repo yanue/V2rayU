@@ -12,6 +12,7 @@
                 <outlet property="autoCheckVersion" destination="m2S-Mu-rFM" id="GQD-EA-vJj"/>
                 <outlet property="autoClearLog" destination="hIN-yp-Qul" id="Iib-Re-pDz"/>
                 <outlet property="autoLaunch" destination="NZE-cI-j04" id="ktV-ps-tl4"/>
+                <outlet property="autoUpdateServers" destination="1FR-Yu-tqb" id="5TK-uS-ear"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
         </customObject>
@@ -20,8 +21,41 @@
             <rect key="frame" x="0.0" y="0.0" width="460" height="360"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VO1-gl-rxy" userLabel="update servers">
+                    <rect key="frame" x="62" y="241" width="315" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Automatically update servers from subscriptions" bezelStyle="regularSquare" imagePosition="left" inset="2" id="1FR-Yu-tqb">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetAutoUpdateServers:" target="-2" id="ygn-My-97v"/>
+                        </connections>
+                    </buttonCell>
+                </button>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tgw-Vy-D08" userLabel="check version">
+                    <rect key="frame" x="62" y="288" width="218" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Check for updates automutically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m2S-Mu-rFM">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetAutoCheckVersion:" target="-2" id="4Ig-pP-her"/>
+                        </connections>
+                    </buttonCell>
+                </button>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59o-dL-xSh" userLabel="clear log">
+                    <rect key="frame" x="62" y="264" width="261" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Automatically clear logs after launching" bezelStyle="regularSquare" imagePosition="left" inset="2" id="hIN-yp-Qul">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetAutoClearLogs:" target="-2" id="gGD-G8-Feq"/>
+                        </connections>
+                    </buttonCell>
+                </button>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="87d-wY-Ocw">
-                    <rect key="frame" x="64" y="305" width="163" height="18"/>
+                    <rect key="frame" x="62" y="313" width="163" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Launch V2rayU at login" bezelStyle="regularSquare" imagePosition="left" inset="2" id="NZE-cI-j04">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -31,52 +65,6 @@
                         </connections>
                     </buttonCell>
                 </button>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UJB-Wh-dgF">
-                    <rect key="frame" x="66" y="279" width="214" height="14"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <subviews>
-                        <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tgw-Vy-D08" userLabel="Check for Updates automutically">
-                            <rect key="frame" x="-2" y="-2" width="218" height="18"/>
-                            <buttonCell key="cell" type="check" title="Check for updates automutically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m2S-Mu-rFM">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                                <connections>
-                                    <action selector="SetAutoCheckVersion:" target="-2" id="4Ig-pP-her"/>
-                                </connections>
-                            </buttonCell>
-                        </button>
-                    </subviews>
-                    <visibilityPriorities>
-                        <integer value="1000"/>
-                    </visibilityPriorities>
-                    <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                    </customSpacing>
-                </stackView>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WJk-22-Sun">
-                    <rect key="frame" x="66" y="236" width="257" height="30"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <subviews>
-                        <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="59o-dL-xSh" userLabel="Check for Updates automutically">
-                            <rect key="frame" x="-2" y="-2" width="261" height="34"/>
-                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="hIN-yp-Qul">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <string key="title">Automatically clear logs after launching
-</string>
-                                <font key="font" metaFont="system"/>
-                                <connections>
-                                    <action selector="SetAutoClearLogs:" target="-2" id="gGD-G8-Feq"/>
-                                </connections>
-                            </buttonCell>
-                        </button>
-                    </subviews>
-                    <visibilityPriorities>
-                        <integer value="1000"/>
-                    </visibilityPriorities>
-                    <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                    </customSpacing>
-                </stackView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Elj-N8-4IK" customClass="MASShortcutView">
                     <rect key="frame" x="247" y="183" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -85,7 +73,7 @@
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ti4-xg-ncf" customClass="MASShortcutView">
-                    <rect key="frame" x="247" y="210" width="139" height="19"/>
+                    <rect key="frame" x="247" y="206" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="associatedUserDefaultsKey" value="ToggleRunning"/>
@@ -101,7 +89,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vtN-0c-sip">
-                    <rect key="frame" x="64" y="211" width="174" height="17"/>
+                    <rect key="frame" x="64" y="207" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Toggle V2ray On/Off:" id="0rn-re-Wn3">
                         <font key="font" metaFont="system"/>
@@ -109,19 +97,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-Na-pRr">
-                    <rect key="frame" x="60" y="21" width="182" height="32"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="Check for Updates..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2p9-GL-XZ9">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="checkVersion:" target="-2" id="4u0-Zb-Xfz"/>
-                    </connections>
-                </button>
                 <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="liJ-Uu-8HQ">
-                    <rect key="frame" x="265" y="21" width="127" height="32"/>
+                    <rect key="frame" x="267" y="21" width="127" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="Feedback..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QjX-NH-23u">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -153,6 +130,17 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-Na-pRr">
+                    <rect key="frame" x="58" y="21" width="182" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="push" title="Check for Updates..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2p9-GL-XZ9">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="checkVersion:" target="-2" id="4u0-Zb-Xfz"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="-144" y="-243"/>
         </view>
