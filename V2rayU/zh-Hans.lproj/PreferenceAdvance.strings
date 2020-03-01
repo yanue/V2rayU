@@ -64,3 +64,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Local Http Listen Host:"; ObjectID = "uWf-ty-nD8"; */
 "uWf-ty-nD8.title" = "本机http监听Host:";
+
+/* Class = "NSButtonCell"; title = "Enable sniffing"; ObjectID = "DUz-lv-lyg"; */
+"DUz-lv-lyg.title" = "开启流量探测";

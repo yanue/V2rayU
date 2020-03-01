@@ -5,6 +5,9 @@
 /* Class = "NSTextFieldCell"; title = "V2ray Core Log level:"; ObjectID = "Ctq-lX-cuA"; */
 "Ctq-lX-cuA.title" = "V2ray Core Log level:";
 
+/* Class = "NSButtonCell"; title = "Enable sniffing"; ObjectID = "DUz-lv-lyg"; */
+"DUz-lv-lyg.title" = "Enable sniffing";
+
 /* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "GyI-8o-VH6"; */
 "GyI-8o-VH6.title" = "Label";
 

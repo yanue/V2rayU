@@ -23,6 +23,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
+    @IBOutlet weak var enableSniffing: NSButton!
 
     @IBOutlet weak var muxConcurrent: NSTextField!
     @IBOutlet weak var logLevel: NSPopUpButton!
@@ -41,6 +42,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         let enableMuxState = UserDefaults.getBool(forKey: .enableMux)
         let enableUdpState = UserDefaults.getBool(forKey: .enableUdp)
+        let enableSniffingState = UserDefaults.getBool(forKey: .enableSniffing)
 
         let localSockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         let localSockHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
@@ -56,6 +58,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         self.enableUdp.state = enableUdpState ? .on : .off
         self.enableMux.state = enableMuxState ? .on : .off
+        self.enableSniffing.state = enableSniffingState ? .on : .off
         self.sockPort.stringValue = localSockPort
         self.sockHost.stringValue = localSockHost
         self.httpPort.stringValue = localHttpPort
@@ -78,6 +81,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
         let enableUdpVal = self.enableUdp.state.rawValue > 0
         let enableMuxVal = self.enableMux.state.rawValue > 0
+        let enableSniffingVal = self.enableSniffing.state.rawValue > 0
 
         let dnsServersVal = self.dnsServers.stringValue
         let muxConcurrentVal = self.muxConcurrent.intValue
@@ -85,6 +89,7 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         // save
         UserDefaults.setBool(forKey: .enableUdp, value: enableUdpVal)
         UserDefaults.setBool(forKey: .enableMux, value: enableMuxVal)
+        UserDefaults.setBool(forKey: .enableSniffing, value: enableSniffingVal)
 
         UserDefaults.set(forKey: .localHttpPort, value: httpPortVal)
         UserDefaults.set(forKey: .localHttpHost, value: self.httpHost.stringValue)

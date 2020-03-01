@@ -51,6 +51,8 @@ extension UserDefaults {
         case enableUdp
         // enable mux
         case enableMux
+        // enable Sniffing
+        case enableSniffing
         // mux Concurrent
         case muxConcurrent
         // pacPort

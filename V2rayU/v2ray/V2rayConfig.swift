@@ -79,6 +79,7 @@ class V2rayConfig: NSObject {
     var httpHost = "127.0.0.1"
     var enableUdp = true
     var enableMux = false
+    var enableSniffing = false
     var mux = 8
     var dns = ""
 
@@ -122,6 +123,7 @@ class V2rayConfig: NSObject {
 
         self.enableMux = UserDefaults.getBool(forKey: .enableMux)
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
+        self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
 
         self.httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
         self.httpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
@@ -190,14 +192,18 @@ class V2rayConfig: NSObject {
         inHttp.port = self.httpPort
         inHttp.listen = self.httpHost
         inHttp.protocol = V2rayProtocolInbound.http
-        inHttp.sniffing = V2rayInboundSniffing()
+        if self.enableSniffing {
+            inHttp.sniffing = V2rayInboundSniffing()
+        }
 
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
         inSocks.listen = self.socksHost
         inSocks.protocol = V2rayProtocolInbound.socks
         inSocks.settingSocks.udp = self.enableUdp
-        inSocks.sniffing = V2rayInboundSniffing()
+        if self.enableSniffing {
+            inSocks.sniffing = V2rayInboundSniffing()
+        }
 
         if self.httpPort == self.socksPort {
             self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
@@ -207,7 +213,7 @@ class V2rayConfig: NSObject {
             // inbounds
             var inbounds: [V2rayInbound] = [inSocks, inHttp]
             if (!self.isEmptyInput && self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
-                for var (_, item) in self.v2ray.inbounds!.enumerated() {
+                for (_, item) in self.v2ray.inbounds!.enumerated() {
                     if item.protocol == V2rayProtocolInbound.http || item.protocol == V2rayProtocolInbound.socks {
                         continue
                     }
@@ -244,7 +250,9 @@ class V2rayConfig: NSObject {
                 var inboundDetour: [V2rayInbound] = []
 
                 for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
-                    item.sniffing = V2rayInboundSniffing()
+                    if self.enableSniffing {
+                        item.sniffing = V2rayInboundSniffing()
+                    }
                     if inType == V2rayProtocolInbound.http && item.protocol == V2rayProtocolInbound.http {
                         continue
                     }
@@ -335,69 +343,111 @@ class V2rayConfig: NSObject {
         var rules: [V2rayRoutingSettingRule] = []
 
         // proxy
-        var routingProxy: V2rayRoutingSettingRule?
-        if self.routingProxyDomains.count > 0 || self.routingProxyIps.count > 0 {
-            routingProxy = V2rayRoutingSettingRule()
+        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp: V2rayRoutingSettingRule?
+        if self.routingProxyDomains.count > 0 {
+            ruleProxyDomain = V2rayRoutingSettingRule()
             // tag is proxy
-            routingProxy?.outboundTag = "proxy"
-            routingProxy?.domain = self.routingProxyDomains
-            routingProxy?.ip = self.routingProxyIps
+            ruleProxyDomain?.outboundTag = "proxy"
+            ruleProxyDomain?.domain = self.routingProxyDomains
+        }
+        if self.routingProxyIps.count > 0 {
+            ruleProxyIp = V2rayRoutingSettingRule()
+            // tag is proxy
+            ruleProxyIp?.outboundTag = "proxy"
+            ruleProxyIp?.ip = self.routingProxyIps
         }
 
         // direct
-        var routingDirect: V2rayRoutingSettingRule?
-        if self.routingDirectDomains.count > 0 || self.routingDirectIps.count > 0 {
-            routingDirect = V2rayRoutingSettingRule()
+        if self.routingDirectDomains.count > 0 {
+            ruleDirectDomain = V2rayRoutingSettingRule()
             // tag is proxy
-            routingDirect?.outboundTag = "direct"
-            routingDirect?.domain = self.routingDirectDomains
-            routingDirect?.ip = self.routingDirectIps
+            ruleDirectDomain?.outboundTag = "direct"
+            ruleDirectDomain?.domain = self.routingDirectDomains
         }
-
+        if self.routingDirectIps.count > 0 {
+            ruleDirectIp = V2rayRoutingSettingRule()
+            // tag is proxy
+            ruleDirectIp?.outboundTag = "direct"
+            ruleDirectIp?.ip = self.routingDirectIps
+        }
         // block
-        var routingBlock: V2rayRoutingSettingRule?
-        if self.routingBlockDomains.count > 0 || self.routingBlockIps.count > 0 {
-            routingBlock = V2rayRoutingSettingRule()
+        if self.routingBlockDomains.count > 0 {
+            ruleBlockDomain = V2rayRoutingSettingRule()
             // tag is proxy
-            routingBlock?.outboundTag = "block"
-            routingBlock?.domain = self.routingBlockDomains
-            routingBlock?.ip = self.routingBlockIps
+            ruleBlockDomain?.outboundTag = "block"
+            ruleBlockDomain?.domain = self.routingBlockDomains
         }
 
-        if routingDirect == nil {
-            routingDirect = V2rayRoutingSettingRule()
+        if self.routingBlockIps.count > 0 {
+            ruleBlockIp = V2rayRoutingSettingRule()
             // tag is proxy
-            routingDirect?.outboundTag = "direct"
+            ruleBlockIp?.outboundTag = "block"
+            ruleBlockIp?.domain = self.routingBlockDomains
+            ruleBlockIp?.ip = self.routingBlockIps
+        }
+
+        // default
+        if ruleDirectDomain == nil {
+            ruleDirectDomain = V2rayRoutingSettingRule()
+            // tag is proxy
+            ruleDirectDomain?.outboundTag = "direct"
+        }
+
+        if ruleDirectIp == nil {
+            ruleDirectIp = V2rayRoutingSettingRule()
+            // tag is proxy
+            ruleDirectIp?.outboundTag = "direct"
         }
 
         switch self.routingRule {
         case .RoutingRuleGlobal:
-            // all set to null
-            routingProxy = nil
-            routingDirect = nil
-            routingBlock = nil
-
+            // all set to nil
+//            (ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp) = (nil, nil, nil, nil, nil, nil)
+            if ruleDirectDomain?.domain?.count == 0 {
+                ruleDirectDomain = nil
+            }
+            if ruleDirectIp?.ip?.count == 0 {
+                ruleDirectIp = nil
+            }
+            break
         case .RoutingRuleLAN:
-            routingDirect?.ip?.append("geoip:private")
+            ruleDirectIp?.ip?.append("geoip:private")
+            ruleDirectDomain?.domain?.append("localhost")
 
         case .RoutingRuleCn:
-            routingDirect?.ip?.append("geoip:cn")
-            routingDirect?.domain?.append("geosite:cn")
+            ruleDirectIp?.ip?.append("geoip:cn")
+            ruleDirectDomain?.domain?.append("geosite:cn")
 
         case .RoutingRuleLANAndCn:
-            routingDirect?.ip?.append("geoip:private")
-            routingDirect?.ip?.append("geoip:cn")
-            routingDirect?.domain?.append("geosite:cn")
+            ruleDirectIp?.ip?.append("geoip:private")
+            ruleDirectIp?.ip?.append("geoip:cn")
+            ruleDirectDomain?.domain?.append("localhost")
+            ruleDirectDomain?.domain?.append("geosite:cn")
         }
 
-        if routingProxy != nil {
-            rules.append(routingProxy!)
+        if ruleProxyDomain != nil {
+            ruleProxyDomain?.ip = nil
+            rules.append(ruleProxyDomain!)
         }
-        if routingDirect != nil {
-            rules.append(routingDirect!)
+        if ruleProxyIp != nil {
+            ruleProxyIp?.domain = nil
+            rules.append(ruleProxyIp!)
         }
-        if routingBlock != nil {
-            rules.append(routingBlock!)
+        if ruleDirectDomain != nil {
+            ruleDirectDomain!.ip = nil
+            rules.append(ruleDirectDomain!)
+        }
+        if ruleDirectIp != nil {
+            ruleDirectIp!.domain = nil
+            rules.append(ruleDirectIp!)
+        }
+        if ruleBlockDomain != nil {
+            ruleBlockDomain?.ip = nil
+            rules.append(ruleBlockDomain!)
+        }
+        if ruleBlockIp != nil {
+            ruleBlockIp?.domain = nil
+            rules.append(ruleBlockIp!)
         }
 
         self.routing.settings.rules = rules
@@ -627,7 +677,8 @@ class V2rayConfig: NSObject {
             // check inbounds
             if json["inbounds"].arrayValue.count > 0 {
                 var inbounds: [V2rayInbound] = []
-                json["inbounds"].arrayValue.forEach { val in
+                json["inbounds"].arrayValue.forEach {
+                    val in
                     inbounds += [self.parseInbound(jsonParams: val)]
                 }
                 self.v2ray.inbounds = inbounds
@@ -646,7 +697,8 @@ class V2rayConfig: NSObject {
             // 2. inboundDetour
             if json["inboundDetour"].arrayValue.count > 0 {
                 var inboundDetour: [V2rayInbound] = []
-                json["inboundDetour"].arrayValue.forEach { val in
+                json["inboundDetour"].arrayValue.forEach {
+                    val in
                     inboundDetour += [self.parseInbound(jsonParams: val)]
                 }
                 self.v2ray.inboundDetour = inboundDetour
@@ -662,7 +714,8 @@ class V2rayConfig: NSObject {
             if json["outbounds"].arrayValue.count > 0 {
                 // outbounds
                 var outbounds: [V2rayOutbound] = []
-                json["outbounds"].arrayValue.forEach { val in
+                json["outbounds"].arrayValue.forEach {
+                    val in
                     outbounds += [self.parseOutbound(jsonParams: val)]
                 }
                 self.v2ray.outbounds = outbounds
@@ -682,7 +735,8 @@ class V2rayConfig: NSObject {
             if json["outboundDetour"].arrayValue.count > 0 {
                 var outboundDetour: [V2rayOutbound] = []
 
-                json["outboundDetour"].arrayValue.forEach { val in
+                json["outboundDetour"].arrayValue.forEach {
+                    val in
                     outboundDetour += [self.parseOutbound(jsonParams: val)]
                 }
 
@@ -918,7 +972,8 @@ class V2rayConfig: NSObject {
                 var settingShadowsocks = V2rayOutboundShadowsocks()
                 var servers: [V2rayOutboundShadowsockServer] = []
                 // servers
-                jsonParams["settings"]["servers"].arrayValue.forEach { val in
+                jsonParams["settings"]["servers"].arrayValue.forEach {
+                    val in
                     var server = V2rayOutboundShadowsockServer()
                     server.port = val["port"].intValue
                     server.email = val["email"].stringValue
@@ -947,7 +1002,8 @@ class V2rayConfig: NSObject {
                 settingSocks.servers[0].port = jsonParams["settings"]["port"].stringValue
 
                 var users: [V2rayOutboundSockUser] = []
-                jsonParams["settings"]["users"].arrayValue.forEach { val in
+                jsonParams["settings"]["users"].arrayValue.forEach {
+                    val in
                     var user = V2rayOutboundSockUser()
                     user.user = val["user"].stringValue
                     user.pass = val["pass"].stringValue
@@ -965,14 +1021,16 @@ class V2rayConfig: NSObject {
                 var settingVMess = V2rayOutboundVMess()
                 var vnext: [V2rayOutboundVMessItem] = []
 
-                jsonParams["settings"]["vnext"].arrayValue.forEach { val in
+                jsonParams["settings"]["vnext"].arrayValue.forEach {
+                    val in
                     var item = V2rayOutboundVMessItem()
 
                     item.address = val["address"].stringValue
                     item.port = val["port"].intValue
 
                     var users: [V2rayOutboundVMessUser] = []
-                    val["users"].arrayValue.forEach { val in
+                    val["users"].arrayValue.forEach {
+                        val in
                         var user = V2rayOutboundVMessUser()
                         user.id = val["id"].stringValue
                         user.alterId = val["alterId"].intValue
