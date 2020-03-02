@@ -485,6 +485,7 @@ class V2rayConfig: NSObject {
             outbound.settingShadowsocks = ss
             break
         case V2rayProtocolOutbound.socks:
+            print("self.serverSocks5", self.serverSocks5)
             outbound.settingSocks = self.serverSocks5
             break
         default:
@@ -549,7 +550,7 @@ class V2rayConfig: NSObject {
                 self.error = "missing socks.address";
                 return
             }
-            if self.serverSocks5.servers[0].port.count == 0 {
+            if self.serverSocks5.servers[0].port == 0 {
                 self.error = "missing socks.port";
                 return
             }
@@ -562,10 +563,6 @@ class V2rayConfig: NSObject {
         // check stream setting
         switch self.streamNetwork {
         case V2rayStreamSettings.network.h2.rawValue:
-            if self.streamH2.path.count == 0 {
-//                self.error = "missing streamSettings.httpSettings.path";
-//                return
-            }
             break
         case V2rayStreamSettings.network.ws.rawValue:
             break
@@ -999,20 +996,31 @@ class V2rayConfig: NSObject {
 
             case .socks:
                 var settingSocks = V2rayOutboundSocks()
-                settingSocks.servers[0].address = jsonParams["settings"]["address"].stringValue
-                settingSocks.servers[0].port = jsonParams["settings"]["port"].stringValue
+                var servers: [V2rayOutboundSockServer] = []
 
-                var users: [V2rayOutboundSockUser] = []
-                jsonParams["settings"]["users"].arrayValue.forEach {
+                jsonParams["settings"]["servers"].arrayValue.forEach {
                     val in
-                    var user = V2rayOutboundSockUser()
-                    user.user = val["user"].stringValue
-                    user.pass = val["pass"].stringValue
-                    user.level = val["level"].intValue
+                    var server = V2rayOutboundSockServer()
+                    server.port = val["port"].intValue
+                    server.address = val["address"].stringValue
+
+                    var users: [V2rayOutboundSockUser] = []
+                    val["users"].arrayValue.forEach {
+                        val in
+                        var user = V2rayOutboundSockUser()
+                        user.user = val["user"].stringValue
+                        user.pass = val["pass"].stringValue
+                        user.level = val["level"].intValue
+                        // append
+                        users.append(user)
+                    }
+
+                    server.users = users
                     // append
-                    users.append(user)
+                    servers.append(server)
                 }
-                settingSocks.servers[0].users = users
+
+                settingSocks.servers = servers
 
                 // set into outbound
                 v2rayOutbound.settingSocks = settingSocks

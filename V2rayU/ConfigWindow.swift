@@ -112,7 +112,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
         }
-        
         self.shadowsockMethod.removeAllItems()
         self.shadowsockMethod.addItems(withTitles: V2rayOutboundShadowsockMethod)
 
@@ -206,7 +205,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig = V2rayConfig()
 
         defer {
-            if self.configText.string.count > 0 && v2rayConfig.isValid {
+            if self.configText.string.count > 0 {
                 self.bindDataToView()
             }
         }
@@ -241,17 +240,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     // export data to V2rayConfig
     func exportData() {
-        // ========================== base start =======================
-        // base
-//        v2rayConfig.httpPort = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
-//        v2rayConfig.socksPort = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
-//        v2rayConfig.enableUdp = self.enableUdp.state.rawValue > 0
-//        v2rayConfig.enableMux = self.enableMux.state.rawValue > 0
-//        v2rayConfig.dns = self.dnsServers.stringValue
-//        v2rayConfig.mux = Int(self.muxConcurrent.intValue)
-//        v2rayConfig.isNewVersion = self.version4.state.rawValue > 0
-        // ========================== base end =======================
-
         // ========================== server start =======================
         if self.switchProtocol.indexOfSelectedItem >= 0 {
             v2rayConfig.serverProtocol = self.switchProtocol.titleOfSelectedItem!
@@ -279,7 +267,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // socks5
         v2rayConfig.serverSocks5.servers[0].address = self.socks5Addr.stringValue
-        v2rayConfig.serverSocks5.servers[0].port = self.socks5Port.stringValue
+        v2rayConfig.serverSocks5.servers[0].port = Int(self.socks5Port.intValue)
 
         var sockUser = V2rayOutboundSockUser()
         sockUser.user = self.socks5User.stringValue
@@ -373,12 +361,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // socks5
         self.socks5Addr.stringValue = v2rayConfig.serverSocks5.servers[0].address
-        self.socks5Port.stringValue = v2rayConfig.serverSocks5.servers[0].port
+        self.socks5Port.stringValue = String(v2rayConfig.serverSocks5.servers[0].port)
         if v2rayConfig.serverSocks5.servers[0].users.count > 0 {
             self.socks5User.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].user
             self.socks5Pass.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].pass
         }
-
         // ========================== server end =======================
 
         // ========================== stream start =======================
@@ -578,7 +565,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func goStreamHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
             return
@@ -703,17 +690,17 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-      _ = menuController.showDock(state: false)
+        _ = menuController.showDock(state: false)
     }
 
     @IBAction func goAdvanceSetting(_ sender: Any) {
         preferencesWindowController.show(preferencePane: .advanceTab)
     }
-    
+
     @IBAction func goSubscribeSetting(_ sender: Any) {
         preferencesWindowController.show(preferencePane: .subscribeTab)
     }
-    
+
     @IBAction func goRoutingRuleSetting(_ sender: Any) {
         preferencesWindowController.show(preferencePane: .routingTab)
     }

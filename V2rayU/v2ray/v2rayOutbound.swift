@@ -188,7 +188,7 @@ struct V2rayOutboundSocks: Codable {
 
 struct V2rayOutboundSockServer: Codable {
     var address: String = ""
-    var port: String = ""
+    var port: Int = 0
     var users: [V2rayOutboundSockUser] = [V2rayOutboundSockUser()]
 }
 
