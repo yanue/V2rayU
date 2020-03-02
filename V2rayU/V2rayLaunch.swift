@@ -230,7 +230,7 @@ class V2rayLaunch: NSObject {
 
     static func checkPort(host: String, port: String, tip: String) -> Bool {
         // shell("/bin/bash",["-c","cd ~ && ls -la"])
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ./V2rayUPort -h " + host + " -p " + port])
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ./V2rayUHelper -cmd port -h " + host + " -p " + port])
         if res != "ok" {
             makeToast(message: tip + " error:    " + (res ?? ""), displayDuration: 5)
             return false

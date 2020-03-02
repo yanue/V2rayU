@@ -93,7 +93,7 @@
                         <action selector="openPreferencePac:" target="hcZ-V7-Dui" id="q2a-9U-SCe"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Ping Speed..." id="Ow7-xo-xhV">
+                <menuItem title="Ping Speed..." tag="1" id="Ow7-xo-xhV">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="pingSpeed:" target="hcZ-V7-Dui" id="S0e-Q3-a8R"/>

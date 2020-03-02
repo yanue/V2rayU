@@ -23,6 +23,7 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
     @IBOutlet weak var autoCheckVersion: NSButtonCell!
     @IBOutlet weak var autoClearLog: NSButtonCell!
     @IBOutlet weak var autoUpdateServers: NSButtonCell!
+    @IBOutlet weak var autoSelectFastestServer: NSButtonCell!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,6 +65,10 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
         UserDefaults.setBool(forKey: .autoUpdateServers, value: sender.state == .on)
     }
     
+    @IBAction func SetAutoSelectFastestServer(_ sender: NSButton) {
+        UserDefaults.setBool(forKey: .autoSelectFastestServer, value: sender.state == .on)
+    }
+    
     @IBAction func goFeedback(_ sender: NSButton) {
         guard let url = URL(string: "https://github.com/yanue/v2rayu/issues") else {
             return
@@ -75,12 +80,5 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
         // need set SUFeedURL into plist
         V2rayUpdater.checkForUpdates(sender)
     }
-    
-    @IBAction func openLogs(_ sender: NSButton) {
-        V2rayLaunch.OpenLogs()
-    }
-    
-    @IBAction func clearLogs(_ sender: NSButton) {
-        V2rayLaunch.ClearLogs()
-    }
+
 }

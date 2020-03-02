@@ -31,6 +31,8 @@ extension UserDefaults {
         case autoClearLog
         // auto update servers
         case autoUpdateServers
+        // auto select Fastest server
+        case autoSelectFastestServer
         // pac|manual|global
         case runMode
         // use rules
@@ -242,88 +244,6 @@ extension FileManager {
     }
 }
 
-func checkTcpPortForListen(port: in_port_t) -> (Bool, descr: String) {
-
-    let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
-    if socketFileDescriptor == -1 {
-        return (false, "SocketCreationFailed, \(descrOfPortError())")
-    }
-
-    var addr = sockaddr_in()
-    let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
-    addr.sin_len = __uint8_t(sizeOfSockAddr)
-    addr.sin_family = sa_family_t(AF_INET)
-    addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
-    addr.sin_addr = in_addr(s_addr: inet_addr("0.0.0.0"))
-    addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
-    var bind_addr = sockaddr()
-    memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
-
-    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
-        let details = descrOfPortError()
-        releaseTcpPort(socket: socketFileDescriptor)
-        return (false, "\(port), BindFailed, \(details)")
-    }
-    if listen(socketFileDescriptor, SOMAXCONN) == -1 {
-        let details = descrOfPortError()
-        releaseTcpPort(socket: socketFileDescriptor)
-        return (false, "\(port), ListenFailed, \(details)")
-    }
-    releaseTcpPort(socket: socketFileDescriptor)
-    return (true, "\(port) is free for use")
-}
-
-func releaseTcpPort(socket: Int32) {
-    Darwin.shutdown(socket, SHUT_RDWR)
-    close(socket)
-}
-
-func descrOfPortError() -> String {
-    return String.init(cString: (UnsafePointer(strerror(errno))))
-}
-
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
-}
-
-func shell(_ args: String...) -> String {
-    let task = Process()
-    task.launchPath = "/usr/bin/env"
-    task.arguments = args
-
-    let pipe = Pipe()
-    task.standardOutput = pipe
-
-    task.launch()
-    task.waitUntilExit()
-
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let output = String(data: data, encoding: String.Encoding.utf8)
-
-    return output ?? ""
-}
-
-func isPortOpen(port: in_port_t) -> Bool {
-    let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
-    if socketFileDescriptor == -1 {
-        return false
-    }
-
-    var addr = sockaddr_in()
-    let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
-    addr.sin_len = __uint8_t(sizeOfSockAddr)
-    addr.sin_family = sa_family_t(AF_INET)
-    addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
-    addr.sin_addr = in_addr(s_addr: inet_addr("0.0.0.0"))
-    addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
-    var bind_addr = sockaddr()
-    memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
-
-    if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
-        return false
-    }
-    if listen(socketFileDescriptor, SOMAXCONN) == -1 {
-        return false
-    }
-    return true
 }

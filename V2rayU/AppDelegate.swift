@@ -101,6 +101,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .autoUpdateServers) == nil {
             UserDefaults.setBool(forKey: .autoUpdateServers, value: true)
         }
+        if UserDefaults.get(forKey: .autoSelectFastestServer) == nil {
+            UserDefaults.setBool(forKey: .autoSelectFastestServer, value: false)
+        }
         if UserDefaults.get(forKey: .autoLaunch) == nil {
             SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
             UserDefaults.setBool(forKey: .autoLaunch, value: true)
@@ -141,7 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2raySubSync().sync()
         }
         // ping
-        menuController.pingAtLaunch()
+        PingSpeed().pingAll()
     }
 
     @objc func onSleepNote(note: NSNotification) {

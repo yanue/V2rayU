@@ -35,7 +35,7 @@
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
-		66C5B199240C1EF7008A22CA /* V2rayUPort in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66C5B198240C1EEE008A22CA /* V2rayUPort */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66C5B19A240D3476008A22CA /* V2rayUHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
 		66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F3029922AA9C0900FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
@@ -88,7 +88,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66C5B199240C1EF7008A22CA /* V2rayUPort in CopyFiles */,
+				66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */,
 				66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -179,7 +179,7 @@
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
 		66C5B197240C17F2008A22CA /* main.go */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.go; sourceTree = "<group>"; };
-		66C5B198240C1EEE008A22CA /* V2rayUPort */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUPort; sourceTree = "<group>"; };
+		66C5B19A240D3476008A22CA /* V2rayUHelper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUHelper; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ping.swift; sourceTree = "<group>"; };
 		66F3029922AA9C0900FCA4E2 /* V2rayUTool */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUTool; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -357,7 +357,7 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				66C5B198240C1EEE008A22CA /* V2rayUPort */,
+				66C5B19A240D3476008A22CA /* V2rayUHelper */,
 				66F3029922AA9C0900FCA4E2 /* V2rayUTool */,
 				664FC05321A70C4300048FE3 /* build.plist */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
