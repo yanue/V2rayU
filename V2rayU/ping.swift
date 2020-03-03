@@ -37,7 +37,23 @@ class PingSpeed: NSObject {
         self.pingServers = []
 
         let normalTitle = menuController.statusMenu.item(withTag: 1)?.title ?? "Ping Speed..."
-        menuController.statusMenu.item(withTag: 1)?.title = "\(normalTitle) - In Testing"
+        let langStr = Locale.current.languageCode
+        var pingTip: String = ""
+        if UserDefaults.getBool(forKey: .autoSelectFastestServer) {
+            if langStr == "en" {
+                pingTip = "Ping Speed - In Testing(Choose fastest server)"
+            } else {
+                pingTip = "Ping Speed - 测试中(选择最快服务器)"
+            }
+        } else {
+            if langStr == "en" {
+                pingTip = "Ping Speed - In Testing "
+            } else {
+                pingTip = "Ping Speed - 测试中"
+            }
+        }
+        menuController.statusMenu.item(withTag: 1)?.title = pingTip
+
 
         let queue = DispatchQueue.global()
         queue.async {
@@ -52,13 +68,25 @@ class PingSpeed: NSObject {
                 // refresh servers
                 // reload
                 V2rayServer.loadConfig()
+
+                // if auto select fastest server
+                if UserDefaults.getBool(forKey: .autoSelectFastestServer) && fastV2rayName.count > 0 {
+                    if V2rayServer.getIndex(name: fastV2rayName) > -1 {
+                        // set current
+                        UserDefaults.set(forKey: .v2rayCurrentServerName, value: fastV2rayName)
+                        // stop first
+                        V2rayLaunch.Stop()
+                        // start
+                        menuController.startV2rayCore()
+                    }
+                }
+
                 // refresh server
                 menuController.showServers()
                 // reload config
                 if menuController.configWindow != nil {
                     menuController.configWindow.serversTableView.reloadData()
                 }
-
                 inPing = false
             }
         }
@@ -105,16 +133,16 @@ class PingSpeed: NSObject {
     }
 
     func parsePingResult() {
-        let jsonText = try? String(contentsOfFile: pingJsonFilePath, encoding: String.Encoding.utf8) ?? ""
-        guard var json = try? JSON(data: jsonText!.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
+        let jsonText = try? String(contentsOfFile: pingJsonFilePath, encoding: String.Encoding.utf8)
+        guard let json = try? JSON(data: (jsonText ?? "").data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
             return
         }
 
         var pingResHash: Dictionary<String, String> = [:]
         if json.arrayValue.count > 0 {
             for val in json.arrayValue {
-                var name = val["name"].stringValue
-                var ping = val["ping"].stringValue
+                let name = val["name"].stringValue
+                let ping = val["ping"].stringValue
                 pingResHash[name] = ping
             }
         }
