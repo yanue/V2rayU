@@ -1,0 +1,12 @@
+
+/* Class = "NSButtonCell"; title = "save"; ObjectID = "6OV-Jq-2Ue"; */
+"6OV-Jq-2Ue.title" = "保存";
+
+/* Class = "NSTextFieldCell"; title = "V2ray Dns Json Text:"; ObjectID = "W0g-B7-neT"; */
+"W0g-B7-neT.title" = "v2ray.dns节点json文本:";
+
+/* Class = "NSButtonCell"; title = "view config"; ObjectID = "gZe-Sc-nCs"; */
+"gZe-Sc-nCs.title" = "查看配置";
+
+/* Class = "NSTextFieldCell"; title = "* Please input v2ray DnsObject  json text"; ObjectID = "yfy-JP-THq"; */
+"yfy-JP-THq.title" = "* 请输入v2ray DnsObject节点json格式文本";

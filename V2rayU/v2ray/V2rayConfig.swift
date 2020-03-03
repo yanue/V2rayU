@@ -16,14 +16,21 @@ let jsSourceFormatConfig =
          * V2ray Config Format
          * @return {string}
          */
-        var V2rayConfigFormat = function (encodeStr) {
-            var deStr = decodeURIComponent(encodeStr);
-            if (!deStr) {
+        var V2rayConfigFormat = function (encodeV2rayStr, encodeDnsStr) {
+            var deV2rayStr = decodeURIComponent(encodeV2rayStr);
+            if (!deV2rayStr) {
                 return "error: cannot decode uri"
             }
 
+            var dns = {};
             try {
-                var obj = JSON.parse(deStr);
+                dns = JSON.parse(decodeURIComponent(encodeDnsStr));
+            } catch (e) {
+                console.log("error", e);
+            }
+
+            try {
+                var obj = JSON.parse(deV2rayStr);
                 if (!obj) {
                     return "error: cannot parse json"
                 }
@@ -38,14 +45,37 @@ let jsSourceFormatConfig =
                 v2rayConfig["outbound"] = obj.outbound;
                 v2rayConfig["outboundDetour"] = obj.outboundDetour;
                 v2rayConfig["api"] = obj.api;
-                v2rayConfig["dns"] = obj.dns;
+                v2rayConfig["dns"] = dns;
                 v2rayConfig["stats"] = obj.stats;
                 v2rayConfig["routing"] = obj.routing;
                 v2rayConfig["policy"] = obj.policy;
                 v2rayConfig["reverse"] = obj.reverse;
                 v2rayConfig["transport"] = obj.transport;
-                
+
                 return JSON.stringify(v2rayConfig, null, 2);
+            } catch (e) {
+                console.log("error", e);
+                return "error: " + e.toString()
+            }
+        };
+
+
+        /**
+         * json beauty Format
+         * @return {string}
+         */
+        var JsonBeautyFormat = function (en64Str) {
+            var deStr = decodeURIComponent(en64Str);
+            if (!deStr) {
+                return "error: cannot decode uri"
+            }
+            try {
+                var obj = JSON.parse(deStr);
+                if (!obj) {
+                    return "error: cannot parse json"
+                }
+
+                return JSON.stringify(obj, null, 2);
             } catch (e) {
                 console.log("error", e);
                 return "error: " + e.toString()
@@ -81,7 +111,7 @@ class V2rayConfig: NSObject {
     var enableMux = false
     var enableSniffing = false
     var mux = 8
-    var dns = ""
+    var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson) ?? ""
 
     // server
     var serverProtocol = V2rayProtocolOutbound.vmess.rawValue
@@ -130,7 +160,6 @@ class V2rayConfig: NSObject {
         self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         self.socksHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
 
-        self.dns = UserDefaults.get(forKey: .dnsServers) ?? ""
         self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
 
         self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
@@ -162,9 +191,10 @@ class V2rayConfig: NSObject {
         if let context = JSContext() {
             context.evaluateScript(jsSourceFormatConfig)
             // call js func
-            if let formatFunction = context.objectForKeyedSubscript("V2rayConfigFormat"),
-               let escapedString = jsonStr.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-                if let result = formatFunction.call(withArguments: [escapedString]) {
+            if let formatFunction = context.objectForKeyedSubscript("V2rayConfigFormat") {
+                let escapedV2String = jsonStr.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+                let escapedDnsString = self.dnsJson.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+                if let result = formatFunction.call(withArguments: [escapedV2String as Any, escapedDnsString as Any]) {
                     // error occurred with prefix "error:"
                     if let reStr = result.toString(), reStr.count > 0 {
                         if !reStr.hasPrefix("error:") {
@@ -184,9 +214,7 @@ class V2rayConfig: NSObject {
     func combineManualData() {
         // base
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
-        if self.dns.count > 0 {
-            self.v2ray.dns.servers = self.dns.components(separatedBy: ",")
-        }
+
         // ------------------------------------- inbound start ---------------------------------------------
         var inHttp = V2rayInbound()
         inHttp.port = self.httpPort

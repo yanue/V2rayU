@@ -28,6 +28,7 @@
 		664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664EB390216CA9E800B6AE0D /* ConfigWindow.swift */; };
 		6650AAAD21771E11000909D8 /* unzip.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6650AAAC21771E11000909D8 /* unzip.sh */; };
 		6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6650AAAF21774A72000909D8 /* V2rayLaunch.swift */; };
+		6662C20B240EA782000AF6CD /* PreferenceDns.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6662C209240EA782000AF6CD /* PreferenceDns.xib */; };
 		667029CA21AF8E7A0079EF41 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 667029C921AF8E7A0079EF41 /* Sparkle.framework */; };
 		667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667029D121AFB86E0079EF41 /* QrcodeWindow.xib */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
@@ -55,6 +56,7 @@
 		6D6DF93B58B654D86ACC490E /* PreferenceAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */; };
 		6D6DF95B4749491F1D600B05 /* PreferenceAdvance.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */; };
 		6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */; };
+		6D6DFC1D9432F2A60D2156E2 /* PreferenceDns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */; };
 		6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */; };
 		6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
@@ -140,7 +142,6 @@
 		66193A7B23EC5F1400289B6A /* Shortcut.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66193A8523EE45B200289B6A /* PreferenceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceRouting.swift; sourceTree = "<group>"; };
 		66193A8823EE46BC00289B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceRouting.xib; sourceTree = SOURCE_ROOT; };
-		66193A9123EF1EF200289B6A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceRouting.strings; sourceTree = "<group>"; };
 		66193A9323EF1EF600289B6A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceRouting.strings"; sourceTree = "<group>"; };
 		66193A9523EF1EFA00289B6A /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceRouting.strings"; sourceTree = "<group>"; };
 		66406AF32183320000B56041 /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
@@ -158,6 +159,9 @@
 		6650AAAF21774A72000909D8 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		6653C20422E0A2B700754D66 /* publish.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = publish.sh; sourceTree = "<group>"; };
 		665DC9BA22A542F90062337B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		6662C20A240EA782000AF6CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceDns.xib; sourceTree = SOURCE_ROOT; };
+		6662C20C240EA794000AF6CD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
+		6662C20D240EA797000AF6CD /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		667029C921AF8E7A0079EF41 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.21.0/Sparkle.framework"; sourceTree = "<group>"; };
 		667029CF21AFB5730079EF41 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
@@ -211,6 +215,7 @@
 		6D6DFD730D8572B1FCAB1FFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceSubscribe.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		6D6DFE1CDFAD9828F2FDE1A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAdvance.xib; sourceTree = SOURCE_ROOT; };
+		6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceDns.swift; sourceTree = "<group>"; };
 		6D6DFFB0110E2442FC8337A5 /* format.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = format.js; sourceTree = "<group>"; };
 		6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
 		8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
@@ -377,12 +382,14 @@
 				6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */,
 				6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */,
 				66193A8523EE45B200289B6A /* PreferenceRouting.swift */,
+				6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */,
 				6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */,
 				6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */,
 				6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */,
 				6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */,
 				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */,
 				66193A8723EE46BC00289B6A /* PreferenceRouting.xib */,
+				6662C209240EA782000AF6CD /* PreferenceDns.xib */,
 			);
 			path = preference;
 			sourceTree = "<group>";
@@ -574,6 +581,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */,
+				6662C20B240EA782000AF6CD /* PreferenceDns.xib in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
@@ -682,6 +690,7 @@
 				6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */,
 				66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */,
 				6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */,
+				6D6DFC1D9432F2A60D2156E2 /* PreferenceDns.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,7 +734,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				66193A8823EE46BC00289B6A /* Base */,
-				66193A9123EF1EF200289B6A /* en */,
 				66193A9323EF1EF600289B6A /* zh-Hans */,
 				66193A9523EF1EFA00289B6A /* zh-HK */,
 			);
@@ -740,6 +748,16 @@
 				669A73A7233776B800807CF9 /* zh-HK */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		6662C209240EA782000AF6CD /* PreferenceDns.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6662C20A240EA782000AF6CD /* Base */,
+				6662C20C240EA794000AF6CD /* zh-Hans */,
+				6662C20D240EA797000AF6CD /* zh-HK */,
+			);
+			name = PreferenceDns.xib;
 			sourceTree = "<group>";
 		};
 		667029D121AFB86E0079EF41 /* QrcodeWindow.xib */ = {

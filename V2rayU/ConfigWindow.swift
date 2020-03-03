@@ -332,7 +332,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.enableUdp.intValue = v2rayConfig.enableUdp ? 1 : 0
         self.enableMux.intValue = v2rayConfig.enableMux ? 1 : 0
         self.muxConcurrent.intValue = Int32(v2rayConfig.mux)
-        self.dnsServers.title = v2rayConfig.dns
         self.version4.intValue = v2rayConfig.isNewVersion ? 1 : 0
         // ========================== base end =======================
 

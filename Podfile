@@ -15,7 +15,7 @@ target 'V2rayU' do
   pod 'Sparkle'
   pod 'QRCoder'
   pod 'MASShortcut'
-  pod 'Swifter', '~> 1.4.7'
+  pod 'Swifter'
 
 
 end

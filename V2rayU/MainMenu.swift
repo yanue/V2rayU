@@ -20,6 +20,7 @@ extension PreferencePane.Identifier {
     static let subscribeTab = Identifier("subscribeTab")
     static let pacTab = Identifier("pacTab")
     static let routingTab = Identifier("routingTab")
+    static let dnsTab = Identifier("dnsTab")
     static let aboutTab = Identifier("aboutTab")
 }
 
@@ -30,6 +31,7 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceSubscribeViewController(),
             PreferencePacViewController(),
             PreferenceRoutingViewController(),
+            PreferenceDnsViewController(),
             PreferenceAboutViewController(),
         ]
 )
@@ -556,7 +558,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
     @IBAction func viewConfig(_ sender: Any) {
         let confUrl = PACUrl.replacingOccurrences(of: "pac/proxy.js", with: "config.json")
-        print("view config json ", PACUrl)
         guard let url = URL(string: confUrl) else {
             return
         }

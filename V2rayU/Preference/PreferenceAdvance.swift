@@ -27,7 +27,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
 
     @IBOutlet weak var muxConcurrent: NSTextField!
     @IBOutlet weak var logLevel: NSPopUpButton!
-    @IBOutlet weak var dnsServers: NSTextField!
     @IBOutlet weak var tips: NSTextField!
 
     override var nibName: NSNib.Name? {
@@ -49,7 +48,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         let localHttpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
         let localHttpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
         let localPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
-        let dnsServers = UserDefaults.get(forKey: .dnsServers) ?? ""
         let muxConcurrent = UserDefaults.get(forKey: .muxConcurrent) ?? "8"
 
         // select item
@@ -64,7 +62,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         self.httpPort.stringValue = localHttpPort
         self.httpHost.stringValue = localHttpHost
         self.pacPort.stringValue = localPacPort
-        self.dnsServers.stringValue = dnsServers
         self.muxConcurrent.intValue = Int32(muxConcurrent) ?? 8;
     }
 
@@ -83,7 +80,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         let enableMuxVal = self.enableMux.state.rawValue > 0
         let enableSniffingVal = self.enableSniffing.state.rawValue > 0
 
-        let dnsServersVal = self.dnsServers.stringValue
         let muxConcurrentVal = self.muxConcurrent.intValue
 
         if httpPortVal == sockPortVal || httpPortVal == pacPortVal || sockPortVal == pacPortVal {
@@ -106,7 +102,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         UserDefaults.set(forKey: .localSockPort, value: sockPortVal)
         UserDefaults.set(forKey: .localSockHost, value: self.sockHost.stringValue)
         UserDefaults.set(forKey: .localPacPort, value: pacPortVal)
-        UserDefaults.set(forKey: .dnsServers, value: dnsServersVal)
         UserDefaults.set(forKey: .muxConcurrent, value: String(muxConcurrentVal))
         print("self.sockHost.stringValue", self.sockHost.stringValue)
 
@@ -122,7 +117,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         v2rayConfig.socksPort = sockPortVal
         v2rayConfig.enableUdp = enableUdpVal
         v2rayConfig.enableMux = enableMuxVal
-        v2rayConfig.dns = dnsServersVal
         v2rayConfig.mux = Int(muxConcurrentVal)
         v2rayConfig.logLevel = logLevelName
 

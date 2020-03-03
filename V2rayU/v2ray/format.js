@@ -1,10 +1,10 @@
-var str = '{"routing":{"settings":{"domainStrategy":"IPIfNonMatch","rules":[{"outboundTag":"direct","type":"field","ip":["geoip:cn","geoip:private"],"domain":["geosite:cn","geosite:speedtest"]}]}},"inbound":{"listen":"127.0.0.1","protocol":"http","settings":null,"tag":"","port":"1088"},"outbound":{"tag":"proxy","protocol":"vmess","settings":{"vnext":[{"address":"ssl.miwukeji.net","users":[{"id":"29f1ae2e-e29d-d804-7bcd-e01b5dfcf26a","alterId":64,"level":0,"security":""}],"port":"443"}]}},"dns":{"servers":["8.8.8.8","1.1.1.1","119.29.29.29","114.114.114.114"]},"log":{"error":"","loglevel":"info","access":""},"transport":{}}'
+var str = '{"routing":{"settings":{"domainStrategy":"IPIfNonMatch","rules":[{"outboundTag":"direct","type":"field","ip":["geoip:cn","geoip:private"],"domain":["geosite:cn","geosite:speedtest"]}]}},"inbound":{"listen":"127.0.0.1","protocol":"http","settings":null,"tag":"","port":"1088"},"outbound":{"tag":"proxy","protocol":"vmess","settings":{"vnext":[{"address":"ssl.miwukeji.net","users":[{"id":"29f1ae2e-e29d-d804-7bcd-e01b5dfcf26a","alterId":64,"level":0,"security":""}],"port":"443"}]}},"dns":{},"log":{"error":"","loglevel":"info","access":""},"transport":{}}'
 
 /**
  * V2ray Config Format
  * @return {string}
  */
-var V2rayConfigFormat = function (encodeStr) {
+var V2rayConfigFormat = function (encodeStr, encodeDns) {
     var deStr = decodeURIComponent(encodeStr);
     if (!deStr) {
         return "error: cannot decode uri"
@@ -45,3 +45,25 @@ console.log("encode", en);
 
 var a = V2rayConfigFormat(en);
 console.log("res", a);
+
+/**
+ * json beauty Format
+ * @return {string}
+ */
+var JsonBeautyFormat = function (en64Str) {
+    var deStr = decodeURIComponent(en64Str);
+    if (!deStr) {
+        return "error: cannot decode uri"
+    }
+    try {
+        var obj = JSON.parse(deStr);
+        if (!obj) {
+            return "error: cannot parse json"
+        }
+
+        return JSON.stringify(obj, null, 2);
+    } catch (e) {
+        console.log("error", e);
+        return "error: " + e.toString()
+    }
+};
