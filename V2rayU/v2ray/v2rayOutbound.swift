@@ -16,6 +16,7 @@ enum V2rayProtocolOutbound: String, Codable {
     case socks
     case vmess
     case dns
+    case http
 }
 
 struct V2rayOutbound: Codable {
@@ -32,6 +33,7 @@ struct V2rayOutbound: Codable {
     var settingSocks: V2rayOutboundSocks?
     var settingVMess: V2rayOutboundVMess?
     var settingDns: V2rayOutboundDns?
+    var settingHttp: V2rayOutboundHttp?
 
     enum CodingKeys: String, CodingKey {
         case sendThrough
@@ -91,6 +93,8 @@ extension V2rayOutbound {
         case .dns:
             settingDns = try container.decode(V2rayOutboundDns.self, forKey: CodingKeys.settings)
             break
+        case .http:
+            settingHttp = try container.decode(V2rayOutboundHttp.self, forKey: CodingKeys.settings)
         }
     }
 
@@ -138,6 +142,9 @@ extension V2rayOutbound {
             break
         case .dns:
             try container.encode(self.settingDns, forKey: .settings)
+            break
+        case .http:
+            try container.encode(self.settingHttp, forKey: .settings)
             break
         }
     }
@@ -222,4 +229,19 @@ struct V2rayOutboundDns: Codable {
     var network: String = "" // "tcp" | "udp" | ""
     var address: String = ""
     var port: Int?
+}
+
+struct V2rayOutboundHttp: Codable {
+    var servers: [V2rayOutboundHttpServer] = [V2rayOutboundHttpServer()]
+}
+
+struct V2rayOutboundHttpServer: Codable {
+    var address: String = ""
+    var port: Int = 0
+    var users: [V2rayOutboundHttpUser] = [V2rayOutboundHttpUser()]
+}
+
+struct V2rayOutboundHttpUser: Codable {
+    var user: String = ""
+    var pass: String = ""
 }

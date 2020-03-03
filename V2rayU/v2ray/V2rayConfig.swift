@@ -994,6 +994,38 @@ class V2rayConfig: NSObject {
                 v2rayOutbound.settingDns = settingDns
                 break
 
+            case .http:
+                var settingHttp = V2rayOutboundHttp()
+                var servers: [V2rayOutboundHttpServer] = []
+
+                jsonParams["settings"]["servers"].arrayValue.forEach {
+                    val in
+                    var server = V2rayOutboundHttpServer()
+                    server.port = val["port"].intValue
+                    server.address = val["address"].stringValue
+
+                    var users: [V2rayOutboundHttpUser] = []
+                    val["users"].arrayValue.forEach {
+                        val in
+                        var user = V2rayOutboundHttpUser()
+                        user.user = val["user"].stringValue
+                        user.pass = val["pass"].stringValue
+                        // append
+                        users.append(user)
+                    }
+
+                    server.users = users
+                    // append
+                    servers.append(server)
+                }
+
+                settingHttp.servers = servers
+
+                // set into outbound
+                v2rayOutbound.settingHttp = settingHttp
+
+                break
+
             case .shadowsocks:
                 var settingShadowsocks = V2rayOutboundShadowsocks()
                 var servers: [V2rayOutboundShadowsockServer] = []
