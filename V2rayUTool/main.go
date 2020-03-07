@@ -70,20 +70,14 @@ func main() {
 }
 
 func checkPort() {
-	if len(host) == 0 || len(port) == 0 {
-		flag.Usage()
-		os.Exit(1)
-		return
-	}
-
 	_, err := net.Listen("tcp", host+":"+port)
 	if err != nil {
-		flag.Usage()
-		os.Exit(2)
+		fmt.Println(err.Error())
 		return
 	}
 
 	fmt.Println("ok")
+	return
 }
 
 type Server struct {

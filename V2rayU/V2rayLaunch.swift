@@ -230,49 +230,15 @@ class V2rayLaunch: NSObject {
 
     static func checkPort(host: String, port: String, tip: String) -> Bool {
         // shell("/bin/bash",["-c","cd ~ && ls -la"])
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && ./V2rayUHelper -cmd port -h " + host + " -p " + port])
+        let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd port -h " + host + " -p " + port
+        let res = shell(launchPath: "/bin/bash", arguments: ["-c", cmd])
+        
+        NSLog("checkPort: res=(\(String(describing: res))) cmd=(\(cmd))")
+
         if res != "ok" {
-            makeToast(message: tip + " error:    " + (res ?? ""), displayDuration: 5)
+            makeToast(message: tip + " error - " + (res ?? ""), displayDuration: 5)
             return false
         }
         return true
-    }
-
-    static func checkTcpPort(port: in_port_t) -> (Bool, descr: String) {
-        let socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0)
-        if socketFileDescriptor == -1 {
-            return (false, "SocketCreationFailed, \(V2rayLaunch.descrOfPortError())")
-        }
-        var addr = sockaddr_in()
-        let sizeOfSockAddr = MemoryLayout<sockaddr_in>.size
-        addr.sin_len = __uint8_t(sizeOfSockAddr)
-        addr.sin_family = sa_family_t(AF_INET)
-        addr.sin_port = Int(OSHostByteOrder()) == OSLittleEndian ? _OSSwapInt16(port) : port
-        addr.sin_addr = in_addr(s_addr: inet_addr("127.0.0.1"))
-        addr.sin_zero = (0, 0, 0, 0, 0, 0, 0, 0)
-        var bind_addr = sockaddr()
-        memcpy(&bind_addr, &addr, Int(sizeOfSockAddr))
-
-        if Darwin.bind(socketFileDescriptor, &bind_addr, socklen_t(sizeOfSockAddr)) == -1 {
-            let details = descrOfPortError()
-            release(socket: socketFileDescriptor)
-            return (false, "\(port), BindFailed, \(details)")
-        }
-        if listen(socketFileDescriptor, SOMAXCONN) == -1 {
-            let details = descrOfPortError()
-            release(socket: socketFileDescriptor)
-            return (false, "\(port), ListenFailed, \(details)")
-        }
-        release(socket: socketFileDescriptor)
-        return (true, "\(port) is free for use")
-    }
-
-    static func release(socket: Int32) {
-        Darwin.shutdown(socket, SHUT_RDWR)
-        close(socket)
-    }
-
-    static func descrOfPortError() -> String {
-        return String.init(cString: (UnsafePointer(strerror(errno))))
     }
 }

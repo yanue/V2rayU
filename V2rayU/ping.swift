@@ -125,6 +125,9 @@ class PingSpeed: NSObject {
         let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
 //        print("cmd", cmd)
         let res = shell(launchPath: "/bin/bash", arguments: ["-c", cmd])
+        
+        NSLog("pingInCmd: res=(\(String(describing: res))) cmd=(\(cmd))")
+
         if res?.contains("ok") ?? false {
             // res is: ok config.xxxx
             fastV2rayName = res!.replacingOccurrences(of: "ok ", with: "")

@@ -1168,7 +1168,7 @@ class V2rayConfig: NSObject {
         }
 
         if (V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue) == nil) {
-            self.errors += ["invalid " + preTxt + ".streamSettings.security"]
+            self.streamTlsSecurity = V2rayStreamSettings.security.none.rawValue
         } else {
             // set security
             stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
