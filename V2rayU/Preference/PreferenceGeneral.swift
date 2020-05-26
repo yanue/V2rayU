@@ -21,7 +21,6 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     @IBOutlet weak var autoLaunch: NSButtonCell!
     @IBOutlet weak var autoCheckVersion: NSButtonCell!
-    @IBOutlet weak var autoClearLog: NSButtonCell!
     @IBOutlet weak var autoUpdateServers: NSButtonCell!
     @IBOutlet weak var autoSelectFastestServer: NSButtonCell!
 
@@ -35,9 +34,6 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             autoCheckVersion.state = .on
-        }
-        if UserDefaults.getBool(forKey: .autoClearLog) {
-            autoClearLog.state = .on
         }
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             autoUpdateServers.state = .on
@@ -54,10 +50,6 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     @IBAction func SetAutoCheckVersion(_ sender: NSButtonCell) {
         UserDefaults.setBool(forKey: .autoCheckVersion, value: sender.state == .on)
-    }
-
-    @IBAction func SetAutoClearLogs(_ sender: NSButtonCell) {
-        UserDefaults.setBool(forKey: .autoClearLog, value: sender.state == .on)
     }
 
     @IBAction func SetAutoUpdateServers(_ sender: NSButtonCell) {

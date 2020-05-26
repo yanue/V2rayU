@@ -53,15 +53,42 @@ class PingSpeed: NSObject {
             }
         }
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
+    
+        
+//        Ping.ping("www.baidu.com", withTimeout: 5.0, completionBlock: { (timeElapsed:Double?, error:Error?) in
+//            print("Ping.ping completionBlock")
+//            if let latency = timeElapsed {
+//                print("latency (ms): \(latency)")
+//            }
+//            if let error = error {
+//                print("error: \(error.localizedDescription)")
+//            }
+//        })
+//
+//        let p = Pinger.init(host: "www.baidu.com", callback: self.call(_:_:_:))
+//        p.start()
+        
+//        let queue = DispatchQueue.global()
+        let queue = DispatchQueue(label: "pinger")
 
-
-        let queue = DispatchQueue.global()
         queue.async {
 
-            self.writeServerToFile()
-            self.pingInCmd()
-            self.parsePingResult()
-
+//            self.writeServerToFile()
+//            self.pingInCmd()
+//            self.parsePingResult()
+            
+            let itemList = V2rayServer.list()
+            if itemList.count == 0 {
+                return
+            }
+            
+            for item in itemList {
+                if !item.isValid {
+                    continue
+                }
+                self.pingEachServer(item:item)
+            }
+            
             DispatchQueue.main.async {
                 menuController.statusMenu.item(withTag: 1)?.title = "\(normalTitle)"
 
@@ -90,6 +117,31 @@ class PingSpeed: NSObject {
                 inPing = false
             }
         }
+    }
+
+    func pingEachServer(item: V2rayItem) {
+        let host = self.parseHost(item: item)
+        guard let _ = NSURL(string: host) else {
+            print("not host",host)
+            return
+        }
+        
+        // Ping once
+        let once = SwiftyPing(host: host, configuration: PingConfiguration(interval: 0.5, with: 5), queue: DispatchQueue.global())
+        once?.observer = { (_, response) in
+            let duration = response.duration
+            if response.error != nil {
+                print("ping error",host,response.error as Any)
+            } else {
+
+            }
+            item.speed = String(format: "%.2f", duration*1000)+"ms"
+            item.store()
+            // refresh server
+            menuController.showServers()
+            once?.stop()
+        }
+        once?.start()
     }
 
     func writeServerToFile() {
@@ -125,7 +177,7 @@ class PingSpeed: NSObject {
         let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
 //        print("cmd", cmd)
         let res = shell(launchPath: "/bin/bash", arguments: ["-c", cmd])
-        
+
         NSLog("pingInCmd: res=(\(String(describing: res))) cmd=(\(cmd))")
 
         if res?.contains("ok") ?? false {
@@ -190,3 +242,4 @@ class PingSpeed: NSObject {
         return host
     }
 }
+

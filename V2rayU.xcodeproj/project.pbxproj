@@ -19,7 +19,6 @@
 		6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 664EB378216C9A5F00B6AE0D /* MainMenu.xib */; };
 		6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6618372823E9BF1A000F7410 /* ToastWindow.swift */; };
 		6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6618372C23E9BF73000F7410 /* ToastWindow.xib */; };
-		66193A7C23EC5F1500289B6A /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66193A7B23EC5F1400289B6A /* Shortcut.m */; };
 		66193A8623EE45B200289B6A /* PreferenceRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66193A8523EE45B200289B6A /* PreferenceRouting.swift */; };
 		66193A8923EE46BC00289B6A /* PreferenceRouting.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66193A8723EE46BC00289B6A /* PreferenceRouting.xib */; };
 		66406AF42183320000B56041 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66406AF32183320000B56041 /* Sample.swift */; };
@@ -33,8 +32,10 @@
 		667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667029D121AFB86E0079EF41 /* QrcodeWindow.xib */; };
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
+		669312932413FC5E00C043F8 /* SwiftyPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669312922413FC5E00C043F8 /* SwiftyPing.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
+		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
 		66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66C5B19A240D3476008A22CA /* V2rayUHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
@@ -45,9 +46,7 @@
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */; };
-		6D6DF426E93AA9929183CE26 /* appdmg.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF927AC79EEF7378C192A /* appdmg.json */; };
 		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */; };
-		6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF8F5112A8407EE959998 /* .gitignore */; };
 		6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */; };
 		6D6DF6F065067CD879201FF9 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Scanner.swift */; };
 		6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */; };
@@ -137,9 +136,6 @@
 		66107B8922DEE445002FFB60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6618372823E9BF1A000F7410 /* ToastWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
 		6618372D23E9BF73000F7410 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ToastWindow.xib; sourceTree = "<group>"; };
-		6618373D23EB03EC000F7410 /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
-		66193A7A23EC5EFA00289B6A /* Shortcut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shortcut.h; sourceTree = "<group>"; };
-		66193A7B23EC5F1400289B6A /* Shortcut.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66193A8523EE45B200289B6A /* PreferenceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceRouting.swift; sourceTree = "<group>"; };
 		66193A8823EE46BC00289B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceRouting.xib; sourceTree = SOURCE_ROOT; };
 		66193A9323EF1EF600289B6A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceRouting.strings"; sourceTree = "<group>"; };
@@ -168,6 +164,7 @@
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
+		669312922413FC5E00C043F8 /* SwiftyPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftyPing.swift; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		669A73A7233776B800807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		669A73A8233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
@@ -180,6 +177,9 @@
 		669A73AF233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		66AD532E241496FE0070529C /* Shortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shortcut.h; sourceTree = "<group>"; };
+		66AD5330241496FF0070529C /* Shortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
+		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
 		66C5B197240C17F2008A22CA /* main.go */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.go; sourceTree = "<group>"; };
@@ -301,6 +301,7 @@
 		664EB368216C9A5E00B6AE0D = {
 			isa = PBXGroup;
 			children = (
+				66AD532D241496EF0070529C /* Common */,
 				6683B1EA21C2AD1A004A1C5F /* pac */,
 				667029CF21AFB5730079EF41 /* v2ray-core */,
 				66FEAD44217D75D7009DECF9 /* Build */,
@@ -329,6 +330,7 @@
 		664EB373216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				669312912413E3A000C043F8 /* trojan */,
 				66F07CF8236D79540088A4AE /* ping.swift */,
 				66F411B421CA8921007AAC10 /* cmd.sh */,
 				6608D9B82182BBAC00A0E0DD /* v2ray */,
@@ -352,11 +354,26 @@
 				6618372823E9BF1A000F7410 /* ToastWindow.swift */,
 				6618372C23E9BF73000F7410 /* ToastWindow.xib */,
 				66107B8822DEDBE4002FFB60 /* Localizable.strings */,
-				66193A7A23EC5EFA00289B6A /* Shortcut.h */,
-				66193A7B23EC5F1400289B6A /* Shortcut.m */,
-				6618373D23EB03EC000F7410 /* V2rayU-Bridging-header.h */,
 			);
 			path = V2rayU;
+			sourceTree = "<group>";
+		};
+		669312912413E3A000C043F8 /* trojan */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = trojan;
+			sourceTree = "<group>";
+		};
+		66AD532D241496EF0070529C /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				669312922413FC5E00C043F8 /* SwiftyPing.swift */,
+				66AD532E241496FE0070529C /* Shortcut.h */,
+				66AD5330241496FF0070529C /* Shortcut.m */,
+				66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */,
+			);
+			name = Common;
 			sourceTree = "<group>";
 		};
 		66FEAD44217D75D7009DECF9 /* Build */ = {
@@ -589,14 +606,12 @@
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */,
-				6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */,
 				6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */,
 				6D6DF95B4749491F1D600B05 /* PreferenceAdvance.strings in Resources */,
 				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */,
 				6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */,
 				66193A8923EE46BC00289B6A /* PreferenceRouting.xib in Resources */,
 				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */,
-				6D6DF426E93AA9929183CE26 /* appdmg.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -669,14 +684,15 @@
 				664EB375216C9A5E00B6AE0D /* AppDelegate.swift in Sources */,
 				6650AAB021774A72000909D8 /* V2rayLaunch.swift in Sources */,
 				66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */,
+				66AD5335241497000070529C /* Shortcut.m in Sources */,
 				6608D9E22182C9C100A0E0DD /* v2rayStream.swift in Sources */,
 				66784AFC2170486D00AD307F /* Util.swift in Sources */,
 				660D0E5A216E0158000C2922 /* V2rayServer.swift in Sources */,
 				6608D9DC2182C6D200A0E0DD /* v2rayInbound.swift in Sources */,
 				6608D9DE2182C92D00A0E0DD /* v2rayOutbound.swift in Sources */,
 				6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */,
-				66193A7C23EC5F1500289B6A /* Shortcut.m in Sources */,
 				6608D9DA2182C69D00A0E0DD /* v2rayStruct.swift in Sources */,
+				669312932413FC5E00C043F8 /* SwiftyPing.swift in Sources */,
 				66F07CF9236D79540088A4AE /* ping.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */,
 				66784B0021704E1300AD307F /* V2rayCore.swift in Sources */,
@@ -1057,17 +1073,19 @@
 				CURRENT_PROJECT_VERSION = 1.5.0;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 2.1.0;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "V2rayU/V2rayU-Bridging-header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Common/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};
@@ -1085,17 +1103,19 @@
 				CURRENT_PROJECT_VERSION = 1.5.0;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 2.1.0;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "V2rayU/V2rayU-Bridging-header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Common/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
 			};

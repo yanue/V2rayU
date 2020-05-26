@@ -10,7 +10,6 @@
         <customObject id="-2" userLabel="File's Owner" customClass="PreferenceGeneralViewController" customModule="V2rayU" customModuleProvider="target">
             <connections>
                 <outlet property="autoCheckVersion" destination="m2S-Mu-rFM" id="GQD-EA-vJj"/>
-                <outlet property="autoClearLog" destination="hIN-yp-Qul" id="Iib-Re-pDz"/>
                 <outlet property="autoLaunch" destination="NZE-cI-j04" id="ktV-ps-tl4"/>
                 <outlet property="autoSelectFastestServer" destination="Kbp-GI-fkh" id="9YM-i1-pvY"/>
                 <outlet property="autoUpdateServers" destination="1FR-Yu-tqb" id="5TK-uS-ear"/>
@@ -23,7 +22,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VO1-gl-rxy" userLabel="update servers">
-                    <rect key="frame" x="62" y="245" width="315" height="18"/>
+                    <rect key="frame" x="62" y="257" width="315" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Automatically update servers from subscriptions" bezelStyle="regularSquare" imagePosition="left" inset="2" id="1FR-Yu-tqb">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -34,24 +33,13 @@
                     </buttonCell>
                 </button>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tgw-Vy-D08" userLabel="check version">
-                    <rect key="frame" x="62" y="291" width="218" height="18"/>
+                    <rect key="frame" x="62" y="286" width="218" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Check for updates automutically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m2S-Mu-rFM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                         <connections>
                             <action selector="SetAutoCheckVersion:" target="-2" id="4Ig-pP-her"/>
-                        </connections>
-                    </buttonCell>
-                </button>
-                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59o-dL-xSh" userLabel="clear log">
-                    <rect key="frame" x="62" y="268" width="261" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Automatically clear logs after launching" bezelStyle="regularSquare" imagePosition="left" inset="2" id="hIN-yp-Qul">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                        <connections>
-                            <action selector="SetAutoClearLogs:" target="-2" id="gGD-G8-Feq"/>
                         </connections>
                     </buttonCell>
                 </button>
@@ -67,21 +55,21 @@
                     </buttonCell>
                 </button>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Elj-N8-4IK" customClass="MASShortcutView">
-                    <rect key="frame" x="247" y="169" width="139" height="19"/>
+                    <rect key="frame" x="247" y="172" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="associatedUserDefaultsKey" value="SwitchProxyMode"/>
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ti4-xg-ncf" customClass="MASShortcutView">
-                    <rect key="frame" x="247" y="192" width="139" height="19"/>
+                    <rect key="frame" x="247" y="195" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="associatedUserDefaultsKey" value="ToggleRunning"/>
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UhI-5l-Ytp">
-                    <rect key="frame" x="64" y="170" width="174" height="17"/>
+                    <rect key="frame" x="64" y="173" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Switch Proxy Mode:" id="Eu4-bo-oYs">
                         <font key="font" metaFont="system"/>
@@ -90,7 +78,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vtN-0c-sip">
-                    <rect key="frame" x="64" y="193" width="174" height="17"/>
+                    <rect key="frame" x="64" y="196" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Toggle V2ray On/Off:" id="0rn-re-Wn3">
                         <font key="font" metaFont="system"/>
@@ -110,7 +98,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2M9-7e-aJI">
-                    <rect key="frame" x="64" y="59" width="324" height="78"/>
+                    <rect key="frame" x="64" y="63" width="324" height="78"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" selectable="YES" borderStyle="border" drawsBackground="YES" id="vHZ-BS-uFb">
                         <font key="font" size="12" name="HelveticaNeue"/>
@@ -123,7 +111,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IRP-lJ-E8h">
-                    <rect key="frame" x="64" y="141" width="174" height="17"/>
+                    <rect key="frame" x="64" y="145" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Related file locations:" id="Oke-cL-DfS">
                         <font key="font" metaFont="system"/>
@@ -143,7 +131,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oUQ-Ax-ZJE" userLabel="update servers">
-                    <rect key="frame" x="62" y="222" width="341" height="18"/>
+                    <rect key="frame" x="62" y="230" width="341" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Automatically select the fastest server by ping" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Kbp-GI-fkh">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

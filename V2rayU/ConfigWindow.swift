@@ -43,6 +43,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var VmessView: NSView!
     @IBOutlet weak var ShadowsocksView: NSView!
     @IBOutlet weak var SocksView: NSView!
+    @IBOutlet weak var TrojanView: NSView!
 
     // vmess
     @IBOutlet weak var vmessAddr: NSTextField!
@@ -63,6 +64,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var socks5Port: NSTextField!
     @IBOutlet weak var socks5User: NSTextField!
     @IBOutlet weak var socks5Pass: NSTextField!
+
+    // for trojan
+    @IBOutlet weak var trojanAddr: NSTextField!
+    @IBOutlet weak var trojanPort: NSTextField!
+    @IBOutlet weak var trojanPass: NSTextField!
+    @IBOutlet weak var trojanAlpn: NSTextField!
 
     @IBOutlet weak var networkView: NSView!
 
@@ -617,8 +624,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         case "socks":
             self.SocksView.isHidden = false
             break;
+        case "trojan":
+            self.TrojanView.isHidden = false
+            break;
         default: // vmess
-            self.SocksView.isHidden = true
+            self.VmessView.isHidden = true
             break
         }
     }
