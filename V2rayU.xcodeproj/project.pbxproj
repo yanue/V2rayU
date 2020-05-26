@@ -36,11 +36,9 @@
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
-		66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66C5B19A240D3476008A22CA /* V2rayUHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
 		66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F3029922AA9C0900FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
-		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
@@ -59,6 +57,7 @@
 		6D6DFC1D9432F2A60D2156E2 /* PreferenceDns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */; };
 		6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF5D99F2FBB7B53564B3B /* PreferenceAbout.strings */; };
 		6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */; };
+		902A6C60247D4F0900E964E4 /* V2rayUHelper in Resources */ = {isa = PBXBuildFile; fileRef = 902A6C5F247D4F0900E964E4 /* V2rayUHelper */; };
 		F260898E336CFA5EAB07ADC9 /* Pods_V2rayU.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */; };
 /* End PBXBuildFile section */
 
@@ -90,7 +89,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */,
 				66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -110,7 +108,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */,
 				66F411B121CA49EE007AAC10 /* pac in Copy Files */,
 			);
 			name = "Copy Files";
@@ -120,7 +117,7 @@
 
 /* Begin PBXFileReference section */
 		230294B5D1C5B1E0D311F3E2 /* libPods-V2rayUTool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-V2rayUTool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		29B27CD97A6B24986CAF0BFD /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
+		50168E150C5B0F1BCBE147AA /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
 		6604E43921798F2900E54AE1 /* V2rayULauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayULauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6604E43B21798F2A00E54AE1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6604E44221798F2A00E54AE1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -163,7 +160,6 @@
 		6662C20C240EA794000AF6CD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		6662C20D240EA797000AF6CD /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		667029C921AF8E7A0079EF41 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.21.0/Sparkle.framework"; sourceTree = "<group>"; };
-		667029CF21AFB5730079EF41 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
@@ -183,7 +179,6 @@
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
 		66C5B197240C17F2008A22CA /* main.go */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.go; sourceTree = "<group>"; };
-		66C5B19A240D3476008A22CA /* V2rayUHelper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUHelper; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ping.swift; sourceTree = "<group>"; };
 		66F3029922AA9C0900FCA4E2 /* V2rayUTool */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUTool; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -218,7 +213,8 @@
 		6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceDns.swift; sourceTree = "<group>"; };
 		6D6DFFB0110E2442FC8337A5 /* format.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = format.js; sourceTree = "<group>"; };
 		6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceGeneral.swift; sourceTree = "<group>"; };
-		8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.debug.xcconfig"; path = "Pods/Target Support Files/Pods-V2rayU/Pods-V2rayU.debug.xcconfig"; sourceTree = "<group>"; };
+		902A6C5F247D4F0900E964E4 /* V2rayUHelper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUHelper; sourceTree = "<group>"; };
+		E91474B6C04BAB16F470688C /* Pods-V2rayU.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-V2rayU.release.xcconfig"; path = "Target Support Files/Pods-V2rayU/Pods-V2rayU.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -302,16 +298,15 @@
 			isa = PBXGroup;
 			children = (
 				6683B1EA21C2AD1A004A1C5F /* pac */,
-				667029CF21AFB5730079EF41 /* v2ray-core */,
 				66FEAD44217D75D7009DECF9 /* Build */,
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
 				660C8CA02181CBAA00896361 /* V2rayUTests */,
 				6604E43A21798F2A00E54AE1 /* V2rayULauncher */,
 				6646669121CBC0860094F0B7 /* V2rayUTool */,
 				664EB372216C9A5E00B6AE0D /* Products */,
-				A10EFB32D901F1862C489D12 /* Pods */,
 				956412AC8DEB3D3D182A5D49 /* Frameworks */,
 				6D6DF8F5112A8407EE959998 /* .gitignore */,
+				EEDD8C4DCBE7DC2BFA6F09E3 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -362,7 +357,7 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				66C5B19A240D3476008A22CA /* V2rayUHelper */,
+				902A6C5F247D4F0900E964E4 /* V2rayUHelper */,
 				66F3029922AA9C0900FCA4E2 /* V2rayUTool */,
 				664FC05321A70C4300048FE3 /* build.plist */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
@@ -418,13 +413,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		A10EFB32D901F1862C489D12 /* Pods */ = {
+		EEDD8C4DCBE7DC2BFA6F09E3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */,
-				29B27CD97A6B24986CAF0BFD /* Pods-V2rayU.release.xcconfig */,
+				50168E150C5B0F1BCBE147AA /* Pods-V2rayU.debug.xcconfig */,
+				E91474B6C04BAB16F470688C /* Pods-V2rayU.release.xcconfig */,
 			);
-			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -587,6 +582,7 @@
 				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
 				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
+				902A6C60247D4F0900E964E4 /* V2rayUHelper in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */,
 				6D6DF5F67A917F78FF652D45 /* .gitignore in Resources */,
@@ -839,10 +835,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -861,10 +857,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -882,10 +878,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayUTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -904,10 +900,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayUTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1047,16 +1043,16 @@
 		};
 		664EB380216C9A5F00B6AE0D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8E15DFCD449143CCC309A1A0 /* Pods-V2rayU.debug.xcconfig */;
+			baseConfigurationReference = 50168E150C5B0F1BCBE147AA /* Pods-V2rayU.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1.5.0;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1075,16 +1071,16 @@
 		};
 		664EB381216C9A5F00B6AE0D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 29B27CD97A6B24986CAF0BFD /* Pods-V2rayU.release.xcconfig */;
+			baseConfigurationReference = E91474B6C04BAB16F470688C /* Pods-V2rayU.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1.5.0;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1104,9 +1100,9 @@
 		66F302BB22AAA95000FCA4E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1116,9 +1112,9 @@
 		66F302BC22AAA95000FCA4E2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = 5PYBGZXB6L;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
