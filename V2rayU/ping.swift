@@ -14,6 +14,7 @@ var fastV2rayName = ""
 var fastV2raySpeed = 5
 let pingJsonFileName = "ping.json"
 let pingJsonFilePath = AppResourcesPath + "/" + pingJsonFileName
+//var task:Process?
 
 struct pingItem: Codable {
     var name: String = ""
@@ -54,21 +55,13 @@ class PingSpeed: NSObject {
         }
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
 
-
-//        Ping.ping("www.baidu.com", withTimeout: 5.0, completionBlock: { (timeElapsed:Double?, error:Error?) in
-//            print("Ping.ping completionBlock")
-//            if let latency = timeElapsed {
-//                print("latency (ms): \(latency)")
-//            }
-//            if let error = error {
-//                print("error: \(error.localizedDescription)")
-//            }
-//        })
-//
-//        let p = Pinger.init(host: "www.baidu.com", callback: self.call(_:_:_:))
-//        p.start()
-
 //        let queue = DispatchQueue.global()
+//        let queueInterval = DispatchQueue.global(qos: .userInitiated)
+//        let interval = DispatchWorkItem{
+//            print("ping terminate")
+//            task?.interrupt()
+//            task?.terminate()
+//        }
         let queue = DispatchQueue(label: "pinger")
 
         queue.async {
@@ -76,6 +69,9 @@ class PingSpeed: NSObject {
 //            self.writeServerToFile()
 //            self.pingInCmd()
 //            self.parsePingResult()
+
+//            print("ping finish")
+//            interval.cancel()
 
             let itemList = V2rayServer.list()
             if itemList.count == 0 {
@@ -178,15 +174,15 @@ class PingSpeed: NSObject {
 
     func pingInCmd() {
         let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
-//        print("cmd", cmd)
-        let res = shell(launchPath: "/bin/bash", arguments: ["-c", cmd])
+        //        print("cmd", cmd)
+        let res = runShell(launchPath: "/bin/bash", arguments: ["-c", cmd])
 
         NSLog("pingInCmd: res=(\(String(describing: res))) cmd=(\(cmd))")
 
-        if res?.contains("ok") ?? false {
+        // 这里直接判断ok有问题，res里面还有lookup
+        if res?.contains("ok config.") ?? false {
             // res is: ok config.xxxx
             fastV2rayName = res!.replacingOccurrences(of: "ok ", with: "")
-            return
         }
     }
 
@@ -244,5 +240,25 @@ class PingSpeed: NSObject {
 
         return host
     }
-}
 
+    func runShell(launchPath: String, arguments: [String]) -> String? {
+        task = Process()
+        task?.launchPath = launchPath
+        task?.arguments = arguments
+
+        let pipe = Pipe()
+        task?.standardOutput = pipe
+        task?.launch()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: String.Encoding.utf8)!
+
+        if output.count > 0 {
+            //remove newline character.
+            let lastIndex = output.index(before: output.endIndex)
+            return String(output[output.startIndex..<lastIndex])
+        }
+
+        return output
+    }
+}

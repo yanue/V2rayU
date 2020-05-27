@@ -16,6 +16,5 @@ target 'V2rayU' do
   pod 'QRCoder'
   pod 'MASShortcut'
   pod 'Swifter'
-  pod '\-----'
-  
+
 end
