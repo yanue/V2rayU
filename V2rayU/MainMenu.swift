@@ -491,12 +491,6 @@ class MenuController: NSObject, NSMenuDelegate {
             return
         }
 
-        // pac mode
-        if runMode == .pac {
-            // generate pac file
-            _ = GeneratePACFile(rewrite: false)
-        }
-
         V2rayLaunch.setSystemProxy(mode: runMode)
     }
 

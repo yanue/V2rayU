@@ -17,7 +17,6 @@ let LAUNCH_HTTP_PLIST = "yanue.v2rayu.http.plist" // simple http server
 let logFilePath = NSHomeDirectory() + "/Library/Logs/v2ray-core.log"
 let launchAgentDirPath = NSHomeDirectory() + LAUNCH_AGENT_DIR
 let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_PLIST
-let launchHttpPlistFile = launchAgentDirPath + LAUNCH_HTTP_PLIST
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let v2rayCorePath = AppResourcesPath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
@@ -59,14 +58,6 @@ class V2rayLaunch: NSObject {
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
 
-        // if old launchHttpPlistFile exist
-        if fileMgr.fileExists(atPath: launchHttpPlistFile) {
-            print("launchHttpPlistFile exist", launchHttpPlistFile)
-            _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
-            _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
-            try! fileMgr.removeItem(atPath: launchHttpPlistFile)
-        }
-
         // permission
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ."])
     }
@@ -76,11 +67,8 @@ class V2rayLaunch: NSObject {
         // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
 
-        self.startHttpServer()
-
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
 
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
@@ -93,7 +81,6 @@ class V2rayLaunch: NSObject {
     }
 
     static func Stop() {
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchHttpPlistFile])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
 
@@ -222,9 +209,6 @@ class V2rayLaunch: NSObject {
             return false
         }
 
-        // restart pac http server
-        startHttpServer()
-
         return true
     }
 
@@ -232,7 +216,7 @@ class V2rayLaunch: NSObject {
         // shell("/bin/bash",["-c","cd ~ && ls -la"])
         let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd port -h " + host + " -p " + port
         let res = shell(launchPath: "/bin/bash", arguments: ["-c", cmd])
-        
+
         NSLog("checkPort: res=(\(String(describing: res))) cmd=(\(cmd))")
 
         if res != "ok" {

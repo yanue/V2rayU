@@ -26,12 +26,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // default settings
         self.checkDefault()
 
-        // auto Clear Logs
-        if UserDefaults.getBool(forKey: .autoClearLog) {
-            print("ClearLogs")
-            V2rayLaunch.ClearLogs()
-        }
-
         // auto launch
         if UserDefaults.getBool(forKey: .autoLaunch) {
             // Insert code here to initialize your application
@@ -54,6 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2rayUpdater.checkForUpdatesInBackground()
         }
 
+        _ = GeneratePACFile(rewrite: true)
         // start http server for pac
         V2rayLaunch.startHttpServer()
 
@@ -111,6 +106,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
         }
+        if UserDefaults.get(forKey: .gfwPacFileContent) == nil {
+            let gfwlist = try? String(contentsOfFile: GFWListFilePath, encoding: String.Encoding.utf8)
+            UserDefaults.set(forKey: .gfwPacFileContent, value: gfwlist ?? "")
+        }
         if V2rayServer.count() == 0 {
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
@@ -132,6 +131,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func onWakeNote(note: NSNotification) {
         print("onWakeNote")
+        // reconnect
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            V2rayLaunch.Stop()
+            V2rayLaunch.Start()
+        }
         // check v2ray core
         V2rayCore().check()
         // auto check updates

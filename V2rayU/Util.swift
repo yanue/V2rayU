@@ -40,6 +40,8 @@ extension UserDefaults {
         case runMode
         // use rules
         case userRules
+        // gfw pac file content
+        case gfwPacFileContent
         // gfw pac list url
         case gfwPacListUrl
 

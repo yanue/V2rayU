@@ -53,8 +53,8 @@ class PingSpeed: NSObject {
             }
         }
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
-    
-        
+
+
 //        Ping.ping("www.baidu.com", withTimeout: 5.0, completionBlock: { (timeElapsed:Double?, error:Error?) in
 //            print("Ping.ping completionBlock")
 //            if let latency = timeElapsed {
@@ -67,7 +67,7 @@ class PingSpeed: NSObject {
 //
 //        let p = Pinger.init(host: "www.baidu.com", callback: self.call(_:_:_:))
 //        p.start()
-        
+
 //        let queue = DispatchQueue.global()
         let queue = DispatchQueue(label: "pinger")
 
@@ -76,19 +76,19 @@ class PingSpeed: NSObject {
 //            self.writeServerToFile()
 //            self.pingInCmd()
 //            self.parsePingResult()
-            
+
             let itemList = V2rayServer.list()
             if itemList.count == 0 {
                 return
             }
-            
+
             for item in itemList {
                 if !item.isValid {
                     continue
                 }
-                self.pingEachServer(item:item)
+                self.pingEachServer(item: item)
             }
-            
+
             DispatchQueue.main.async {
                 menuController.statusMenu.item(withTag: 1)?.title = "\(normalTitle)"
 
@@ -101,10 +101,13 @@ class PingSpeed: NSObject {
                     if V2rayServer.getIndex(name: fastV2rayName) > -1 {
                         // set current
                         UserDefaults.set(forKey: .v2rayCurrentServerName, value: fastV2rayName)
-                        // stop first
-                        V2rayLaunch.Stop()
-                        // start
-                        menuController.startV2rayCore()
+                        // if not stop status
+                        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+                            // stop first
+                            V2rayLaunch.Stop()
+                            // start
+                            menuController.startV2rayCore()
+                        }
                     }
                 }
 
@@ -122,20 +125,20 @@ class PingSpeed: NSObject {
     func pingEachServer(item: V2rayItem) {
         let host = self.parseHost(item: item)
         guard let _ = NSURL(string: host) else {
-            print("not host",host)
+            print("not host", host)
             return
         }
-        
+
         // Ping once
         let once = SwiftyPing(host: host, configuration: PingConfiguration(interval: 0.5, with: 5), queue: DispatchQueue.global())
         once?.observer = { (_, response) in
             let duration = response.duration
             if response.error != nil {
-                print("ping error",host,response.error as Any)
+                print("ping error", host, response.error as Any)
             } else {
 
             }
-            item.speed = String(format: "%.2f", duration*1000)+"ms"
+            item.speed = String(format: "%.2f", duration * 1000) + "ms"
             item.store()
             // refresh server
             menuController.showServers()
