@@ -283,6 +283,11 @@ class ImportUri {
         v2ray.streamTlsSecurity = vmess.tls
         v2ray.streamTlsServerName = vmess.tlsServer
 
+        // tls servername for h2 or ws
+        if vmess.tlsServer.count == 0 && (vmess.network == V2rayStreamSettings.network.h2.rawValue || vmess.network == V2rayStreamSettings.network.ws.rawValue) {
+            v2ray.streamTlsServerName = vmess.netHost
+        }
+
         // kcp
         v2ray.streamKcp.header.type = vmess.type
         v2ray.streamKcp.uplinkCapacity = vmess.uplinkCapacity

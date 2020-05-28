@@ -478,7 +478,8 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // set icon
         setStatusOn(runMode: runMode)
-
+        // launch
+        V2rayLaunch.Start()
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first

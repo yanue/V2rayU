@@ -63,10 +63,13 @@ class V2rayLaunch: NSObject {
     }
 
     static func Start() {
+        // start http server
+        startHttpServer()
+        
         // permission: make v2ray execable
         // ~/LaunchAgents/yanue.v2rayu.v2ray-core.plist
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./v2ray-core"])
-
+        
         // unload first
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["unload", launchAgentPlistFile])
@@ -81,6 +84,9 @@ class V2rayLaunch: NSObject {
     }
 
     static func Stop() {
+        // stop pac server
+        webServer.stop()
+        
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.v2ray-core"])
         _ = shell(launchPath: "/bin/launchctl", arguments: ["remove", "yanue.v2rayu.http.plist"])
 

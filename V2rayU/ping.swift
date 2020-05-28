@@ -14,7 +14,7 @@ var fastV2rayName = ""
 var fastV2raySpeed = 5
 let pingJsonFileName = "ping.json"
 let pingJsonFilePath = AppResourcesPath + "/" + pingJsonFileName
-//var task:Process?
+var task:Process?
 
 struct pingItem: Codable {
     var name: String = ""
