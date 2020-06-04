@@ -71,10 +71,9 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
     }
 
     func saveSettingsAndReload() {
-
-        let httpPortVal = self.httpPort.stringValue.replacingOccurrences(of: ",", with: "")
-        let sockPortVal = self.sockPort.stringValue.replacingOccurrences(of: ",", with: "")
-        let pacPortVal = self.pacPort.stringValue.replacingOccurrences(of: ",", with: "")
+        let httpPortVal = String(self.httpPort.intValue)
+        let sockPortVal = String(self.sockPort.intValue)
+        let pacPortVal = String(self.pacPort.intValue)
 
         let enableUdpVal = self.enableUdp.state.rawValue > 0
         let enableMuxVal = self.enableMux.state.rawValue > 0
