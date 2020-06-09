@@ -279,7 +279,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         var sockUser = V2rayOutboundSockUser()
         sockUser.user = self.socks5User.stringValue
         sockUser.pass = self.socks5Pass.stringValue
-        v2rayConfig.serverSocks5.servers[0].users = [sockUser]
+        if self.socks5User.stringValue.count > 0 || self.socks5Pass.stringValue.count > 0 {
+            v2rayConfig.serverSocks5.servers[0].users = [sockUser]
+        } else {
+            v2rayConfig.serverSocks5.servers[0].users = nil
+        }
         // ========================== server end =======================
 
         // ========================== stream start =======================
@@ -368,9 +372,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // socks5
         self.socks5Addr.stringValue = v2rayConfig.serverSocks5.servers[0].address
         self.socks5Port.stringValue = String(v2rayConfig.serverSocks5.servers[0].port)
-        if v2rayConfig.serverSocks5.servers[0].users.count > 0 {
-            self.socks5User.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].user
-            self.socks5Pass.stringValue = v2rayConfig.serverSocks5.servers[0].users[0].pass
+        if let users = v2rayConfig.serverSocks5.servers[0].users, users.count > 0 {
+            self.socks5User.stringValue = users[0].user
+            self.socks5Pass.stringValue = users[0].pass
         }
         // ========================== server end =======================
 
