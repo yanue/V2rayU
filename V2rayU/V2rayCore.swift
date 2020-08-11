@@ -11,9 +11,9 @@ import SwiftyJSON
 
 // v2ray-core version check, download, unzip
 class V2rayCore {
-    static let version = "v4.21.3"
+    static let version = "v4.27.0"
     // need replace ${version}
-    var releaseUrl: String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos.zip"
+    var releaseUrl: String = "https://github.com/v2ray/v2ray-core/releases/download/${version}/v2ray-macos-64.zip"
     // lastet release verison info
     let versionUrl: String = "https://api.github.com/repos/v2ray/v2ray-core/releases/latest"
 

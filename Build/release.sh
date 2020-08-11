@@ -179,11 +179,12 @@ function downloadV2ray() {
 }
 
 function createDmgByAppdmg() {
-    umount "/Volumes/${APP_NAME}"
+#    umount "/Volumes/${APP_NAME}"
 
-    rm -rf ${BUILD_DIR}/${APP_NAME}.app ${BUILD_DIR}/${DMG_FINAL}
-    \cp -Rf "${V2rayU_RELEASE}/${APP_NAME}.app" "${BUILD_DIR}/${APP_NAME}.app"
+#    rm -rf ${BUILD_DIR}/${APP_NAME}.app ${BUILD_DIR}/${DMG_FINAL}
+#    \cp -Rf "${V2rayU_RELEASE}/${APP_NAME}.app" "${BUILD_DIR}/${APP_NAME}.app"
 
+    rm -f  ${BUILD_DIR}/${DMG_FINAL}
     # https://github.com/LinusU/node-appdmg
     # npm install -g appdmg
     echo ${BUILD_DIR}/appdmg.json
@@ -192,7 +193,7 @@ function createDmgByAppdmg() {
     # appcast sign update
     ${AppCastDir}/bin/sign_update ${DMG_FINAL}
 
-    umount "/Volumes/${APP_NAME}"
+#    umount "/Volumes/${APP_NAME}"
 }
 
 function makeDmg() {
@@ -211,10 +212,10 @@ function makeDmg() {
     exit;;
     esac
 
-    rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
-    updatePlistVersion
-    downloadV2ray
-    build
+#    rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
+#    updatePlistVersion
+#    downloadV2ray
+#    build
     createDmgByAppdmg
 }
 
