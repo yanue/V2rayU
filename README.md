@@ -76,7 +76,16 @@ v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira
 cd /Applications/V2rayU.app/Contents/Resources/
 ./v2ray-core/v2ray -config ./config.json
 ```
+### 彻底卸载(推荐使用AppCleaner)
+```
+cd ~/Library/LaunchAgents/
+/bin/launchctl remove yanue.v2rayu.v2ray-core
+/bin/launchctl remove yanue.v2rayu.http
 
+rm -f ~/Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
+rm -f ~/Library/Preferences/net.yanue.V2rayU.plist
+rm -f ~/Library/Logs/V2rayU.log
+```
 ### 相关问题
 **1. 闪退**
 
