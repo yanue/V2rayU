@@ -76,7 +76,8 @@ v2ray模板: [https://github.com/KiriKira/vTemplate](https://github.com/KiriKira
 cd /Applications/V2rayU.app/Contents/Resources/
 ./v2ray-core/v2ray -config ./config.json
 ```
-### 彻底卸载(推荐使用AppCleaner)
+### 彻底卸载
+(推荐使用AppCleaner)
 ```
 cd ~/Library/LaunchAgents/
 /bin/launchctl remove yanue.v2rayu.v2ray-core
