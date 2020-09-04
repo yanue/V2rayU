@@ -6,6 +6,11 @@
 #  Created by yanue on 2018/10/17.
 #  Copyright © 2018 yanue. All rights reserved.
 
+if [ ! -f "./v2ray-macos.zip" ]; then
+  echo "文件不存在"
+  exit
+fi
+
 rm -rf ./v2ray-core
 unzip -o ./v2ray-macos.zip -d ./v2ray-core
 
