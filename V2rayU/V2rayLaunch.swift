@@ -175,6 +175,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func checkPorts() -> Bool {
+        return true
         // stop old v2ray process
         self.Stop()
         // stop pac server
