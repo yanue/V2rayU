@@ -227,6 +227,9 @@ class PingSpeed: NSObject {
         if cfg.serverProtocol == V2rayProtocolOutbound.vmess.rawValue {
             host = cfg.serverVmess.address
             port = cfg.serverVmess.port
+        } else if cfg.serverProtocol == V2rayProtocolOutbound.vless.rawValue {
+            host = cfg.serverVless.address
+            port = cfg.serverVless.port
         } else if cfg.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
             host = cfg.serverShadowsocks.address
             port = cfg.serverShadowsocks.port
