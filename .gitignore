@@ -3,5 +3,7 @@ V2rayU.xcodeproj/xcuserdata
 Pods
 V2rayU.xcworkspace/xcuserdata
 Build/v2ray-core
-.DS_Store
+*.DS_Store
 .idea
+*.app
+*.dmg
