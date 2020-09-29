@@ -118,6 +118,7 @@ class V2rayConfig: NSObject {
     var serverVmess = V2rayOutboundVMessItem()
     var serverSocks5 = V2rayOutboundSocks()
     var serverShadowsocks = V2rayOutboundShadowsockServer()
+    var serverVless = V2rayOutboundVLessItem()
 
     // transfor
     var streamNetwork = V2rayStreamSettings.network.tcp.rawValue
@@ -504,6 +505,21 @@ class V2rayConfig: NSObject {
             outbound.mux = mux
 
             break
+        case V2rayProtocolOutbound.vless:
+            var vless = outbound.settingVLess
+            if vless == nil {
+                vless = V2rayOutboundVLess()
+            }
+            vless!.vnext = [self.serverVless]
+            outbound.settingVLess = vless
+            
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+
+            outbound.mux = mux
+
+            break
         case V2rayProtocolOutbound.shadowsocks:
             var ss = outbound.settingShadowsocks
             if ss == nil {
@@ -552,6 +568,27 @@ class V2rayConfig: NSObject {
                 }
             } else {
                 self.error = "missing vmess.users";
+                return
+            }
+            break
+        case V2rayProtocolOutbound.vless.rawValue:
+            if self.serverVless.address.count == 0 {
+                self.error = "missing vmess.address"
+                return
+            }
+            
+            if self.serverVless.port == 0 {
+                self.error = "missing vmess.port"
+                return
+            }
+            
+            if self.serverVless.users.count > 0 {
+                if self.serverVless.users[0].id.count == 0 {
+                    self.error = "missing vless.users[0].id"
+                    return
+                }
+            } else {
+                self.error = "missing vless.users"
                 return
             }
             break
@@ -611,6 +648,17 @@ class V2rayConfig: NSObject {
             outbound.settingVMess = vmess
 
             // enable mux only vmess
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+            outbound.mux = mux
+
+            break
+        case V2rayProtocolOutbound.vless:
+            var vless = V2rayOutboundVLess()
+            vless.vnext = [self.serverVless]
+            outbound.settingVLess = vless
+            
             var mux = V2rayOutboundMux()
             mux.enabled = self.enableMux
             mux.concurrency = self.mux
@@ -684,7 +732,7 @@ class V2rayConfig: NSObject {
 
         self.errors = []
 
-        guard var json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
+        guard let json = try? JSON(data: jsonText.data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
             self.errors += ["invalid json"]
             return
         }
@@ -926,6 +974,39 @@ class V2rayConfig: NSObject {
                 // set into inbound
                 v2rayInbound.settingVMess = settings
                 break
+                
+            case .vless:
+                var settings = V2rayInboundVLess()
+                if jsonParams["settings"]["clients"].dictionaryValue.count > 0 {
+                    var clients: [V2rayInboundVLessClient] = []
+                    for subJson in jsonParams["settings"]["clients"].arrayValue {
+                        var client = V2rayInboundVLessClient()
+                        client.id = subJson["id"].stringValue
+                        client.flow = subJson["flow"].stringValue
+                        client.level = subJson["level"].intValue
+                        client.email = subJson["email"].stringValue
+                        clients.append(client)
+                    }
+                    settings.clients = clients
+                }
+                
+                settings.decryption = jsonParams["settings"]["decryption"].stringValue
+                
+                if jsonParams["settings"]["fallbacks"].dictionaryValue.count > 0 {
+                    var fallbacks: [V2rayInboundVLessFallback] = []
+                    for subJson in jsonParams["settings"]["fallbacks"].arrayValue {
+                        var fallback = V2rayInboundVLessFallback()
+                        fallback.alpn = subJson["alpn"].stringValue
+                        fallback.path = subJson["path"].stringValue
+                        fallback.dest = subJson["dest"].intValue
+                        fallback.xver = subJson["xver"].intValue
+                        fallbacks.append(fallback)
+                    }
+                    settings.fallbacks = fallbacks
+                }
+                
+                v2rayInbound.settingVLess = settings
+                break
             }
         }
 
@@ -1126,6 +1207,40 @@ class V2rayConfig: NSObject {
                 v2rayOutbound.mux = mux
 
                 break
+                
+            case .vless:
+                var settingVLess = V2rayOutboundVLess()
+                var vnext: [V2rayOutboundVLessItem] = []
+                
+                jsonParams["settings"]["vnext"].arrayValue.forEach { val in
+                    var item = V2rayOutboundVLessItem()
+                    
+                    item.address = val["address"].stringValue
+                    item.port = val["port"].intValue
+                    
+                    var users: [V2rayOutboundVLessUser] = []
+                    val["users"].arrayValue.forEach { val in
+                        var user = V2rayOutboundVLessUser()
+                        user.id = val["id"].stringValue
+                        user.flow = val["flow"].stringValue
+                        user.encryption = val["encryption"].stringValue
+                        user.level = val["level"].intValue
+                        users.append(user)
+                    }
+                    item.users = users
+                    vnext.append(item)
+                }
+                
+                settingVLess.vnext = vnext
+                v2rayOutbound.settingVLess = settingVLess
+                
+                var mux = V2rayOutboundMux()
+                mux.enabled = self.enableMux
+                mux.concurrency = self.mux
+                v2rayOutbound.mux = mux
+                
+                break
+                
             }
         }
 
@@ -1135,7 +1250,7 @@ class V2rayConfig: NSObject {
         }
 
         // set main server protocol
-        if !self.foundServerProtocol && [V2rayProtocolOutbound.socks.rawValue, V2rayProtocolOutbound.vmess.rawValue, V2rayProtocolOutbound.shadowsocks.rawValue].contains(v2rayOutbound.protocol.rawValue) {
+        if !self.foundServerProtocol && [V2rayProtocolOutbound.socks.rawValue, V2rayProtocolOutbound.vmess.rawValue, V2rayProtocolOutbound.vless.rawValue, V2rayProtocolOutbound.shadowsocks.rawValue].contains(v2rayOutbound.protocol.rawValue) {
             self.serverProtocol = v2rayOutbound.protocol.rawValue
             self.foundServerProtocol = true
         }
@@ -1146,6 +1261,10 @@ class V2rayConfig: NSObject {
 
         if v2rayOutbound.protocol == V2rayProtocolOutbound.vmess && v2rayOutbound.settingVMess != nil && v2rayOutbound.settingVMess!.vnext.count > 0 {
             self.serverVmess = v2rayOutbound.settingVMess!.vnext[0]
+        }
+        
+        if v2rayOutbound.protocol == V2rayProtocolOutbound.vless && v2rayOutbound.settingVLess != nil && v2rayOutbound.settingVLess!.vnext.count > 0 {
+            self.serverVless = v2rayOutbound.settingVLess!.vnext[0]
         }
 
         if v2rayOutbound.protocol == V2rayProtocolOutbound.shadowsocks && v2rayOutbound.settingShadowsocks != nil && v2rayOutbound.settingShadowsocks!.servers.count > 0 {
