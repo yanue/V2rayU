@@ -106,7 +106,7 @@ class V2rayCore {
             return
         }
 
-        // download file: /Application/V2rayU.app/Contents/Resources/v2ray-macos.zip
+        // download file: /Application/V2rayU.app/Contents/Resources/v2ray-macos-64.zip
         let fileUrl = URL.init(fileURLWithPath: shFile.path.replacingOccurrences(of: "/unzip.sh", with: "/v2ray-macos-64.zip"))
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
             return (fileUrl, [.removePreviousFile, .createIntermediateDirectories])
