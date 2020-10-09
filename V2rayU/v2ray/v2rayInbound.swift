@@ -22,6 +22,7 @@ struct V2rayInbound: Codable {
     var settingSocks: V2rayInboundSocks = V2rayInboundSocks()
     var settingShadowsocks: V2rayInboundShadowsocks?
     var settingVMess: V2rayInboundVMess?
+    var settingVLess: V2rayInboundVLess?
 
     enum CodingKeys: String, CodingKey {
         case port
@@ -67,6 +68,9 @@ extension V2rayInbound {
         case .vmess:
             settingVMess = try container.decode(V2rayInboundVMess.self, forKey: CodingKeys.settings)
             break
+        case .vless:
+            settingVLess = try container.decode(V2rayInboundVLess.self, forKey: CodingKeys.settings)
+            break
         }
     }
 
@@ -104,6 +108,9 @@ extension V2rayInbound {
             break
         case .vmess:
             try container.encode(self.settingVMess, forKey: .settings)
+            break
+        case .vless:
+            try container.encode(self.settingVLess, forKey: .settings)
             break
         }
     }
@@ -188,4 +195,24 @@ struct V2RayInboundVMessDetour: Codable {
 struct V2RayInboundVMessDefault: Codable {
     var level: Int = 0
     var alterId: Int = 64
+}
+
+struct V2rayInboundVLess: Codable {
+    var clients: [V2rayInboundVLessClient]?
+    var decryption: String = "none"
+    var fallbacks: [V2rayInboundVLessFallback]? = [V2rayInboundVLessFallback()]
+}
+
+struct V2rayInboundVLessClient: Codable {
+    var id: String?
+    var flow: String = ""
+    var level: Int = 0
+    var email: String?
+}
+
+struct V2rayInboundVLessFallback: Codable {
+    var alpn: String? = ""
+    var path: String? = ""
+    var dest: Int = 80
+    var xver: Int = 0
 }

@@ -17,6 +17,7 @@ enum V2rayProtocolOutbound: String, Codable {
     case vmess
     case dns
     case http
+    case vless
 }
 
 struct V2rayOutbound: Codable {
@@ -34,6 +35,7 @@ struct V2rayOutbound: Codable {
     var settingVMess: V2rayOutboundVMess?
     var settingDns: V2rayOutboundDns?
     var settingHttp: V2rayOutboundHttp?
+    var settingVLess: V2rayOutboundVLess?
 
     enum CodingKeys: String, CodingKey {
         case sendThrough
@@ -95,6 +97,8 @@ extension V2rayOutbound {
             break
         case .http:
             settingHttp = try container.decode(V2rayOutboundHttp.self, forKey: CodingKeys.settings)
+        case .vless:
+            settingVLess = try container.decode(V2rayOutboundVLess.self, forKey: CodingKeys.settings)
         }
     }
 
@@ -145,6 +149,9 @@ extension V2rayOutbound {
             break
         case .http:
             try container.encode(self.settingHttp, forKey: .settings)
+            break
+        case .vless:
+            try container.encode(self.settingVLess, forKey: .settings)
             break
         }
     }
@@ -244,4 +251,21 @@ struct V2rayOutboundHttpServer: Codable {
 struct V2rayOutboundHttpUser: Codable {
     var user: String = ""
     var pass: String = ""
+}
+
+struct V2rayOutboundVLess: Codable {
+    var vnext: [V2rayOutboundVLessItem] = [V2rayOutboundVLessItem()]
+}
+
+struct V2rayOutboundVLessItem: Codable {
+    var address: String = ""
+    var port: Int = 443
+    var users: [V2rayOutboundVLessUser] = [V2rayOutboundVLessUser()]
+}
+
+struct V2rayOutboundVLessUser: Codable {
+    var id: String = ""
+    var flow: String = ""
+    var encryption: String = "none"
+    var level: Int = 0
 }

@@ -41,6 +41,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBOutlet weak var serverView: NSView!
     @IBOutlet weak var VmessView: NSView!
+    @IBOutlet weak var VlessView: NSView!
     @IBOutlet weak var ShadowsocksView: NSView!
     @IBOutlet weak var SocksView: NSView!
     @IBOutlet weak var TrojanView: NSView!
@@ -52,6 +53,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var vmessLevel: NSTextField!
     @IBOutlet weak var vmessUserId: NSTextField!
     @IBOutlet weak var vmessSecurity: NSPopUpButton!
+    
+    // vless
+    @IBOutlet weak var vlessAddr: NSTextField!
+    @IBOutlet weak var vlessPort: NSTextField!
+    @IBOutlet weak var vlessUserId: NSTextField!
+    @IBOutlet weak var vlessLevel: NSTextField!
 
     // shadowsocks
     @IBOutlet weak var shadowsockAddr: NSTextField!
@@ -263,6 +270,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             user.security = self.vmessSecurity.titleOfSelectedItem!
         }
         v2rayConfig.serverVmess.users[0] = user
+        
+        // vless
+        v2rayConfig.serverVless.address = self.vlessAddr.stringValue
+        v2rayConfig.serverVmess.port = Int(self.vlessPort.intValue)
+        var vless_user = V2rayOutboundVLessUser()
+        vless_user.id = self.vlessUserId.stringValue
+        vless_user.level = Int(self.vlessLevel.intValue)
+        v2rayConfig.serverVless.users[0] = vless_user
 
         // shadowsocks
         v2rayConfig.serverShadowsocks.address = self.shadowsockAddr.stringValue
@@ -359,6 +374,15 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             self.vmessLevel.intValue = Int32(user.level)
             self.vmessUserId.stringValue = user.id
             self.vmessSecurity.selectItem(withTitle: user.security)
+        }
+        
+        // vless
+        self.vlessAddr.stringValue = v2rayConfig.serverVless.address
+        self.vmessPort.intValue = Int32(v2rayConfig.serverVless.port)
+        if v2rayConfig.serverVless.users.count > 0 {
+            let user = v2rayConfig.serverVless.users[0]
+            self.vlessLevel.intValue = Int32(user.level)
+            self.vlessUserId.stringValue = user.id
         }
 
         // shadowsocks
@@ -621,16 +645,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         switch protocolTitle {
         case "vmess":
             self.VmessView.isHidden = false
-            break;
+            break
+        case "vless":
+            self.VlessView.isHidden = false
+            break
         case "shadowsocks":
             self.ShadowsocksView.isHidden = false
-            break;
+            break
         case "socks":
             self.SocksView.isHidden = false
-            break;
+            break
         case "trojan":
             self.TrojanView.isHidden = false
-            break;
+            break
         default: // vmess
             self.VmessView.isHidden = true
             break

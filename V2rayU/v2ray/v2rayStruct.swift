@@ -32,6 +32,7 @@ enum V2rayProtocolInbound: String, CaseIterable, Codable {
     case shadowsocks
     case socks
     case vmess
+    case vless
 }
 
 // log

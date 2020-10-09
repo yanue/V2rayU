@@ -11,7 +11,7 @@ import SwiftyJSON
 
 // v2ray-core version check, download, unzip
 class V2rayCore {
-    static let version = "v4.27.0"
+    static let version = "v4.29.0"
     // need replace ${version}
     var releaseUrl: String = "https://github.com/v2fly/v2ray-core/releases/download/${version}/v2ray-macos-64.zip"
     // lastet release verison info
@@ -95,7 +95,7 @@ class V2rayCore {
     }
 
     func download() {
-        let version = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v4.27.0"
+        let version = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v4.29.0"
         let url = releaseUrl.replacingOccurrences(of: "${version}", with: version)
         NSLog("start download", version)
 
