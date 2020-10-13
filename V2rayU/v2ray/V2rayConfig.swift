@@ -119,6 +119,7 @@ class V2rayConfig: NSObject {
     var serverSocks5 = V2rayOutboundSocks()
     var serverShadowsocks = V2rayOutboundShadowsockServer()
     var serverVless = V2rayOutboundVLessItem()
+    var serverTrojan = V2rayOutboundTrojanServer()
 
     // transfor
     var streamNetwork = V2rayStreamSettings.network.tcp.rawValue
@@ -512,7 +513,7 @@ class V2rayConfig: NSObject {
             }
             vless!.vnext = [self.serverVless]
             outbound.settingVLess = vless
-            
+
             var mux = V2rayOutboundMux()
             mux.enabled = self.enableMux
             mux.concurrency = self.mux
@@ -528,9 +529,18 @@ class V2rayConfig: NSObject {
             ss!.servers = [self.serverShadowsocks]
             outbound.settingShadowsocks = ss
             break
+
         case V2rayProtocolOutbound.socks:
-            print("self.serverSocks5", self.serverSocks5)
             outbound.settingSocks = self.serverSocks5
+            break
+
+        case V2rayProtocolOutbound.trojan:
+            var tro = outbound.settingTrojan
+            if tro == nil {
+                tro = V2rayOutboundTrojan()
+            }
+            tro!.servers = [self.serverTrojan]
+            outbound.settingTrojan = tro
             break
         default:
             break
@@ -576,12 +586,12 @@ class V2rayConfig: NSObject {
                 self.error = "missing vmess.address"
                 return
             }
-            
+
             if self.serverVless.port == 0 {
                 self.error = "missing vmess.port"
                 return
             }
-            
+
             if self.serverVless.users.count > 0 {
                 if self.serverVless.users[0].id.count == 0 {
                     self.error = "missing vless.users[0].id"
@@ -619,6 +629,18 @@ class V2rayConfig: NSObject {
                 self.error = "missing socks.port";
                 return
             }
+            break
+        case V2rayProtocolOutbound.trojan.rawValue:
+            if self.serverTrojan.address.count == 0 {
+                self.error = "missing trojan.address"
+                return
+            }
+
+            if self.serverTrojan.port == 0 {
+                self.error = "missing trojan.port"
+                return
+            }
+
             break
         default:
             self.error = "missing outbound.protocol";
@@ -658,7 +680,7 @@ class V2rayConfig: NSObject {
             var vless = V2rayOutboundVLess()
             vless.vnext = [self.serverVless]
             outbound.settingVLess = vless
-            
+
             var mux = V2rayOutboundMux()
             mux.enabled = self.enableMux
             mux.concurrency = self.mux
@@ -974,7 +996,7 @@ class V2rayConfig: NSObject {
                 // set into inbound
                 v2rayInbound.settingVMess = settings
                 break
-                
+
             case .vless:
                 var settings = V2rayInboundVLess()
                 if jsonParams["settings"]["clients"].dictionaryValue.count > 0 {
@@ -989,9 +1011,9 @@ class V2rayConfig: NSObject {
                     }
                     settings.clients = clients
                 }
-                
+
                 settings.decryption = jsonParams["settings"]["decryption"].stringValue
-                
+
                 if jsonParams["settings"]["fallbacks"].dictionaryValue.count > 0 {
                     var fallbacks: [V2rayInboundVLessFallback] = []
                     for subJson in jsonParams["settings"]["fallbacks"].arrayValue {
@@ -1004,8 +1026,38 @@ class V2rayConfig: NSObject {
                     }
                     settings.fallbacks = fallbacks
                 }
-                
+
                 v2rayInbound.settingVLess = settings
+                break
+
+            case .trojan:
+                var settings = V2rayInboundTrojan()
+                if jsonParams["settings"]["clients"].dictionaryValue.count > 0 {
+                    var clients: [V2rayInboundTrojanClient] = []
+                    for subJson in jsonParams["settings"]["clients"].arrayValue {
+                        var client = V2rayInboundTrojanClient()
+                        client.password = subJson["password"].stringValue
+                        client.level = subJson["level"].intValue
+                        client.email = subJson["email"].stringValue
+                        clients.append(client)
+                    }
+                    settings.clients = clients
+                }
+
+                if jsonParams["settings"]["fallbacks"].dictionaryValue.count > 0 {
+                    var fallbacks: [V2rayInboundTrojanFallback] = []
+                    for subJson in jsonParams["settings"]["fallbacks"].arrayValue {
+                        var fallback = V2rayInboundTrojanFallback()
+                        fallback.alpn = subJson["alpn"].stringValue
+                        fallback.path = subJson["path"].stringValue
+                        fallback.dest = subJson["dest"].intValue
+                        fallback.xver = subJson["xver"].intValue
+                        fallbacks.append(fallback)
+                    }
+                    settings.fallbacks = fallbacks
+                }
+
+                v2rayInbound.settingTrojan = settings
                 break
             }
         }
@@ -1207,17 +1259,17 @@ class V2rayConfig: NSObject {
                 v2rayOutbound.mux = mux
 
                 break
-                
+
             case .vless:
                 var settingVLess = V2rayOutboundVLess()
                 var vnext: [V2rayOutboundVLessItem] = []
-                
+
                 jsonParams["settings"]["vnext"].arrayValue.forEach { val in
                     var item = V2rayOutboundVLessItem()
-                    
+
                     item.address = val["address"].stringValue
                     item.port = val["port"].intValue
-                    
+
                     var users: [V2rayOutboundVLessUser] = []
                     val["users"].arrayValue.forEach { val in
                         var user = V2rayOutboundVLessUser()
@@ -1230,17 +1282,37 @@ class V2rayConfig: NSObject {
                     item.users = users
                     vnext.append(item)
                 }
-                
+
                 settingVLess.vnext = vnext
                 v2rayOutbound.settingVLess = settingVLess
-                
+
                 var mux = V2rayOutboundMux()
                 mux.enabled = self.enableMux
                 mux.concurrency = self.mux
                 v2rayOutbound.mux = mux
-                
+
                 break
-                
+
+            case .trojan:
+                var settingTrojan = V2rayOutboundTrojan()
+                var servers: [V2rayOutboundTrojanServer] = []
+                // servers
+                jsonParams["settings"]["servers"].arrayValue.forEach { val in
+                    var server = V2rayOutboundTrojanServer()
+                    server.address = val["address"].stringValue
+                    server.password = val["password"].stringValue
+                    server.port = val["port"].intValue
+                    server.level = val["level"].intValue
+                    server.email = val["email"].stringValue
+
+                    // append
+                    servers.append(server)
+                }
+                settingTrojan.servers = servers
+                // set into outbound
+                v2rayOutbound.settingTrojan = settingTrojan
+
+                break
             }
         }
 
@@ -1262,7 +1334,7 @@ class V2rayConfig: NSObject {
         if v2rayOutbound.protocol == V2rayProtocolOutbound.vmess && v2rayOutbound.settingVMess != nil && v2rayOutbound.settingVMess!.vnext.count > 0 {
             self.serverVmess = v2rayOutbound.settingVMess!.vnext[0]
         }
-        
+
         if v2rayOutbound.protocol == V2rayProtocolOutbound.vless && v2rayOutbound.settingVLess != nil && v2rayOutbound.settingVLess!.vnext.count > 0 {
             self.serverVless = v2rayOutbound.settingVLess!.vnext[0]
         }
@@ -1270,6 +1342,11 @@ class V2rayConfig: NSObject {
         if v2rayOutbound.protocol == V2rayProtocolOutbound.shadowsocks && v2rayOutbound.settingShadowsocks != nil && v2rayOutbound.settingShadowsocks!.servers.count > 0 {
             self.serverShadowsocks = v2rayOutbound.settingShadowsocks!.servers[0]
         }
+
+        if v2rayOutbound.protocol == V2rayProtocolOutbound.trojan && v2rayOutbound.settingTrojan != nil && v2rayOutbound.settingTrojan!.servers.count > 0 {
+            self.serverTrojan = v2rayOutbound.settingTrojan!.servers[0]
+        }
+
 
         return (v2rayOutbound)
     }

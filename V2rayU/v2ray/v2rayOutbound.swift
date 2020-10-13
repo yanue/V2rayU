@@ -18,6 +18,7 @@ enum V2rayProtocolOutbound: String, Codable {
     case dns
     case http
     case vless
+    case trojan
 }
 
 struct V2rayOutbound: Codable {
@@ -36,6 +37,7 @@ struct V2rayOutbound: Codable {
     var settingDns: V2rayOutboundDns?
     var settingHttp: V2rayOutboundHttp?
     var settingVLess: V2rayOutboundVLess?
+    var settingTrojan: V2rayOutboundTrojan?
 
     enum CodingKeys: String, CodingKey {
         case sendThrough
@@ -97,8 +99,13 @@ extension V2rayOutbound {
             break
         case .http:
             settingHttp = try container.decode(V2rayOutboundHttp.self, forKey: CodingKeys.settings)
+            break
         case .vless:
             settingVLess = try container.decode(V2rayOutboundVLess.self, forKey: CodingKeys.settings)
+            break
+        case .trojan:
+            settingTrojan = try container.decode(V2rayOutboundTrojan.self, forKey: CodingKeys.settings)
+            break
         }
     }
 
@@ -152,6 +159,9 @@ extension V2rayOutbound {
             break
         case .vless:
             try container.encode(self.settingVLess, forKey: .settings)
+            break
+        case .trojan:
+            try container.encode(self.settingTrojan, forKey: .settings)
             break
         }
     }
@@ -268,4 +278,16 @@ struct V2rayOutboundVLessUser: Codable {
     var flow: String = ""
     var encryption: String = "none"
     var level: Int = 0
+}
+
+struct V2rayOutboundTrojan: Codable {
+    var servers: [V2rayOutboundTrojanServer] = [V2rayOutboundTrojanServer()]
+}
+
+struct V2rayOutboundTrojanServer: Codable {
+    var address: String = ""
+    var port: Int = 0
+    var password: String = ""
+    var level: Int = 0
+    var email: String = ""
 }

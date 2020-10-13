@@ -17,7 +17,7 @@ DEPENDENCIES:
   - SwiftyJSON
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs:
+  https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - MASShortcut
     - QRCoder
@@ -45,4 +45,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 6196a63d3d6fcd5c461152d1c910391f609a3bba
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.8.4

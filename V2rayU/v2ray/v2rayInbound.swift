@@ -23,6 +23,7 @@ struct V2rayInbound: Codable {
     var settingShadowsocks: V2rayInboundShadowsocks?
     var settingVMess: V2rayInboundVMess?
     var settingVLess: V2rayInboundVLess?
+    var settingTrojan: V2rayInboundTrojan?
 
     enum CodingKeys: String, CodingKey {
         case port
@@ -71,6 +72,9 @@ extension V2rayInbound {
         case .vless:
             settingVLess = try container.decode(V2rayInboundVLess.self, forKey: CodingKeys.settings)
             break
+        case .trojan:
+            settingTrojan = try container.decode(V2rayInboundTrojan.self, forKey: CodingKeys.settings)
+            break
         }
     }
 
@@ -111,6 +115,9 @@ extension V2rayInbound {
             break
         case .vless:
             try container.encode(self.settingVLess, forKey: .settings)
+            break
+        case .trojan:
+            try container.encode(self.settingTrojan, forKey: .settings)
             break
         }
     }
@@ -211,6 +218,25 @@ struct V2rayInboundVLessClient: Codable {
 }
 
 struct V2rayInboundVLessFallback: Codable {
+    var alpn: String? = ""
+    var path: String? = ""
+    var dest: Int = 80
+    var xver: Int = 0
+}
+
+struct V2rayInboundTrojan: Codable {
+    var clients: [V2rayInboundTrojanClient]?
+    var decryption: String = "none"
+    var fallbacks: [V2rayInboundTrojanFallback]? = [V2rayInboundTrojanFallback()]
+}
+
+struct V2rayInboundTrojanClient: Codable {
+    var password: String = ""
+    var level: Int = 0
+    var email: String?
+}
+
+struct V2rayInboundTrojanFallback: Codable {
     var alpn: String? = ""
     var path: String? = ""
     var dest: Int = 80
