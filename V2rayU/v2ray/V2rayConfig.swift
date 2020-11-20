@@ -136,6 +136,10 @@ class V2rayConfig: NSObject {
     var streamTlsAllowInsecure = true
     var streamTlsServerName = ""
 
+    // xtls
+    var streamXtlsAllowInsecure = true
+    var streamXtlsServerName = ""
+
     var routingDomainStrategy: V2rayRoutingSetting.domainStrategy = .AsIs
     var routingRule: RoutingRule = .RoutingRuleGlobal
     let routingProxyDomains = UserDefaults.getArray(forKey: .routingProxyDomains) ?? [];
@@ -511,7 +515,10 @@ class V2rayConfig: NSObject {
             if vless == nil {
                 vless = V2rayOutboundVLess()
             }
-            vless!.vnext = [self.serverVless]
+            if vless?.vnext == nil {
+                vless!.vnext = [self.serverVless]
+            }
+
             outbound.settingVLess = vless
 
             var mux = V2rayOutboundMux()
@@ -728,15 +735,29 @@ class V2rayConfig: NSObject {
             streamSettings.quicSettings = self.streamQuic
             break
         }
-        streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
-        var tls = TlsSettings()
+        streamSettings.security = .none;
+        if (self.streamTlsSecurity == "tls") {
+            streamSettings.security = .tls;
+        } else if (self.streamTlsSecurity == "xtls") {
+            streamSettings.security = .xtls;
+        }
 
+        // TLS
+        var tls = TlsSettings()
         tls.allowInsecure = self.streamTlsAllowInsecure
         if self.streamTlsServerName.count > 0 {
             tls.serverName = self.streamTlsServerName
         }
 
         streamSettings.tlsSettings = tls
+
+        // XTLS
+        var xtls = XtlsSettings()
+        xtls.allowInsecure = self.streamXtlsAllowInsecure
+        if self.streamXtlsServerName.count > 0 {
+            xtls.serverName = self.streamXtlsServerName
+        }
+        streamSettings.xtlsSettings = xtls
 
         return streamSettings
     }
@@ -1400,9 +1421,14 @@ class V2rayConfig: NSObject {
                 // set data
                 if transport.tlsSettings?.serverName != nil {
                     self.streamTlsServerName = transport.tlsSettings!.serverName!
-                }
-                if transport.tlsSettings?.serverName != nil {
                     self.streamTlsAllowInsecure = transport.tlsSettings!.allowInsecure!
+                }
+            }
+
+            if transport.xtlsSettings != nil {
+                if transport.xtlsSettings?.serverName != nil {
+                    self.streamXtlsServerName = transport.xtlsSettings!.serverName!
+                    self.streamXtlsAllowInsecure = transport.xtlsSettings!.allowInsecure!
                 }
             }
 
@@ -1457,6 +1483,15 @@ class V2rayConfig: NSObject {
                 tlsSettings.certificates = certificates
             }
             stream.tlsSettings = tlsSettings
+        }
+
+        // xtlsSettings
+        if steamJson["xtlsSettings"].dictionaryValue.count > 0 {
+            var xtlsSettings = XtlsSettings();
+            xtlsSettings.serverName = steamJson["xtlsSettings"]["serverName"].stringValue
+            xtlsSettings.alpn = steamJson["xtlsSettings"]["alpn"].stringValue
+            xtlsSettings.allowInsecure = steamJson["xtlsSettings"]["allowInsecure"].boolValue
+            xtlsSettings.allowInsecureCiphers = steamJson["xtlsSettings"]["allowInsecureCiphers"].boolValue
         }
 
         // tcpSettings
