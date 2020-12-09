@@ -154,4 +154,4 @@ cd /Applications/V2rayU.app/Contents/Resources/
 	GPLv3
 
 ### Thanks
-<p><a href=https://www.jetbrains.com/?from=yanue><img src="https://github.com/yanue/V2rayU/blob/master/Build/jetbrains.png?raw=true" width="25%" alt="jetbrains"></a></p>
+<p><a href=https://www.jetbrains.com/?from=yanue><img src="https://github.com/yanue/V2rayU/blob/master/Build/jetbrains.png?raw=true" width="10%" alt="jetbrains"></a></p>
