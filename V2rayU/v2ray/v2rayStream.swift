@@ -32,12 +32,14 @@ struct V2rayStreamSettings: Codable {
     enum security: String, Codable {
         case none
         case tls
+        case xtls
     }
 
     var network: network = .tcp
     var security: security = .none
     var sockopt: V2rayStreamSettingSockopt?
     var tlsSettings: TlsSettings?
+    var xtlsSettings: XTlsSettings?
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
@@ -55,6 +57,28 @@ struct TlsSettings: Codable {
 }
 
 struct TlsCertificates: Codable {
+    enum usage: String, Codable {
+        case encipherment
+        case verify
+        case issue
+    }
+
+    var usage: usage? = .encipherment
+    var certificateFile: String?
+    var keyFile: String?
+    var certificate: String?
+    var key: String?
+}
+
+struct XTlsSettings: Codable {
+    var serverName: String?
+    var alpn: String?
+    var allowInsecure: Bool?
+    var allowInsecureCiphers: Bool?
+    var certificates: XTlsCertificates?
+}
+
+struct XTlsCertificates: Codable {
     enum usage: String, Codable {
         case encipherment
         case verify

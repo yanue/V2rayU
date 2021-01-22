@@ -71,6 +71,7 @@
                 <outlet property="trojanPort" destination="GDZ-VV-XZT" id="sQf-g2-zyT"/>
                 <outlet property="version4" destination="TeX-0Y-mTO" id="RAA-U8-rYR"/>
                 <outlet property="vlessAddr" destination="UwP-s6-YSd" id="sCw-tl-CmI"/>
+                <outlet property="vlessFlow" destination="ZKe-I3-hnU" id="Fn5-z5-6Yo"/>
                 <outlet property="vlessLevel" destination="cfE-ED-uw4" id="3ZF-j8-SlO"/>
                 <outlet property="vlessPort" destination="6hs-R1-PDR" id="JpP-ou-uYf"/>
                 <outlet property="vlessUserId" destination="df5-zh-h85" id="2Rh-Jp-lyo"/>
@@ -699,6 +700,10 @@ Gw
                                                                                 <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                             </allowedInputSourceLocales>
                                                                         </textFieldCell>
+                                                                        <connections>
+                                                                            <binding destination="HhC-a7-Hqz" name="hidden" keyPath="values" id="4QM-ac-Lv1"/>
+                                                                            <binding destination="HhC-a7-Hqz" name="toolTip" keyPath="values" id="Ioj-j2-ETY"/>
+                                                                        </connections>
                                                                     </textField>
                                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="df5-zh-h85">
                                                                         <rect key="frame" x="75" y="76" width="275" height="22"/>
@@ -732,6 +737,27 @@ Gw
                                                                             <allowedInputSourceLocales>
                                                                                 <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                             </allowedInputSourceLocales>
+                                                                        </textFieldCell>
+                                                                    </textField>
+                                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZKe-I3-hnU">
+                                                                        <rect key="frame" x="76" y="17" width="177" height="22"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="mEx-c0-8J5">
+                                                                            <font key="font" metaFont="system"/>
+                                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                            <allowedInputSourceLocales>
+                                                                                <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                                                            </allowedInputSourceLocales>
+                                                                        </textFieldCell>
+                                                                    </textField>
+                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vC-hC-FXu">
+                                                                        <rect key="frame" x="31" y="17" width="36" height="17"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="flow:" placeholderString="xtls" id="IQn-2B-w6S">
+                                                                            <font key="font" metaFont="system"/>
+                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
                                                                 </subviews>
@@ -1098,6 +1124,9 @@ Gw
                                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                                         </menuItem>
                                                                         <menuItem title="tls" id="btZ-hB-lY3">
+                                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                                        </menuItem>
+                                                                        <menuItem title="xtls" id="php-YZ-8dr">
                                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                                         </menuItem>
                                                                     </items>
@@ -1754,7 +1783,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="76o-eU-kIf">
-                        <rect key="frame" x="60" y="68" width="62" height="16"/>
+                        <rect key="frame" x="60" y="69" width="62" height="15"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="show log" bezelStyle="inline" alignment="center" borderStyle="border" inset="2" id="OQK-lm-eg7">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1793,6 +1822,7 @@ Gw
             <accessibility identifier="ConfigWindow"/>
             <point key="canvasLocation" x="117.5" y="137"/>
         </window>
+        <userDefaultsController representsSharedInstance="YES" id="HhC-a7-Hqz"/>
     </objects>
     <resources>
         <image name="NSAddTemplate" width="14" height="13"/>

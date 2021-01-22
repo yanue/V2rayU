@@ -167,15 +167,15 @@ function commit() {
 
 function downloadV2ray() {
     echo "正在查询最新版v2ray ..."
-    rm -fr v2ray-macos.zip v2ray-core
-    tag='v4.23.1'
-    echo "v2ray-core version: ${tag}"
-    url="https://github.com/v2ray/v2ray-core/releases/download/${tag}/v2ray-macos.zip"
-    echo "正在下载最新版v2ray: ${tag}"
-    curl -Lo v2ray-macos.zip ${url}
+#    rm -fr v2ray-macos.zip v2ray-core
+#    tag='v4.31.0'
+#    echo "v2ray-core version: ${tag}"
+#    url="https://github.com/v2fly/v2ray-core/releases/download/${tag}/v2ray-macos.zip"
+#    echo "正在下载最新版v2ray: ${tag}"
+#    curl -Lo v2ray-macos.zip ${url}
 
-    unzip -o v2ray-macos.zip -d v2ray-core
-    rm -fr v2ray-macos.zip
+    unzip -o v2ray-macos-64.zip -d v2ray-core
+#    rm -fr v2ray-macos.zip
 }
 
 function createDmgByAppdmg() {

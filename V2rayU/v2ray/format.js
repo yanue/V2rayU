@@ -1,4 +1,4 @@
-var str = '{"routing":{"settings":{"domainStrategy":"IPIfNonMatch","rules":[{"outboundTag":"direct","type":"field","ip":["geoip:cn","geoip:private"],"domain":["geosite:cn","geosite:speedtest"]}]}},"inbound":{"listen":"127.0.0.1","protocol":"http","settings":null,"tag":"","port":"1088"},"outbound":{"tag":"proxy","protocol":"vmess","settings":{"vnext":[{"address":"ssl.miwukeji.net","users":[{"id":"29f1ae2e-e29d-d804-7bcd-e01b5dfcf26a","alterId":64,"level":0,"security":""}],"port":"443"}]}},"dns":{},"log":{"error":"","loglevel":"info","access":""},"transport":{}}'
+var str = '{"routing":{"settings":{"domainStrategy":"IPIfNonMatch","rules":[{"outboundTag":"direct","type":"field","ip":["geoip:cn","geoip:private"],"domain":["geosite:cn","geosite:speedtest"]}]}},"inbound":{"listen":"127.0.0.1","protocol":"http","settings":null,"tag":"","port":"1088"},"outbound":{"tag":"proxy","protocol":"vmess","settings":{"vnext":[{"address":"ssl.miwukeji.net","users":[{"id":"29f1ae2e-e29d-d804-7bcd-e01b5dfcf26a","alterId":64,"level":0,"security":""}],"port":""}]}},"dns":{},"log":{"error":"","loglevel":"info","access":""},"transport":{}}'
 
 /**
  * V2ray Config Format

@@ -728,15 +728,29 @@ class V2rayConfig: NSObject {
             streamSettings.quicSettings = self.streamQuic
             break
         }
-        streamSettings.security = self.streamTlsSecurity == "tls" ? .tls : .none
-        var tls = TlsSettings()
 
-        tls.allowInsecure = self.streamTlsAllowInsecure
-        if self.streamTlsServerName.count > 0 {
-            tls.serverName = self.streamTlsServerName
+        if self.streamTlsSecurity == "tls" {
+            var tls = TlsSettings()
+
+            tls.allowInsecure = self.streamTlsAllowInsecure
+            if self.streamTlsServerName.count > 0 {
+                tls.serverName = self.streamTlsServerName
+            }
+            streamSettings.security = .tls
+            streamSettings.tlsSettings = tls
         }
 
-        streamSettings.tlsSettings = tls
+        if self.streamTlsSecurity == "xtls" {
+            var xtls = XTlsSettings()
+
+            xtls.allowInsecure = self.streamTlsAllowInsecure
+            if self.streamTlsServerName.count > 0 {
+                xtls.serverName = self.streamTlsServerName
+            }
+            streamSettings.security = .xtls
+            streamSettings.xtlsSettings = xtls
+        }
+
 
         return streamSettings
     }

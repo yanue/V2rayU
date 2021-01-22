@@ -59,6 +59,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var vlessPort: NSTextField!
     @IBOutlet weak var vlessUserId: NSTextField!
     @IBOutlet weak var vlessLevel: NSTextField!
+    @IBOutlet weak var vlessFlow: NSTextField!
 
     // shadowsocks
     @IBOutlet weak var shadowsockAddr: NSTextField!
@@ -151,7 +152,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 // add server config
         case 0:
             // add
-            _ = V2rayServer.add()
+            V2rayServer.add()
 
             // reload data
             self.serversTableView.reloadData()
@@ -273,10 +274,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // vless
         v2rayConfig.serverVless.address = self.vlessAddr.stringValue
-        v2rayConfig.serverVmess.port = Int(self.vlessPort.intValue)
+        v2rayConfig.serverVless.port = Int(self.vlessPort.intValue)
         var vless_user = V2rayOutboundVLessUser()
         vless_user.id = self.vlessUserId.stringValue
         vless_user.level = Int(self.vlessLevel.intValue)
+        vless_user.flow = self.vlessFlow.stringValue
         v2rayConfig.serverVless.users[0] = vless_user
 
         // shadowsocks
@@ -383,10 +385,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // vless
         self.vlessAddr.stringValue = v2rayConfig.serverVless.address
-        self.vmessPort.intValue = Int32(v2rayConfig.serverVless.port)
+        self.vlessPort.intValue = Int32(v2rayConfig.serverVless.port)
         if v2rayConfig.serverVless.users.count > 0 {
             let user = v2rayConfig.serverVless.users[0]
             self.vlessLevel.intValue = Int32(user.level)
+            self.vlessFlow.stringValue = user.flow
             self.vlessUserId.stringValue = user.id
         }
 
