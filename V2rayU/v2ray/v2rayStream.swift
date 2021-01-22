@@ -16,6 +16,7 @@ struct V2rayTransport: Codable {
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
+    var xtlsSettings: XtlsSettings?
 }
 
 struct V2rayStreamSettings: Codable {
@@ -46,9 +47,18 @@ struct V2rayStreamSettings: Codable {
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
+    var xtlsSettings: XtlsSettings?
 }
 
 struct TlsSettings: Codable {
+    var serverName: String?
+    var alpn: String?
+    var allowInsecure: Bool?
+    var allowInsecureCiphers: Bool?
+    var certificates: TlsCertificates?
+}
+
+struct XtlsSettings: Codable {
     var serverName: String?
     var alpn: String?
     var allowInsecure: Bool?
