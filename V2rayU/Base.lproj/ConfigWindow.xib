@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,7 +11,6 @@
             <connections>
                 <outlet property="ShadowsocksView" destination="j7t-2G-Ip6" id="kZj-Uh-esG"/>
                 <outlet property="SocksView" destination="JY4-cp-0Rx" id="em9-Kc-i9B"/>
-                <outlet property="SwitchProtocol" destination="gPp-Kb-B0H" id="uUC-Iv-haH"/>
                 <outlet property="TrojanView" destination="g0a-5e-TlB" id="sd6-CO-qVG"/>
                 <outlet property="VlessView" destination="rJI-46-Le8" id="EYS-YD-71W"/>
                 <outlet property="VmessView" destination="3dJ-vk-01w" id="lWc-V4-wzx"/>
@@ -92,7 +91,7 @@
         <window title="V2rayU" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
             <rect key="contentRect" x="196" y="240" width="597" height="566"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="597" height="566"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -138,13 +137,13 @@
                     </scrollView>
                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7rT-zk-KIa">
                         <rect key="frame" x="17" y="277" width="150" height="23"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="selectOne" id="i7b-XT-FIs">
                             <font key="font" metaFont="system"/>
                             <segments>
-                                <segment image="NSAddTemplate" width="38"/>
-                                <segment image="NSRemoveTemplate" imageScaling="proportionallyUpOrDown" width="38" tag="1"/>
-                                <segment width="70" enabled="NO"/>
+                                <segment image="NSAddTemplate" imageScaling="none" width="38"/>
+                                <segment image="NSMenuMixedStateTemplate" imageScaling="none" width="37" tag="1"/>
+                                <segment width="67" enabled="NO"/>
                             </segments>
                             <connections>
                                 <action selector="addRemoveServer:" target="-2" id="mfS-2o-yqj"/>
@@ -332,9 +331,6 @@ Gw
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="message" size="11"/>
                                                                 </buttonCell>
-                                                                <connections>
-                                                                    <binding destination="-2" name="argument" keyPath="self.sockPort" id="QWe-ai-TOh"/>
-                                                                </connections>
                                                             </button>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YQW-II-5yq">
                                                                 <rect key="frame" x="18" y="48" width="64" height="14"/>
@@ -429,9 +425,6 @@ Gw
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <connections>
-                                                        <action selector="goAdvanceSetting:" target="-2" id="I7e-qD-N2e"/>
-                                                    </connections>
                                                 </button>
                                             </subviews>
                                         </customView>
@@ -700,10 +693,6 @@ Gw
                                                                                 <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                             </allowedInputSourceLocales>
                                                                         </textFieldCell>
-                                                                        <connections>
-                                                                            <binding destination="HhC-a7-Hqz" name="hidden" keyPath="values" id="4QM-ac-Lv1"/>
-                                                                            <binding destination="HhC-a7-Hqz" name="toolTip" keyPath="values" id="Ioj-j2-ETY"/>
-                                                                        </connections>
                                                                     </textField>
                                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="df5-zh-h85">
                                                                         <rect key="frame" x="75" y="76" width="275" height="22"/>
@@ -1826,6 +1815,6 @@ Gw
     </objects>
     <resources>
         <image name="NSAddTemplate" width="14" height="13"/>
-        <image name="NSRemoveTemplate" width="14" height="4"/>
+        <image name="NSMenuMixedStateTemplate" width="14" height="4"/>
     </resources>
 </document>

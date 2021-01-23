@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -105,8 +105,7 @@
                         <action selector="ImportFromPasteboard:" target="hcZ-V7-Dui" id="aP0-Ao-OTD"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Scan QR Code From Screen" id="XHn-5w-qWM">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Scan QR Code From Screen" keyEquivalent="d" id="XHn-5w-qWM">
                     <connections>
                         <action selector="scanQrcode:" target="hcZ-V7-Dui" id="URj-Vl-1TY"/>
                     </connections>

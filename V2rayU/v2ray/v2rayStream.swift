@@ -40,14 +40,13 @@ struct V2rayStreamSettings: Codable {
     var security: security = .none
     var sockopt: V2rayStreamSettingSockopt?
     var tlsSettings: TlsSettings?
-    var xtlsSettings: XTlsSettings?
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
-    var xtlsSettings: XtlsSettings?
+    var xtlsSettings: XTlsSettings?
 }
 
 struct TlsSettings: Codable {

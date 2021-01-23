@@ -759,14 +759,6 @@ class V2rayConfig: NSObject {
         }
 
 
-        // XTLS
-        var xtls = XtlsSettings()
-        xtls.allowInsecure = self.streamXtlsAllowInsecure
-        if self.streamXtlsServerName.count > 0 {
-            xtls.serverName = self.streamXtlsServerName
-        }
-        streamSettings.xtlsSettings = xtls
-
         return streamSettings
     }
 
