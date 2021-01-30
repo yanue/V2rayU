@@ -39,7 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // check v2ray core
-//        V2rayCore().check()
+        V2rayCore().check()
         // generate plist
         V2rayLaunch.generateLaunchAgentPlist()
         // auto check updates
@@ -137,7 +137,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2rayLaunch.Start()
         }
         // check v2ray core
-//        V2rayCore().check()
+        V2rayCore().check()
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // check version
