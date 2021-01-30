@@ -125,12 +125,12 @@ class V2rayCore {
                         if let _ = response.result.value {
                             // make unzip.sh execable
                             // chmod 777 unzip.sh
-                            let execable = "cd " + AppResourcesPath + " && /bin/chmod 777 ./unzip.sh"
+                            let execable = "cd " + AppHomePath + " && /bin/chmod 777 ./unzip.sh"
                             _ = shell(launchPath: "/bin/bash", arguments: ["-c", execable])
 
                             // unzip v2ray-core
                             // cmd: /bin/bash -c 'cd path && ./unzip.sh '
-                            let sh = "cd " + AppResourcesPath + " && ./unzip.sh && /bin/chmod -R 777 ./v2ray-core"
+                            let sh = "cd " + AppHomePath + " && ./unzip.sh && /bin/chmod -R 777 ./v2ray-core"
                             // exec shell
                             let res = shell(launchPath: "/bin/bash", arguments: ["-c", sh])
                             NSLog("res:", sh, res!)

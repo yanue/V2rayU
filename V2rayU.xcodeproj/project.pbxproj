@@ -44,6 +44,7 @@
 		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
+		6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF7F662C35646734A352E /* install.sh */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
 		6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */; };
 		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */; };
@@ -207,6 +208,7 @@
 		6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSubscribe.swift; sourceTree = "<group>"; };
 		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAdvance.swift; sourceTree = "<group>"; };
+		6D6DF7F662C35646734A352E /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		6D6DF81E59907A2C7579BFE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceGeneral.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAbout.swift; sourceTree = "<group>"; };
 		6D6DF87840CDA04AF0E9D36E /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 				6618372823E9BF1A000F7410 /* ToastWindow.swift */,
 				6618372C23E9BF73000F7410 /* ToastWindow.xib */,
 				66107B8822DEDBE4002FFB60 /* Localizable.strings */,
+				6D6DF7F662C35646734A352E /* install.sh */,
 			);
 			path = V2rayU;
 			sourceTree = "<group>";
@@ -604,6 +607,7 @@
 				6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */,
 				66193A8923EE46BC00289B6A /* PreferenceRouting.xib in Resources */,
 				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */,
+				6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1062,7 +1066,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3.0.0.preview;
+				CURRENT_PROJECT_VERSION = 3.0.0;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
@@ -1072,7 +1076,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.0.0.preview;
+				MARKETING_VERSION = 3.0.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1093,7 +1097,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3.0.0.preview;
+				CURRENT_PROJECT_VERSION = 3.0.0;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
@@ -1103,7 +1107,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 3.0.0.preview;
+				MARKETING_VERSION = 3.0.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";

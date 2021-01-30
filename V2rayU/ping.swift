@@ -13,7 +13,7 @@ var inPing = false
 var fastV2rayName = ""
 var fastV2raySpeed = 5
 let pingJsonFileName = "ping.json"
-let pingJsonFilePath = AppResourcesPath + "/" + pingJsonFileName
+let pingJsonFilePath = AppHomePath + "/" + pingJsonFileName
 var task:Process?
 
 struct pingItem: Codable {
@@ -173,7 +173,7 @@ class PingSpeed: NSObject {
     }
 
     func pingInCmd() {
-        let cmd = "cd " + AppResourcesPath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
+        let cmd = "cd " + AppHomePath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
         //        print("cmd", cmd)
         let res = runShell(launchPath: "/bin/bash", arguments: ["-c", cmd])
 

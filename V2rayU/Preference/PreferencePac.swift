@@ -10,7 +10,7 @@ import Cocoa
 import Preferences
 import Alamofire
 
-let PACRulesDirPath = AppResourcesPath + "/pac/"
+let PACRulesDirPath = AppHomePath + "/pac/"
 let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
 let PACFilePath = PACRulesDirPath + "proxy.js"
 var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.js"
@@ -142,7 +142,7 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
     let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
 
     // permission
-    _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppResourcesPath + " && /bin/chmod -R 755 ./pac"])
+    _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod -R 755 ./pac"])
 
     // if PACFilePath exist and not need rewrite
     if (!(rewrite || !FileManager.default.fileExists(atPath: PACFilePath))) {
