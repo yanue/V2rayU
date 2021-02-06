@@ -20,7 +20,7 @@
       "x": 120,
       "y": 120,
       "type": "file",
-      "path": "V2rayU.app"
+      "path": "release/V2rayU.app"
     }
   ]
 }
