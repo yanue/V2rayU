@@ -10,12 +10,6 @@
 rm -fr ~/.V2rayU/v2ray-core
 rm -fr ~/.V2rayU/pac
 
-# mkdir
-mkdir -p ~/.V2rayU/
-mkdir -p ~/.V2rayU/pac
-mkdir -p ~/.V2rayU/v2ray-core
-mkdir -p ~/.V2rayU/config
-
 # copy
 \cp -rv ./V2rayUHelper  ~/.V2rayU/
 \cp -rf ./V2rayUTool  ~/.V2rayU/

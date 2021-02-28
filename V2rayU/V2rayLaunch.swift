@@ -35,6 +35,12 @@ class V2rayLaunch: NSObject {
         // generate plist
         V2rayLaunch.generateLaunchAgentPlist()
 
+        // Ensure launch agent directory is existed.
+        let fileMgr = FileManager.default
+        if !fileMgr.fileExists(atPath: AppHomePath) {
+            try! fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
+        }
+
         // make sure new version
         print("install", AppResourcesPath)
         var needRunInstall = false
@@ -57,7 +63,7 @@ class V2rayLaunch: NSObject {
             return
         }
 
-        let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rx  ./install.sh && ./install.sh"
+        let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         print("runAppleScript:" + doSh)
         var error: NSDictionary?
         if let scriptObject = NSAppleScript(source: "do shell script \"" + doSh + "\" with administrator privileges") {

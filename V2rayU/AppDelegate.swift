@@ -42,6 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
+            menuController.checkV2rayUVersion()
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
@@ -126,6 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         V2rayCore().check()
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
+            menuController.checkV2rayUVersion()
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }

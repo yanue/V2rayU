@@ -10,6 +10,7 @@ import Cocoa
 import ServiceManagement
 import Preferences
 import Sparkle
+import Alamofire
 
 let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
 let V2rayUpdater = SUUpdater()
@@ -134,9 +135,12 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBOutlet weak var toggleV2rayItem: NSMenuItem!
     @IBOutlet weak var v2rayStatusItem: NSMenuItem!
     @IBOutlet weak var serverItems: NSMenuItem!
+    @IBOutlet weak var newVersionItem: NSMenuItem!
 
     // when menu.xib loaded
     override func awakeFromNib() {
+        newVersionItem.isHidden = true
+
         // install before launch
         V2rayLaunch.install()
 
@@ -497,6 +501,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
+        menuController.checkV2rayUVersion()
         // need set SUFeedURL into plist
         V2rayUpdater.checkForUpdates(sender)
     }
@@ -620,5 +625,62 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func noticeTip(title: String = "", subtitle: String = "", informativeText: String = "") {
         makeToast(message: title + (subtitle.count > 0 ? " - " + subtitle : "") + " : " + informativeText)
+    }
+
+    @IBAction func goRelease(_ sender: Any) {
+        guard let url = URL(string: "https://github.com/yanue/v2rayu/releases") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
+    func checkV2rayUVersion() {
+        // 当前版本检测
+        Alamofire.request("https://api.github.com/repos/yanue/V2rayU/releases/latest").responseJSON { [self] response in
+            //to get status code
+            if let status = response.response?.statusCode {
+                if status != 200 {
+                    NSLog("error with response status: ", status)
+                    return
+                }
+            }
+
+            //to get JSON return value
+            if let result = response.result.value {
+                let JSON = result as! NSDictionary
+
+                // get tag_name (verion)
+                guard let tag_name = JSON["tag_name"] else {
+                    NSLog("error: no tag_name")
+                    return
+                }
+
+                // get prerelease and draft
+                guard let prerelease = JSON["prerelease"], let draft = JSON["draft"] else {
+                    // get
+                    NSLog("error: get prerelease or draft")
+                    return
+                }
+
+                // not pre release or draft
+                if prerelease as! Bool == true || draft as! Bool == true {
+                    NSLog("this release is a prerelease or draft")
+                    return
+                }
+
+                let newVer = (tag_name as! String)
+                // get old versiion
+                let oldVer = appVersion.replacingOccurrences(of: "v", with: "").versionToInt()
+                let curVer = newVer.replacingOccurrences(of: "v", with: "").versionToInt()
+
+                // compare with [Int]
+                if oldVer.lexicographicallyPrecedes(curVer) {
+                    newVersionItem.isHidden = false
+                    newVersionItem.title = "has new version " + newVer
+                } else {
+                    newVersionItem.isHidden = true
+                }
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@
             <connections>
                 <outlet property="globalMode" destination="sZL-Iu-xAt" id="Iz8-oL-8dU"/>
                 <outlet property="manualMode" destination="hTu-27-5OL" id="lHt-aQ-ZNU"/>
+                <outlet property="newVersionItem" destination="SdL-DD-qZe" id="WXr-Gw-0HS"/>
                 <outlet property="pacMode" destination="NrZ-oB-7yd" id="d3C-wO-jAI"/>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="0Z8-41-eCi"/>
                 <outlet property="statusMenu" destination="9n3-TW-9ur" id="Hgg-sa-fM8"/>
@@ -40,6 +41,12 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="K10-II-m5R"/>
+                <menuItem title="has new version" id="SdL-DD-qZe">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="goRelease:" target="hcZ-V7-Dui" id="yMr-mv-496"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="View config.json" id="b3o-tG-rp3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
