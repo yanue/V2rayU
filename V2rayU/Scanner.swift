@@ -417,6 +417,9 @@ class VmessUri {
             case "h2host":
                 self.netHost = param[1]
                 break
+            case "aid":
+                self.alterId = Int(param[1]) ?? 0
+                break
             case "tls":
                 self.tls = param[1] == "1" ? "tls" : "none"
                 break
