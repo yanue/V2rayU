@@ -133,7 +133,7 @@ class V2rayConfig: NSObject {
 
     // tls
     var streamTlsSecurity = "none"
-    var streamTlsAllowInsecure = true
+    var streamTlsAllowInsecure = false
     var streamTlsServerName = ""
 
     // xtls
