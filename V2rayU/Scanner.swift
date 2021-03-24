@@ -337,7 +337,7 @@ class VmessUri {
     var type: String = "none"
     var uplinkCapacity: Int = 50
     var downlinkCapacity: Int = 20
-    var allowInsecure: Bool = true
+    var allowInsecure: Bool = false
     var tlsServer: String = ""
     var mux: Bool = true
     var muxConcurrency: Int = 8
