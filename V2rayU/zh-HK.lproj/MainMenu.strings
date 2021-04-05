@@ -180,7 +180,7 @@
 "ssN-pW-aqd.title" = "Find";
 
 /* Class = "NSMenuItem"; title = "Copy HTTP Proxy Shell Export Line"; ObjectID = "tBG-YP-XJr"; */
-"tBG-YP-XJr.title" = "複製總端代理命令";
+"tBG-YP-XJr.title" = "複製終端代理命令";
 
 /* Class = "NSMenuItem"; title = "Transformations"; ObjectID = "uSH-Cb-tWZ"; */
 "uSH-Cb-tWZ.title" = "Transformations";
