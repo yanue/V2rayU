@@ -420,7 +420,7 @@ class MenuController: NSObject, NSMenuDelegate {
             }
             let space = String(repeating: " ", count: spaceCnt < 0 ? 0 : spaceCnt) + "　"
 
-            menuItem.title = item.remark
+            menuItem.title = ping + space + item.remark
             menuItem.action = #selector(self.switchServer(_:))
             menuItem.representedObject = item
             menuItem.target = self

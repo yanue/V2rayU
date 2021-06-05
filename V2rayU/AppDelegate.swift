@@ -8,7 +8,6 @@
 
 import Cocoa
 import ServiceManagement
-import Swifter
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()

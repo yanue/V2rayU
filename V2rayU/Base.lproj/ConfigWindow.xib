@@ -68,7 +68,6 @@
                 <outlet property="trojanAlpn" destination="gxI-oU-ecU" id="H7D-bT-eQR"/>
                 <outlet property="trojanPass" destination="uIu-c1-QVw" id="1aP-ue-yfV"/>
                 <outlet property="trojanPort" destination="GDZ-VV-XZT" id="sQf-g2-zyT"/>
-                <outlet property="version4" destination="TeX-0Y-mTO" id="RAA-U8-rYR"/>
                 <outlet property="vlessAddr" destination="UwP-s6-YSd" id="sCw-tl-CmI"/>
                 <outlet property="vlessFlow" destination="ZKe-I3-hnU" id="Fn5-z5-6Yo"/>
                 <outlet property="vlessLevel" destination="cfE-ED-uw4" id="3ZF-j8-SlO"/>
@@ -341,23 +340,6 @@ Gw
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Prg-vD-GcJ">
-                                                                <rect key="frame" x="18" y="7" width="47" height="14"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Version " id="vhp-WG-z79">
-                                                                    <font key="font" metaFont="message" size="11"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TeX-0Y-mTO">
-                                                                <rect key="frame" x="79" y="3" width="74" height="20"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="check" title="above 4.0" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="a6s-FY-a2J">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="message" size="11"/>
-                                                                </buttonCell>
-                                                            </button>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LLo-pU-1C5">
                                                                 <rect key="frame" x="18" y="28" width="64" height="14"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -378,17 +360,6 @@ Gw
                                                                     <binding destination="-2" name="argument" keyPath="self.sockPort" id="pZt-xd-JfF"/>
                                                                 </connections>
                                                             </button>
-                                                            <button toolTip="use inbounds, outbounds" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iCr-AX-IPK">
-                                                                <rect key="frame" x="161" y="2" width="21" height="22"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="left" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lpB-jT-M0N">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="message" size="11"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="goVersionHelp:" target="-2" id="Eaz-Ia-FcI"/>
-                                                                </connections>
-                                                            </button>
                                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yO9-ma-EEI">
                                                                 <rect key="frame" x="305" y="47" width="45" height="20"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -398,7 +369,7 @@ Gw
                                                                 </buttonCell>
                                                             </button>
                                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fIt-Kc-ZTg">
-                                                                <rect key="frame" x="253" y="4" width="51" height="20"/>
+                                                                <rect key="frame" x="82" y="1" width="51" height="20"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Mux" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="2HH-pl-apg">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -406,7 +377,7 @@ Gw
                                                                 </buttonCell>
                                                             </button>
                                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CkC-qQ-sQP">
-                                                                <rect key="frame" x="309" y="4" width="40" height="19"/>
+                                                                <rect key="frame" x="138" y="1" width="40" height="19"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="roundTextured" title="8" bezelStyle="texturedRounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hCY-o2-Mz3">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

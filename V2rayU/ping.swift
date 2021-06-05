@@ -14,7 +14,7 @@ var fastV2rayName = ""
 var fastV2raySpeed = 5
 let pingJsonFileName = "ping.json"
 let pingJsonFilePath = AppHomePath + "/" + pingJsonFileName
-var task:Process?
+var task: Process?
 
 struct pingItem: Codable {
     var name: String = ""
@@ -87,7 +87,7 @@ class PingSpeed: NSObject {
 
             DispatchQueue.main.async {
                 menuController.statusMenu.item(withTag: 1)?.title = "\(normalTitle)"
-
+                print("            // refresh server            menuController.showServers()")
                 // refresh servers
                 // reload
                 V2rayServer.loadConfig()
@@ -124,20 +124,18 @@ class PingSpeed: NSObject {
             print("not host", host)
             return
         }
-
+        print("item", item.remark, host, item.url)
         // Ping once
         let once = SwiftyPing(host: host, configuration: PingConfiguration(interval: 0.5, with: 5), queue: DispatchQueue.global())
         once?.observer = { (_, response) in
+            print("response", item.remark, response)
             let duration = response.duration
             if response.error != nil {
                 print("ping error", host, response.error as Any)
             } else {
-
             }
-            item.speed = String(format: "%.2f", duration * 1000) + "ms"
+            item.speed = String(format: "%d", duration * 1000) + "ms"
             item.store()
-            // refresh server
-            menuController.showServers()
             once?.stop()
         }
         once?.start()
@@ -227,13 +225,20 @@ class PingSpeed: NSObject {
         if cfg.serverProtocol == V2rayProtocolOutbound.vmess.rawValue {
             host = cfg.serverVmess.address
             port = cfg.serverVmess.port
-        } else if cfg.serverProtocol == V2rayProtocolOutbound.vless.rawValue {
+        }
+        if cfg.serverProtocol == V2rayProtocolOutbound.vless.rawValue {
             host = cfg.serverVless.address
             port = cfg.serverVless.port
-        } else if cfg.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
+        }
+        if cfg.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
             host = cfg.serverShadowsocks.address
             port = cfg.serverShadowsocks.port
-        } else if cfg.serverProtocol == V2rayProtocolOutbound.socks.rawValue {
+        }
+        if cfg.serverProtocol == V2rayProtocolOutbound.trojan.rawValue {
+            host = cfg.serverTrojan.address
+            port = cfg.serverTrojan.port
+        }
+        if cfg.serverProtocol == V2rayProtocolOutbound.socks.rawValue {
             if cfg.serverSocks5.servers.count == 0 {
                 return ""
             }

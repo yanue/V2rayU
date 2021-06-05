@@ -151,6 +151,12 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
+        // Ensure launch agent directory is existed.
+        let fileMgr = FileManager.default
+        if !fileMgr.isExecutableFile(atPath: AppHomePath + "/V2rayUTool") {
+            self.install()
+        }
+        
         let task = Process.launchedProcess(launchPath: AppHomePath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {

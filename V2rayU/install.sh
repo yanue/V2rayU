@@ -19,7 +19,8 @@ rm -fr ~/.V2rayU/pac
 \cp -rf ./v2ray-core  ~/.V2rayU/
 
 # permission
-chmod -R 755 ~/.V2rayU/
+sudo chown -R $USER  ~/.V2rayU/
+sudo chmod -R 777 ~/.V2rayU/
 
 # root permission
 cd  ~/.V2rayU/

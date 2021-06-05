@@ -95,8 +95,6 @@ class V2rayConfig: NSObject {
 
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
-    var isNewVersion = true
-    var isEmptyInput = false
 
     var error = ""
     var errors: [String] = []
@@ -243,70 +241,20 @@ class V2rayConfig: NSObject {
             self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
         }
 
-        if self.isNewVersion {
-            // inbounds
-            var inbounds: [V2rayInbound] = [inSocks, inHttp]
-            if (!self.isEmptyInput && self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
-                for (_, item) in self.v2ray.inbounds!.enumerated() {
-                    if item.protocol == V2rayProtocolInbound.http || item.protocol == V2rayProtocolInbound.socks {
-                        continue
-                    }
-                    inbounds.append(item)
+        // inbounds
+        var inbounds: [V2rayInbound] = []
+        if (self.v2ray.inbounds != nil && self.v2ray.inbounds!.count > 0) {
+            for (_, item) in self.v2ray.inbounds!.enumerated() {
+                if item.protocol == V2rayProtocolInbound.http || item.protocol == V2rayProtocolInbound.socks {
+                    continue
                 }
-                self.v2ray.inbounds = inbounds
-            } else {
-                // new add
-                self.v2ray.inbounds = inbounds
-            }
-            self.v2ray.inboundDetour = nil
-            self.v2ray.inbound = nil
-        } else {
-            self.v2ray.inbounds = nil
-            // inbound
-            var inType: V2rayProtocolInbound = V2rayProtocolInbound.socks
-            if self.v2ray.inbound != nil {
-                if self.v2ray.inbound!.protocol == V2rayProtocolInbound.http {
-                    self.v2ray.inbound!.port = self.httpPort
-                    self.v2ray.inbound!.listen = self.httpHost
-                    inType = V2rayProtocolInbound.http
-                }
-                if self.v2ray.inbound!.protocol == V2rayProtocolInbound.socks {
-
-                    self.v2ray.inbound!.port = self.socksPort
-                    self.v2ray.inbound!.listen = self.socksHost
-                    self.v2ray.inbound!.settingSocks.udp = self.enableUdp
-                }
-            } else {
-                self.v2ray.inbound = inSocks
-            }
-
-            // inboundDetour
-            if (self.v2ray.inboundDetour != nil && self.v2ray.inboundDetour!.count > 0) {
-                var inboundDetour: [V2rayInbound] = []
-
-                for var (_, item) in self.v2ray.inboundDetour!.enumerated() {
-                    if self.enableSniffing {
-                        item.sniffing = V2rayInboundSniffing()
-                    }
-                    if inType == V2rayProtocolInbound.http && item.protocol == V2rayProtocolInbound.http {
-                        continue
-                    }
-                    if inType == V2rayProtocolInbound.socks && item.protocol == V2rayProtocolInbound.socks {
-                        continue
-                    }
-                    inboundDetour.append(item)
-                }
-
-                self.v2ray.inboundDetour = inboundDetour
-            } else {
-                if inType == V2rayProtocolInbound.http {
-                    self.v2ray.inboundDetour = [inSocks]
-                }
-                if inType == V2rayProtocolInbound.socks {
-                    self.v2ray.inboundDetour = [inHttp]
-                }
+                inbounds.append(item)
             }
         }
+        inbounds.append(inSocks)
+        inbounds.append(inHttp)
+        self.v2ray.inbounds = inbounds
+
         // ------------------------------------- inbound end ----------------------------------------------
 
         // ------------------------------------- outbound start -------------------------------------------
@@ -323,52 +271,26 @@ class V2rayConfig: NSObject {
         outboundBlackhole.settingBlackhole = V2rayOutboundBlackhole()
 
         // outbound
-        let outbound = self.getOutbound()
+        let outbound = self.getOutbound() // get from setting
+        var outbounds: [V2rayOutbound] = [outbound]
 
-        if self.isEmptyInput {
-            if self.isNewVersion {
-                self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
-                self.v2ray.outbound = nil
-                self.v2ray.outboundDetour = nil
-            } else {
-                self.v2ray.outbounds = nil
-                self.v2ray.outbound = outbound
-                self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
-            }
-        } else {
-            if self.isNewVersion {
-                if (self.v2ray.outbounds != nil && self.v2ray.outbounds!.count > 0) {
-                    var outbounds: [V2rayOutbound] = []
-                    for var (_, item) in self.v2ray.outbounds!.enumerated() {
-                        if self.serverProtocol == item.protocol.rawValue {
-                            // replace data
-                            item = self.replaceOutbound(item: item)
-                        }
-                        outbounds.append(item)
-                    }
-                    self.v2ray.outbounds = outbounds
-                } else {
-                    self.v2ray.outbounds = [outbound, outboundFreedom, outboundBlackhole]
+        if (self.v2ray.outbounds != nil && self.v2ray.outbounds!.count > 0) {
+            for var (i, item) in self.v2ray.outbounds!.enumerated() {
+                // the first one is just from manual settings
+                if i == 0 {
+                    continue
                 }
-                self.v2ray.outboundDetour = nil
-                self.v2ray.outbound = nil
-            } else {
-                // if has outbounds
-                self.v2ray.outbounds = nil
-
-                // outbound
-                if self.v2ray.outbound != nil {
-                    self.v2ray.outbound = self.replaceOutbound(item: self.v2ray.outbound!)
-                } else {
-                    self.v2ray.outbound = outbound
+                // ignore freedom and blackhole
+                if item.protocol == V2rayProtocolOutbound.freedom || item.protocol == V2rayProtocolOutbound.blackhole {
+                    continue
                 }
-
-                // outboundDetour
-                if !(self.v2ray.outboundDetour != nil && self.v2ray.outboundDetour!.count > 0) {
-                    self.v2ray.outboundDetour = [outboundFreedom, outboundBlackhole]
-                }
+                outbounds.append(item)
             }
         }
+        outbounds.append(outboundFreedom)
+        outbounds.append(outboundBlackhole)
+
+        self.v2ray.outbounds = outbounds
 
         // ------------------------------------- outbound end ---------------------------------------------
 
@@ -489,72 +411,6 @@ class V2rayConfig: NSObject {
         // set v2ray routing
         self.v2ray.routing = self.routing
         // ------------------------------------- routing end ----------------------------------------------
-    }
-
-    private func replaceOutbound(item: V2rayOutbound) -> V2rayOutbound {
-        var outbound = item
-        switch outbound.protocol {
-        case V2rayProtocolOutbound.vmess:
-            var vmess = outbound.settingVMess
-            if vmess == nil {
-                vmess = V2rayOutboundVMess()
-            }
-            vmess!.vnext = [self.serverVmess]
-            outbound.settingVMess = vmess
-
-            // enable mux only vmess
-            var mux = V2rayOutboundMux()
-            mux.enabled = self.enableMux
-            mux.concurrency = self.mux
-
-            outbound.mux = mux
-
-            break
-        case V2rayProtocolOutbound.vless:
-            var vless = outbound.settingVLess
-            if vless == nil {
-                vless = V2rayOutboundVLess()
-            }
-            if vless?.vnext == nil {
-                vless!.vnext = [self.serverVless]
-            }
-
-            outbound.settingVLess = vless
-
-            var mux = V2rayOutboundMux()
-            mux.enabled = self.enableMux
-            mux.concurrency = self.mux
-
-            outbound.mux = mux
-
-            break
-        case V2rayProtocolOutbound.shadowsocks:
-            var ss = outbound.settingShadowsocks
-            if ss == nil {
-                ss = V2rayOutboundShadowsocks()
-            }
-            ss!.servers = [self.serverShadowsocks]
-            outbound.settingShadowsocks = ss
-            break
-
-        case V2rayProtocolOutbound.socks:
-            outbound.settingSocks = self.serverSocks5
-            break
-
-        case V2rayProtocolOutbound.trojan:
-            var tro = outbound.settingTrojan
-            if tro == nil {
-                tro = V2rayOutboundTrojan()
-            }
-            tro!.servers = [self.serverTrojan]
-            outbound.settingTrojan = tro
-            break
-        default:
-            break
-        }
-
-        outbound.streamSettings = self.getStreamSettings()
-        return outbound
     }
 
     func checkManualValid() {
@@ -699,9 +555,22 @@ class V2rayConfig: NSObject {
             ss.servers = [self.serverShadowsocks]
             outbound.settingShadowsocks = ss
             break
+
         case V2rayProtocolOutbound.socks:
             outbound.settingSocks = self.serverSocks5
             break
+
+        case V2rayProtocolOutbound.trojan:
+            var trojan = V2rayOutboundTrojan()
+            trojan.servers = [self.serverTrojan]
+            outbound.settingTrojan = trojan
+
+            var mux = V2rayOutboundMux()
+            mux.enabled = self.enableMux
+            mux.concurrency = self.mux
+            outbound.mux = mux
+            break
+
         default:
             break
         }
@@ -788,45 +657,12 @@ class V2rayConfig: NSObject {
         // ignore dns,  use default
 
         // ============ parse inbound start =========================================
-        // > 4.0
-        if json["inbounds"].exists() {
-            self.isNewVersion = true
-            // check inbounds
-            if json["inbounds"].arrayValue.count > 0 {
-                var inbounds: [V2rayInbound] = []
-                json["inbounds"].arrayValue.forEach {
-                    val in
-                    inbounds += [self.parseInbound(jsonParams: val)]
-                }
-                self.v2ray.inbounds = inbounds
-            } else {
-                self.error = "missing inbounds"
-            }
-        } else {
-            // old version
-            // 1. inbound
-            if json["inbound"].dictionaryValue.count > 0 {
-                self.v2ray.inbound = self.parseInbound(jsonParams: json["inbound"])
-            } else {
-                self.error = "missing inbound"
-            }
-
-            // 2. inboundDetour
-            if json["inboundDetour"].arrayValue.count > 0 {
-                var inboundDetour: [V2rayInbound] = []
-                json["inboundDetour"].arrayValue.forEach {
-                    val in
-                    inboundDetour += [self.parseInbound(jsonParams: val)]
-                }
-                self.v2ray.inboundDetour = inboundDetour
-            }
-        }
+        // use default
         // ------------ parse inbound end -------------------------------------------
 
         // ============ parse outbound start =========================================
         // > 4.0
         if json["outbounds"].exists() {
-            self.isNewVersion = true
             // check outbounds
             if json["outbounds"].arrayValue.count > 0 {
                 // outbounds
@@ -841,24 +677,23 @@ class V2rayConfig: NSObject {
             }
         } else {
             // check outbounds
+            var outbounds: [V2rayOutbound] = []
+
             // 1. outbound
             if json["outbound"].dictionaryValue.count > 0 {
-                self.v2ray.outbound = self.parseOutbound(jsonParams: json["outbound"])
+                outbounds += [self.parseOutbound(jsonParams: json["outbound"])]
             } else {
                 self.errors += ["missing outbound"]
             }
 
             // outboundDetour
             if json["outboundDetour"].arrayValue.count > 0 {
-                var outboundDetour: [V2rayOutbound] = []
-
                 json["outboundDetour"].arrayValue.forEach {
                     val in
-                    outboundDetour += [self.parseOutbound(jsonParams: val)]
+                    outbounds += [self.parseOutbound(jsonParams: val)]
                 }
-
-                self.v2ray.outboundDetour = outboundDetour
             }
+            self.v2ray.outbounds = outbounds
         }
         // ------------ parse outbound end -------------------------------------------
 
@@ -1343,31 +1178,31 @@ class V2rayConfig: NSObject {
         }
 
         // set main server protocol
-        if !self.foundServerProtocol && [V2rayProtocolOutbound.socks.rawValue, V2rayProtocolOutbound.vmess.rawValue, V2rayProtocolOutbound.vless.rawValue, V2rayProtocolOutbound.shadowsocks.rawValue].contains(v2rayOutbound.protocol.rawValue) {
+        let mainProtocol: [V2rayProtocolOutbound] = [V2rayProtocolOutbound.blackhole, V2rayProtocolOutbound.freedom, V2rayProtocolOutbound.http, V2rayProtocolOutbound.dns]
+        if !self.foundServerProtocol && !mainProtocol.contains(v2rayOutbound.protocol) {
             self.serverProtocol = v2rayOutbound.protocol.rawValue
             self.foundServerProtocol = true
-        }
 
-        if v2rayOutbound.protocol == V2rayProtocolOutbound.socks {
-            self.serverSocks5 = v2rayOutbound.settingSocks!
-        }
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.socks {
+                self.serverSocks5 = v2rayOutbound.settingSocks!
+            }
 
-        if v2rayOutbound.protocol == V2rayProtocolOutbound.vmess && v2rayOutbound.settingVMess != nil && v2rayOutbound.settingVMess!.vnext.count > 0 {
-            self.serverVmess = v2rayOutbound.settingVMess!.vnext[0]
-        }
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.vmess && v2rayOutbound.settingVMess != nil && v2rayOutbound.settingVMess!.vnext.count > 0 {
+                self.serverVmess = v2rayOutbound.settingVMess!.vnext[0]
+            }
 
-        if v2rayOutbound.protocol == V2rayProtocolOutbound.vless && v2rayOutbound.settingVLess != nil && v2rayOutbound.settingVLess!.vnext.count > 0 {
-            self.serverVless = v2rayOutbound.settingVLess!.vnext[0]
-        }
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.vless && v2rayOutbound.settingVLess != nil && v2rayOutbound.settingVLess!.vnext.count > 0 {
+                self.serverVless = v2rayOutbound.settingVLess!.vnext[0]
+            }
 
-        if v2rayOutbound.protocol == V2rayProtocolOutbound.shadowsocks && v2rayOutbound.settingShadowsocks != nil && v2rayOutbound.settingShadowsocks!.servers.count > 0 {
-            self.serverShadowsocks = v2rayOutbound.settingShadowsocks!.servers[0]
-        }
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.shadowsocks && v2rayOutbound.settingShadowsocks != nil && v2rayOutbound.settingShadowsocks!.servers.count > 0 {
+                self.serverShadowsocks = v2rayOutbound.settingShadowsocks!.servers[0]
+            }
 
-        if v2rayOutbound.protocol == V2rayProtocolOutbound.trojan && v2rayOutbound.settingTrojan != nil && v2rayOutbound.settingTrojan!.servers.count > 0 {
-            self.serverTrojan = v2rayOutbound.settingTrojan!.servers[0]
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.trojan && v2rayOutbound.settingTrojan != nil && v2rayOutbound.settingTrojan!.servers.count > 0 {
+                self.serverTrojan = v2rayOutbound.settingTrojan!.servers[0]
+            }
         }
-
 
         return (v2rayOutbound)
     }

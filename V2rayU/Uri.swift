@@ -1,323 +1,10 @@
 //
-// Created by yanue on 2018/11/22.
-// Copyright (c) 2018 yanue. All rights reserved.
+// Created by yanue on 2021/6/5.
+// Copyright (c) 2021 yanue. All rights reserved.
 //
 
-import Cocoa
-import CoreGraphics
-import CoreImage
+import Foundation
 import SwiftyJSON
-
-struct VmessShare: Codable {
-    var v: String = "2"
-    var ps: String = ""
-    var add: String = ""
-    var port: String = ""
-    var id: String = ""
-    var aid: String = ""
-    var net: String = ""
-    var type: String = "none"
-    var host: String = ""
-    var path: String = ""
-    var tls: String = "none"
-}
-
-class ShareUri {
-    var error = ""
-    var remark = ""
-    var uri: String = ""
-    var v2ray = V2rayConfig()
-    var share = VmessShare()
-
-    func qrcode(item: V2rayItem) {
-        v2ray.parseJson(jsonText: item.json)
-        if !v2ray.isValid {
-            self.error = v2ray.errors[0]
-            return
-        }
-
-        self.remark = item.remark
-
-        if v2ray.serverProtocol == V2rayProtocolOutbound.vmess.rawValue {
-            self.genVmessUri()
-
-            let encoder = JSONEncoder()
-            if let data = try? encoder.encode(self.share) {
-                let uri = String(data: data, encoding: .utf8)!
-                self.uri = "vmess://" + uri.base64Encoded()!
-            } else {
-                self.error = "encode uri error"
-            }
-            return
-        }
-
-        if v2ray.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
-            self.genShadowsocksUri()
-            return
-        }
-
-        self.error = "not support"
-    }
-
-    /**s
-    分享的链接（二维码）格式：vmess://(Base64编码的json格式服务器数据
-    json数据如下
-    {
-    "v": "2",
-    "ps": "备注别名",
-    "add": "111.111.111.111",
-    "port": "32000",
-    "id": "1386f85e-657b-4d6e-9d56-78badb75e1fd",
-    "aid": "100",
-    "net": "tcp",
-    "type": "none",
-    "host": "www.bbb.com",
-    "path": "/",
-    "tls": "tls"
-    }
-    v:配置文件版本号,主要用来识别当前配置
-    net ：传输协议（tcp\kcp\ws\h2)
-    type:伪装类型（none\http\srtp\utp\wechat-video）
-    host：伪装的域名
-    1)http host中间逗号(,)隔开
-    2)ws host
-    3)h2 host
-    path:path(ws/h2)
-    tls：底层传输安全（tls)
-    */
-    private func genVmessUri() {
-        self.share.add = self.v2ray.serverVmess.address
-        self.share.ps = self.remark
-        self.share.port = String(self.v2ray.serverVmess.port)
-        self.share.id = self.v2ray.serverVmess.users[0].id
-        self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
-        self.share.net = self.v2ray.streamNetwork
-
-        if self.v2ray.streamNetwork == "h2" {
-            self.share.host = self.v2ray.streamH2.host[0]
-            self.share.path = self.v2ray.streamH2.path
-        }
-
-        if self.v2ray.streamNetwork == "ws" {
-            self.share.host = self.v2ray.streamWs.headers.host
-            self.share.path = self.v2ray.streamWs.path
-        }
-
-        self.share.tls = self.v2ray.streamTlsSecurity
-    }
-
-    // Shadowsocks
-    func genShadowsocksUri() {
-        let ss = ShadowsockUri()
-        ss.host = self.v2ray.serverShadowsocks.address
-        ss.port = self.v2ray.serverShadowsocks.port
-        ss.password = self.v2ray.serverShadowsocks.password
-        ss.method = self.v2ray.serverShadowsocks.method
-        ss.remark = self.remark
-        self.uri = ss.encode()
-        self.error = ss.error
-    }
-}
-
-class ImportUri {
-    var isValid: Bool = false
-    var json: String = ""
-    var remark: String = ""
-    var error: String = ""
-    var uri: String = ""
-
-    static func importUri(uri: String, id: String = "", checkExist: Bool = true) -> ImportUri? {
-        if checkExist && V2rayServer.exist(url: uri) {
-            let importUri = ImportUri()
-            importUri.isValid = false
-            importUri.error = "Url already exists"
-            return importUri
-        }
-
-        if uri.hasPrefix("vmess://") {
-            let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri, id: id)
-            return importUri
-        } else if uri.hasPrefix("ss://") {
-            let importUri = ImportUri()
-            importUri.importSSUri(uri: uri)
-            return importUri
-        } else if uri.hasPrefix("ssr://") {
-            let importUri = ImportUri()
-            importUri.importSSRUri(uri: uri)
-            return importUri
-        }
-        return nil
-    }
-
-    static func supportProtocol(uri: String) -> Bool {
-        if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") {
-            return true
-        }
-        return false
-    }
-
-    func importSSUri(uri: String) {
-        var url = URL(string: uri)
-        if url == nil {
-            let aUri = uri.split(separator: "#")
-            url = URL(string: String(aUri[0]))
-            if url == nil {
-                self.error = "invalid ss url"
-                return
-            }
-            // 支持 ss://YWVzLTI1Ni1jZmI6ZjU1LmZ1bi0wNTM1NDAxNkA0NS43OS4xODAuMTExOjExMDc4#翻墙党300.16美国 格式
-            self.remark = String(aUri[1])
-        }
-
-        self.uri = uri
-
-        let ss = ShadowsockUri()
-        ss.Init(url: url!)
-        if ss.error.count > 0 {
-            self.error = ss.error
-            self.isValid = false
-            return
-        }
-        if ss.remark.count > 0 {
-            self.remark = ss.remark
-        }
-
-        let v2ray = V2rayConfig()
-        var ssServer = V2rayOutboundShadowsockServer()
-        ssServer.address = ss.host
-        ssServer.port = ss.port
-        ssServer.password = ss.password
-        ssServer.method = ss.method
-        v2ray.serverShadowsocks = ssServer
-        v2ray.enableMux = false
-        v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
-        // check is valid
-        v2ray.checkManualValid()
-        if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
-        } else {
-            self.error = v2ray.error
-            self.isValid = false
-        }
-    }
-
-    func importSSRUri(uri: String) {
-        if URL(string: uri) == nil {
-            self.error = "invalid ssr url"
-            return
-        }
-        self.uri = uri
-
-        let ssr = ShadowsockRUri()
-        ssr.Init(url: URL(string: uri)!)
-        if ssr.error.count > 0 {
-            self.error = ssr.error
-            self.isValid = false
-            return
-        }
-        self.remark = ssr.remark
-
-        let v2ray = V2rayConfig()
-        var ssServer = V2rayOutboundShadowsockServer()
-        ssServer.address = ssr.host
-        ssServer.port = ssr.port
-        ssServer.password = ssr.password
-        ssServer.method = ssr.method
-        v2ray.serverShadowsocks = ssServer
-        v2ray.enableMux = false
-        v2ray.serverProtocol = V2rayProtocolOutbound.shadowsocks.rawValue
-        // check is valid
-        v2ray.checkManualValid()
-        if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
-        } else {
-            self.error = v2ray.error
-            self.isValid = false
-        }
-    }
-
-    func importVmessUri(uri: String, id: String = "") {
-        if URL(string: uri) == nil {
-            self.error = "invalid vmess url"
-            return
-        }
-
-        self.uri = uri
-
-        var vmess = VmessUri()
-        vmess.parseType2(url: URL(string: uri)!)
-        if vmess.error.count > 0 {
-            vmess = VmessUri()
-            vmess.parseType1(url: URL(string: uri)!)
-            if vmess.error.count > 0 {
-                print("error", vmess.error)
-                self.isValid = false;
-                self.error = vmess.error
-                return
-            }
-        }
-        self.remark = vmess.remark
-
-        let v2ray = V2rayConfig()
-
-        var vmessItem = V2rayOutboundVMessItem()
-        vmessItem.address = vmess.address
-        vmessItem.port = vmess.port
-        var user = V2rayOutboundVMessUser()
-        if id.count > 0 {
-//            vmess.id = id
-        }
-        user.id = vmess.id
-        user.alterId = vmess.alterId
-        user.security = vmess.security
-        vmessItem.users = [user]
-        v2ray.serverVmess = vmessItem
-        v2ray.serverProtocol = V2rayProtocolOutbound.vmess.rawValue
-
-        // stream
-        v2ray.streamNetwork = vmess.network
-        v2ray.streamTlsAllowInsecure = vmess.allowInsecure
-        v2ray.streamTlsSecurity = vmess.tls
-        v2ray.streamTlsServerName = vmess.tlsServer
-
-        // tls servername for h2 or ws
-        if vmess.tlsServer.count == 0 && (vmess.network == V2rayStreamSettings.network.h2.rawValue || vmess.network == V2rayStreamSettings.network.ws.rawValue) {
-            v2ray.streamTlsServerName = vmess.netHost
-        }
-
-        // kcp
-        v2ray.streamKcp.header.type = vmess.type
-        v2ray.streamKcp.uplinkCapacity = vmess.uplinkCapacity
-        v2ray.streamKcp.downlinkCapacity = vmess.downlinkCapacity
-
-        // h2
-        v2ray.streamH2.host[0] = vmess.netHost
-        v2ray.streamH2.path = vmess.netPath
-
-        // ws
-        v2ray.streamWs.path = vmess.netPath
-        v2ray.streamWs.headers.host = vmess.netHost
-
-        // tcp
-        v2ray.streamTcp.header.type = vmess.type
-
-        // quic
-        v2ray.streamQuic.header.type = vmess.type
-
-        // check is valid
-        v2ray.checkManualValid()
-        if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
-        } else {
-            self.error = v2ray.error
-            self.isValid = false
-        }
-    }
-}
 
 // see: https://github.com/v2ray/v2ray-core/issues/1139
 class VmessUri {
@@ -695,54 +382,37 @@ class ShadowsockRUri: ShadowsockUri {
     }
 }
 
-class Scanner {
+// trojan
+class TrojanUri {
+    var host: String = ""
+    var port: Int = 443
+    var password: String = ""
+    var remark: String = ""
 
-    // scan from screen
-    static func scanQRCodeFromScreen() -> String {
-        var displayCount: UInt32 = 0;
-        var result = CGGetActiveDisplayList(0, nil, &displayCount)
-        if (Int(result.rawValue) != 0) {
-            return ""
-        }
-        let allocated = Int(displayCount)
-        let activeDisplays: UnsafeMutablePointer<UInt32> = UnsafeMutablePointer<CGDirectDisplayID>.allocate(capacity: allocated)
+    var error: String = ""
 
-        result = CGGetActiveDisplayList(displayCount, activeDisplays, &displayCount)
-        if (Int(result.rawValue) != 0) {
-            return ""
-        }
-
-        var qrStr = ""
-
-        for i in 0..<displayCount {
-            let str = self.getQrcodeStr(displayID: activeDisplays[Int(i)])
-            // support: ss:// | ssr:// | vmess://
-            if ImportUri.supportProtocol(uri: str) {
-                qrStr = str
-                break
-            }
-        }
-
-        activeDisplays.deallocate()
-
-        return qrStr
+    // trojan://password@remote_host:remote_port
+    func encode() -> String {
+        let uri = self.password + "@" + self.host + ":" + String(self.port)
+        return "trojan://" + uri + "#" + self.remark
     }
 
-    private static func getQrcodeStr(displayID: CGDirectDisplayID) -> String {
-        guard let qrcodeImg = CGDisplayCreateImage(displayID) else {
-            return ""
+    func Init(url: URL) {
+        guard let host = url.host else {
+            self.error = "error:missing host"
+            return
         }
-
-        let detector: CIDetector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])!
-        let ciImage: CIImage = CIImage(cgImage: qrcodeImg)
-        let features = detector.features(in: ciImage)
-
-        var qrCodeLink = ""
-
-        for feature in features as! [CIQRCodeFeature] {
-            qrCodeLink += feature.messageString ?? ""
+        guard let port = url.port else {
+            self.error = "error:missing port"
+            return
         }
-
-        return qrCodeLink
+        guard let password = url.user else {
+            self.error = "error:missing password"
+            return
+        }
+        self.host = host
+        self.port = Int(port)
+        self.password = password
+        self.remark = url.fragment ?? "trojan"
     }
 }

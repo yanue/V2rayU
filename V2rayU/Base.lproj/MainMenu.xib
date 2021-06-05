@@ -100,6 +100,12 @@
                         <action selector="openPreferencePac:" target="hcZ-V7-Dui" id="q2a-9U-SCe"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Ping Speed..." tag="1" id="A9g-Ks-No1">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="pingSpeed:" target="hcZ-V7-Dui" id="Ldd-t9-Gzs"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="4r0-fk-xMy"/>
                 <menuItem title="Import Server From Pasteboard" keyEquivalent="p" toolTip="ss:// or vmess://" id="Kct-KD-qPN">
                     <connections>
