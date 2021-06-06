@@ -446,75 +446,88 @@ class VlessUri {
     var address: String = ""
     var port: Int = 0
     var id: String = ""
+
     var level: Int = 0
     var flow: String = ""
 
     var encryption: String = "" // auto,aes-128-gcm,...
     var security: String = "" // xtls,tls
 
-    var network: String = "tcp"
-    var netHost: String = ""
-    var netPath: String = ""
+    var type: String = "" // tcp,http
+    var host: String = ""
+    var sni: String = ""
+    var path: String = ""
 
-    var headerType: String = ""
+    // vless://f2a5064a-fabb-43ed-a2b6-8ffeb970df7f@00.com:443?flow=xtls-rprx-splite&encryption=none&security=xtls&sni=aaaaa&type=http&host=00.com&path=%2fvl#vless1
+    func encode() -> String {
+        var uri = URLComponents()
+        uri.scheme = "vless"
+        uri.user = self.id
+        uri.host = self.address
+        uri.port = self.port
+        uri.queryItems = [
+            URLQueryItem(name: "flow", value: self.flow),
+            URLQueryItem(name: "encryption", value: self.encryption),
+            URLQueryItem(name: "type", value: self.type),
+            URLQueryItem(name: "host", value: self.host),
+            URLQueryItem(name: "path", value: self.path),
+            URLQueryItem(name: "sni", value: self.sni),
+        ]
 
-    var type: String = "none"
-    var uplinkCapacity: Int = 50
-    var downlinkCapacity: Int = 20
-    var allowInsecure: Bool = false
-    var tlsServer: String = ""
-    var mux: Bool = true
-    var muxConcurrency: Int = 8
+        return uri.url?.absoluteString ?? "" + "#" + self.remark
+    }
 
-    func parseType1(url: URL) {
-        let urlStr = url.absoluteString
-        // vless://
-        let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 8)
-        let base64End = urlStr.firstIndex(of: "?")
-        let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])
-
-        var paramsStr: String = ""
-        if base64End != nil {
-            let paramsAll = urlStr.components(separatedBy: "?")
-            paramsStr = paramsAll[1]
-        }
-
-        guard let decodeStr = encodedStr.base64Decoded() else {
-            self.error = "error decode Str"
+    func Init(url: URL) {
+        guard let address = url.host else {
+            self.error = "error:missing host"
             return
         }
-        print("decodeStr", decodeStr)
-        // main
-        var uuid_ = ""
-        var host_ = ""
-        let mainArr = decodeStr.components(separatedBy: "@")
-        if mainArr.count > 1 {
-            uuid_ = mainArr[0]
-            host_ = mainArr[1]
+        guard let port = url.port else {
+            self.error = "error:missing port"
+            return
         }
-
-        let uuid_security = uuid_.components(separatedBy: ":")
-        if uuid_security.count > 1 {
-            self.security = uuid_security[0]
-            self.id = uuid_security[1]
+        guard let id = url.user else {
+            self.error = "error:missing id"
+            return
         }
-
-        let host_port = host_.components(separatedBy: ":")
-        if host_port.count > 1 {
-            self.address = host_port[0]
-            self.port = Int(host_port[1]) ?? 0
-        }
-        print("VmessUri self", self)
-
-        // params
-        let params = paramsStr.components(separatedBy: "&")
-        for item in params {
-            var param = item.components(separatedBy: "=")
-            switch param[0] {
+        self.address = address
+        self.port = Int(port)
+        self.id = id
+        let queryItems = url.queryParams()
+        for item in queryItems {
+            switch item.key {
+            case "level":
+                self.level = item.value as! Int
+                break
+            case "flow":
+                self.flow = item.value as! String
+                break
+            case "encryption":
+                self.encryption = item.value as! String
+                if self.encryption.count == 0 {
+                    self.encryption = "none"
+                }
+                break
+            case "security":
+                self.security = item.value as! String
+                break
+            case "type":
+                self.type = item.value as! String
+                break
+            case "host":
+                self.host = item.value as! String
+                break
+            case "sni":
+                self.sni = item.value as! String
+                break
+            case "path":
+                self.path = item.value as! String
+                break
             default:
                 break
             }
         }
-    }
 
+        self.remark = url.fragment ?? "vless"
+    }
 }

@@ -49,6 +49,11 @@ class ShareUri {
             return
         }
 
+        if v2ray.serverProtocol == V2rayProtocolOutbound.vless.rawValue {
+            self.genVlessUri()
+            return
+        }
+
         if v2ray.serverProtocol == V2rayProtocolOutbound.shadowsocks.rawValue {
             self.genShadowsocksUri()
             return
@@ -131,4 +136,35 @@ class ShareUri {
         self.uri = ss.encode()
         self.error = ss.error
     }
+
+    func genVlessUri() {
+        let ss = VlessUri()
+        ss.address = self.v2ray.serverVless.address
+        ss.port = self.v2ray.serverVless.port
+
+        ss.id = self.v2ray.serverVless.users[0].id
+        ss.level = self.v2ray.serverVless.users[0].level
+        ss.flow = self.v2ray.serverVless.users[0].flow
+        ss.encryption = self.v2ray.serverVless.users[0].encryption
+
+        ss.remark = self.remark
+
+        ss.security = self.v2ray.streamTlsSecurity
+
+        ss.type = self.v2ray.streamNetwork
+
+        if self.v2ray.streamNetwork == "h2" {
+            ss.host = self.v2ray.streamH2.host[0]
+            ss.path = self.v2ray.streamH2.path
+        }
+
+        if self.v2ray.streamNetwork == "ws" {
+            ss.host = self.v2ray.streamWs.headers.host
+            ss.path = self.v2ray.streamWs.path
+        }
+
+        self.uri = ss.encode()
+        self.error = ss.error
+    }
+
 }

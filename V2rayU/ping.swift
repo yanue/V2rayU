@@ -87,8 +87,6 @@ class PingSpeed: NSObject {
 
             DispatchQueue.main.async {
                 menuController.statusMenu.item(withTag: 1)?.title = "\(normalTitle)"
-                print("            // refresh server            menuController.showServers()")
-                // refresh servers
                 // reload
                 V2rayServer.loadConfig()
 

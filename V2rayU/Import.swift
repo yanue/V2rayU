@@ -35,7 +35,7 @@ class ImportUri {
         }
         if uri.hasPrefix("vless://") {
             let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri, id: id)
+            importUri.importVlessUri(uri: uri)
             return importUri
         }
         if uri.hasPrefix("ss://") {
@@ -201,6 +201,73 @@ class ImportUri {
         // ws
         v2ray.streamWs.path = vmess.netPath
         v2ray.streamWs.headers.host = vmess.netHost
+
+        // tcp
+        v2ray.streamTcp.header.type = vmess.type
+
+        // quic
+        v2ray.streamQuic.header.type = vmess.type
+
+        // check is valid
+        v2ray.checkManualValid()
+        if v2ray.isValid {
+            self.isValid = true
+            self.json = v2ray.combineManual()
+        } else {
+            self.error = v2ray.error
+            self.isValid = false
+        }
+    }
+
+    func importVlessUri(uri: String, id: String = "") {
+        if URL(string: uri) == nil {
+            self.error = "invalid vless url"
+            return
+        }
+
+        self.uri = uri
+
+        let vmess = VlessUri()
+        vmess.Init(url: URL(string: uri)!)
+        if vmess.error.count > 0 {
+            self.error = vmess.error
+            return
+        }
+        self.remark = vmess.remark
+        print("vmess", vmess)
+        let v2ray = V2rayConfig()
+        v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
+
+        var vmessItem = V2rayOutboundVLessItem()
+        vmessItem.address = vmess.address
+        vmessItem.port = vmess.port
+        var user = V2rayOutboundVLessUser()
+        user.id = vmess.id
+        user.flow = vmess.flow
+        user.encryption = vmess.encryption
+        user.level = vmess.level
+        vmessItem.users = [user]
+        v2ray.serverVless = vmessItem
+
+        // stream
+        v2ray.streamNetwork = vmess.type
+        v2ray.streamTlsSecurity = vmess.security
+
+        // tls servername for h2 or ws
+        if (vmess.type == V2rayStreamSettings.network.h2.rawValue || vmess.type == V2rayStreamSettings.network.ws.rawValue) {
+            v2ray.streamTlsServerName = vmess.host
+        }
+
+        // kcp
+        v2ray.streamKcp.header.type = vmess.type
+
+        // h2
+        v2ray.streamH2.host[0] = vmess.host
+        v2ray.streamH2.path = vmess.path
+
+        // ws
+        v2ray.streamWs.path = vmess.path
+        v2ray.streamWs.headers.host = vmess.host
 
         // tcp
         v2ray.streamTcp.header.type = vmess.type

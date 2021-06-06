@@ -252,3 +252,20 @@ extension FileManager {
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
 }
+
+extension URL {
+    func queryParams() -> [String: Any] {
+        var dict = [String: Any]()
+
+        if let components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
+            if let queryItems = components.queryItems {
+                for item in queryItems {
+                    dict[item.name] = item.value!
+                }
+            }
+            return dict
+        } else {
+            return [:]
+        }
+    }
+}
