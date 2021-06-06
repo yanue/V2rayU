@@ -106,8 +106,7 @@ class V2rayLaunch: NSObject {
         // start http server
         startHttpServer()
 
-        // unload first
-        _ = shell(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
+        // just start: stop is so slow
         let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["start", LAUNCH_AGENT_NAME])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
@@ -156,7 +155,7 @@ class V2rayLaunch: NSObject {
         if !fileMgr.isExecutableFile(atPath: AppHomePath + "/V2rayUTool") {
             self.install()
         }
-        
+
         let task = Process.launchedProcess(launchPath: AppHomePath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {

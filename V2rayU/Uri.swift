@@ -416,3 +416,105 @@ class TrojanUri {
         self.remark = url.fragment ?? "trojan"
     }
 }
+
+// 待定标准方案: https://github.com/XTLS/Xray-core/issues/91
+//# VMess + TCP，不加密（仅作示例，不安全）
+//vmess://99c80931-f3f1-4f84-bffd-6eed6030f53d@qv2ray.net:31415?encryption=none#VMessTCPNaked
+//# VMess + TCP，自动选择加密。编程人员特别注意不是所有的 URL 都有问号，注意处理边缘情况。
+//vmess://f08a563a-674d-4ffb-9f02-89d28aec96c9@qv2ray.net:9265#VMessTCPAuto
+//# VMess + TCP，手动选择加密
+//vmess://5dc94f3a-ecf0-42d8-ae27-722a68a6456c@qv2ray.net:35897?encryption=aes-128-gcm#VMessTCPAES
+//# VMess + TCP + TLS，内层不加密
+//vmess://136ca332-f855-4b53-a7cc-d9b8bff1a8d7@qv2ray.net:9323?encryption=none&security=tls#VMessTCPTLSNaked
+//# VMess + TCP + TLS，内层也自动选择加密
+//vmess://be5459d9-2dc8-4f47-bf4d-8b479fc4069d@qv2ray.net:8462?security=tls#VMessTCPTLS
+//# VMess + TCP + TLS，内层不加密，手动指定 SNI
+//vmess://c7199cd9-964b-4321-9d33-842b6fcec068@qv2ray.net:64338?encryption=none&security=tls&sni=fastgit.org#VMessTCPTLSSNI
+//# VLESS + TCP + XTLS
+//vless://b0dd64e4-0fbd-4038-9139-d1f32a68a0dc@qv2ray.net:3279?security=xtls&flow=rprx-xtls-splice#VLESSTCPXTLSSplice
+//# VLESS + mKCP + Seed
+//vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:50288?type=kcp&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeed
+//# VLESS + mKCP + Seed，伪装成 Wireguard
+//vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:41971?type=kcp&headerType=wireguard&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeedWG
+//# VMess + WebSocket + TLS
+//vmess://44efe52b-e143-46b5-a9e7-aadbfd77eb9c@qv2ray.net:6939?type=ws&security=tls&host=qv2ray.net&path=%2Fsomewhere#VMessWebSocketTLS
+
+class VlessUri {
+    var error: String = ""
+    var remark: String = ""
+
+    var address: String = ""
+    var port: Int = 0
+    var id: String = ""
+    var level: Int = 0
+    var flow: String = ""
+
+    var encryption: String = "" // auto,aes-128-gcm,...
+    var security: String = "" // xtls,tls
+
+    var network: String = "tcp"
+    var netHost: String = ""
+    var netPath: String = ""
+
+    var headerType: String = ""
+
+    var type: String = "none"
+    var uplinkCapacity: Int = 50
+    var downlinkCapacity: Int = 20
+    var allowInsecure: Bool = false
+    var tlsServer: String = ""
+    var mux: Bool = true
+    var muxConcurrency: Int = 8
+
+    func parseType1(url: URL) {
+        let urlStr = url.absoluteString
+        // vless://
+        let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 8)
+        let base64End = urlStr.firstIndex(of: "?")
+        let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])
+
+        var paramsStr: String = ""
+        if base64End != nil {
+            let paramsAll = urlStr.components(separatedBy: "?")
+            paramsStr = paramsAll[1]
+        }
+
+        guard let decodeStr = encodedStr.base64Decoded() else {
+            self.error = "error decode Str"
+            return
+        }
+        print("decodeStr", decodeStr)
+        // main
+        var uuid_ = ""
+        var host_ = ""
+        let mainArr = decodeStr.components(separatedBy: "@")
+        if mainArr.count > 1 {
+            uuid_ = mainArr[0]
+            host_ = mainArr[1]
+        }
+
+        let uuid_security = uuid_.components(separatedBy: ":")
+        if uuid_security.count > 1 {
+            self.security = uuid_security[0]
+            self.id = uuid_security[1]
+        }
+
+        let host_port = host_.components(separatedBy: ":")
+        if host_port.count > 1 {
+            self.address = host_port[0]
+            self.port = Int(host_port[1]) ?? 0
+        }
+        print("VmessUri self", self)
+
+        // params
+        let params = paramsStr.components(separatedBy: "&")
+        for item in params {
+            var param = item.components(separatedBy: "=")
+            switch param[0] {
+            default:
+                break
+            }
+        }
+    }
+
+}
