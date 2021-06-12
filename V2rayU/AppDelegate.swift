@@ -135,7 +135,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2raySubSync().sync()
         }
         // ping
-        PingSpeed().pingAll()
+//        PingSpeed().pingAll()
     }
 
     @objc func onSleepNote(note: NSNotification) {
