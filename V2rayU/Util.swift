@@ -12,7 +12,7 @@ extension UserDefaults {
 
     enum KEY: String {
         // v2ray-core version
-        case v2rayCoreVersion
+        case xRayCoreVersion
         // v2ray server item list
         case v2rayServerList
         // v2ray subscribe item list

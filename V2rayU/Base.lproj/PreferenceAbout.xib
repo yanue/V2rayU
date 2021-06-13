@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -38,7 +38,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Te4-BT-hGI">
-                    <rect key="frame" x="167" y="189" width="152" height="16"/>
+                    <rect key="frame" x="166" y="189" width="152" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="github.com/yanue/v2rayU" id="Qby-y7-vli">
                         <font key="font" metaFont="systemUltraLight" size="12"/>
@@ -47,7 +47,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e05-pp-m5L">
-                    <rect key="frame" x="166" y="166" width="122" height="16"/>
+                    <rect key="frame" x="168" y="166" width="122" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="yanue@outlook.com" id="Guc-nt-FeY">
                         <font key="font" metaFont="systemUltraLight" size="12"/>
@@ -65,7 +65,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oNz-CM-Geb">
-                    <rect key="frame" x="147" y="139" width="24" height="25"/>
+                    <rect key="frame" x="147" y="138" width="24" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="🔗" id="rUl-Lc-b4S">
                         <font key="font" size="12" name="AppleColorEmoji"/>
@@ -74,9 +74,9 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hji-yO-Zff">
-                    <rect key="frame" x="167" y="143" width="106" height="16"/>
+                    <rect key="frame" x="167" y="143" width="146" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="github.com/v2ray" id="Sw8-ch-1M9">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="https://github.com/XTLS" id="Sw8-ch-1M9">
                         <font key="font" metaFont="systemUltraLight" size="12"/>
                         <color key="textColor" name="selectedContentBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
@@ -85,7 +85,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="huF-fy-g3j">
                     <rect key="frame" x="142" y="92" width="156" height="14"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Copyright © 2019 yanue.net" id="bCA-au-e3o">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Copyright © 2021 yanue.net" id="bCA-au-e3o">
                         <font key="font" metaFont="controlContent" size="11"/>
                         <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -94,7 +94,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gws-ge-QLa">
                     <rect key="frame" x="144" y="69" width="156" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" controlSize="mini" lineBreakMode="charWrapping" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="based on v2ray-core v4.18.0" usesSingleLineMode="YES" bezelStyle="round" id="8bU-0Q-dTD">
+                    <textFieldCell key="cell" controlSize="mini" lineBreakMode="charWrapping" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="based on Xray-core v1.4.2" usesSingleLineMode="YES" bezelStyle="round" id="8bU-0Q-dTD">
                         <font key="font" metaFont="menu" size="9"/>
                         <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -110,7 +110,7 @@
                     </textFieldCell>
                 </textField>
             </subviews>
-            <point key="canvasLocation" x="-155" y="-220.5"/>
+            <point key="canvasLocation" x="-155" y="-221"/>
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
     </objects>

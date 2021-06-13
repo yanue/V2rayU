@@ -562,7 +562,7 @@ class MenuController: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             self.importUri(url: uri)
         } else {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess:// from Pasteboard")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// from Pasteboard")
         }
     }
 
@@ -592,7 +592,7 @@ class MenuController: NSObject, NSMenuDelegate {
             // ss://YWVzLTI1Ni1jZmI6ZUlXMERuazY5NDU0ZTZuU3d1c3B2OURtUzIwMXRRMERAMTcyLjEwNS43MS44Mjo4MDk5#翻墙党325.06美国 类型这种含中文的格式不是标准的URL格式
 //            if URL(string: uri) == nil {
             if !ImportUri.supportProtocol(uri: uri) {
-                noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
+                noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
                 continue
             }
 
@@ -601,7 +601,7 @@ class MenuController: NSObject, NSMenuDelegate {
                 continue
             }
 
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found ss:// , ssr:// or vmess://")
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
         }
     }
 

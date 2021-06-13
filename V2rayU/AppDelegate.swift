@@ -73,8 +73,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func checkDefault() {
-        if UserDefaults.get(forKey: .v2rayCoreVersion) == nil {
-            UserDefaults.set(forKey: .v2rayCoreVersion, value: V2rayCore.version)
+        if UserDefaults.get(forKey: .xRayCoreVersion) == nil {
+            UserDefaults.set(forKey: .xRayCoreVersion, value: V2rayCore.version)
         }
         if UserDefaults.get(forKey: .autoCheckVersion) == nil {
             UserDefaults.setBool(forKey: .autoCheckVersion, value: true)

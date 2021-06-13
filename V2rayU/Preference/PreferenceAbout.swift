@@ -28,7 +28,7 @@ final class PreferenceAboutViewController: NSViewController, PreferencePane {
         
         self.VersionLabel.stringValue = "Version " + appVersion
 
-        if let v2rayCoreVersion = UserDefaults.get(forKey: .v2rayCoreVersion) {
+        if let v2rayCoreVersion = UserDefaults.get(forKey: .xRayCoreVersion) {
             self.V2rayCoreVersion.stringValue = "based on v2ray-core " + v2rayCoreVersion
         }
     }

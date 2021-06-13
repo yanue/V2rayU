@@ -50,7 +50,8 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         var userRuleTxt = """
                           ! Put user rules line by line in this file.
                           ! See https://adblockplus.org/en/filter-cheatsheet
-
+                          ||api.github.com
+                          ||githubusercontent.com
                           """
         if txt != nil {
             if txt!.count > 0 {
@@ -61,6 +62,11 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             if str?.count ?? 0 > 0 {
                 userRuleTxt = str!
             }
+        }
+        // auto include githubusercontent.com api.github.com
+        if !userRuleTxt.contains("githubusercontent.com") {
+            userRuleTxt.append("\n||api.github.com")
+            userRuleTxt.append("\n||githubusercontent.com")
         }
         userRulesView.string = userRuleTxt
     }

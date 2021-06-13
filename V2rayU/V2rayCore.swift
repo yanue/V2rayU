@@ -11,12 +11,12 @@ import SwiftyJSON
 
 // v2ray-core version check, download, unzip
 class V2rayCore {
-    static let version = "v4.31.0"
+    static let version = "v1.4.2"
     // need replace ${version}
-    //  "https://github.com/v2fly/v2ray-core/releases/download/v4.34.0/v2ray-macos-64.zip"
-    var releaseUrl: String = "https://github.com/v2fly/v2ray-core/releases/download/${version}/v2ray-macos-64.zip"
-    // lastet release verison info
-    let versionUrl: String = "https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
+    //  "https://github.com/XTLS/Xray-core/releases/download/v1.4.2/Xray-macos-64.zip"
+    var releaseUrl: String = "https://github.com/XTLS/Xray-core/releases/download/${version}/Xray-macos-64.zip"
+    // last release version info
+    let versionUrl: String = "https://api.github.com/repos/XTLS/Xray-core/releases/latest"
 
     func checkLocal(hasNewVersion: Bool) {
         // has new verion
@@ -34,7 +34,7 @@ class V2rayCore {
 
     func check() {
         // 当前版本检测
-        let oldVersion = UserDefaults.get(forKey: .v2rayCoreVersion) ?? V2rayCore.version
+        let oldVersion = UserDefaults.get(forKey: .xRayCoreVersion) ?? V2rayCore.version
         NSLog("check version", oldVersion)
 
         Alamofire.request(versionUrl).responseJSON { response in
@@ -85,7 +85,7 @@ class V2rayCore {
                 // compare with [Int]
                 if oldVer.lexicographicallyPrecedes(curVer) {
                     // store this version
-                    UserDefaults.set(forKey: .v2rayCoreVersion, value: newVersion)
+                    UserDefaults.set(forKey: .xRayCoreVersion, value: newVersion)
                     // has new version
                     hasNewVersion = true
                     NSLog("has new version", newVersion)
@@ -97,7 +97,7 @@ class V2rayCore {
     }
 
     func download() {
-        let version = UserDefaults.get(forKey: .v2rayCoreVersion) ?? "v4.34.0"
+        let version = UserDefaults.get(forKey: .xRayCoreVersion) ?? "v1.4.2"
         let url = releaseUrl.replacingOccurrences(of: "${version}", with: version)
         NSLog("start download", version)
 
