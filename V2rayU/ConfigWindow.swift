@@ -317,6 +317,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             v2rayConfig.streamTlsSecurity = self.streamSecurity.titleOfSelectedItem!
         }
         v2rayConfig.streamTlsServerName = self.streamTlsServerName.stringValue
+        v2rayConfig.streamXtlsServerName = self.streamTlsServerName.stringValue
 
         // tcp
         if self.tcpHeaderType.indexOfSelectedItem >= 0 {
@@ -425,6 +426,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamAllowSecure.intValue = v2rayConfig.streamTlsAllowInsecure ? 1 : 0
         self.streamSecurity.selectItem(withTitle: v2rayConfig.streamTlsSecurity)
         self.streamTlsServerName.stringValue = v2rayConfig.streamTlsServerName
+        if v2rayConfig.streamTlsSecurity == "xtls" {
+            self.streamTlsServerName.stringValue = v2rayConfig.streamXtlsServerName
+        }
 
         // tcp
         self.tcpHeaderType.selectItem(withTitle: v2rayConfig.streamTcp.header.type)

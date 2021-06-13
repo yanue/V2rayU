@@ -130,7 +130,7 @@ class V2rayConfig: NSObject {
     var routing = V2rayRouting()
 
     // tls
-    var streamTlsSecurity = "none"
+    var streamTlsSecurity = "none" // none|tls/xtls
     var streamTlsAllowInsecure = false
     var streamTlsServerName = ""
 
@@ -617,11 +617,11 @@ class V2rayConfig: NSObject {
         }
 
         if self.streamTlsSecurity == "xtls" {
-            var xtls = XTlsSettings()
+            var xtls = XtlsSettings()
 
             xtls.allowInsecure = self.streamTlsAllowInsecure
-            if self.streamTlsServerName.count > 0 {
-                xtls.serverName = self.streamTlsServerName
+            if self.streamXtlsServerName.count > 0 {
+                xtls.serverName = self.streamXtlsServerName
             }
             streamSettings.security = .xtls
             streamSettings.xtlsSettings = xtls
@@ -1244,6 +1244,7 @@ class V2rayConfig: NSObject {
         // steamSettings (same as global transport)
         let transport = self.parseTransport(steamJson: steamJson)
         stream.tlsSettings = transport.tlsSettings
+        stream.xtlsSettings = transport.xtlsSettings
         stream.tcpSettings = transport.tcpSettings
         stream.kcpSettings = transport.kcpSettings
         stream.wsSettings = transport.wsSettings
@@ -1327,6 +1328,20 @@ class V2rayConfig: NSObject {
             xtlsSettings.alpn = steamJson["xtlsSettings"]["alpn"].stringValue
             xtlsSettings.allowInsecure = steamJson["xtlsSettings"]["allowInsecure"].boolValue
             xtlsSettings.allowInsecureCiphers = steamJson["xtlsSettings"]["allowInsecureCiphers"].boolValue
+            // certificates
+            if steamJson["xtlsSettings"]["certificates"].dictionaryValue.count > 0 {
+                var certificates = TlsCertificates()
+                let usage = TlsCertificates.usage(rawValue: steamJson["xtlsSettings"]["certificates"]["usage"].stringValue)
+                if (usage != nil) {
+                    certificates.usage = usage!
+                }
+                certificates.certificateFile = steamJson["xtlsSettings"]["certificates"]["certificateFile"].stringValue
+                certificates.keyFile = steamJson["xtlsSettings"]["certificates"]["keyFile"].stringValue
+                certificates.certificate = steamJson["xtlsSettings"]["certificates"]["certificate"].stringValue
+                certificates.key = steamJson["xtlsSettings"]["certificates"]["key"].stringValue
+                xtlsSettings.certificates = certificates
+            }
+            stream.xtlsSettings = xtlsSettings
         }
 
         // tcpSettings

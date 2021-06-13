@@ -467,6 +467,7 @@ class VlessUri {
         uri.port = self.port
         uri.queryItems = [
             URLQueryItem(name: "flow", value: self.flow),
+            URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "encryption", value: self.encryption),
             URLQueryItem(name: "type", value: self.type),
             URLQueryItem(name: "host", value: self.host),
@@ -474,7 +475,7 @@ class VlessUri {
             URLQueryItem(name: "sni", value: self.sni),
         ]
 
-        return uri.url?.absoluteString ?? "" + "#" + self.remark
+        return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
 
     func Init(url: URL) {

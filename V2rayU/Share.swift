@@ -150,6 +150,7 @@ class ShareUri {
         ss.remark = self.remark
 
         ss.security = self.v2ray.streamTlsSecurity
+        ss.host = self.v2ray.streamXtlsServerName
 
         ss.type = self.v2ray.streamNetwork
 

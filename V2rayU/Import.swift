@@ -234,7 +234,6 @@ class ImportUri {
             return
         }
         self.remark = vmess.remark
-        print("vmess", vmess)
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
 
@@ -252,10 +251,9 @@ class ImportUri {
         // stream
         v2ray.streamNetwork = vmess.type
         v2ray.streamTlsSecurity = vmess.security
-
-        // tls servername for h2 or ws
-        if (vmess.type == V2rayStreamSettings.network.h2.rawValue || vmess.type == V2rayStreamSettings.network.ws.rawValue) {
-            v2ray.streamTlsServerName = vmess.host
+        v2ray.streamXtlsServerName = vmess.host
+        if vmess.host.count == 0 {
+            v2ray.streamXtlsServerName = vmess.address
         }
 
         // kcp
