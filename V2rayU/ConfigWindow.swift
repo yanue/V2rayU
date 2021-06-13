@@ -313,12 +313,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             v2rayConfig.streamNetwork = self.switchNetwork.titleOfSelectedItem!
         }
         v2rayConfig.streamTlsAllowInsecure = self.streamAllowSecure.state.rawValue > 0
+        v2rayConfig.streamXtlsAllowInsecure = self.streamAllowSecure.state.rawValue > 0
         if self.streamSecurity.indexOfSelectedItem >= 0 {
             v2rayConfig.streamTlsSecurity = self.streamSecurity.titleOfSelectedItem!
         }
         v2rayConfig.streamTlsServerName = self.streamTlsServerName.stringValue
         v2rayConfig.streamXtlsServerName = self.streamTlsServerName.stringValue
-
         // tcp
         if self.tcpHeaderType.indexOfSelectedItem >= 0 {
             v2rayConfig.streamTcp.header.type = self.tcpHeaderType.titleOfSelectedItem!
@@ -428,6 +428,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamTlsServerName.stringValue = v2rayConfig.streamTlsServerName
         if v2rayConfig.streamTlsSecurity == "xtls" {
             self.streamTlsServerName.stringValue = v2rayConfig.streamXtlsServerName
+            self.streamAllowSecure.intValue = v2rayConfig.streamXtlsAllowInsecure ? 1 : 0
         }
 
         // tcp

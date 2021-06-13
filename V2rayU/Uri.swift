@@ -188,7 +188,7 @@ class VmessUri {
             return
         }
 
-        self.remark = json["ps"].stringValue
+        self.remark = json["ps"].stringValue.urlDecoded()
         self.address = json["add"].stringValue
         self.port = json["port"].intValue
         self.id = json["id"].stringValue
@@ -252,7 +252,7 @@ class ShadowsockUri {
         self.port = Int(port)
 
         // This can be overriden by the fragment part of SIP002 URL
-        self.remark = parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? ""
+        self.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? "").urlEncoded()
 
         if let password = parsedUrl.password {
             self.method = user.lowercased()
@@ -278,7 +278,7 @@ class ShadowsockUri {
 
             // SIP002 defines where to put the profile name
             if let profileName = parsedUrl.fragment {
-                self.remark = profileName
+                self.remark = profileName.urlEncoded()
             }
         }
     }
@@ -343,7 +343,7 @@ class ShadowsockRUri: ShadowsockUri {
 
         self.method = method.lowercased()
         if let tag = _tag {
-            self.remark = tag
+            self.remark = tag.urlEncoded()
         }
 
         guard let data = Data(base64Encoded: self.padBase64(string: passwordBase64)), let password = String(data: data, encoding: .utf8) else {
@@ -413,7 +413,7 @@ class TrojanUri {
         self.host = host
         self.port = Int(port)
         self.password = password
-        self.remark = url.fragment ?? "trojan"
+        self.remark = (url.fragment ?? "trojan").urlDecoded()
     }
 }
 
@@ -529,6 +529,6 @@ class VlessUri {
             }
         }
 
-        self.remark = url.fragment ?? "vless"
+        self.remark = (url.fragment ?? "vless").urlDecoded()
     }
 }

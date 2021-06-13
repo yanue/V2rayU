@@ -537,9 +537,10 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func copyExportCommand(_ sender: NSMenuItem) {
         // Get the Http proxy config.
         let httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
 
         // Format an export string.
-        let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);"
+        let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);export ALL_PROXY=socks5://127.0.0.1:\(sockPort)"
 
         // Copy to paste board.
         NSPasteboard.general.clearContents()

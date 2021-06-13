@@ -168,13 +168,14 @@ function commit() {
 function downloadV2ray() {
     echo "正在查询最新版v2ray ..."
     rm -fr v2ray-core
-    tag='v4.34.0'
+    tag='v1.4.2'
     echo "v2ray-core version: ${tag}"
-    url="https://github.com/v2fly/v2ray-core/releases/download/v4.34.0/v2ray-macos-64.zip"
+    url="https://github.com/XTLS/Xray-core/releases/download/v1.4.2/Xray-macos-64.zip"
     echo "正在下载最新版v2ray: ${tag}"
-#    curl -Lo v2ray-macos-64.zip ${url}
+    curl -Lo Xray-macos-64.zip ${url}
 
-    unzip -o v2ray-macos-64.zip -d v2ray-core
+    unzip -o Xray-macos-64.zip -d v2ray-core
+    \cp v2ray-core/xray v2ray-core/v2ray
 }
 
 function createDmgByAppdmg() {
