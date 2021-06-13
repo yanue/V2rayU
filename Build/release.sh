@@ -224,8 +224,6 @@ function publish() {
 #    pushRelease ${release_note}
     generateAppcast ${release_note}
     commit
-
-    rm -rf "${DMG_TMP}" "${APP_PATH}" "${V2rayU_RELEASE}"
 }
 
 
