@@ -30,7 +30,7 @@ class ShareUri {
     func qrcode(item: V2rayItem) {
         v2ray.parseJson(jsonText: item.json)
         if !v2ray.isValid {
-            self.error = v2ray.errors[0]
+            self.error = v2ray.errors.count > 0 ? v2ray.errors[0] : ""
             return
         }
 
@@ -97,12 +97,16 @@ class ShareUri {
         self.share.add = self.v2ray.serverVmess.address
         self.share.ps = self.remark
         self.share.port = String(self.v2ray.serverVmess.port)
-        self.share.id = self.v2ray.serverVmess.users[0].id
-        self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
+        if self.v2ray.serverVmess.users.count > 0 {
+            self.share.id = self.v2ray.serverVmess.users[0].id
+            self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
+        }
         self.share.net = self.v2ray.streamNetwork
 
         if self.v2ray.streamNetwork == "h2" {
-            self.share.host = self.v2ray.streamH2.host[0]
+            if self.v2ray.streamH2.host.count > 0 {
+                self.share.host = self.v2ray.streamH2.host[0]
+            }
             self.share.path = self.v2ray.streamH2.path
         }
 
@@ -142,11 +146,12 @@ class ShareUri {
         ss.address = self.v2ray.serverVless.address
         ss.port = self.v2ray.serverVless.port
 
-        ss.id = self.v2ray.serverVless.users[0].id
-        ss.level = self.v2ray.serverVless.users[0].level
-        ss.flow = self.v2ray.serverVless.users[0].flow
-        ss.encryption = self.v2ray.serverVless.users[0].encryption
-
+        if self.v2ray.serverVless.users.count > 0 {
+            ss.id = self.v2ray.serverVless.users[0].id
+            ss.level = self.v2ray.serverVless.users[0].level
+            ss.flow = self.v2ray.serverVless.users[0].flow
+            ss.encryption = self.v2ray.serverVless.users[0].encryption
+        }
         ss.remark = self.remark
 
         ss.security = self.v2ray.streamTlsSecurity
@@ -155,7 +160,9 @@ class ShareUri {
         ss.type = self.v2ray.streamNetwork
 
         if self.v2ray.streamNetwork == "h2" {
-            ss.host = self.v2ray.streamH2.host[0]
+            if self.v2ray.streamH2.host.count > 0 {
+                ss.host = self.v2ray.streamH2.host[0]
+            }
             ss.path = self.v2ray.streamH2.path
         }
 

@@ -76,6 +76,7 @@ extension UserDefaults {
         case routingDirectIps
         case routingBlockDomains
         case routingBlockIps
+        case Exception
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
@@ -151,8 +152,7 @@ extension String {
 
     //将原始的url编码为合法的url
     func urlEncoded() -> String {
-        let encodeUrlString = self.addingPercentEncoding(withAllowedCharacters:
-        .urlQueryAllowed)
+        let encodeUrlString = self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         return encodeUrlString ?? self
     }
 

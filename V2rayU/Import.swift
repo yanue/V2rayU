@@ -68,7 +68,9 @@ class ImportUri {
                 return
             }
             // 支持 ss://YWVzLTI1Ni1jZmI6ZjU1LmZ1bi0wNTM1NDAxNkA0NS43OS4xODAuMTExOjExMDc4#翻墙党300.16美国 格式
-            self.remark = String(aUri[1])
+            if aUri.count > 1 {
+                self.remark = String(aUri[1])
+            }
         }
 
         self.uri = uri
@@ -195,6 +197,9 @@ class ImportUri {
         v2ray.streamKcp.downlinkCapacity = vmess.downlinkCapacity
 
         // h2
+        if v2ray.streamH2.host.count == 0 {
+            v2ray.streamH2.host = [""]
+        }
         v2ray.streamH2.host[0] = vmess.netHost
         v2ray.streamH2.path = vmess.netPath
 
@@ -260,6 +265,9 @@ class ImportUri {
         v2ray.streamKcp.header.type = vmess.type
 
         // h2
+        if v2ray.streamH2.host.count == 0 {
+            v2ray.streamH2.host = [""]
+        }
         v2ray.streamH2.host[0] = vmess.host
         v2ray.streamH2.path = vmess.path
 

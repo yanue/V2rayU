@@ -41,7 +41,6 @@
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
 		66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F3029922AA9C0900FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
-		66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */ = {isa = PBXBuildFile; fileRef = 667029CF21AFB5730079EF41 /* v2ray-core */; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF7F662C35646734A352E /* install.sh */; };
@@ -112,7 +111,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66F411B221CA49F4007AAC10 /* v2ray-core in Copy Files */,
 				66F411B121CA49EE007AAC10 /* pac in Copy Files */,
 			);
 			name = "Copy Files";
@@ -162,7 +160,6 @@
 		6662C20C240EA794000AF6CD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		6662C20D240EA797000AF6CD /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		667029C921AF8E7A0079EF41 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.21.0/Sparkle.framework"; sourceTree = "<group>"; };
-		667029CF21AFB5730079EF41 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
@@ -309,7 +306,6 @@
 			children = (
 				66AD532D241496EF0070529C /* Common */,
 				6683B1EA21C2AD1A004A1C5F /* pac */,
-				667029CF21AFB5730079EF41 /* v2ray-core */,
 				66FEAD44217D75D7009DECF9 /* Build */,
 				664EB373216C9A5E00B6AE0D /* V2rayU */,
 				660C8CA02181CBAA00896361 /* V2rayUTests */,

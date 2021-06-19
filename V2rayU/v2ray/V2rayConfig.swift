@@ -39,11 +39,7 @@ let jsSourceFormatConfig =
                 // ordered keys
                 v2rayConfig["log"] = obj.log;
                 v2rayConfig["inbounds"] = obj.inbounds;
-                v2rayConfig["inbound"] = obj.inbound;
-                v2rayConfig["inboundDetour"] = obj.inboundDetour;
                 v2rayConfig["outbounds"] = obj.outbounds;
-                v2rayConfig["outbound"] = obj.outbound;
-                v2rayConfig["outboundDetour"] = obj.outboundDetour;
                 v2rayConfig["api"] = obj.api;
                 v2rayConfig["dns"] = dns;
                 v2rayConfig["stats"] = obj.stats;
@@ -484,6 +480,10 @@ class V2rayConfig: NSObject {
             }
             break
         case V2rayProtocolOutbound.socks.rawValue:
+            if self.serverSocks5.servers.count == 0 {
+                self.error = "missing socks.servers";
+                return
+            }
             if self.serverSocks5.servers[0].address.count == 0 {
                 self.error = "missing socks.address";
                 return
@@ -1183,7 +1183,7 @@ class V2rayConfig: NSObject {
             self.serverProtocol = v2rayOutbound.protocol.rawValue
             self.foundServerProtocol = true
 
-            if v2rayOutbound.protocol == V2rayProtocolOutbound.socks {
+            if v2rayOutbound.protocol == V2rayProtocolOutbound.socks && v2rayOutbound.settingSocks != nil {
                 self.serverSocks5 = v2rayOutbound.settingSocks!
             }
 
@@ -1208,7 +1208,7 @@ class V2rayConfig: NSObject {
     }
 
     // parse steamSettings
-    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> (V2rayStreamSettings) {
+    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> V2rayStreamSettings {
         var stream = V2rayStreamSettings()
 
         if (V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue) == nil) {

@@ -94,6 +94,9 @@ class VmessUri {
         let params = paramsStr.components(separatedBy: "&")
         for item in params {
             var param = item.components(separatedBy: "=")
+            if param.count < 2 {
+                continue
+            }
             switch param[0] {
             case "network":
                 self.network = param[1]
@@ -252,7 +255,7 @@ class ShadowsockUri {
         self.port = Int(port)
 
         // This can be overriden by the fragment part of SIP002 URL
-        self.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? "").urlEncoded()
+        self.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? "").urlDecoded()
 
         if let password = parsedUrl.password {
             self.method = user.lowercased()
@@ -278,7 +281,7 @@ class ShadowsockUri {
 
             // SIP002 defines where to put the profile name
             if let profileName = parsedUrl.fragment {
-                self.remark = profileName.urlEncoded()
+                self.remark = profileName.urlDecoded()
             }
         }
     }
@@ -343,7 +346,7 @@ class ShadowsockRUri: ShadowsockUri {
 
         self.method = method.lowercased()
         if let tag = _tag {
-            self.remark = tag.urlEncoded()
+            self.remark = tag.urlDecoded()
         }
 
         guard let data = Data(base64Encoded: self.padBase64(string: passwordBase64)), let password = String(data: data, encoding: .utf8) else {

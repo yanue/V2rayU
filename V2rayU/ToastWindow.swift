@@ -66,7 +66,9 @@ class ToastWindowController: NSWindowController {
         var hudWindowFrame: CGRect = self.window!.frame
         hudWindowFrame.size.width = labelFrame.size.width + kHudHorizontalMargin * 2
         hudWindowFrame.size.height = kHudHeight
-
+        if NSScreen.screens.count == 0 {
+            return
+        }
         let screenRect: NSRect = NSScreen.screens[0].visibleFrame
         hudWindowFrame.origin.x = (screenRect.size.width - hudWindowFrame.size.width) / 2
         hudWindowFrame.origin.y = (screenRect.size.height - hudWindowFrame.size.height) / 2
