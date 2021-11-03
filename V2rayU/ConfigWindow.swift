@@ -348,10 +348,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.streamKcp.congestion = self.kcpCongestion.state.rawValue > 0
 
         // h2
-        if v2rayConfig.streamH2.host.count == 0 {
-            v2rayConfig.streamH2.host = [""]
+        let h2HostString = self.h2Host.stringValue
+        if h2HostString.count != 0 {
+            v2rayConfig.streamH2.host = [h2HostString]
+        } else {
+            v2rayConfig.streamH2.host = []
         }
-        v2rayConfig.streamH2.host[0] = self.h2Host.stringValue
         v2rayConfig.streamH2.path = self.h2Path.stringValue
 
         // ws
