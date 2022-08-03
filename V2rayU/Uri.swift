@@ -255,7 +255,7 @@ class ShadowsockUri {
         self.port = Int(port)
 
         // This can be overriden by the fragment part of SIP002 URL
-        self.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? "").urlDecoded()
+        self.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? _tag ?? "").urlDecoded()
 
         if let password = parsedUrl.password {
             self.method = user.lowercased()
