@@ -166,15 +166,34 @@ function commit() {
 }
 
 function downloadV2ray() {
-    echo "正在查询最新版v2ray ..."
+    DMG_FINAL="${APP_NAME}-64.dmg"
+    rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
+    
+    echo "正在查询最新版v2ray-64 ..."
     rm -fr v2ray-core
-    tag='v1.4.2'
+    tag='v1.5.9'
     echo "v2ray-core version: ${tag}"
-    url="https://github.com/XTLS/Xray-core/releases/download/v1.4.2/Xray-macos-64.zip"
+    url="https://github.com/XTLS/Xray-core/releases/download/v1.5.9/Xray-macos-64.zip"
     echo "正在下载最新版v2ray: ${tag}"
     curl -Lo Xray-macos-64.zip ${url}
 
     unzip -o Xray-macos-64.zip -d v2ray-core
+    \cp v2ray-core/xray v2ray-core/v2ray
+}
+
+function downloadV2rayArm() {
+    DMG_FINAL="${APP_NAME}-arm64.dmg"
+    rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
+
+    echo "正在查询最新版v2ray-arm64 ..."
+    rm -fr v2ray-core
+    tag='v1.5.9'
+    echo "v2ray-core version: ${tag}"
+    url="https://github.com/XTLS/Xray-core/releases/download/v1.5.9/Xray-macos-arm64-v8a.zip"
+    echo "正在下载最新版v2ray: ${tag}"
+    curl -Lo Xray-macos-arm64-v8a.zip ${url}
+
+    unzip -o Xray-macos-arm64-v8a.zip -d v2ray-core
     \cp v2ray-core/xray v2ray-core/v2ray
 }
 
@@ -211,26 +230,29 @@ function makeDmg() {
     echo "请输入Y|N"
     exit;;
     esac
+    echo "请选择build的版本 :"
+    options=("64" "arm64")
+    select target in "${options[@]}"
+    do
+        case $target in
+        "64")
+            echo "你选择了: 64"
+            downloadV2ray
+            break
+            ;;
+        "arm64")
+            echo "你选择了: arm64"
+            downloadV2rayArm
+            break
+            ;;
+        *) echo "请选择";;
+        esac
+    done
 
-    rm -fr ${DMG_FINAL} ${V2rayU_RELEASE}
     updatePlistVersion
-    downloadV2ray
     build
     createDmgByAppdmg
 }
 
-function publish() {
-    read -p "请输入版本描述: " release_note
-#    pushRelease ${release_note}
-    generateAppcast ${release_note}
-    commit
-}
-
-
-if [ "$1" = "publish" ]
-then
-    publish
-else
-    makeDmg
-fi
+makeDmg
 echo 'done'

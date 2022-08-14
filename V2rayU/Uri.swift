@@ -399,12 +399,18 @@ class TrojanUri {
 
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
     func encode() -> String {
-        let uri = self.password + "@" + self.host + ":" + String(self.port)
+        var uri = URLComponents()
+        uri.scheme = "trojan"
+        uri.password = self.password
+        uri.host = self.host
+        uri.port = self.port
         uri.queryItems = [
             URLQueryItem(name: "flow", value: self.flow),
+            URLQueryItem(name: "security", value: self.security),
+            URLQueryItem(name: "alpn", value: self.alpn),
             URLQueryItem(name: "sni", value: self.sni),
         ]
-        return "trojan://" + uri + "#" + self.remark
+        return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
 
     func Init(url: URL) {
