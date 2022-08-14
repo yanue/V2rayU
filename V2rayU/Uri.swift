@@ -391,12 +391,19 @@ class TrojanUri {
     var port: Int = 443
     var password: String = ""
     var remark: String = ""
-
+    var sni: String = ""
+    var flow: String = ""
+    var security: String = ""
+    var alpn: String = ""
     var error: String = ""
 
-    // trojan://password@remote_host:remote_port
+    // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
     func encode() -> String {
         let uri = self.password + "@" + self.host + ":" + String(self.port)
+        uri.queryItems = [
+            URLQueryItem(name: "flow", value: self.flow),
+            URLQueryItem(name: "sni", value: self.sni),
+        ]
         return "trojan://" + uri + "#" + self.remark
     }
 
@@ -416,6 +423,19 @@ class TrojanUri {
         self.host = host
         self.port = Int(port)
         self.password = password
+        let queryItems = url.queryParams()
+        for item in queryItems {
+            switch item.key {
+            case "sni":
+                self.sni = item.value as! String
+                break
+            case "flow":
+                self.flow = item.value as! String
+                break
+            default:
+                break
+            }
+        }
         self.remark = (url.fragment ?? "trojan").urlDecoded()
     }
 }

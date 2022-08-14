@@ -297,7 +297,7 @@ class V2raySubSync: NSObject {
         }
 
         if URL(string: uri) == nil {
-            logTip(title: "fail: ", uri: uri, informativeText: "no found ss://, ssr://, vmess://")
+            logTip(title: "fail: ", uri: uri, informativeText: "no found ss://, ssr://, vmess://, vless://, trojan://")
             return
         }
 

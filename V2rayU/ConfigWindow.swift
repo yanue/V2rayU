@@ -78,6 +78,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var trojanPort: NSTextField!
     @IBOutlet weak var trojanPass: NSTextField!
     @IBOutlet weak var trojanAlpn: NSTextField!
+    @IBOutlet weak var trojanSni: NSTextField!
 
     @IBOutlet weak var networkView: NSView!
 
