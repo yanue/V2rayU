@@ -294,7 +294,7 @@ class ImportUri {
 
     func importTrojanUri(uri: String) {
         if URL(string: uri) == nil {
-            self.error = "invalid ssr url"
+            self.error = "invalid trojan url"
             return
         }
         self.uri = uri
@@ -313,6 +313,7 @@ class ImportUri {
         svr.address = trojan.host
         svr.port = trojan.port
         svr.password = trojan.password
+        svr.sni = trojan.sni
         NSLog("\(svr)")
         v2ray.serverTrojan = svr
         v2ray.enableMux = false

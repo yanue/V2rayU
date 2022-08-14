@@ -290,4 +290,5 @@ struct V2rayOutboundTrojanServer: Codable {
     var password: String = ""
     var level: Int = 0
     var email: String = ""
+    var sni: String = ""
 }
