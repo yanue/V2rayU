@@ -393,8 +393,7 @@ class TrojanUri {
     var remark: String = ""
     var sni: String = ""
     var flow: String = ""
-    var security: String = ""
-    var alpn: String = ""
+    var security: String = "tls"
     var error: String = ""
 
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
@@ -407,7 +406,6 @@ class TrojanUri {
         uri.queryItems = [
             URLQueryItem(name: "flow", value: self.flow),
             URLQueryItem(name: "security", value: self.security),
-            URLQueryItem(name: "alpn", value: self.alpn),
             URLQueryItem(name: "sni", value: self.sni),
         ]
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
@@ -438,9 +436,15 @@ class TrojanUri {
             case "flow":
                 self.flow = item.value as! String
                 break
+            case "security":
+                self.security = item.value as! String
+                break
             default:
                 break
             }
+        }
+        if self.security == "" {
+            self.security = "tls"
         }
         self.remark = (url.fragment ?? "trojan").urlDecoded()
     }

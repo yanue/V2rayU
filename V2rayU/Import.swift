@@ -313,10 +313,15 @@ class ImportUri {
         svr.address = trojan.host
         svr.port = trojan.port
         svr.password = trojan.password
-        svr.sni = trojan.sni
+        svr.flow = trojan.flow
         NSLog("\(svr)")
         v2ray.serverTrojan = svr
         v2ray.enableMux = false
+        // tcp
+        v2ray.streamNetwork = "tcp"
+        v2ray.streamTlsSecurity = trojan.security
+        v2ray.streamTlsAllowInsecure = true
+
         v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // check is valid
         v2ray.checkManualValid()

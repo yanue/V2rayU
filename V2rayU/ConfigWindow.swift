@@ -302,6 +302,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.serverTrojan.address = self.trojanAddr.stringValue
         v2rayConfig.serverTrojan.port = Int(self.trojanPort.intValue)
         v2rayConfig.serverTrojan.password = self.trojanPass.stringValue
+        v2rayConfig.serverTrojan.password = self.trojanPass.stringValue
 
         // socks5
         if v2rayConfig.serverSocks5.servers.count == 0 {

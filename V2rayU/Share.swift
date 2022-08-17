@@ -137,6 +137,9 @@ class ShareUri {
         ss.port = self.v2ray.serverTrojan.port
         ss.password = self.v2ray.serverTrojan.password
         ss.remark = self.remark
+        ss.security = "tls"
+        ss.flow = self.v2ray.serverTrojan.flow
+        
         self.uri = ss.encode()
         self.error = ss.error
     }
