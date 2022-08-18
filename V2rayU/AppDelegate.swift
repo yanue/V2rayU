@@ -42,7 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // ERROR ExceptionHandler
-        if let exception = UserDefaults.getArray(forKey: .Exception) as? [String] {
+        if let exception = UserDefaults.getArray(forKey: .Exception) {
             print("Error was occured on previous session! \n", exception, "\n\n-------------------------")
             var exceptions = ""
             for e in exception {
@@ -52,7 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.delArray(forKey: .Exception)
         }
         NSSetUncaughtExceptionHandler(exceptionHandler);
-
+                
         // default settings
         self.checkDefault()
 
