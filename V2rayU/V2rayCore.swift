@@ -34,7 +34,6 @@ class V2rayCore {
     }
 
     func check() {
-        UserDefaults.set(forKey: .xRayCoreVersion,value: "v1.5.4")
         // 当前版本检测
         let oldVersion = UserDefaults.get(forKey: .xRayCoreVersion) ?? V2rayCore.version
         NSLog("check version", oldVersion)
