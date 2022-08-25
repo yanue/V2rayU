@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:V2rayU.xcodeproj">
+      location = "self:/Users/yanue/Documents/kyan_bar/V2rayU.xcodeproj">
    </FileRef>
 </Workspace>
