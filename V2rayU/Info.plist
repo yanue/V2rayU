@@ -2,16 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>V2rayU</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSUIElement</key>
+	<true/>
 	<key>Links</key>
 	<dict>
+		<key>About</key>
+		<string>https://github.com/yanue/</string>
 		<key>Issues</key>
 		<string>https://github.com/yanue/V2rayU/issues</string>
 		<key>Releases</key>
 		<string>https://github.com/yanue/V2rayU/releases</string>
-		<key>About</key>
-		<string>https://github.com/yanue/</string>
 	</dict>
-	<key>LSUIElement</key>
-	<true/>
 </dict>
 </plist>
