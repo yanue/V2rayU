@@ -12,16 +12,22 @@ class AppState: ObservableObject {
 
 @main
 struct V2rayUApp: App {
-    
+    @StateObject var v2rayUStore: V2rayUStore
+
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @StateObject var appState = AppState()
+    
+    init() {
+        _v2rayUStore = StateObject(wrappedValue: V2rayUStore.shared)
+    }
+
     
     // This is our Scene. We are not using Settings
     var body: some Scene {
         
         WindowGroup("MainView") {
-            ContentView().environmentObject(appState)   // inject to update
+            ContentView().environmentObject(v2rayUStore)   // inject to update
             // selected book
         }.handlesExternalEvents(matching: Set(arrayLiteral: WinHelper.mainView.rawValue))
         
