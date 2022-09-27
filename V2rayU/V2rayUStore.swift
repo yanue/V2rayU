@@ -13,7 +13,7 @@ enum V2rayUPanelViewType: Hashable, Equatable {
     case servers
     case subscribtions
     case routes
-
+    
     var stringValue: String {
         switch self {
         case .servers:
@@ -29,14 +29,14 @@ enum V2rayUPanelViewType: Hashable, Equatable {
 @MainActor class V2rayUStore: ObservableObject {
     static let shared = V2rayUStore()
     static let version = 1
-
+    
     let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "V2rayUStore")
-
+    
     let indicatorTimer = Timer.publish(every: 1.25, tolerance: 0.25, on: .current, in: .default).autoconnect()
-
+    
     @Published var navigationTitle = "Planet"
     @Published var navigationSubtitle = ""
-
+    
     @Published var isCreatingPlanet = false
     @Published var isEditingPlanet = false
     @Published var isFollowingPlanet = false
@@ -49,8 +49,8 @@ enum V2rayUPanelViewType: Hashable, Equatable {
     @Published var selectedView: V2rayUPanelViewType? {
         didSet {
             if selectedView != oldValue {
-//                refreshSelectedArticles()
-//                selectedArticle = nil
+                //                refreshSelectedArticles()
+                //                selectedArticle = nil
                 UserDefaults.standard.set(selectedView?.stringValue, forKey: "lastSelectedView")
             }
         }

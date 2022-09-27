@@ -7,19 +7,12 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @Environment(\.openURL) var openURL
-
+struct ContentView: View {    
     var body: some View {
-        Button("Other View") {
-           if let url = URL(string: "V2rayU://otherview") {
-               openURL(url)
-           }
-       }
         NavigationView {
             SidebarView()
             ConfigView()
-        }
+        }.navigationTitle("Settings")
     }
 }
 

@@ -56,6 +56,16 @@ class MainMenu: NSObject {
         // Adding a seperator
         menu.addItem(NSMenuItem.separator())
         
+        
+        // Adding a quit menu item
+        let cfgMenuItem = NSMenuItem(
+            title: "Configure...",
+            action: #selector(show),
+            keyEquivalent: "c"
+        )
+        cfgMenuItem.target = self
+        menu.addItem(cfgMenuItem)
+        
         // Adding a quit menu item
         let quitMenuItem = NSMenuItem(
             title: "Quit V2rayU",
@@ -64,17 +74,7 @@ class MainMenu: NSObject {
         )
         quitMenuItem.target = self
         menu.addItem(quitMenuItem)
-        
-        
-        // Adding a quit menu item
-        let cfgMenuItem = NSMenuItem(
-            title: "configure...",
-            action: #selector(show),
-            keyEquivalent: "c"
-        )
-        cfgMenuItem.target = self
-        menu.addItem(cfgMenuItem)
-        
+
         return menu
     }
     
@@ -101,7 +101,7 @@ class MainMenu: NSObject {
             ): "Copyright 2022 © YANUE. all right reserved"
         ])
     }
-        
+    
     // The selector that quits the app
     @objc func quit(sender: NSMenuItem) {
         NSApp.terminate(self)

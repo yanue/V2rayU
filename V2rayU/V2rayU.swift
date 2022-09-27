@@ -13,7 +13,7 @@ class AppState: ObservableObject {
 @main
 struct V2rayUApp: App {
     @StateObject var v2rayUStore: V2rayUStore
-
+    
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @StateObject var appState = AppState()
@@ -21,7 +21,7 @@ struct V2rayUApp: App {
     init() {
         _v2rayUStore = StateObject(wrappedValue: V2rayUStore.shared)
     }
-
+    
     
     // This is our Scene. We are not using Settings
     var body: some Scene {
@@ -32,9 +32,6 @@ struct V2rayUApp: App {
         }.handlesExternalEvents(matching: Set(arrayLiteral: WinHelper.mainView.rawValue))
         
         
-        WindowGroup("OtherView") {
-            OtherView()
-        }.handlesExternalEvents(matching: Set(arrayLiteral: WinHelper.helperView.rawValue))
     }
 }
 
@@ -68,8 +65,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 // magic here
 enum WinHelper: String, CaseIterable {
     case mainView   = "MainView"
-    case helperView = "OtherView"
-    
+    case generalView = "GeneralView"
+    case advanceView = "AdvanceView"
+    case routingView = "RoutingView"
+    case subscriptionView = "SubscriptionView"
+
     func open(){
         if let url = URL(string: "V2rayU://\(self.rawValue)") {
             print("opening \(self.rawValue)")
