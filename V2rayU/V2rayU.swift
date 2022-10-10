@@ -6,7 +6,8 @@
 
 import Cocoa
 import SwiftUI
-
+let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
+let appVersion = getAppVersion()
 
 @main
 struct V2rayUApp: App {
