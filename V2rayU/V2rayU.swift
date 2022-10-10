@@ -7,8 +7,6 @@
 import Cocoa
 import SwiftUI
 
-class AppState: ObservableObject {
-}
 
 @main
 struct V2rayUApp: App {
@@ -16,7 +14,6 @@ struct V2rayUApp: App {
     
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject var appState = AppState()
     
     init() {
         _v2rayUStore = StateObject(wrappedValue: V2rayUStore.shared)

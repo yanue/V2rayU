@@ -23,6 +23,7 @@ struct ConfigView: View {
                 // magic here
                 WinHelper.advanceView.open()
             }
+            
         }
         .frame(minWidth: 400)
     }
