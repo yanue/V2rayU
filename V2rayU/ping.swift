@@ -92,9 +92,6 @@ class PingSpeed: NSObject {
                         item.store()
                         message += String(format: "round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms", roundtrip.minimum * 1000, roundtrip.average * 1000, roundtrip.maximum * 1000, roundtrip.standardDeviation * 1000)
                     }
-                    //print("finished",message)
-                    self.pingServers.append(item)
-                    self.refreshStatusMenu()
                 }
             }
             ping?.targetCount = 5
@@ -102,6 +99,9 @@ class PingSpeed: NSObject {
         } catch {
             print("ping ",item.name,host,error.localizedDescription)
         }
+        //print("finished",message)
+        self.pingServers.append(item)
+        self.refreshStatusMenu()
     }
 
     func refreshStatusMenu() {
