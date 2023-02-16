@@ -395,6 +395,7 @@ class TrojanUri {
     var flow: String = ""
     var security: String = "tls"
     var error: String = ""
+    var type: String = "tcp"
 
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
     func encode() -> String {
@@ -407,6 +408,7 @@ class TrojanUri {
             URLQueryItem(name: "flow", value: self.flow),
             URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "sni", value: self.sni),
+            URLQueryItem(name: "type", value: self.type)
         ]
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
@@ -439,6 +441,8 @@ class TrojanUri {
             case "security":
                 self.security = item.value as! String
                 break
+            case "type":
+                self.type = item.value as! String
             default:
                 break
             }
