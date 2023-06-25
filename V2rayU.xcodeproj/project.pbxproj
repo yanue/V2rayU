@@ -534,6 +534,7 @@
 				TargetAttributes = {
 					6604E43821798F2900E54AE1 = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = "";
 					};
 					660C8C9E2181CBAA00896361 = {
 						CreatedOnToolsVersion = 10.0;
@@ -541,6 +542,7 @@
 					};
 					664EB370216C9A5E00B6AE0D = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = "";
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
 								enabled = 0;

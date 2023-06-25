@@ -52,6 +52,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                           ! See https://adblockplus.org/en/filter-cheatsheet
                           ||api.github.com
                           ||githubusercontent.com
+                          ||github.com
+                          ||chat.openai.com
+                          ||openai.com
                           """
         if txt != nil {
             if txt!.count > 0 {
@@ -65,6 +68,8 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         }
         // auto include githubusercontent.com api.github.com
         if !userRuleTxt.contains("githubusercontent.com") {
+            userRuleTxt.append("\n||openai.com")
+            userRuleTxt.append("\n||chat.openai.com")
             userRuleTxt.append("\n||api.github.com")
             userRuleTxt.append("\n||githubusercontent.com")
         }
@@ -160,8 +165,11 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
     do {
         let gfwlist = UserDefaults.get(forKey: .gfwPacFileContent) ?? ""
         if let data = Data(base64Encoded: gfwlist, options: .ignoreUnknownCharacters) {
-            let str = String(data: data, encoding: String.Encoding.utf8)
-            var lines = str!.components(separatedBy: CharacterSet.newlines)
+            guard let str = String(data: data, encoding: String.Encoding.utf8) else {
+                NSLog("Failed to base64Encoded")
+                return false
+            }
+            var lines = str.components(separatedBy: CharacterSet.newlines)
             do {
                 // read userRules from UserDefaults
                 let userRules = UserDefaults.get(forKey: .userRules) ?? ""
@@ -188,8 +196,11 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8)
 
                 // Get raw pac js
-                let jsData = try? Data(contentsOf: URL.init(fileURLWithPath: PACAbpFile))
-                var jsStr = String(data: jsData!, encoding: String.Encoding.utf8)
+                guard let jsData = try? Data(contentsOf: URL.init(fileURLWithPath: PACAbpFile)) else {
+                    NSLog("Failed to Get raw pac js")
+                    return false
+                }
+                var jsStr = String(data: jsData, encoding: String.Encoding.utf8)
 
                 // Replace rules placeholder in pac js
                 jsStr = jsStr!.replacingOccurrences(of: "__RULES__", with: rulesJsonStr!)
