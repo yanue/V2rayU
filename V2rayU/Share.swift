@@ -100,6 +100,7 @@ class ShareUri {
         if self.v2ray.serverVmess.users.count > 0 {
             self.share.id = self.v2ray.serverVmess.users[0].id
             self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
+            self.share.type = self.v2ray.serverVmess.users[0].security // security type
         }
         self.share.net = self.v2ray.streamNetwork
 

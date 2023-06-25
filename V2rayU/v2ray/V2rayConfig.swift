@@ -545,7 +545,7 @@ class V2rayConfig: NSObject {
             outbound.settingVLess = vless
 
             var mux = V2rayOutboundMux()
-            mux.enabled = self.enableMux
+            mux.enabled = false
             mux.concurrency = self.mux
             outbound.mux = mux
 
@@ -566,7 +566,7 @@ class V2rayConfig: NSObject {
             outbound.settingTrojan = trojan
 
             var mux = V2rayOutboundMux()
-            mux.enabled = self.enableMux
+            mux.enabled = false
             mux.concurrency = self.mux
             outbound.mux = mux
             break

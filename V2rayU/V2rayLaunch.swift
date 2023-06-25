@@ -94,7 +94,7 @@ class V2rayLaunch: NSObject {
             "StandardOutPath": logFilePath,
             "StandardErrorPath": logFilePath,
             "ProgramArguments": agentArguments,
-            "KeepAlive": true,
+            "KeepAlive": false, // 不能开启,否则重启会自动启动
         ]
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
