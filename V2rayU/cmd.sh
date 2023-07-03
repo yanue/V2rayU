@@ -14,10 +14,4 @@ sudo chown root:admin ${cmd}
 sudo chmod a+rx ${cmd}
 sudo chmod +s ${cmd}
 
-cmd="./V2rayUHelper"
-
-sudo chown root:admin ${cmd}
-sudo chmod a+rx ${cmd}
-sudo chmod +s ${cmd}
-
 echo 'done'

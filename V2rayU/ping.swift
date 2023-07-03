@@ -116,20 +116,6 @@ class PingSpeed: NSObject {
         }
     }
 
-    func pingInCmd() {
-        let cmd = "cd " + AppHomePath + " && chmod +x ./V2rayUHelper && ./V2rayUHelper -cmd ping -t 5s -f ./" + pingJsonFileName
-        //        print("cmd", cmd)
-        let res = runShell(launchPath: "/bin/bash", arguments: ["-c", cmd])
-
-        NSLog("pingInCmd: res=(\(String(describing: res))) cmd=(\(cmd))")
-
-        // 这里直接判断ok有问题，res里面还有lookup
-        if res?.contains("ok config.") ?? false {
-            // res is: ok config.xxxx
-            fastV2rayName = res!.replacingOccurrences(of: "ok ", with: "")
-        }
-    }
-
     func parsePingResult() {
         let jsonText = try? String(contentsOfFile: pingJsonFilePath, encoding: String.Encoding.utf8)
         guard let json = try? JSON(data: (jsonText ?? "").data(using: String.Encoding.utf8, allowLossyConversion: false)!) else {
