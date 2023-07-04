@@ -254,5 +254,5 @@ function makeDmg() {
     createDmgByAppdmg
 }
 
-makeDmg
+createDmgByAppdmg
 echo 'done'

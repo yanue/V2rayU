@@ -31,16 +31,15 @@
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		66784B0021704E1300AD307F /* V2rayCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFF21704E1300AD307F /* V2rayCore.swift */; };
 		66847A5D2A531F7B00930C48 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6646669221CBC0860094F0B7 /* main.swift */; };
+		66847A6B2A546E5600930C48 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F302B722AAA95000FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		669312932413FC5E00C043F8 /* SwiftyPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669312922413FC5E00C043F8 /* SwiftyPing.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66A77BE3268225790097A126 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66A77BE2268225790097A126 /* v2ray-core */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
-		66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66C5B19A240D3476008A22CA /* V2rayUHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
-		66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66F3029922AA9C0900FCA4E2 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
+		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF7F662C35646734A352E /* install.sh */; };
@@ -81,8 +80,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				66C5B19B240D3483008A22CA /* V2rayUHelper in CopyFiles */,
-				66F302A522AAA1D400FCA4E2 /* V2rayUTool in CopyFiles */,
+				66847A6B2A546E5600930C48 /* V2rayUTool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,9 +167,7 @@
 		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
-		66C5B19A240D3476008A22CA /* V2rayUHelper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUHelper; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ping.swift; sourceTree = "<group>"; };
-		66F3029922AA9C0900FCA4E2 /* V2rayUTool */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = V2rayUTool; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		66F3029D22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
 		66F3029E22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/QrcodeWindow.strings"; sourceTree = "<group>"; };
@@ -343,8 +339,6 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				66C5B19A240D3476008A22CA /* V2rayUHelper */,
-				66F3029922AA9C0900FCA4E2 /* V2rayUTool */,
 				664FC05321A70C4300048FE3 /* build.plist */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
 				6D6DFD93CE866018306A090E /* pac */,
@@ -437,8 +431,8 @@
 				664EB36E216C9A5E00B6AE0D /* Frameworks */,
 				664EB36F216C9A5E00B6AE0D /* Resources */,
 				83C3E4047C50A6CD7233F986 /* [CP] Embed Pods Frameworks */,
-				66973ECA21797A6B001FEA1E /* Copy Files */,
 				66F411B021CA49CF007AAC10 /* Copy Files */,
+				66973ECA21797A6B001FEA1E /* Copy Files */,
 				66F302A422AAA1BF00FCA4E2 /* CopyFiles */,
 			);
 			buildRules = (
@@ -806,7 +800,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = UA5X5UL787;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayULauncher;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -855,7 +849,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -920,7 +914,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -991,7 +985,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 3.4.0;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = UA5X5UL787;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -1022,7 +1016,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				INFOPLIST_FILE = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1036,9 +1030,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UA5X5UL787;
+				DEVELOPMENT_TEAM = RJYEH6TCJD;
 				INFOPLIST_FILE = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
