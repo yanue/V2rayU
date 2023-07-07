@@ -88,8 +88,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var wsView: NSView!
     @IBOutlet weak var h2View: NSView!
     @IBOutlet weak var quicView: NSView!
+    @IBOutlet weak var tlsView: NSView!
+    @IBOutlet weak var realityView: NSView!
 
     @IBOutlet weak var switchNetwork: NSPopUpButton!
+    @IBOutlet weak var switchSecurity: NSPopUpButton!
 
     // kcp setting
     @IBOutlet weak var kcpMtu: NSTextField!
@@ -116,9 +119,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var quicHeaderType: NSPopUpButton!
 
     @IBOutlet weak var streamSecurity: NSPopUpButton!
-    @IBOutlet weak var streamAllowSecure: NSButton!
+    @IBOutlet weak var streamTlsAllowInsecure: NSButton!
     @IBOutlet weak var streamTlsServerName: NSTextField!
-
+    @IBOutlet weak var streamRealityServerName: NSTextField!
+    @IBOutlet weak var streamRealityPublicKey: NSTextField!
+    @IBOutlet weak var streamRealityShortId: NSTextField!
+    @IBOutlet weak var streamRealitySpiderX: NSTextField!
+    
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
@@ -325,13 +332,19 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if self.switchNetwork.indexOfSelectedItem >= 0 {
             v2rayConfig.streamNetwork = self.switchNetwork.titleOfSelectedItem!
         }
-        v2rayConfig.streamTlsAllowInsecure = self.streamAllowSecure.state.rawValue > 0
-        v2rayConfig.streamXtlsAllowInsecure = self.streamAllowSecure.state.rawValue > 0
+        // security
         if self.streamSecurity.indexOfSelectedItem >= 0 {
-            v2rayConfig.streamTlsSecurity = self.streamSecurity.titleOfSelectedItem!
+            v2rayConfig.streamSecurity = self.streamSecurity.titleOfSelectedItem!
         }
-        v2rayConfig.streamTlsServerName = self.streamTlsServerName.stringValue
-        v2rayConfig.streamXtlsServerName = self.streamTlsServerName.stringValue
+        // tls
+        v2rayConfig.securityTls.allowInsecure = self.streamTlsAllowInsecure.state.rawValue > 0
+        v2rayConfig.securityTls.serverName = self.streamTlsServerName.stringValue
+        // reality
+        v2rayConfig.securityReality.serverName = self.streamRealityServerName.stringValue
+        v2rayConfig.securityReality.publicKey = self.streamRealityPublicKey.stringValue
+        v2rayConfig.securityReality.shortId = self.streamRealityShortId.stringValue
+        v2rayConfig.securityReality.spiderX = self.streamRealitySpiderX.stringValue
+        
         // tcp
         if self.tcpHeaderType.indexOfSelectedItem >= 0 {
             v2rayConfig.streamTcp.header.type = self.tcpHeaderType.titleOfSelectedItem!
@@ -445,14 +458,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.switchNetwork.selectItem(withTitle: v2rayConfig.streamNetwork)
         self.switchSteamView(network: v2rayConfig.streamNetwork)
 
-        self.streamAllowSecure.intValue = v2rayConfig.streamTlsAllowInsecure ? 1 : 0
-        self.streamSecurity.selectItem(withTitle: v2rayConfig.streamTlsSecurity)
-        self.streamTlsServerName.stringValue = v2rayConfig.streamTlsServerName
-        if v2rayConfig.streamTlsSecurity == "xtls" {
-            self.streamTlsServerName.stringValue = v2rayConfig.streamXtlsServerName
-            self.streamAllowSecure.intValue = v2rayConfig.streamXtlsAllowInsecure ? 1 : 0
-        }
-
+        self.switchSecurityView(securityTitle: v2rayConfig.streamSecurity)
+        self.streamSecurity.selectItem(withTitle: v2rayConfig.streamSecurity)
+        self.streamTlsAllowInsecure.intValue = v2rayConfig.securityTls.allowInsecure ? 1 : 0
+        self.streamTlsServerName.stringValue = v2rayConfig.securityTls.serverName
+        
+        // reality
+        self.streamRealityServerName.stringValue = v2rayConfig.securityReality.serverName
+        self.streamRealityPublicKey.stringValue = v2rayConfig.securityReality.publicKey
+        self.streamRealityPublicKey.stringValue = v2rayConfig.securityReality.publicKey
+        self.streamRealityShortId.stringValue = v2rayConfig.securityReality.shortId
+        self.streamRealitySpiderX.stringValue = v2rayConfig.securityReality.spiderX
+        
         // tcp
         self.tcpHeaderType.selectItem(withTitle: v2rayConfig.streamTcp.header.type)
 
@@ -706,7 +723,24 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             break
         }
     }
+    
+    func switchSecurityView(securityTitle: String) {
+        print("switchSecurityView",securityTitle)
+        self.tlsView.isHidden = true
+        self.realityView.isHidden = true
+        if securityTitle == "reality" {
+            self.realityView.isHidden = false
+        } else {
+            self.tlsView.isHidden = false
+        }
+    }
 
+    @IBAction func switchSteamSecurity(_ sender: NSPopUpButtonCell) {
+        if let item = switchSecurity.selectedItem {
+            self.switchSecurityView(securityTitle: item.title)
+        }
+    }
+    
     @IBAction func switchSteamNetwork(_ sender: NSPopUpButtonCell) {
         if let item = switchNetwork.selectedItem {
             self.switchSteamView(network: item.title)

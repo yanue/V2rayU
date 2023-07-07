@@ -193,14 +193,14 @@ struct V2rayOutboundShadowsocks: Codable {
     var servers: [V2rayOutboundShadowsockServer] = [V2rayOutboundShadowsockServer()]
 }
 
-let V2rayOutboundShadowsockMethod = ["rc4-md5", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-gcm", "aes-192-gcm", "aes-256-gcm", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "bf-cfb", "salsa20", "chacha20", "chacha20-ietf", "chacha20-ietf-poly1305"]
+let V2rayOutboundShadowsockMethod = ["2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", "chacha20-ietf-poly1305", "chacha20-poly1305", "aes-128-gcm", "aes-256-gcm", "rc4-md5", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr",  "aes-192-gcm", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "bf-cfb", "salsa20", "chacha20", "chacha20-ietf"]
 
 struct V2rayOutboundShadowsockServer: Codable {
     var email: String = ""
     var address: String = ""
     var port: Int = 0
     // V2rayOutboundShadowsockMethod
-    var method: String = "aes-256-cfb"
+    var method: String = "aes-256-gcm"
     var password: String = ""
     var ota: Bool = false
     var level: Int = 0

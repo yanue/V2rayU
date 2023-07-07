@@ -182,13 +182,13 @@ class ImportUri {
 
         // stream
         v2ray.streamNetwork = vmess.network
-        v2ray.streamTlsAllowInsecure = vmess.allowInsecure
-        v2ray.streamTlsSecurity = vmess.tls
-        v2ray.streamTlsServerName = vmess.tlsServer
+        v2ray.streamSecurity = vmess.tls
+        v2ray.securityTls.allowInsecure = vmess.allowInsecure
+        v2ray.securityTls.serverName = vmess.tlsServer
 
         // tls servername for h2 or ws
         if vmess.tlsServer.count == 0 && (vmess.network == V2rayStreamSettings.network.h2.rawValue || vmess.network == V2rayStreamSettings.network.ws.rawValue) {
-            v2ray.streamTlsServerName = vmess.netHost
+            v2ray.securityTls.serverName = vmess.tlsServer
         }
 
         // kcp
@@ -255,10 +255,10 @@ class ImportUri {
 
         // stream
         v2ray.streamNetwork = vmess.type
-        v2ray.streamTlsSecurity = vmess.security
-        v2ray.streamXtlsServerName = vmess.host
+        v2ray.streamSecurity = vmess.security
+        v2ray.securityTls.serverName = vmess.host
         if vmess.host.count == 0 {
-            v2ray.streamXtlsServerName = vmess.address
+            v2ray.securityTls.serverName = vmess.address
         }
 
         // kcp
@@ -319,8 +319,8 @@ class ImportUri {
         v2ray.enableMux = false
         // tcp
         v2ray.streamNetwork = "tcp"
-        v2ray.streamTlsSecurity = trojan.security
-        v2ray.streamTlsAllowInsecure = true
+        v2ray.streamSecurity = trojan.security
+        v2ray.securityTls.allowInsecure = true
 
         v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // check is valid

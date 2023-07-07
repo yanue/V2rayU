@@ -126,14 +126,10 @@ class V2rayConfig: NSObject {
     var routing = V2rayRouting()
 
     // tls
-    var streamTlsSecurity = "none" // none|tls/xtls
-    var streamTlsAllowInsecure = false
-    var streamTlsServerName = ""
-
-    // xtls
-    var streamXtlsAllowInsecure = true
-    var streamXtlsServerName = ""
-
+    var streamSecurity = "tls" // none|tls|xtls|ults|reality
+    var securityTls = TlsSettings() // tls|xtls|ults
+    var securityReality = RealitySettings() // reality
+    
     var routingDomainStrategy: V2rayRoutingSetting.domainStrategy = .AsIs
     var routingRule: RoutingRule = .RoutingRuleGlobal
     let routingProxyDomains = UserDefaults.getArray(forKey: .routingProxyDomains) ?? [];
@@ -605,29 +601,29 @@ class V2rayConfig: NSObject {
             break
         }
 
-        if self.streamTlsSecurity == "tls" {
-            var tls = TlsSettings()
-
-            tls.allowInsecure = self.streamTlsAllowInsecure
-            if self.streamTlsServerName.count > 0 {
-                tls.serverName = self.streamTlsServerName
-            }
+        if self.streamSecurity == "tls" {
+            var tls = self.securityTls
             streamSettings.security = .tls
             streamSettings.tlsSettings = tls
         }
 
-        if self.streamTlsSecurity == "xtls" {
-            var xtls = XtlsSettings()
-
-            xtls.allowInsecure = self.streamTlsAllowInsecure
-            if self.streamXtlsServerName.count > 0 {
-                xtls.serverName = self.streamXtlsServerName
-            }
+        if self.streamSecurity == "xtls" {
+            var tls = self.securityTls
             streamSettings.security = .xtls
-            streamSettings.xtlsSettings = xtls
+            streamSettings.xtlsSettings = tls
+        }
+        
+        if self.streamSecurity == "utls" {
+            var tls = self.securityTls
+            streamSettings.security = .utls
+            streamSettings.utlsSettings = tls
         }
 
-
+        if self.streamSecurity == "reality" {
+            streamSettings.security = .reality
+            streamSettings.realitySettings = self.securityReality
+        }
+        
         return streamSettings
     }
 
@@ -697,7 +693,7 @@ class V2rayConfig: NSObject {
         }
         // ------------ parse outbound end -------------------------------------------
 
-        v2ray.transport = self.parseTransport(steamJson: json["transport"])
+        v2ray.transport = self.parseTransport(streamJson: json["transport"])
     }
 
     // parse inbound from json
@@ -920,7 +916,7 @@ class V2rayConfig: NSObject {
 
         // stream settings
         if jsonParams["streamSettings"].dictionaryValue.count > 0 {
-            v2rayInbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "inbound")
+            v2rayInbound.streamSettings = self.parseSteamSettings(streamJson: jsonParams["streamSettings"], preTxt: "inbound")
         }
 
         return (v2rayInbound)
@@ -1174,7 +1170,7 @@ class V2rayConfig: NSObject {
 
         // stream settings
         if jsonParams["streamSettings"].dictionaryValue.count > 0 {
-            v2rayOutbound.streamSettings = self.parseSteamSettings(steamJson: jsonParams["streamSettings"], preTxt: "outbound")
+            v2rayOutbound.streamSettings = self.parseSteamSettings(streamJson: jsonParams["streamSettings"], preTxt: "outbound")
         }
 
         // set main server protocol
@@ -1208,41 +1204,41 @@ class V2rayConfig: NSObject {
     }
 
     // parse steamSettings
-    func parseSteamSettings(steamJson: JSON, preTxt: String = "") -> V2rayStreamSettings {
+    func parseSteamSettings(streamJson: JSON, preTxt: String = "") -> V2rayStreamSettings {
         var stream = V2rayStreamSettings()
 
-        if (V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue) == nil) {
+        if (V2rayStreamSettings.network(rawValue: streamJson["network"].stringValue) == nil) {
             self.errors += ["invalid " + preTxt + ".streamSettings.network"]
         } else {
             // set network
-            stream.network = V2rayStreamSettings.network(rawValue: steamJson["network"].stringValue)!
+            stream.network = V2rayStreamSettings.network(rawValue: streamJson["network"].stringValue)!
             self.streamNetwork = stream.network.rawValue
         }
 
-        if (V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue) == nil) {
-            self.streamTlsSecurity = V2rayStreamSettings.security.none.rawValue
+        if (V2rayStreamSettings.security(rawValue: streamJson["security"].stringValue) == nil) {
+            self.streamSecurity = V2rayStreamSettings.security.none.rawValue
         } else {
             // set security
-            stream.security = V2rayStreamSettings.security(rawValue: steamJson["security"].stringValue)!
-            self.streamTlsSecurity = stream.security.rawValue
+            stream.security = V2rayStreamSettings.security(rawValue: streamJson["security"].stringValue)!
+            self.streamSecurity = stream.security.rawValue
         }
 
-        if steamJson["sockopt"].dictionaryValue.count > 0 {
+        if streamJson["sockopt"].dictionaryValue.count > 0 {
             var sockopt = V2rayStreamSettingSockopt()
 
             // tproxy
-            if (V2rayStreamSettingSockopt.tproxy(rawValue: steamJson["sockopt"]["tproxy"].stringValue) != nil) {
-                sockopt.tproxy = V2rayStreamSettingSockopt.tproxy(rawValue: steamJson["sockopt"]["tproxy"].stringValue)!
+            if (V2rayStreamSettingSockopt.tproxy(rawValue: streamJson["sockopt"]["tproxy"].stringValue) != nil) {
+                sockopt.tproxy = V2rayStreamSettingSockopt.tproxy(rawValue: streamJson["sockopt"]["tproxy"].stringValue)!
             }
 
-            sockopt.tcpFastOpen = steamJson["sockopt"]["tcpFastOpen"].boolValue
-            sockopt.mark = steamJson["sockopt"]["mark"].intValue
+            sockopt.tcpFastOpen = streamJson["sockopt"]["tcpFastOpen"].boolValue
+            sockopt.mark = streamJson["sockopt"]["mark"].intValue
 
             stream.sockopt = sockopt
         }
 
         // steamSettings (same as global transport)
-        let transport = self.parseTransport(steamJson: steamJson)
+        let transport = self.parseTransport(streamJson: streamJson)
         stream.tlsSettings = transport.tlsSettings
         stream.xtlsSettings = transport.xtlsSettings
         stream.tcpSettings = transport.tcpSettings
@@ -1253,18 +1249,26 @@ class V2rayConfig: NSObject {
 
         // for outbound stream
         if preTxt == "outbound" {
+            
+            if transport.utlsSettings != nil {
+                if transport.utlsSettings?.serverName != nil {
+                    self.securityTls.serverName = transport.utlsSettings!.serverName
+                    self.securityTls.allowInsecure = transport.utlsSettings!.allowInsecure
+                }
+            }
+            
+            if transport.xtlsSettings != nil {
+                if transport.xtlsSettings?.serverName != nil {
+                    self.securityTls.serverName = transport.xtlsSettings!.serverName
+                    self.securityTls.allowInsecure = transport.xtlsSettings!.allowInsecure
+                }
+            }
+            
             if transport.tlsSettings != nil {
                 // set data
                 if transport.tlsSettings?.serverName != nil {
-                    self.streamTlsServerName = transport.tlsSettings!.serverName!
-                    self.streamTlsAllowInsecure = transport.tlsSettings!.allowInsecure!
-                }
-            }
-
-            if transport.xtlsSettings != nil {
-                if transport.xtlsSettings?.serverName != nil {
-                    self.streamXtlsServerName = transport.xtlsSettings!.serverName!
-                    self.streamXtlsAllowInsecure = transport.xtlsSettings!.allowInsecure!
+                    self.securityTls.serverName = transport.tlsSettings!.serverName
+                    self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
                 }
             }
 
@@ -1296,69 +1300,113 @@ class V2rayConfig: NSObject {
         return (stream)
     }
 
-    func parseTransport(steamJson: JSON) -> V2rayTransport {
+    func parseTransport(streamJson: JSON) -> V2rayTransport {
         var stream = V2rayTransport()
         // tlsSettings
-        if steamJson["tlsSettings"].dictionaryValue.count > 0 {
+        if streamJson["tlsSettings"].dictionaryValue.count > 0 {
+            var settings = streamJson["tlsSettings"]
             var tlsSettings = TlsSettings()
-            tlsSettings.serverName = steamJson["tlsSettings"]["serverName"].stringValue
-            tlsSettings.alpn = steamJson["tlsSettings"]["alpn"].stringValue
-            tlsSettings.allowInsecure = steamJson["tlsSettings"]["allowInsecure"].boolValue
-            tlsSettings.allowInsecureCiphers = steamJson["tlsSettings"]["allowInsecureCiphers"].boolValue
+            tlsSettings.serverName = settings["serverName"].stringValue
+            tlsSettings.alpn = settings["alpn"].stringValue
+            tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
+            tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
             // certificates
-            if steamJson["tlsSettings"]["certificates"].dictionaryValue.count > 0 {
+            if settings["certificates"].dictionaryValue.count > 0 {
                 var certificates = TlsCertificates()
-                let usage = TlsCertificates.usage(rawValue: steamJson["tlsSettings"]["certificates"]["usage"].stringValue)
+                let usage = TlsCertificates.usage(rawValue: settings["certificates"]["usage"].stringValue)
                 if (usage != nil) {
                     certificates.usage = usage!
                 }
-                certificates.certificateFile = steamJson["tlsSettings"]["certificates"]["certificateFile"].stringValue
-                certificates.keyFile = steamJson["tlsSettings"]["certificates"]["keyFile"].stringValue
-                certificates.certificate = steamJson["tlsSettings"]["certificates"]["certificate"].stringValue
-                certificates.key = steamJson["tlsSettings"]["certificates"]["key"].stringValue
+                certificates.certificateFile = settings["certificates"]["certificateFile"].stringValue
+                certificates.keyFile = settings["certificates"]["keyFile"].stringValue
+                certificates.certificate = settings["certificates"]["certificate"].stringValue
+                certificates.key = settings["certificates"]["key"].stringValue
                 tlsSettings.certificates = certificates
             }
             stream.tlsSettings = tlsSettings
         }
 
         // xtlsSettings
-        if steamJson["xtlsSettings"].dictionaryValue.count > 0 {
-            var xtlsSettings = XtlsSettings();
-            xtlsSettings.serverName = steamJson["xtlsSettings"]["serverName"].stringValue
-            xtlsSettings.alpn = steamJson["xtlsSettings"]["alpn"].stringValue
-            xtlsSettings.allowInsecure = steamJson["xtlsSettings"]["allowInsecure"].boolValue
-            xtlsSettings.allowInsecureCiphers = steamJson["xtlsSettings"]["allowInsecureCiphers"].boolValue
+        if streamJson["xtlsSettings"].dictionaryValue.count > 0 {
+            var settings = streamJson["xtlsSettings"]
+            var tlsSettings = TlsSettings()
+            tlsSettings.serverName = settings["serverName"].stringValue
+            tlsSettings.alpn = settings["alpn"].stringValue
+            tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
+            tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
             // certificates
-            if steamJson["xtlsSettings"]["certificates"].dictionaryValue.count > 0 {
+            if settings["certificates"].dictionaryValue.count > 0 {
                 var certificates = TlsCertificates()
-                let usage = TlsCertificates.usage(rawValue: steamJson["xtlsSettings"]["certificates"]["usage"].stringValue)
+                let usage = TlsCertificates.usage(rawValue: settings["certificates"]["usage"].stringValue)
                 if (usage != nil) {
                     certificates.usage = usage!
                 }
-                certificates.certificateFile = steamJson["xtlsSettings"]["certificates"]["certificateFile"].stringValue
-                certificates.keyFile = steamJson["xtlsSettings"]["certificates"]["keyFile"].stringValue
-                certificates.certificate = steamJson["xtlsSettings"]["certificates"]["certificate"].stringValue
-                certificates.key = steamJson["xtlsSettings"]["certificates"]["key"].stringValue
-                xtlsSettings.certificates = certificates
+                certificates.certificateFile = settings["certificates"]["certificateFile"].stringValue
+                certificates.keyFile = settings["certificates"]["keyFile"].stringValue
+                certificates.certificate = settings["certificates"]["certificate"].stringValue
+                certificates.key = settings["certificates"]["key"].stringValue
+                tlsSettings.certificates = certificates
             }
-            stream.xtlsSettings = xtlsSettings
+            stream.xtlsSettings = tlsSettings
         }
 
+        // utlsSettings
+        if streamJson["utlsSettings"].dictionaryValue.count > 0 {
+            var settings = streamJson["utlsSettings"]
+            var tlsSettings = TlsSettings()
+            tlsSettings.serverName = settings["serverName"].stringValue
+            tlsSettings.alpn = settings["alpn"].stringValue
+            tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
+            tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
+            // certificates
+            if settings["certificates"].dictionaryValue.count > 0 {
+                var certificates = TlsCertificates()
+                let usage = TlsCertificates.usage(rawValue: settings["certificates"]["usage"].stringValue)
+                if (usage != nil) {
+                    certificates.usage = usage!
+                }
+                certificates.certificateFile = settings["certificates"]["certificateFile"].stringValue
+                certificates.keyFile = settings["certificates"]["keyFile"].stringValue
+                certificates.certificate = settings["certificates"]["certificate"].stringValue
+                certificates.key = settings["certificates"]["key"].stringValue
+                tlsSettings.certificates = certificates
+            }
+            stream.xtlsSettings = tlsSettings
+        }
+        
+        // reality
+        if streamJson["realitySettings"].dictionaryValue.count > 0 {
+            var settings = streamJson["realitySettings"]
+            var realitySettings = RealitySettings()
+            realitySettings.show = settings["show"].boolValue
+            realitySettings.fingerprint = settings["fingerprint"].stringValue  // 必填，使用 uTLS 库模拟客户端 TLS 指纹
+            realitySettings.serverName = settings["allowInsecure"].stringValue
+            realitySettings.publicKey = settings["allowInsecureCiphers"].stringValue
+            realitySettings.shortId = settings["shortId"].stringValue
+            realitySettings.spiderX = settings["spiderX"].stringValue
+            
+            if realitySettings.fingerprint==""{
+                realitySettings.fingerprint="chrome"
+            }
+            
+            stream.realitySettings = realitySettings
+        }
+        
         // tcpSettings
-        if steamJson["tcpSettings"].dictionaryValue.count > 0 {
+        if streamJson["tcpSettings"].dictionaryValue.count > 0 {
             var tcpSettings = TcpSettings()
             var tcpHeader = TcpSettingHeader()
 
             // type
-            if steamJson["tcpSettings"]["header"]["type"].stringValue == "http" {
+            if streamJson["tcpSettings"]["header"]["type"].stringValue == "http" {
                 tcpHeader.type = "http"
             } else {
                 tcpHeader.type = "none"
             }
 
             // request
-            if steamJson["tcpSettings"]["header"]["request"].dictionaryValue.count > 0 {
-                var requestJson = steamJson["tcpSettings"]["header"]["request"]
+            if streamJson["tcpSettings"]["header"]["request"].dictionaryValue.count > 0 {
+                var requestJson = streamJson["tcpSettings"]["header"]["request"]
                 var tcpRequest = TcpSettingHeaderRequest()
                 tcpRequest.version = requestJson["version"].stringValue
                 tcpRequest.method = requestJson["method"].stringValue
@@ -1387,8 +1435,8 @@ class V2rayConfig: NSObject {
             }
 
             // response
-            if steamJson["tcpSettings"]["header"]["response"].dictionaryValue.count > 0 {
-                var responseJson = steamJson["tcpSettings"]["header"]["response"]
+            if streamJson["tcpSettings"]["header"]["response"].dictionaryValue.count > 0 {
+                var responseJson = streamJson["tcpSettings"]["header"]["response"]
                 var tcpResponse = TcpSettingHeaderResponse()
 
                 tcpResponse.version = responseJson["version"].stringValue
@@ -1418,59 +1466,59 @@ class V2rayConfig: NSObject {
         }
 
         // kcpSettings see: https://www.v2ray.com/chapter_02/transport/mkcp.html
-        if steamJson["kcpSettings"].dictionaryValue.count > 0 {
+        if streamJson["kcpSettings"].dictionaryValue.count > 0 {
             var kcpSettings = KcpSettings()
-            kcpSettings.mtu = steamJson["kcpSettings"]["mtu"].intValue
-            kcpSettings.tti = steamJson["kcpSettings"]["tti"].intValue
-            kcpSettings.uplinkCapacity = steamJson["kcpSettings"]["uplinkCapacity"].intValue
-            kcpSettings.downlinkCapacity = steamJson["kcpSettings"]["downlinkCapacity"].intValue
-            kcpSettings.congestion = steamJson["kcpSettings"]["congestion"].boolValue
-            kcpSettings.readBufferSize = steamJson["kcpSettings"]["readBufferSize"].intValue
-            kcpSettings.writeBufferSize = steamJson["kcpSettings"]["writeBufferSize"].intValue
+            kcpSettings.mtu = streamJson["kcpSettings"]["mtu"].intValue
+            kcpSettings.tti = streamJson["kcpSettings"]["tti"].intValue
+            kcpSettings.uplinkCapacity = streamJson["kcpSettings"]["uplinkCapacity"].intValue
+            kcpSettings.downlinkCapacity = streamJson["kcpSettings"]["downlinkCapacity"].intValue
+            kcpSettings.congestion = streamJson["kcpSettings"]["congestion"].boolValue
+            kcpSettings.readBufferSize = streamJson["kcpSettings"]["readBufferSize"].intValue
+            kcpSettings.writeBufferSize = streamJson["kcpSettings"]["writeBufferSize"].intValue
             // "none"
-            if KcpSettingsHeaderType.firstIndex(of: steamJson["kcpSettings"]["header"]["type"].stringValue) != nil {
-                kcpSettings.header.type = steamJson["kcpSettings"]["header"]["type"].stringValue
+            if KcpSettingsHeaderType.firstIndex(of: streamJson["kcpSettings"]["header"]["type"].stringValue) != nil {
+                kcpSettings.header.type = streamJson["kcpSettings"]["header"]["type"].stringValue
             }
             stream.kcpSettings = kcpSettings
         }
 
         // wsSettings see: https://www.v2ray.com/chapter_02/transport/websocket.html
-        if steamJson["wsSettings"].dictionaryValue.count > 0 {
+        if streamJson["wsSettings"].dictionaryValue.count > 0 {
             var wsSettings = WsSettings()
-            wsSettings.path = steamJson["wsSettings"]["path"].stringValue
-            wsSettings.headers.host = steamJson["wsSettings"]["headers"]["host"].stringValue
+            wsSettings.path = streamJson["wsSettings"]["path"].stringValue
+            wsSettings.headers.host = streamJson["wsSettings"]["headers"]["host"].stringValue
 
             stream.wsSettings = wsSettings
         }
 
         // (HTTP/2)httpSettings see: https://www.v2ray.com/chapter_02/transport/websocket.html
-        if steamJson["httpSettings"].dictionaryValue.count > 0 && steamJson["httpSettings"].dictionaryValue.count > 0 {
+        if streamJson["httpSettings"].dictionaryValue.count > 0 && streamJson["httpSettings"].dictionaryValue.count > 0 {
             var httpSettings = HttpSettings()
-            httpSettings.host = steamJson["httpSettings"]["host"].arrayValue.map {
+            httpSettings.host = streamJson["httpSettings"]["host"].arrayValue.map {
                 $0.stringValue
             }
-            httpSettings.path = steamJson["httpSettings"]["path"].stringValue
+            httpSettings.path = streamJson["httpSettings"]["path"].stringValue
 
             stream.httpSettings = httpSettings
         }
 
         // dsSettings
-        if steamJson["dsSettings"].dictionaryValue.count > 0 && steamJson["dsSettings"].dictionaryValue.count > 0 {
+        if streamJson["dsSettings"].dictionaryValue.count > 0 && streamJson["dsSettings"].dictionaryValue.count > 0 {
             var dsSettings = DsSettings()
-            dsSettings.path = steamJson["dsSettings"]["path"].stringValue
+            dsSettings.path = streamJson["dsSettings"]["path"].stringValue
             stream.dsSettings = dsSettings
         }
 
         // quicSettings
-        if steamJson["quicSettings"].dictionaryValue.count > 0 && steamJson["quicSettings"].dictionaryValue.count > 0 {
+        if streamJson["quicSettings"].dictionaryValue.count > 0 && streamJson["quicSettings"].dictionaryValue.count > 0 {
             var quicSettings = QuicSettings()
-            quicSettings.key = steamJson["quicSettings"]["key"].stringValue
+            quicSettings.key = streamJson["quicSettings"]["key"].stringValue
             // "none"
-            if QuicSettingsHeaderType.firstIndex(of: steamJson["quicSettings"]["header"]["type"].stringValue) != nil {
-                quicSettings.header.type = steamJson["quicSettings"]["header"]["type"].stringValue
+            if QuicSettingsHeaderType.firstIndex(of: streamJson["quicSettings"]["header"]["type"].stringValue) != nil {
+                quicSettings.header.type = streamJson["quicSettings"]["header"]["type"].stringValue
             }
-            if QuicSettingsSecurity.firstIndex(of: steamJson["quicSettings"]["security"].stringValue) != nil {
-                quicSettings.security = steamJson["quicSettings"]["security"].stringValue
+            if QuicSettingsSecurity.firstIndex(of: streamJson["quicSettings"]["security"].stringValue) != nil {
+                quicSettings.security = streamJson["quicSettings"]["security"].stringValue
             }
             stream.quicSettings = quicSettings
         }

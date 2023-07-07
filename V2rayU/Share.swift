@@ -116,7 +116,7 @@ class ShareUri {
             self.share.path = self.v2ray.streamWs.path
         }
 
-        self.share.tls = self.v2ray.streamTlsSecurity
+        self.share.tls = self.v2ray.streamSecurity
     }
 
     // Shadowsocks
@@ -158,8 +158,8 @@ class ShareUri {
         }
         ss.remark = self.remark
 
-        ss.security = self.v2ray.streamTlsSecurity
-        ss.host = self.v2ray.streamXtlsServerName
+        ss.security = self.v2ray.streamSecurity
+        ss.host = self.v2ray.securityTls.serverName
 
         ss.type = self.v2ray.streamNetwork
 
