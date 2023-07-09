@@ -107,11 +107,11 @@
                                                 </textFieldCell>
                                                 <prototypeCellViews>
                                                     <tableCellView id="sbc-Q5-Cgb">
-                                                        <rect key="frame" x="1" y="1" width="105" height="20"/>
+                                                        <rect key="frame" x="1" y="1" width="104" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uV2-VE-pu4">
-                                                                <rect key="frame" x="0.0" y="3" width="105" height="17"/>
+                                                                <rect key="frame" x="0.0" y="3" width="104" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" identifier="firstName" title="Table View Cell" id="2SR-49-K11">
                                                                     <font key="font" metaFont="system"/>
@@ -139,11 +139,11 @@
                                                 </textFieldCell>
                                                 <prototypeCellViews>
                                                     <tableCellView id="FLk-I9-55S">
-                                                        <rect key="frame" x="107.5" y="1" width="317" height="16"/>
+                                                        <rect key="frame" x="107" y="1" width="318" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9CU-oY-puz">
-                                                                <rect key="frame" x="0.0" y="0.0" width="317" height="16"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="318" height="16"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="justified" identifier="lastName" title="Table View Cell" id="OER-yL-Osv">
                                                                     <font key="font" metaFont="system"/>

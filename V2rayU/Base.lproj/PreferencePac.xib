@@ -80,7 +80,7 @@
                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <size key="minSize" width="658" height="176"/>
-                                        <size key="maxSize" width="658" height="10000000"/>
+                                        <size key="maxSize" width="660" height="10000000"/>
                                         <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     </textView>
                                 </subviews>
@@ -95,7 +95,7 @@
                             </scroller>
                         </scrollView>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LeF-Sd-TXL">
-                            <rect key="frame" x="18" y="206" width="295" height="21"/>
+                            <rect key="frame" x="18" y="206" width="294" height="21"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="User Rules" id="W0g-B7-neT">
                                 <font key="font" metaFont="system"/>

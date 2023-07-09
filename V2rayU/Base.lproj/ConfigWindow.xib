@@ -184,17 +184,17 @@ Gw
                         </connections>
                     </button>
                     <tabView fixedFrame="YES" drawsBackground="NO" allowsTruncatedLabels="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ppK-ei-cOI">
-                        <rect key="frame" x="173" y="7" width="417" height="590"/>
+                        <rect key="frame" x="173" y="7" width="416" height="590"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Import" identifier="Import" id="BS9-X1-ueN">
                                 <view key="view" id="Ab3-ML-cu8">
-                                    <rect key="frame" x="10" y="33" width="394" height="491"/>
+                                    <rect key="frame" x="10" y="33" width="396" height="544"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box fixedFrame="YES" boxType="custom" cornerRadius="5" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="nEa-7Z-9Fm">
-                                            <rect key="frame" x="7" y="446" width="377" height="44"/>
+                                            <rect key="frame" x="7" y="499" width="377" height="44"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="mda-tW-Kc5">
                                                 <rect key="frame" x="1" y="1" width="375" height="42"/>
@@ -290,7 +290,7 @@ Gw
                             </tabViewItem>
                             <tabViewItem label="Manual" identifier="Manual" id="qq1-yV-VsK">
                                 <view key="view" id="YXI-Uw-7SR">
-                                    <rect key="frame" x="10" y="33" width="397" height="544"/>
+                                    <rect key="frame" x="10" y="33" width="396" height="544"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dBV-ws-KbW" userLabel="inbound">
@@ -1033,7 +1033,7 @@ Gw
                                             </subviews>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FDI-R5-vOc" userLabel="stream">
-                                            <rect key="frame" x="7" y="8" width="380" height="230"/>
+                                            <rect key="frame" x="6" y="8" width="380" height="230"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="40C-lR-ydV">
