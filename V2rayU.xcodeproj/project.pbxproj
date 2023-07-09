@@ -798,9 +798,10 @@
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayULauncher;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -810,6 +811,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 			};
@@ -980,12 +982,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 3.4.0;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -1029,8 +1032,9 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				INFOPLIST_FILE = "";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
