@@ -18,3 +18,12 @@ target 'V2rayU' do
   pod 'Swifter'
 
 end
+
+# fix libarclite_macosx.a need min deploy target 10.14
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
+    end
+  end
+endß
