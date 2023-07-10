@@ -210,7 +210,7 @@ function createDmgByAppdmg() {
     appdmg appdmg.json ${DMG_FINAL}
 
     # appcast sign update
-    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
+#    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
 
 #    umount "/Volumes/${APP_NAME}"
 }
@@ -237,22 +237,26 @@ function makeDmg() {
         case $target in
         "64")
             echo "你选择了: 64"
-            downloadV2ray
+#            downloadV2ray
+            cd release/
             break
             ;;
         "arm64")
             echo "你选择了: arm64"
-            downloadV2rayArm
+#            downloadV2rayArm
             break
             ;;
         *) echo "请选择";;
         esac
     done
 
-    updatePlistVersion
-    build
+#    updatePlistVersion
+#    build
     createDmgByAppdmg
 }
 
-createDmgByAppdmg
+
+
+
+
 echo 'done'

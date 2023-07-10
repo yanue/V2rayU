@@ -142,6 +142,7 @@
 		6662C20D240EA797000AF6CD /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		667029C921AF8E7A0079EF41 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Downloads/Sparkle-1.21.0/Sparkle.framework"; sourceTree = "<group>"; };
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
+		66757C6C2A5C505300758F32 /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66784AFF21704E1300AD307F /* V2rayCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayCore.swift; sourceTree = "<group>"; };
 		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
@@ -238,7 +239,6 @@
 				D38E7EE2D07C57D0C3F2E6D4 /* Pods-V2rayU.debug.xcconfig */,
 				CCD980CE9E6984583F7A8B9D /* Pods-V2rayU.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -352,6 +352,7 @@
 				6D6DFD93CE866018306A090E /* pac */,
 				6653C20422E0A2B700754D66 /* publish.sh */,
 				6D6DF927AC79EEF7378C192A /* appdmg.json */,
+				66757C6C2A5C505300758F32 /* appdmg.sh */,
 			);
 			path = Build;
 			sourceTree = "<group>";
@@ -771,9 +772,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayULauncher;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -783,6 +786,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.v2rayu.V2rayULauncher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 			};
@@ -794,11 +798,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayULauncher;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -943,12 +947,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3.4.0;
+				CURRENT_PROJECT_VERSION = 3.5.0;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -957,7 +964,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 3.4.0;
+				MARKETING_VERSION = 3.5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -978,14 +985,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3.4.0;
+				CURRENT_PROJECT_VERSION = 3.5.0;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -994,7 +1002,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 3.4.0;
+				MARKETING_VERSION = 3.5.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1013,8 +1021,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RJYEH6TCJD;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				INFOPLIST_FILE = "";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
@@ -1028,10 +1038,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
 				INFOPLIST_FILE = "";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
