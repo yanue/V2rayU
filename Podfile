@@ -26,4 +26,4 @@ post_install do |installer|
       config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
     end
   end
-endß
+end
