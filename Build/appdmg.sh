@@ -31,7 +31,7 @@ do
     "64")
         echo "你选择了: 64"
         # remove v2ray-arm64
-        rm -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray-arm64
+#        rm -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray-arm64
         echo "appdmg V2rayU-64.dmg"
         rm -f V2rayU-64.dmg
         appdmg appdmg.json "V2rayU-64.dmg"
@@ -41,8 +41,8 @@ do
     "arm64")
         echo "你选择了: arm64"
         # replace v2ray-arm64 to v2ray
-        rm -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray
-        mv -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray-arm64 release/V2rayU.app/Contents/Resources/v2ray-core/v2ray
+#        rm -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray
+#        mv -f release/V2rayU.app/Contents/Resources/v2ray-core/v2ray-arm64 release/V2rayU.app/Contents/Resources/v2ray-core/v2ray
         echo "appdmg V2rayU-arm64.dmg"
         rm -f V2rayU-arm64.dmg
         appdmg appdmg.json "V2rayU-arm64.dmg"
