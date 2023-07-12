@@ -23,6 +23,12 @@ sudo chmod -R 777 ~/.V2rayU/
 
 # root permission
 cd  ~/.V2rayU/
+
+# for apple silicon replace v2ray
+if [[ $(arch) == 'arm64' ]]; then
+    \cp -rf ~/.V2rayU/v2ray-core/v2ray-arm64  ~/.V2rayU/v2ray-core/v2ray
+fi
+
 cmd="./unzip.sh"
 sudo chown root:admin ${cmd}
 sudo chmod a+rx ${cmd}
