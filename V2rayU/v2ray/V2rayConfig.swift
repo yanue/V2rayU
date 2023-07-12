@@ -602,15 +602,13 @@ class V2rayConfig: NSObject {
         }
 
         if self.streamSecurity == "tls" {
-            var tls = self.securityTls
             streamSettings.security = .tls
-            streamSettings.tlsSettings = tls
+            streamSettings.tlsSettings = self.securityTls
         }
 
         if self.streamSecurity == "xtls" {
-            var tls = self.securityTls
             streamSettings.security = .xtls
-            streamSettings.xtlsSettings = tls
+            streamSettings.xtlsSettings = self.securityTls
         }
 
         if self.streamSecurity == "reality" {
@@ -1132,11 +1130,6 @@ class V2rayConfig: NSObject {
                 settingVLess.vnext = vnext
                 v2rayOutbound.settingVLess = settingVLess
 
-                var mux = V2rayOutboundMux()
-                mux.enabled = self.enableMux
-                mux.concurrency = self.mux
-                v2rayOutbound.mux = mux
-
                 break
 
             case .trojan:
@@ -1245,20 +1238,24 @@ class V2rayConfig: NSObject {
         if preTxt == "outbound" {
 
             if transport.xtlsSettings != nil {
-                if transport.xtlsSettings?.serverName != nil {
-                    self.securityTls.serverName = transport.xtlsSettings!.serverName
-                    self.securityTls.allowInsecure = transport.xtlsSettings!.allowInsecure
-                }
+                self.securityTls.serverName = transport.xtlsSettings!.serverName
+                self.securityTls.allowInsecure = transport.xtlsSettings!.allowInsecure
             }
             
             if transport.tlsSettings != nil {
-                // set data
-                if transport.tlsSettings?.serverName != nil {
-                    self.securityTls.serverName = transport.tlsSettings!.serverName
-                    self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
-                }
+                self.securityTls.serverName = transport.tlsSettings!.serverName
+                self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
             }
-
+            
+            if transport.realitySettings != nil {
+                self.securityReality.serverName = transport.realitySettings!.serverName
+                self.securityReality.show = transport.realitySettings!.show
+                self.securityReality.fingerprint = transport.realitySettings!.fingerprint
+                self.securityReality.publicKey = transport.realitySettings!.publicKey
+                self.securityReality.shortId = transport.realitySettings!.shortId
+                self.securityReality.spiderX = transport.realitySettings!.spiderX
+            }
+            
             if transport.tcpSettings != nil {
                 self.streamTcp = transport.tcpSettings!
             }
@@ -1291,7 +1288,7 @@ class V2rayConfig: NSObject {
         var stream = V2rayTransport()
         // tlsSettings
         if streamJson["tlsSettings"].dictionaryValue.count > 0 {
-            var settings = streamJson["tlsSettings"]
+            let settings = streamJson["tlsSettings"]
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
             tlsSettings.alpn = settings["alpn"].stringValue
@@ -1315,7 +1312,7 @@ class V2rayConfig: NSObject {
 
         // xtlsSettings
         if streamJson["xtlsSettings"].dictionaryValue.count > 0 {
-            var settings = streamJson["xtlsSettings"]
+            let settings = streamJson["xtlsSettings"]
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
             tlsSettings.alpn = settings["alpn"].stringValue
@@ -1336,39 +1333,15 @@ class V2rayConfig: NSObject {
             }
             stream.xtlsSettings = tlsSettings
         }
-
-        // utlsSettings
-        if streamJson["utlsSettings"].dictionaryValue.count > 0 {
-            var settings = streamJson["utlsSettings"]
-            var tlsSettings = TlsSettings()
-            tlsSettings.serverName = settings["serverName"].stringValue
-            tlsSettings.alpn = settings["alpn"].stringValue
-            tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
-            tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
-            // certificates
-            if settings["certificates"].dictionaryValue.count > 0 {
-                var certificates = TlsCertificates()
-                let usage = TlsCertificates.usage(rawValue: settings["certificates"]["usage"].stringValue)
-                if (usage != nil) {
-                    certificates.usage = usage!
-                }
-                certificates.certificateFile = settings["certificates"]["certificateFile"].stringValue
-                certificates.keyFile = settings["certificates"]["keyFile"].stringValue
-                certificates.certificate = settings["certificates"]["certificate"].stringValue
-                certificates.key = settings["certificates"]["key"].stringValue
-                tlsSettings.certificates = certificates
-            }
-            stream.xtlsSettings = tlsSettings
-        }
-
+        
         // reality
         if streamJson["realitySettings"].dictionaryValue.count > 0 {
-            var settings = streamJson["realitySettings"]
+            let settings = streamJson["realitySettings"]
             var realitySettings = RealitySettings()
             realitySettings.show = settings["show"].boolValue
             realitySettings.fingerprint = settings["fingerprint"].stringValue  // 必填，使用 uTLS 库模拟客户端 TLS 指纹
-            realitySettings.serverName = settings["allowInsecure"].stringValue
-            realitySettings.publicKey = settings["allowInsecureCiphers"].stringValue
+            realitySettings.serverName = settings["serverName"].stringValue
+            realitySettings.publicKey = settings["publicKey"].stringValue
             realitySettings.shortId = settings["shortId"].stringValue
             realitySettings.spiderX = settings["spiderX"].stringValue
             
@@ -1393,7 +1366,7 @@ class V2rayConfig: NSObject {
 
             // request
             if streamJson["tcpSettings"]["header"]["request"].dictionaryValue.count > 0 {
-                var requestJson = streamJson["tcpSettings"]["header"]["request"]
+                let requestJson = streamJson["tcpSettings"]["header"]["request"]
                 var tcpRequest = TcpSettingHeaderRequest()
                 tcpRequest.version = requestJson["version"].stringValue
                 tcpRequest.method = requestJson["method"].stringValue
