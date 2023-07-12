@@ -170,9 +170,6 @@ class ImportUri {
         vmessItem.address = vmess.address
         vmessItem.port = vmess.port
         var user = V2rayOutboundVMessUser()
-        if id.count > 0 {
-//            vmess.id = id
-        }
         user.id = vmess.id
         user.alterId = vmess.alterId
         user.security = vmess.security
@@ -184,11 +181,11 @@ class ImportUri {
         v2ray.streamNetwork = vmess.network
         v2ray.streamSecurity = vmess.tls
         v2ray.securityTls.allowInsecure = vmess.allowInsecure
-        v2ray.securityTls.serverName = vmess.tlsServer
+        v2ray.securityTls.serverName = vmess.sni
 
         // tls servername for h2 or ws
-        if vmess.tlsServer.count == 0 && (vmess.network == V2rayStreamSettings.network.h2.rawValue || vmess.network == V2rayStreamSettings.network.ws.rawValue) {
-            v2ray.securityTls.serverName = vmess.tlsServer
+        if vmess.sni.count == 0 && (vmess.network == V2rayStreamSettings.network.h2.rawValue || vmess.network == V2rayStreamSettings.network.ws.rawValue) {
+            v2ray.securityTls.serverName = vmess.address
         }
 
         // kcp
@@ -259,6 +256,13 @@ class ImportUri {
         v2ray.securityTls.serverName = vmess.host
         if vmess.host.count == 0 {
             v2ray.securityTls.serverName = vmess.address
+        }
+
+        if v2ray.streamSecurity == "reality" {
+            v2ray.securityReality.publicKey = vmess.pbk
+            v2ray.securityReality.fingerprint = vmess.fp
+            v2ray.securityReality.shortId = vmess.sid
+            v2ray.securityReality.serverName = vmess.address
         }
 
         // kcp

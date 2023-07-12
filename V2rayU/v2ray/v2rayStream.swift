@@ -17,7 +17,6 @@ struct V2rayTransport: Codable {
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
     var xtlsSettings: TlsSettings?
-    var utlsSettings: TlsSettings?
     var realitySettings: RealitySettings?
 }
 
@@ -36,7 +35,6 @@ struct V2rayStreamSettings: Codable {
         case none
         case tls
         case xtls
-        case utls
         case reality // for vless
     }
 
@@ -51,7 +49,6 @@ struct V2rayStreamSettings: Codable {
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
     var xtlsSettings: TlsSettings?
-    var utlsSettings: TlsSettings?
     var realitySettings: RealitySettings?
 }
 

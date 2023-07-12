@@ -15,19 +15,18 @@ class VmessUri {
     var port: Int = 8379
     var id: String = ""
     var alterId: Int = 0
-    var security: String = "aes-128-gcm"
+    var security: String = "auto" // 加密方式
 
     var network: String = "tcp"
     var netHost: String = ""
     var netPath: String = ""
     var tls: String = ""
-    var type: String = "none"
+    var type: String = "none" // 伪装类型
     var uplinkCapacity: Int = 50
     var downlinkCapacity: Int = 20
-    var allowInsecure: Bool = false
-    var tlsServer: String = ""
-    var mux: Bool = true
-    var muxConcurrency: Int = 8
+    var allowInsecure: Bool = true
+    var alpn: String = ""
+    var sni: String = ""
 
     /**
     vmess://base64(security:uuid@host:port)?[urlencode(parameters)]
@@ -45,8 +44,6 @@ class VmessUri {
     tls - 是否启用 TLS，为 0 或 1
     allowInsecure - TLS 的 AllowInsecure，为 0 或 1
     tlsServer - TLS 的服务器端证书的域名
-    mux - 是否启用 mux，为 0 或 1
-    muxConcurrency - mux 的 最大并发连接数
     remark - 备注名称
     导入配置时，不在列表中的参数一般会按照 Core 的默认值处理。
     */
@@ -117,13 +114,16 @@ class VmessUri {
                 self.allowInsecure = param[1] == "1" ? true : false
                 break
             case "tlsServer":
-                self.tlsServer = param[1]
+                self.sni = param[1]
                 break
-            case "mux":
-                self.mux = param[1] == "1" ? true : false
+            case "sni":
+                self.sni = param[1]
                 break
-            case "muxConcurrency":
-                self.muxConcurrency = Int(param[1]) ?? 8
+            case "alpn":
+                self.alpn = param[1]
+                break
+            case "encryption":
+                self.security = param[1]
                 break
             case "kcpHeader":
                 // type 是所有传输方式的伪装类型
@@ -196,6 +196,15 @@ class VmessUri {
         self.port = json["port"].intValue
         self.id = json["id"].stringValue
         self.alterId = json["aid"].intValue
+        self.security = json["security"].stringValue
+        if self.security.count == 0 {
+            self.security = json["scy"].stringValue
+        }
+        if self.security.count == 0 {
+            self.security = "auto"
+        }
+        self.alpn = json["alpn"].stringValue
+        self.sni = json["sni"].stringValue
         self.network = json["net"].stringValue
         self.netHost = json["host"].stringValue
         self.netPath = json["path"].stringValue
@@ -471,6 +480,8 @@ class TrojanUri {
 //vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:41971?type=kcp&headerType=wireguard&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeedWG
 //# VMess + WebSocket + TLS
 //vmess://44efe52b-e143-46b5-a9e7-aadbfd77eb9c@qv2ray.net:6939?type=ws&security=tls&host=qv2ray.net&path=%2Fsomewhere#VMessWebSocketTLS
+//# VLESS + TCP + reality
+//vless://44efe52b-e143-46b5-a9e7-aadbfd77eb9c@qv2ray.net:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=sni.yahoo.com&fp=chrome&pbk=xxx&sid=88&type=tcp&headerType=none&host=hk.yahoo.com#reality
 
 class VlessUri {
     var error: String = ""
@@ -484,12 +495,15 @@ class VlessUri {
     var flow: String = ""
 
     var encryption: String = "" // auto,aes-128-gcm,...
-    var security: String = "" // xtls,tls
+    var security: String = "" // xtls,tls,reality
 
     var type: String = "" // tcp,http
     var host: String = ""
     var sni: String = ""
     var path: String = ""
+    var fp: String = "" // fingerprint
+    var pbk: String = "" // reality public key
+    var sid: String = "" // reality shortId
 
     // vless://f2a5064a-fabb-43ed-a2b6-8ffeb970df7f@00.com:443?flow=xtls-rprx-splite&encryption=none&security=xtls&sni=aaaaa&type=http&host=00.com&path=%2fvl#vless1
     func encode() -> String {
@@ -506,6 +520,9 @@ class VlessUri {
             URLQueryItem(name: "host", value: self.host),
             URLQueryItem(name: "path", value: self.path),
             URLQueryItem(name: "sni", value: self.sni),
+            URLQueryItem(name: "fp", value: self.fp),
+            URLQueryItem(name: "pbk", value: self.pbk),
+            URLQueryItem(name: "sid", value: self.sid),
         ]
 
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
@@ -556,6 +573,15 @@ class VlessUri {
                 break
             case "path":
                 self.path = item.value as! String
+                break
+            case "fp":
+                self.fp = item.value as! String
+                break
+            case "pbk":
+                self.pbk = item.value as! String
+                break
+            case "sid":
+                self.sid = item.value as! String
                 break
             default:
                 break

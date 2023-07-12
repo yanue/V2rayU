@@ -126,8 +126,8 @@ class V2rayConfig: NSObject {
     var routing = V2rayRouting()
 
     // tls
-    var streamSecurity = "tls" // none|tls|xtls|ults|reality
-    var securityTls = TlsSettings() // tls|xtls|ults
+    var streamSecurity = "tls" // none|tls|xtls|reality
+    var securityTls = TlsSettings() // tls|xtls
     var securityReality = RealitySettings() // reality
     
     var routingDomainStrategy: V2rayRoutingSetting.domainStrategy = .AsIs
@@ -611,12 +611,6 @@ class V2rayConfig: NSObject {
             var tls = self.securityTls
             streamSettings.security = .xtls
             streamSettings.xtlsSettings = tls
-        }
-        
-        if self.streamSecurity == "utls" {
-            var tls = self.securityTls
-            streamSettings.security = .utls
-            streamSettings.utlsSettings = tls
         }
 
         if self.streamSecurity == "reality" {
@@ -1249,14 +1243,7 @@ class V2rayConfig: NSObject {
 
         // for outbound stream
         if preTxt == "outbound" {
-            
-            if transport.utlsSettings != nil {
-                if transport.utlsSettings?.serverName != nil {
-                    self.securityTls.serverName = transport.utlsSettings!.serverName
-                    self.securityTls.allowInsecure = transport.utlsSettings!.allowInsecure
-                }
-            }
-            
+
             if transport.xtlsSettings != nil {
                 if transport.xtlsSettings?.serverName != nil {
                     self.securityTls.serverName = transport.xtlsSettings!.serverName
@@ -1373,7 +1360,7 @@ class V2rayConfig: NSObject {
             }
             stream.xtlsSettings = tlsSettings
         }
-        
+
         // reality
         if streamJson["realitySettings"].dictionaryValue.count > 0 {
             var settings = streamJson["realitySettings"]
@@ -1385,8 +1372,8 @@ class V2rayConfig: NSObject {
             realitySettings.shortId = settings["shortId"].stringValue
             realitySettings.spiderX = settings["spiderX"].stringValue
             
-            if realitySettings.fingerprint==""{
-                realitySettings.fingerprint="chrome"
+            if realitySettings.fingerprint == "" {
+                realitySettings.fingerprint = "chrome"
             }
             
             stream.realitySettings = realitySettings

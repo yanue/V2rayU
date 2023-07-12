@@ -17,7 +17,9 @@ struct VmessShare: Codable {
     var type: String = "none"
     var host: String = ""
     var path: String = ""
-    var tls: String = "none"
+    var tls: String = "tls"
+    var security: String = "auto"
+    var sni: String = ""
 }
 
 class ShareUri {
@@ -100,7 +102,7 @@ class ShareUri {
         if self.v2ray.serverVmess.users.count > 0 {
             self.share.id = self.v2ray.serverVmess.users[0].id
             self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
-            self.share.type = self.v2ray.serverVmess.users[0].security // security type
+            self.share.security = self.v2ray.serverVmess.users[0].security // security type
         }
         self.share.net = self.v2ray.streamNetwork
 
@@ -117,6 +119,9 @@ class ShareUri {
         }
 
         self.share.tls = self.v2ray.streamSecurity
+        self.share.sni = self.v2ray.securityTls.serverName
+        self.share.net = self.v2ray.streamNetwork
+        // todo headerType
     }
 
     // Shadowsocks
@@ -159,7 +164,14 @@ class ShareUri {
         ss.remark = self.remark
 
         ss.security = self.v2ray.streamSecurity
-        ss.host = self.v2ray.securityTls.serverName
+        if self.v2ray.streamSecurity == "reality" {
+            ss.pbk = self.v2ray.securityReality.publicKey
+            ss.fp = self.v2ray.securityReality.fingerprint
+            ss.sid = self.v2ray.securityReality.shortId
+            ss.sni = self.v2ray.securityReality.serverName
+        } else {
+            ss.sni = self.v2ray.securityTls.serverName
+        }
 
         ss.type = self.v2ray.streamNetwork
 
