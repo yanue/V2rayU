@@ -87,6 +87,9 @@ class ImportUri {
         }
 
         let v2ray = V2rayConfig()
+        v2ray.streamNetwork = "tcp" // 必须为tcp
+        v2ray.streamSecurity = "none" // ss 必须为 none
+
         var ssServer = V2rayOutboundShadowsockServer()
         ssServer.address = ss.host
         ssServer.port = ss.port
@@ -123,6 +126,9 @@ class ImportUri {
         self.remark = ssr.remark
 
         let v2ray = V2rayConfig()
+        v2ray.streamNetwork = "tcp" // 必须为tcp
+        v2ray.streamSecurity = "none" // ss 必须为 none
+
         var ssServer = V2rayOutboundShadowsockServer()
         ssServer.address = ssr.host
         ssServer.port = ssr.port
@@ -253,16 +259,13 @@ class ImportUri {
         // stream
         v2ray.streamNetwork = vmess.type
         v2ray.streamSecurity = vmess.security
-        v2ray.securityTls.serverName = vmess.host
-        if vmess.host.count == 0 {
-            v2ray.securityTls.serverName = vmess.address
-        }
+        v2ray.securityTls.serverName = vmess.sni // default tls sni
 
         if v2ray.streamSecurity == "reality" {
             v2ray.securityReality.publicKey = vmess.pbk
             v2ray.securityReality.fingerprint = vmess.fp
             v2ray.securityReality.shortId = vmess.sid
-            v2ray.securityReality.serverName = vmess.address
+            v2ray.securityReality.serverName = vmess.sni
         }
 
         // kcp
@@ -325,6 +328,7 @@ class ImportUri {
         v2ray.streamNetwork = "tcp"
         v2ray.streamSecurity = trojan.security
         v2ray.securityTls.allowInsecure = true
+        v2ray.securityTls.serverName = svr.sni // default tls sni
 
         v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // check is valid

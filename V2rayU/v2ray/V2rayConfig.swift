@@ -125,8 +125,8 @@ class V2rayConfig: NSObject {
     var streamQuic = QuicSettings()
     var routing = V2rayRouting()
 
-    // tls
-    var streamSecurity = "tls" // none|tls|xtls|reality
+    // tls 默认需为none,shadowsocks需为none
+    var streamSecurity = "none" // none|tls|xtls|reality
     var securityTls = TlsSettings() // tls|xtls
     var securityReality = RealitySettings() // reality
     
@@ -474,6 +474,7 @@ class V2rayConfig: NSObject {
                 self.error = "missing shadowsocks.method";
                 return
             }
+            s.security = "none" // 需为none
             break
         case V2rayProtocolOutbound.socks.rawValue:
             if self.serverSocks5.servers.count == 0 {
