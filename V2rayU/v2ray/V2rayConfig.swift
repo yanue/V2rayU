@@ -115,7 +115,7 @@ class V2rayConfig: NSObject {
     var serverVless = V2rayOutboundVLessItem()
     var serverTrojan = V2rayOutboundTrojanServer()
 
-    // transfor
+    // transfer
     var streamNetwork = V2rayStreamSettings.network.tcp.rawValue
     var streamTcp = TcpSettings()
     var streamKcp = KcpSettings()
@@ -123,6 +123,7 @@ class V2rayConfig: NSObject {
     var streamWs = WsSettings()
     var streamH2 = HttpSettings()
     var streamQuic = QuicSettings()
+    var streamGrpc = GrpcSettings()
     var routing = V2rayRouting()
 
     // tls 默认需为none,shadowsocks需为none
@@ -599,6 +600,9 @@ class V2rayConfig: NSObject {
             break
         case .quic:
             streamSettings.quicSettings = self.streamQuic
+            break
+        case .grpc:
+            streamSettings.grpcSettings = self.streamGrpc
             break
         }
 
@@ -1245,6 +1249,7 @@ class V2rayConfig: NSObject {
             
             if transport.tlsSettings != nil {
                 self.securityTls.serverName = transport.tlsSettings!.serverName
+                self.securityTls.fingerprint = transport.tlsSettings!.fingerprint
                 self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
             }
             
@@ -1279,6 +1284,10 @@ class V2rayConfig: NSObject {
 
             if transport.quicSettings != nil {
                 self.streamQuic = transport.quicSettings!
+            }
+
+            if transport.grpcSettings != nil {
+                self.streamGrpc = transport.grpcSettings!
             }
         }
 
@@ -1316,6 +1325,7 @@ class V2rayConfig: NSObject {
             let settings = streamJson["xtlsSettings"]
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
+            tlsSettings.fingerprint = settings["fingerprint"].stringValue  // 必填，使用 uTLS 库模拟客户端 TLS 指纹
             tlsSettings.alpn = settings["alpn"].stringValue
             tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
             tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
@@ -1484,6 +1494,14 @@ class V2rayConfig: NSObject {
             stream.quicSettings = quicSettings
         }
 
+        // grpcSettings
+        if streamJson["grpcSettings"].dictionaryValue.count > 0 && streamJson["grpcSettings"].dictionaryValue.count > 0 {
+            var grpcSettings = GrpcSettings()
+            grpcSettings.serverName = streamJson["grpcSettings"]["serviceName"].stringValue
+            grpcSettings.user_agent = streamJson["grpcSettings"]["user_agent"].stringValue
+            grpcSettings.serverName = streamJson["grpcSettings"]["multiMode"].boolValue
+            stream.grpcSettings = grpcSettings
+        }
         return stream
     }
 

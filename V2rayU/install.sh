@@ -10,9 +10,13 @@
 rm -fr ~/.V2rayU/v2ray-core
 rm -fr ~/.V2rayU/pac
 
+# root permission for change system proxy
+cmd="./V2rayUTool"
+sudo chown root:admin ${cmd}
+sudo chmod a+rx ${cmd}
+sudo chmod +s ${cmd}
+
 # copy
-\cp -rf ./V2rayUTool  ~/.V2rayU/
-\cp -rv ./cmd.sh  ~/.V2rayU/
 \cp -rf ./pac  ~/.V2rayU/
 \cp -rf ./unzip.sh  ~/.V2rayU/
 \cp -rf ./v2ray-core  ~/.V2rayU/
@@ -30,11 +34,6 @@ if [[ $(arch) == 'arm64' ]]; then
 fi
 
 cmd="./unzip.sh"
-sudo chown root:admin ${cmd}
-sudo chmod a+rx ${cmd}
-sudo chmod +s ${cmd}
-
-cmd="./V2rayUTool"
 sudo chown root:admin ${cmd}
 sudo chmod a+rx ${cmd}
 sudo chmod +s ${cmd}

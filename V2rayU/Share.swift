@@ -118,8 +118,16 @@ class ShareUri {
             self.share.path = self.v2ray.streamWs.path
         }
 
+        if self.v2ray.streamNetwork == "grpc" {
+            self.share.path = self.v2ray.streamGrpc.serviceName
+            if self.v2ray.streamGrpc.multi {
+                self.share.type = "multi"
+            }
+        }
+
         self.share.tls = self.v2ray.streamSecurity
         self.share.sni = self.v2ray.securityTls.serverName
+        self.share.fp = self.v2ray.securityTls.fingerprint
         self.share.net = self.v2ray.streamNetwork
         // todo headerType
     }
@@ -144,8 +152,9 @@ class ShareUri {
         ss.password = self.v2ray.serverTrojan.password
         ss.remark = self.remark
         ss.security = "tls"
+        ss.fp = self.v2ray.securityTls.fingerprint
         ss.flow = self.v2ray.serverTrojan.flow
-        
+
         self.uri = ss.encode()
         self.error = ss.error
     }
@@ -171,6 +180,7 @@ class ShareUri {
             ss.sni = self.v2ray.securityReality.serverName
         } else {
             ss.sni = self.v2ray.securityTls.serverName
+            ss.fp = self.v2ray.securityTls.fingerprint
         }
 
         ss.type = self.v2ray.streamNetwork
@@ -185,6 +195,13 @@ class ShareUri {
         if self.v2ray.streamNetwork == "ws" {
             ss.host = self.v2ray.streamWs.headers.host
             ss.path = self.v2ray.streamWs.path
+        }
+
+        if self.v2ray.streamNetwork == "grpc" {
+            self.share.path = self.v2ray.streamGrpc.serviceName
+            if self.v2ray.streamGrpc.multi {
+                self.share.type = "multi"
+            }
         }
 
         self.uri = ss.encode()

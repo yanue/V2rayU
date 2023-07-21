@@ -27,6 +27,7 @@ class VmessUri {
     var allowInsecure: Bool = true
     var alpn: String = ""
     var sni: String = ""
+    var fp: String = ""
 
     /**
     vmess://base64(security:uuid@host:port)?[urlencode(parameters)]
@@ -119,6 +120,12 @@ class VmessUri {
             case "sni":
                 self.sni = param[1]
                 break
+            case "fp":
+                self.fp = param[1]
+                break
+            case "type":
+                self.type = param[1]
+                break
             case "alpn":
                 self.alpn = param[1]
                 break
@@ -209,6 +216,7 @@ class VmessUri {
         self.netHost = json["host"].stringValue
         self.netPath = json["path"].stringValue
         self.tls = json["tls"].stringValue
+        self.fp = json["fp"].stringValue
         // type:伪装类型（none\http\srtp\utp\wechat-video）
         self.type = json["type"].stringValue
         print("json", json)
@@ -403,6 +411,7 @@ class TrojanUri {
     var sni: String = ""
     var flow: String = ""
     var security: String = "tls"
+    var fp: String = ""
     var error: String = ""
 
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
@@ -416,6 +425,7 @@ class TrojanUri {
             URLQueryItem(name: "flow", value: self.flow),
             URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "sni", value: self.sni),
+            URLQueryItem(name: "fp", value: self.fp),
         ]
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
@@ -447,6 +457,9 @@ class TrojanUri {
                 break
             case "security":
                 self.security = item.value as! String
+                break
+            case "fp":
+                self.fp = item.value as! String
                 break
             default:
                 break
