@@ -118,6 +118,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var quicSecurity: NSPopUpButton!
     @IBOutlet weak var quicHeaderType: NSPopUpButton!
 
+    @IBOutlet weak var grpcServiceName: NSTextField!
+    @IBOutlet weak var grpcUseragent: NSTextField!
+    @IBOutlet weak var grpcMulti: NSButton!
+
     @IBOutlet weak var streamSecurity: NSPopUpButton!
     @IBOutlet weak var streamTlsAllowInsecure: NSButton!
     @IBOutlet weak var streamTlsServerName: NSTextField!
@@ -309,7 +313,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.serverTrojan.address = self.trojanAddr.stringValue
         v2rayConfig.serverTrojan.port = Int(self.trojanPort.intValue)
         v2rayConfig.serverTrojan.password = self.trojanPass.stringValue
-        v2rayConfig.serverTrojan.password = self.trojanPass.stringValue
 
         // socks5
         if v2rayConfig.serverSocks5.servers.count == 0 {
@@ -386,6 +389,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if self.quicSecurity.indexOfSelectedItem >= 0 {
             v2rayConfig.streamQuic.security = self.quicSecurity.titleOfSelectedItem!
         }
+
+        // grpc
+        v2rayConfig.streamGrpc.serviceName = self.grpcServiceName.stringValue
+        v2rayConfig.streamGrpc.user_agent = self.grpcUseragent.stringValue
+        v2rayConfig.streamGrpc.multiMode = self.grpcMulti.state.rawValue > 0
+
         // ========================== stream end =======================
     }
 
@@ -498,6 +507,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.quicKey.stringValue = v2rayConfig.streamQuic.key
         self.quicSecurity.selectItem(withTitle: v2rayConfig.streamQuic.security)
         self.quicHeaderType.selectItem(withTitle: v2rayConfig.streamQuic.header.type)
+
+        // grpc
+        self.grpcServiceName.stringValue = v2rayConfig.streamGrpc.serviceName
+        self.grpcUseragent.stringValue = v2rayConfig.streamGrpc.user_agent
+        self.grpcMulti.intValue = v2rayConfig.streamGrpc.multiMode ? 1 : 0
 
         // ========================== stream end =======================
     }

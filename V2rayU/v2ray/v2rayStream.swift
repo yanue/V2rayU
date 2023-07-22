@@ -18,6 +18,7 @@ struct V2rayTransport: Codable {
     var quicSettings: QuicSettings?
     var xtlsSettings: TlsSettings?
     var realitySettings: RealitySettings?
+    var grpcSettings: GrpcSettings?
 }
 
 struct V2rayStreamSettings: Codable {
@@ -29,6 +30,7 @@ struct V2rayStreamSettings: Codable {
         case h2
         case domainsocket
         case quic
+        case grpc
     }
 
     enum security: String, Codable {
@@ -41,13 +43,16 @@ struct V2rayStreamSettings: Codable {
     var network: network = .tcp
     var security: security = .none
     var sockopt: V2rayStreamSettingSockopt?
-    var tlsSettings: TlsSettings?
+    // transport
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
+    var grpcSettings: GrpcSettings?
+    // security
+    var tlsSettings: TlsSettings?
     var xtlsSettings: TlsSettings?
     var realitySettings: RealitySettings?
 }
@@ -58,6 +63,7 @@ struct TlsSettings: Codable {
     var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
     var alpn: String?
+    var fingerprint: String = "chrome" // 必填，使用 tls 库模拟客户端 TLS 指纹
 }
 
 struct RealitySettings: Codable {
@@ -196,4 +202,14 @@ var QuicSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wi
 struct QuicSettingHeader: Codable {
     // QuicSettingsHeaderType
     var type: String = "none"
+}
+
+struct GrpcSettings: Codable {
+    var serviceName: String = ""
+    var multiMode: Bool = false
+    var user_agent: String = ""
+    var idle_timeout: Int = 60
+    var health_check_timeout: int = 60
+    var permit_without_stream: Bool = false
+    var initial_windows_size: int = 0
 }

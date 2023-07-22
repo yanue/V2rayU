@@ -69,7 +69,7 @@ class ImportUri {
             }
             // 支持 ss://YWVzLTI1Ni1jZmI6ZjU1LmZ1bi0wNTM1NDAxNkA0NS43OS4xODAuMTExOjExMDc4#翻墙党300.16美国 格式
             if aUri.count > 1 {
-                self.remark = String(aUri[1])
+                self.remark = String(aUri[1]).urlDecoded()
             }
         }
 
@@ -110,20 +110,31 @@ class ImportUri {
     }
 
     func importSSRUri(uri: String) {
-        if URL(string: uri) == nil {
-            self.error = "invalid ssr url"
-            return
+        var url = URL(string: uri)
+        if url == nil {
+            // 标准url不支持非url-encoded
+            let aUri = uri.split(separator: "#")
+            url = URL(string: String(aUri[0]))
+            if url == nil {
+                self.error = "invalid ssr url"
+                return
+            }
+            if aUri.count > 1 {
+                self.remark = String(aUri[1]).urlDecoded()
+            }
         }
         self.uri = uri
 
         let ssr = ShadowsockRUri()
-        ssr.Init(url: URL(string: uri)!)
+        ssr.Init(url: url!)
         if ssr.error.count > 0 {
             self.error = ssr.error
             self.isValid = false
             return
         }
-        self.remark = ssr.remark
+        if ssr.remark.count > 0 {
+            self.remark = ssr.remark
+        }
 
         let v2ray = V2rayConfig()
         v2ray.streamNetwork = "tcp" // 必须为tcp
@@ -149,18 +160,27 @@ class ImportUri {
     }
 
     func importVmessUri(uri: String, id: String = "") {
-        if URL(string: uri) == nil {
-            self.error = "invalid vmess url"
-            return
+        var url = URL(string: uri)
+        if url == nil {
+            // 标准url不支持非url-encoded
+            let aUri = uri.split(separator: "#")
+            url = URL(string: String(aUri[0]))
+            if url == nil {
+                self.error = "invalid vmess url"
+                return
+            }
+            if aUri.count > 1 {
+                self.remark = String(aUri[1]).urlDecoded()
+            }
         }
 
         self.uri = uri
 
         var vmess = VmessUri()
-        vmess.parseType2(url: URL(string: uri)!)
+        vmess.parseType2(url: url!)
         if vmess.error.count > 0 {
             vmess = VmessUri()
-            vmess.parseType1(url: URL(string: uri)!)
+            vmess.parseType1(url: url!)
             if vmess.error.count > 0 {
                 print("error", vmess.error)
                 self.isValid = false;
@@ -168,7 +188,9 @@ class ImportUri {
                 return
             }
         }
-        self.remark = vmess.remark
+        if vmess.remark.count > 0 {
+            self.remark = vmess.remark
+        }
 
         let v2ray = V2rayConfig()
 
@@ -210,6 +232,10 @@ class ImportUri {
         v2ray.streamWs.path = vmess.netPath
         v2ray.streamWs.headers.host = vmess.netHost
 
+        // grpc
+        v2ray.streamGrpc.serviceName = vmess.netPath
+        v2ray.streamGrpc.multiMode = vmess.type == "multi" // v2rayN
+
         // tcp
         v2ray.streamTcp.header.type = vmess.type
 
@@ -228,20 +254,31 @@ class ImportUri {
     }
 
     func importVlessUri(uri: String, id: String = "") {
-        if URL(string: uri) == nil {
-            self.error = "invalid vless url"
-            return
+        var url = URL(string: uri)
+        if url == nil {
+            // 标准url不支持非url-encoded
+            let aUri = uri.split(separator: "#")
+            url = URL(string: String(aUri[0]))
+            if url == nil {
+                self.error = "invalid vless url"
+                return
+            }
+            if aUri.count > 1 {
+                self.remark = String(aUri[1]).urlDecoded()
+            }
         }
-
         self.uri = uri
 
         let vmess = VlessUri()
-        vmess.Init(url: URL(string: uri)!)
+        vmess.Init(url: url!)
         if vmess.error.count > 0 {
             self.error = vmess.error
+            self.isValid = false
             return
         }
-        self.remark = vmess.remark
+        if vmess.remark.count > 0 {
+            self.remark = vmess.remark
+        }
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
 
@@ -260,6 +297,7 @@ class ImportUri {
         v2ray.streamNetwork = vmess.type
         v2ray.streamSecurity = vmess.security
         v2ray.securityTls.serverName = vmess.sni // default tls sni
+        v2ray.securityTls.fingerprint = vmess.fp
 
         if v2ray.streamSecurity == "reality" {
             v2ray.securityReality.publicKey = vmess.pbk
@@ -282,6 +320,10 @@ class ImportUri {
         v2ray.streamWs.path = vmess.path
         v2ray.streamWs.headers.host = vmess.host
 
+        // grpc
+        v2ray.streamGrpc.serviceName = vmess.path
+        v2ray.streamGrpc.multiMode = vmess.type == "multi" // v2rayN
+
         // tcp
         v2ray.streamTcp.header.type = vmess.type
 
@@ -300,9 +342,18 @@ class ImportUri {
     }
 
     func importTrojanUri(uri: String) {
-        if URL(string: uri) == nil {
-            self.error = "invalid trojan url"
-            return
+        var url = URL(string: uri)
+        if url == nil {
+            // 标准url不支持非url-encoded
+            let aUri = uri.split(separator: "#")
+            url = URL(string: String(aUri[0]))
+            if url == nil {
+                self.error = "invalid trojan url"
+                return
+            }
+            if aUri.count > 1 {
+                self.remark = String(aUri[1]).urlDecoded()
+            }
         }
         self.uri = uri
 
@@ -313,7 +364,9 @@ class ImportUri {
             self.isValid = false
             return
         }
-        self.remark = trojan.remark
+        if trojan.remark.count > 0 {
+            self.remark = trojan.remark
+        }
 
         let v2ray = V2rayConfig()
         var svr = V2rayOutboundTrojanServer()
@@ -329,6 +382,7 @@ class ImportUri {
         v2ray.streamSecurity = trojan.security
         v2ray.securityTls.allowInsecure = true
         v2ray.securityTls.serverName = trojan.sni // default tls sni
+        v2ray.securityTls.fingerprint = trojan.fp
 
         v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // check is valid
