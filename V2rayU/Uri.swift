@@ -588,8 +588,8 @@ class VlessUri {
             }
         }
 
-        if vmess.sni.count == 0 {
-            vmess.sni = address
+        if self.sni.count == 0 {
+            self.sni = address
         }
 
         self.remark = (url.fragment ?? "vless").urlDecoded()

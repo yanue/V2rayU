@@ -328,7 +328,7 @@ class ImportUri {
         v2ray.streamNetwork = "tcp"
         v2ray.streamSecurity = trojan.security
         v2ray.securityTls.allowInsecure = true
-        v2ray.securityTls.serverName = svr.sni // default tls sni
+        v2ray.securityTls.serverName = trojan.sni // default tls sni
 
         v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // check is valid

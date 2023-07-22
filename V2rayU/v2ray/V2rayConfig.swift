@@ -474,7 +474,7 @@ class V2rayConfig: NSObject {
                 self.error = "missing shadowsocks.method";
                 return
             }
-            s.security = "none" // 需为none
+            self.streamSecurity = "none" // 需为none
             break
         case V2rayProtocolOutbound.socks.rawValue:
             if self.serverSocks5.servers.count == 0 {
