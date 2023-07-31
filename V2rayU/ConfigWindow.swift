@@ -35,7 +35,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var enableUdp: NSButton!
     @IBOutlet weak var enableMux: NSButton!
     @IBOutlet weak var muxConcurrent: NSButton!
-    @IBOutlet weak var version4: NSButton!
 
     @IBOutlet weak var switchProtocol: NSPopUpButton!
 
@@ -78,7 +77,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var trojanPort: NSTextField!
     @IBOutlet weak var trojanPass: NSTextField!
     @IBOutlet weak var trojanAlpn: NSTextField!
-    @IBOutlet weak var trojanSni: NSTextField!
 
     @IBOutlet weak var networkView: NSView!
 
@@ -88,6 +86,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var wsView: NSView!
     @IBOutlet weak var h2View: NSView!
     @IBOutlet weak var quicView: NSView!
+    @IBOutlet weak var grpcView: NSView!
     @IBOutlet weak var tlsView: NSView!
     @IBOutlet weak var realityView: NSView!
 
@@ -704,6 +703,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             break;
         case "quic":
             self.quicView.isHidden = false
+            break;
+        case "grpc":
+            self.grpcView.isHidden = false
             break;
         default: // vmess
             self.tcpView.isHidden = false

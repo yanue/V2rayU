@@ -209,7 +209,7 @@ struct GrpcSettings: Codable {
     var multiMode: Bool = false
     var user_agent: String = ""
     var idle_timeout: Int = 60
-    var health_check_timeout: int = 60
+    var health_check_timeout: Int = 60
     var permit_without_stream: Bool = false
-    var initial_windows_size: int = 0
+    var initial_windows_size: Int = 0
 }

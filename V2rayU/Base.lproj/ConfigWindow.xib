@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,6 +24,7 @@
                 <outlet property="grpcMulti" destination="jTj-JZ-zLg" id="dTl-Id-oSY"/>
                 <outlet property="grpcServiceName" destination="bKO-wS-GJk" id="VaT-6V-6i9"/>
                 <outlet property="grpcUseragent" destination="sEX-hx-uoC" id="TFO-eg-WKd"/>
+                <outlet property="grpcView" destination="N3Z-y8-lLI" id="03X-05-WLH"/>
                 <outlet property="h2Host" destination="oNO-uC-5aA" id="Sk9-pP-UP9"/>
                 <outlet property="h2Path" destination="72t-oS-N1H" id="5OL-Xr-CNm"/>
                 <outlet property="h2View" destination="H0M-GA-ZbL" id="o5s-Bb-usn"/>
@@ -100,7 +100,7 @@
         <window title="V2rayU" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
             <rect key="contentRect" x="196" y="240" width="600" height="620"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="600" height="620"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -136,7 +136,7 @@
                         </clipView>
                         <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="CcG-vA-eQv">
-                            <rect key="frame" x="1" y="183" width="148" height="16"/>
+                            <rect key="frame" x="1" y="184" width="148" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="aeH-wA-qiH">
@@ -264,15 +264,15 @@ Gw
                                             <rect key="frame" x="8" y="8" width="377" height="482"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <clipView key="contentView" id="0rS-HW-TeI">
-                                                <rect key="frame" x="1" y="1" width="375" height="480"/>
+                                                <rect key="frame" x="1" y="1" width="360" height="480"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" selectionGranularity="word" allowsUndo="YES" allowsNonContiguousLayout="YES" textCompletion="NO" smartInsertDelete="YES" id="dNK-7u-GUm">
-                                                        <rect key="frame" x="0.0" y="0.0" width="379" height="480"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="364" height="480"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="minSize" width="375" height="480"/>
+                                                        <size key="minSize" width="360" height="480"/>
                                                         <size key="maxSize" width="400" height="10000000"/>
                                                         <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                     </textView>
@@ -284,7 +284,7 @@ Gw
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="PcW-ea-yMr">
-                                                <rect key="frame" x="360" y="1" width="16" height="480"/>
+                                                <rect key="frame" x="361" y="1" width="15" height="480"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
@@ -293,7 +293,7 @@ Gw
                             </tabViewItem>
                             <tabViewItem label="Manual" identifier="Manual" id="qq1-yV-VsK">
                                 <view key="view" id="YXI-Uw-7SR">
-                                    <rect key="frame" x="10" y="33" width="396" height="544"/>
+                                    <rect key="frame" x="10" y="33" width="395" height="544"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dBV-ws-KbW" userLabel="inbound">
@@ -1036,7 +1036,7 @@ Gw
                                             </subviews>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FDI-R5-vOc" userLabel="stream">
-                                            <rect key="frame" x="6" y="8" width="380" height="230"/>
+                                            <rect key="frame" x="5" y="8" width="380" height="230"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="40C-lR-ydV">
@@ -1774,14 +1774,14 @@ Gw
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fab-dv-Yb9">
                                                                         <rect key="frame" x="2" y="46" width="80" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="serviceName:" id="MRr-QY-M2Q">
+                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="serviceName" id="MRr-QY-M2Q">
                                                                             <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bKO-wS-GJk">
-                                                                        <rect key="frame" x="90" y="44" width="160" height="22"/>
+                                                                        <rect key="frame" x="90" y="46" width="160" height="22"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="vLW-HR-QxJ">
                                                                             <font key="font" metaFont="system"/>
@@ -1793,24 +1793,24 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jTj-JZ-zLg" userLabel="multiMode">
-                                                                        <rect key="frame" x="280" y="44" width="65" height="14"/>
+                                                                        <rect key="frame" x="260" y="48" width="90" height="18"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                        <buttonCell key="cell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="GBf-u6-8w6" userLabel="multiMode">
+                                                                        <buttonCell key="cell" type="check" title="multiMode" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="GBf-u6-8w6" userLabel="multiMode">
                                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                             <font key="font" metaFont="system"/>
                                                                         </buttonCell>
                                                                     </button>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OwK-yb-G9Q" userLabel="userAgent:">
-                                                                        <rect key="frame" x="2" y="24" width="80" height="14"/>
+                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OwK-yb-G9Q" userLabel="userAgent">
+                                                                        <rect key="frame" x="2" y="20" width="80" height="16"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="twS-Ob-alb">
-                                                                            <font key="font" metaFont="message" size="11"/>
-                                                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="userAgent" id="twS-Ob-alb" userLabel="userAgent">
+                                                                            <font key="font" metaFont="system"/>
+                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sEX-hx-uoC">
-                                                                        <rect key="frame" x="100" y="24" width="240" height="14"/>
+                                                                        <rect key="frame" x="90" y="16" width="240" height="22"/>
                                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="GYb-Xh-kfo">
                                                                             <font key="font" metaFont="system"/>
@@ -1852,6 +1852,9 @@ Gw
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                 </menuItem>
                                                                 <menuItem title="quic" id="YMp-PC-1to">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="grpc" id="tJK-Y7-fqM">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                 </menuItem>
                                                             </items>
@@ -1962,7 +1965,7 @@ Gw
         <userDefaultsController representsSharedInstance="YES" id="HhC-a7-Hqz"/>
     </objects>
     <resources>
-        <image name="NSAddTemplate" width="14" height="13"/>
-        <image name="NSMenuMixedStateTemplate" width="14" height="4"/>
+        <image name="NSAddTemplate" width="18" height="16"/>
+        <image name="NSMenuMixedStateTemplate" width="18" height="4"/>
     </resources>
 </document>

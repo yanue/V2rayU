@@ -1497,9 +1497,9 @@ class V2rayConfig: NSObject {
         // grpcSettings
         if streamJson["grpcSettings"].dictionaryValue.count > 0 && streamJson["grpcSettings"].dictionaryValue.count > 0 {
             var grpcSettings = GrpcSettings()
-            grpcSettings.serverName = streamJson["grpcSettings"]["serviceName"].stringValue
+            grpcSettings.serviceName = streamJson["grpcSettings"]["serviceName"].stringValue
             grpcSettings.user_agent = streamJson["grpcSettings"]["user_agent"].stringValue
-            grpcSettings.serverName = streamJson["grpcSettings"]["multiMode"].boolValue
+            grpcSettings.multiMode = streamJson["grpcSettings"]["multiMode"].boolValue
             stream.grpcSettings = grpcSettings
         }
         return stream
