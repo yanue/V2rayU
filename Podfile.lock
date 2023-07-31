@@ -1,5 +1,13 @@
 PODS:
   - Alamofire (4.8.2)
+  - AppCenter (5.0.2):
+    - AppCenter/Analytics (= 5.0.2)
+    - AppCenter/Crashes (= 5.0.2)
+  - AppCenter/Analytics (5.0.2):
+    - AppCenter/Core
+  - AppCenter/Core (5.0.2)
+  - AppCenter/Crashes (5.0.2):
+    - AppCenter/Core
   - MASShortcut (2.3.6)
   - Preferences (0.3.0)
   - QRCoder (1.1.0)
@@ -9,6 +17,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - AppCenter
   - MASShortcut
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
@@ -19,6 +28,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
+    - AppCenter
     - MASShortcut
     - QRCoder
     - Sparkle
@@ -36,6 +46,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  AppCenter: 355ba776b273d30147c3ac385c558bec60a7d4b1
   MASShortcut: 9c215e8a8a78f3d01ce56da48e2730ab66b538fa
   Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
@@ -43,6 +54,6 @@ SPEC CHECKSUMS:
   Swifter: 2327ef5d872c638aebab79646ce494af508b0c8f
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: afbb15bff2fbb48b2526dfad82a860aa6a3f2c55
+PODFILE CHECKSUM: 30a1560c6338c1a946f9e83690ee1d2428754ad5
 
 COCOAPODS: 1.12.1

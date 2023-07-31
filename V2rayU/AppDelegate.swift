@@ -8,6 +8,9 @@
 
 import Cocoa
 import ServiceManagement
+import AppCenter
+import AppCenterAnalytics
+import AppCenterCrashes
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
@@ -68,6 +71,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
+          Analytics.self,
+          Crashes.self
+        ])
+        
         // check v2ray core
         V2rayCore().check()
 

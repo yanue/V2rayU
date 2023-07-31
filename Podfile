@@ -8,6 +8,7 @@ target 'V2rayU' do
   use_frameworks!
 
   # Pods for V2rayU
+  pod 'AppCenter'
   pod 'Alamofire'
   pod 'SwiftyJSON'
   # master branch
