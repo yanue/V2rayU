@@ -9,6 +9,7 @@ target 'V2rayU' do
 
   # Pods for V2rayU
   pod 'AppCenter'
+  pod 'fastlane'
   pod 'Alamofire'
   pod 'SwiftyJSON'
   # master branch

@@ -111,7 +111,7 @@ function generateAppcast() {
     if [[ -z "$description" ]]; then
         description="bug fix"
     fi
-    downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU.dmg"
+    downloadUrl="https://github.com/yanue/V2rayU/releases/download/${APP_Version}/V2rayU-64.dmg"
     # https://github.com/c9s/appcast.git
     ${AppCastDir}/appcast -append\
         -dsaSignature="PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps"\

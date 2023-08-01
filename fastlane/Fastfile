@@ -1,0 +1,52 @@
+lane :build do
+
+addKeyChain
+
+build_app(
+  workspace: "V2rayU.xcworkspace",
+  scheme: "V2rayU",
+  export_method: "developer-id",
+  skip_package_pkg: "false",
+  clean: "true",
+  derived_data_path: "./build_derived_data"
+)
+end
+
+lane :check do
+  build_app(
+    workspace: "V2rayU.xcworkspace",
+    scheme: "V2rayU",
+    codesigning_identity: "-",
+    export_method: "developer-id",
+    skip_package_pkg: "true",
+    clean: "true",
+    derived_data_path: "./build_derived_data"
+  )
+  end
+
+lane :addKeyChain do
+  if is_ci?
+    
+    puts("create custom keychain")
+
+    delete_keychain(
+      name: "v2rayUBuild"
+    ) if File.exist? File.expand_path("~/Library/Keychains/v2rayUBuild-db")
+
+    create_keychain(
+      name: "v2rayUBuild",
+      default_keychain: false,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false,
+      password: "password"
+    )
+    
+    import_certificate(
+      certificate_path: "Build/sign.p12",
+      keychain_name:"v2rayUBuild",
+      keychain_password:"v2rayUBuild",
+      certificate_password:""
+    )
+  end
+end

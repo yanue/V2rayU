@@ -38,6 +38,10 @@
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
+		66C3F2762A795D2D004F1234 /* Pluginfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2752A795D2C004F1234 /* Pluginfile */; };
+		66C3F2792A795DD5004F1234 /* Appfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2772A795DD5004F1234 /* Appfile */; };
+		66C3F27A2A795DD5004F1234 /* Fastfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2782A795DD5004F1234 /* Fastfile */; };
+		66C3F27C2A795F44004F1234 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F27B2A795F44004F1234 /* Readme.md */; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66F411B521CA8921007AAC10 /* cmd.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F411B421CA8921007AAC10 /* cmd.sh */; };
@@ -163,6 +167,11 @@
 		66AD5330241496FF0070529C /* Shortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
+		66C3F2732A795A86004F1234 /* sign.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign.sh; sourceTree = "<group>"; };
+		66C3F2752A795D2C004F1234 /* Pluginfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Pluginfile; sourceTree = "<group>"; };
+		66C3F2772A795DD5004F1234 /* Appfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Appfile; sourceTree = "<group>"; };
+		66C3F2782A795DD5004F1234 /* Fastfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
+		66C3F27B2A795F44004F1234 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ping.swift; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -276,6 +285,7 @@
 		664EB368216C9A5E00B6AE0D = {
 			isa = PBXGroup;
 			children = (
+				66C3F2742A795D2C004F1234 /* fastlane */,
 				66A77BE2268225790097A126 /* v2ray-core */,
 				66AD532D241496EF0070529C /* Common */,
 				6683B1EA21C2AD1A004A1C5F /* pac */,
@@ -344,6 +354,17 @@
 			name = Common;
 			sourceTree = "<group>";
 		};
+		66C3F2742A795D2C004F1234 /* fastlane */ = {
+			isa = PBXGroup;
+			children = (
+				66C3F2772A795DD5004F1234 /* Appfile */,
+				66C3F2782A795DD5004F1234 /* Fastfile */,
+				66C3F2752A795D2C004F1234 /* Pluginfile */,
+				66C3F27B2A795F44004F1234 /* Readme.md */,
+			);
+			path = fastlane;
+			sourceTree = "<group>";
+		};
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
@@ -353,6 +374,7 @@
 				6653C20422E0A2B700754D66 /* publish.sh */,
 				6D6DF927AC79EEF7378C192A /* appdmg.json */,
 				66757C6C2A5C505300758F32 /* appdmg.sh */,
+				66C3F2732A795A86004F1234 /* sign.sh */,
 			);
 			path = Build;
 			sourceTree = "<group>";
@@ -528,14 +550,18 @@
 				66A77BE3268225790097A126 /* v2ray-core in Resources */,
 				667029D321AFB86E0079EF41 /* QrcodeWindow.xib in Resources */,
 				6662C20B240EA782000AF6CD /* PreferenceDns.xib in Resources */,
+				66C3F2762A795D2D004F1234 /* Pluginfile in Resources */,
 				6650AAAD21771E11000909D8 /* unzip.sh in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
 				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
+				66C3F2792A795DD5004F1234 /* Appfile in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
+				66C3F27A2A795DD5004F1234 /* Fastfile in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */,
 				6D6DFEA4ED44E1BE02451B6D /* PreferenceAbout.strings in Resources */,
+				66C3F27C2A795F44004F1234 /* Readme.md in Resources */,
 				6D6DF95B4749491F1D600B05 /* PreferenceAdvance.strings in Resources */,
 				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */,
 				6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */,
@@ -772,7 +798,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = V2rayULauncher/V2rayULauncher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
@@ -802,7 +828,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				INFOPLIST_FILE = V2rayULauncher/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayULauncher;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -947,7 +973,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -993,7 +1019,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -1021,7 +1047,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = UA5X5UL787;
@@ -1041,7 +1067,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RJYEH6TCJD;
 				INFOPLIST_FILE = "";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
