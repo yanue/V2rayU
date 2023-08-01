@@ -53,7 +53,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>https://gitee.com/yanue/appcast/raw/master/appcast.xml</string>
+	<string>https://api.appcenter.ms/v0.1/public/sparkle/apps/d52dd1a1-7a3a-4143-b159-a30434f87713</string>
 	<key>SUPublicEDKey</key>
 	<string>PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps</string>
 </dict>
