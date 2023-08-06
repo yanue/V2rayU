@@ -1,28 +1,40 @@
-lane :build do
-
-addKeyChain
-
-build_app(
-  workspace: "V2rayU.xcworkspace",
-  scheme: "V2rayU",
-  export_method: "developer-id",
-  skip_package_pkg: "false",
-  clean: "true",
-  derived_data_path: "./build_derived_data"
-)
+if File.exist?('../.env')
+  open('../.env', 'r').readlines.each do |l|
+    kv = l.split('=')
+    ENV[kv[0]] = kv[1].chomp
+  end
 end
 
-lane :check do
-  build_app(
-    workspace: "V2rayU.xcworkspace",
-    scheme: "V2rayU",
-    codesigning_identity: "-",
-    export_method: "developer-id",
-    skip_package_pkg: "true",
-    clean: "true",
-    derived_data_path: "./build_derived_data"
-  )
-  end
+
+lane :build do
+    addKeyChain
+
+    build_app(
+      workspace: "V2rayU.xcworkspace",
+      scheme: "V2rayU",
+      export_method: "development",
+      skip_package_pkg: "false",
+      clean: "true",
+      derived_data_path: "./build_derived_data"
+    )
+end
+
+lane :upload do
+    appcenter_upload(
+        api_token: ENV["API_TOKEN"],
+        owner_name: "yanue",
+        app_name: "V2rayU",
+        build_number: ENV["BUILD_NUMBER"],
+        version: ENV["VERSION"],
+        app_os: 'macOS',
+        file: "./Build/V2rayU-64.dmg",
+        dsa_signature: "PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps"
+    )
+end
+
+lane :sparkle do
+
+end
 
 lane :addKeyChain do
   if is_ci?

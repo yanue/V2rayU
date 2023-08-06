@@ -4,22 +4,5 @@
     
     
     
-      
-      <testcase classname="fastlane.lanes" name="0: Switch to addKeyChain lane" time="0.001135">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="1: is_ci" time="0.000748">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="2: build_app" time="426.002096">
-        
-          <failure message="/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/actions/actions_helper.rb:67:in `execute_action'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:255:in `block in execute_action'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:229:in `chdir'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:229:in `execute_action'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:157:in `trigger_action_by_name'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/fast_file.rb:159:in `method_missing'&#10;Fastfile:5:in `block in parsing_binding'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/lane.rb:33:in `call'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:49:in `block in execute'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:45:in `chdir'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/runner.rb:45:in `execute'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/lane_manager.rb:47:in `cruise_lane'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/command_line_handler.rb:36:in `handle'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/commands_generator.rb:110:in `block (2 levels) in run'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:187:in `call'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:157:in `run'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/commander-4.6.0/lib/commander/runner.rb:444:in `run_active_command'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb:124:in `run!'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/commander-4.6.0/lib/commander/delegates.rb:18:in `run!'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/commands_generator.rb:354:in `run'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/commands_generator.rb:43:in `start'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/fastlane/lib/fastlane/cli_tools_distributor.rb:123:in `take_off'&#10;/Users/yanue/.gem/ruby/2.6.0/gems/fastlane-2.214.0/bin/fastlane:23:in `&lt;top (required)&gt;'&#10;/Users/yanue/.gem/ruby/2.6.0/bin/fastlane:25:in `load'&#10;/Users/yanue/.gem/ruby/2.6.0/bin/fastlane:25:in `&lt;main&gt;'&#10;&#10;Error packaging up the application" />
-        
-      </testcase>
-    
   </testsuite>
 </testsuites>
