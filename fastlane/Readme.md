@@ -19,10 +19,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane build
 ```
 
-```
-gem install aws-partitions public_suffix addressable --user-install
-```
-
 ### upload
 
 ```sh
@@ -35,14 +31,6 @@ gem install aws-partitions public_suffix addressable --user-install
 
 ```sh
 [bundle exec] fastlane sparkle
-```
-
-
-
-### make_dmg
-
-```sh
-[bundle exec] fastlane make_dmg
 ```
 
 

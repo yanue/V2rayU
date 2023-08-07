@@ -210,7 +210,7 @@ function createDmgByAppdmg() {
     appdmg appdmg.json ${DMG_FINAL}
 
     # appcast sign update
-#    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
+    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
 
 #    umount "/Volumes/${APP_NAME}"
 }

@@ -39,7 +39,6 @@
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
 		66C3F2762A795D2D004F1234 /* Pluginfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2752A795D2C004F1234 /* Pluginfile */; };
-		66C3F2792A795DD5004F1234 /* Appfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2772A795DD5004F1234 /* Appfile */; };
 		66C3F27A2A795DD5004F1234 /* Fastfile in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F2782A795DD5004F1234 /* Fastfile */; };
 		66C3F27C2A795F44004F1234 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 66C3F27B2A795F44004F1234 /* Readme.md */; };
 		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
@@ -160,7 +159,6 @@
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C3F2732A795A86004F1234 /* sign.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign.sh; sourceTree = "<group>"; };
 		66C3F2752A795D2C004F1234 /* Pluginfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Pluginfile; sourceTree = "<group>"; };
-		66C3F2772A795DD5004F1234 /* Appfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Appfile; sourceTree = "<group>"; };
 		66C3F2782A795DD5004F1234 /* Fastfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
 		66C3F27B2A795F44004F1234 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
@@ -348,7 +346,6 @@
 		66C3F2742A795D2C004F1234 /* fastlane */ = {
 			isa = PBXGroup;
 			children = (
-				66C3F2772A795DD5004F1234 /* Appfile */,
 				66C3F2782A795DD5004F1234 /* Fastfile */,
 				66C3F2752A795D2C004F1234 /* Pluginfile */,
 				66C3F27B2A795F44004F1234 /* Readme.md */,
@@ -545,7 +542,6 @@
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
 				66F411B521CA8921007AAC10 /* cmd.sh in Resources */,
-				66C3F2792A795DD5004F1234 /* Appfile in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66C3F27A2A795DD5004F1234 /* Fastfile in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,

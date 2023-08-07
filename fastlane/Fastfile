@@ -28,7 +28,7 @@ lane :upload do
         version: ENV["VERSION"],
         app_os: 'macOS',
         file: "./Build/V2rayU-64.dmg",
-        dsa_signature: "PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps"
+        dsa_signature: ENV["dsa_signature"]
     )
 end
 
