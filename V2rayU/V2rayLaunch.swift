@@ -64,11 +64,6 @@ class V2rayLaunch: NSObject {
             return
         }
         
-        if checkFileIsRootAdmin(file: <#T##String#>) {
-            print("not install")
-            return
-        }
-        
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         print("runAppleScript:" + doSh)
         var error: NSDictionary?
@@ -166,6 +161,8 @@ class V2rayLaunch: NSObject {
         if checkFileIsRootAdmin(file: v2rayUTool) {
             self.install()
         }
+        
+        print("v2rayUTool", v2rayUTool)
 
         let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
