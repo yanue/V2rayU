@@ -284,3 +284,24 @@ extension utsname {
         sMachine == "arm64"
     }
 }
+
+func checkFileIsRootAdmin(file: String) -> Bool {
+    do {
+        let fileAttrs = try FileManager.default.attributesOfItem(atPath: file)
+        var ownerUser = ""
+        var groupUser = ""
+        for attr in fileAttrs {
+            if attr.key.rawValue == "NSFileOwnerAccountName" {
+                ownerUser = attr.value as! String
+            }
+            if attr.key.rawValue == "NSFileGroupOwnerAccountName" {
+                groupUser = attr.value as! String
+            }
+        }
+        print("checkFileIsRootAdmin: file=\(file),owner=\(ownerUser),group=\(groupUser)")
+        return ownerUser == "root" && groupUser == "admin"
+    } catch {
+        print("\(error)")
+    }
+    return false
+}

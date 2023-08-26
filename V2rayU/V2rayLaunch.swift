@@ -13,6 +13,7 @@ import Swifter
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
+let v2rayUTool = AppResourcesPath + "/V2rayUTool"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
@@ -62,7 +63,12 @@ class V2rayLaunch: NSObject {
             print("not install")
             return
         }
-
+        
+        if checkFileIsRootAdmin(file: <#T##String#>) {
+            print("not install")
+            return
+        }
+        
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         print("runAppleScript:" + doSh)
         var error: NSDictionary?
@@ -152,11 +158,16 @@ class V2rayLaunch: NSObject {
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
-        if !fileMgr.isExecutableFile(atPath: AppResourcesPath + "/V2rayUTool") {
+        if !fileMgr.isExecutableFile(atPath: v2rayUTool) {
+            self.install()
+        }
+        
+        // Ensure permission with root admin
+        if checkFileIsRootAdmin(file: v2rayUTool) {
             self.install()
         }
 
-        let task = Process.launchedProcess(launchPath: AppResourcesPath + "/V2rayUTool", arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
             NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
