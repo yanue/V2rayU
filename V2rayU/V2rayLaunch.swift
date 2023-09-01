@@ -13,8 +13,8 @@ import Swifter
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
-let v2rayUTool = AppResourcesPath + "/V2rayUTool"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
+let v2rayUTool = AppHomePath + "/V2rayUTool"
 let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
@@ -39,6 +39,7 @@ class V2rayLaunch: NSObject {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: AppHomePath) {
+            print("app home dir \(AppHomePath) not exists,need install")
             try! fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
         }
 
@@ -46,21 +47,28 @@ class V2rayLaunch: NSObject {
         print("install", AppResourcesPath)
         var needRunInstall = false
         if !FileManager.default.fileExists(atPath: v2rayCoreFile) {
-            print("app home dir not exists,need install")
+            print("\(v2rayCoreFile) not exists,need install")
             needRunInstall = true
         }
-
-        let launchKey = "launchedBefore-" + appVersion
-        let launchedBefore = UserDefaults.standard.bool(forKey: launchKey)
-        if !launchedBefore {
-            print("First launch, need install.")
-            UserDefaults.standard.set(true, forKey: launchKey)
+        if !FileManager.default.fileExists(atPath: v2rayUTool) {
+            print("\(v2rayUTool) not exists,need install")
             needRunInstall = true
         }
-
-        print("launchedBefore", launchedBefore, needRunInstall)
+        if !FileManager.default.fileExists(atPath: PACAbpFile) {
+            print("\(PACAbpFile) not exists,need install")
+            needRunInstall = true
+        }
+        if !FileManager.default.fileExists(atPath: GFWListFilePath) {
+            print("\(GFWListFilePath) not exists,need install")
+            needRunInstall = true
+        }
+        if !FileManager.default.fileExists(atPath: PACUserRuleFilePath) {
+            print("\(PACUserRuleFilePath) not exists,need install")
+            needRunInstall = true
+        }
+        print("launchedBefore", needRunInstall)
         if !needRunInstall {
-            print("not install")
+            print("no need install")
             return
         }
         
@@ -152,8 +160,7 @@ class V2rayLaunch: NSObject {
 
     static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
         // Ensure launch agent directory is existed.
-        let fileMgr = FileManager.default
-        if !fileMgr.isExecutableFile(atPath: v2rayUTool) {
+        if !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
             self.install()
         }
         
