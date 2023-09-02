@@ -19,7 +19,6 @@ let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 let JsonConfigFilePath = AppHomePath + "/config.json"
-let PingConfigFilePath = AppHomePath + "/config_ping.json"
 var webServer = HttpServer()
 
 enum RunMode: String {

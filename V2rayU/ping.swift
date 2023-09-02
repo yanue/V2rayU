@@ -13,10 +13,6 @@ import SwiftyJSON
 var inPing = false
 var fastV2rayName = ""
 var fastV2raySpeed = 5
-let pingJsonFileName = "ping.json"
-let pingJsonFilePath = AppHomePath + "/" + pingJsonFileName
-var task: Process?
-
 
 class PingSpeed: NSObject, URLSessionDataDelegate {
     var pingServers: [V2rayItem] = []
@@ -53,8 +49,13 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         // in ping
         inPing = true
         serverLen = itemList.count
+        // queue
+        let queue = DispatchQueue(label: "v2rayU.pingQueue")
         for item in itemList {
-            pingEachServer(item: item)
+            // run ping by sync queue
+            queue.sync {
+                pingEachServer(item: item)
+            }
         }
         NSLog("ping done")
     }
@@ -66,12 +67,11 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
             pingServers.append(item)
             return
         }
-        let bindPort = findFreePort()
-        print("bindPort", bindPort)
-        createJsonFileForPing(item: item, bindPort: 1087)
-        doPing(item: item, bindPort: bindPort)
+        // ping
+        doPing(item: item)
         // print("finished",message)
         pingServers.append(item)
+        // refresh menu
         refreshStatusMenu()
     }
 
@@ -87,22 +87,55 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         }
     }
 
-    func createJsonFileForPing(item: V2rayItem, bindPort: UInt16) {
+    func doPing(item: V2rayItem) {
+        let bindPort = findFreePort()
+
+        NSLog("doPing: \(item.name)-\(item.remark) - \(bindPort)")
+        
+        let jsonFile = AppHomePath + "/\(item.name).json"
+
+        // create v2ray config file
+        self.createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
+
+        // Create a Process instance
+        let process = Process()
+        
+        // async process
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.runV2ray(process: process,jsonFile: jsonFile)
+        }
+        
+        // sync process
+        checkProxySpent(item: item, bindPort: bindPort)
+        
+        // exit process
+        if process.isRunning {
+            // terminate v2ray process
+            process.interrupt()
+            process.terminate()
+            // delete config
+            try? FileManager.default.removeItem(at:  URL(fileURLWithPath: jsonFile))
+        }
+    }
+
+    func createV2rayJsonFileForPing(item: V2rayItem, bindPort: UInt16, jsonFile: String) {
         var jsonText = item.json
         NSLog("bindPort: \(item.name)-\(item.remark) - \(bindPort)")
         // parse old
         let vCfg = V2rayConfig()
         vCfg.parseJson(jsonText: item.json)
+        vCfg.httpHost="0.0.0.0"
+        vCfg.socksHost="0.0.0.0"
         vCfg.socksPort = String(bindPort)
         vCfg.httpPort = String(bindPort)
         // combine new default config
         jsonText = vCfg.combineManual()
 
         do {
-            let jsonFilePath = URL(fileURLWithPath: PingConfigFilePath)
+            let jsonFilePath = URL(fileURLWithPath: jsonFile)
 
             // delete before config
-            if FileManager.default.fileExists(atPath: PingConfigFilePath) {
+            if FileManager.default.fileExists(atPath: jsonFile) {
                 try? FileManager.default.removeItem(at: jsonFilePath)
             }
 
@@ -113,20 +146,27 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         }
     }
 
-    func doPing(item: V2rayItem, bindPort: UInt16) {
-        NSLog("doPing: \(item.name)-\(item.remark) - \(bindPort)")
-        let _shell = v2rayCorePath + " -config " + PingConfigFilePath
-        print("_shell", _shell)
+    func runV2ray(process: Process,jsonFile: String) {
+        let doSh = "cd " + AppHomePath + " && ./v2ray-core/v2ray  -config \(jsonFile)"
+        NSLog("doSh: " + doSh)
 
-        self.checkProxySpent(item: item, bindPort: 1087)
-//        self.checkProxySpent(item: item, bindPort: bindPort)
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", doSh]
+
+        // Create a Pipe for capturing the output
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+
+        // Start the process
+        process.launch()
+
+        process.waitUntilExit()
     }
-    
+
     func checkProxySpent(item: V2rayItem, bindPort: UInt16) {
-        // set URLSessionDataDelegate
-        let metric = PingMetrics()
-        metric.ping = item
-        
+        let group = DispatchGroup()
+        group.enter()
+
         let proxyHost = "127.0.0.1"
         let proxyPort = bindPort
 
@@ -141,33 +181,47 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
             kCFNetworkProxiesHTTPSPort as AnyHashable: proxyPort,
         ]
         configuration.timeoutIntervalForRequest = 2 // Set your desired timeout interval in seconds
+
+        // replace item ping to default
+        item.speed = "-1ms"
         
+        // set URLSessionDataDelegate
+        let metric = PingMetrics()
+        metric.ping = item
+        metric.group = group
+
+        // url request by DispatchGroup wait
         let session = URLSession(configuration: configuration, delegate: metric, delegateQueue: nil)
         let url = URL(string: "http://www.google.com/generate_204")!
         let task = session.dataTask(with: URLRequest(url: url))
         task.resume()
+        // wait
+        group.wait()
     }
 }
 
 class PingMetrics: NSObject, URLSessionDataDelegate {
     var ping: V2rayItem?
+    var group: DispatchGroup = DispatchGroup()
 
     // MARK: - URLSessionDataDelegate
+
     func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         if let transactionMetrics = metrics.transactionMetrics.first {
-            let request = transactionMetrics.request
-            let response = transactionMetrics.response
             let fetchStartDate = transactionMetrics.fetchStartDate
             let responseEndDate = transactionMetrics.responseEndDate
             // check
-            if self.ping != nil && responseEndDate != nil && fetchStartDate != nil  {
+            if ping != nil && responseEndDate != nil && fetchStartDate != nil {
                 let requestDuration = responseEndDate!.timeIntervalSince(fetchStartDate!)
-                let pingTs = Int(requestDuration*100)
-                print("fetchStartDate=\(fetchStartDate) responseEndDate=\(responseEndDate) requestDuration=\(requestDuration) pingTs=\(pingTs)")
+                let pingTs = Int(requestDuration * 100)
+                print("PingResult: fetchStartDate=\(fetchStartDate!),responseEndDate=\(responseEndDate!),requestDuration=\(requestDuration),pingTs=\(pingTs)")
                 // update ping speed
-                self.ping!.speed = String(format: "%d", pingTs) + "ms"
-                self.ping!.store()
+                ping!.speed = String(format: "%d", pingTs) + "ms"
             }
         }
+        // save
+        ping!.store()
+        // done
+        group.leave()
     }
 }
