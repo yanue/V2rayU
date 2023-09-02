@@ -28,7 +28,6 @@
 		66784AFC2170486D00AD307F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66784AFB2170486D00AD307F /* Util.swift */; };
 		667ECE722A9A05EC009B00EC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667ECE712A9A05EC009B00EC /* main.swift */; };
 		667ECE762A9A064C009B00EC /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 667ECE6F2A9A05EB009B00EC /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		669312932413FC5E00C043F8 /* SwiftyPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669312922413FC5E00C043F8 /* SwiftyPing.swift */; };
 		66973EB721797719001FEA1E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66973EB621797719001FEA1E /* ServiceManagement.framework */; };
 		66A77BE3268225790097A126 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66A77BE2268225790097A126 /* v2ray-core */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
@@ -127,7 +126,6 @@
 		667ECE6F2A9A05EB009B00EC /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		667ECE712A9A05EC009B00EC /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
-		669312922413FC5E00C043F8 /* SwiftyPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftyPing.swift; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		669A73A7233776B800807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		669A73A8233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
@@ -283,7 +281,6 @@
 		66AD532D241496EF0070529C /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				669312922413FC5E00C043F8 /* SwiftyPing.swift */,
 				66AD532E241496FE0070529C /* Shortcut.h */,
 				66AD5330241496FF0070529C /* Shortcut.m */,
 				66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */,
@@ -529,7 +526,6 @@
 				6608D9DE2182C92D00A0E0DD /* v2rayOutbound.swift in Sources */,
 				6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */,
 				6608D9DA2182C69D00A0E0DD /* v2rayStruct.swift in Sources */,
-				669312932413FC5E00C043F8 /* SwiftyPing.swift in Sources */,
 				66F07CF9236D79540088A4AE /* ping.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */,
 				66193A8623EE45B200289B6A /* PreferenceRouting.swift in Sources */,
