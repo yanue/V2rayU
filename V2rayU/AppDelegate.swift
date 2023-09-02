@@ -147,9 +147,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func onWakeNote(note: NSNotification) {
-        print("onWakeNote")
+        NSLog("onWakeNote")
         // reconnect
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            NSLog("V2rayLaunch restart")
             V2rayLaunch.Stop()
             V2rayLaunch.Start()
         }
@@ -168,7 +169,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func onSleepNote(note: NSNotification) {
-        print("onSleepNote")
+        NSLog("onSleepNote")
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

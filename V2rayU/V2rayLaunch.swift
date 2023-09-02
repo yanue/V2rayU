@@ -8,7 +8,6 @@
 
 import Cocoa
 import SystemConfiguration
-import Alamofire
 import Swifter
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
@@ -20,6 +19,7 @@ let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
 var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 let JsonConfigFilePath = AppHomePath + "/config.json"
+let PingConfigFilePath = AppHomePath + "/config_ping.json"
 var webServer = HttpServer()
 
 enum RunMode: String {
