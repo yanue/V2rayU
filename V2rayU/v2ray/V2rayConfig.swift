@@ -101,7 +101,8 @@ class V2rayConfig: NSObject {
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
-    var enableUdp = true
+    var enableSocks = true
+    var enableUdp = false
     var enableMux = false
     var enableSniffing = false
     var mux = 8
@@ -244,7 +245,10 @@ class V2rayConfig: NSObject {
                 inbounds.append(item)
             }
         }
-        inbounds.append(inSocks)
+        // for ping just use http
+        if self.enableSocks {
+            inbounds.append(inSocks)
+        }
         inbounds.append(inHttp)
         self.v2ray.inbounds = inbounds
 

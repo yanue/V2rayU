@@ -48,16 +48,21 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
         // in ping
         inPing = true
-        serverLen = itemList.count
-        // queue
-        let queue = DispatchQueue(label: "v2rayU.pingQueue")
-        for item in itemList {
-            // run ping by sync queue
-            queue.sync {
-                pingEachServer(item: item)
+        // use thread
+        let thread = Thread {
+            // ping
+            self.serverLen = itemList.count
+            for item in itemList {
+                // run ping by sync queue
+                self.pingEachServer(item: item)
             }
+            // refresh menu
+            self.refreshStatusMenu()
+            NSLog("ping done")
         }
-        NSLog("ping done")
+        thread.name = "thread2"
+        thread.threadPriority = 1 /// 优先级
+        thread.start()
     }
 
     func pingEachServer(item: V2rayItem) {
@@ -91,30 +96,33 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         let bindPort = findFreePort()
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(bindPort)")
-        
-        let jsonFile = AppHomePath + "/\(item.name).json"
+        let jsonFile = AppHomePath + "/config_ping.json"
+//        let jsonFile = AppHomePath + "/\(item.name).json"
 
         // create v2ray config file
-        self.createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
+        createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
 
         // Create a Process instance
         let process = Process()
-        
+
         // async process
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.runV2ray(process: process,jsonFile: jsonFile)
+        DispatchQueue.global(qos: .background).async {
+            self.runV2ray(process: process, jsonFile: jsonFile)
         }
-        
+
+        let second: Double = 1000000
+        usleep(useconds_t(0.5 * second))
+
         // sync process
         checkProxySpent(item: item, bindPort: bindPort)
-        
+
         // exit process
         if process.isRunning {
             // terminate v2ray process
             process.interrupt()
             process.terminate()
             // delete config
-            try? FileManager.default.removeItem(at:  URL(fileURLWithPath: jsonFile))
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
         }
     }
 
@@ -123,11 +131,12 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         NSLog("bindPort: \(item.name)-\(item.remark) - \(bindPort)")
         // parse old
         let vCfg = V2rayConfig()
+        vCfg.enableSocks = false // just can use one tcp port
         vCfg.parseJson(jsonText: item.json)
-        vCfg.httpHost="0.0.0.0"
-        vCfg.socksHost="0.0.0.0"
-        vCfg.socksPort = String(bindPort)
+        vCfg.httpHost = "127.0.0.1"
+        vCfg.socksHost = "127.0.0.1"
         vCfg.httpPort = String(bindPort)
+        vCfg.socksPort = String(bindPort + 1) // can't same with http port
         // combine new default config
         jsonText = vCfg.combineManual()
 
@@ -146,20 +155,13 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         }
     }
 
-    func runV2ray(process: Process,jsonFile: String) {
+    func runV2ray(process: Process, jsonFile: String) {
         let doSh = "cd " + AppHomePath + " && ./v2ray-core/v2ray  -config \(jsonFile)"
         NSLog("doSh: " + doSh)
 
         process.launchPath = "/bin/bash"
         process.arguments = ["-c", doSh]
-
-        // Create a Pipe for capturing the output
-        let outputPipe = Pipe()
-        process.standardOutput = outputPipe
-
-        // Start the process
         process.launch()
-
         process.waitUntilExit()
     }
 
