@@ -9,7 +9,6 @@
 import Cocoa
 
 extension UserDefaults {
-
     enum KEY: String {
         // v2ray-core version
         case xRayCoreVersion
@@ -115,15 +114,15 @@ extension UserDefaults {
 extension String {
     // version compare
     func versionToInt() -> [Int] {
-        return self.components(separatedBy: ".")
-                .map {
-                    Int.init($0) ?? 0
-                }
+        return components(separatedBy: ".")
+            .map {
+                Int($0) ?? 0
+            }
     }
 
     //: ### Base64 encoding a string
     func base64Encoded() -> String? {
-        if let data = self.data(using: .utf8) {
+        if let data = data(using: .utf8) {
             return data.base64EncodedString()
         }
         return nil
@@ -131,10 +130,10 @@ extension String {
 
     //: ### Base64 decoding a string
     func base64Decoded() -> String? {
-        if let _ = self.range(of: ":")?.lowerBound {
+        if let _ = range(of: ":")?.lowerBound {
             return self
         }
-        let base64String = self.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        let base64String = replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
         let padding = base64String.count + (base64String.count % 4 != 0 ? (4 - base64String.count % 4) : 0)
         if let decodedData = Data(base64Encoded: base64String.padding(toLength: padding, withPad: "=", startingAt: 0), options: NSData.Base64DecodingOptions(rawValue: 0)), let decodedString = NSString(data: decodedData, encoding: String.Encoding.utf8.rawValue) {
             return decodedString as String
@@ -150,15 +149,15 @@ extension String {
         return result
     }
 
-    //将原始的url编码为合法的url
+    // 将原始的url编码为合法的url
     func urlEncoded() -> String {
-        let encodeUrlString = self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        let encodeUrlString = addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         return encodeUrlString ?? self
     }
 
-    //将编码后的url转换回原始的url
+    // 将编码后的url转换回原始的url
     func urlDecoded() -> String {
-        return self.removingPercentEncoding ?? self
+        return removingPercentEncoding ?? self
     }
 }
 
@@ -179,9 +178,9 @@ func shell(launchPath: String, arguments: [String]) -> String? {
     let output = String(data: data, encoding: String.Encoding.utf8)!
 
     if output.count > 0 {
-        //remove newline character.
+        // remove newline character.
         let lastIndex = output.index(before: output.endIndex)
-        return String(output[output.startIndex..<lastIndex])
+        return String(output[output.startIndex ..< lastIndex])
     }
 
     return output
@@ -207,9 +206,9 @@ struct TemporaryFile {
     /// - 注意: 这里不会创建文件！
     init(creatingTempDirectoryForFilename filename: String) throws {
         let (directory, deleteDirectory) = try FileManager.default
-                .urlForUniqueTemporaryDirectory()
-        self.directoryURL = directory
-        self.fileURL = directory.appendingPathComponent(filename)
+            .urlForUniqueTemporaryDirectory()
+        directoryURL = directory
+        fileURL = directory.appendingPathComponent(filename)
         self.deleteDirectory = deleteDirectory
     }
 }
@@ -221,17 +220,15 @@ extension FileManager {
     ///   完成后调用函数删除目录。
     ///
     /// - 注意: 在应用退出后，不应该存在依赖的临时目录。
-    func urlForUniqueTemporaryDirectory(preferredName: String? = nil) throws
-                    -> (url: URL, deleteDirectory: () throws -> Void) {
+    func urlForUniqueTemporaryDirectory(preferredName: String? = nil) throws -> (url: URL, deleteDirectory: () throws -> Void) {
         let basename = preferredName ?? UUID().uuidString
 
         var counter = 0
-        var createdSubdirectory: URL? = nil
+        var createdSubdirectory: URL?
         repeat {
             do {
                 let subdirName = counter == 0 ? basename : "\(basename)-\(counter)"
-                let subdirectory = temporaryDirectory
-                        .appendingPathComponent(subdirName, isDirectory: true)
+                let subdirectory = temporaryDirectory.appendingPathComponent(subdirName, isDirectory: true)
                 try createDirectory(at: subdirectory, withIntermediateDirectories: false)
                 createdSubdirectory = subdirectory
             } catch CocoaError.fileWriteFileExists {
@@ -280,6 +277,7 @@ extension utsname {
             }
         }
     }
+
     static var isAppleSilicon: Bool {
         sMachine == "arm64"
     }
@@ -308,67 +306,98 @@ func checkFileIsRootAdmin(file: String) -> Bool {
 
 // https://stackoverflow.com/questions/65670932/how-to-find-a-free-local-port-using-swift
 func findFreePort() -> UInt16 {
-    var port: UInt16 = 8000;
+    var port: UInt16 = 8000
 
-    let socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    let socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
     if socketFD == -1 {
-      //print("Error creating socket: \(errno)")
-      return port;
+        // print("Error creating socket: \(errno)")
+        return port
     }
 
     var hints = addrinfo(
-      ai_flags: AI_PASSIVE,
-      ai_family: AF_INET,
-      ai_socktype: SOCK_STREAM,
-      ai_protocol: 0,
-      ai_addrlen: 0,
-      ai_canonname: nil,
-      ai_addr: nil,
-      ai_next: nil
-    );
+        ai_flags: AI_PASSIVE,
+        ai_family: AF_INET,
+        ai_socktype: SOCK_STREAM,
+        ai_protocol: 0,
+        ai_addrlen: 0,
+        ai_canonname: nil,
+        ai_addr: nil,
+        ai_next: nil
+    )
 
-    var addressInfo: UnsafeMutablePointer<addrinfo>? = nil;
-    var result = getaddrinfo(nil, "0", &hints, &addressInfo);
+    var addressInfo: UnsafeMutablePointer<addrinfo>?
+    var result = getaddrinfo(nil, "0", &hints, &addressInfo)
     if result != 0 {
-      //print("Error getting address info: \(errno)")
-      close(socketFD);
+        // print("Error getting address info: \(errno)")
+        close(socketFD)
 
-      return port;
+        return port
     }
 
-    result = Darwin.bind(socketFD, addressInfo!.pointee.ai_addr, socklen_t(addressInfo!.pointee.ai_addrlen));
+    result = Darwin.bind(socketFD, addressInfo!.pointee.ai_addr, socklen_t(addressInfo!.pointee.ai_addrlen))
     if result == -1 {
-      //print("Error binding socket to an address: \(errno)")
-      close(socketFD);
+        // print("Error binding socket to an address: \(errno)")
+        close(socketFD)
 
-      return port;
+        return port
     }
 
-    result = Darwin.listen(socketFD, 1);
+    result = Darwin.listen(socketFD, 1)
     if result == -1 {
-      //print("Error setting socket to listen: \(errno)")
-      close(socketFD);
+        // print("Error setting socket to listen: \(errno)")
+        close(socketFD)
 
-      return port;
+        return port
     }
 
-    var addr_in = sockaddr_in();
-    addr_in.sin_len = UInt8(MemoryLayout.size(ofValue: addr_in));
-    addr_in.sin_family = sa_family_t(AF_INET);
+    var addr_in = sockaddr_in()
+    addr_in.sin_len = UInt8(MemoryLayout.size(ofValue: addr_in))
+    addr_in.sin_family = sa_family_t(AF_INET)
 
-    var len = socklen_t(addr_in.sin_len);
+    var len = socklen_t(addr_in.sin_len)
     result = withUnsafeMutablePointer(to: &addr_in, {
-      $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-        return Darwin.getsockname(socketFD, $0, &len);
-      }
-    });
+        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+            Darwin.getsockname(socketFD, $0, &len)
+        }
+    })
 
     if result == 0 {
-      port = addr_in.sin_port;
+        port = addr_in.sin_port
     }
 
-    Darwin.shutdown(socketFD, SHUT_RDWR);
-    close(socketFD);
+    Darwin.shutdown(socketFD, SHUT_RDWR)
+    close(socketFD)
 
-    return port;
+    return port
+}
+
+func isPortOpen(port: UInt16) -> Bool {
+    let process = Process()
+    process.launchPath = "/usr/sbin/lsof"
+    process.arguments = ["-i", ":\(port)"]
+
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    process.launch()
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: .utf8)
+    return output?.contains("LISTEN") ?? false
+}
+
+func getUsablePort(port: UInt16) -> (Bool,UInt16) {
+    var i = 0
+    var isNew = false
+    var _port = port
+    while i < 100 {
+        let opened = isPortOpen(port: _port)
+        NSLog("getUsablePort: try=\(i) port=\(_port) opened=\(opened)")
+        if !opened {
+            return (isNew, _port)
+        }
+        isNew = true
+        i += 1
+        _port += 1
+    }
+    return (isNew, _port)
 }

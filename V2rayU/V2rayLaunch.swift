@@ -49,6 +49,10 @@ class V2rayLaunch: NSObject {
             print("\(v2rayCoreFile) not exists,need install")
             needRunInstall = true
         }
+        if !FileManager.default.fileExists(atPath: v2rayCorePath+"/geoip.dat") {
+            print("\(v2rayCorePath)/geoip.dat not exists,need install")
+            needRunInstall = true
+        }
         if !FileManager.default.fileExists(atPath: v2rayUTool) {
             print("\(v2rayUTool) not exists,need install")
             needRunInstall = true
@@ -190,7 +194,17 @@ class V2rayLaunch: NSObject {
             webServer["/:path"] = shareFilesFromDirectory(AppHomePath)
             webServer["/pac/:path"] = shareFilesFromDirectory(AppHomePath + "/pac")
 
-            let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+            // check pacPort is usable
+            var pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+            let (isNew, usablePacPort) = getUsablePort(port: pacPort)
+            if isNew {
+                // port has been used
+                print("changePort - usablePacPort: nowPort=\(usablePacPort),oldPort=\(pacPort)")
+                // update UserDefault
+                UserDefaults.set(forKey: .localPacPort, value: String(usablePacPort))
+                // change pacPort
+                pacPort = usablePacPort
+            }
             try webServer.start(pacPort)
             print("webServer.start at:\(pacPort)")
         } catch let error {

@@ -214,14 +214,6 @@ class V2rayConfig: NSObject {
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
 
         // ------------------------------------- inbound start ---------------------------------------------
-        var inHttp = V2rayInbound()
-        inHttp.port = self.httpPort
-        inHttp.listen = self.httpHost
-        inHttp.protocol = V2rayProtocolInbound.http
-        if self.enableSniffing {
-            inHttp.sniffing = V2rayInboundSniffing()
-        }
-
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
         inSocks.listen = self.socksHost
@@ -231,8 +223,41 @@ class V2rayConfig: NSObject {
             inSocks.sniffing = V2rayInboundSniffing()
         }
 
+        // check socksPort is usable
+        let socksPort = UInt16(self.socksPort) ?? 1080
+        let (isNew, usableSocksPort) = getUsablePort(port: socksPort)
+        if isNew {
+            // port has been used
+            print("changePort - usableSocksPort: nowPort=\(usableSocksPort),oldPort=\(socksPort)")
+            // replace
+            inSocks.port = String(usableSocksPort)
+            self.socksPort = inSocks.port
+            // update UserDefault
+            UserDefaults.set(forKey: .localSockPort, value: String(usableSocksPort))
+        }
+
+        // check same
         if self.httpPort == self.socksPort {
-            self.httpPort = String((Int(self.socksPort) ?? 0) + 1)
+            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        }
+        var inHttp = V2rayInbound()
+        inHttp.port = self.httpPort
+        inHttp.listen = self.httpHost
+        inHttp.protocol = V2rayProtocolInbound.http
+        if self.enableSniffing {
+            inHttp.sniffing = V2rayInboundSniffing()
+        }
+        // check httpPort is usable
+        let httpPort = UInt16(self.httpPort) ?? 1087
+        let (isNewHttp, usableHttpPort) = getUsablePort(port: httpPort)
+        if isNewHttp {
+            // port has been used
+            print("changePort - useableHttpPort: nowPort=\(usableHttpPort),oldPort=\(httpPort)")
+            // replace
+            inHttp.port = String(usableHttpPort)
+            self.httpPort = inHttp.port
+            // update UserDefault
+            UserDefaults.set(forKey: .localHttpPort, value: String(usableHttpPort))
         }
 
         // inbounds

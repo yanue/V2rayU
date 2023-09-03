@@ -60,7 +60,7 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
             self.refreshStatusMenu()
             NSLog("ping done")
         }
-        thread.name = "thread2"
+        thread.name = "pingThread"
         thread.threadPriority = 1 /// 优先级
         thread.start()
     }
@@ -93,25 +93,26 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
     }
 
     func doPing(item: V2rayItem) {
-        let bindPort = findFreePort()
+        let (_, bindPort) = getUsablePort(port: 11081)
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(bindPort)")
         let jsonFile = AppHomePath + "/config_ping.json"
-//        let jsonFile = AppHomePath + "/\(item.name).json"
 
         // create v2ray config file
         createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
 
-        // Create a Process instance
+        let doSh = "cd " + AppHomePath + " && ./v2ray-core/v2ray  -config \(jsonFile)"
+        NSLog("doSh: " + doSh)
+
+        // Create a Process instance with async launch
         let process = Process()
-
-        // async process
-        DispatchQueue.global(qos: .background).async {
-            self.runV2ray(process: process, jsonFile: jsonFile)
-        }
-
+        
+        // async launch process
+        self.runV2ray(process: process, jsonFile: jsonFile)
+        
+        // sleep for wait v2ray process instanse
         let second: Double = 1000000
-        usleep(useconds_t(0.5 * second))
+        usleep(useconds_t(0.25 * second))
 
         // sync process
         checkProxySpent(item: item, bindPort: bindPort)
@@ -161,8 +162,8 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
 
         process.launchPath = "/bin/bash"
         process.arguments = ["-c", doSh]
+        // async launch and can't waitUntilExit
         process.launch()
-        process.waitUntilExit()
     }
 
     func checkProxySpent(item: V2rayItem, bindPort: UInt16) {
