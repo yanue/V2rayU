@@ -409,3 +409,35 @@ func getUsablePort(port: UInt16) -> (Bool,UInt16) {
     }
     return (isNew, _port)
 }
+
+// can't use this (crash when launchctl)
+func closePort(port: UInt16) {
+    let process = Process()
+    process.launchPath = "/usr/sbin/lsof"
+    process.arguments = ["-ti", ":\(port)"]
+    
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    
+    process.terminationHandler = { process in
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        if let output = String(data: data, encoding: .utf8) {
+            let pids = output.split(separator: "\n")
+            for pid in pids {
+                if let pid = Int(String(pid)) {
+                    let terminateProcess = Process()
+                    terminateProcess.launchPath = "/usr/bin/kill"
+                    terminateProcess.arguments = ["-9", String(pid)]
+                    terminateProcess.launch()
+                    terminateProcess.waitUntilExit()
+                    print("Port \(pid) closed.")
+                }
+            }
+            print("Port \(port) closed.")
+        }
+    }
+    
+    process.launch()
+    process.waitUntilExit()
+}
+
