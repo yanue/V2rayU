@@ -17,7 +17,6 @@ let v2rayUTool = AppHomePath + "/V2rayUTool"
 let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
-var HttpServerPacPort = UserDefaults.get(forKey: .localPacPort) ?? "11085"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 var webServer = HttpServer()
 
@@ -161,7 +160,7 @@ class V2rayLaunch: NSObject {
         try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
     }
 
-    static func setSystemProxy(mode: RunMode, httpPort: String = "", sockPort: String = "") {
+    static func setSystemProxy(mode: RunMode) {
         // Ensure launch agent directory is existed.
         if !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
             self.install()
@@ -173,8 +172,16 @@ class V2rayLaunch: NSObject {
         }
         
         print("v2rayUTool", v2rayUTool)
+        let pacUrl = getPacUrl()
+        var httpPort: String = ""
+        var sockPort: String = ""
+        // reload
+        if mode == .global {
+            httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1080"
+            sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1087"
+        }
 
-        let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", PACUrl, "-http-port", httpPort, "-sock-port", sockPort])
+        let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", pacUrl, "-http-port", httpPort, "-sock-port", sockPort])
         task.waitUntilExit()
         if task.terminationStatus == 0 {
             NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
@@ -214,5 +221,60 @@ class V2rayLaunch: NSObject {
 
     static func checkPorts() -> Bool {
         return true
+    }
+    
+    // create current v2ray server json file
+    static func createJsonFile(item: V2rayItem) {
+        var jsonText = item.json
+
+        // parse old
+        let vCfg = V2rayConfig()
+        vCfg.parseJson(jsonText: item.json)
+        // check socksPort is usable
+        let socksPort = UInt16(vCfg.socksPort) ?? 1080
+        let (isNew, usableSocksPort) = getUsablePort(port: socksPort)
+        if isNew {
+            // port has been used
+            print("changePort - usableSocksPort: nowPort=\(usableSocksPort),oldPort=\(socksPort)")
+            // replace
+            vCfg.socksPort = String(usableSocksPort)
+            // update UserDefault
+            UserDefaults.set(forKey: .localSockPort, value: String(usableSocksPort))
+        }
+        let httpPort = UInt16(vCfg.httpPort) ?? 1087
+        let (isNewHttp, usableHttpPort) = getUsablePort(port: httpPort)
+        if isNewHttp {
+            // port has been used
+            print("changePort - useableHttpPort: nowPort=\(usableHttpPort),oldPort=\(httpPort)")
+            // replace
+            vCfg.httpPort = String(usableHttpPort)
+            // update UserDefault
+            UserDefaults.set(forKey: .localHttpPort, value: String(usableHttpPort))
+        }
+        
+        // combine new default config
+        jsonText = vCfg.combineManual()
+        V2rayServer.save(v2ray: item, jsonData: jsonText)
+
+        // path: /Application/V2rayU.app/Contents/Resources/config.json
+        guard let jsonFile = V2rayServer.getJsonFile() else {
+            NSLog("unable get config file path")
+            return
+        }
+
+        do {
+
+            let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
+
+            // delete before config
+            if FileManager.default.fileExists(atPath: jsonFile) {
+                try? FileManager.default.removeItem(at: jsonFilePath)
+            }
+
+            try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
+        } catch let error {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+            NSLog("save json file fail: \(error)")
+        }
     }
 }

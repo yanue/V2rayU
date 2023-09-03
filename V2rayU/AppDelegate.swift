@@ -123,10 +123,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
         }
-        if UserDefaults.get(forKey: .gfwPacFileContent) == nil {
-            let gfwlist = try? String(contentsOfFile: GFWListFilePath, encoding: String.Encoding.utf8)
-            UserDefaults.set(forKey: .gfwPacFileContent, value: gfwlist ?? "")
-        }
         if V2rayServer.count() == 0 {
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)

@@ -122,10 +122,6 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         // set current server item and reload v2ray-core
         regenerateAllConfig()
 
-        // set HttpServerPacPort
-        HttpServerPacPort = pacPortVal
-        PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.js"
-
         _ = GeneratePACFile(rewrite: true)
         // restart pac http server
         V2rayLaunch.startHttpServer()

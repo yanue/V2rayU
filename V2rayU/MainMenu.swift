@@ -281,7 +281,7 @@ class MenuController: NSObject, NSMenuDelegate {
         let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "manual") ?? .manual
 
         // create json file
-        V2rayConfig.createJsonFile(item: v2ray)
+        V2rayLaunch.createJsonFile(item: v2ray)
 
         // set status
         setStatusOn(runMode: runMode)
@@ -468,19 +468,7 @@ class MenuController: NSObject, NSMenuDelegate {
         self.globalMode.state = runMode == .global ? .on : .off
         self.pacMode.state = runMode == .pac ? .on : .off
         self.manualMode.state = runMode == .manual ? .on : .off
-        // enable
-        var sockPort = ""
-        var httpPort = ""
-
-        let v2ray = V2rayServer.loadSelectedItem()
-
-        if v2ray != nil && v2ray!.isValid {
-            let cfg = V2rayConfig()
-            cfg.parseJson(jsonText: v2ray!.json)
-            sockPort = cfg.socksPort
-            httpPort = cfg.httpPort
-        }
-
+       
         // set icon
         setStatusOn(runMode: runMode)
         // launch
@@ -493,7 +481,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // global
         if runMode == .global {
-            V2rayLaunch.setSystemProxy(mode: .global, httpPort: httpPort, sockPort: sockPort)
+            V2rayLaunch.setSystemProxy(mode: .global)
             return
         }
 
@@ -572,8 +560,16 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func viewConfig(_ sender: Any) {
-        let confUrl = PACUrl.replacingOccurrences(of: "pac/proxy.js", with: "config.json")
+        let confUrl = getConfigUrl()
         guard let url = URL(string: confUrl) else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
+    @IBAction func viewPacFile(_ sender: Any) {
+        let pacUrl = getPacUrl()
+        guard let url = URL(string: pacUrl) else {
             return
         }
         NSWorkspace.shared.open(url)

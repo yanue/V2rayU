@@ -223,19 +223,6 @@ class V2rayConfig: NSObject {
             inSocks.sniffing = V2rayInboundSniffing()
         }
 
-        // check socksPort is usable
-        let socksPort = UInt16(self.socksPort) ?? 1080
-        let (isNew, usableSocksPort) = getUsablePort(port: socksPort)
-        if isNew {
-            // port has been used
-            print("changePort - usableSocksPort: nowPort=\(usableSocksPort),oldPort=\(socksPort)")
-            // replace
-            inSocks.port = String(usableSocksPort)
-            self.socksPort = inSocks.port
-            // update UserDefault
-            UserDefaults.set(forKey: .localSockPort, value: String(usableSocksPort))
-        }
-
         // check same
         if self.httpPort == self.socksPort {
             self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
@@ -246,18 +233,6 @@ class V2rayConfig: NSObject {
         inHttp.protocol = V2rayProtocolInbound.http
         if self.enableSniffing {
             inHttp.sniffing = V2rayInboundSniffing()
-        }
-        // check httpPort is usable
-        let httpPort = UInt16(self.httpPort) ?? 1087
-        let (isNewHttp, usableHttpPort) = getUsablePort(port: httpPort)
-        if isNewHttp {
-            // port has been used
-            print("changePort - useableHttpPort: nowPort=\(usableHttpPort),oldPort=\(httpPort)")
-            // replace
-            inHttp.port = String(usableHttpPort)
-            self.httpPort = inHttp.port
-            // update UserDefault
-            UserDefaults.set(forKey: .localHttpPort, value: String(usableHttpPort))
         }
 
         // inbounds
@@ -1532,39 +1507,5 @@ class V2rayConfig: NSObject {
             stream.grpcSettings = grpcSettings
         }
         return stream
-    }
-
-    // create current v2ray server json file
-    static func createJsonFile(item: V2rayItem) {
-        var jsonText = item.json
-
-        // parse old
-        let vCfg = V2rayConfig()
-        vCfg.parseJson(jsonText: item.json)
-
-        // combine new default config
-        jsonText = vCfg.combineManual()
-        _ = V2rayServer.save(v2ray: item, jsonData: jsonText)
-
-        // path: /Application/V2rayU.app/Contents/Resources/config.json
-        guard let jsonFile = V2rayServer.getJsonFile() else {
-            NSLog("unable get config file path")
-            return
-        }
-
-        do {
-
-            let jsonFilePath = URL.init(fileURLWithPath: jsonFile)
-
-            // delete before config
-            if FileManager.default.fileExists(atPath: jsonFile) {
-                try? FileManager.default.removeItem(at: jsonFilePath)
-            }
-
-            try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
-        } catch let error {
-            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-            NSLog("save json file fail: \(error)")
-        }
     }
 }

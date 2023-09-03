@@ -82,7 +82,7 @@ final class PreferenceDnsViewController: NSViewController, PreferencePane {
     }
 
     @IBAction func goViewConfig(_ sender: Any) {
-        let confUrl = PACUrl.replacingOccurrences(of: "pac/proxy.js", with: "config.json")
+        let confUrl = getConfigUrl()
         guard let url = URL(string: confUrl) else {
             return
         }

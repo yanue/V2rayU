@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -53,7 +53,13 @@
                         <action selector="viewConfig:" target="hcZ-V7-Dui" id="wgb-Uh-Z1z"/>
                     </connections>
                 </menuItem>
-                <menuItem title="View Log" id="52m-v5-TzY">
+                <menuItem title="View pac file" id="vvd-2v-T8I" userLabel="View pac file">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="viewPacFile:" target="hcZ-V7-Dui" id="maa-Bt-SQU"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="View v2ray log" id="52m-v5-TzY" userLabel="View v2ray log">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openLogs:" target="hcZ-V7-Dui" id="ebe-fD-cCz"/>

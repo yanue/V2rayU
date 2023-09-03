@@ -6,14 +6,13 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
+import Alamofire
 import Cocoa
 import Preferences
-import Alamofire
 
 let PACRulesDirPath = AppHomePath + "/pac/"
 let PACUserRuleFilePath = PACRulesDirPath + "user-rule.txt"
-let PACFilePath = PACRulesDirPath + "proxy.js"
-var PACUrl = "http://127.0.0.1:" + String(HttpServerPacPort) + "/pac/proxy.js"
+let PACFilePath = AppHomePath + "/proxy.js"
 let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
@@ -23,81 +22,55 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
     let preferencePaneTitle = "Pac"
     let toolbarItemIcon = NSImage(named: NSImage.bookmarksTemplateName)!
 
-    @IBOutlet weak var tips: NSTextField!
+    @IBOutlet var tips: NSTextField!
 
     override var nibName: NSNib.Name? {
         return "PreferencePac"
     }
 
-    @IBOutlet weak var gfwPacListUrl: NSTextField!
+    @IBOutlet var gfwPacListUrl: NSTextField!
     @IBOutlet var userRulesView: NSTextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
-        self.preferredContentSize = NSMakeSize(self.view.frame.size.width, self.view.frame.size.height);
-        self.tips.stringValue = ""
+        preferredContentSize = NSMakeSize(view.frame.size.width, view.frame.size.height)
+        tips.stringValue = ""
 
         let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl)
         if gfwUrl != nil {
-            self.gfwPacListUrl.stringValue = gfwUrl!
+            gfwPacListUrl.stringValue = gfwUrl!
         } else {
-            self.gfwPacListUrl.stringValue = GFWListURL
+            gfwPacListUrl.stringValue = GFWListURL
         }
-
-        // read userRules from UserDefaults
-        let txt = UserDefaults.get(forKey: .userRules)
-        var userRuleTxt = """
-                          ! Put user rules line by line in this file.
-                          ! See https://adblockplus.org/en/filter-cheatsheet
-                          ||api.github.com
-                          ||githubusercontent.com
-                          ||github.com
-                          ||chat.openai.com
-                          ||openai.com
-                          """
-        if txt != nil {
-            if txt!.count > 0 {
-                userRuleTxt = txt!
-            }
-        } else {
-            let str = try? String(contentsOfFile: PACUserRuleFilePath, encoding: String.Encoding.utf8)
-            if str?.count ?? 0 > 0 {
-                userRuleTxt = str!
-            }
-        }
-        // auto include githubusercontent.com api.github.com
-        if !userRuleTxt.contains("githubusercontent.com") {
-            userRuleTxt.append("\n||openai.com")
-            userRuleTxt.append("\n||chat.openai.com")
-            userRuleTxt.append("\n||api.github.com")
-            userRuleTxt.append("\n||githubusercontent.com")
-        }
-        userRulesView.string = userRuleTxt
+        userRulesView.string = getPacUserRules()
     }
 
     @IBAction func viewPacFile(_ sender: Any) {
-        print("viewPacFile PACUrl", PACUrl)
-        guard let url = URL(string: PACUrl) else {
+        var pacUrl = getPacUrl()
+        print("viewPacFile PACUrl", pacUrl)
+        guard let url = URL(string: pacUrl) else {
             return
         }
         NSWorkspace.shared.open(url)
     }
 
     @IBAction func updatePac(_ sender: Any) {
-        self.tips.stringValue = "Updating Pac Rules ..."
+        tips.stringValue = "Updating Pac Rules ..."
 
         if let str = userRulesView?.string {
             do {
-                // save user rules into UserDefaults
-                UserDefaults.set(forKey: .userRules, value: str)
-                UpdatePACFromGFWList(gfwPacListUrl: self.gfwPacListUrl.stringValue)
+                // save user rules into file
+                print("user-rules", str)
+                try str.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
+
+                UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl.stringValue)
 
                 if GeneratePACFile(rewrite: true) {
                     // Popup a user notification
-                    self.tips.stringValue = "PAC has been updated by User Rules."
+                    tips.stringValue = "PAC has been updated by User Rules."
                 } else {
-                    self.tips.stringValue = "It's failed to update PAC by User Rules."
+                    tips.stringValue = "It's failed to update PAC by User Rules."
                 }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -105,6 +78,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                     self.tips.stringValue = ""
                 }
             } catch {
+                NSLog("updatePac error \(error)")
             }
         }
     }
@@ -118,29 +92,74 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             }
         }
 
-        Alamofire.request(gfwPacListUrl).responseString {
-            response in
+        let proxyHost = "127.0.0.1"
+        let proxyPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+
+        // Create a URLSessionConfiguration with proxy settings
+        let configuration = URLSessionConfiguration.default
+        configuration.connectionProxyDictionary = [
+            kCFNetworkProxiesHTTPEnable as AnyHashable: true,
+            kCFNetworkProxiesHTTPProxy as AnyHashable: proxyHost,
+            kCFNetworkProxiesHTTPPort as AnyHashable: proxyPort,
+            kCFNetworkProxiesHTTPSEnable as AnyHashable: true,
+            kCFNetworkProxiesHTTPSProxy as AnyHashable: proxyHost,
+            kCFNetworkProxiesHTTPSPort as AnyHashable: proxyPort,
+        ]
+        configuration.timeoutIntervalForRequest = 30 // Set your desired timeout interval in seconds
+
+        // url request by DispatchGroup wait
+//        let session = URLSession(configuration: configuration)
+//        let task = session.dataTask(with: URLRequest(url: url)) { data, _, error in
+//            if let error = error {
+//                // Handle HTTP request error
+//                print("error", error)
+//
+//            } else if let data = data {
+//                // Handle HTTP request response
+//                print("data", data)
+//            } else {
+//                // Handle unexpected error
+//                print("unexpected \(error)")
+//            }
+//        }
+        print("configuration \(configuration.description)")
+        let session = Alamofire.SessionManager(configuration: configuration)
+        session.request(gfwPacListUrl).responseString { response in
             if response.result.isSuccess {
                 if let v = response.result.value {
                     do {
                         try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
+                        
+                        self.tips.stringValue = "gfwList has been updated"
+                        NSLog("\(self.tips.stringValue)")
 
                         // save to UserDefaults
                         UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
-                        UserDefaults.set(forKey: .gfwPacFileContent, value: v)
 
                         if GeneratePACFile(rewrite: true) {
                             // Popup a user notification
                             self.tips.stringValue = "PAC has been updated by latest GFW List."
+                            NSLog("\(self.tips.stringValue)")
                         }
                     } catch {
                         // Popup a user notification
                         self.tips.stringValue = "Failed to Write latest GFW List."
+                        NSLog("\(self.tips.stringValue)")
                     }
                 }
             } else {
                 // Popup a user notification
                 self.tips.stringValue = "Failed to download latest GFW List."
+                
+                let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+                let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
+                NSLog("curlCmd: \(curlCmd)")
+                let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
+                NSLog("curl result: \(msg)")
+                if GeneratePACFile(rewrite: true) {
+                    // Popup a user notification
+                    self.tips.stringValue = "PAC has been updated by latest GFW List."
+                }
             }
         }
     }
@@ -156,28 +175,23 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod -R 755 ./pac"])
 
     // if PACFilePath exist and not need rewrite
-    if (!(rewrite || !FileManager.default.fileExists(atPath: PACFilePath))) {
+    if !(rewrite || !FileManager.default.fileExists(atPath: PACFilePath)) {
         return true
     }
 
     print("GeneratePACFile rewrite", sockPort)
-
+    var userRules = getPacUserRules()
+    var gfwlist = getPacGFWList()
     do {
-        let gfwlist = UserDefaults.get(forKey: .gfwPacFileContent) ?? ""
         if let data = Data(base64Encoded: gfwlist, options: .ignoreUnknownCharacters) {
-            guard let str = String(data: data, encoding: String.Encoding.utf8) else {
-                NSLog("Failed to base64Encoded")
-                return false
+            if let str = String(data: data, encoding: .utf8) {
+                NSLog("base64Encoded")
+                gfwlist = str
             }
-            var lines = str.components(separatedBy: CharacterSet.newlines)
-            do {
-                // read userRules from UserDefaults
-                let userRules = UserDefaults.get(forKey: .userRules) ?? ""
-                let userRuleLines = userRules.components(separatedBy: CharacterSet.newlines)
-                lines = userRuleLines + lines
-            } catch {
-                NSLog("Not found user-rule.txt")
-            }
+            let userRuleLines = userRules.components(separatedBy: CharacterSet.newlines)
+            var lines = gfwlist.components(separatedBy: CharacterSet.newlines)
+            lines = userRuleLines + lines
+
             // Filter empty and comment lines
             lines = lines.filter({ (s: String) -> Bool in
                 if s.isEmpty {
@@ -196,7 +210,7 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8)
 
                 // Get raw pac js
-                guard let jsData = try? Data(contentsOf: URL.init(fileURLWithPath: PACAbpFile)) else {
+                guard let jsData = try? Data(contentsOf: URL(fileURLWithPath: PACAbpFile)) else {
                     NSLog("Failed to Get raw pac js")
                     return false
                 }
@@ -219,12 +233,72 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 try jsStr!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
                 return true
             } catch {
+                print("write pac fail \(error)")
+            }
+        } else {
+            NSLog("base64Encoded not decode")
+        }
+    }
 
+    return false
+}
+
+func getPacUserRules() -> String {
+    var userRuleTxt = """
+    ! Put user rules line by line in this file.
+    ! See https://adblockplus.org/en/filter-cheatsheet
+    ||api.github.com
+    ||githubusercontent.com
+    ||github.io
+    ||github.com
+    ||chat.openai.com
+    ||openai.com
+    """
+    do {
+        let url = URL(fileURLWithPath: PACUserRuleFilePath)
+        if let str = try? String(contentsOf: url, encoding: .utf8) {
+            NSLog("getPacUserRules: \(PACUserRuleFilePath) \(str.count)")
+            if str.count > 0 {
+                userRuleTxt = str
             }
         }
-
     } catch {
-        NSLog("Not found gfwlist.txt")
+        NSLog("getPacUserRules err \(error)")
     }
-    return false
+    // auto include githubusercontent.com api.github.com
+    if !userRuleTxt.contains("githubusercontent.com") {
+        userRuleTxt.append("\n||githubusercontent.com")
+    }
+    if !userRuleTxt.contains("github.io") {
+        userRuleTxt.append("\n||github.io")
+    }
+    if !userRuleTxt.contains("api.github.com") {
+        userRuleTxt.append("\n||api.github.com")
+    }
+    if !userRuleTxt.contains("api.github.com") {
+        userRuleTxt.append("\n||api.github.com")
+    }
+    if !userRuleTxt.contains("openai.com") {
+        userRuleTxt.append("\n||openai.com")
+    }
+    if !userRuleTxt.contains("chat.openai.com") {
+        userRuleTxt.append("\n||chat.openai.com")
+    }
+    return userRuleTxt
+}
+
+func getPacGFWList() -> String {
+    var gfwList = ""
+    do {
+        let url = URL(fileURLWithPath: GFWListFilePath)
+        if let str = try? String(contentsOf: url, encoding: String.Encoding.utf8) {
+            NSLog("getPacGFWList: \(GFWListFilePath) \(str.count)")
+            if str.count > 0 {
+                gfwList = str
+            }
+        }
+    } catch {
+        NSLog("getPacGFWList err \(error)")
+    }
+    return gfwList
 }

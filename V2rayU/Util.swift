@@ -37,10 +37,6 @@ extension UserDefaults {
         case autoSelectFastestServer
         // pac|manual|global
         case runMode
-        // use rules
-        case userRules
-        // gfw pac file content
-        case gfwPacFileContent
         // gfw pac list url
         case gfwPacListUrl
 
@@ -109,6 +105,18 @@ extension UserDefaults {
     static func delArray(forKey key: KEY) {
         UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
+}
+
+func getPacUrl() -> String {
+    var pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+    var pacUrl = "http://127.0.0.1:" + String(pacPort) + "/proxy.js"
+    return pacUrl
+}
+
+func getConfigUrl() -> String {
+    var pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+    var configUrl = "http://127.0.0.1:" + String(pacPort) + "/config.json"
+    return configUrl
 }
 
 extension String {
