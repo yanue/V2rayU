@@ -26,6 +26,8 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     @IBOutlet weak var subscribeView: NSView!
     @IBOutlet var logArea: NSTextView!
     @IBOutlet weak var hideLogs: NSButton!
+    
+    @IBOutlet weak var autoUpdateServers: NSButtonCell!
 
 
     // our variable

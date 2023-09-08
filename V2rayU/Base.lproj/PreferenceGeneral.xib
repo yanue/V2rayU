@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -12,6 +12,7 @@
                 <outlet property="autoCheckVersion" destination="m2S-Mu-rFM" id="GQD-EA-vJj"/>
                 <outlet property="autoLaunch" destination="NZE-cI-j04" id="ktV-ps-tl4"/>
                 <outlet property="autoUpdateServers" destination="1FR-Yu-tqb" id="5TK-uS-ear"/>
+                <outlet property="groupBySubcriptionRemark" destination="9f0-C4-Hyf" id="aG0-aw-R4t"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
         </customObject>
@@ -21,7 +22,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VO1-gl-rxy" userLabel="update servers">
-                    <rect key="frame" x="62" y="251" width="315" height="18"/>
+                    <rect key="frame" x="62" y="262" width="315" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Automatically update servers from subscriptions" bezelStyle="regularSquare" imagePosition="left" inset="2" id="1FR-Yu-tqb">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -31,25 +32,25 @@
                         </connections>
                     </buttonCell>
                 </button>
-                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tgw-Vy-D08" userLabel="check version">
-                    <rect key="frame" x="62" y="280" width="218" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Check for updates automutically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m2S-Mu-rFM">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                        <connections>
-                            <action selector="SetAutoCheckVersion:" target="-2" id="4Ig-pP-her"/>
-                        </connections>
-                    </buttonCell>
-                </button>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="87d-wY-Ocw">
-                    <rect key="frame" x="62" y="307" width="163" height="18"/>
+                    <rect key="frame" x="62" y="313" width="163" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Launch V2rayU at login" bezelStyle="regularSquare" imagePosition="left" inset="2" id="NZE-cI-j04">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                         <connections>
                             <action selector="SetAutoLogin:" target="-2" id="IIX-dN-5GG"/>
+                        </connections>
+                    </buttonCell>
+                </button>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xdq-d6-1rG">
+                    <rect key="frame" x="62" y="236" width="315" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Group by subsciption remark" bezelStyle="regularSquare" imagePosition="left" inset="2" id="9f0-C4-Hyf">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetSrvrsGrpBySubsrptnRmk:" target="-2" id="hyv-N4-E5E"/>
                         </connections>
                     </buttonCell>
                 </button>
@@ -127,6 +128,17 @@
                     <connections>
                         <action selector="checkVersion:" target="-2" id="4u0-Zb-Xfz"/>
                     </connections>
+                </button>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tgw-Vy-D08" userLabel="check version">
+                    <rect key="frame" x="62" y="287" width="218" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Check for updates automutically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m2S-Mu-rFM">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetAutoCheckVersion:" target="-2" id="4Ig-pP-her"/>
+                        </connections>
+                    </buttonCell>
                 </button>
             </subviews>
             <point key="canvasLocation" x="-144" y="-243"/>

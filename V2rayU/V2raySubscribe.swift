@@ -240,11 +240,15 @@ class V2raySubSync: NSObject {
         }
 
         for item in list {
-            self.dlFromUrl(url: item.url, subscribe: item.name)
+            self.dlFromUrl(v2raySubItem: item)
         }
     }
 
-    public func dlFromUrl(url: String, subscribe: String) {
+    public func dlFromUrl(v2raySubItem: V2raySubItem) {
+        let url: String = v2raySubItem.url
+        let subscribe: String = v2raySubItem.name
+        let subscriptionRemark: String = v2raySubItem.remark
+        
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         var request = URLRequest(url: URL(string: url)!)
@@ -254,7 +258,7 @@ class V2raySubSync: NSObject {
             switch (response.result) {
             case .success(_):
                 if let data = response.result.value {
-                    self.handle(base64Str: data, subscribe: subscribe, url: url)
+                    self.handle(base64Str: data, subscribe: subscribe, url: url, subscriptionRemark: subscriptionRemark)
                 }
 
             case .failure(_):
@@ -265,7 +269,7 @@ class V2raySubSync: NSObject {
         }
     }
 
-    func handle(base64Str: String, subscribe: String, url: String) {
+    func handle(base64Str: String, subscribe: String, url: String, subscriptionRemark: String) {
         let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded()
         if strTmp == nil {
             self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
@@ -285,12 +289,12 @@ class V2raySubSync: NSObject {
             if (item.count == 0) {
                 continue;
             } else {
-                self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id)
+                self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id, groupTag: subscriptionRemark)
             }
         }
     }
 
-    func importUri(uri: String, subscribe: String, id: String) {
+    func importUri(uri: String, subscribe: String, id: String, groupTag: String) {
         if uri.count == 0 {
             logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
             return
@@ -304,7 +308,7 @@ class V2raySubSync: NSObject {
         if let importUri = ImportUri.importUri(uri: uri, id: id) {
             if importUri.isValid {
                 // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe, groupTag: groupTag)
                 // refresh server
                 menuController.showServers()
 

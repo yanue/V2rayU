@@ -11,6 +11,9 @@
 /* Class = "NSButtonCell"; title = "Launch V2rayU at login"; ObjectID = "NZE-cI-j04"; */
 "NZE-cI-j04.title" = "開機自動啟動";
 
+/* Class = "NSButtonCell"; title = "Group by subscription remark"; ObjectID = "Xdq-d6-1rG"; */
+"9f0-C4-Hyf.title" = "按訂閱備註分組";
+
 /* Class = "NSButtonCell"; title = "Feedback..."; ObjectID = "QjX-NH-23u"; */
 "QjX-NH-23u.title" = "問題反饋...";
 

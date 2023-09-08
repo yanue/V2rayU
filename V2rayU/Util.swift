@@ -39,6 +39,8 @@ extension UserDefaults {
         case runMode
         // gfw pac list url
         case gfwPacListUrl
+        // server iterms group by subscription remark
+        case grpBySubsrptnRmrk
 
         // base settings
         // http host

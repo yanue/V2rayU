@@ -128,7 +128,7 @@ class V2rayServer: NSObject {
     }
 
     // add v2ray server (by scan qrcode)
-    static func add(remark: String, json: String, isValid: Bool, url: String = "", subscribe: String = "") {
+    static func add(remark: String, json: String, isValid: Bool, url: String = "", subscribe: String = "", groupTag: String = "") {
         var remark_ = remark
         if remark.count == 0 {
             remark_ = "new server"
@@ -137,7 +137,7 @@ class V2rayServer: NSObject {
         // name is : config. + uuid
         let name = "config." + UUID().uuidString
 
-        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url, subscribe: subscribe)
+        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url, subscribe: subscribe, groupTag: groupTag)
         // save to v2ray UserDefaults
         v2ray.store()
 
@@ -331,9 +331,10 @@ class V2rayItem: NSObject, NSCoding {
     var url: String
     var subscribe: String // subscript name: uuid
     var speed: String // unit ms
+    var groupTag: String // (subscription remark by default)
 
     // init
-    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "", subscribe: String = "", speed: String = "-1ms") {
+    required init(name: String, remark: String, isValid: Bool, json: String = "", url: String = "", subscribe: String = "", speed: String = "-1ms", groupTag: String = "") {
         self.name = name
         self.remark = remark
         self.json = json
@@ -341,6 +342,7 @@ class V2rayItem: NSObject, NSCoding {
         self.url = url
         self.subscribe = subscribe
         self.speed = speed
+        self.groupTag = groupTag
     }
 
     // decode
@@ -352,6 +354,7 @@ class V2rayItem: NSObject, NSCoding {
         self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
         self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? ""
         self.speed = decoder.decodeObject(forKey: "Speed") as? String ?? ""
+        self.groupTag = decoder.decodeObject(forKey: "groupTag") as? String ?? ""
     }
 
     // object encode
@@ -363,6 +366,7 @@ class V2rayItem: NSObject, NSCoding {
         coder.encode(url, forKey: "Url")
         coder.encode(subscribe, forKey: "Subscribe")
         coder.encode(speed, forKey: "Speed")
+        coder.encode(groupTag, forKey: "groupTag")
     }
 
     // store into UserDefaults
