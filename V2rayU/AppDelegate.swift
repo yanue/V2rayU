@@ -11,6 +11,7 @@ import ServiceManagement
 import AppCenter
 import AppCenterAnalytics
 import AppCenterCrashes
+import MASShortcut
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()

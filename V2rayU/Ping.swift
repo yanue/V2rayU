@@ -101,14 +101,18 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         // create v2ray config file
         createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
 
-        let doSh = "cd " + AppHomePath + " && ./v2ray-core/v2ray  -config \(jsonFile)"
-        NSLog("doSh: " + doSh)
-
         // Create a Process instance with async launch
         let process = Process()
-        
-        // async launch process
-        self.runV2ray(process: process, jsonFile: jsonFile)
+        // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
+        process.launchPath = v2rayCoreFile
+        process.arguments = ["-config", jsonFile]
+        process.terminationHandler = { _process in
+            if _process.terminationStatus != EXIT_SUCCESS {
+                NSLog("process is not kill \(_process.description) -  \(_process.processIdentifier) - \(_process.terminationStatus)")
+            }
+        }
+        // async launch and can't waitUntilExit
+        process.launch()
         
         // sleep for wait v2ray process instanse
         let second: Double = 1000000
@@ -120,11 +124,15 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         // exit process
         if process.isRunning {
             // terminate v2ray process
-            process.interrupt()
             process.terminate()
-            // delete config
-            try? FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
+            process.waitUntilExit()
         }
+        
+        // close port
+        closePort(port: bindPort)
+        
+        // delete config
+        try? FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
     }
 
     func createV2rayJsonFileForPing(item: V2rayItem, bindPort: UInt16, jsonFile: String) {
@@ -154,16 +162,6 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
             NSLog("save json file fail: \(error)")
         }
-    }
-
-    func runV2ray(process: Process, jsonFile: String) {
-        let doSh = "cd " + AppHomePath + " && ./v2ray-core/v2ray  -config \(jsonFile)"
-        NSLog("doSh: " + doSh)
-
-        process.launchPath = "/bin/bash"
-        process.arguments = ["-c", doSh]
-        // async launch and can't waitUntilExit
-        process.launch()
     }
 
     func checkProxySpent(item: V2rayItem, bindPort: UInt16) {

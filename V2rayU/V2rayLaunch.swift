@@ -10,7 +10,6 @@ import Cocoa
 import SystemConfiguration
 import Swifter
 
-let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
@@ -28,11 +27,14 @@ enum RunMode: String {
     case backup
     case restore
 }
+// Create a Process instance with async launch
+var v2rayProcess = Process()
 
 class V2rayLaunch: NSObject {
+    
     static func install() {
-        // generate plist
-        V2rayLaunch.generateLaunchAgentPlist()
+        // rempve plist of old version ( < 4.0 )
+         V2rayLaunch.removeLaunchAgentPlist()
 
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
@@ -85,61 +87,72 @@ class V2rayLaunch: NSObject {
             }
         }
     }
-
-    static func generateLaunchAgentPlist() {
+    
+    static func removeLaunchAgentPlist() {
+        let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
         let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/"
         let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_NAME + ".plist"
+        // old version ( < 4.0 )
+        if FileManager.default.fileExists(atPath: launchAgentPlistFile) {
+            let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
+            task.waitUntilExit()
 
-        // Ensure launch agent directory is existed.
-        let fileMgr = FileManager.default
-        if !fileMgr.fileExists(atPath: launchAgentDirPath) {
-            try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
+            let task1 = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", LAUNCH_AGENT_NAME])
+            task1.waitUntilExit()
+            
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: launchAgentPlistFile))
         }
-
-        // write launch agent
-        let agentArguments = ["./v2ray-core/v2ray", "-config", "config.json"]
-
-        let dictAgent: NSMutableDictionary = [
-            "Label": LAUNCH_AGENT_NAME,
-            "WorkingDirectory": AppHomePath,
-            "StandardOutPath": logFilePath,
-            "StandardErrorPath": logFilePath,
-            "ProgramArguments": agentArguments,
-            "KeepAlive": false, // 不能开启,否则重启会自动启动
-        ]
-
-        dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
-        // load launch service
-        Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
     }
 
     static func Start() {
         // start http server
         startHttpServer()
+        
+        // permission
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod +x ./v2ray-core/v2ray"])
 
-        // just start: stop is so slow
-        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["start", LAUNCH_AGENT_NAME])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("Start v2ray-core succeeded.")
-        } else {
-            NSLog("Start v2ray-core failed.")
+        // stop before
+        self.stopV2ray()
+
+        // reinstance
+        // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
+        v2rayProcess = Process()
+        v2rayProcess.launchPath = v2rayCoreFile
+        v2rayProcess.arguments = ["-config", JsonConfigFilePath]
+        v2rayProcess.terminationHandler = { process in
+            if process.terminationStatus != EXIT_SUCCESS {
+                NSLog("process is not kill \(process.description) -  \(process.processIdentifier) - \(process.terminationStatus)")
+            }
         }
+        // async launch and can't waitUntilExit
+        v2rayProcess.launch()
+
     }
 
     static func Stop() {
         // stop pac server
         webServer.stop()
 
-        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("Stop v2ray-core succeeded.")
-        } else {
-            NSLog("Stop v2ray-core failed.")
-        }
+        self.stopV2ray()
     }
-
+    
+    static func stopV2ray() {
+        print("stopV2ray", v2rayProcess.isRunning)
+        // exit process
+        if v2rayProcess.isRunning {
+            // terminate v2ray process
+            v2rayProcess.terminate()
+            v2rayProcess.waitUntilExit()
+        }
+        
+        // close port
+        let httpPort = UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1080") ?? 1080
+        let sockPort = UInt16( UserDefaults.get(forKey: .localSockPort) ?? "1087") ?? 1087
+        
+        closePort(port: httpPort)
+        closePort(port: sockPort)
+    }
+    
     static func OpenLogs() {
         if !FileManager.default.fileExists(atPath: logFilePath) {
             let txt = ""
@@ -202,16 +215,8 @@ class V2rayLaunch: NSObject {
             webServer["/pac/:path"] = shareFilesFromDirectory(AppHomePath + "/pac")
 
             // check pacPort is usable
-            var pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
-            let (isNew, usablePacPort) = getUsablePort(port: pacPort)
-            if isNew {
-                // port has been used
-                print("changePort - usablePacPort: nowPort=\(usablePacPort),oldPort=\(pacPort)")
-                // update UserDefault
-                UserDefaults.set(forKey: .localPacPort, value: String(usablePacPort))
-                // change pacPort
-                pacPort = usablePacPort
-            }
+            let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+            closePort(port: pacPort)
             try webServer.start(pacPort)
             print("webServer.start at:\(pacPort)")
         } catch let error {
@@ -230,28 +235,9 @@ class V2rayLaunch: NSObject {
         // parse old
         let vCfg = V2rayConfig()
         vCfg.parseJson(jsonText: item.json)
-        // check socksPort is usable
-        let socksPort = UInt16(vCfg.socksPort) ?? 1080
-        let (isNew, usableSocksPort) = getUsablePort(port: socksPort)
-        if isNew {
-            // port has been used
-            print("changePort - usableSocksPort: nowPort=\(usableSocksPort),oldPort=\(socksPort)")
-            // replace
-            vCfg.socksPort = String(usableSocksPort)
-            // update UserDefault
-            UserDefaults.set(forKey: .localSockPort, value: String(usableSocksPort))
-        }
-        let httpPort = UInt16(vCfg.httpPort) ?? 1087
-        let (isNewHttp, usableHttpPort) = getUsablePort(port: httpPort)
-        if isNewHttp {
-            // port has been used
-            print("changePort - useableHttpPort: nowPort=\(usableHttpPort),oldPort=\(httpPort)")
-            // replace
-            vCfg.httpPort = String(usableHttpPort)
-            // update UserDefault
-            UserDefaults.set(forKey: .localHttpPort, value: String(usableHttpPort))
-        }
-        
+        vCfg.v2ray.log.access = logFilePath
+        vCfg.v2ray.log.error = logFilePath
+
         // combine new default config
         jsonText = vCfg.combineManual()
         V2rayServer.save(v2ray: item, jsonData: jsonText)

@@ -107,21 +107,6 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         ]
         configuration.timeoutIntervalForRequest = 30 // Set your desired timeout interval in seconds
 
-        // url request by DispatchGroup wait
-//        let session = URLSession(configuration: configuration)
-//        let task = session.dataTask(with: URLRequest(url: url)) { data, _, error in
-//            if let error = error {
-//                // Handle HTTP request error
-//                print("error", error)
-//
-//            } else if let data = data {
-//                // Handle HTTP request response
-//                print("data", data)
-//            } else {
-//                // Handle unexpected error
-//                print("unexpected \(error)")
-//            }
-//        }
         print("configuration \(configuration.description)")
         let session = Alamofire.SessionManager(configuration: configuration)
         session.request(gfwPacListUrl).responseString { response in
@@ -167,10 +152,14 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
-    let socks5Address = "127.0.0.1"
-
     let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
-
+    var socks5Address = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
+    
+    // get ip addr
+    if socks5Address == "0.0.0.0" {
+        socks5Address = GetIPAddresses() ?? "127.0.0.1"
+    }
+    
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod -R 755 ./pac"])
 

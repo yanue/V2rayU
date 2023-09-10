@@ -33,7 +33,7 @@
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
-		66F07CF9236D79540088A4AE /* ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* ping.swift */; };
+		66F07CF9236D79540088A4AE /* Ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* Ping.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF7F662C35646734A352E /* install.sh */; };
@@ -144,7 +144,7 @@
 		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
-		66F07CF8236D79540088A4AE /* ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ping.swift; sourceTree = "<group>"; };
+		66F07CF8236D79540088A4AE /* Ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ping.swift; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		66F3029D22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
 		66F3029E22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/QrcodeWindow.strings"; sourceTree = "<group>"; };
@@ -243,7 +243,7 @@
 		664EB373216C9A5E00B6AE0D /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
-				66F07CF8236D79540088A4AE /* ping.swift */,
+				66F07CF8236D79540088A4AE /* Ping.swift */,
 				6608D9B82182BBAC00A0E0DD /* v2ray */,
 				664EB376216C9A5F00B6AE0D /* Assets.xcassets */,
 				664EB374216C9A5E00B6AE0D /* AppDelegate.swift */,
@@ -408,6 +408,7 @@
 				TargetAttributes = {
 					664EB370216C9A5E00B6AE0D = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = "";
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
 								enabled = 0;
@@ -526,7 +527,7 @@
 				6608D9DE2182C92D00A0E0DD /* v2rayOutbound.swift in Sources */,
 				6618372923E9BF1A000F7410 /* ToastWindow.swift in Sources */,
 				6608D9DA2182C69D00A0E0DD /* v2rayStruct.swift in Sources */,
-				66F07CF9236D79540088A4AE /* ping.swift in Sources */,
+				66F07CF9236D79540088A4AE /* Ping.swift in Sources */,
 				664EB392216CA9E800B6AE0D /* ConfigWindow.swift in Sources */,
 				66193A8623EE45B200289B6A /* PreferenceRouting.swift in Sources */,
 				6D6DF8BFC33F97E9AFCA5A4B /* V2rayConfig.swift in Sources */,
