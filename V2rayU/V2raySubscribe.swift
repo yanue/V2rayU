@@ -9,6 +9,7 @@
 import Cocoa
 import Alamofire
 import SwiftyJSON
+import Yams
 
 // ----- v2ray subscribe manager -----
 class V2raySubscribe: NSObject {
@@ -266,8 +267,7 @@ class V2raySubSync: NSObject {
     }
 
     func handle(base64Str: String, subscribe: String, url: String) {
-        let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded()
-        if strTmp == nil {
+        guard let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded() else {
             self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
             return
         }
@@ -277,10 +277,19 @@ class V2raySubSync: NSObject {
         // remove old v2ray servers by subscribe
         V2rayServer.remove(subscribe: subscribe)
 
+        if self.parseYaml(strTmp: strTmp) {
+            return
+        }
+        
         let id: String = String(url.suffix(32));
 
-        let list = strTmp!.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
+        let list = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
+        var count = 0
         for item in list {
+            count += 1
+            if count > 50 {
+                break // limit 50
+            }
             // import every server
             if (item.count == 0) {
                 continue;
@@ -290,6 +299,23 @@ class V2raySubSync: NSObject {
         }
     }
 
+    func parseYaml(strTmp: String) -> Bool {
+        // parse clash yaml
+        do {
+            let decoder = YAMLDecoder()
+            let decoded = try decoder.decode(Clash.self, from: strTmp)
+            print("decoded",decoded)
+            for item in decoded.proxies {
+                importByClash(item: item)
+            }
+            return true
+        } catch {
+            NSLog("parseYaml \(error)")
+        }
+        
+        return false
+    }
+    
     func importUri(uri: String, subscribe: String, id: String) {
         if uri.count == 0 {
             logTip(title: "fail: ", uri: uri, informativeText: "uri not found")
@@ -331,3 +357,77 @@ class V2raySubSync: NSObject {
     }
 }
 
+// MARK: - clash
+
+struct Clash: Codable {
+    var port, socksPort, redirPort, mixedPort: Int?
+    var allowLAN: Bool?
+    var mode: String
+    var logLevel: String?
+    var externalController: String?
+    var proxies: [clashProxy]
+    var rules: [String]?
+}
+
+// MARK: - Proxy
+struct clashProxy: Codable {
+    var type: String
+    var name: String
+    var server: String
+    var port: Int
+    var username: String? // socks5 | http
+    var password: String?
+    var sni: String?
+    var skipCERTVerify: Bool?
+    var cipher: String? // ss | ssr
+    var uuid: String? // vmess | vless
+    var alterId: Int? // vmess | vless
+    var tls: Bool? // tls
+    var fp: String?
+    var `protocol`: String? // ssr
+    var obfs: String // ssr
+    var udp: Bool? // socks5
+    var network: String? // ws | h2
+    var servername: String? // priority over wss host, REALITY servername,SNI
+    var clientFingerprint: String? // vless
+    var fingerprint: String? // vmess
+    var flow: String? // vless
+    var wsOpts: clashWsOpts? // vmess
+    var httpOpts: clashHttpOpts? // vmess
+    var h2Opts: clashH2Opts? // vmess
+    var grpcOpts: grpcOpts? // vmess
+    var realityOpts: realityOpts? // vless
+}
+
+struct clashWsOpts: Codable {
+    var path: String?
+}
+
+struct clashHttpOpts: Codable {
+    var path: [String]?
+}
+
+struct clashH2Opts: Codable {
+    var path: String?
+    var host: [String]?
+}
+
+struct grpcOpts: Codable {
+    var grpcServiceName: String?
+}
+
+struct realityOpts: Codable {
+    var publicKey: String?
+    var shortId: String?
+}
+
+/**
+ - {"type":"ss","name":"v2rayse_test_1","server":"198.57.27.218","port":5004,"cipher":"aes-256-gcm","password":"g5MeD6Ft3CWlJId"}
+ - {"type":"ssr","name":"v2rayse_test_3","server":"20.239.49.44","port":59814,"protocol":"origin","cipher":"dummy","obfs":"plain","password":"3df57276-03ef-45cf-bdd4-4edb6dfaa0ef"}
+ - {"type":"vmess","name":"v2rayse_test_2","ws-opts":{"path":"/"},"server":"154.23.190.162","port":443,"uuid":"b9984674-f771-4e67-a198-","alterId":"0","cipher":"auto","network":"ws"}
+ - {"type":"vless","name":"test","server":"1.2.3.4","port":7777,"uuid":"abc-def-ghi-fge-zsx","skip-cert-verify":true,"network":"tcp","tls":true,"udp":true}
+ - {"type":"trojan","name":"v2rayse_test_4","server":"ca-trojan.bonds.id","port":443,"password":"bc7593fe-0604-4fbe--b4ab-11eb-b65e-1239d0255272","udp":true,"skip-cert-verify":true}
+ - {"type":"http","name":"http_proxy","server":"124.15.12.24","port":251,"username":"username","password":"password","udp":true}
+ - {"type":"socks5","name":"socks5_proxy","server":"124.15.12.24","port":2312,"udp":true}
+ - {"type":"socks5","name":"telegram_proxy","server":"1.2.3.4","port":123,"username":"username","password":"password","udp":true}
+ */

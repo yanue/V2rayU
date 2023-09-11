@@ -86,6 +86,10 @@ class ImportUri {
             self.remark = ss.remark
         }
 
+        self.importSS(ss: ss)
+    }
+    
+    func importSS(ss: ShadowsockUri) {
         let v2ray = V2rayConfig()
         v2ray.streamNetwork = "tcp" // 必须为tcp
         v2ray.streamSecurity = "none" // ss 必须为 none
@@ -108,7 +112,7 @@ class ImportUri {
             self.isValid = false
         }
     }
-
+    
     func importSSRUri(uri: String) {
         var url = URL(string: uri)
         if url == nil {
@@ -136,6 +140,10 @@ class ImportUri {
             self.remark = ssr.remark
         }
 
+        self.importSSR(ssr: ssr)
+    }
+    
+    func importSSR(ssr: ShadowsockRUri) {
         let v2ray = V2rayConfig()
         v2ray.streamNetwork = "tcp" // 必须为tcp
         v2ray.streamSecurity = "none" // ss 必须为 none
@@ -192,6 +200,10 @@ class ImportUri {
             self.remark = vmess.remark
         }
 
+        self.importVmess(vmess: vmess)
+    }
+    
+    func importVmess(vmess: VmessUri) {
         let v2ray = V2rayConfig()
 
         var vmessItem = V2rayOutboundVMessItem()
@@ -279,6 +291,11 @@ class ImportUri {
         if vmess.remark.count > 0 {
             self.remark = vmess.remark
         }
+        
+        self.importVless(vmess: vmess)
+    }
+    
+    func importVless(vmess: VlessUri) {
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
 
@@ -367,7 +384,11 @@ class ImportUri {
         if trojan.remark.count > 0 {
             self.remark = trojan.remark
         }
+        // import
+        self.importTrojan(trojan: trojan)
+    }
 
+    func importTrojan(trojan: TrojanUri) {
         let v2ray = V2rayConfig()
         var svr = V2rayOutboundTrojanServer()
         svr.address = trojan.host
@@ -396,7 +417,105 @@ class ImportUri {
             self.isValid = false
         }
     }
+}
 
+func importByClash(clash: clashProxy) {
+    if clash.type == "trojan" {
+        // var name: String
+        let item = TrojanUri()
+        item.remark = clash.name
+        item.host = clash.server
+        item.port = clash.port
+        item.password = clash.password ?? ""
+        item.sni = clash.sni ?? clash.server
+        item.security = "tls"
+        item.fp = clash.fp ?? ""
+        ImportUri().importTrojan(trojan: item)
+    }
+    
+    if clash.type == "vmess" {
+        let item = VmessUri()
+        item.remark = clash.name
+        item.address = clash.server
+        item.port = clash.port
+        item.id = clash.uuid ?? ""
+        item.security = clash.cipher ?? "auto"
+        item.alterId = Int(clash.alterId ?? 0)
+        item.allowInsecure = clash.skipCERTVerify ?? true
+        item.network = clash.network ?? "tcp"
+        item.sni = clash.sni ?? item.address
+        if clash.tls ?? true {
+            item.tls = "tls"
+        }
+        // network ws
+        if item.network == "ws" {
+            item.netHost = clash.servername ?? clash.server
+            item.netPath = "/"
+            if clash.wsOpts != nil {
+                item.netPath = clash.wsOpts?.path ?? "/"
+            }
+        }
+        // network h2
+        if item.network == "h2" {
+            item.netHost = clash.servername ?? clash.server
+            item.netPath = "/"
+            if clash.h2Opts != nil {
+                item.netPath = clash.h2Opts?.path ?? "/"
+                let h2hosts = clash.h2Opts?.host
+                if h2hosts != nil && h2hosts!.count > 0 {
+                    item.netHost = h2hosts![0]
+                }
+            }
+        }
+        // network grpc
+        if item.network == "grpc" {
+            item.netHost = clash.servername ?? clash.server
+            if clash.grpcOpts != nil {
+                item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
+            }
+        }
+    }
+
+    if clash.type == "vless" {
+        let item = VlessUri()
+        item.remark = clash.name
+        item.address = clash.server
+        item.port = clash.port
+        item.id = clash.uuid ?? ""
+        item.security = clash.cipher ?? "auto"
+        item.network = clash.network ?? "tcp"
+        item.sni = clash.sni ?? item.address
+        if clash.security ?? true {
+            item.tls = "tls"
+        }
+        // network ws
+        if item.network == "ws" {
+            item.netHost = clash.servername ?? clash.server
+            item.netPath = "/"
+            if clash.wsOpts != nil {
+                item.netPath = clash.wsOpts?.path ?? "/"
+            }
+        }
+        // network h2
+        if item.network == "h2" {
+            item.netHost = clash.servername ?? clash.server
+            item.netPath = "/"
+            if clash.h2Opts != nil {
+                item.netPath = clash.h2Opts?.path ?? "/"
+                let h2hosts = clash.h2Opts?.host
+                if h2hosts != nil && h2hosts!.count > 0 {
+                    item.netHost = h2hosts![0]
+                }
+            }
+        }
+        // network grpc
+        if item.network == "grpc" {
+            item.netHost = clash.servername ?? clash.server
+            if clash.grpcOpts != nil {
+                item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
+            }
+        }
+    }
 }
 
 class Scanner {

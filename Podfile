@@ -17,7 +17,8 @@ target 'V2rayU' do
   pod 'QRCoder'
   pod 'MASShortcut'
   pod 'Swifter'
-
+  pod 'Yams'
+  
 end
 
 # fix libarclite_macosx.a need min deploy target 10.14

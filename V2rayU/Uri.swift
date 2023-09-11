@@ -20,7 +20,7 @@ class VmessUri {
     var network: String = "tcp"
     var netHost: String = ""
     var netPath: String = ""
-    var tls: String = ""
+    var tls: String = "" // none|tls|xlts
     var type: String = "none" // 伪装类型
     var uplinkCapacity: Int = 50
     var downlinkCapacity: Int = 20

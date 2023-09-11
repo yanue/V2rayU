@@ -8,35 +8,35 @@ PODS:
   - AppCenter/Core (5.0.2)
   - AppCenter/Crashes (5.0.2):
     - AppCenter/Core
-  - BlueSocket (2.0.4)
   - MASShortcut (2.3.6)
   - Preferences (0.3.0)
   - QRCoder (1.1.0)
   - Sparkle (1.24.0)
   - Swifter (1.4.7)
   - SwiftyJSON (5.0.0)
+  - Yams (5.0.6)
 
 DEPENDENCIES:
   - Alamofire
   - AppCenter
-  - BlueSocket
   - MASShortcut
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
   - Sparkle
   - Swifter
   - SwiftyJSON
+  - Yams
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - AppCenter
-    - BlueSocket
     - MASShortcut
     - QRCoder
     - Sparkle
     - Swifter
     - SwiftyJSON
+    - Yams
 
 EXTERNAL SOURCES:
   Preferences:
@@ -50,14 +50,14 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   AppCenter: 355ba776b273d30147c3ac385c558bec60a7d4b1
-  BlueSocket: cc33e2bded4b680ff14200b4160ed459602b9205
   MASShortcut: 9c215e8a8a78f3d01ce56da48e2730ab66b538fa
   Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   Sparkle: 270cd27377bf04e9c128af06e3a22d0f572d6ee3
   Swifter: 2327ef5d872c638aebab79646ce494af508b0c8f
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
+  Yams: e10dae147f517ed57ecae37c5e8681bdf8fcab65
 
-PODFILE CHECKSUM: 4f21049e20dbb9e6f3a9c10782969019c41d3ef2
+PODFILE CHECKSUM: 3e6393519555a41d4672846cccbb38ef2c16f21f
 
 COCOAPODS: 1.12.1
