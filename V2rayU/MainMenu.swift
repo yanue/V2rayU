@@ -116,7 +116,10 @@ func regenerateAllConfig() {
 
     // reload config window
     if menuController.configWindow != nil {
-        menuController.configWindow.serversTableView.reloadData()
+        // fix: must be used from main thread only
+        DispatchQueue.main.async {
+            menuController.configWindow.serversTableView.reloadData()
+        }
     }
 }
 
@@ -146,9 +149,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
-
-        // backup system proxy when init
-        V2rayLaunch.setSystemProxy(mode: .backup)
 
         // Do any additional setup after loading the view.
         // initial auth ref
@@ -251,8 +251,8 @@ class MenuController: NSObject, NSMenuDelegate {
         self.setStatusOff()
         // stop launch
         V2rayLaunch.Stop()
-        // restore system proxy
-        V2rayLaunch.setSystemProxy(mode: .restore)
+        // off system proxy
+        V2rayLaunch.setSystemProxy(mode: .off)
     }
 
     // start v2ray core
@@ -294,19 +294,39 @@ class MenuController: NSObject, NSMenuDelegate {
         if !inPing {
             // use thread
             let thread = Thread {
-                // ping
-                PingSpeed().doPing(item: v2ray)
-                // refresh
-                self.showServers()
-                // reload config
-                if self.configWindow != nil {
-                    self.configWindow.serversTableView.reloadData()
-                }
+                NSLog("ping current start")
+                // sleep for wait v2ray process instanse
+                usleep(useconds_t(1 * second))
+                // ping and refresh
+                self.pingCurrent(ping: v2ray)
             }
             thread.name = "pingOneThread"
             thread.threadPriority = 1 /// 优先级
             thread.start()
         }
+    }
+    
+    
+    func pingCurrent(ping: V2rayItem) {
+        // async process
+        // set URLSessionDataDelegate
+        let metric = PingMetrics()
+        metric.ping = ping
+        // url request
+        let session = URLSession(configuration: getProxyUrlSessionConfigure(), delegate: metric, delegateQueue: nil)
+        let url = URL(string: "http://www.google.com/generate_204")!
+        let task = session.dataTask(with: URLRequest(url: url)){(data: Data?, response: URLResponse?, error: Error?) in
+            NSLog("ping current end")
+            self.showServers()
+            // reload config
+            if self.configWindow != nil {
+                // fix: must be used from main thread only
+                DispatchQueue.main.async {
+                    self.configWindow.serversTableView.reloadData()
+                }
+            }
+        }
+        task.resume()
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
@@ -364,7 +384,7 @@ class MenuController: NSObject, NSMenuDelegate {
             configWindow = ConfigWindowController()
         }
 
-        self.showDock(state: true)
+        _ = self.showDock(state: true)
 //        // show window
         configWindow.showWindow(nil)
         configWindow.window?.makeKeyAndOrderFront(self)
@@ -413,10 +433,11 @@ class MenuController: NSObject, NSMenuDelegate {
         // reomve old items
         serverItems.submenu?.removeAllItems()
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
+        // reload servers
+        V2rayServer.loadConfig()
         // add new
         var validCount = 0
         var groupMenus: Dictionary = [String: NSMenu]()
-        
         for item in V2rayServer.list() {
             if !item.isValid {
                 continue
@@ -436,7 +457,7 @@ class MenuController: NSObject, NSMenuDelegate {
                 let newGroupMenu: NSMenu = NSMenu()
                 var groupTagName = "订阅"
                 if let sub = V2raySubItem.load(name: item.subscribe) {
-                    groupTagName = sub.remark
+                    groupTagName = "🔗 " + sub.remark
                 }
                 
                 newGroup.submenu = newGroupMenu
@@ -460,20 +481,20 @@ class MenuController: NSObject, NSMenuDelegate {
     // build menu item by V2rayItem
     func buildServerItem(item: V2rayItem, curSer: String?) -> NSMenuItem {
         let menuItem: NSMenuItem = NSMenuItem()
-        let ping = item.speed.count > 0 ? item.speed : "-1ms"
+        let speed = item.speed.count > 0 ? item.speed : "-1ms"
         let totalSpaceCnt = 10
-        var spaceCnt = totalSpaceCnt - ping.count
+        var spaceCnt = totalSpaceCnt - speed.count
         // littleSpace: 1,.
-        if ping.contains(".") || ping.contains("1") {
-            let littleSpaceCount = ping.filter({ $0 == "." }).count + ping.filter({ $0 == "1" }).count
-            spaceCnt = totalSpaceCnt - ((ping.count - littleSpaceCount) + Int((ping.count - littleSpaceCount)/2))
+        if speed.contains(".") || speed.contains("1") {
+            let littleSpaceCount = speed.filter({ $0 == "." }).count + speed.filter({ $0 == "1" }).count
+            spaceCnt = totalSpaceCnt - ((speed.count - littleSpaceCount) + Int((speed.count - littleSpaceCount)/2))
         }
-        if ping.contains("-1ms") {
+        if speed.contains("-1ms") {
             spaceCnt = 9
         }
         let space = String(repeating: " ", count: spaceCnt < 0 ? 0 : spaceCnt) + "　"
 
-        menuItem.title = ping + space + item.remark
+        menuItem.title = speed + space + item.remark
         menuItem.action = #selector(self.switchServer(_:))
         menuItem.representedObject = item
         menuItem.target = self
@@ -519,7 +540,7 @@ class MenuController: NSObject, NSMenuDelegate {
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first
-            V2rayLaunch.setSystemProxy(mode: .backup)
+            V2rayLaunch.setSystemProxy(mode: .off)
         }
 
         // global
@@ -599,7 +620,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func pingSpeed(_ sender: NSMenuItem) {
-        PingSpeed().pingAll()
+        ping.pingAll()
     }
 
     @IBAction func viewConfig(_ sender: Any) {
@@ -652,8 +673,11 @@ class MenuController: NSObject, NSMenuDelegate {
             self.showServers()
 
             // reload server
-            if menuController.configWindow != nil {
-                menuController.configWindow.serversTableView.reloadData()
+            if self.configWindow != nil {
+                // fix: must be used from main thread only
+                DispatchQueue.main.async {
+                    self.configWindow.serversTableView.reloadData()
+                }
             }
 
             noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)

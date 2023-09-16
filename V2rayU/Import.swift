@@ -64,12 +64,12 @@ class ImportUri {
             let aUri = uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
-                self.error = "invalid ss url"
+                error = "invalid ss url"
                 return
             }
             // 支持 ss://YWVzLTI1Ni1jZmI6ZjU1LmZ1bi0wNTM1NDAxNkA0NS43OS4xODAuMTExOjExMDc4#翻墙党300.16美国 格式
             if aUri.count > 1 {
-                self.remark = String(aUri[1]).urlDecoded()
+                remark = String(aUri[1]).urlDecoded()
             }
         }
 
@@ -78,17 +78,17 @@ class ImportUri {
         let ss = ShadowsockUri()
         ss.Init(url: url!)
         if ss.error.count > 0 {
-            self.error = ss.error
-            self.isValid = false
+            error = ss.error
+            isValid = false
             return
         }
         if ss.remark.count > 0 {
-            self.remark = ss.remark
+            remark = ss.remark
         }
 
-        self.importSS(ss: ss)
+        importSS(ss: ss)
     }
-    
+
     func importSS(ss: ShadowsockUri) {
         let v2ray = V2rayConfig()
         v2ray.streamNetwork = "tcp" // 必须为tcp
@@ -105,14 +105,14 @@ class ImportUri {
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
+            isValid = true
+            json = v2ray.combineManual()
         } else {
-            self.error = v2ray.error
-            self.isValid = false
+            error = v2ray.error
+            isValid = false
         }
     }
-    
+
     func importSSRUri(uri: String) {
         var url = URL(string: uri)
         if url == nil {
@@ -120,11 +120,11 @@ class ImportUri {
             let aUri = uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
-                self.error = "invalid ssr url"
+                error = "invalid ssr url"
                 return
             }
             if aUri.count > 1 {
-                self.remark = String(aUri[1]).urlDecoded()
+                remark = String(aUri[1]).urlDecoded()
             }
         }
         self.uri = uri
@@ -132,17 +132,17 @@ class ImportUri {
         let ssr = ShadowsockRUri()
         ssr.Init(url: url!)
         if ssr.error.count > 0 {
-            self.error = ssr.error
-            self.isValid = false
+            error = ssr.error
+            isValid = false
             return
         }
         if ssr.remark.count > 0 {
-            self.remark = ssr.remark
+            remark = ssr.remark
         }
 
-        self.importSSR(ssr: ssr)
+        importSSR(ssr: ssr)
     }
-    
+
     func importSSR(ssr: ShadowsockRUri) {
         let v2ray = V2rayConfig()
         v2ray.streamNetwork = "tcp" // 必须为tcp
@@ -159,11 +159,11 @@ class ImportUri {
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
+            isValid = true
+            json = v2ray.combineManual()
         } else {
-            self.error = v2ray.error
-            self.isValid = false
+            error = v2ray.error
+            isValid = false
         }
     }
 
@@ -174,11 +174,11 @@ class ImportUri {
             let aUri = uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
-                self.error = "invalid vmess url"
+                error = "invalid vmess url"
                 return
             }
             if aUri.count > 1 {
-                self.remark = String(aUri[1]).urlDecoded()
+                remark = String(aUri[1]).urlDecoded()
             }
         }
 
@@ -191,18 +191,18 @@ class ImportUri {
             vmess.parseType1(url: url!)
             if vmess.error.count > 0 {
                 print("error", vmess.error)
-                self.isValid = false;
-                self.error = vmess.error
+                isValid = false
+                error = vmess.error
                 return
             }
         }
         if vmess.remark.count > 0 {
-            self.remark = vmess.remark
+            remark = vmess.remark
         }
 
-        self.importVmess(vmess: vmess)
+        importVmess(vmess: vmess)
     }
-    
+
     func importVmess(vmess: VmessUri) {
         let v2ray = V2rayConfig()
 
@@ -257,11 +257,11 @@ class ImportUri {
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
+            isValid = true
+            json = v2ray.combineManual()
         } else {
-            self.error = v2ray.error
-            self.isValid = false
+            error = v2ray.error
+            isValid = false
         }
     }
 
@@ -272,11 +272,11 @@ class ImportUri {
             let aUri = uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
-                self.error = "invalid vless url"
+                error = "invalid vless url"
                 return
             }
             if aUri.count > 1 {
-                self.remark = String(aUri[1]).urlDecoded()
+                remark = String(aUri[1]).urlDecoded()
             }
         }
         self.uri = uri
@@ -284,17 +284,17 @@ class ImportUri {
         let vmess = VlessUri()
         vmess.Init(url: url!)
         if vmess.error.count > 0 {
-            self.error = vmess.error
-            self.isValid = false
+            error = vmess.error
+            isValid = false
             return
         }
         if vmess.remark.count > 0 {
-            self.remark = vmess.remark
+            remark = vmess.remark
         }
-        
-        self.importVless(vmess: vmess)
+
+        importVless(vmess: vmess)
     }
-    
+
     func importVless(vmess: VlessUri) {
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
@@ -354,11 +354,11 @@ class ImportUri {
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
+            isValid = true
+            json = v2ray.combineManual()
         } else {
-            self.error = v2ray.error
-            self.isValid = false
+            error = v2ray.error
+            isValid = false
         }
     }
 
@@ -369,27 +369,27 @@ class ImportUri {
             let aUri = uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
-                self.error = "invalid trojan url"
+                error = "invalid trojan url"
                 return
             }
             if aUri.count > 1 {
-                self.remark = String(aUri[1]).urlDecoded()
+                remark = String(aUri[1]).urlDecoded()
             }
         }
         self.uri = uri
 
         let trojan = TrojanUri()
-        trojan.Init(url: url)
+        trojan.Init(url: url!)
         if trojan.error.count > 0 {
-            self.error = trojan.error
-            self.isValid = false
+            error = trojan.error
+            isValid = false
             return
         }
         if trojan.remark.count > 0 {
-            self.remark = trojan.remark
+            remark = trojan.remark
         }
         // import
-        self.importTrojan(trojan: trojan)
+        importTrojan(trojan: trojan)
     }
 
     func importTrojan(trojan: TrojanUri) {
@@ -399,7 +399,7 @@ class ImportUri {
         svr.port = trojan.port
         svr.password = trojan.password
         svr.flow = trojan.flow
-        NSLog("\(svr)")
+
         v2ray.serverTrojan = svr
         v2ray.enableMux = false
         // tcp
@@ -413,17 +413,16 @@ class ImportUri {
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
-            self.isValid = true
-            self.json = v2ray.combineManual()
-            NSLog("\(self.json)")
+            isValid = true
+            json = v2ray.combineManual()
         } else {
-            self.error = v2ray.error
-            self.isValid = false
+            error = v2ray.error
+            isValid = false
         }
     }
 }
 
-func importByClash(clash: clashProxy) {
+func importByClash(clash: clashProxy) -> ImportUri? {
     if clash.type == "trojan" {
         // var name: String
         let item = TrojanUri()
@@ -434,9 +433,12 @@ func importByClash(clash: clashProxy) {
         item.sni = clash.sni ?? clash.server
         item.security = "tls"
         item.fp = clash.fp ?? ""
-        ImportUri().importTrojan(trojan: item)
+        let uri = ImportUri()
+        uri.remark = clash.name
+        uri.importTrojan(trojan: item)
+        return uri
     }
-    
+
     if clash.type == "vmess" {
         let item = VmessUri()
         item.remark = clash.name
@@ -478,7 +480,10 @@ func importByClash(clash: clashProxy) {
                 item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
             }
         }
-        ImportUri().importVmess(vmess: item)
+        let uri = ImportUri()
+        uri.remark = clash.name
+        uri.importVmess(vmess: item)
+        return uri
     }
 
     if clash.type == "vless" {
@@ -488,11 +493,8 @@ func importByClash(clash: clashProxy) {
         item.port = clash.port
         item.id = clash.uuid ?? ""
         item.security = clash.cipher ?? "auto"
-        item.network = clash.network ?? "tcp"
+        item.type = clash.network ?? "tcp"
         item.sni = clash.sni ?? clash.server
-        if clash.security ?? true {
-            item.tls = "tls"
-        }
         if clash.security == "reality" {
             item.sni = clash.servername ?? clash.server
             item.fp = clash.clientFingerprint ?? "chrome"
@@ -502,41 +504,42 @@ func importByClash(clash: clashProxy) {
             }
         }
         // network ws
-        if item.network == "ws" {
-            item.netHost = clash.servername ?? clash.server
-            item.netPath = "/"
+        if item.type == "ws" {
+            item.host = clash.servername ?? clash.server
+            item.path = "/"
             if clash.wsOpts != nil {
-                item.netPath = clash.wsOpts?.path ?? "/"
+                item.path = clash.wsOpts?.path ?? "/"
             }
         }
         // network h2
-        if item.network == "h2" {
-            item.netHost = clash.servername ?? clash.server
-            item.netPath = "/"
+        if item.type == "h2" {
+            item.host = clash.servername ?? clash.server
+            item.path = "/"
             if clash.h2Opts != nil {
-                item.netPath = clash.h2Opts?.path ?? "/"
+                item.path = clash.h2Opts?.path ?? "/"
                 let h2hosts = clash.h2Opts?.host
                 if h2hosts != nil && h2hosts!.count > 0 {
-                    item.netHost = h2hosts![0]
+                    item.host = h2hosts![0]
                 }
             }
         }
         // network grpc
-        if item.network == "grpc" {
-            item.netHost = clash.servername ?? clash.server
+        if item.type == "grpc" {
+            item.host = clash.servername ?? clash.server
             if clash.grpcOpts != nil {
-                item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
+                item.path = clash.grpcOpts?.grpcServiceName ?? "/"
             }
         }
-        ImportUri().importVless(vless: item)
+        let uri = ImportUri()
+        uri.remark = clash.name
+        uri.importVless(vmess: item)
+        return uri
     }
 
-    if clash.type == "http"  {
-
+    if clash.type == "http" {
     }
 
-    if clash.type == "socks5"  {
-
+    if clash.type == "socks5" {
     }
 
     if clash.type == "ss" || clash.type == "ssr" {
@@ -546,31 +549,34 @@ func importByClash(clash: clashProxy) {
         item.port = clash.port
         item.method = clash.cipher ?? ""
         item.password = clash.password ?? ""
-        ImportUri().importSS(ss: item)
+        let uri = ImportUri()
+        uri.remark = clash.name
+        uri.importSS(ss: item)
+        return uri
     }
+    return nil
 }
 
 class Scanner {
-
     // scan from screen
     static func scanQRCodeFromScreen() -> String {
-        var displayCount: UInt32 = 0;
+        var displayCount: UInt32 = 0
         var result = CGGetActiveDisplayList(0, nil, &displayCount)
-        if (Int(result.rawValue) != 0) {
+        if Int(result.rawValue) != 0 {
             return ""
         }
         let allocated = Int(displayCount)
         let activeDisplays: UnsafeMutablePointer<UInt32> = UnsafeMutablePointer<CGDirectDisplayID>.allocate(capacity: allocated)
 
         result = CGGetActiveDisplayList(displayCount, activeDisplays, &displayCount)
-        if (Int(result.rawValue) != 0) {
+        if Int(result.rawValue) != 0 {
             return ""
         }
 
         var qrStr = ""
 
-        for i in 0..<displayCount {
-            let str = self.getQrcodeStr(displayID: activeDisplays[Int(i)])
+        for i in 0 ..< displayCount {
+            let str = getQrcodeStr(displayID: activeDisplays[Int(i)])
             // support: ss:// | ssr:// | vmess://
             if ImportUri.supportProtocol(uri: str) {
                 qrStr = str

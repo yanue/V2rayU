@@ -38,7 +38,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         tips.stringValue = ""
 
         let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl) ?? GFWListURL
-        gfwPacListUrl.stringValue = gfwUrl!
+        gfwPacListUrl.stringValue = gfwUrl
 
         userRulesView.string = getPacUserRules()
     }
@@ -88,41 +88,54 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             } catch {
             }
         }
+        
+        guard let reqUrl = URL(string: gfwPacListUrl) else {
+            self.tips.stringValue = "Failed to download latest GFW List: url is not valid"
+            return
+        }
+        
+        // url request with proxy
+        let session = URLSession(configuration: getProxyUrlSessionConfigure())
+        let task = session.dataTask(with: URLRequest(url: reqUrl)){(data: Data?, response: URLResponse?, error: Error?) in
+            if error != nil {
+                self.tips.stringValue = "Failed to download latest GFW List: \(String(describing: error))"
+            } else {
+                if data != nil {
+                    if let outputStr = String(data: data!, encoding: String.Encoding.utf8) {
+                        do {
+                            try outputStr.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
+                            
+                            self.tips.stringValue = "gfwList has been updated"
+                            NSLog("\(self.tips.stringValue)")
 
-        let session = getAlamofireSession()
-        session.request(gfwPacListUrl).responseString { response in
-            if response.result.isSuccess {
-                if let v = response.result.value {
-                    do {
-                        try v.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
-                        
-                        self.tips.stringValue = "gfwList has been updated"
-                        NSLog("\(self.tips.stringValue)")
+                            // save to UserDefaults
+                            UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
 
-                        // save to UserDefaults
-                        UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
-
-                        if GeneratePACFile(rewrite: true) {
+                            if GeneratePACFile(rewrite: true) {
+                                // Popup a user notification
+                                self.tips.stringValue = "PAC has been updated by latest GFW List."
+                                NSLog("\(self.tips.stringValue)")
+                            }
+                        } catch {
                             // Popup a user notification
-                            self.tips.stringValue = "PAC has been updated by latest GFW List."
+                            self.tips.stringValue = "Failed to Write latest GFW List."
                             NSLog("\(self.tips.stringValue)")
                         }
-                    } catch {
-                        // Popup a user notification
-                        self.tips.stringValue = "Failed to Write latest GFW List."
-                        NSLog("\(self.tips.stringValue)")
+                    } else {
+                        self.tips.stringValue = "Failed to download latest GFW List."
                     }
+                } else {
+                    // Popup a user notification
+                    self.tips.stringValue = "Failed to download latest GFW List."
+                    self.tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
                 }
-            } else {
-                // Popup a user notification
-                self.tips.stringValue = "Failed to download latest GFW List."
-                self.tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
             }
         }
+        task.resume()
     }
 
     func tryDownloadByShell(gfwPacListUrl: String) {
-        let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let sockPort = getSocksProxyPort()
         let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
         NSLog("curlCmd: \(curlCmd)")
         let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])

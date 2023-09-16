@@ -19,25 +19,6 @@ let appVersion = getAppVersion()
 let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
 let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
 
-func SignalHandler(signal: Int32) -> Void {
-    var mstr = String()
-    mstr += "Stack:\n"
-//    mstr = mstr.appendingFormat("slideAdress:0x%0x\r\n", calculate())
-    for symbol in Thread.callStackSymbols {
-        mstr = mstr.appendingFormat("%@\r\n", symbol)
-    }
-}
-
-func exceptionHandler(exception: NSException) {
-    print(exception)
-    print(exception.callStackSymbols)
-    let stack = exception.callStackReturnAddresses
-    print("Stack trace: \(stack)")
-    print("Error Handling: ", exception)
-    print("Error Handling callStackSymbols: ", exception.callStackSymbols)
-
-    UserDefaults.setArray(forKey: .Exception, value: exception.callStackSymbols)
-}
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -45,18 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var statusMenu: NSMenu!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // ERROR ExceptionHandler
-        if let exception = UserDefaults.getArray(forKey: .Exception) {
-            print("Error was occured on previous session! \n", exception, "\n\n-------------------------")
-            var exceptions = ""
-            for e in exception {
-                exceptions = exceptions + e + "\n"
-            }
-            makeToast(message: exceptions)
-            UserDefaults.delArray(forKey: .Exception)
-        }
-        NSSetUncaughtExceptionHandler(exceptionHandler);
-                
+        
         // default settings
         self.checkDefault()
 
@@ -162,7 +132,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             V2raySubSync().sync()
         }
         // ping
-        PingSpeed().pingAll()
+        ping.pingAll()
     }
 
     @objc func onSleepNote(note: NSNotification) {
@@ -174,7 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         MASShortcutMonitor.shared().unregisterAllShortcuts()
         // Insert code here to tear down your application
         V2rayLaunch.Stop()
-        // restore system proxy
-        V2rayLaunch.setSystemProxy(mode: .restore)
+        // off system proxy
+        V2rayLaunch.setSystemProxy(mode: .off)
     }
 }

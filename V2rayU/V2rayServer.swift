@@ -178,7 +178,7 @@ class V2rayServer: NSObject {
         let curName = UserDefaults.get(forKey: .v2rayCurrentServerName)
 
         for item in V2rayServer.v2rayItemList {
-            print("remove item: ", subscribe, item.subscribe)
+//            print("remove item: ", subscribe, item.subscribe)
             if item.subscribe == subscribe {
                 V2rayItem.remove(name: item.name)
                 // if cuerrent item is default
@@ -196,7 +196,10 @@ class V2rayServer: NSObject {
 
         // reload config
         if menuController.configWindow != nil {
-            menuController.configWindow.serversTableView.reloadData()
+            // fix: must be used from main thread only
+            DispatchQueue.main.async {
+                menuController.configWindow.serversTableView.reloadData()
+            }
         }
 
         // refresh server

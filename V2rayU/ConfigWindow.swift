@@ -150,7 +150,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // table view
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
-        self.serversTableView.reloadData()
+        // fix: must be used from main thread only
+        DispatchQueue.main.async {
+            self.serversTableView.reloadData()
+        }
         // tab view
         self.tabView.delegate = self
     }
@@ -471,7 +474,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamTlsAllowInsecure.intValue = v2rayConfig.securityTls.allowInsecure ? 1 : 0
         self.streamTlsServerName.stringValue = v2rayConfig.securityTls.serverName
         
-        print("v2rayConfig.securityReality",v2rayConfig.securityReality)
         // reality
         self.streamRealityServerName.stringValue = v2rayConfig.securityReality.serverName
         self.streamRealityPublicKey.stringValue = v2rayConfig.securityReality.publicKey

@@ -219,7 +219,6 @@ class VmessUri {
         self.fp = json["fp"].stringValue
         // type:伪装类型（none\http\srtp\utp\wechat-video）
         self.type = json["type"].stringValue
-        print("json", json)
     }
 }
 

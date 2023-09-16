@@ -51,8 +51,11 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
             notice in
             self.tip += notice.object as? String ?? ""
 
-            self.logArea.string = self.tip
-            self.logArea.scrollToEndOfDocument("")
+            // fix: must be used from main thread only
+            DispatchQueue.main.async {
+                self.logArea.string = self.tip
+                self.logArea.scrollToEndOfDocument("")
+            }
         })
     }
 

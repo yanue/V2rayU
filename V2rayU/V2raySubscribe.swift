@@ -10,7 +10,6 @@ import Cocoa
 import Alamofire
 import SwiftyJSON
 import Yams
-import WebUrl
 
 // ----- v2ray subscribe manager -----
 class V2raySubscribe: NSObject {
@@ -33,7 +32,7 @@ class V2raySubscribe: NSObject {
 
         // load name list from UserDefaults
         let list = UserDefaults.getArray(forKey: .v2raySubList)
-        print("loadConfig", list)
+//        print("loadConfig", list)
 
         if list == nil {
             return
@@ -231,8 +230,17 @@ class V2raySubItem: NSObject, NSCoding {
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
 class V2raySubSync: NSObject {
+    var isLoading = false
     // sync from Subscribe list
     public func sync() {
+        if self.isLoading {
+            print("Subscribe in loading ...")
+            return
+        }
+        self.isLoading = true
+        defer {
+            self.isLoading = false
+        }
         print("sync from Subscribe list")
         V2raySubscribe.loadConfig()
         let list = V2raySubscribe.list()
@@ -240,7 +248,6 @@ class V2raySubSync: NSObject {
         if list.count == 0 {
             self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
         }
-
         for item in list {
             self.dlFromUrl(url: item.url, subscribe: item.name)
         }
@@ -249,26 +256,29 @@ class V2raySubSync: NSObject {
     public func dlFromUrl(url: String, subscribe: String) {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
-        guard let url = WebURL(string: url) else {
-            logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
+        guard let reqUrl = URL(string: url) else {
+            logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + url + "\n\n")
             return
         }
-        var request = URLRequest(url: url)
-        request.cachePolicy = .reloadIgnoringCacheData
-        let session = getAlamofireSession()
-        session.request(request).responseString { response in
-            switch (response.result) {
-            case .success(_):
-                if let data = response.result.value {
-                    self.handle(base64Str: data, subscribe: subscribe, url: url)
+        
+        // url request with proxy
+        let session = URLSession(configuration: getProxyUrlSessionConfigure())
+        let task = session.dataTask(with: URLRequest(url: reqUrl)){(data: Data?, response: URLResponse?, error: Error?) in
+            if error != nil {
+                self.logTip(title: "loading fail: ", uri: url, informativeText: "error: \(String(describing: error))")
+            } else {
+                if data != nil {
+                    if let outputStr = String(data: data!, encoding: String.Encoding.utf8) {
+                        self.handle(base64Str: outputStr, subscribe: subscribe, url: url)
+                    } else {
+                        self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
+                    }
+                } else {
+                    self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
                 }
-
-            case .failure(_):
-                print("dlFromUrl error:", url, " -- ", response.result.error ?? "")
-                self.logTip(title: "loading fail : ", uri: "", informativeText: url)
-                break
             }
         }
+        task.resume()
     }
 
     func handle(base64Str: String, subscribe: String, url: String) {
@@ -282,7 +292,7 @@ class V2raySubSync: NSObject {
         // remove old v2ray servers by subscribe
         V2rayServer.remove(subscribe: subscribe)
 
-        if self.parseYaml(strTmp: strTmp) {
+        if self.parseYaml(strTmp: strTmp, subscribe: subscribe) {
             return
         }
         
@@ -302,16 +312,45 @@ class V2raySubSync: NSObject {
                 self.importUri(uri: item.trimmingCharacters(in: .whitespacesAndNewlines), subscribe: subscribe, id: id)
             }
         }
+        
+        // refresh server
+        menuController.showServers()
+
+        // reload server
+        if menuController.configWindow != nil {
+            // fix: must be used from main thread only
+            DispatchQueue.main.async {
+                menuController.configWindow.serversTableView.reloadData()
+            }
+        }
     }
 
-    func parseYaml(strTmp: String) -> Bool {
+    func parseYaml(strTmp: String, subscribe: String) -> Bool {
         // parse clash yaml
         do {
             let decoder = YAMLDecoder()
             let decoded = try decoder.decode(Clash.self, from: strTmp)
-            print("decoded",decoded)
             for item in decoded.proxies {
-                importByClash(item: item)
+                if let importUri = importByClash(clash: item) {
+                    if importUri.isValid {
+                        // add server
+                        V2rayServer.add(remark: item.name, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
+                        logTip(title: "success: ", informativeText: importUri.remark)
+                    } else {
+                        logTip(title: "fail: ", informativeText: importUri.error)
+                    }
+                }
+            }
+            
+            // refresh server
+            menuController.showServers()
+
+            // reload server
+            if menuController.configWindow != nil {
+                // fix: must be used from main thread only
+                DispatchQueue.main.async {
+                    menuController.configWindow.serversTableView.reloadData()
+                }
             }
             return true
         } catch {
@@ -327,23 +366,10 @@ class V2raySubSync: NSObject {
             return
         }
 
-        if URL(string: uri) == nil {
-            logTip(title: "fail: ", uri: uri, informativeText: "no found ss://, ssr://, vmess://, vless://, trojan://")
-            return
-        }
-
         if let importUri = ImportUri.importUri(uri: uri, id: id) {
             if importUri.isValid {
                 // add server
                 V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
-                // refresh server
-                menuController.showServers()
-
-                // reload server
-                if menuController.configWindow != nil {
-                    menuController.configWindow.serversTableView.reloadData()
-                }
-
                 logTip(title: "success: ", uri: uri, informativeText: importUri.remark)
             } else {
                 logTip(title: "fail: ", uri: uri, informativeText: importUri.error)
@@ -390,12 +416,13 @@ struct clashProxy: Codable {
     var tls: Bool? // tls
     var fp: String?
     var `protocol`: String? // ssr
-    var obfs: String // ssr
+    var obfs: String? // ssr
     var udp: Bool? // socks5
     var network: String? // ws | h2
     var servername: String? // priority over wss host, REALITY servername,SNI
     var clientFingerprint: String? // vless
     var fingerprint: String? // vmess
+    var security: String? // vmess
     var flow: String? // vless
     var wsOpts: clashWsOpts? // vmess
     var httpOpts: clashHttpOpts? // vmess
