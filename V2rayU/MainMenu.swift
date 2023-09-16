@@ -457,7 +457,7 @@ class MenuController: NSObject, NSMenuDelegate {
                 let newGroupMenu: NSMenu = NSMenu()
                 var groupTagName = "订阅"
                 if let sub = V2raySubItem.load(name: item.subscribe) {
-                    groupTagName = "🔗 " + sub.remark
+                    groupTagName = "🌏 " + sub.remark
                 }
                 
                 newGroup.submenu = newGroupMenu

@@ -41,14 +41,6 @@ class ShareUri {
 
         if v2ray.serverProtocol == V2rayProtocolOutbound.vmess.rawValue {
             self.genVmessUri()
-
-            let encoder = JSONEncoder()
-            if let data = try? encoder.encode(self.share) {
-                let uri = String(data: data, encoding: .utf8)!
-                self.uri = "vmess://" + uri.base64Encoded()!
-            } else {
-                self.error = "encode uri error"
-            }
             return
         }
 
@@ -131,6 +123,13 @@ class ShareUri {
         self.share.fp = self.v2ray.securityTls.fingerprint
         self.share.net = self.v2ray.streamNetwork
         // todo headerType
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(self.share) {
+            let uri = String(data: data, encoding: .utf8)!
+            self.uri = "vmess://" + uri.base64Encoded()!
+        } else {
+            self.error = "encode uri error"
+        }
     }
 
     // Shadowsocks

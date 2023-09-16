@@ -330,14 +330,49 @@ class V2raySubSync: NSObject {
         do {
             let decoder = YAMLDecoder()
             let decoded = try decoder.decode(Clash.self, from: strTmp)
+            // reload all
+            V2rayServer.loadConfig()
+            // get old
+            var oldList: [String] = []
+            for (_, item) in V2rayServer.list().enumerated() {
+                if item.subscribe == subscribe {
+                    oldList.append(item.name)
+                }
+            }
+            // new exits
+            var exists: Dictionary =  [String: Bool]()
             for item in decoded.proxies {
                 if let importUri = importByClash(clash: item) {
                     if importUri.isValid {
-                        // add server
-                        V2rayServer.add(remark: item.name, json: importUri.json, isValid: true, url: importUri.uri, subscribe: subscribe)
-                        logTip(title: "success: ", informativeText: importUri.remark)
+                        // old share uri
+                        let v2ray = V2rayItem(name: "tmp", remark: item.name, isValid: importUri.isValid, json: importUri.json, url: "", subscribe: subscribe)
+                        let share = ShareUri()
+                        share.qrcode(item: v2ray)
+                        if let v2rayOld = V2rayServer.exist(url: share.uri) {
+                            v2rayOld.json = importUri.json
+                            v2rayOld.isValid = importUri.isValid
+                            v2rayOld.name = item.name
+                            v2rayOld.store()
+                            logTip(title: "success update: ", informativeText: importUri.remark)
+                            exists[v2rayOld.name] = true
+                        } else {
+                            // add server
+                            V2rayServer.add(remark: item.name, json: importUri.json, isValid: true, url: share.uri, subscribe: subscribe)
+                            logTip(title: "success add: ", informativeText: importUri.remark)
+                        }
                     } else {
                         logTip(title: "fail: ", informativeText: importUri.error)
+                    }
+                }
+                
+                logTip(title: "need remove?: ", informativeText: "\(oldList.count) - \(exists.count)")
+
+                // remove not exist
+                for name in oldList {
+                    if exists[name] ?? false {
+                        // delete from v2ray UserDefaults
+                        V2rayItem.remove(name: name)
+                        logTip(title: "remove: ", informativeText: name)
                     }
                 }
             }

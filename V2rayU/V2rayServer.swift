@@ -179,7 +179,7 @@ class V2rayServer: NSObject {
 
         for item in V2rayServer.v2rayItemList {
 //            print("remove item: ", subscribe, item.subscribe)
-            if item.subscribe == subscribe {
+            if item.subscribe == subscribe  && item.url == "" {
                 V2rayItem.remove(name: item.name)
                 // if cuerrent item is default
                 if curName != nil && item.name == curName {
@@ -227,6 +227,16 @@ class V2rayServer: NSObject {
         return false
     }
 
+    // check url is exists
+    static func exist(url: String) -> V2rayItem? {
+        for item in self.v2rayItemList {
+            if item.url == url {
+                return item
+            }
+        }
+        return nil
+    }
+    
     // get json file url
     static func getJsonFile() -> String? {
 //        return Bundle.main.url(forResource: "unzip", withExtension: "sh")?.path.replacingOccurrences(of: "/unzip.sh", with: "/config.json")
