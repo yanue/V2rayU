@@ -13,6 +13,7 @@ target 'V2rayU' do
   pod 'SwiftyJSON'
   # master branch
   pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
+  pod 'WebURL',:git => 'https://github.com/karwa/swift-url.git'
   pod 'Sparkle'
   pod 'QRCoder'
   pod 'MASShortcut'

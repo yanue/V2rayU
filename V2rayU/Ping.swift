@@ -48,13 +48,17 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
         // in ping
         inPing = true
+        let pingQueue = DispatchQueue.init(label: "pingQueue") // 串行队列
         // use thread
         let thread = Thread {
             // ping
             self.serverLen = itemList.count
+
             for item in itemList {
-                // run ping by sync queue
-                self.pingEachServer(item: item)
+                pingQueue.async {
+                    // run ping by async queue
+                    self.pingEachServer(item: item)
+                }
             }
             // refresh menu
             self.refreshStatusMenu()
@@ -93,10 +97,11 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
     }
 
     func doPing(item: V2rayItem) {
-        let (_, bindPort) = getUsablePort(port: 11081)
+        let randomInt = Int.random(in: 9000...36500)
+        let (_, bindPort) = getUsablePort(port: randomInt)
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(bindPort)")
-        let jsonFile = AppHomePath + "/config_ping.json"
+        let jsonFile = AppHomePath + "/.config_ping.\(item.name).json"
 
         // create v2ray config file
         createV2rayJsonFileForPing(item: item, bindPort: bindPort, jsonFile: jsonFile)
@@ -116,7 +121,7 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         
         // sleep for wait v2ray process instanse
         let second: Double = 1000000
-        usleep(useconds_t(0.25 * second))
+        usleep(useconds_t(1 * second))
 
         // sync process
         checkProxySpent(item: item, bindPort: bindPort)
@@ -132,7 +137,10 @@ class PingSpeed: NSObject, URLSessionDataDelegate {
         closePort(port: bindPort)
         
         // delete config
-        try? FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
+        guard let filePath = URL(fileURLWithPath: jsonFile) else {
+            return
+        }
+        try? FileManager.default.removeItem(at: filePath)
     }
 
     func createV2rayJsonFileForPing(item: V2rayItem, bindPort: UInt16, jsonFile: String) {

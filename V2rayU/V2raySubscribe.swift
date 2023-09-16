@@ -10,6 +10,7 @@ import Cocoa
 import Alamofire
 import SwiftyJSON
 import Yams
+import WebUrl
 
 // ----- v2ray subscribe manager -----
 class V2raySubscribe: NSObject {
@@ -248,10 +249,14 @@ class V2raySubSync: NSObject {
     public func dlFromUrl(url: String, subscribe: String) {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
-        var request = URLRequest(url: URL(string: url)!)
+        guard let url = WebURL(string: url) else {
+            logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
+            return
+        }
+        var request = URLRequest(url: url)
         request.cachePolicy = .reloadIgnoringCacheData
-        
-        Alamofire.request(request).responseString { response in
+        let session = getAlamofireSession()
+        session.request(request).responseString { response in
             switch (response.result) {
             case .success(_):
                 if let data = response.result.value {

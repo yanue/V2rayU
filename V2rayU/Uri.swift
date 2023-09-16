@@ -336,6 +336,9 @@ class ShadowsockUri {
 }
 
 // link: https://coderschool.cn/2498.html
+// ssr://server:port:protocol:method:obfs:password_base64/?params_base64
+// 上面的链接的不同之处在于 password_base64 和 params_base64 ，顾名思义，password_base64 就是密码被 base64编码 后的字符串，而 params_base64 则是协议参数、混淆参数、备注及Group对应的参数值被 base64编码 后拼接而成的字符串。
+
 class ShadowsockRUri: ShadowsockUri {
 
     override func Init(url: URL) {

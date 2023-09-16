@@ -37,12 +37,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         preferredContentSize = NSMakeSize(view.frame.size.width, view.frame.size.height)
         tips.stringValue = ""
 
-        let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl)
-        if gfwUrl != nil {
-            gfwPacListUrl.stringValue = gfwUrl!
-        } else {
-            gfwPacListUrl.stringValue = GFWListURL
-        }
+        let gfwUrl = UserDefaults.get(forKey: .gfwPacListUrl) ?? GFWListURL
+        gfwPacListUrl.stringValue = gfwUrl!
+
         userRulesView.string = getPacUserRules()
     }
 
@@ -92,23 +89,7 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             }
         }
 
-        let proxyHost = "127.0.0.1"
-        let proxyPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
-
-        // Create a URLSessionConfiguration with proxy settings
-        let configuration = URLSessionConfiguration.default
-        configuration.connectionProxyDictionary = [
-            kCFNetworkProxiesHTTPEnable as AnyHashable: true,
-            kCFNetworkProxiesHTTPProxy as AnyHashable: proxyHost,
-            kCFNetworkProxiesHTTPPort as AnyHashable: proxyPort,
-            kCFNetworkProxiesHTTPSEnable as AnyHashable: true,
-            kCFNetworkProxiesHTTPSProxy as AnyHashable: proxyHost,
-            kCFNetworkProxiesHTTPSPort as AnyHashable: proxyPort,
-        ]
-        configuration.timeoutIntervalForRequest = 30 // Set your desired timeout interval in seconds
-
-        print("configuration \(configuration.description)")
-        let session = Alamofire.SessionManager(configuration: configuration)
+        let session = getAlamofireSession()
         session.request(gfwPacListUrl).responseString { response in
             if response.result.isSuccess {
                 if let v = response.result.value {
@@ -135,17 +116,20 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
             } else {
                 // Popup a user notification
                 self.tips.stringValue = "Failed to download latest GFW List."
-                
-                let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
-                let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
-                NSLog("curlCmd: \(curlCmd)")
-                let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
-                NSLog("curl result: \(msg)")
-                if GeneratePACFile(rewrite: true) {
-                    // Popup a user notification
-                    self.tips.stringValue = "PAC has been updated by latest GFW List."
-                }
+                self.tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
             }
+        }
+    }
+
+    func tryDownloadByShell(gfwPacListUrl: String) {
+        let sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+        let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
+        NSLog("curlCmd: \(curlCmd)")
+        let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
+        NSLog("curl result: \(msg)")
+        if GeneratePACFile(rewrite: true) {
+            // Popup a user notification
+            self.tips.stringValue = "PAC has been updated by latest GFW List."
         }
     }
 }
@@ -196,30 +180,36 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
             do {
                 // rule lines to json array
                 let rulesJsonData: Data = try JSONSerialization.data(withJSONObject: lines, options: .prettyPrinted)
-                let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8)
+                guard let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8) else {
+                    NSLog("Failed to Get rulesJsonData")
+                    return false
+                }
 
                 // Get raw pac js
                 guard let jsData = try? Data(contentsOf: URL(fileURLWithPath: PACAbpFile)) else {
                     NSLog("Failed to Get raw pac js")
                     return false
                 }
-                var jsStr = String(data: jsData, encoding: String.Encoding.utf8)
+                guard var jsStr = String(data: jsData, encoding: String.Encoding.utf8) else {
+                    NSLog("Failed to Get js str")
+                    return false
+                }
 
                 // Replace rules placeholder in pac js
-                jsStr = jsStr!.replacingOccurrences(of: "__RULES__", with: rulesJsonStr!)
+                jsStr = jsStr.replacingOccurrences(of: "__RULES__", with: rulesJsonStr)
                 // Replace __SOCKS5PORT__ palcholder in pac js
-                jsStr = jsStr!.replacingOccurrences(of: "__SOCKS5PORT__", with: "\(sockPort)")
+                jsStr = jsStr.replacingOccurrences(of: "__SOCKS5PORT__", with: "\(sockPort)")
                 // Replace __SOCKS5ADDR__ palcholder in pac js
                 var sin6 = sockaddr_in6()
                 if socks5Address.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
-                    jsStr = jsStr!.replacingOccurrences(of: "__SOCKS5ADDR__", with: "[\(socks5Address)]")
+                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: "[\(socks5Address)]")
                 } else {
-                    jsStr = jsStr!.replacingOccurrences(of: "__SOCKS5ADDR__", with: socks5Address)
+                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: socks5Address)
                 }
                 print("PACFilePath", PACFilePath)
 
                 // Write the pac js to file.
-                try jsStr!.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
+                try jsStr.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
                 return true
             } catch {
                 print("write pac fail \(error)")

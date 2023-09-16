@@ -310,6 +310,10 @@ class ImportUri {
         vmessItem.users = [user]
         v2ray.serverVless = vmessItem
 
+        if vmess.sni.count == 0 {
+            vmess.sni = vmess.address
+        }
+
         // stream
         v2ray.streamNetwork = vmess.type
         v2ray.streamSecurity = vmess.security
@@ -375,7 +379,7 @@ class ImportUri {
         self.uri = uri
 
         let trojan = TrojanUri()
-        trojan.Init(url: URL(string: uri)!)
+        trojan.Init(url: url)
         if trojan.error.count > 0 {
             self.error = trojan.error
             self.isValid = false
@@ -474,6 +478,7 @@ func importByClash(clash: clashProxy) {
                 item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
             }
         }
+        ImportUri().importVmess(vmess: item)
     }
 
     if clash.type == "vless" {
@@ -484,9 +489,17 @@ func importByClash(clash: clashProxy) {
         item.id = clash.uuid ?? ""
         item.security = clash.cipher ?? "auto"
         item.network = clash.network ?? "tcp"
-        item.sni = clash.sni ?? item.address
+        item.sni = clash.sni ?? clash.server
         if clash.security ?? true {
             item.tls = "tls"
+        }
+        if clash.security == "reality" {
+            item.sni = clash.servername ?? clash.server
+            item.fp = clash.clientFingerprint ?? "chrome"
+            if clash.realityOpts != nil {
+                item.pbk = clash.realityOpts!.publicKey ?? ""
+                item.sid = clash.realityOpts!.shortId ?? ""
+            }
         }
         // network ws
         if item.network == "ws" {
@@ -515,6 +528,25 @@ func importByClash(clash: clashProxy) {
                 item.netPath = clash.grpcOpts?.grpcServiceName ?? "/"
             }
         }
+        ImportUri().importVless(vless: item)
+    }
+
+    if clash.type == "http"  {
+
+    }
+
+    if clash.type == "socks5"  {
+
+    }
+
+    if clash.type == "ss" || clash.type == "ssr" {
+        let item = ShadowsockUri()
+        item.remark = clash.name
+        item.host = clash.server
+        item.port = clash.port
+        item.method = clash.cipher ?? ""
+        item.password = clash.password ?? ""
+        ImportUri().importSS(ss: item)
     }
 }
 

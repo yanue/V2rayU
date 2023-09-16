@@ -630,7 +630,6 @@ class MenuController: NSObject, NSMenuDelegate {
             }
 
             // ss://YWVzLTI1Ni1jZmI6ZUlXMERuazY5NDU0ZTZuU3d1c3B2OURtUzIwMXRRMERAMTcyLjEwNS43MS44Mjo4MDk5#翻墙党325.06美国 类型这种含中文的格式不是标准的URL格式
-//            if URL(string: uri) == nil {
             if !ImportUri.supportProtocol(uri: uri) {
                 noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
                 continue
