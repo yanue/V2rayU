@@ -21,7 +21,7 @@ class PingSpeed: NSObject {
     var unpingServers: Dictionary = [String: Bool]()
     
     let lock = NSLock()
-    let semaphore = DispatchSemaphore(value: 10) // work pool 
+    let semaphore = DispatchSemaphore(value: 20) // work pool
 
     func pingAll() {
         NSLog("ping start")
@@ -29,6 +29,8 @@ class PingSpeed: NSObject {
             NSLog("ping inPing")
             return
         }
+        let pskillCmd = "/bin/kill $(ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}')"
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
         fastV2rayName = ""
         unpingServers = [String: Bool]()
         let itemList = V2rayServer.list()
@@ -53,7 +55,7 @@ class PingSpeed: NSObject {
         menuController.statusMenu.item(withTag: 1)?.title = pingTip
         // in ping
         inPing = true
-        let pingQueue = DispatchQueue(label: "pingQueue", attributes: .concurrent) // 串行队列
+        let pingQueue = DispatchQueue(label: "pingQueue", attributes: .concurrent)
         for item in itemList {
             unpingServers[item.name] = true
             pingQueue.async {
@@ -118,7 +120,7 @@ class PingServer: NSObject, URLSessionDataDelegate {
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(_bindPort)")
         bindPort = _bindPort
-        jsonFile = AppHomePath + "/.config_ping.\(item.name).json"
+        jsonFile = AppHomePath + "/.\(item.name).json"
 
         // create v2ray config file
         createV2rayJsonFileForPing()
@@ -163,7 +165,7 @@ class PingServer: NSObject, URLSessionDataDelegate {
             let jsonFilePath = URL(fileURLWithPath: jsonFile)
             // delete before config
             if FileManager.default.fileExists(atPath: jsonFile) {
-                try? FileManager.default.removeItem(at: jsonFilePath)
+                try FileManager.default.removeItem(at: jsonFilePath)
             }
             // write
             try jsonText.write(to: jsonFilePath, atomically: true, encoding: String.Encoding.utf8)
@@ -197,24 +199,25 @@ class PingServer: NSObject, URLSessionDataDelegate {
     func pingEnd() {
         NSLog("ping end: \(item.remark) - \(item.speed)")
 
-        // refresh servers
-        ping.refreshStatusMenu(item: item)
-
-        // exit process
-        if process.isRunning {
-            // terminate v2ray process
-            process.terminate()
-            process.waitUntilExit()
-        }
-
-        // close port
-        closePort(port: bindPort)
-
         // delete config
         do {
-            let jsonFilePath = URL(fileURLWithPath: jsonFile)
-            try? FileManager.default.removeItem(at: jsonFilePath)
+            // exit process
+            if process.isRunning {
+                // terminate v2ray process
+                process.interrupt()
+                process.terminate()
+                process.waitUntilExit()
+            }
+            // close port
+            closePort(port: bindPort)
+            print("remove ping config:" ,self.jsonFile)
+            try FileManager.default.removeItem(at: URL(fileURLWithPath: self.jsonFile))
+        } catch let error {
+            print("remove ping config error: \(error)")
         }
+        
+        // refresh servers
+        ping.refreshStatusMenu(item: item)
     }
 }
 

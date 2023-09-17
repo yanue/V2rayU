@@ -175,24 +175,26 @@ extension String {
 // shell("/bin/bash",["-c","ls"])
 // shell("/bin/bash",["-c","cd ~ && ls -la"])
 func shell(launchPath: String, arguments: [String]) -> String? {
-    let task = Process()
-    task.launchPath = launchPath
-    task.arguments = arguments
-
-    let pipe = Pipe()
-    task.standardOutput = pipe
-    task.launch()
-
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let output = String(data: data, encoding: String.Encoding.utf8)!
-
-    if output.count > 0 {
-        // remove newline character.
-        let lastIndex = output.index(before: output.endIndex)
-        return String(output[output.startIndex ..< lastIndex])
+    do {
+        let task = Process()
+        task.launchPath = launchPath
+        task.arguments = arguments
+        
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.launch()
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: String.Encoding.utf8)!
+        
+        if output.count > 0 {
+            // remove newline character.
+            let lastIndex = output.index(before: output.endIndex)
+            return String(output[output.startIndex ..< lastIndex])
+        }
+        return output
     }
-
-    return output
+    return nil
 }
 
 // → /var/folders/v8/tft1q…/T/…-8DC6DD131DC1/report.pdf
@@ -427,10 +429,8 @@ func closePort(port: UInt16) {
             for pid in pids {
                 if let pid = Int(String(pid)) {
                     killProcess(processIdentifier: pid_t(pid))
-                    print("Port \(pid) closed.")
                 }
             }
-            print("Port \(port) closed.")
         }
     }
     process.launch()
@@ -466,11 +466,13 @@ func GetIPAddresses() -> String? {
 }
 
 func killProcess(processIdentifier: pid_t) {
-    let result = killpg(processIdentifier, SIGKILL)
-    if result == -1 {
-        NSLog("killProcess: Failed to kill process with identifier \(processIdentifier)")
-    } else {
-        NSLog("killProcess: Successfully killed process with identifier \(processIdentifier)")
+    do {
+        let result = kill(processIdentifier, SIGKILL)
+        if result == -1 {
+            NSLog("killProcess: Failed to kill process with identifier \(processIdentifier)")
+        } else {
+            NSLog("killProcess: Successfully killed process with identifier \(processIdentifier)")
+        }
     }
 }
 
@@ -502,7 +504,7 @@ func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfigurati
     // Create a URLSessionConfiguration with proxy settings
     let configuration = URLSessionConfiguration.default
     let proxyHost = "127.0.0.1"
-    let proxyPort = getHttpProxyPort()
+    let proxyPort = httpProxyPort
     // set proxies
     configuration.connectionProxyDictionary = [
         kCFNetworkProxiesHTTPEnable as AnyHashable: true,

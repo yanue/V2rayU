@@ -14,7 +14,8 @@ class V2rayServer: NSObject {
     static var shared = V2rayServer()
 
     static private let defaultV2rayName = "config.default"
-
+    static let lock = NSLock()
+    
     // Initialization
     override init() {
         super.init()
@@ -26,6 +27,11 @@ class V2rayServer: NSObject {
 
     // (init) load v2ray server list from UserDefaults
     static func loadConfig() {
+        self.lock.lock()
+        defer {
+            self.lock.unlock()
+        }
+
         // static reset
         self.v2rayItemList = []
 
@@ -194,16 +200,17 @@ class V2rayServer: NSObject {
         // reload
         V2rayServer.loadConfig()
 
-        // reload config
-        if menuController.configWindow != nil {
-            // fix: must be used from main thread only
-            DispatchQueue.main.async {
-                menuController.configWindow.serversTableView.reloadData()
+        do {
+            // reload config
+            if menuController.configWindow != nil {
+                // fix: must be used from main thread only
+                DispatchQueue.main.async {
+                    menuController.configWindow.serversTableView.reloadData()
+                }
             }
-        }
-
-        // refresh server
-        menuController.showServers()
+            // refresh server
+            menuController.showServers()
+       }
     }
 
     // update server list UserDefaults
