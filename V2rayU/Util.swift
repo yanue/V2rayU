@@ -491,6 +491,8 @@ func getProxyUrlSessionConfigure() -> URLSessionConfiguration {
             kCFNetworkProxiesHTTPSPort as AnyHashable: proxyPort,
         ]
     }
+    configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+    configuration.urlCache = nil
     configuration.timeoutIntervalForRequest = 30 // Set your desired timeout interval in seconds
 
     return configuration
@@ -510,7 +512,9 @@ func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfigurati
         kCFNetworkProxiesHTTPSProxy as AnyHashable: proxyHost,
         kCFNetworkProxiesHTTPSPort as AnyHashable: proxyPort,
     ]
-    configuration.timeoutIntervalForRequest = 30 // Set your desired timeout interval in seconds
+    configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+    configuration.urlCache = nil
+    configuration.timeoutIntervalForRequest = 2 // Set your desired timeout interval in seconds
     return configuration
 }
 

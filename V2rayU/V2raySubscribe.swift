@@ -314,7 +314,7 @@ class V2raySubSync: NSObject {
     func importByYaml(strTmp: String, subscribe: String) -> Bool {
         // parse clash yaml
         do {
-            var oldList = getOld(subscribe: subscribe)
+            let oldList = getOld(subscribe: subscribe)
             var exists: Dictionary = [String: Bool]()
             
             let decoder = YAMLDecoder()
@@ -332,7 +332,7 @@ class V2raySubSync: NSObject {
 
             // remove not exist
             for name in oldList {
-                if exists[name] ?? false {
+                if !(exists[name] ?? false) {
                     // delete from v2ray UserDefaults
                     V2rayItem.remove(name: name)
                     logTip(title: "remove: ", informativeText: name)
@@ -349,7 +349,7 @@ class V2raySubSync: NSObject {
     }
     
     func importByNormal(strTmp: String, subscribe: String)  {
-        var oldList = getOld(subscribe: subscribe)
+        let oldList = getOld(subscribe: subscribe)
         var exists: Dictionary = [String: Bool]()
         
         let list = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
@@ -371,10 +371,10 @@ class V2raySubSync: NSObject {
         }
         
         logTip(title: "need remove?: ", informativeText: "old=\(oldList.count) - new=\(exists.count)")
-
+        
         // remove not exist
         for name in oldList {
-            if exists[name] ?? false {
+            if !(exists[name] ?? false) {
                 // delete from v2ray UserDefaults
                 V2rayItem.remove(name: name)
                 logTip(title: "remove: ", informativeText: name)
@@ -411,7 +411,7 @@ class V2raySubSync: NSObject {
             if let v2rayOld = V2rayServer.exist(url: newUri) {
                 v2rayOld.json = importUri.json
                 v2rayOld.isValid = importUri.isValid
-                v2rayOld.name = importUri.remark
+                v2rayOld.remark = importUri.remark
                 v2rayOld.store()
                 logTip(title: "success update: ", informativeText: importUri.remark)
                 return v2rayOld

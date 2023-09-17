@@ -312,8 +312,10 @@ class MenuController: NSObject, NSMenuDelegate {
         // set URLSessionDataDelegate
         let metric = PingMetrics()
         metric.ping = ping
+        let config = getProxyUrlSessionConfigure()
+        config.timeoutIntervalForRequest = 2
         // url request
-        let session = URLSession(configuration: getProxyUrlSessionConfigure(), delegate: metric, delegateQueue: nil)
+        let session = URLSession(configuration: config, delegate: metric, delegateQueue: nil)
         let url = URL(string: "http://www.google.com/generate_204")!
         let task = session.dataTask(with: URLRequest(url: url)){(data: Data?, response: URLResponse?, error: Error?) in
             NSLog("ping current end")
@@ -431,7 +433,9 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func showServers() {
         // reomve old items
-        serverItems.submenu?.removeAllItems()
+        if serverItems.submenu != nil {
+            serverItems.submenu?.removeAllItems()
+        }
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
         // reload servers
         V2rayServer.loadConfig()

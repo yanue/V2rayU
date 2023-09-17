@@ -119,6 +119,8 @@ class V2rayLaunch: NSObject {
         v2rayProcess = Process()
         v2rayProcess.launchPath = v2rayCoreFile
         v2rayProcess.arguments = ["-config", JsonConfigFilePath]
+        v2rayProcess.standardError = nil
+        v2rayProcess.standardOutput = nil
         v2rayProcess.terminationHandler = { process in
             if process.terminationStatus != EXIT_SUCCESS {
                 NSLog("process is not kill \(process.description) -  \(process.processIdentifier) - \(process.terminationStatus)")

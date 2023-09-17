@@ -42,22 +42,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
-          Analytics.self,
-          Crashes.self
-        ])
-
-        // auto check updates
-        if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            menuController.checkV2rayUVersion()
-            // check version
-            V2rayUpdater.checkForUpdatesInBackground()
-        }
-
-        _ = GeneratePACFile(rewrite: true)
-        // start http server for pac
-        V2rayLaunch.startHttpServer()
-
         // wake and sleep
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onSleepNote(note:)), name: NSWorkspace.willSleepNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(onWakeNote(note:)), name: NSWorkspace.didWakeNotification, object: nil)
@@ -78,6 +62,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Register global hotkey
         ShortcutsController.bindShortcuts()
+        
+        // appcenter init
+        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
+          Analytics.self,
+          Crashes.self
+        ])
+
+        // auto check updates
+        if UserDefaults.getBool(forKey: .autoCheckVersion) {
+            menuController.checkV2rayUVersion()
+            // check version
+            V2rayUpdater.checkForUpdatesInBackground()
+        }
+
+        _ = GeneratePACFile(rewrite: true)
+        // start http server for pac
+        V2rayLaunch.startHttpServer()
     }
 
     func checkDefault() {
@@ -94,6 +95,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
         }
+        V2rayServer.loadConfig()
         if V2rayServer.count() == 0 {
             // add default
             V2rayServer.add(remark: "default", json: "", isValid: false)
