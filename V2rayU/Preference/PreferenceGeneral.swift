@@ -22,6 +22,7 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
     @IBOutlet weak var autoLaunch: NSButtonCell!
     @IBOutlet weak var autoCheckVersion: NSButtonCell!
     @IBOutlet weak var autoUpdateServers: NSButtonCell!
+    @IBOutlet weak var autoSelectFastServer: NSButtonCell!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,9 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             autoUpdateServers.state = .on
         }
+        if UserDefaults.getBool(forKey: .autoSelectFastestServer) {
+            autoSelectFastServer.state = .on
+        }
     }
 
     @IBAction func SetAutoLogin(_ sender: NSButtonCell) {
@@ -50,6 +54,10 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     @IBAction func SetAutoUpdateServers(_ sender: NSButtonCell) {
         UserDefaults.setBool(forKey: .autoUpdateServers, value: sender.state == .on)
+    }
+
+    @IBAction func SetAutoSelectFastServer(_ sender: NSButtonCell) {
+        UserDefaults.setBool(forKey: .autoSelectFastestServer, value: sender.state == .on)
     }
 
     @IBAction func goFeedback(_ sender: NSButton) {

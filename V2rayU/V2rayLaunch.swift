@@ -119,9 +119,11 @@ class V2rayLaunch: NSObject {
         let httpPort = UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1080") ?? 1080
         let sockPort = UInt16( UserDefaults.get(forKey: .localSockPort) ?? "1087") ?? 1087
         
-        closePort(port: httpPort)
-        closePort(port: sockPort)
-    
+        if !inPingCurrent{
+            closePort(port: httpPort)
+            closePort(port: sockPort)
+        }
+        
         // reinstance
         // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
         v2rayProcess = Process()
@@ -133,7 +135,7 @@ class V2rayLaunch: NSObject {
             if process.terminationStatus == EXIT_SUCCESS {
                 NSLog("process been killed: \(process.description) -  \(process.processIdentifier) - \(process.terminationStatus)")
                 // reconnect
-                if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+                if UserDefaults.getBool(forKey: .v2rayTurnOn) && !inPingCurrent {
                     DispatchQueue.main.async {
                         NSLog("V2rayLaunch process been killed, restart now")
                         V2rayLaunch.Stop()

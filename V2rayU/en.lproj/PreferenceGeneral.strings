@@ -1,0 +1,30 @@
+
+/* Class = "NSTextFieldCell"; title = "Toggle V2ray On/Off:"; ObjectID = "0rn-re-Wn3"; */
+"0rn-re-Wn3.title" = "Toggle V2ray On/Off:";
+
+/* Class = "NSButtonCell"; title = "Automatically update servers from subscriptions "; ObjectID = "1FR-Yu-tqb"; */
+"1FR-Yu-tqb.title" = "Automatically update servers from subscriptions ";
+
+/* Class = "NSButtonCell"; title = "Check for Updates..."; ObjectID = "2p9-GL-XZ9"; */
+"2p9-GL-XZ9.title" = "Check for Updates...";
+
+/* Class = "NSTextFieldCell"; title = "Switch Proxy Mode:"; ObjectID = "Eu4-bo-oYs"; */
+"Eu4-bo-oYs.title" = "Switch Proxy Mode:";
+
+/* Class = "NSButtonCell"; title = "Launch V2rayU at login"; ObjectID = "NZE-cI-j04"; */
+"NZE-cI-j04.title" = "Launch V2rayU at login";
+
+/* Class = "NSTextFieldCell"; title = "Related file locations:"; ObjectID = "Oke-cL-DfS"; */
+"Oke-cL-DfS.title" = "Related file locations:";
+
+/* Class = "NSButtonCell"; title = "Feedback..."; ObjectID = "QjX-NH-23u"; */
+"QjX-NH-23u.title" = "Feedback...";
+
+/* Class = "NSButtonCell"; title = "Automatically select fastest server"; ObjectID = "WsS-I0-2Zs"; */
+"WsS-I0-2Zs.title" = "Automatically select fastest server";
+
+/* Class = "NSButtonCell"; title = "Check for updates automutically"; ObjectID = "m2S-Mu-rFM"; */
+"m2S-Mu-rFM.title" = "Check for updates automutically";
+
+/* Class = "NSTextFieldCell"; title = "~/.V2rayU/\n~/Library/Preferences/net.yanue.V2rayU.plist"; ObjectID = "vHZ-BS-uFb"; */
+"vHZ-BS-uFb.title" = "~/.V2rayU/\n~/Library/Preferences/net.yanue.V2rayU.plist";

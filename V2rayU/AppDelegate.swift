@@ -26,7 +26,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var statusMenu: NSMenu!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
+        // appcenter init
+        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
+          Analytics.self,
+          Crashes.self
+        ])
+
         // default settings
         self.checkDefault()
 
@@ -62,12 +67,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Register global hotkey
         ShortcutsController.bindShortcuts()
-        
-        // appcenter init
-        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
-          Analytics.self,
-          Crashes.self
-        ])
 
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
@@ -93,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.setBool(forKey: .autoLaunch, value: true)
         }
         if UserDefaults.get(forKey: .runMode) == nil {
-            UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
+            UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         }
         V2rayServer.loadConfig()
         if V2rayServer.count() == 0 {
@@ -142,11 +141,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
+        print("applicationWillTerminate")
         // unregister All shortcut
         MASShortcutMonitor.shared().unregisterAllShortcuts()
         // Insert code here to tear down your application
         V2rayLaunch.Stop()
         // off system proxy
         V2rayLaunch.setSystemProxy(mode: .off)
+        // kill v2ray
+        let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
+        _ = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     }
 }

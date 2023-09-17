@@ -11,6 +11,7 @@
             <connections>
                 <outlet property="autoCheckVersion" destination="m2S-Mu-rFM" id="GQD-EA-vJj"/>
                 <outlet property="autoLaunch" destination="NZE-cI-j04" id="ktV-ps-tl4"/>
+                <outlet property="autoSelectFastServer" destination="WsS-I0-2Zs" id="e7a-LT-iqI"/>
                 <outlet property="autoUpdateServers" destination="1FR-Yu-tqb" id="5TK-uS-ear"/>
                 <outlet property="view" destination="bXz-rK-jao" id="xYY-dt-fo2"/>
             </connections>
@@ -21,9 +22,9 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VO1-gl-rxy" userLabel="update servers">
-                    <rect key="frame" x="62" y="251" width="315" height="18"/>
+                    <rect key="frame" x="62" y="251" width="323" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Automatically update servers from subscriptions" bezelStyle="regularSquare" imagePosition="left" inset="2" id="1FR-Yu-tqb">
+                    <buttonCell key="cell" type="check" title="Automatically update servers from subscriptions " bezelStyle="regularSquare" imagePosition="left" inset="2" id="1FR-Yu-tqb">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                         <connections>
@@ -54,21 +55,21 @@
                     </buttonCell>
                 </button>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Elj-N8-4IK" customClass="MASShortcutView">
-                    <rect key="frame" x="247" y="179" width="139" height="19"/>
+                    <rect key="frame" x="247" y="159" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="associatedUserDefaultsKey" value="SwitchProxyMode"/>
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ti4-xg-ncf" customClass="MASShortcutView">
-                    <rect key="frame" x="247" y="202" width="139" height="19"/>
+                    <rect key="frame" x="247" y="182" width="139" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="associatedUserDefaultsKey" value="ToggleRunning"/>
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UhI-5l-Ytp">
-                    <rect key="frame" x="64" y="180" width="174" height="17"/>
+                    <rect key="frame" x="64" y="160" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Switch Proxy Mode:" id="Eu4-bo-oYs">
                         <font key="font" metaFont="system"/>
@@ -77,7 +78,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vtN-0c-sip">
-                    <rect key="frame" x="64" y="203" width="174" height="17"/>
+                    <rect key="frame" x="64" y="183" width="174" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Toggle V2ray On/Off:" id="0rn-re-Wn3">
                         <font key="font" metaFont="system"/>
@@ -97,24 +98,14 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2M9-7e-aJI">
-                    <rect key="frame" x="64" y="63" width="324" height="78"/>
+                    <rect key="frame" x="64" y="56" width="324" height="62"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" selectable="YES" borderStyle="border" drawsBackground="YES" id="vHZ-BS-uFb">
                         <font key="font" size="12" name="HelveticaNeue"/>
                         <string key="title">~/.V2rayU/
-~/Library/LaunchAgents/yanue.v2rayu.v2ray-core.plist
 ~/Library/Preferences/net.yanue.V2rayU.plist</string>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IRP-lJ-E8h">
-                    <rect key="frame" x="64" y="145" width="174" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Related file locations:" id="Oke-cL-DfS">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <button horizontalHuggingPriority="500" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-Na-pRr">
@@ -128,6 +119,26 @@
                         <action selector="checkVersion:" target="-2" id="4u0-Zb-Xfz"/>
                     </connections>
                 </button>
+                <button horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VEG-TX-WgO" userLabel="choose f">
+                    <rect key="frame" x="62" y="221" width="235" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Automatically select fastest server" bezelStyle="regularSquare" imagePosition="left" inset="2" id="WsS-I0-2Zs">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <action selector="SetAutoSelectFastServer:" target="-2" id="aXE-Jz-JrZ"/>
+                        </connections>
+                    </buttonCell>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IRP-lJ-E8h">
+                    <rect key="frame" x="64" y="126" width="174" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Related file locations:" id="Oke-cL-DfS">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="-144" y="-243"/>
         </view>
