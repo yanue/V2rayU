@@ -15,7 +15,7 @@ class ImportUri {
     var error: String = ""
     var uri: String = ""
 
-    static func importUri(uri: String, id: String = "", checkExist: Bool = true) -> ImportUri? {
+    static func importUri(uri: String, checkExist: Bool = true) -> ImportUri? {
         if checkExist && V2rayServer.exist(url: uri) {
             let importUri = ImportUri()
             importUri.isValid = false
@@ -25,7 +25,7 @@ class ImportUri {
 
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
-            importUri.importVmessUri(uri: uri, id: id)
+            importUri.importVmessUri(uri: uri)
             return importUri
         }
         if uri.hasPrefix("trojan://") {
@@ -167,7 +167,7 @@ class ImportUri {
         }
     }
 
-    func importVmessUri(uri: String, id: String = "") {
+    func importVmessUri(uri: String) {
         var url = URL(string: uri)
         if url == nil {
             // 标准url不支持非url-encoded
@@ -265,7 +265,7 @@ class ImportUri {
         }
     }
 
-    func importVlessUri(uri: String, id: String = "") {
+    func importVlessUri(uri: String) {
         var url = URL(string: uri)
         if url == nil {
             // 标准url不支持非url-encoded
