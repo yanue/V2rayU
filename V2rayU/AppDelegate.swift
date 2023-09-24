@@ -85,7 +85,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.setBool(forKey: .autoUpdateServers, value: true)
         }
         if UserDefaults.get(forKey: .autoSelectFastestServer) == nil {
-            UserDefaults.setBool(forKey: .autoSelectFastestServer, value: false)
+            UserDefaults.setBool(forKey: .autoSelectFastestServer, value: true)
         }
         if UserDefaults.get(forKey: .autoLaunch) == nil {
             SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)

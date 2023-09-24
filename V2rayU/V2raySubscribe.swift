@@ -399,25 +399,20 @@ class V2raySubSync: NSObject {
     
     func refreshMenu(url: String)  {
         lock.lock()
-        defer { lock.unlock() }
         
         semaphore.signal()
-        
-        todos.removeValue(forKey: url)
 
-        if todos.count == 0 {
+        todos.removeValue(forKey: url)
+        let remainCount = todos.count
+        
+        lock.unlock()
+        
+        if remainCount == 0 {
             inSyncSubscribe = false
             usleep(useconds_t(1 * second))
             do {
                 // refresh server
                 menuController.showServers()
-                // reload server
-                if menuController.configWindow != nil {
-                    // fix: must be used from main thread only
-                    DispatchQueue.main.async {
-                        menuController.configWindow.serversTableView.reloadData()
-                    }
-                }
                 usleep(useconds_t(2 * second))
                 // do ping
                 ping.pingAll()

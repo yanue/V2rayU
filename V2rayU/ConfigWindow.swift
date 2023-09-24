@@ -150,10 +150,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // table view
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
-        // fix: must be used from main thread only
-        DispatchQueue.main.async {
-            self.serversTableView.reloadData()
-        }
+        self.serversTableView.reloadData()
         // tab view
         self.tabView.delegate = self
     }

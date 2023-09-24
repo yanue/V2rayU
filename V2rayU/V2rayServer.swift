@@ -201,13 +201,6 @@ class V2rayServer: NSObject {
         V2rayServer.loadConfig()
 
         do {
-            // reload config
-            if menuController.configWindow != nil {
-                // fix: must be used from main thread only
-                DispatchQueue.main.async {
-                    menuController.configWindow.serversTableView.reloadData()
-                }
-            }
             // refresh server
             menuController.showServers()
        }

@@ -415,6 +415,7 @@ func getUsablePort(port: UInt16) -> (Bool, UInt16) {
 
 // can't use this (crash when launchctl)
 func closePort(port: UInt16) {
+    return
     let process = Process()
     process.launchPath = "/usr/sbin/lsof"
     process.arguments = ["-ti", ":\(port)"]

@@ -94,11 +94,9 @@ class V2rayLaunch: NSObject {
         let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_NAME + ".plist"
         // old version ( < 4.0 )
         if FileManager.default.fileExists(atPath: launchAgentPlistFile) {
-            let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
-            task.waitUntilExit()
-
-            let task1 = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", LAUNCH_AGENT_NAME])
-            task1.waitUntilExit()
+            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME]).waitUntilExit()
+            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["remove", LAUNCH_AGENT_NAME]).waitUntilExit()
+            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", LAUNCH_AGENT_NAME]).waitUntilExit()
             
             try? FileManager.default.removeItem(at: URL(fileURLWithPath: launchAgentPlistFile))
         }

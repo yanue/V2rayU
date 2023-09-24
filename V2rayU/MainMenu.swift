@@ -41,6 +41,7 @@ var qrcodeWindow = QrcodeWindowController()
 var toastWindowCtrl: ToastWindowController!
 
 func makeToast(message: String, displayDuration: Double? = 2) {
+    return
     if toastWindowCtrl != nil {
         toastWindowCtrl.close()
     }
@@ -414,6 +415,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
     
     func showServers() {
+        print("showServers")
         lock.lock()
         defer {
             lock.unlock()
@@ -478,6 +480,13 @@ class MenuController: NSObject, NSMenuDelegate {
             _subMenus.addItem(menuItem)
         }
         serverItems.submenu = _subMenus
+        
+        if menuController.configWindow != nil {
+            DispatchQueue.main.async {
+                // fix: must be used from main thread only
+                menuController.configWindow.serversTableView.reloadData()
+            }
+        }
     }
     
     // build menu item by V2rayItem
@@ -673,14 +682,6 @@ class MenuController: NSObject, NSMenuDelegate {
             V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
             // refresh server
             self.showServers()
-
-            // reload server
-            if self.configWindow != nil {
-                // fix: must be used from main thread only
-                DispatchQueue.main.async {
-                    self.configWindow.serversTableView.reloadData()
-                }
-            }
 
             noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)
         } else {
