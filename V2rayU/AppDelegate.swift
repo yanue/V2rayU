@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var statusMenu: NSMenu!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        print("applicationDidFinishLaunching")
         // appcenter init
         AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
           Analytics.self,
@@ -74,10 +75,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
-
-        _ = GeneratePACFile(rewrite: true)
-        // start http server for pac
-        V2rayLaunch.startHttpServer()
     }
 
     func checkDefault() {
@@ -149,7 +146,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // off system proxy
         V2rayLaunch.setSystemProxy(mode: .off)
         // kill v2ray
-        let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
-        _ = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
+        killSelfV2ray()
     }
 }

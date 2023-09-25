@@ -415,7 +415,6 @@ func getUsablePort(port: UInt16) -> (Bool, UInt16) {
 
 // can't use this (crash when launchctl)
 func closePort(port: UInt16) {
-    return
     let process = Process()
     process.launchPath = "/usr/sbin/lsof"
     process.arguments = ["-ti", ":\(port)"]
@@ -522,14 +521,26 @@ func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfigurati
 }
 
 
-func getHttpProxyPort() -> Int {
-    return Int(UserDefaults.get(forKey: .localHttpPort) ?? "1087") ?? 1087
+func getHttpProxyPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1087") ?? 1087
 }
 
-func getSocksProxyPort() -> Int {
-    return Int(UserDefaults.get(forKey: .localHttpPort) ?? "1080") ?? 1080
+func getSocksProxyPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localSockPort) ?? "1080") ?? 1080
 }
 
-func getPacPort() -> Int {
-    return Int(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+func getPacPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
+}
+
+func killAllPing(){
+    let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
+    let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
+    NSLog("killAllPing: \(String(describing: msg))")
+}
+
+func killSelfV2ray(){
+    let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
+    let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
+    NSLog("killSelfV2ray: \(String(describing: msg))")
 }

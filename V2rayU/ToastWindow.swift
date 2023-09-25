@@ -30,6 +30,8 @@ class ToastWindowController: NSWindowController {
 
     var timerToFadeOut: Timer? = nil
     var fadingOut: Bool = false
+    
+    var isShow: Bool = false
 
     override func windowDidLoad() {
         super.windowDidLoad()

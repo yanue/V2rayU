@@ -81,10 +81,6 @@ class PingSpeed: NSObject {
             do {
                 menuController.setStatusMenuTip(pingTip: "Ping Speed...")
                 menuController.showServers()
-                // reload config
-                if menuController.configWindow != nil {
-                    
-                }
             }
             // kill after ping
             killAllPing()
@@ -123,8 +119,8 @@ class PingServer: NSObject, URLSessionDataDelegate {
         // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
         process.launchPath = v2rayCoreFile
         process.arguments = ["-config", jsonFile]
-        process.standardError = nil
-        process.standardOutput = nil
+//        process.standardError = nil
+//        process.standardOutput = nil
         process.terminationHandler = { _process in
             if _process.terminationStatus != EXIT_SUCCESS {
                 NSLog("process is not kill \(_process.description) -  \(_process.processIdentifier) - \(_process.terminationStatus)")
@@ -203,7 +199,6 @@ class PingServer: NSObject, URLSessionDataDelegate {
                 process.waitUntilExit()
             }
             // close port
-            closePort(port: bindPort)
             print("remove ping config:", jsonFile)
             try FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
         } catch let error {
@@ -326,10 +321,4 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
             inPingCurrent = false
         }
     }
-}
-
-func killAllPing(){
-    let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
-    let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
-    NSLog("killAllPing: \(String(describing: msg))")
 }

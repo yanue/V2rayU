@@ -1264,6 +1264,9 @@ class V2rayConfig: NSObject {
                 self.securityReality.publicKey = transport.realitySettings!.publicKey
                 self.securityReality.shortId = transport.realitySettings!.shortId
                 self.securityReality.spiderX = transport.realitySettings!.spiderX
+                if self.securityReality.fingerprint == "" {
+                    self.securityReality.fingerprint = "chrome"
+                }
             }
             
             if transport.tcpSettings != nil {

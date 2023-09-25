@@ -114,21 +114,44 @@ class V2rayLaunch: NSObject {
 
         
         // close port
-        let httpPort = UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1080") ?? 1080
-        let sockPort = UInt16( UserDefaults.get(forKey: .localSockPort) ?? "1087") ?? 1087
-        
-        if !inPingCurrent{
-            closePort(port: httpPort)
-            closePort(port: sockPort)
+        let httpPort = getHttpProxyPort()
+        let sockPort = getSocksProxyPort()
+    
+        // port has been used
+        if isPortOpen(port: httpPort) {
+            var toast = ""
+            if Locale.current.languageCode == "en" {
+                toast = "http port \(httpPort) has been used, please replace from advance setting"
+            } else {
+                toast = "http端口 \(httpPort) 已被使用, 请更换"
+            }
+            makeToast(message: toast, displayDuration: 10)
+            menuController.stopV2rayCore()
+            preferencesWindowController.show(preferencePane: .advanceTab)
+            return
         }
         
+        // port has been used
+        if isPortOpen(port: sockPort) {
+            var toast = ""
+            if Locale.current.languageCode == "en" {
+                toast = "socks port \(sockPort) has been used, please replace from advance setting"
+            } else {
+                toast = "socks端口 \(sockPort) 已被使用, 请更换"
+            }
+            makeToast(message: toast, displayDuration: 10)
+            menuController.stopV2rayCore()
+            preferencesWindowController.show(preferencePane: .advanceTab)
+            return
+        }
+            
         // reinstance
         // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
         v2rayProcess = Process()
         v2rayProcess.launchPath = v2rayCoreFile
         v2rayProcess.arguments = ["-config", JsonConfigFilePath]
-        v2rayProcess.standardError = nil
-        v2rayProcess.standardOutput = nil
+//        v2rayProcess.standardError = nil
+//        v2rayProcess.standardOutput = nil
         v2rayProcess.terminationHandler = { process in
             if process.terminationStatus == EXIT_SUCCESS {
                 NSLog("process been killed: \(process.description) -  \(process.processIdentifier) - \(process.terminationStatus)")
@@ -144,7 +167,14 @@ class V2rayLaunch: NSObject {
         }
         // async launch and can't waitUntilExit
         v2rayProcess.launch()
-
+        
+        // ping and select server
+        if let v2ray = V2rayServer.loadSelectedItem() {
+            // ping and refresh
+            DispatchQueue.global().async {
+                PingCurrent(item: v2ray).doPing()
+            }
+        }
     }
 
     static func Stop() {
@@ -162,7 +192,10 @@ class V2rayLaunch: NSObject {
             v2rayProcess.interrupt()
             v2rayProcess.terminate()
             v2rayProcess.waitUntilExit()
+            usleep(useconds_t(1 * second))
         }
+        // kill self v2ray
+        killSelfV2ray()
     }
     
     static func OpenLogs() {
@@ -227,8 +260,20 @@ class V2rayLaunch: NSObject {
             webServer["/pac/:path"] = shareFilesFromDirectory(AppHomePath + "/pac")
 
             // check pacPort is usable
-            let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
-            closePort(port: pacPort)
+            let pacPort = getPacPort()
+            // port has been used
+            if isPortOpen(port: pacPort) {
+                var toast = ""
+                if Locale.current.languageCode == "en" {
+                    toast = "pac port \(pacPort) has been used, please replace from advance setting"
+                } else {
+                    toast = "pac端口 \(pacPort) 已被使用, 请更换"
+                }
+                makeToast(message: toast, displayDuration: 10)
+                preferencesWindowController.show(preferencePane: .advanceTab)
+                return
+            }
+            
             try webServer.start(pacPort)
             print("webServer.start at:\(pacPort)")
         } catch let error {
