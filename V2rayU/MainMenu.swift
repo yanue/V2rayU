@@ -41,8 +41,11 @@ var qrcodeWindow = QrcodeWindowController()
 var toastWindowCtrl =  ToastWindowController()
 
 func makeToast(message: String, displayDuration: Double? = 2) {
+    toastWindowCtrl.close()
+    toastWindowCtrl = ToastWindowController()
     toastWindowCtrl.message = message
-    toastWindowCtrl.showWindow(Any.self)
+    toastWindowCtrl.showWindow(nil)
+    toastWindowCtrl.becomeFirstResponder()
     toastWindowCtrl.fadeInHud(displayDuration)
 }
 
@@ -50,17 +53,11 @@ func ToggleRunning(_ toast: Bool = true) {
     // turn off
     if UserDefaults.getBool(forKey: .v2rayTurnOn) {
         menuController.stopV2rayCore()
-        if toast {
-            makeToast(message: "v2ray-core: Off")
-        }
         return
     }
 
     // start
     menuController.startV2rayCore()
-    if toast {
-        makeToast(message: "v2ray-core: On")
-    }
 }
 
 func SwitchProxyMode() {
@@ -69,15 +66,12 @@ func SwitchProxyMode() {
     switch runMode {
     case .pac:
         menuController.switchRunMode(runMode: .global)
-        makeToast(message: "V2rayU: global Mode")
         break
     case .global:
         menuController.switchRunMode(runMode: .manual)
-        makeToast(message: "V2rayU: manual Mode")
         break
     case .manual:
         menuController.switchRunMode(runMode: .pac)
-        makeToast(message: "V2rayU: pac Mode")
         break
 
     default: break
@@ -275,13 +269,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // create json file
         V2rayLaunch.createJsonFile(item: v2ray)
-
-        // set status
-        setStatusOn(runMode: runMode)
-
-        // launch
-        V2rayLaunch.Start()
-        NSLog("start v2ray-core done.")
 
         // switch run mode
         self.switchRunMode(runMode: runMode)
@@ -527,10 +514,15 @@ class MenuController: NSObject, NSMenuDelegate {
         self.pacMode.state = runMode == .pac ? .on : .off
         self.manualMode.state = runMode == .manual ? .on : .off
        
+        // launch
+        let started = V2rayLaunch.Start()
+        if !started {
+            return
+        }
+        
         // set icon
         setStatusOn(runMode: runMode)
-        // launch
-        V2rayLaunch.Start()
+        
         // manual mode
         if lastRunMode == RunMode.manual.rawValue {
             // backup first

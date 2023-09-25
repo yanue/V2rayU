@@ -102,7 +102,7 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func Start() {
+    static func Start() -> Bool {
         // start http server
         startHttpServer()
         
@@ -128,7 +128,7 @@ class V2rayLaunch: NSObject {
             makeToast(message: toast, displayDuration: 10)
             menuController.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
-            return
+            return false
         }
         
         // port has been used
@@ -142,7 +142,7 @@ class V2rayLaunch: NSObject {
             makeToast(message: toast, displayDuration: 10)
             menuController.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
-            return
+            return false
         }
             
         // reinstance
@@ -160,7 +160,7 @@ class V2rayLaunch: NSObject {
                     DispatchQueue.main.async {
                         NSLog("V2rayLaunch process been killed, restart now")
                         V2rayLaunch.Stop()
-                        V2rayLaunch.Start()
+                        _ = V2rayLaunch.Start()
                     }
                 }
             }
@@ -171,10 +171,12 @@ class V2rayLaunch: NSObject {
         // ping and select server
         if let v2ray = V2rayServer.loadSelectedItem() {
             // ping and refresh
-            DispatchQueue.global().async {
+            DispatchQueue.global(qos: .background).async {
                 PingCurrent(item: v2ray).doPing()
             }
         }
+        
+        return true
     }
 
     static func Stop() {
