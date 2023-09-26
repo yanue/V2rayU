@@ -412,7 +412,9 @@ class V2raySubSync: NSObject {
             usleep(useconds_t(1 * second))
             do {
                 // refresh server
-                menuController.showServers()
+                DispatchQueue.main.async {
+                    menuController.showServers()
+                }
                 usleep(useconds_t(2 * second))
                 // do ping
                 ping.pingAll()

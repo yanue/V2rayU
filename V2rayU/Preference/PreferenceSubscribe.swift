@@ -46,19 +46,22 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         V2raySubscribe.loadConfig()
 
         // set global hotkey
-        let notifyCenter = NotificationCenter.default
-        notifyCenter.addObserver(forName: NOTIFY_UPDATE_SubSync, object: nil, queue: nil, using: {
-            notice in
-            self.tip += notice.object as? String ?? ""
-
-            // fix: must be used from main thread only
-            DispatchQueue.main.async {
-                self.logArea.string = self.tip
-                self.logArea.scrollToEndOfDocument("")
-            }
-        })
+        NotificationCenter.default.addObserver(self, selector: #selector(self.updateTip), name: NOTIFY_UPDATE_SubSync, object: nil)
+    }
+    
+    deinit {
+       NotificationCenter.default.removeObserver(self,name: NOTIFY_UPDATE_SubSync, object: nil)
     }
 
+    @objc func  updateTip(notification: Notification) {
+        self.tip += notification.object as? String ?? ""
+
+        DispatchQueue.main.async {
+            self.logArea.string = self.tip
+            self.logArea.scrollToEndOfDocument("")
+        }
+    }
+    
     @IBAction func addSubscribe(_ sender: Any) {
         var url = self.url.stringValue
         var remark = self.remark.stringValue

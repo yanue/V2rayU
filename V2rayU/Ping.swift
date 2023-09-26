@@ -79,8 +79,10 @@ class PingSpeed: NSObject {
             inPing = false
             usleep(useconds_t(1 * second))
             do {
-                menuController.setStatusMenuTip(pingTip: "Ping Speed...")
-                menuController.showServers()
+                DispatchQueue.main.async {
+                    menuController.setStatusMenuTip(pingTip: "Ping Speed...")
+                    menuController.showServers()
+                }
             }
             // kill after ping
             killAllPing()
@@ -266,7 +268,9 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
             }
         } else {
             inPingCurrent = false
-            menuController.showServers()
+            DispatchQueue.main.async {
+                menuController.showServers()
+            }
         }
     }
 

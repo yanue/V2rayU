@@ -135,7 +135,10 @@ class MenuController: NSObject, NSMenuDelegate {
     override func awakeFromNib() {
         print("awakeFromNib")
         newVersionItem.isHidden = true
-        
+        self.runAtStart()
+    }
+    
+    func runAtStart(){
         // kill v2ray
         killSelfV2ray()
         
@@ -186,7 +189,7 @@ class MenuController: NSObject, NSMenuDelegate {
             // show off status
             self.setStatusOff()
         }
-
+        
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             V2raySubSync().sync()
