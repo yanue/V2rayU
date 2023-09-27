@@ -62,7 +62,7 @@
 /* Class = "NSMenuItem"; title = "Cut"; ObjectID = "Jms-CT-Lld"; */
 "Jms-CT-Lld.title" = "Cut";
 
-/* Class = "NSMenuItem"; title = "Subscribe..."; ObjectID = "JuC-lf-LpQ"; */
+/* Class = "NSMenuItem"; title = "Subscription..."; ObjectID = "JuC-lf-LpQ"; */
 "JuC-lf-LpQ.title" = "訂閱設置";
 
 /* Class = "NSMenuItem"; ibShadowedToolTip = "ss:// or vmess://"; ObjectID = "Kct-KD-qPN"; */

@@ -56,7 +56,7 @@ final class PreferenceDnsViewController: NSViewController, PreferencePane {
                                 v2rayConfig.dnsJson = str
 
                                 // set current server item and reload v2ray-core
-                                regenerateAllConfig()
+                                V2rayLaunch.restartV2ray()
 
                                 self.dnsJson.string = reStr
                             } else {

@@ -607,3 +607,37 @@ class Scanner {
         return qrCodeLink
     }
 }
+
+func importUri(url: String) {
+    let urls = url.split(separator: "\n")
+
+    for url in urls {
+        let uri = url.trimmingCharacters(in: .whitespaces)
+
+        if uri.count == 0 {
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
+            continue
+        }
+
+        // ss://YWVzLTI1Ni1jZmI6ZUlXMERuazY5NDU0ZTZuU3d1c3B2OURtUzIwMXRRMERAMTcyLjEwNS43MS44Mjo4MDk5#翻墙党325.06美国 类型这种含中文的格式不是标准的URL格式
+        if !ImportUri.supportProtocol(uri: uri) {
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
+            continue
+        }
+
+        if let importUri = ImportUri.importUri(uri: uri) {
+            if importUri.isValid {
+                // add server
+                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
+                // refresh server
+                self.showServers()
+                noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)
+            } else {
+                noticeTip(title: "import server fail", subtitle: "", informativeText: importUri.error)
+            }
+            continue
+        } else {
+            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
+        }
+    }
+}

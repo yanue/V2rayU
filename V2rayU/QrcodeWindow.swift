@@ -7,6 +7,23 @@ import Cocoa
 import Cocoa
 import QRCoder
 
+var qrcodeWindow = QrcodeWindowController()
+
+func showQRCode(uri: String) {
+    // close before
+    qrcodeWindow.close()
+    // renew
+    qrcodeWindow = QrcodeWindowController()
+    // show window
+    qrcodeWindow.showWindow(nil)
+    // center
+    qrcodeWindow.window?.center()
+    // set uri
+    qrcodeWindow.setShareUri(uri: uri)
+    // bring to front
+    NSApp.activate(ignoringOtherApps: true)
+}
+
 class QrcodeWindowController: NSWindowController {
     override var windowNibName: String? {
         return "QrcodeWindow" // no extension .xib here

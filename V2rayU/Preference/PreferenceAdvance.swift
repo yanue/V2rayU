@@ -119,12 +119,11 @@ final class PreferenceAdvanceViewController: NSViewController, PreferencePane {
         v2rayConfig.mux = Int(muxConcurrentVal)
         v2rayConfig.logLevel = logLevelName
 
-        // set current server item and reload v2ray-core
-        regenerateAllConfig()
-
         _ = GeneratePACFile(rewrite: true)
         // restart pac http server
         V2rayLaunch.startHttpServer()
+        // restart v2ray
+        V2rayLaunch.restartV2ray()
 
         self.tips.stringValue = "save success."
 

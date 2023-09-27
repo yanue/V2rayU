@@ -32,15 +32,15 @@
 		66A77BE3268225790097A126 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66A77BE2268225790097A126 /* v2ray-core */; };
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
-		66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */; };
+		66BC2B89228C589E00FBB716 /* V2raySubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscription.swift */; };
 		66F07CF9236D79540088A4AE /* Ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* Ping.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
 		6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF7F662C35646734A352E /* install.sh */; };
 		6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF12EA09D2D80788666D0 /* QrcodeWindow.swift */; };
-		6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */; };
+		6D6DF2F2DFB2234541488BBD /* PreferenceSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF5345E4582EE0EBD468D /* PreferenceSubscription.swift */; };
 		6D6DF41FA8F7C7B020AC4115 /* Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF79424C83391C205CB9C /* Share.swift */; };
-		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */; };
+		6D6DF51271B1AF55EACC79F2 /* PreferenceSubscription.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D6DF0CCE47F1253DECD5855 /* PreferenceSubscription.strings */; };
 		6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */; };
 		6D6DF670FFB063EE2360776C /* Uri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF11F0983AFCBEF1E347B /* Uri.swift */; };
 		6D6DF6F065067CD879201FF9 /* Import.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF87840CDA04AF0E9D36E /* Import.swift */; };
@@ -147,7 +147,7 @@
 		669A73AB233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceAdvance.strings"; sourceTree = "<group>"; };
 		669A73AC233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceGeneral.strings"; sourceTree = "<group>"; };
 		669A73AD233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferencePac.strings"; sourceTree = "<group>"; };
-		669A73AE233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceSubscribe.strings"; sourceTree = "<group>"; };
+		669A73AE233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceSubscription.strings"; sourceTree = "<group>"; };
 		669A73AF233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A77BE2268225790097A126 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 		66AD532E241496FE0070529C /* Shortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shortcut.h; sourceTree = "<group>"; };
 		66AD5330241496FF0070529C /* Shortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
-		66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscribe.swift; sourceTree = "<group>"; };
+		66BC2B88228C589E00FBB716 /* V2raySubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscription.swift; sourceTree = "<group>"; };
 		66C5B194240B58B8008A22CA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = ../en.lproj/PreferenceAdvance.strings; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* Ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ping.swift; sourceTree = "<group>"; };
 		66F3029C22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		66F302A022AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceAdvance.strings"; sourceTree = "<group>"; };
 		66F302A122AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceGeneral.strings"; sourceTree = "<group>"; };
 		66F302A222AAA0A700FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferencePac.strings"; sourceTree = "<group>"; };
-		66F302A322AAA0A700FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceSubscribe.strings"; sourceTree = "<group>"; };
+		66F302A322AAA0A700FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceSubscription.strings"; sourceTree = "<group>"; };
 		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		6D6DF085C3C411989C416D0D /* user-rule.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
@@ -175,7 +175,7 @@
 		6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencePac.swift; sourceTree = "<group>"; };
 		6D6DF3A2857899778B719CE1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAbout.xib; sourceTree = SOURCE_ROOT; };
 		6D6DF3C1564D0EBC5A99C9C1 /* gfwlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
-		6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSubscribe.swift; sourceTree = "<group>"; };
+		6D6DF5345E4582EE0EBD468D /* PreferenceSubscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSubscription.swift; sourceTree = "<group>"; };
 		6D6DF69C7CA7EBEFFE8E22D1 /* abp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
 		6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceAdvance.swift; sourceTree = "<group>"; };
 		6D6DF79424C83391C205CB9C /* Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Share.swift; sourceTree = "<group>"; };
@@ -185,7 +185,7 @@
 		6D6DF87840CDA04AF0E9D36E /* Import.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Import.swift; sourceTree = "<group>"; };
 		6D6DF8F5112A8407EE959998 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
 		6D6DF927AC79EEF7378C192A /* appdmg.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
-		6D6DFD730D8572B1FCAB1FFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceSubscribe.xib; sourceTree = SOURCE_ROOT; };
+		6D6DFD730D8572B1FCAB1FFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceSubscription.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFD9F5991B38B128888D6 /* V2rayConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayConfig.swift; sourceTree = "<group>"; };
 		6D6DFE1CDFAD9828F2FDE1A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceAdvance.xib; sourceTree = SOURCE_ROOT; };
 		6D6DFEB25B88118513B9F581 /* PreferenceDns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceDns.swift; sourceTree = "<group>"; };
@@ -266,7 +266,7 @@
 				66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */,
 				660D0E59216E0158000C2922 /* V2rayServer.swift */,
 				663F040525ED4B2C00687600 /* V2rayLaunch.swift */,
-				66BC2B88228C589E00FBB716 /* V2raySubscribe.swift */,
+				66BC2B88228C589E00FBB716 /* V2raySubscription.swift */,
 				66784AFB2170486D00AD307F /* Util.swift */,
 				6D6DF87840CDA04AF0E9D36E /* Import.swift */,
 				664EB37B216C9A5F00B6AE0D /* Info.plist */,
@@ -320,7 +320,7 @@
 			children = (
 				6D6DF870C8E334815FBA78B2 /* PreferenceAbout.swift */,
 				6D6DF3151BBA6E56836AF6DE /* PreferencePac.swift */,
-				6D6DF5345E4582EE0EBD468D /* PreferenceSubscribe.swift */,
+				6D6DF5345E4582EE0EBD468D /* PreferenceSubscription.swift */,
 				6D6DFFB29020127E034AD168 /* PreferenceGeneral.swift */,
 				6D6DF701C75D8D416096D717 /* PreferenceAdvance.swift */,
 				66193A8523EE45B200289B6A /* PreferenceRouting.swift */,
@@ -329,7 +329,7 @@
 				6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */,
 				6D6DF76CE2762F4A33DB32BD /* PreferenceGeneral.strings */,
 				6D6DFE89E1A7BFE2AC1D8871 /* PreferencePac.strings */,
-				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */,
+				6D6DF0CCE47F1253DECD5855 /* PreferenceSubscription.strings */,
 				66193A8723EE46BC00289B6A /* PreferenceRouting.xib */,
 				6662C209240EA782000AF6CD /* PreferenceDns.xib */,
 			);
@@ -478,7 +478,7 @@
 				6D6DFC1618D163A9DFE3B628 /* PreferenceGeneral.strings in Resources */,
 				6D6DFFD18860EBE148F6DF1F /* PreferencePac.strings in Resources */,
 				66193A8923EE46BC00289B6A /* PreferenceRouting.xib in Resources */,
-				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscribe.strings in Resources */,
+				6D6DF51271B1AF55EACC79F2 /* PreferenceSubscription.strings in Resources */,
 				6D6DF0D1DC87F9423F490B31 /* install.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -551,9 +551,9 @@
 				6D6DF2CF13D9FD3C7C6492A4 /* QrcodeWindow.swift in Sources */,
 				6D6DF93B58B654D86ACC490E /* PreferenceAbout.swift in Sources */,
 				6D6DF87497313615AFE3320A /* PreferencePac.swift in Sources */,
-				6D6DF2F2DFB2234541488BBD /* PreferenceSubscribe.swift in Sources */,
+				6D6DF2F2DFB2234541488BBD /* PreferenceSubscription.swift in Sources */,
 				6D6DF6553CF221AEB71913EE /* PreferenceGeneral.swift in Sources */,
-				66BC2B89228C589E00FBB716 /* V2raySubscribe.swift in Sources */,
+				66BC2B89228C589E00FBB716 /* V2raySubscription.swift in Sources */,
 				6D6DF807BE591BE396221EF3 /* PreferenceAdvance.swift in Sources */,
 				6D6DFC1D9432F2A60D2156E2 /* PreferenceDns.swift in Sources */,
 				6D6DF670FFB063EE2360776C /* Uri.swift in Sources */,
@@ -648,14 +648,14 @@
 			name = ConfigWindow.xib;
 			sourceTree = "<group>";
 		};
-		6D6DF0CCE47F1253DECD5855 /* PreferenceSubscribe.strings */ = {
+		6D6DF0CCE47F1253DECD5855 /* PreferenceSubscription.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6D6DFD730D8572B1FCAB1FFE /* Base */,
 				66F302A322AAA0A700FCA4E2 /* zh-Hans */,
 				669A73AE233776B900807CF9 /* zh-HK */,
 			);
-			name = PreferenceSubscribe.strings;
+			name = PreferenceSubscription.strings;
 			sourceTree = "<group>";
 		};
 		6D6DF586D59F646DD1C552F1 /* PreferenceAdvance.strings */ = {

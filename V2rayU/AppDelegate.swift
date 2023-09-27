@@ -12,13 +12,36 @@ import AppCenter
 import AppCenterAnalytics
 import AppCenterCrashes
 import MASShortcut
+import Preferences
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
+let V2rayUpdater = SUUpdater()
 
 let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
 let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
 
+extension PreferencePane.Identifier {
+    static let generalTab = Identifier("generalTab")
+    static let advanceTab = Identifier("advanceTab")
+    static let subscribeTab = Identifier("subscribeTab")
+    static let pacTab = Identifier("pacTab")
+    static let routingTab = Identifier("routingTab")
+    static let dnsTab = Identifier("dnsTab")
+    static let aboutTab = Identifier("aboutTab")
+}
+
+let preferencesWindowController = PreferencesWindowController(
+        preferencePanes: [
+            PreferenceGeneralViewController(),
+            PreferenceAdvanceViewController(),
+            PreferenceSubscribeViewController(),
+            PreferencePacViewController(),
+            PreferenceRoutingViewController(),
+            PreferenceDnsViewController(),
+            PreferenceAboutViewController(),
+        ]
+)
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -58,20 +81,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let notifyCenter = NotificationCenter.default
         notifyCenter.addObserver(forName: NOTIFY_TOGGLE_RUNNING_SHORTCUT, object: nil, queue: nil, using: {
             notice in
-            ToggleRunning()
+            V2rayLaunch.ToggleRunning()
         })
 
         notifyCenter.addObserver(forName: NOTIFY_SWITCH_PROXY_MODE_SHORTCUT, object: nil, queue: nil, using: {
             notice in
-            SwitchProxyMode()
+            V2rayLaunch.SwitchProxyMode()
         })
 
         // Register global hotkey
         ShortcutsController.bindShortcuts()
 
+        // run at start
+        V2rayLaunch.runAtStart()
+
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            menuController.checkV2rayUVersion()
+            checkV2rayUVersion()
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
@@ -121,13 +147,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            menuController.checkV2rayUVersion()
+            checkV2rayUVersion()
             // check version
             V2rayUpdater.checkForUpdatesInBackground()
         }
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            V2raySubSync().sync()
+            v2raySubSync.sync()
         }
         // ping
         ping.pingAll()
@@ -137,8 +163,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSLog("onSleepNote")
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        print("applicationWillTerminate")
+    func applicationShouldTerminate (_ sender: NSApplication) -> NSApplication.TerminateReply {
+        print("applicationShouldTerminate")
         // unregister All shortcut
         MASShortcutMonitor.shared().unregisterAllShortcuts()
         // Insert code here to tear down your application
@@ -147,5 +173,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         V2rayLaunch.setSystemProxy(mode: .off)
         // kill v2ray
         killSelfV2ray()
+        // webServer stop
+        webServer.stop()
+        // code
+        return NSApplication.TerminateReply.*
+    }
+
+    func applicationWillTerminate(_ aNotification: Notification) {
     }
 }

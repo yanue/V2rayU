@@ -48,7 +48,7 @@ class PingSpeed: NSObject {
         menuController.setStatusMenuTip(pingTip: pingTip)
         // in ping
         inPing = true
-        let pingQueue = DispatchQueue(label: "pingQueue", attributes: .concurrent)
+        let pingQueue = DispatchQueue(label: "pingQueue", qos: .background, attributes: .concurrent)
         for item in itemList {
             unpingServers[item.name] = true
             pingQueue.async {

@@ -8,6 +8,25 @@
 
 import Cocoa
 
+var toastWindowCtrl =  ToastWindowController()
+
+func makeToast(message: String, displayDuration: Double? = 2) {
+    toastWindowCtrl.close()
+    toastWindowCtrl = ToastWindowController()
+    toastWindowCtrl.message = message
+    toastWindowCtrl.showWindow(nil)
+    toastWindowCtrl.becomeFirstResponder()
+    toastWindowCtrl.fadeInHud(displayDuration)
+}
+
+func alertDialog(title: String, message: String) -> Bool {
+    let myPopup = NSAlert()
+    myPopup.messageText = title
+    myPopup.informativeText = message
+    myPopup.alertStyle = NSAlertStyle.warning
+    return myPopup.runModal() == NSAlertFirstButtonReturn
+}
+
 class ToastWindowController: NSWindowController {
 
     override var windowNibName: String? {

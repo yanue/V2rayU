@@ -13,7 +13,7 @@ import SwiftyJSON
 
 final class PreferenceSubscribeViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.subscribeTab
-    let preferencePaneTitle = "Subscribe"
+    let preferencePaneTitle = "Subscription"
     let toolbarItemIcon = NSImage(named: NSImage.userAccountsName)!
     let tableViewDragType: String = "v2ray.subscribe"
     var tip: String = ""
@@ -30,7 +30,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
 
     // our variable
     override var nibName: NSNib.Name? {
-        return "PreferenceSubscribe"
+        return "PreferenceSubscription"
     }
 
     override func viewDidLoad() {
@@ -43,7 +43,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         self.logArea.string = ""
 
         // reload tableview
-        V2raySubscribe.loadConfig()
+        V2raySubscription.loadConfig()
 
         // set global hotkey
         NotificationCenter.default.addObserver(self, selector: #selector(self.updateTip), name: NOTIFY_UPDATE_SubSync, object: nil)
@@ -95,7 +95,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         }
 
         // add to server
-        V2raySubscribe.add(remark: remark, url: url)
+        V2raySubscription.add(remark: remark, url: url)
 
         // reset
         self.remark.stringValue = ""
@@ -108,16 +108,16 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
     @IBAction func removeSubscribe(_ sender: Any) {
         let idx = self.tableView.selectedRow
         if self.tableView.selectedRow > -1 {
-            if let item = V2raySubscribe.loadSubItem(idx: idx) {
+            if let item = V2raySubscription.loadSubItem(idx: idx) {
                 print("remove sub item", item.name, item.url)
                 // remove old v2ray servers by subscribe
                 V2rayServer.remove(subscribe: item.name)
             }
             // remove subscribe
-            V2raySubscribe.remove(idx: idx)
+            V2raySubscription.remove(idx: idx)
 
             // selected prev row
-            let cnt: Int = V2raySubscribe.count()
+            let cnt: Int = V2raySubscription.count()
             var rowIndex: Int = idx - 1
             if idx > 0 && idx < cnt {
                 rowIndex = idx
@@ -150,20 +150,20 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         self.logArea.string = ""
         self.tip = ""
 
-        // update Subscribe
-        V2raySubSync().sync()
+        // update Subscription
+        v2raySubSync.sync()
     }
 }
 
 extension PreferenceSubscribeViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return V2raySubscribe.count()
+        return V2raySubscription.count()
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let identifier = tableColumn?.identifier as NSString?
-        var data = V2raySubscribe.list()
+        var data = V2raySubscription.list()
         if (identifier == "remarkCell") {
             let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "remarkCell"), owner: self) as! NSTableCellView
             cell.textField?.stringValue = data[row].remark

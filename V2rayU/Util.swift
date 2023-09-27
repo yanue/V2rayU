@@ -13,9 +13,9 @@ extension UserDefaults {
     enum KEY: String {
         // v2ray-core version
         case xRayCoreVersion
-        // v2ray server item list
+        // v2ray server item list
         case v2rayServerList
-        // v2ray subscribe item list
+        // v2ray subscribe item list
         case v2raySubList
         // current v2ray server name
         case v2rayCurrentServerName
@@ -543,4 +543,45 @@ func killSelfV2ray(){
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     NSLog("killSelfV2ray: \(String(describing: msg))")
+}
+
+
+func OpenLogs() {
+    if !FileManager.default.fileExists(atPath: logFilePath) {
+        let txt = ""
+        try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+    }
+
+    let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
+    task.waitUntilExit()
+    if task.terminationStatus == 0 {
+        NSLog("open logs succeeded.")
+    } else {
+        NSLog("open logs failed.")
+    }
+}
+
+func ClearLogs() {
+    let txt = ""
+    try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+}
+
+func showDock(state: Bool) -> Bool {
+    // Get transform state.
+    var transformState: ProcessApplicationTransformState
+    if state {
+        transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
+    } else {
+        transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+    }
+
+    // Show / hide dock icon.
+    var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+    let transformStatus: OSStatus = TransformProcessType(&psn, transformState)
+
+    return transformStatus == 0
+}
+
+func noticeTip(title: String = "", informativeText: String = "") {
+    makeToast(message: title + " : " + informativeText)
 }

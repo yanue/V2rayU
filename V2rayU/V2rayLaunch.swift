@@ -102,51 +102,165 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func Start() -> Bool {
+    static func runAtStart(){
+        // install before launch
+        V2rayLaunch.install()
+
+        // kill v2ray
+        killSelfV2ray()
+
         // start http server
         startHttpServer()
-        
+
+        // start or show servers
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            // start and show servers
+            self.startV2rayCore()
+        } else {
+            // show off status
+            menuController.setStatusOff()
+            // show servers
+            menuController.showServers()
+        }
+
+        // auto update subscribe servers
+        if UserDefaults.getBool(forKey: .autoUpdateServers) {
+            v2raySubSync.sync()
+        }
+    }
+
+    static func SwitchProxyMode() {
+        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
+
+        switch runMode {
+        case .pac:
+            self.SwitchRunMode(mode: .global)
+            break
+        case .global:
+            self.SwitchRunMode(mode: .manual)
+            break
+        case .manual:
+            self.SwitchRunMode(mode: .pac)
+            break
+
+        default: break
+        }
+    }
+
+    static func SwitchRunMode(mode: RunMode) {
+        // save
+        UserDefaults.set(forKey: .runMode, value: runMode.rawValue)
+
+        // launch
+        let started = V2rayLaunch.Start()
+        if !started {
+            menuController.setStatusOff()
+            return
+        }
+
+        // set icon
+        menuController.setStatusOn(mode: mode)
+
+        self.setSystemProxy(mode: mode)
+    }
+
+    static func ToggleRunning() {
+        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            V2rayLaunch.stopV2rayCore()
+        } else {
+            V2rayLaunch.startV2rayCore()
+        }
+    }
+
+    static func restartV2ray(){
+        // stop first
+        V2rayLaunch.Stop()
+        // start
+        self.startV2rayCore()
+    }
+
+    // start v2ray core
+    static func startV2rayCore() {
+        NSLog("start v2ray-core begin")
+        guard let v2ray = V2rayServer.loadSelectedItem() else {
+            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
+            menuController.setStatusOff()
+            return
+        }
+
+        if !v2ray.isValid {
+            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
+            menuController.setStatusOff()
+            return
+        }
+
+        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
+
+        // create json file
+        self.createJsonFile(item: v2ray)
+
+        // switch run mode
+        self.SwitchRunMode(mode: runMode)
+
+        // reload menu
+        menuController.showServers()
+    }
+
+    static func stopV2rayCore() {
+        // set status
+        menuController.setStatusOff()
+        // stop launch
+        V2rayLaunch.Stop()
+        // off system proxy
+        V2rayLaunch.setSystemProxy(mode: .off)
+        // reload menu
+        menuController.showServers()
+    }
+
+    static func Start() -> Bool {
         // permission
         _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod +x ./v2ray-core/v2ray"])
 
         // stop before
         self.stopV2ray()
 
-        
+        // restart http server
+        startHttpServer()
+
         // close port
         let httpPort = getHttpProxyPort()
         let sockPort = getSocksProxyPort()
     
         // port has been used
         if isPortOpen(port: httpPort) {
-            var toast = ""
+            var toast = "http端口 \(httpPort) 已被使用, 请更换"
+            var title = "端口已被占用"
             if Locale.current.languageCode == "en" {
-                toast = "http port \(httpPort) has been used, please replace from advance setting"
-            } else {
-                toast = "http端口 \(httpPort) 已被使用, 请更换"
+                toast = "http port \(httpPort) has been used, please replace it from advance setting"
+                title = "Port is already in use"
             }
-            makeToast(message: toast, displayDuration: 10)
-            menuController.stopV2rayCore()
+            alertDialog(message: toast, title: title)
+            self.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
             return false
         }
         
         // port has been used
         if isPortOpen(port: sockPort) {
-            var toast = ""
+            var toast = "socks端口 \(sockPort) 已被使用, 请更换"
+            var title = "端口已被占用"
             if Locale.current.languageCode == "en" {
-                toast = "socks port \(sockPort) has been used, please replace from advance setting"
-            } else {
-                toast = "socks端口 \(sockPort) 已被使用, 请更换"
+                toast = "socks port \(sockPort) has been used, please replace it from advance setting"
+                title = "Port is already in use"
             }
-            makeToast(message: toast, displayDuration: 10)
-            menuController.stopV2rayCore()
+            alertDialog(message: toast, title: title)
+            self.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
             return false
         }
-            
+
         // reinstance
-        // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
+        // can't use `/bin/bash -c cmd...` otherwise v2ray process will become a ghost process
         v2rayProcess = Process()
         v2rayProcess.launchPath = v2rayCoreFile
         v2rayProcess.arguments = ["-config", JsonConfigFilePath]
@@ -180,9 +294,6 @@ class V2rayLaunch: NSObject {
     }
 
     static func Stop() {
-        // stop pac server
-        webServer.stop()
-
         self.stopV2ray()
     }
     
@@ -198,26 +309,6 @@ class V2rayLaunch: NSObject {
         }
         // kill self v2ray
         killSelfV2ray()
-    }
-    
-    static func OpenLogs() {
-        if !FileManager.default.fileExists(atPath: logFilePath) {
-            let txt = ""
-            try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
-        }
-
-        let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("open logs succeeded.")
-        } else {
-            NSLog("open logs failed.")
-        }
-    }
-
-    static func ClearLogs() {
-        let txt = ""
-        try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
     }
 
     static func setSystemProxy(mode: RunMode) {
@@ -265,13 +356,13 @@ class V2rayLaunch: NSObject {
             let pacPort = getPacPort()
             // port has been used
             if isPortOpen(port: pacPort) {
-                var toast = ""
+                var toast = "pac端口 \(pacPort) 已被使用, 请更换"
+                var title = "端口已被占用"
                 if Locale.current.languageCode == "en" {
                     toast = "pac port \(pacPort) has been used, please replace from advance setting"
-                } else {
-                    toast = "pac端口 \(pacPort) 已被使用, 请更换"
+                    title = "Port is already in use"
                 }
-                makeToast(message: toast, displayDuration: 10)
+                alertDialog(message: toast, title: title)
                 preferencesWindowController.show(preferencePane: .advanceTab)
                 return
             }
@@ -320,6 +411,59 @@ class V2rayLaunch: NSObject {
         } catch let error {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
             NSLog("save json file fail: \(error)")
+        }
+    }
+}
+
+func checkV2rayUVersion() {
+    // 当前版本检测
+    Alamofire.request("https://api.github.com/repos/yanue/V2rayU/releases/latest").responseJSON { [self] response in
+        //to get status code
+        if let status = response.response?.statusCode {
+            if status != 200 {
+                NSLog("error with response status: ", status)
+                return
+            }
+        }
+
+        //to get JSON return value
+        if let result = response.result.value {
+            guard let JSON = result as NSDictionary else {
+                NSLog("error: no tag_name")
+                return
+            }
+
+            // get tag_name (version)
+            guard let tag_name = JSON["tag_name"] else {
+                NSLog("error: no tag_name")
+                return
+            }
+
+            // get prerelease and draft
+            guard let prerelease = JSON["prerelease"], let draft = JSON["draft"] else {
+                // get
+                NSLog("error: get prerelease or draft")
+                return
+            }
+
+            // not pre release or draft
+            if prerelease as! Bool == true || draft as! Bool == true {
+                NSLog("this release is a prerelease or draft")
+                return
+            }
+
+            let newVer = (tag_name as! String)
+            // get old version
+            let oldVer = appVersion.replacingOccurrences(of: "v", with: "").versionToInt()
+            let curVer = newVer.replacingOccurrences(of: "v", with: "").versionToInt()
+
+            // compare with [Int]
+            if oldVer.lexicographicallyPrecedes(curVer) {
+                newVersionItem.isHidden = false
+                newVersionItem.title = "has new version " + newVer
+            } else {
+                newVersionItem.isHidden = true
+            }
         }
     }
 }

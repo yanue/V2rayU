@@ -1,5 +1,5 @@
 //
-//  V2raySubscribe.swift
+//  V2raySubscription.swift
 //  V2rayU
 //
 //  Created by yanue on 2019/5/15.
@@ -12,15 +12,15 @@ import SwiftyJSON
 import Yams
 
 // ----- v2ray subscribe manager -----
-class V2raySubscribe: NSObject {
-    static var shared = V2raySubscribe()
+class V2raySubscription: NSObject {
+    static var shared = V2raySubscription()
     static let lock = NSLock()
     
     // Initialization
     override init() {
         super.init()
-        print("V2raySubscribe init")
-        V2raySubscribe.loadConfig()
+        print("V2raySubscription init")
+        V2raySubscription.loadConfig()
     }
 
     // v2ray subscribe list
@@ -96,11 +96,11 @@ class V2raySubscribe: NSObject {
 
     // move item to new index
     static func move(oldIndex: Int, newIndex: Int) {
-        if !V2raySubscribe.v2raySubList.indices.contains(oldIndex) {
+        if !V2raySubscription.v2raySubList.indices.contains(oldIndex) {
             NSLog("index out of range", oldIndex)
             return
         }
-        if !V2raySubscribe.v2raySubList.indices.contains(newIndex) {
+        if !V2raySubscription.v2raySubList.indices.contains(newIndex) {
             NSLog("index out of range", newIndex)
             return
         }
@@ -136,12 +136,12 @@ class V2raySubscribe: NSObject {
 
     // remove v2ray subscribe (tmp and UserDefaults and config json file)
     static func remove(idx: Int) {
-        if !V2raySubscribe.v2raySubList.indices.contains(idx) {
+        if !V2raySubscription.v2raySubList.indices.contains(idx) {
             NSLog("index out of range", idx)
             return
         }
 
-        let v2ray = V2raySubscribe.v2raySubList[idx]
+        let v2ray = V2raySubscription.v2raySubList[idx]
 
         // delete from tmp
         self.v2raySubList.remove(at: idx)
@@ -156,7 +156,7 @@ class V2raySubscribe: NSObject {
     // update subscribe list UserDefaults
     static private func saveItemList() {
         var v2raySubList: Array<String> = []
-        for item in V2raySubscribe.list() {
+        for item in V2raySubscription.list() {
             v2raySubList.append(item.name)
         }
 
@@ -165,7 +165,7 @@ class V2raySubscribe: NSObject {
 
     // load json file data
     static func loadSubItem(idx: Int) -> V2raySubItem? {
-        if !V2raySubscribe.v2raySubList.indices.contains(idx) {
+        if !V2raySubscription.v2raySubList.indices.contains(idx) {
             NSLog("index out of range", idx)
             return nil
         }
@@ -233,22 +233,24 @@ class V2raySubItem: NSObject, NSCoding {
 
 // ----- v2ray subscribe  updater -----
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
-var inSyncSubscribe = false
+
+let v2raySubSync = V2raySubSync()
 
 class V2raySubSync: NSObject {
     var todos: Dictionary = [String: Bool]()
     let lock = NSLock()
     let semaphore = DispatchSemaphore(value: 1) // work pool
+    var inSyncSubscribe = false
 
-    // sync from Subscribe list
+    // sync from Subscription list
     public func sync() {
         if inSyncSubscribe {
-            print("Subscribe in loading ...")
+            print("Subscription in loading ...")
             return
         }
-        print("sync from Subscribe list")
-        V2raySubscribe.loadConfig()
-        let list = V2raySubscribe.list()
+        print("sync from Subscription list")
+        V2raySubscription.loadConfig()
+        let list = V2raySubscription.list()
 
         if list.count == 0 {
             self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")

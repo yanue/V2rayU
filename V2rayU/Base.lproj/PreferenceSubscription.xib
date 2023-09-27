@@ -127,7 +127,7 @@
                                                     </tableCellView>
                                                 </prototypeCellViews>
                                             </tableColumn>
-                                            <tableColumn identifier="urlCell" editable="NO" width="312.5" minWidth="40" maxWidth="1000" id="kc4-bL-WBd" userLabel="Subscribe Url">
+                                            <tableColumn identifier="urlCell" editable="NO" width="312.5" minWidth="40" maxWidth="1000" id="kc4-bL-WBd" userLabel="Subscription Url">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Subscription Url ">
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>

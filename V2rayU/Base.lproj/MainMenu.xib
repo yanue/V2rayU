@@ -94,7 +94,7 @@
                         <action selector="openConfig:" target="hcZ-V7-Dui" id="cu6-mU-Y02"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Subscribe..." id="JuC-lf-LpQ">
+                <menuItem title="Subscription..." id="JuC-lf-LpQ">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="openPreferenceSubscribe:" target="hcZ-V7-Dui" id="Xax-Nj-ygb"/>
