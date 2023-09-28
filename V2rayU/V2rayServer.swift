@@ -182,10 +182,13 @@ class V2rayServer: NSObject {
     // remove v2ray server by subscribe
     static func remove(subscribe: String) {
         let curName = UserDefaults.get(forKey: .v2rayCurrentServerName)
-
+        if subscribe == "" {
+            return
+        }
+        
         for item in V2rayServer.v2rayItemList {
 //            print("remove item: ", subscribe, item.subscribe)
-            if item.subscribe == subscribe  && item.url == "" && subscribe == "" {
+            if item.subscribe == subscribe {
                 V2rayItem.remove(name: item.name)
                 // if cuerrent item is default
                 if curName != nil && item.name == curName {
@@ -196,14 +199,6 @@ class V2rayServer: NSObject {
 
         // update server list UserDefaults
         self.saveItemList()
-
-        // reload
-        V2rayServer.loadConfig()
-
-        do {
-            // refresh server
-            menuController.showServers()
-       }
     }
 
     // update server list UserDefaults

@@ -16,7 +16,7 @@ var fastV2rayName = ""
 var fastV2raySpeed = 5
 var ping = PingSpeed()
 let second: Double = 1000000
-let pingURL = URL(string: "http://www.google.com/generate_204")!
+let pingURL = URL(string: "http://www.gstatic.com/generate_204")!
 
 class PingSpeed: NSObject {
     var unpingServers: Dictionary = [String: Bool]()

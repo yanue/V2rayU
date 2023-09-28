@@ -11,6 +11,7 @@ import Cocoa
 var toastWindowCtrl =  ToastWindowController()
 
 func makeToast(message: String, displayDuration: Double? = 2) {
+    print("makeToast", message)
     toastWindowCtrl.close()
     toastWindowCtrl = ToastWindowController()
     toastWindowCtrl.message = message

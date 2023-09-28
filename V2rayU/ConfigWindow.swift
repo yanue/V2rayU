@@ -198,6 +198,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // remove
             V2rayServer.remove(idx: idx)
 
+            // reload
+            V2rayServer.loadConfig()
+            menuController.showServers()
+
             // selected prev row
             let cnt: Int = V2rayServer.count()
             var rowIndex: Int = idx - 1

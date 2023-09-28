@@ -83,8 +83,6 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane {
         UserDefaults.setArray(forKey: .routingBlockDomains, value: domains)
         UserDefaults.setArray(forKey: .routingBlockIps, value: ips)
 
-        makeToast(message: "v2ray: routing rule setting success", displayDuration: 1)
-
         // set current server item and reload v2ray-core
         V2rayLaunch.restartV2ray()
     }

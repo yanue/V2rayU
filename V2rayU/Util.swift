@@ -194,7 +194,6 @@ func shell(launchPath: String, arguments: [String]) -> String? {
         }
         return output
     }
-    return nil
 }
 
 // → /var/folders/v8/tft1q…/T/…-8DC6DD131DC1/report.pdf

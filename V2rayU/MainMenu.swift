@@ -137,9 +137,6 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayServer.loadConfig()
         // for each
         for item in V2rayServer.list() {
-            if !item.isValid {
-                continue
-            }
             validCount+=1
             let menuItem: NSMenuItem = self.buildServerItem(item: item, curSer: curSer)
             var groupTag: String = item.subscribe
@@ -233,11 +230,6 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func switchServer(_ sender: NSMenuItem) {
         guard let obj = sender.representedObject as? V2rayItem else {
             NSLog("switchServer err")
-            return
-        }
-
-        if !obj.isValid {
-            NSLog("current server is invalid", obj.remark)
             return
         }
         // set current

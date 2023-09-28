@@ -208,7 +208,7 @@ class V2rayLaunch: NSObject {
             menuController.setStatusOff()
             return
         }
-
+        
         let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
 
         // create json file
@@ -226,6 +226,9 @@ class V2rayLaunch: NSObject {
 
         // reload menu
         menuController.showServers()
+        
+        // ping current
+        PingCurrent(item: v2ray).doPing()
     }
 
     static func stopV2rayCore() {
