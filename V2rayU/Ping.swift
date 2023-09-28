@@ -318,7 +318,7 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
                 // stop first
                 V2rayLaunch.Stop()
                 // start
-                menuController.startV2rayCore()
+                V2rayLaunch.startV2rayCore()
                 // reload menu
                 menuController.showServers()
             }

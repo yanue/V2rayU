@@ -16,11 +16,7 @@ var configWindow = ConfigWindowController()
 func OpenConfigWindow(){
         if configWindow != nil {
             // close before
-            if closedByConfigWindow {
-                configWindow.close()
-                // renew
-                configWindow = ConfigWindowController()
-            }
+            
         } else {
             // renew
             configWindow = ConfigWindowController()
@@ -29,7 +25,7 @@ func OpenConfigWindow(){
         _ = showDock(state: true)
         // show window
         configWindow.showWindow(nil)
-        configWindow.window?.makeKeyAndOrderFront(self)
+        configWindow.window?.makeKeyAndOrderFront(configWindow.self)
         // bring to front
         NSApp.activate(ignoringOtherApps: true)
 }
@@ -594,9 +590,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             let v2rayItemList = V2rayServer.list()
             if curName == v2rayItemList[self.serversTableView.selectedRow].name {
                 if ok {
-                    menuController.startV2rayCore()
+                    V2rayLaunch.startV2rayCore()
                 } else {
-                    menuController.stopV2rayCore()
+                    V2rayLaunch.stopV2rayCore()
                 }
             }
         }
@@ -845,7 +841,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-        _ = menuController.showDock(state: false)
+        _ = showDock(state: false)
     }
 
     @IBAction func goAdvanceSetting(_ sender: Any) {

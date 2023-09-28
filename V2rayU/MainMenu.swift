@@ -46,7 +46,10 @@ class MenuController: NSObject, NSMenuDelegate {
         toggleV2rayItem.title = "Turn v2ray-core On"
 
         if let button = statusItem.button {
-            button.image = NSImage(named: NSImage.Name("IconOff"))
+            // UI API called on a background thread: -[NSStatusBarButton setImage:]
+            DispatchQueue.main.async {
+                button.image = NSImage(named: NSImage.Name("IconOff"))
+            }
         }
 
         self.pacMode.state = .off
@@ -57,25 +60,22 @@ class MenuController: NSObject, NSMenuDelegate {
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
     }
 
-    func setStatusOn(mode: RunMode) {
-        v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
-        toggleV2rayItem.title = "Turn v2ray-core Off"
-
+    func setModeIcon(mode: RunMode) {
         var iconName = "IconOn"
 
-        switch runMode {
+        switch mode {
         case .global:
             iconName = "IconOnG"
             self.pacMode.state = .off
             self.globalMode.state = .on
             self.manualMode.state = .off
         case .manual:
-            iconName = "IconOnP"
+            iconName = "IconOnM"
             self.pacMode.state = .off
             self.globalMode.state = .off
             self.manualMode.state = .on
         case .pac:
-            iconName = "IconOnM"
+            iconName = "IconOnP"
             self.pacMode.state = .on
             self.globalMode.state = .off
             self.manualMode.state = .off
@@ -84,9 +84,19 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         if let button = statusItem.button {
-            button.image = NSImage(named: NSImage.Name(iconName))
+            // UI API called on a background thread: -[NSStatusBarButton setImage:]
+            DispatchQueue.main.async {
+                button.image = NSImage(named: NSImage.Name(iconName))
+            }
         }
-
+    }
+    
+    func setStatusOn(mode: RunMode) {
+        v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
+        toggleV2rayItem.title = "Turn v2ray-core Off"
+        
+        self.setModeIcon(mode: mode)
+        
         // set on
         UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
     }
@@ -106,13 +116,79 @@ class MenuController: NSObject, NSMenuDelegate {
         do {
             serverItems.submenu = _subMenus
             // fix: must be used from main thread only
-            if configWindow != nil {
+            if configWindow != nil && configWindow.serversTableView != nil  {
                 DispatchQueue.main.async {
                     configWindow.serversTableView.reloadData()
                 }
             }
         }
         lock.unlock()
+    }
+    
+    func getServerMenus() -> NSMenu {
+        // default
+        let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
+        let _subMenus: NSMenu = NSMenu()
+        // add new
+        var validCount = 0
+        var groupMenus: Dictionary = [String: NSMenu]()
+        var chooseGroup = ""
+        // reload servers
+        V2rayServer.loadConfig()
+        // for each
+        for item in V2rayServer.list() {
+            if !item.isValid {
+                continue
+            }
+            validCount+=1
+            let menuItem: NSMenuItem = self.buildServerItem(item: item, curSer: curSer)
+            var groupTag: String = item.subscribe
+            if (groupTag.isEmpty) {
+                groupTag = "default"
+                _subMenus.addItem(menuItem)
+                continue
+            }
+            if item.name == curSer {
+                chooseGroup = groupTag
+            }
+
+            if let menu = groupMenus[groupTag] {
+                menu.addItem(menuItem)
+            } else {
+                let newGroupMenu: NSMenu = NSMenu()
+                groupMenus[groupTag] = newGroupMenu
+                newGroupMenu.addItem(menuItem)
+            }
+        }
+
+        // subscribe items
+        for (itemKey,menu) in groupMenus {
+            if itemKey == "default" {
+                continue
+            }
+            let newGroup: NSMenuItem = NSMenuItem()
+            var groupTagName = "🌏 订阅"
+            if let sub = V2raySubItem.load(name: itemKey) {
+                groupTagName = "🌏 " + sub.remark + " (\(menu.items.count))"
+            }
+            newGroup.submenu = menu
+            newGroup.title = groupTagName
+            newGroup.target = self
+            newGroup.isEnabled = true
+            if chooseGroup == itemKey {
+                newGroup.state = NSControl.StateValue.on
+            }
+            _subMenus.addItem(newGroup)
+        }
+
+        if validCount == 0 {
+            let menuItem: NSMenuItem = NSMenuItem()
+            menuItem.title = "no available servers."
+            menuItem.isEnabled = false
+            _subMenus.addItem(menuItem)
+        }
+
+        return _subMenus
     }
 
     // build menu item by V2rayItem
@@ -130,11 +206,11 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func openLogs(_ sender: NSMenuItem) {
-        V2rayLaunch.OpenLogs()
+        OpenLogs()
     }
 
     @IBAction func start(_ sender: NSMenuItem) {
-        ToggleRunning(false)
+        V2rayLaunch.ToggleRunning()
     }
 
     @IBAction func quitClicked(_ sender: NSMenuItem) {
@@ -166,6 +242,8 @@ class MenuController: NSObject, NSMenuDelegate {
         }
         // set current
         UserDefaults.set(forKey: .v2rayCurrentServerName, value: obj.name)
+        // restart
+        V2rayLaunch.restartV2ray()
     }
 
     // open config window
@@ -195,19 +273,19 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func switchManualMode(_ sender: NSMenuItem) {
-        // disable
-        V2rayLaunch.setSystemProxy(mode: .off)
+        UserDefaults.set(forKey: .runMode, value: RunMode.manual.rawValue)
+        V2rayLaunch.restartV2ray()
     }
 
     @IBAction func switchPacMode(_ sender: NSMenuItem) {
-        // switch mode
-        V2rayLaunch.setSystemProxy(mode: .pac)
+        UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
+        V2rayLaunch.restartV2ray()
     }
 
     // MARK: - actions
     @IBAction func switchGlobalMode(_ sender: NSMenuItem) {
-        // switch mode
-        V2rayLaunch.setSystemProxy(mode: .global)
+        UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
+        V2rayLaunch.restartV2ray()
     }
 
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
@@ -292,72 +370,6 @@ class MenuController: NSObject, NSMenuDelegate {
         }
         NSWorkspace.shared.open(url)
     }
-}
-
-func getServerMenus() -> NSMenu {
-    // default
-    let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
-    let _subMenus: NSMenu = NSMenu()
-    // add new
-    var validCount = 0
-    var groupMenus: Dictionary = [String: NSMenu]()
-    var chooseGroup = ""
-    // reload servers
-    V2rayServer.loadConfig()
-    // for each
-    for item in V2rayServer.list() {
-        if !item.isValid {
-            continue
-        }
-        validCount+=1
-        let menuItem: NSMenuItem = menuController.buildServerItem(item: item, curSer: curSer)
-        var groupTag: String = item.subscribe
-        if (groupTag.isEmpty) {
-            groupTag = "default"
-            _subMenus.addItem(menuItem)
-            continue
-        }
-        if item.name == curSer {
-            chooseGroup = groupTag
-        }
-
-        if let menu = groupMenus[groupTag] {
-            menu.addItem(menuItem)
-        } else {
-            let newGroupMenu: NSMenu = NSMenu()
-            groupMenus[groupTag] = newGroupMenu
-            newGroupMenu.addItem(menuItem)
-        }
-    }
-
-    // subscribe items
-    for (itemKey,menu) in groupMenus {
-        if itemKey == "default" {
-            continue
-        }
-        let newGroup: NSMenuItem = NSMenuItem()
-        var groupTagName = "🌏 订阅"
-        if let sub = V2raySubItem.load(name: itemKey) {
-            groupTagName = "🌏 " + sub.remark + " (\(menu.items.count))"
-        }
-        newGroup.submenu = menu
-        newGroup.title = groupTagName
-        newGroup.target = self
-        newGroup.isEnabled = true
-        if chooseGroup == itemKey {
-            newGroup.state = NSControl.StateValue.on
-        }
-        _subMenus.addItem(newGroup)
-    }
-
-    if validCount == 0 {
-        let menuItem: NSMenuItem = NSMenuItem()
-        menuItem.title = "no available servers."
-        menuItem.isEnabled = false
-        _subMenus.addItem(menuItem)
-    }
-
-    return _subMenus
 }
 
 func getMenuServerTitle(item: V2rayItem) -> String {

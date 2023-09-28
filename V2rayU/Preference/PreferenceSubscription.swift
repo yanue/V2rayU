@@ -163,7 +163,7 @@ extension PreferenceSubscribeViewController: NSTableViewDataSource, NSTableViewD
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let identifier = tableColumn?.identifier as NSString?
-        var data = V2raySubscription.list()
+        let data = V2raySubscription.list()
         if (identifier == "remarkCell") {
             let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "remarkCell"), owner: self) as! NSTableCellView
             cell.textField?.stringValue = data[row].remark

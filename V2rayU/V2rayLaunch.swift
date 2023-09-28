@@ -9,7 +9,9 @@
 import Cocoa
 import SystemConfiguration
 import Swifter
+import Alamofire
 
+let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
@@ -33,9 +35,11 @@ var v2rayProcess = Process()
 class V2rayLaunch: NSObject {
     
     static func install() {
-        // rempve plist of old version ( < 4.0 )
-         V2rayLaunch.removeLaunchAgentPlist()
+        V2rayLaunch.Stop()
 
+        // generate plist
+        V2rayLaunch.generateLaunchAgentPlist()
+        
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: AppHomePath) {
@@ -70,6 +74,25 @@ class V2rayLaunch: NSObject {
             print("\(PACUserRuleFilePath) not exists,need install")
             needRunInstall = true
         }
+        
+        // V2rayUTool version
+        let toolVersion = shell(launchPath: v2rayUTool, arguments: ["version"])
+        if toolVersion != nil {
+            let _version = toolVersion ?? ""            // old version
+            if _version.contains("Usage:") {
+                print("\(v2rayUTool) old version,need install")
+                needRunInstall = true
+            } else {
+                if !(_version >= "4.0.0") {
+                    print("\(v2rayUTool) old version,need install")
+                    needRunInstall = true
+                }
+            }
+        } else {
+            print("\(v2rayUTool) not exists,need install")
+            needRunInstall = true
+        }
+        
         print("launchedBefore", needRunInstall)
         if !needRunInstall {
             print("no need install")
@@ -88,26 +111,44 @@ class V2rayLaunch: NSObject {
         }
     }
     
-    static func removeLaunchAgentPlist() {
-        let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
+    static func generateLaunchAgentPlist() {
         let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/"
         let launchAgentPlistFile = launchAgentDirPath + LAUNCH_AGENT_NAME + ".plist"
-        // old version ( < 4.0 )
-        if FileManager.default.fileExists(atPath: launchAgentPlistFile) {
-            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME]).waitUntilExit()
-            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["remove", LAUNCH_AGENT_NAME]).waitUntilExit()
-            Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", LAUNCH_AGENT_NAME]).waitUntilExit()
-            
-            try? FileManager.default.removeItem(at: URL(fileURLWithPath: launchAgentPlistFile))
+
+        // Ensure launch agent directory is existed.
+        let fileMgr = FileManager.default
+        if !fileMgr.fileExists(atPath: launchAgentDirPath) {
+            try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
+        }
+
+        // write launch agent
+        let agentArguments = ["./v2ray-core/v2ray", "-config", "config.json"]
+
+        let dictAgent: NSMutableDictionary = [
+            "Label": LAUNCH_AGENT_NAME,
+            "WorkingDirectory": AppHomePath,
+            "StandardOutPath": logFilePath,
+            "StandardErrorPath": logFilePath,
+            "ProgramArguments": agentArguments,
+            "RunAtLoad": false, // can not set true
+            "KeepAlive": false, // can not set true
+        ]
+
+        dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
+        // load launch service
+//        Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", "-F", launchAgentPlistFile]).waitUntilExit()
+        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("launchctl load \(launchAgentPlistFile) succeeded.")
+        } else {
+            NSLog("launchctl load \(launchAgentPlistFile) failed.")
         }
     }
-
+    
     static func runAtStart(){
         // install before launch
         V2rayLaunch.install()
-
-        // kill v2ray
-        killSelfV2ray()
 
         // start http server
         startHttpServer()
@@ -130,33 +171,13 @@ class V2rayLaunch: NSObject {
     }
 
     static func SwitchProxyMode() {
-        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
-
-        switch runMode {
-        case .pac:
-            self.SwitchRunMode(mode: .global)
-            break
-        case .global:
-            self.SwitchRunMode(mode: .manual)
-            break
-        case .manual:
-            self.SwitchRunMode(mode: .pac)
-            break
-
-        default: break
-        }
+        print("SwitchProxyMode")
+        V2rayLaunch.startV2rayCore()
     }
 
-    static func SwitchRunMode(mode: RunMode) {
+    static func setRunMode(mode: RunMode) {
         // save
-        UserDefaults.set(forKey: .runMode, value: runMode.rawValue)
-
-        // launch
-        let started = V2rayLaunch.Start()
-        if !started {
-            menuController.setStatusOff()
-            return
-        }
+        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
 
         // set icon
         menuController.setStatusOn(mode: mode)
@@ -166,30 +187,24 @@ class V2rayLaunch: NSObject {
 
     static func ToggleRunning() {
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
+            print("ToggleRunning stop")
             V2rayLaunch.stopV2rayCore()
         } else {
+            print("ToggleRunning start")
             V2rayLaunch.startV2rayCore()
         }
     }
 
     static func restartV2ray(){
-        // stop first
-        V2rayLaunch.Stop()
         // start
         self.startV2rayCore()
     }
-
+    
     // start v2ray core
     static func startV2rayCore() {
         NSLog("start v2ray-core begin")
         guard let v2ray = V2rayServer.loadSelectedItem() else {
-            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "v2ray config not found")
-            menuController.setStatusOff()
-            return
-        }
-
-        if !v2ray.isValid {
-            noticeTip(title: "start v2ray fail", subtitle: "", informativeText: "invalid v2ray config")
+            noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
             menuController.setStatusOff()
             return
         }
@@ -199,34 +214,37 @@ class V2rayLaunch: NSObject {
         // create json file
         self.createJsonFile(item: v2ray)
 
-        // switch run mode
-        self.SwitchRunMode(mode: runMode)
+        // launch
+        let started = V2rayLaunch.Start()
+        if !started {
+            menuController.setStatusOff()
+            return
+        }
+        
+        // set run mode
+        self.setRunMode(mode: runMode)
 
         // reload menu
         menuController.showServers()
     }
 
     static func stopV2rayCore() {
-        // set status
-        menuController.setStatusOff()
         // stop launch
         V2rayLaunch.Stop()
         // off system proxy
         V2rayLaunch.setSystemProxy(mode: .off)
+        // set status
+        menuController.setStatusOff()
         // reload menu
         menuController.showServers()
     }
 
     static func Start() -> Bool {
-        // permission
-        _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod +x ./v2ray-core/v2ray"])
-
-        // stop before
-        self.stopV2ray()
-
-        // restart http server
+        self.Stop()
+        
+        // start http server
         startHttpServer()
-
+        
         // close port
         let httpPort = getHttpProxyPort()
         let sockPort = getSocksProxyPort()
@@ -239,7 +257,7 @@ class V2rayLaunch: NSObject {
                 toast = "http port \(httpPort) has been used, please replace it from advance setting"
                 title = "Port is already in use"
             }
-            alertDialog(message: toast, title: title)
+            _ = alertDialog(title: title, message: toast)
             self.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
             return false
@@ -253,76 +271,50 @@ class V2rayLaunch: NSObject {
                 toast = "socks port \(sockPort) has been used, please replace it from advance setting"
                 title = "Port is already in use"
             }
-            alertDialog(message: toast, title: title)
+            _ = alertDialog(title: title, message: toast)
             self.stopV2rayCore()
             preferencesWindowController.show(preferencePane: .advanceTab)
             return false
         }
-
-        // reinstance
-        // can't use `/bin/bash -c cmd...` otherwise v2ray process will become a ghost process
-        v2rayProcess = Process()
-        v2rayProcess.launchPath = v2rayCoreFile
-        v2rayProcess.arguments = ["-config", JsonConfigFilePath]
-//        v2rayProcess.standardError = nil
-//        v2rayProcess.standardOutput = nil
-        v2rayProcess.terminationHandler = { process in
-            if process.terminationStatus == EXIT_SUCCESS {
-                NSLog("process been killed: \(process.description) -  \(process.processIdentifier) - \(process.terminationStatus)")
-                // reconnect
-                if UserDefaults.getBool(forKey: .v2rayTurnOn) && !inPingCurrent {
-                    DispatchQueue.main.async {
-                        NSLog("V2rayLaunch process been killed, restart now")
-                        V2rayLaunch.Stop()
-                        _ = V2rayLaunch.Start()
-                    }
-                }
-            }
-        }
-        // async launch and can't waitUntilExit
-        v2rayProcess.launch()
         
-        // ping and select server
-        if let v2ray = V2rayServer.loadSelectedItem() {
-            // ping and refresh
-            DispatchQueue.global(qos: .background).async {
-                PingCurrent(item: v2ray).doPing()
-            }
+        // just start: stop is so slow
+        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["start", LAUNCH_AGENT_NAME])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("Start v2ray-core succeeded.")
+            return true
+        } else {
+            NSLog("Start v2ray-core failed.")
+            return false
         }
-        
-        return true
     }
 
     static func Stop() {
-        self.stopV2ray()
+        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
+        task.waitUntilExit()
+        if task.terminationStatus == 0 {
+            NSLog("Stop v2ray-core succeeded.")
+        } else {
+            NSLog("Stop v2ray-core failed.")
+        }
     }
     
-    static func stopV2ray() {
-        print("stopV2ray", v2rayProcess.isRunning)
-        // exit process
-        if v2rayProcess.isRunning {
-            // terminate v2ray process
-            v2rayProcess.interrupt()
-            v2rayProcess.terminate()
-            v2rayProcess.waitUntilExit()
-            usleep(useconds_t(1 * second))
-        }
-        // kill self v2ray
-        killSelfV2ray()
-    }
-
-    static func setSystemProxy(mode: RunMode) {
+    static func checkV2rayUTool() {
         // Ensure launch agent directory is existed.
         if !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
             self.install()
         }
         
         // Ensure permission with root admin
-        if checkFileIsRootAdmin(file: v2rayUTool) {
+        if !checkFileIsRootAdmin(file: v2rayUTool) {
             self.install()
         }
+    }
+    
+    static func setSystemProxy(mode: RunMode) {
+        self.checkV2rayUTool()
         
-        print("v2rayUTool", v2rayUTool)
+        print("v2rayUTool", v2rayUTool,mode)
         let pacUrl = getPacUrl()
         var httpPort: String = ""
         var sockPort: String = ""
@@ -362,7 +354,7 @@ class V2rayLaunch: NSObject {
                     toast = "pac port \(pacPort) has been used, please replace from advance setting"
                     title = "Port is already in use"
                 }
-                alertDialog(message: toast, title: title)
+                _ = alertDialog(title: title, message: toast)
                 preferencesWindowController.show(preferencePane: .advanceTab)
                 return
             }
@@ -372,10 +364,6 @@ class V2rayLaunch: NSObject {
         } catch let error {
             print("webServer.start error:\(error)")
         }
-    }
-
-    static func checkPorts() -> Bool {
-        return true
     }
     
     // create current v2ray server json file
@@ -417,7 +405,7 @@ class V2rayLaunch: NSObject {
 
 func checkV2rayUVersion() {
     // 当前版本检测
-    Alamofire.request("https://api.github.com/repos/yanue/V2rayU/releases/latest").responseJSON { [self] response in
+    Alamofire.request("https://api.github.com/repos/yanue/V2rayU/releases/latest").responseJSON { response in
         //to get status code
         if let status = response.response?.statusCode {
             if status != 200 {
@@ -428,7 +416,7 @@ func checkV2rayUVersion() {
 
         //to get JSON return value
         if let result = response.result.value {
-            guard let JSON = result as NSDictionary else {
+            guard let JSON = result as? NSDictionary else {
                 NSLog("error: no tag_name")
                 return
             }
@@ -459,10 +447,10 @@ func checkV2rayUVersion() {
 
             // compare with [Int]
             if oldVer.lexicographicallyPrecedes(curVer) {
-                newVersionItem.isHidden = false
-                newVersionItem.title = "has new version " + newVer
+                menuController.newVersionItem.isHidden = false
+                menuController.newVersionItem.title = "has new version " + newVer
             } else {
-                newVersionItem.isHidden = true
+                menuController.newVersionItem.isHidden = true
             }
         }
     }

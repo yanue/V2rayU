@@ -23,8 +23,8 @@ func alertDialog(title: String, message: String) -> Bool {
     let myPopup = NSAlert()
     myPopup.messageText = title
     myPopup.informativeText = message
-    myPopup.alertStyle = NSAlertStyle.warning
-    return myPopup.runModal() == NSAlertFirstButtonReturn
+    myPopup.alertStyle = .warning
+    return myPopup.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
 }
 
 class ToastWindowController: NSWindowController {

@@ -237,10 +237,9 @@ let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 let v2raySubSync = V2raySubSync()
 
 class V2raySubSync: NSObject {
-    var todos: Dictionary = [String: Bool]()
     let lock = NSLock()
-    let semaphore = DispatchSemaphore(value: 1) // work pool
     var inSyncSubscribe = false
+    var group = DispatchGroup()
 
     // sync from Subscription list
     public func sync() {
@@ -256,22 +255,44 @@ class V2raySubSync: NSObject {
             self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
         }
         // sync queue with DispatchGroup
-        let subQueue = DispatchQueue(label: "subQueue",attributes: .concurrent)
+        group = DispatchGroup()
+        let subQueue = DispatchQueue(label: "subQueue", qos: .background, attributes: .concurrent)
         for item in list {
             subQueue.async {
-                self.todos[item.url] = true
-                self.semaphore.wait()
+                self.group.enter()
                 self.dlFromUrl(url: item.url, subscribe: item.name)
             }
         }
+        group.wait()
+        print("V2raySubSync end")
+        self.refreshMenu()
     }
-
+    
+    func refreshMenu()  {
+        print("V2raySubSync refreshMenu")
+        inSyncSubscribe = false
+        usleep(useconds_t(1 * second))
+        do {
+            // refresh server
+            DispatchQueue.main.async {
+                menuController.showServers()
+            }
+            usleep(useconds_t(2 * second))
+            // do ping
+            ping.pingAll()
+        }
+    }
+    
+    func importEnd(url: String, subscribe: String) {
+        self.group.leave()
+    }
+    
     public func dlFromUrl(url: String, subscribe: String) {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         guard let reqUrl = URL(string: url) else {
             logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + url + "\n\n")
-            self.refreshMenu(url: url)
+            self.importEnd(url: url, subscribe: subscribe)
             return
         }
         
@@ -279,7 +300,7 @@ class V2raySubSync: NSObject {
         let session = URLSession(configuration: getProxyUrlSessionConfigure())
         let task = session.dataTask(with: URLRequest(url: reqUrl)){(data: Data?, response: URLResponse?, error: Error?) in
             defer {
-                self.refreshMenu(url: url)
+                self.importEnd(url: url, subscribe: subscribe)
             }
             if error != nil {
                 self.logTip(title: "loading fail: ", uri: url, informativeText: "error: \(String(describing: error))")
@@ -398,32 +419,7 @@ class V2raySubSync: NSObject {
         }
         
     }
-    
-    func refreshMenu(url: String)  {
-        lock.lock()
-        
-        semaphore.signal()
 
-        todos.removeValue(forKey: url)
-        let remainCount = todos.count
-        
-        lock.unlock()
-        
-        if remainCount == 0 {
-            inSyncSubscribe = false
-            usleep(useconds_t(1 * second))
-            do {
-                // refresh server
-                DispatchQueue.main.async {
-                    menuController.showServers()
-                }
-                usleep(useconds_t(2 * second))
-                // do ping
-                ping.pingAll()
-            }
-        }
-    }
-    
     func saveImport(importUri: ImportUri, subscribe: String) -> V2rayItem? {
         if importUri.isValid {
             var newUri = importUri.uri

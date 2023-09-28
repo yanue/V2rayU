@@ -13,6 +13,7 @@ import AppCenterAnalytics
 import AppCenterCrashes
 import MASShortcut
 import Preferences
+import Sparkle
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
@@ -142,8 +143,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // reconnect
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             NSLog("V2rayLaunch restart")
-            V2rayLaunch.Stop()
-            V2rayLaunch.Start()
+            V2rayLaunch.restartV2ray()
         }
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
@@ -176,7 +176,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // webServer stop
         webServer.stop()
         // code
-        return NSApplication.TerminateReply.*
+        print("applicationShouldTerminate end")
+        return NSApplication.TerminateReply.terminateNow
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

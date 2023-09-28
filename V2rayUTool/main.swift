@@ -10,22 +10,26 @@ import Cocoa
 import SystemConfiguration
 
 var authRef: AuthorizationRef?
-let SysProxyBackupPlist = NSHomeDirectory() + "/Library/Preferences/net.yanue.V2rayU.system_proxy_backup.plist"
+let _version = "4.0.0"
 
 class V2rayUTool: NSObject {
-    static let usage = "Usage: V2rayUTool -mode <global|manual|pac|off|restore|backup> -pac <url> -http-port <port> -sock-port <port>"
+    static let usage = "Usage: \n V2rayUTool -mode <global|manual|pac|off> -pac <url> -http-port <port> -sock-port <port> \n V2rayUTool version"
 
     enum RunMode: String {
         case global
         case manual
         case pac
         case off
-        case backup
-        case restore
     }
 
     static func run() {
         let arguments = CommandLine.arguments
+        if arguments.count > 1 {
+            if arguments[1] == "-v" || arguments[1] == "version" {
+                print(_version)
+                return
+            }
+        }
         if arguments.count < 9 {
             print(self.usage)
             return
@@ -55,12 +59,6 @@ class V2rayUTool: NSObject {
             // set system proxy
             let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "V2rayU" as CFString, nil, authRef)!
             let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices)!
-
-            // backup system proxy
-            if mode == .backup {
-                (sets as! NSDictionary).write(toFile: SysProxyBackupPlist, atomically: true)
-                return
-            }
 
             var proxies = [NSObject: AnyObject]()
 
@@ -96,33 +94,22 @@ class V2rayUTool: NSObject {
                 proxies[kCFNetworkProxiesProxyAutoConfigEnable] = 1 as NSNumber
             }
 
-            // restore system proxy setting in off or manual or restore
-            var originalSets: Dictionary<String, Dictionary<String, Any>>?
-            if mode == .off || mode == .manual || mode == .restore {
-                originalSets = (NSDictionary(contentsOfFile: SysProxyBackupPlist) as? Dictionary<String, Dictionary<String, Any>>)
-            }
-
             sets.allKeys!.forEach { (key) in
                 let dict = sets.object(forKey: key)!
                 let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
 
                 if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
-                    // restore system proxy setting in off or manual or restore
-                    if (mode == .off || mode == .manual || mode == .restore) && originalSets != nil && originalSets!.keys.contains(key) {
-                        if let nowSet = originalSets![key] {
-                            proxies = nowSet["Proxies"] as! [NSObject: AnyObject];
-                        }
-                    }
-
                     SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetProxies)" as CFString, proxies as CFDictionary)
                 }
             }
+            
 
             // commit to system preferences.
             let commitRet = SCPreferencesCommitChanges(prefRef)
             let applyRet = SCPreferencesApplyChanges(prefRef)
+            
             SCPreferencesSynchronize(prefRef)
-            // AuthorizationFree(authRef, kAuthorizationFlagDefaults)
+
             Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
         }
     }

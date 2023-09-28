@@ -615,13 +615,13 @@ func importUri(url: String) {
         let uri = url.trimmingCharacters(in: .whitespaces)
 
         if uri.count == 0 {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "import error: uri not found")
+            noticeTip(title: "import server fail", informativeText: "import error: uri not found")
             continue
         }
 
         // ss://YWVzLTI1Ni1jZmI6ZUlXMERuazY5NDU0ZTZuU3d1c3B2OURtUzIwMXRRMERAMTcyLjEwNS43MS44Mjo4MDk5#翻墙党325.06美国 类型这种含中文的格式不是标准的URL格式
         if !ImportUri.supportProtocol(uri: uri) {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
+            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
             continue
         }
 
@@ -630,14 +630,14 @@ func importUri(url: String) {
                 // add server
                 V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
                 // refresh server
-                self.showServers()
-                noticeTip(title: "import server success", subtitle: "", informativeText: importUri.remark)
+                menuController.showServers()
+                noticeTip(title: "import server success", informativeText: importUri.remark)
             } else {
-                noticeTip(title: "import server fail", subtitle: "", informativeText: importUri.error)
+                noticeTip(title: "import server fail", informativeText: importUri.error)
             }
             continue
         } else {
-            noticeTip(title: "import server fail", subtitle: "", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
+            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
         }
     }
 }
