@@ -48,48 +48,53 @@ class V2rayLaunch: NSObject {
         }
 
         // make sure new version
-        print("install", AppResourcesPath)
+        NSLog("install", AppResourcesPath)
         var needRunInstall = false
         if !FileManager.default.fileExists(atPath: v2rayCoreFile) {
-            print("\(v2rayCoreFile) not exists,need install")
+            NSLog("\(v2rayCoreFile) not exists,need install")
+            needRunInstall = true
+        }
+        if !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
+            NSLog("\(v2rayCoreFile) not accessable")
             needRunInstall = true
         }
         if !FileManager.default.fileExists(atPath: v2rayCorePath+"/geoip.dat") {
-            print("\(v2rayCorePath)/geoip.dat not exists,need install")
+            NSLog("\(v2rayCorePath)/geoip.dat not exists,need install")
             needRunInstall = true
         }
         if !FileManager.default.fileExists(atPath: v2rayUTool) {
-            print("\(v2rayUTool) not exists,need install")
+            NSLog("\(v2rayUTool) not exists,need install")
             needRunInstall = true
         }
         if !FileManager.default.fileExists(atPath: PACAbpFile) {
-            print("\(PACAbpFile) not exists,need install")
+            NSLog("\(PACAbpFile) not exists,need install")
             needRunInstall = true
         }
         if !FileManager.default.fileExists(atPath: GFWListFilePath) {
-            print("\(GFWListFilePath) not exists,need install")
+            NSLog("\(GFWListFilePath) not exists,need install")
             needRunInstall = true
         }
         if !FileManager.default.fileExists(atPath: PACUserRuleFilePath) {
-            print("\(PACUserRuleFilePath) not exists,need install")
+            NSLog("\(PACUserRuleFilePath) not exists,need install")
             needRunInstall = true
         }
-        
-        // V2rayUTool version
-        let toolVersion = shell(launchPath: v2rayUTool, arguments: ["version"])
+
+        // use /bin/bash to fix crash when V2rayUTool is not exist
+        let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
+        NSLog("toolVersion - \(v2rayUTool): \(String(describing: toolVersion))")
         if toolVersion != nil {
             let _version = toolVersion ?? ""            // old version
             if _version.contains("Usage:") {
-                print("\(v2rayUTool) old version,need install")
+                NSLog("\(v2rayUTool) old version,need install")
                 needRunInstall = true
             } else {
                 if !(_version >= "4.0.0") {
-                    print("\(v2rayUTool) old version,need install")
+                    NSLog("\(v2rayUTool) old version,need install")
                     needRunInstall = true
                 }
             }
         } else {
-            print("\(v2rayUTool) not exists,need install")
+            NSLog("\(v2rayUTool) not exists,need install")
             needRunInstall = true
         }
         
@@ -149,7 +154,7 @@ class V2rayLaunch: NSObject {
     static func runAtStart(){
         // clear not available
         V2rayServer.clearItems()
-
+        
         // install before launch
         V2rayLaunch.install()
 
@@ -314,6 +319,17 @@ class V2rayLaunch: NSObject {
         
         // Ensure permission with root admin
         if !checkFileIsRootAdmin(file: v2rayUTool) {
+            self.install()
+        }
+    }
+    
+    static func checkV2rayCore() {
+        if !FileManager.default.fileExists(atPath: v2rayCoreFile) {
+            print("\(v2rayCoreFile) not exists,need install")
+            self.install()
+        }
+        if !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
+            print("\(v2rayCoreFile) not accessable")
             self.install()
         }
     }

@@ -103,8 +103,10 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func setStatusMenuTip(pingTip: String) {
         do {
-            if self.statusMenu.item(withTag: 1) != nil {
-                self.statusMenu.item(withTag: 1)!.title = pingTip
+            DispatchQueue.main.async {
+                if self.statusMenu.item(withTag: 1) != nil {
+                    self.statusMenu.item(withTag: 1)!.title = pingTip
+                }
             }
         }
     }
@@ -114,11 +116,11 @@ class MenuController: NSObject, NSMenuDelegate {
         let _subMenus = getServerMenus()
         lock.lock()
         do {
-            serverItems.submenu = _subMenus
-            // fix: must be used from main thread only
-            if configWindow != nil && configWindow.serversTableView != nil  {
-                DispatchQueue.main.async {
-                    configWindow.serversTableView.reloadData()
+            DispatchQueue.main.async {
+                self.serverItems.submenu = _subMenus
+                // fix: must be used from main thread only
+                if configWindow != nil && configWindow.serversTableView != nil  {
+                        configWindow.serversTableView.reloadData()
                 }
             }
         }

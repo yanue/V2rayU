@@ -536,6 +536,9 @@ func killAllPing(){
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     NSLog("killAllPing: \(String(describing: msg))")
+    let rmPingJsonCmd = "rm -f ~/.V2rayU/.config.*.json"
+    let msg1 = shell(launchPath: "/bin/bash", arguments: ["-c", rmPingJsonCmd])
+    NSLog("rmPingJson: \(String(describing: msg1))")
 }
 
 func killSelfV2ray(){
