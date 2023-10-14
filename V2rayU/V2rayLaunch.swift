@@ -169,7 +169,7 @@ class V2rayLaunch: NSObject {
 
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            v2raySubSync.sync()
+            V2raySubSync.shared.sync()
         }
     }
 

@@ -153,7 +153,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            v2raySubSync.sync()
+            V2raySubSync.shared.sync()
         }
         // ping
         ping.pingAll()

@@ -234,43 +234,53 @@ class V2raySubItem: NSObject, NSCoding {
 // ----- v2ray subscribe  updater -----
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
-let v2raySubSync = V2raySubSync()
-
 class V2raySubSync: NSObject {
     let lock = NSLock()
-    var inSyncSubscribe = false
+    var V2raySubSyncing = false
     var group = DispatchGroup()
-
+    
+    static var shared = V2raySubSync()
+    // Initialization
+    override init() {
+        super.init()
+        NSLog("V2raySubSync init")
+    }
+    
     // sync from Subscription list
     public func sync() {
-        if inSyncSubscribe {
-            print("Subscription in loading ...")
+        if V2raySubSyncing {
+            NSLog("V2raySubSync Syncing ...")
             return
         }
-        print("sync from Subscription list")
-        V2raySubscription.loadConfig()
-        let list = V2raySubscription.list()
+        self.V2raySubSyncing = true
+        NSLog("V2raySubSync start")
 
-        if list.count == 0 {
-            self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
-        }
-        // sync queue with DispatchGroup
-        group = DispatchGroup()
-        let subQueue = DispatchQueue(label: "subQueue", qos: .background, attributes: .concurrent)
-        for item in list {
-            subQueue.sync {
-                self.group.enter()
-                self.dlFromUrl(url: item.url, subscribe: item.name)
+        let thread = Thread {
+            V2raySubscription.loadConfig()
+            let list = V2raySubscription.list()
+
+            if list.count == 0 {
+                self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
             }
+            // sync queue with DispatchGroup
+            self.group = DispatchGroup()
+            let subQueue = DispatchQueue(label: "subQueue", qos: .background)
+            for item in list {
+                subQueue.sync {
+                    self.group.enter()
+                    self.dlFromUrl(url: item.url, subscribe: item.name)
+                }
+            }
+            self.group.wait()
+            NSLog("V2raySubSync end")
+            self.refreshMenu()
         }
-        group.wait()
-        print("V2raySubSync end")
-        self.refreshMenu()
+        thread.start()
     }
     
     func refreshMenu()  {
-        print("V2raySubSync refreshMenu")
-        inSyncSubscribe = false
+        NSLog("V2raySubSync refreshMenu")
+        self.V2raySubSyncing = false
         usleep(useconds_t(1 * second))
         do {
             // refresh server

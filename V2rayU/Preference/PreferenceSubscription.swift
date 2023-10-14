@@ -134,6 +134,13 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
                 // selected row
                 self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: true)
             }
+            
+            do {
+                // refresh server
+                DispatchQueue.main.async {
+                    menuController.showServers()
+                }
+            }
         }
     }
 
@@ -151,7 +158,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
         self.tip = ""
 
         // update Subscription
-        v2raySubSync.sync()
+        V2raySubSync.shared.sync()
     }
 }
 
