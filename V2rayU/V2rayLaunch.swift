@@ -147,6 +147,9 @@ class V2rayLaunch: NSObject {
     }
     
     static func runAtStart(){
+        // clear not available
+        V2rayServer.clearItems()
+
         // install before launch
         V2rayLaunch.install()
 
@@ -323,8 +326,8 @@ class V2rayLaunch: NSObject {
         var sockPort: String = ""
         // reload
         if mode == .global {
-            httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1080"
-            sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1087"
+            httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+            sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         }
 
         let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", pacUrl, "-http-port", httpPort, "-sock-port", sockPort])

@@ -55,6 +55,57 @@ class V2rayServer: NSObject {
             // append
             self.v2rayItemList.append(v2ray)
         }
+        print("loadConfig", self.v2rayItemList.count)
+    }
+
+    // clear old not valid or exist item
+    static func clearItems() {
+        // remove all
+//        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        var sub_list: [String] = []
+        if let list = UserDefaults.getArray(forKey: .v2raySubList) {
+            sub_list = list
+        }
+        var svr_list: [String] = []
+        if let list = UserDefaults.getArray(forKey: .v2rayServerList) {
+            svr_list = list
+        }
+        print("clearItems sub_list", sub_list)
+        print("clearItems svr_list", svr_list.count)
+        
+        UserDefaults.standard.dictionaryRepresentation().forEach { (key, val) in
+            // filter config
+            if key.contains("config.") {
+                if let v2ray = V2rayItem.load(name: key) {
+                    // remove v2ray when subscribe is not available
+                    if v2ray.subscribe.count > 0 && !sub_list.contains(v2ray.subscribe) {
+                        print("remove v2ray",key)
+                        V2rayItem.remove(name: key)
+                    } else {
+                        // not in svr_list
+                        if !svr_list.contains(v2ray.name) {
+                            svr_list.append(v2ray.name)
+                        }
+                    }
+                } else {
+                    // delete from UserDefaults
+                    print("remove v2ray",key)
+                    V2rayItem.remove(name: key)
+                }
+            }
+            // filter subscribe
+            if key.contains("subscribe.") {
+                let sub = V2raySubItem.load(name: key)
+                if sub == nil  {
+                    //  delete from UserDefaults
+                    print("remove subscribe",key)
+                    V2rayServer.remove(subscribe: key)
+                }
+            }
+        }
+        print("clearItems svr_list", svr_list.count)
+        // update svr_list
+        UserDefaults.setArray(forKey: .v2rayServerList, value: svr_list)
     }
 
     // get list from v2ray server list
@@ -140,12 +191,18 @@ class V2rayServer: NSObject {
             remark_ = "new server"
         }
 
-        // name is : config. + uuid
-        let name = "config." + UUID().uuidString
+        var v2ray: V2rayItem
+        if let exist = self.existItem(url: url) {
+            v2ray = exist
+            NSLog("server exist: \(remark) - \(url)")
+        } else {
+            // name is : config. + uuid
+            let name = "config." + UUID().uuidString
 
-        let v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url, subscribe: subscribe)
-        // save to v2ray UserDefaults
-        v2ray.store()
+            v2ray = V2rayItem(name: name, remark: remark_, isValid: isValid, json: json, url: url, subscribe: subscribe)
+            // save to v2ray UserDefaults
+            v2ray.store()
+        }
 
         // just add to mem
         self.v2rayItemList.append(v2ray)
@@ -223,7 +280,7 @@ class V2rayServer: NSObject {
     }
 
     // check url is exists
-    static func exist(url: String) -> V2rayItem? {
+    static func existItem(url: String) -> V2rayItem? {
         for item in self.v2rayItemList {
             if item.url == url {
                 return item

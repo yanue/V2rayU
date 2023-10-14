@@ -258,7 +258,7 @@ class V2raySubSync: NSObject {
         group = DispatchGroup()
         let subQueue = DispatchQueue(label: "subQueue", qos: .background, attributes: .concurrent)
         for item in list {
-            subQueue.async {
+            subQueue.sync {
                 self.group.enter()
                 self.dlFromUrl(url: item.url, subscribe: item.name)
             }
@@ -325,10 +325,7 @@ class V2raySubSync: NSObject {
             return
         }
 
-        self.logTip(title: "del old from url : ", uri: "", informativeText: url + "\n\n")
-
-        // remove old v2ray servers by subscribe
-        V2rayServer.remove(subscribe: subscribe)
+        self.logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
 
         if self.importByYaml(strTmp: strTmp, subscribe: subscribe) {
             return
@@ -431,7 +428,10 @@ class V2raySubSync: NSObject {
                 share.qrcode(item: v2ray)
                 newUri = share.uri
             }
-            if let v2rayOld = V2rayServer.exist(url: newUri) {
+
+            print("\(importUri.remark) - \(newUri)")
+
+            if let v2rayOld = V2rayServer.existItem(url: newUri) {
                 v2rayOld.json = importUri.json
                 v2rayOld.isValid = importUri.isValid
                 v2rayOld.remark = importUri.remark
