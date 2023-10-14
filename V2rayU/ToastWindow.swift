@@ -8,16 +8,17 @@
 
 import Cocoa
 
-var toastWindowCtrl =  ToastWindowController()
+var toastWindow =  ToastWindowController()
 
-func makeToast(message: String, displayDuration: Double? = 2) {
+func makeToast(message: String, displayDuration: Double? = 3) {
     print("makeToast", message)
-    toastWindowCtrl.close()
-    toastWindowCtrl = ToastWindowController()
-    toastWindowCtrl.message = message
-    toastWindowCtrl.showWindow(nil)
-    toastWindowCtrl.becomeFirstResponder()
-    toastWindowCtrl.fadeInHud(displayDuration)
+    toastWindow.close()
+    toastWindow = ToastWindowController()
+    toastWindow.message = message
+    toastWindow.showWindow(Any.self)
+    toastWindow.fadeInHud(displayDuration)
+
+    NSApp.activate(ignoringOtherApps: true)
 }
 
 func alertDialog(title: String, message: String) -> Bool {

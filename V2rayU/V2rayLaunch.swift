@@ -291,6 +291,7 @@ class V2rayLaunch: NSObject {
             return true
         } else {
             NSLog("Start v2ray-core failed.")
+            makeToast(message: "Start v2ray-core failed.")
             return false
         }
     }
