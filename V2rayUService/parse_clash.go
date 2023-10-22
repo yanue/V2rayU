@@ -1,6 +1,5 @@
 package main
 
-import "C"
 import (
 	"fmt"
 	"gopkg.in/yaml.v3"
