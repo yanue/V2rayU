@@ -118,11 +118,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         }
-        V2rayServer.loadConfig()
-        if V2rayServer.count() == 0 {
-            // add default
-            V2rayServer.add(remark: "default", json: "", isValid: false)
-        }
     }
 
     @objc func handleAppleEvent(event: NSAppleEventDescriptor, replyEvent: NSAppleEventDescriptor) {

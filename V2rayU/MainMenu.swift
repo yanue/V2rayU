@@ -118,10 +118,6 @@ class MenuController: NSObject, NSMenuDelegate {
         do {
             DispatchQueue.main.async {
                 self.serverItems.submenu = _subMenus
-                // fix: must be used from main thread only
-                if configWindow != nil && configWindow.serversTableView != nil  {
-                        configWindow.serversTableView.reloadData()
-                }
             }
         }
         lock.unlock()
@@ -136,9 +132,10 @@ class MenuController: NSObject, NSMenuDelegate {
         var groupMenus: Dictionary = [String: NSMenu]()
         var chooseGroup = ""
         // reload servers
-        V2rayServer.loadConfig()
+        var svr = V2rayServer()
+        svr.loadConfig()
         // for each
-        for item in V2rayServer.list() {
+        for item in svr.list() {
             validCount+=1
             let menuItem: NSMenuItem = self.buildServerItem(item: item, curSer: curSer)
             var groupTag: String = item.subscribe
@@ -289,7 +286,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func generateQrcode(_ sender: NSMenuItem) {
-        guard let v2ray = V2rayServer.loadSelectedItem() else {
+        guard let v2ray = V2rayServer().loadSelectedItem() else {
             NSLog("v2ray config not found")
             noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
             return

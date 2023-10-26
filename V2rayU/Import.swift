@@ -15,14 +15,7 @@ class ImportUri {
     var error: String = ""
     var uri: String = ""
 
-    static func importUri(uri: String, checkExist: Bool = true) -> ImportUri? {
-        if checkExist && V2rayServer.exist(url: uri) {
-            let importUri = ImportUri()
-            importUri.isValid = false
-            importUri.error = "Url already exists"
-            return importUri
-        }
-
+    static func importUri(uri: String) -> ImportUri? {
         if uri.hasPrefix("vmess://") {
             let importUri = ImportUri()
             importUri.importVmessUri(uri: uri)
@@ -610,6 +603,7 @@ class Scanner {
 
 func importUri(url: String) {
     let urls = url.split(separator: "\n")
+    let srv = V2rayServer()
 
     for url in urls {
         let uri = url.trimmingCharacters(in: .whitespaces)
@@ -624,20 +618,24 @@ func importUri(url: String) {
             noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
             continue
         }
-
+        if srv.exist(url: uri) {
+            noticeTip(title: "import server fail", informativeText: "Url already exists ")
+            continue
+        }
         if let importUri = ImportUri.importUri(uri: uri) {
             if importUri.isValid {
                 // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
-                // refresh server
-                menuController.showServers()
+                srv.add(remark: importUri.remark, json: importUri.json, isValid: true, url: importUri.uri)
                 noticeTip(title: "import server success", informativeText: importUri.remark)
             } else {
                 noticeTip(title: "import server fail", informativeText: importUri.error)
             }
-            continue
         } else {
             noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// ")
         }
+    }
+    // refresh server
+    DispatchQueue.main.async {
+        menuController.showServers()
     }
 }

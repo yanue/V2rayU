@@ -111,7 +111,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane 
             if let item = V2raySubscription.loadSubItem(idx: idx) {
                 print("remove sub item", item.name, item.url)
                 // remove old v2ray servers by subscribe
-                V2rayServer.remove(subscribe: item.name)
+                V2rayServer().remove(subscribe: item.name)
             }
             // remove subscribe
             V2raySubscription.remove(idx: idx)

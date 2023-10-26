@@ -148,14 +148,16 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var streamRealityShortId: NSTextField!
     @IBOutlet weak var streamRealitySpiderX: NSTextField!
     
+    var svr = V2rayServer()
+    
     override func awakeFromNib() {
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
         serversTableView.allowsMultipleSelection = true
 
-        if V2rayServer.count() == 0 {
+        if self.svr.count() == 0 {
             // add default
-            V2rayServer.add(remark: "default", json: "", isValid: false)
+            self.svr.add(remark: "default", json: "", isValid: false)
         }
         self.shadowsockMethod.removeAllItems()
         self.shadowsockMethod.addItems(withTitles: V2rayOutboundShadowsockMethod)
@@ -174,6 +176,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.tabView.delegate = self
     }
 
+    // 在这里处理窗口切换到最前面的事件
+    func windowDidBecomeKey(_ notification: Notification) {
+        NSLog("windowDidBecomeKey")
+        DispatchQueue.main.async {
+            self.serversTableView.reloadData()
+        }
+    }
+
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
         // 0 add,1 remove
         let seg = addRemoveButton.indexOfSelectedItem
@@ -182,12 +192,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 // add server config
         case 0:
             // add
-            V2rayServer.add()
+            self.svr.add()
 
             // reload data
             self.serversTableView.reloadData()
             // selected current row
-            self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
+            self.serversTableView.selectRowIndexes(NSIndexSet(index: self.svr.count() - 1) as IndexSet, byExtendingSelection: false)
 
             break
 
@@ -196,14 +206,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // get seleted index
             let idx = self.serversTableView.selectedRow
             // remove
-            V2rayServer.remove(idx: idx)
+            self.svr.remove(idx: idx)
 
             // reload
-            V2rayServer.loadConfig()
-            menuController.showServers()
+            self.svr.loadConfig()
+            self.showMenus()
 
             // selected prev row
-            let cnt: Int = V2rayServer.count()
+            let cnt: Int = self.svr.count()
             var rowIndex: Int = idx - 1
             if idx > 0 && idx < cnt {
                 rowIndex = idx
@@ -225,7 +235,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             }
 
             // refresh menu
-            menuController.showServers()
+            self.showMenus()
             break
 
                 // unknown action
@@ -550,7 +560,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             return
         }
 
-        let item = V2rayServer.loadV2rayItem(idx: rowIndex)
+        let item = self.svr.loadV2rayItem(idx: rowIndex)
         self.configText.string = item?.json ?? ""
         v2rayConfig.isValid = item?.isValid ?? false
         self.jsonUrl.stringValue = item?.url ?? ""
@@ -571,7 +581,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
 
         // save
-        let errMsg = V2rayServer.save(idx: self.serversTableView.selectedRow, isValid: v2rayConfig.isValid, jsonData: text)
+        let errMsg = self.svr.save(idx: self.serversTableView.selectedRow, isValid: v2rayConfig.isValid, jsonData: text)
         if errMsg.count == 0 {
             if self.errTip.stringValue == "" {
                 self.errTip.stringValue = "save success"
@@ -586,12 +596,18 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
     }
 
+    func showMenus(){
+        DispatchQueue.main.async {
+            self.menuController.showServers()
+        }
+    }
+
     func refreshServerList(ok: Bool = true) {
         // refresh menu
-        menuController.showServers()
+        self.showMenus()
         // if server is current
         if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
-            let v2rayItemList = V2rayServer.list()
+            let v2rayItemList = self.svr.list()
             if curName == v2rayItemList[self.serversTableView.selectedRow].name {
                 if ok {
                     V2rayLaunch.startV2rayCore()
@@ -627,7 +643,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if importUri.isValid {
             self.configText.string = importUri.json
             if importUri.remark.count > 0 {
-                V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, remark: importUri.remark)
+                self.svr.edit(rowIndex: self.serversTableView.selectedRow, remark: importUri.remark)
             }
 
             // refresh
@@ -641,9 +657,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         let text = self.configText.string
         let uri = jsonUrl.stringValue.trimmingCharacters(in: .whitespaces)
         // edit item remark
-        V2rayServer.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
+        self.svr.edit(rowIndex: self.serversTableView.selectedRow, url: uri)
 
-        if let importUri = ImportUri.importUri(uri: uri, checkExist: false) {
+        if let importUri = ImportUri.importUri(uri: uri) {
             self.saveImport(importUri: importUri)
         } else {
             // download json file
@@ -865,11 +881,11 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 extension ConfigWindowController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return V2rayServer.count()
+        return self.svr.count()
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        let v2rayItemList = V2rayServer.list()
+        let v2rayItemList = self.svr.list()
         // set cell data
         if v2rayItemList.count >= row {
             return v2rayItemList[row].remark
@@ -884,11 +900,11 @@ extension ConfigWindowController: NSTableViewDataSource {
             return
         }
         // edit item remark
-        V2rayServer.edit(rowIndex: row, remark: remark)
+        self.svr.edit(rowIndex: row, remark: remark)
         // reload table
         tableView.reloadData()
         // reload menu
-        menuController.showServers()
+        self.showMenus()
     }
 }
 
@@ -944,13 +960,13 @@ extension ConfigWindowController: NSTableViewDelegate {
         }
 
         // move
-        V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
+        self.svr.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
         // set selected
         self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
         // reload table
         self.serversTableView.reloadData()
         // reload menu
-        menuController.showServers()
+        self.showMenus()
 
         return true
     }

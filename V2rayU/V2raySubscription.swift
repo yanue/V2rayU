@@ -238,6 +238,7 @@ class V2raySubSync: NSObject {
     let lock = NSLock()
     var V2raySubSyncing = false
     var group = DispatchGroup()
+    var svr = V2rayServer()
     
     static var shared = V2raySubSync()
     // Initialization
@@ -266,8 +267,8 @@ class V2raySubSync: NSObject {
             self.group = DispatchGroup()
             let subQueue = DispatchQueue(label: "subQueue", qos: .background)
             for item in list {
+                self.group.enter()
                 subQueue.sync {
-                    self.group.enter()
                     self.dlFromUrl(url: item.url, subscribe: item.name)
                 }
             }
@@ -281,13 +282,11 @@ class V2raySubSync: NSObject {
     func refreshMenu()  {
         NSLog("V2raySubSync refreshMenu")
         self.V2raySubSyncing = false
-        usleep(useconds_t(1 * second))
         do {
             // refresh server
             DispatchQueue.main.async {
                 menuController.showServers()
             }
-            usleep(useconds_t(2 * second))
             // do ping
             ping.pingAll()
         }
@@ -345,10 +344,10 @@ class V2raySubSync: NSObject {
     
     func getOld(subscribe: String) -> [String] {
         // reload all
-        V2rayServer.loadConfig()
+        self.svr.loadConfig()
         // get old
         var oldList: [String] = []
-        for (_, item) in V2rayServer.list().enumerated() {
+        for (_, item) in self.svr.all().enumerated() {
             if item.subscribe == subscribe {
                 oldList.append(item.name)
             }
@@ -406,7 +405,7 @@ class V2raySubSync: NSObject {
             // import every server
             if (uri.count > 0) {
                 let filterUri =  uri.trimmingCharacters(in: .whitespacesAndNewlines)
-                if let importUri = ImportUri.importUri(uri: filterUri,checkExist: false) {
+                if let importUri = ImportUri.importUri(uri: filterUri) {
                     if let v2rayOld = self.saveImport(importUri: importUri, subscribe: subscribe) {
                         exists[v2rayOld.name] = true
                     }
@@ -441,7 +440,7 @@ class V2raySubSync: NSObject {
 
             print("\(importUri.remark) - \(newUri)")
 
-            if let v2rayOld = V2rayServer.existItem(url: newUri) {
+            if let v2rayOld = self.svr.existItem(url: newUri) {
                 v2rayOld.json = importUri.json
                 v2rayOld.isValid = importUri.isValid
                 v2rayOld.remark = importUri.remark
@@ -450,7 +449,7 @@ class V2raySubSync: NSObject {
                 return v2rayOld
             } else {
                 // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: newUri, subscribe: subscribe)
+                self.svr.add(remark: importUri.remark, json: importUri.json, isValid: true, url: newUri, subscribe: subscribe)
                 logTip(title: "success add: ", informativeText: importUri.remark)
             }
         } else {
