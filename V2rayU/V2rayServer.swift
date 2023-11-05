@@ -109,15 +109,11 @@ class V2rayServer: NSObject {
                     allList.append(v2ray)
                 } else {
                     // delete from UserDefaults
-                    print("remove v2ray",key)
                     V2rayItem.remove(name: key)
                 }
             }
-            print("clearItems svr_list", svr_list.count)
-            // update svr_list
-            UserDefaults.setArray(forKey: .v2rayServerList, value: svr_list)
         }
-        return self.v2rayItemList
+        return allList
     }
 
     // get count from v2ray server list

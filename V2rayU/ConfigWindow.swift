@@ -154,7 +154,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // set table drag style
         serversTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: tableViewDragType)])
         serversTableView.allowsMultipleSelection = true
-
+        self.svr.loadConfig()
         if self.svr.count() == 0 {
             // add default
             self.svr.add(remark: "default", json: "", isValid: false)
@@ -598,13 +598,14 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     func showMenus(){
         DispatchQueue.main.async {
-            self.menuController.showServers()
+            menuController.showServers()
         }
     }
 
     func refreshServerList(ok: Bool = true) {
         // refresh menu
         self.showMenus()
+        self.svr.loadConfig()
         // if server is current
         if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
             let v2rayItemList = self.svr.list()

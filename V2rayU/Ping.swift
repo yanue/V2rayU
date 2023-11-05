@@ -20,7 +20,7 @@ let pingURL = URL(string: "http://www.gstatic.com/generate_204")!
 class PingSpeed: NSObject {
     let lock = NSLock()
     let semaphore = DispatchSemaphore(value: 20) // work pool
-    let group = DispatchGroup()
+    var group = DispatchGroup()
 
     func pingAll() {
         NSLog("ping start")
@@ -37,6 +37,7 @@ class PingSpeed: NSObject {
 
         let itemList = V2rayServer().all()
         if itemList.count == 0 {
+            NSLog("no items")
             inPing = false
             return
         }
@@ -59,9 +60,11 @@ class PingSpeed: NSObject {
     func runTask() {
         self.group = DispatchGroup()
         let pingQueue = DispatchQueue(label: "pingQueue", qos: .background, attributes: .concurrent)
-        for item in itemList {
+        var items = V2rayServer().all()
+        for item in items {
             self.group.enter() // 进入DispatchGroup
             pingQueue.async {
+                // 信号量,限制最大并发
                 self.semaphore.wait()
                 // run ping by async queue
                 self.pingEachServer(item: item)
@@ -70,6 +73,16 @@ class PingSpeed: NSObject {
         self.group.wait() // 等待所有任务完成
         print("All tasks finished")
         inPing = false
+        let langStr = Locale.current.languageCode
+        var pingTip: String = ""
+        if langStr == "en" {
+            pingTip = "Ping Speed"
+        } else {
+            pingTip = "Ping Speed"
+        }
+        DispatchQueue.main.async {
+            menuController.setStatusMenuTip(pingTip: pingTip)
+        }
         DispatchQueue.main.async {
             menuController.showServers()
         }

@@ -411,7 +411,7 @@ class V2rayLaunch: NSObject {
             let jsonFilePath = URL.init(fileURLWithPath: JsonConfigFilePath)
 
             // delete before config
-            if FileManager.default.fileExists(atPath: jsonFile) {
+            if FileManager.default.fileExists(atPath: JsonConfigFilePath) {
                 try? FileManager.default.removeItem(at: jsonFilePath)
             }
 
