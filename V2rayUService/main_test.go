@@ -84,3 +84,13 @@ func TestPingAll(t *testing.T) {
 	v2rayCoreFile = "xray.exe"
 	Ping.pingAll()
 }
+
+func TestToJson(t *testing.T) {
+	items := getAllServers()
+	for _, item := range items {
+		fmt.Println("item", item)
+		s := new(ServerToV2ray).toV2rayConfig(item)
+		fmt.Println(s.config)
+		fmt.Println(ToJson(s.config))
+	}
+}

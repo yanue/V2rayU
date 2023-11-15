@@ -40,16 +40,20 @@ type V2rayRouting struct {
 
 type V2rayRoutingRule struct {
 	Type        string   `json:"type"`
-	InboundTag  []string `json:"inboundTag"`
+	InboundTag  []string `json:"inboundTag,omitempty"`
 	OutboundTag string   `json:"outboundTag"`
+	Domain      []string `json:"domain,omitempty"`
+	Ip          []string `json:"ip,omitempty"`
 	Port        string   `json:"port,omitempty"`
 }
 
 type V2rayPolicy struct {
-	System struct {
-		StatsOutboundUplink   bool `json:"statsOutboundUplink"`
-		StatsOutboundDownlink bool `json:"statsOutboundDownlink"`
-	} `json:"system"`
+	System V2rayPolicyStat `json:"system"`
+}
+
+type V2rayPolicyStat struct {
+	StatsOutboundUplink   bool `json:"statsOutboundUplink"`
+	StatsOutboundDownlink bool `json:"statsOutboundDownlink"`
 }
 
 type FakeDNS struct {
@@ -58,27 +62,29 @@ type FakeDNS struct {
 }
 
 type Inbound struct {
-	Listen   string `json:"listen"`
-	Port     int    `json:"port"`
-	Protocol string `json:"protocol"`
-	Settings struct {
-	} `json:"settings"`
-	StreamSettings StreamSetting `json:"tag"`
-	Sniffing       struct {
-		Enabled      bool     `json:"enabled"`
-		DestOverride []string `json:"destOverride"`
-	} `json:"sniffing"`
-	Allocate struct {
-		Strategy    string `json:"strategy"`
-		Refresh     int    `json:"refresh"`
-		Concurrency int    `json:"concurrency"`
-	} `json:"allocate"`
+	Listen   string           `json:"listen"`
+	Port     int              `json:"port"`
+	Protocol string           `json:"protocol"`
+	Sniffing *InboundSniffing `json:"sniffing,omitempty"`
+	Allocate *InboundAllocate `json:"allocate,omitempty"`
+}
+
+type InboundSniffing struct {
+	Enabled      bool     `json:"enabled"`
+	DestOverride []string `json:"destOverride"`
+}
+
+type InboundAllocate struct {
+	Strategy    string `json:"strategy"`
+	Refresh     int    `json:"refresh"`
+	Concurrency int    `json:"concurrency"`
 }
 
 type Outbound struct {
-	Protocol string `json:"protocol"` // 出站协议
-	Tag      string `json:"tag"`      // 当其不为空时，其值必须在所有 tag 中 唯一。
-	Settings any    `json:"settings"` // 出站协议配置
+	Protocol       string `json:"protocol"`                  // 出站协议
+	Tag            string `json:"tag"`                       // 当其不为空时，其值必须在所有 tag 中 唯一。
+	Settings       any    `json:"settings,omitempty"`        // 出站协议配置
+	StreamSettings any    `json:"stream_settings,omitempty"` // 底层传输方式（transport）是当前 Xray 节点和其它节点对接的方式
 }
 
 type OutboundDNS struct {
@@ -100,10 +106,10 @@ type OutboundFreedom struct {
 }
 
 type OutboundTrojan struct {
-	Servers []OutboundTrojanItem `json:"servers"`
+	Servers []TrojanItem `json:"servers"`
 }
 
-type OutboundTrojanItem struct {
+type TrojanItem struct {
 	Address  string `json:"address"`         // 服务端地址，支持 IPv4、IPv6 和域名。必填。
 	Port     int    `json:"port"`            // 服务端端口，通常与服务端监听的端口相同。
 	Password string `json:"password"`        // 密码. 必填，任意字符串。
@@ -123,6 +129,7 @@ type VMessNext struct {
 type VMessUser struct {
 	Id       string `json:"id"`              // Vmess 的用户 ID，可以是任意小于 30 字节的字符串, 也可以是一个合法的 UUID.
 	Security string `json:"security"`        // 推荐使用"auto"加密方式，security: "aes-128-gcm" | "chacha20-poly1305" | "auto" | "none" | "zero"
+	AlterId  int    `json:"alter_id"`        // alter id
 	Level    int    `json:"level,omitempty"` // 用户等级，可选，默认值为 0。
 }
 
@@ -161,40 +168,44 @@ type ShadowsockItem struct {
 }
 
 type StreamSetting struct {
-	Network      string              `json:"network"`
-	Security     string              `json:"security"`
-	TlsSettings  TlsSetting          `json:"tlsSettings,omitempty"`
-	TcpSettings  TcpSetting          `json:"tcpSettings,omitempty"`
-	KcpSettings  KcpSetting          `json:"kcpSettings,omitempty"`
-	WsSettings   WsSetting           `json:"wsSettings,omitempty"`
-	HttpSettings HttpSetting         `json:"httpSettings,omitempty"`
-	QuicSettings QuicSetting         `json:"quicSettings,omitempty"`
-	DsSettings   DomainSocketSetting `json:"dsSettings,omitempty"`
-	GrpcSettings GrpcSetting         `json:"grpcSettings,omitempty"`
-	Sockopt      struct {
-		Mark                 int    `json:"mark"`
-		TcpFastOpen          bool   `json:"tcpFastOpen"`
-		Tproxy               string `json:"tproxy"`
-		DomainStrategy       string `json:"domainStrategy"`
-		DialerProxy          string `json:"dialerProxy"`
-		AcceptProxyProtocol  bool   `json:"acceptProxyProtocol"`
-		TcpKeepAliveInterval int    `json:"tcpKeepAliveInterval"`
-	} `json:"sockopt"`
+	Network  string `json:"network"`  // network: "tcp" | "kcp" | "ws" | "http" | "domainsocket" | "quic" | "grpc"
+	Security string `json:"security"` // security: "none" | "tls" | "reality" | "xtls"
+	// network settings, 按需
+	TcpSettings  *TcpSetting          `json:"tcpSettings,omitempty"`
+	KcpSettings  *KcpSetting          `json:"kcpSettings,omitempty"`
+	WsSettings   *WsSetting           `json:"wsSettings,omitempty"`
+	HttpSettings *HttpSetting         `json:"httpSettings,omitempty"`
+	QuicSettings *QuicSetting         `json:"quicSettings,omitempty"`
+	DsSettings   *DomainSocketSetting `json:"dsSettings,omitempty"`
+	GrpcSettings *GrpcSetting         `json:"grpcSettings,omitempty"`
+	// security settings，按需
+	TlsSettings     *TlsSetting     `json:"tlsSettings,omitempty"`
+	RealitySettings *RealitySetting `json:"realitySettings,omitempty"`
+}
+
+type Sockopt struct {
+	Mark                 int    `json:"mark"`
+	TcpFastOpen          bool   `json:"tcpFastOpen"`
+	Tproxy               string `json:"tproxy"`
+	DomainStrategy       string `json:"domainStrategy"`
+	DialerProxy          string `json:"dialerProxy"`
+	AcceptProxyProtocol  bool   `json:"acceptProxyProtocol"`
+	TcpKeepAliveInterval int    `json:"tcpKeepAliveInterval"`
 }
 
 type TlsSetting struct {
 	ServerName                       string        `json:"serverName"`       // 指定服务器端证书的域名，在连接由 IP 建立时有用。
 	RejectUnknownSni                 bool          `json:"rejectUnknownSni"` // 当值为 true 时，服务端接收到的 SNI 与证书域名不匹配即拒绝 TLS 握手，默认为 false。
 	AllowInsecure                    bool          `json:"allowInsecure"`    // 默认值为 false。 (出于安全性考虑，这个选项不应该在实际场景中选择 true，否则可能遭受中间人攻击。 )
-	Alpn                             []string      `json:"alpn"`             // 一个字符串数组，指定了 TLS 握手时指定的 ALPN 数值。默认值为 ["h2", "http/1.1"]。
+	Alpn                             []string      `json:"alpn,omitempty"`   // 一个字符串数组，指定了 TLS 握手时指定的 ALPN 数值。默认值为 ["h2", "http/1.1"]。
 	MinVersion                       string        `json:"minVersion"`
 	MaxVersion                       string        `json:"maxVersion"`
 	CipherSuites                     string        `json:"cipherSuites"`
-	Certificates                     []interface{} `json:"certificates"`
+	Certificates                     []interface{} `json:"certificates,omitempty"`
 	DisableSystemRoot                bool          `json:"disableSystemRoot"`
 	EnableSessionResumption          bool          `json:"enableSessionResumption"`
 	Fingerprint                      string        `json:"fingerprint"` // 当其值为空时，表示不启用此功能
-	PinnedPeerCertificateChainSha256 []string      `json:"pinnedPeerCertificateChainSha256"`
+	PinnedPeerCertificateChainSha256 []string      `json:"pinnedPeerCertificateChainSha256,omitempty"`
 }
 
 type TcpSetting struct {
