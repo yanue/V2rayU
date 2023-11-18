@@ -25,6 +25,7 @@ type ServerItem struct {
 	Id             int32  `json:"_id,omitempty"`            // 自增id
 	Key            string `json:"key,omitempty"`            // server key
 	SubKey         string `json:"sub_key,omitempty"`        // 订阅key
+	SubRemark      string `json:"sub_remark,omitempty"`     // 订阅名称
 	Type           string `json:"type,omitempty"`           // server type: vmess|vless|trojan|ss|ssr|
 	Remark         string `json:"remark,omitempty"`         // remark
 	Speed          int    `json:"speed"`                    // speed

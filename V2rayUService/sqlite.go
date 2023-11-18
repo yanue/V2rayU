@@ -11,75 +11,81 @@ import (
 var db *sql.DB
 
 var initSql = `
-CREATE TABLE IF NOT EXISTS "config" (
-	"_id"	INTEGER,
-	"key"	TEXT,
-	"val"	TEXT,
-	PRIMARY KEY("_id" AUTOINCREMENT)
+CREATE TABLE IF NOT EXISTS "config"
+(
+    "_id" INTEGER NOT NULL,
+    "key" varchar not null default '',
+    "val" varchar not null default '',
+    PRIMARY KEY ("_id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "routing" (
-	"_id"	INTEGER NOT NULL,
-	"remark"	varchar,
-	"url"	varchar,
-	"ruleSet"	varchar,
-	"ruleNum"	integer,
-	"enabled"	integer,
-	"locked"	integer,
-	"customIcon"	varchar,
-	"domainStrategy"	varchar,
-	"sort"	integer,
-	PRIMARY KEY("_id" AUTOINCREMENT)
+CREATE TABLE IF NOT EXISTS "routing"
+(
+    "_id"            INTEGER NOT NULL,
+    "remark"         varchar not null default '',
+    "url"            varchar not null default '',
+    "ruleSet"        varchar not null default '',
+    "ruleNum"        integer not null default 0,
+    "enabled"        integer not null default 0,
+    "locked"         integer not null default 0,
+    "customIcon"     varchar not null default '',
+    "domainStrategy" varchar not null default '',
+    "sort"           integer not null default 0,
+    PRIMARY KEY ("_id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "server_item" (
-	"_id"	INTEGER,
-	"key"	varchar UNIQUE,
-	"sub_key"	varchar,
-	"type"	varchar,
-	"remark"	varchar,
-	"speed" 	integer,
-	"address"	varchar,
-	"url"	text,
-	"json"	text,
-	"port"	integer,
-	"id"	varchar,
-	"alterId"	integer,
-	"security"	varchar,
-	"network"	varchar,
-	"headerType"	varchar,
-	"requestHost"	varchar,
-	"path"	varchar,
-	"streamSecurity"	varchar,
-	"allowInsecure"	varchar,
-	"flow"	varchar,
-	"sni"	varchar,
-	"alpn"	varchar,
-	"fingerprint"	varchar,
-	"publicKey"	varchar,
-	"shortId"	varchar,
-	"spiderX"	varchar,
-	UNIQUE ("sub_key","address","port")
-	PRIMARY KEY("_id" AUTOINCREMENT)
+CREATE TABLE IF NOT EXISTS "server_item"
+(
+    "_id"            INTEGER        NOT NULL,
+    "key"            varchar UNIQUE not null default '',
+    "sub_key"        varchar        not null default '',
+    "sub_remark"     varchar        not null default '',
+    "type"           varchar        not null default '',
+    "remark"         varchar        not null default '',
+    "speed"          integer        not null default 0,
+    "address"        varchar        not null default '',
+    "url"            varchar        not null default '',
+    "json"           varchar        not null default '',
+    "port"           integer        not null default 0,
+    "id"             varchar        not null default '',
+    "alterId"        integer        not null default 0,
+    "security"       varchar        not null default '',
+    "network"        varchar        not null default '',
+    "headerType"     varchar        not null default '',
+    "requestHost"    varchar        not null default '',
+    "path"           varchar        not null default '',
+    "streamSecurity" varchar        not null default '',
+    "allowInsecure"  varchar        not null default '',
+    "flow"           varchar        not null default '',
+    "sni"            varchar        not null default '',
+    "alpn"           varchar        not null default '',
+    "fingerprint"    varchar        not null default '',
+    "publicKey"      varchar        not null default '',
+    "shortId"        varchar        not null default '',
+    "spiderX"        varchar        not null default '',
+    UNIQUE ("sub_key", "address", "port")
+        PRIMARY KEY ("_id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "server_stat" (
-	"_id"	varchar NOT NULL,
-	"totalUp"	integer,
-	"totalDown"	integer,
-	"todayUp"	integer,
-	"todayDown"	integer,
-	"dateNow"	integer,
-	PRIMARY KEY("_id")
+CREATE TABLE IF NOT EXISTS "server_stat"
+(
+    "_id"       INTEGER NOT NULL,
+    "totalUp"   integer not null default 0,
+    "totalDown" integer not null default 0,
+    "todayUp"   integer not null default 0,
+    "todayDown" integer not null default 0,
+    "dateNow"   integer not null default 0,
+    PRIMARY KEY ("_id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "sub_item" (
-	"_id"	INTEGER,
-	"key"	TEXT UNIQUE,
-	"sub_type"	TEXT,
-	"remark"	TEXT,
-	"url"	TEXT UNIQUE,
-	"enabled"	integer,
-	"sort"	integer,
-	"auto_update_interval"	integer,
-	"update_time"	INTEGER,
-	PRIMARY KEY("_id" AUTOINCREMENT)
+CREATE TABLE IF NOT EXISTS "sub_item"
+(
+    "_id"                  INTEGER NOT NULL,
+    "key"                  varchar not null default '' UNIQUE,
+    "sub_type"             varchar not null default '',
+    "remark"               varchar not null default '',
+    "url"                  varchar not null default '' UNIQUE,
+    "enabled"              integer not null default 0,
+    "sort"                 integer not null default 0,
+    "auto_update_interval" integer not null default 0,
+    "update_time"          INTEGER not null default 0,
+    PRIMARY KEY ("_id" AUTOINCREMENT)
 );
 -- default routing
 INSERT INTO "routing" ("_id", "remark", "url", "ruleSet", "ruleNum", "enabled", "locked", "customIcon", "domainStrategy", "sort") VALUES ('1', '绕过大陆(Whitelist)', '', '[{"id":"5580264978215010713","outboundTag":"direct","domain":["domain:example-example.com","domain:example-example2.com"],"enabled":true},{"id":"5064543300651137083","outboundTag":"block","domain":["geosite:category-ads-all"],"enabled":true},{"id":"5232676580862334797","outboundTag":"direct","domain":["geosite:cn"],"enabled":true},{"id":"5048348083573612254","outboundTag":"direct","ip":["geoip:private","geoip:cn"],"enabled":true},{"id":"5384766660577926508","port":"0-65535","outboundTag":"proxy","enabled":true}]', '5', '1', '0', '', '', '1');

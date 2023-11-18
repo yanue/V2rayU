@@ -2,16 +2,10 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 func getAllServers() (list []*ServerItem) {
-	fields := []string{
-		`_id`, `key`, `sub_key`, `type`, `remark`, `speed`, `url`, `json`, `address`, `port`,
-		`id`, `alterId`, `security`, `network`, `headerType`, `requestHost`, `path`, `streamSecurity`, `allowInsecure`, `flow`,
-		`sni`, `alpn`, `fingerprint`, `publicKey`, `shortId`, `spiderX`,
-	}
-	query, err := db.Query(fmt.Sprintf("select %s from server_item order by id asc", strings.Join(fields, ",")))
+	query, err := db.Query(fmt.Sprintf("select %s from server_item order by id asc", serverItemPlaceholder))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
