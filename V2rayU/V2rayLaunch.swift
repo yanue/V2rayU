@@ -127,7 +127,7 @@ class V2rayLaunch: NSObject {
         }
 
         // write launch agent
-        let agentArguments = ["./v2ray-core/v2ray", "-config", "config.json"]
+        let agentArguments = ["./v2ray-core/v2ray", "run -config", "config.json"]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_NAME,
