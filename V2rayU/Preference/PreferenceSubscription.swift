@@ -194,6 +194,13 @@ extension PreferenceSubscribeViewController: NSTableViewDataSource {
 extension PreferenceSubscribeViewController: NSTableViewDelegate {
     // For NSTableViewDelegate
     func tableViewSelectionDidChange(_ notification: Notification) {
-        print("selected row", self.tableView.selectedRow)
+        let idx = self.tableView.selectedRow
+        if idx > -1 {
+            if let item = V2raySubscription.loadSubItem(idx: idx) {
+                // choose
+                self.remark.stringValue = item.remark
+                self.url.stringValue = item.url
+            }
+        }
     }
 }

@@ -57,7 +57,34 @@ class V2rayServer: NSObject {
         }
         print("loadConfig", self.v2rayItemList.count)
     }
+    
+    static func all()  -> [V2rayItem] {
+        // static reset
+        var items : [V2rayItem] = []
 
+        // load name list from UserDefaults
+        var list = UserDefaults.getArray(forKey: .v2rayServerList)
+
+        if list == nil {
+            list = ["default"]
+            // store default
+            let model = V2rayItem(name: self.defaultV2rayName, remark: "default", isValid: false)
+            model.store()
+        }
+
+        // load each V2rayItem
+        for item in list! {
+            guard let v2ray = V2rayItem.load(name: item) else {
+                // delete from UserDefaults
+                V2rayItem.remove(name: item)
+                continue
+            }
+            // append
+            items.append(v2ray)
+        }
+        return items
+    }
+    
     // clear old not valid or exist item
     static func clearItems() {
         // remove all

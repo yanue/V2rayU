@@ -301,52 +301,26 @@ class V2rayConfig: NSObject {
 
         // proxy
         if self.routingProxyDomains.count > 0 {
-            ruleProxyDomain = V2rayRoutingSettingRule()
-            ruleProxyDomain.outboundTag = "proxy"
-            ruleProxyDomain.type = "field"
-            ruleProxyDomain.domain = self.routingProxyDomains
+            ruleProxyDomain = getRoutingRule(outTag: "proxy", domain: self.routingProxyDomains, ip: nil, port: nil)
         }
         if self.routingProxyIps.count > 0 {
-            ruleProxyIp = V2rayRoutingSettingRule()
-            ruleProxyIp.outboundTag = "proxy"
-            ruleProxyIp.type = "field"
-            ruleProxyIp.ip = self.routingProxyIps
+            ruleProxyIp = getRoutingRule(outTag: "proxy", domain: nil, ip: self.routingProxyIps, port: nil)
         }
 
         // direct
         if self.routingDirectDomains.count > 0 {
-            ruleDirectDomain = V2rayRoutingSettingRule()
-            ruleDirectDomain.outboundTag = "direct"
-            ruleDirectDomain.type = "field"
-            ruleDirectDomain.domain = self.routingDirectDomains
+            ruleDirectDomain = getRoutingRule(outTag: "direct", domain: self.routingDirectDomains, ip: nil, port: nil)
         }
         if self.routingDirectIps.count > 0 {
-            ruleDirectIp = V2rayRoutingSettingRule()
-            ruleDirectIp.outboundTag = "direct"
-            ruleDirectIp.type = "field"
-            ruleDirectIp.ip = self.routingDirectIps
+            ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: self.routingDirectIps, port: nil)
         }
 
         // block
         if self.routingBlockDomains.count > 0 {
-            ruleBlockDomain = V2rayRoutingSettingRule()
-            ruleBlockDomain.outboundTag = "block"
-            ruleBlockDomain.type = "field"
-            ruleBlockDomain.domain = self.routingBlockDomains
+            ruleBlockDomain = getRoutingRule(outTag: "block", domain: self.routingDirectDomains, ip: nil, port: nil)
         }
         if self.routingBlockIps.count > 0 {
-            ruleBlockIp = V2rayRoutingSettingRule()
-            ruleBlockIp.outboundTag = "block"
-            ruleBlockIp.type = "field"
-            ruleBlockIp.ip = self.routingBlockIps
-        }
-
-        // default proxy rule
-        if ruleProxyDomain == nil {
-            ruleProxyDomain = V2rayRoutingSettingRule()
-            ruleProxyDomain.outboundTag = "proxy"
-            ruleProxyDomain.type = "field"
-            ruleProxyDomain.port = "0-65535" // 默认按端口全部代理
+            ruleBlockIp = getRoutingRule(outTag: "block", domain: nil, ip: self.routingBlockIps, port: nil)
         }
 
         switch self.routingRule {
@@ -354,58 +328,40 @@ class V2rayConfig: NSObject {
             break
         case .RoutingRuleLAN:
             if ruleDirectIp == nil {
-                ruleDirectIp = V2rayRoutingSettingRule()
-                ruleDirectIp.outboundTag = "direct"
-                ruleDirectIp.type = "field"
-                ruleDirectIp.domain = ["geoip:private"]
+                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:private"], port: nil)
             } else {
                 ruleDirectIp?.domain?.append("geoip:private")
             }
             if ruleDirectDomain == nil {
-                ruleDirectDomain = V2rayRoutingSettingRule()
-                ruleDirectDomain.outboundTag = "direct"
-                ruleDirectDomain.type = "field"
-                ruleDirectDomain.domain = ["localhost"]
+                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["localhost"], ip: nil, port: nil)
             } else {
-                ruleDirectDomain?.domain.append("localhost")
+                ruleDirectDomain?.domain?.append("localhost")
             }
             break
         case .RoutingRuleCn:
             if ruleDirectIp == nil {
-                ruleDirectIp = V2rayRoutingSettingRule()
-                ruleDirectIp.outboundTag = "direct"
-                ruleDirectIp.type = "field"
-                ruleDirectIp.domain = ["geoip:cn"]
+                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn"], port: nil)
             } else {
                 ruleDirectIp?.domain?.append("geoip:cn")
             }
             if ruleDirectDomain == nil {
-                ruleDirectDomain = V2rayRoutingSettingRule()
-                ruleDirectDomain.outboundTag = "direct"
-                ruleDirectDomain.type = "field"
-                ruleDirectDomain.domain = ["geosite:cn"]
+                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["geosite:cn"], ip: nil, port: nil)
             } else {
-                ruleDirectDomain?.domain.append("geosite:cn")
+                ruleDirectDomain?.domain?.append("geosite:cn")
             }
             break
         case .RoutingRuleLANAndCn:
             if ruleDirectIp == nil {
-                ruleDirectIp = V2rayRoutingSettingRule()
-                ruleDirectIp.outboundTag = "direct"
-                ruleDirectIp.type = "field"
-                ruleDirectIp.domain = ["geoip:cn","geoip:private"]
+                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn","geoip:private"], port: nil)
             } else {
                 ruleDirectIp?.ip?.append("geoip:private")
                 ruleDirectIp?.ip?.append("geoip:cn")
             }
             if ruleDirectDomain == nil {
-                ruleDirectDomain = V2rayRoutingSettingRule()
-                ruleDirectDomain.outboundTag = "direct"
-                ruleDirectDomain.type = "field"
-                ruleDirectDomain.domain = ["geosite:cn","localhost"]
+                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["geosite:cn","localhost"], ip: nil, port: nil)
             } else {
-                ruleDirectDomain?.domain.append("geosite:cn")
-                ruleDirectDomain?.domain.append("localhost")
+                ruleDirectDomain?.domain?.append("geosite:cn")
+                ruleDirectDomain?.domain?.append("localhost")
             }
             break
         }
@@ -436,6 +392,14 @@ class V2rayConfig: NSObject {
             ruleProxyIp?.domain = nil
             rules.append(ruleProxyIp!)
         }
+        
+        // 默认按端口全部代理
+        var ruleProxyPort = getRoutingRule(outTag: "proxy", domain: nil, ip: nil, port: "0-65535")
+        ruleProxyPort.outboundTag = "proxy"
+        ruleProxyPort.type = "field"
+        ruleProxyPort.port = "0-65535"
+//        rules.append(ruleProxyPort)
+
         // 代理规则
         self.routing.settings.rules = rules
         // set v2ray routing
@@ -443,6 +407,16 @@ class V2rayConfig: NSObject {
         // ------------------------------------- routing end ----------------------------------------------
     }
 
+    func getRoutingRule(outTag: String, domain:[String]?, ip: [String]?, port:String?) -> V2rayRoutingSettingRule {
+        var rule = V2rayRoutingSettingRule()
+        rule.outboundTag = outTag
+        rule.type = "field"
+        rule.domain = domain
+        rule.ip = ip
+        rule.port = port
+        return rule
+    }
+    
     func checkManualValid() {
         defer {
             if self.error != "" {

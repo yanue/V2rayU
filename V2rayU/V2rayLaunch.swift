@@ -162,7 +162,7 @@ class V2rayLaunch: NSObject {
 
     static func runAtStart(){
         // clear not available
-        V2rayServer().clearItems()
+        V2rayServer.clearItems()
 
         // install before launch
         V2rayLaunch.install()
@@ -222,7 +222,7 @@ class V2rayLaunch: NSObject {
     // start v2ray core
     static func startV2rayCore() {
         NSLog("start v2ray-core begin")
-        guard let v2ray = V2rayServer().loadSelectedItem() else {
+        guard let v2ray = V2rayServer.loadSelectedItem() else {
             noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
             menuController.setStatusOff()
             return
@@ -413,7 +413,7 @@ class V2rayLaunch: NSObject {
             let jsonFilePath = URL.init(fileURLWithPath: JsonConfigFilePath)
 
             // delete before config
-            if FileManager.default.fileExists(atPath: jsonFile) {
+            if FileManager.default.fileExists(atPath: JsonConfigFilePath) {
                 try? FileManager.default.removeItem(at: jsonFilePath)
             }
 

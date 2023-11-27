@@ -19,8 +19,8 @@ let pingURL = URL(string: "http://www.gstatic.com/generate_204")!
 
 class PingSpeed: NSObject {
     let lock = NSLock()
-    let semaphore = DispatchSemaphore(value: 20) // work pool
-    let group = DispatchGroup()
+    let semaphore = DispatchSemaphore(value: 30) // work pool
+    var group = DispatchGroup()
 
     func pingAll() {
         NSLog("ping start")
@@ -32,11 +32,12 @@ class PingSpeed: NSObject {
         V2rayLaunch.checkV2rayCore()
         // in ping
         inPing = true
-
+        
         killAllPing()
 
-        let itemList = V2rayServer().all()
+        let itemList = V2rayServer.all()
         if itemList.count == 0 {
+            NSLog("no items")
             inPing = false
             return
         }
@@ -51,17 +52,18 @@ class PingSpeed: NSObject {
             menuController.setStatusMenuTip(pingTip: pingTip)
         }
         let thread = Thread{
-            self.runTask()
+            self.runTask(items: itemList)
         }
         thread.start()
     }
 
-    func runTask() {
+    func runTask(items: [V2rayItem]) {
         self.group = DispatchGroup()
         let pingQueue = DispatchQueue(label: "pingQueue", qos: .background, attributes: .concurrent)
-        for item in itemList {
+        for item in items {
             self.group.enter() // 进入DispatchGroup
             pingQueue.async {
+                // 信号量,限制最大并发
                 self.semaphore.wait()
                 // run ping by async queue
                 self.pingEachServer(item: item)
@@ -70,10 +72,20 @@ class PingSpeed: NSObject {
         self.group.wait() // 等待所有任务完成
         print("All tasks finished")
         inPing = false
+        let langStr = Locale.current.languageCode
+        var pingTip: String = ""
+        if langStr == "en" {
+            pingTip = "Ping Speed"
+        } else {
+            pingTip = "Ping"
+        }
+        DispatchQueue.main.async {
+            menuController.setStatusMenuTip(pingTip: pingTip)
+        }
         DispatchQueue.main.async {
             menuController.showServers()
         }
-        // kill all ping
+        // kill
         killAllPing()
     }
 
@@ -113,27 +125,34 @@ class PingServer: NSObject, URLSessionDataDelegate {
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(_bindPort)")
         bindPort = _bindPort
-        jsonFile = AppHomePath + "/.\(item.name).json"
+        
+        let _json_file = ".\(item.name).json"
+        jsonFile = AppHomePath + "/" + _json_file
 
         // create v2ray config file
         createV2rayJsonFileForPing()
 
         // Create a Process instance with async launch
-        // can't use `/bin/bash -c cmd...` otherwize v2ray process will become a ghost process
-        process.launchPath = v2rayCoreFile
-        process.arguments = ["run", "-config", jsonFile] // 兼容 v2ray | xray
+        // use `/bin/bash -c cmd ...` and need kill subprocess
+        let pingCmd = "cd \(AppHomePath) && ./v2ray-core/v2ray run -config \(_json_file)"
+        NSLog("pingCmd: \(pingCmd)")
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", pingCmd]
 //        process.standardError = nil
 //        process.standardOutput = nil
         process.terminationHandler = { _process in
+            // 结束子进程
             if _process.terminationStatus != EXIT_SUCCESS {
-                NSLog("process is not kill \(_process.description) -  \(_process.processIdentifier) - \(_process.terminationStatus)")
+                NSLog("process is not kill \(_bindPort) - \(_process.description) -  \(_process.processIdentifier) - \(_process.terminationStatus)")
+                _process.terminate()
+                _process.waitUntilExit()
             }
         }
         // async launch and can't waitUntilExit
         process.launch()
 
         // sleep for wait v2ray process instanse
-        usleep(useconds_t(1 * second))
+        usleep(useconds_t(2 * second))
 
         // url request
         let session = URLSession(configuration: getProxyUrlSessionConfigure(httpProxyPort: bindPort), delegate: self, delegateQueue: nil)
@@ -225,10 +244,9 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
     func doPing() {
         inPingCurrent = true
         NSLog("PingCurrent start: try=\(tryPing),item=\(item.remark)")
-        usleep(useconds_t(1 * second))
         // set URLSessionDataDelegate
         let config = getProxyUrlSessionConfigure()
-        config.timeoutIntervalForRequest = 2
+        config.timeoutIntervalForRequest = 3
         // url request
         let session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
         let task = session.dataTask(with: URLRequest(url: pingURL))
@@ -262,6 +280,7 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
         // ping current fail
         if item.speed == "-1ms" {
             if tryPing < 3 {
+                usleep(useconds_t(3 * second))
                 doPing()
             } else {
                 // choose next server
@@ -281,7 +300,7 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
             return
         }
         do {
-            let serverList = V2rayServer().all()
+            let serverList = V2rayServer.all()
             if serverList.count > 1 {
                 var pingedSvrs: Dictionary = [String: Int]()
                 var allSvrs = [String]()
