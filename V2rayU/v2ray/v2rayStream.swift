@@ -10,14 +10,14 @@ import Cocoa
 
 struct V2rayTransport: Codable {
     var tlsSettings: TlsSettings?
+    var xtlsSettings: TlsSettings?
+    var realitySettings: RealitySettings?
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
-    var xtlsSettings: TlsSettings?
-    var realitySettings: RealitySettings?
     var grpcSettings: GrpcSettings?
 }
 
