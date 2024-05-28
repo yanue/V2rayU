@@ -18,9 +18,7 @@ let second: Double = 1000000
 let pingURL = URL(string: "http://www.gstatic.com/generate_204")!
 
 class PingSpeed: NSObject {
-    let lock = NSLock()
     let semaphore = DispatchSemaphore(value: 30) // work pool
-    var group = DispatchGroup()
 
     func pingAll() {
         NSLog("ping start")
@@ -28,6 +26,7 @@ class PingSpeed: NSObject {
             NSLog("ping inPing")
             return
         }
+        
         // make sure core file
         V2rayLaunch.checkV2rayCore()
         // in ping
@@ -51,26 +50,47 @@ class PingSpeed: NSObject {
         DispatchQueue.main.async {
             menuController.setStatusMenuTip(pingTip: pingTip)
         }
-        let thread = Thread{
-            self.runTask(items: itemList)
-        }
-        thread.start()
-    }
-
-    func runTask(items: [V2rayItem]) {
-        self.group = DispatchGroup()
-        let pingQueue = DispatchQueue(label: "pingQueue", qos: .background, attributes: .concurrent)
-        for item in items {
-            self.group.enter() // 进入DispatchGroup
-            pingQueue.async {
-                // 信号量,限制最大并发
-                self.semaphore.wait()
-                // run ping by async queue
-                self.pingEachServer(item: item)
+        Task {
+            do {
+                try await pingTaskGroup(items: itemList)
+            } catch let error {
+                NSLog("pingTaskGroup error: \(error)")
             }
         }
-        self.group.wait() // 等待所有任务完成
-        print("All tasks finished")
+    }
+    
+    func pingTaskGroup(items: [V2rayItem]) async throws {
+        await withThrowingTaskGroup(of: Int.self) { group in
+            for item in items {
+                group.addTask {
+                    do {
+                        await self.semaphore.wait()
+                        defer {
+                            self.semaphore.signal()
+                        }
+                        try await self.pingEachServer(item: item)
+                    } catch let error {
+                        NSLog("pingEachServer error: \(error)")
+                    }
+                    return 1
+                }
+            }
+        }
+        print("pingTaskGroup end")
+        self.pingEnd()
+    }
+
+    func pingEachServer(item: V2rayItem) async throws {
+        NSLog("ping \(item.name) - \(item.remark)")
+        if !item.isValid {
+            return
+        }
+        // ping
+        let t = PingServer(item: item)
+        try await t.doPing()
+    }
+
+    func pingEnd() {
         inPing = false
         let langStr = Locale.current.languageCode
         var pingTip: String = ""
@@ -79,32 +99,13 @@ class PingSpeed: NSObject {
         } else {
             pingTip = "Ping"
         }
+        print("pingTaskGroup pingEnd", pingTip)
         DispatchQueue.main.async {
             menuController.setStatusMenuTip(pingTip: pingTip)
-        }
-        DispatchQueue.main.async {
             menuController.showServers()
         }
         // kill
         killAllPing()
-    }
-
-    func pingEachServer(item: V2rayItem) {
-        NSLog("ping \(item.name) - \(item.remark)")
-        if !item.isValid {
-            // refresh servers
-            ping.pingEnd(item: item)
-            return
-        }
-        // ping
-        PingServer(item: item).doPing()
-    }
-
-    func pingEnd(item: V2rayItem) {
-        lock.lock()
-        self.semaphore.signal() // 释放信号量
-        self.group.leave() // 离开DispatchGroup
-        lock.unlock()
     }
 }
 
@@ -120,7 +121,7 @@ class PingServer: NSObject, URLSessionDataDelegate {
         super.init() // can actually be omitted in this example because will happen automatically.
     }
 
-    func doPing() {
+    func doPing() async throws {
         let (_, _bindPort) = getUsablePort(port: uint16(Int.random(in: 9000 ... 36500)))
 
         NSLog("doPing: \(item.name)-\(item.remark) - \(_bindPort)")
@@ -154,10 +155,13 @@ class PingServer: NSObject, URLSessionDataDelegate {
         // sleep for wait v2ray process instanse
         usleep(useconds_t(2 * second))
 
-        // url request
         let session = URLSession(configuration: getProxyUrlSessionConfigure(httpProxyPort: bindPort), delegate: self, delegateQueue: nil)
-        let task = session.dataTask(with: URLRequest(url: pingURL))
-        task.resume()
+        do {
+            let (_,_) = try await session.data(for: URLRequest(url: pingURL))
+        } catch let error {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+            NSLog("session request fail: \(error)")
+        }
     }
 
     func createV2rayJsonFileForPing() {
@@ -226,9 +230,6 @@ class PingServer: NSObject, URLSessionDataDelegate {
         } catch let error {
             print("remove ping config error: \(error)")
         }
-
-        // refresh servers
-        ping.pingEnd(item: item)
     }
 }
 
@@ -241,17 +242,34 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
         super.init() // can actually be omitted in this example because will happen automatically.
     }
 
-    func doPing() {
+    func doPing()  {
+        Task {
+            do {
+                try await _doPing()
+                pingCurrentEnd()
+            } catch let error {
+                NSLog("doPing error: \(error)")
+            }
+        }
+    }
+    
+    func _doPing() async throws {
         inPingCurrent = true
+        usleep(useconds_t(1 * second))
         NSLog("PingCurrent start: try=\(tryPing),item=\(item.remark)")
         // set URLSessionDataDelegate
         let config = getProxyUrlSessionConfigure()
         config.timeoutIntervalForRequest = 3
         // url request
         let session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
-        let task = session.dataTask(with: URLRequest(url: pingURL))
-        task.resume()
         tryPing += 1
+        do {
+            let (data, response) = try await session.data(for: URLRequest(url: pingURL))
+            print("doPing: ", data, response)
+        } catch let error {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+            NSLog("save json file fail: \(error)")
+        }
     }
 
     // MARK: - URLSessionDataDelegate
@@ -272,7 +290,6 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
         }
         // save
         item.store()
-        pingCurrentEnd()
     }
 
     func pingCurrentEnd() {

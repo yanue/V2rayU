@@ -235,10 +235,9 @@ class V2raySubItem: NSObject, NSCoding {
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
 class V2raySubSync: NSObject {
-    let lock = NSLock()
     var V2raySubSyncing = false
-    var group = DispatchGroup()
-    
+    let semaphore = DispatchSemaphore(value: 2) // work pool
+
     static var shared = V2raySubSync()
     // Initialization
     override init() {
@@ -255,27 +254,42 @@ class V2raySubSync: NSObject {
         self.V2raySubSyncing = true
         NSLog("V2raySubSync start")
 
-        let thread = Thread {
-            V2raySubscription.loadConfig()
-            let list = V2raySubscription.list()
+        V2raySubscription.loadConfig()
+        
+        let list = V2raySubscription.list()
 
-            if list.count == 0 {
-                self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
+        if list.count == 0 {
+            self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
+        }
+        // sync queue with DispatchGroup
+        Task {
+            do {
+                try await self.syncTaskGroup(items: list)
+            } catch let error {
+                NSLog("pingTaskGroup error: \(error)")
             }
-            // sync queue with DispatchGroup
-            self.group = DispatchGroup()
-            let subQueue = DispatchQueue(label: "subQueue", qos: .background)
-            for item in list {
-                subQueue.sync {
-                    self.group.enter()
-                    self.dlFromUrl(url: item.url, subscribe: item.name)
+        }
+    }
+    
+    func syncTaskGroup(items: [V2raySubItem]) async throws {
+        await withThrowingTaskGroup(of: Int.self) { group in
+            for item in items {
+                group.addTask {
+                    do {
+                        await self.semaphore.wait()
+                        defer {
+                            self.semaphore.signal()
+                        }
+                        try await self.dlFromUrl(url: item.url, subscribe: item.name)
+                    } catch let error {
+                        NSLog("syncTaskGroup error: \(error)")
+                    }
+                    return 1
                 }
             }
-            self.group.wait()
-            NSLog("V2raySubSync end")
-            self.refreshMenu()
         }
-        thread.start()
+        print("syncTaskGroup end")
+        self.refreshMenu()
     }
     
     func refreshMenu()  {
@@ -293,40 +307,27 @@ class V2raySubSync: NSObject {
         }
     }
     
-    func importEnd(url: String, subscribe: String) {
-        self.group.leave()
-    }
-    
-    public func dlFromUrl(url: String, subscribe: String) {
+    public func dlFromUrl(url: String, subscribe: String) async throws {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         guard let reqUrl = URL(string: url) else {
             logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + url + "\n\n")
-            self.importEnd(url: url, subscribe: subscribe)
             return
         }
         
         // url request with proxy
         let session = URLSession(configuration: getProxyUrlSessionConfigure())
-        let task = session.dataTask(with: URLRequest(url: reqUrl)){(data: Data?, response: URLResponse?, error: Error?) in
-            defer {
-                self.importEnd(url: url, subscribe: subscribe)
-            }
-            if error != nil {
-                self.logTip(title: "loading fail: ", uri: url, informativeText: "error: \(String(describing: error))")
+        do {
+            let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
+            if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
+                self.handle(base64Str: outputStr, subscribe: subscribe, url: url)
             } else {
-                if data != nil {
-                    if let outputStr = String(data: data!, encoding: String.Encoding.utf8) {
-                        self.handle(base64Str: outputStr, subscribe: subscribe, url: url)
-                    } else {
-                        self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
-                    }
-                } else {
-                    self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
-                }
+                self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
             }
+        } catch let error {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+            NSLog("save json file fail: \(error)")
         }
-        task.resume()
     }
 
     func handle(base64Str: String, subscribe: String, url: String) {
