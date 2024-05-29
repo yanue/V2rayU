@@ -14,6 +14,7 @@ import AppCenterCrashes
 import MASShortcut
 import Preferences
 import Sparkle
+import FirebaseCore
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
@@ -51,6 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("applicationDidFinishLaunching")
+        FirebaseApp.configure()
         // appcenter init
         AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
           Analytics.self,

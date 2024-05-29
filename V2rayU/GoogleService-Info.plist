@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBdkmf2b5ynuSiV3qcG9lo_v1Fb57YvgXs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>114354938670</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>net.yanue.V2rayU</string>
+	<key>PROJECT_ID</key>
+	<string>v2rayu-61f76</string>
+	<key>STORAGE_BUCKET</key>
+	<string>v2rayu-61f76.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:114354938670:ios:a2ee8062d103d95aad50bf</string>
+</dict>
+</plist>

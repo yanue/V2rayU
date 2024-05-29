@@ -9,6 +9,8 @@ target 'V2rayU' do
 
   # Pods for V2rayU
   pod 'AppCenter'
+  pod 'FirebaseAnalytics'
+  pod 'FirebaseCrashlytics'
   pod 'Alamofire'
   pod 'SwiftyJSON'
   # master branch
