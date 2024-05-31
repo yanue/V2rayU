@@ -283,9 +283,8 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
-        checkV2rayUVersion()
         // need set SUFeedURL into plist
-        V2rayUpdater.checkForUpdates(sender)
+        V2rayUpdater.checkForUpdates()
     }
 
     @IBAction func generateQrcode(_ sender: NSMenuItem) {

@@ -8,14 +8,13 @@ target 'V2rayU' do
   use_frameworks!
 
   # Pods for V2rayU
-  pod 'AppCenter'
-  pod 'FirebaseAnalytics'
+  pod 'FirebaseAnalytics', '~> 10.24.0'
   pod 'FirebaseCrashlytics'
   pod 'Alamofire'
   pod 'SwiftyJSON'
   # master branch
   pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
-  pod 'Sparkle'
+  pod 'Sparkle' ,'~> 2.0'
   pod 'QRCoder'
   pod 'MASShortcut'
   pod 'Swifter'

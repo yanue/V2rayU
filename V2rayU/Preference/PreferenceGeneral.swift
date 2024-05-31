@@ -69,7 +69,7 @@ final class PreferenceGeneralViewController: NSViewController, PreferencePane {
 
     @IBAction func checkVersion(_ sender: NSButton) {
         // need set SUFeedURL into plist
-        V2rayUpdater.checkForUpdates(sender)
+        V2rayUpdater.checkForUpdates()
     }
 
 }

@@ -8,9 +8,6 @@
 
 import Cocoa
 import ServiceManagement
-import AppCenter
-import AppCenterAnalytics
-import AppCenterCrashes
 import MASShortcut
 import Preferences
 import Sparkle
@@ -18,7 +15,7 @@ import FirebaseCore
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
-let V2rayUpdater = SUUpdater()
+let V2rayUpdater = V2rayUpdaterController()
 
 let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
 let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
@@ -53,11 +50,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("applicationDidFinishLaunching")
         FirebaseApp.configure()
-        // appcenter init
-        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
-          Analytics.self,
-          Crashes.self
-        ])
 
         // default settings
         self.checkDefault()
@@ -100,9 +92,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            checkV2rayUVersion()
-            // check version
-            V2rayUpdater.checkForUpdatesInBackground()
+            // 初始化更新控制器
+            V2rayUpdater.checkForUpdates()
         }
     }
 
@@ -149,9 +140,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // auto check updates
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            checkV2rayUVersion()
             // check version
-            V2rayUpdater.checkForUpdatesInBackground()
+            V2rayUpdater.checkForUpdates()
         }
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
