@@ -41,12 +41,12 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane,
         self.logView.isHidden = true
         self.subscribeView.isHidden = false
         self.logArea.string = ""
+        // reload tableview
+        V2raySubscription.loadConfig()
         // table view
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.reloadData()
-        // reload tableview
-        V2raySubscription.loadConfig()
 
         // set global hotkey
         NotificationCenter.default.addObserver(self, selector: #selector(self.updateTip), name: NOTIFY_UPDATE_SubSync, object: nil)
@@ -105,6 +105,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane,
         self.url.stringValue = ""
 
         // reload tableview
+        V2raySubscription.loadConfig()
         self.tableView.reloadData()
     }
 
@@ -130,6 +131,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane,
             }
 
             // reload tableview
+            V2raySubscription.loadConfig()
             self.tableView.reloadData()
 
             // fix
@@ -138,12 +140,7 @@ final class PreferenceSubscribeViewController: NSViewController, PreferencePane,
                 self.tableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: true)
             }
             
-            do {
-                // refresh server
-                DispatchQueue.main.async {
-                    menuController.showServers()
-                }
-            }
+            menuController.showServers()
         }
     }
 

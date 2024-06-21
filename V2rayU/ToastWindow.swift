@@ -11,22 +11,33 @@ import Cocoa
 var toastWindow =  ToastWindowController()
 
 func makeToast(message: String, displayDuration: Double? = 3) {
-    print("makeToast", message)
-    toastWindow.close()
-    toastWindow = ToastWindowController()
-    toastWindow.message = message
-    toastWindow.showWindow(Any.self)
-    toastWindow.fadeInHud(displayDuration)
-
-    NSApp.activate(ignoringOtherApps: true)
+    // UI 更新需要在主线程上执行
+    DispatchQueue.main.async {
+        print("makeToast", message)
+        toastWindow.close()
+        toastWindow = ToastWindowController()
+        toastWindow.message = message
+        toastWindow.showWindow(Any.self)
+        toastWindow.fadeInHud(displayDuration)
+        
+        NSApp.activate(ignoringOtherApps: true)
+    }
 }
 
-func alertDialog(title: String, message: String) -> Bool {
-    let myPopup = NSAlert()
-    myPopup.messageText = title
-    myPopup.informativeText = message
-    myPopup.alertStyle = .warning
-    return myPopup.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+func alertDialog(title: String, message: String) {
+    DispatchQueue.main.async {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        let response = alert.runModal()
+        
+        if response == .alertFirstButtonReturn {
+            print("OK clicked")
+        } else {
+            print("Cancel clicked")
+        }
+    }
 }
 
 class ToastWindowController: NSWindowController {

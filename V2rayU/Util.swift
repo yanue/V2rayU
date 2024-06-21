@@ -568,20 +568,20 @@ func ClearLogs() {
     try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
 }
 
-func showDock(state: Bool) -> Bool {
-    // Get transform state.
-    var transformState: ProcessApplicationTransformState
-    if state {
-        transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
-    } else {
-        transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+func showDock(state: Bool) {
+    DispatchQueue.main.async {
+        // Get transform state.
+        var transformState: ProcessApplicationTransformState
+        if state {
+            transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
+        } else {
+            transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+        }
+
+        // Show / hide dock icon.
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        TransformProcessType(&psn, transformState)
     }
-
-    // Show / hide dock icon.
-    var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
-    let transformStatus: OSStatus = TransformProcessType(&psn, transformState)
-
-    return transformStatus == 0
 }
 
 func noticeTip(title: String = "", informativeText: String = "") {

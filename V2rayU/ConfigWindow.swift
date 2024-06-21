@@ -11,23 +11,15 @@ import Alamofire
 
 var v2rayConfig: V2rayConfig = V2rayConfig()
 
-var configWindow = ConfigWindowController()
+let configWindow = ConfigWindowController()
 
 func OpenConfigWindow(){
-        if configWindow != nil {
-            // close before
-            
-        } else {
-            // renew
-            configWindow = ConfigWindowController()
-        }
-
-        _ = showDock(state: true)
-        // show window
-        configWindow.showWindow(nil)
-        configWindow.window?.makeKeyAndOrderFront(configWindow.self)
-        // bring to front
-        NSApp.activate(ignoringOtherApps: true)
+    // show window
+    configWindow.showWindow(nil)
+    configWindow.window?.makeKeyAndOrderFront(configWindow.self)
+    // bring to front
+    NSApp.activate(ignoringOtherApps: true)
+    showDock(state: true)
 }
 
 class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDelegate {
@@ -165,7 +157,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     override func windowDidLoad() {
         super.windowDidLoad()
-
+        
+        V2rayServer.loadConfig()
         // table view
         self.serversTableView.delegate = self
         self.serversTableView.dataSource = self
@@ -177,60 +170,64 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func addRemoveServer(_ sender: NSSegmentedCell) {
         // 0 add,1 remove
         let seg = addRemoveButton.indexOfSelectedItem
-
-        switch seg {
+        DispatchQueue.global().async {
+            switch seg {
                 // add server config
-        case 0:
-            // add
-            V2rayServer.add()
-
-            // reload data
-            self.serversTableView.reloadData()
-            // selected current row
-            self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
-
-            break
-
+            case 0:
+                // add
+                V2rayServer.add()
+                
+                DispatchQueue.main.sync {
+                    V2rayServer.loadConfig()
+                    // reload data
+                    self.serversTableView.reloadData()
+                    // selected current row
+                    self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
+                }
+                break
+                
                 // delete server config
-        case 1:
-            // get seleted index
-            let idx = self.serversTableView.selectedRow
-            // remove
-            V2rayServer.remove(idx: idx)
-
-            // reload
-            V2rayServer.loadConfig()
-            menuController.showServers()
-
-            // selected prev row
-            let cnt: Int = V2rayServer.count()
-            var rowIndex: Int = idx - 1
-            if idx > 0 && idx < cnt {
-                rowIndex = idx
-            }
-
-            // reload
-            self.serversTableView.reloadData()
-
-            // fix
-            if cnt > 1 {
-                // selected row
-                self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
-            }
-
-            if rowIndex >= 0 {
-                self.loadJsonData(rowIndex: rowIndex)
-            } else {
-                self.serversTableView.becomeFirstResponder()
-            }
-
-            // refresh menu
-            menuController.showServers()
-            break
-
+            case 1:
+                // get seleted index
+                let idx = self.serversTableView.selectedRow
+                // remove
+                V2rayServer.remove(idx: idx)
+                
+                // reload
+                V2rayServer.loadConfig()
+                menuController.showServers()
+                
+                // selected prev row
+                let cnt: Int = V2rayServer.count()
+                var rowIndex: Int = idx - 1
+                if idx > 0 && idx < cnt {
+                    rowIndex = idx
+                }
+                
+                DispatchQueue.main.sync {
+                    // reload
+                    self.serversTableView.reloadData()
+                    // fix
+                    if cnt > 1 {
+                        // selected row
+                        self.serversTableView.selectRowIndexes(NSIndexSet(index: rowIndex) as IndexSet, byExtendingSelection: false)
+                    }
+                
+                    if rowIndex >= 0 {
+                        self.loadJsonData(rowIndex: rowIndex)
+                    } else {
+                        self.serversTableView.becomeFirstResponder()
+                    }
+                }
+                
+                // refresh menu
+                menuController.showServers()
+                break
+                
                 // unknown action
-        default:
-            return
+            default:
+                return
+            }
         }
     }
 
@@ -273,7 +270,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     func switchToImportView() {
         // reset error
         self.errTip.stringValue = ""
-
         self.exportData()
 
         v2rayConfig.checkManualValid()
@@ -554,7 +550,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.configText.string = item?.json ?? ""
         v2rayConfig.isValid = item?.isValid ?? false
         self.jsonUrl.stringValue = item?.url ?? ""
-
+        
         v2rayConfig.parseJson(jsonText: self.configText.string)
         if v2rayConfig.errors.count > 0 {
             self.errTip.stringValue = v2rayConfig.errors[0]
@@ -567,7 +563,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         v2rayConfig.parseJson(jsonText: self.configText.string)
         if v2rayConfig.errors.count > 0 {
-            self.errTip.stringValue = v2rayConfig.errors[0]
+            DispatchQueue.main.sync {
+                self.errTip.stringValue = v2rayConfig.errors[0]
+            }
         }
 
         // save
@@ -582,7 +580,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             }
             self.refreshServerList(ok: errMsg.count == 0)
         } else {
-            self.errTip.stringValue = errMsg
+            DispatchQueue.main.sync {
+                self.errTip.stringValue = errMsg
+            }
         }
     }
 
@@ -591,8 +591,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         menuController.showServers()
         // if server is current
         if let curName = UserDefaults.get(forKey: .v2rayCurrentServerName) {
-            let v2rayItemList = V2rayServer.list()
-            if curName == v2rayItemList[self.serversTableView.selectedRow].name {
+            let v2rayItemList = V2rayServer.all()
+            if v2rayItemList.count > self.serversTableView.selectedRow && curName == v2rayItemList[self.serversTableView.selectedRow].name {
                 if ok {
                     V2rayLaunch.startV2rayCore()
                 } else {
@@ -649,12 +649,16 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             // download json file
             Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
                 if (DataResponse.error != nil) {
-                    self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
+                    DispatchQueue.main.async{
+                        self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
+                    }
                     return
                 }
 
                 if DataResponse.value != nil {
-                    self.configText.string = v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                    DispatchQueue.main.async{
+                        self.configText.string = v2rayConfig.formatJson(json: DataResponse.value ?? text)
+                    }
                 }
             }
         }
@@ -664,115 +668,142 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/tcp.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func goDsHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/domainsocket.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func goQuicHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/transport/quic.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func goProtocolHelp(_ sender: NSButton) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/protocols/vmess.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func goVersionHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/01_overview.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @IBAction func goStreamHelp(_ sender: Any) {
         guard let url = URL(string: "https://www.v2ray.com/chapter_02/05_transport.html") else {
             return
         }
-        NSWorkspace.shared.open(url)
+        DispatchQueue.main.async{
+            NSWorkspace.shared.open(url)
+        }
     }
 
     func switchSteamView(network: String) {
-        networkView.subviews.forEach {
-            $0.isHidden = true
-        }
-
-        switch network {
-        case "tcp":
-            self.tcpView.isHidden = false
-            break;
-        case "kcp":
-            self.kcpView.isHidden = false
-            break;
-        case "domainsocket":
-            self.dsView.isHidden = false
-            break;
-        case "ws":
-            self.wsView.isHidden = false
-            break;
-        case "h2":
-            self.h2View.isHidden = false
-            break;
-        case "quic":
-            self.quicView.isHidden = false
-            break;
-        case "grpc":
-            self.grpcView.isHidden = false
-            break;
-        default: // vmess
-            self.tcpView.isHidden = false
-            break
+        DispatchQueue.main.async{
+            self.networkView.subviews.forEach {
+                $0.isHidden = true
+            }
+            
+            switch network {
+            case "tcp":
+                self.tcpView.isHidden = false
+                break;
+            case "kcp":
+                self.kcpView.isHidden = false
+                break;
+            case "domainsocket":
+                self.dsView.isHidden = false
+                break;
+            case "ws":
+                self.wsView.isHidden = false
+                break;
+            case "h2":
+                self.h2View.isHidden = false
+                break;
+            case "quic":
+                self.quicView.isHidden = false
+                break;
+            case "grpc":
+                self.grpcView.isHidden = false
+                break;
+            default: // vmess
+                self.tcpView.isHidden = false
+                break
+            }
         }
     }
 
     func switchOutboundView(protocolTitle: String) {
-        serverView.subviews.forEach {
-            $0.isHidden = true
-        }
-
-        switch protocolTitle {
-        case "vmess":
-            self.VmessView.isHidden = false
-            break
-        case "vless":
-            self.VlessView.isHidden = false
-            break
-        case "shadowsocks":
-            self.ShadowsocksView.isHidden = false
-            break
-        case "socks":
-            self.SocksView.isHidden = false
-            break
-        case "trojan":
-            self.TrojanView.isHidden = false
-            break
-        default: // vmess
-            self.VmessView.isHidden = true
-            break
+        DispatchQueue.main.async{
+            self.serverView.subviews.forEach {
+                $0.isHidden = true
+            }
+            
+            switch protocolTitle {
+            case "vmess":
+                self.VmessView.isHidden = false
+                break
+            case "vless":
+                self.VlessView.isHidden = false
+                break
+            case "shadowsocks":
+                self.ShadowsocksView.isHidden = false
+                break
+            case "socks":
+                self.SocksView.isHidden = false
+                break
+            case "trojan":
+                self.TrojanView.isHidden = false
+                break
+            default: // vmess
+                self.VmessView.isHidden = true
+                break
+            }
         }
     }
     
     func switchSecurityView(securityTitle: String) {
-        print("switchSecurityView",securityTitle)
-        self.tlsView.isHidden = true
-        self.realityView.isHidden = true
-        if securityTitle == "reality" {
-            self.realityView.isHidden = false
-        } else {
-            self.tlsView.isHidden = false
+        DispatchQueue.main.async{
+            print("switchSecurityView",securityTitle)
+            self.tlsView.isHidden = true
+            self.realityView.isHidden = true
+            if securityTitle == "reality" {
+                self.realityView.isHidden = false
+            } else {
+                self.tlsView.isHidden = false
+            }
         }
     }
 
+    func reloadData(){
+        DispatchQueue.main.async{
+            if self.serversTableView != nil {
+                V2rayServer.loadConfig()
+                self.serversTableView.reloadData()
+            }
+        }
+    }
+    
     @IBAction func switchSteamSecurity(_ sender: NSPopUpButtonCell) {
         if let item = switchSecurity.selectedItem {
             self.switchSecurityView(securityTitle: item.title)
@@ -795,43 +826,47 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         guard let item = sender.selectedItem else {
             return
         }
-        // url
-        if item.title == "url" {
-            jsonUrl.stringValue = ""
-            selectFileBtn.isHidden = true
-            importBtn.isHidden = false
-            jsonUrl.isEditable = true
-        } else {
-            // local file
-            jsonUrl.stringValue = ""
-            selectFileBtn.isHidden = false
-            importBtn.isHidden = true
-            jsonUrl.isEditable = false
+        DispatchQueue.main.async{
+            // url
+            if item.title == "url" {
+                self.jsonUrl.stringValue = ""
+                self.selectFileBtn.isHidden = true
+                self.importBtn.isHidden = false
+                self.jsonUrl.isEditable = true
+            } else {
+                // local file
+                self.jsonUrl.stringValue = ""
+                self.selectFileBtn.isHidden = false
+                self.importBtn.isHidden = true
+                self.jsonUrl.isEditable = false
+            }
         }
     }
 
     @IBAction func browseFile(_ sender: NSButton) {
-        jsonUrl.stringValue = ""
-        let dialog = NSOpenPanel()
-
-        dialog.title = "Choose a .json file";
-        dialog.showsResizeIndicator = true;
-        dialog.showsHiddenFiles = false;
-        dialog.canChooseDirectories = true;
-        dialog.canCreateDirectories = true;
-        dialog.allowsMultipleSelection = false;
-        dialog.allowedFileTypes = ["json", "txt"];
-
-        if (dialog.runModal() == NSApplication.ModalResponse.OK) {
-            let result = dialog.url // Pathname of the file
-
-            if (result != nil) {
-                jsonUrl.stringValue = result?.absoluteString ?? ""
-                self.importJson()
+        DispatchQueue.main.async{
+            self.jsonUrl.stringValue = ""
+            let dialog = NSOpenPanel()
+            
+            dialog.title = "Choose a .json file";
+            dialog.showsResizeIndicator = true;
+            dialog.showsHiddenFiles = false;
+            dialog.canChooseDirectories = true;
+            dialog.canCreateDirectories = true;
+            dialog.allowsMultipleSelection = false;
+            dialog.allowedFileTypes = ["json", "txt"];
+            
+            if (dialog.runModal() == NSApplication.ModalResponse.OK) {
+                let result = dialog.url // Pathname of the file
+                
+                if (result != nil) {
+                    self.jsonUrl.stringValue = result?.absoluteString ?? ""
+                    self.importJson()
+                }
+            } else {
+                // User clicked on "Cancel"
+                return
             }
-        } else {
-            // User clicked on "Cancel"
-            return
         }
     }
 
@@ -845,19 +880,25 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBAction func cancel(_ sender: NSButton) {
         // hide dock icon and close all opened windows
-        _ = showDock(state: false)
+        showDock(state: false)
     }
 
     @IBAction func goAdvanceSetting(_ sender: Any) {
-        preferencesWindowController.show(preferencePane: .advanceTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .advanceTab)
+        }
     }
 
     @IBAction func goSubscribeSetting(_ sender: Any) {
-        preferencesWindowController.show(preferencePane: .subscribeTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .subscribeTab)
+        }
     }
 
     @IBAction func goRoutingRuleSetting(_ sender: Any) {
-        preferencesWindowController.show(preferencePane: .routingTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .routingTab)
+        }
     }
 }
 
@@ -883,12 +924,16 @@ extension ConfigWindowController: NSTableViewDataSource {
             NSLog("remark is nil")
             return
         }
-        // edit item remark
-        V2rayServer.edit(rowIndex: row, remark: remark)
-        // reload table
-        tableView.reloadData()
-        // reload menu
-        menuController.showServers()
+        DispatchQueue.global().async {
+            // edit item remark
+            V2rayServer.edit(rowIndex: row, remark: remark)
+            // reload table
+            DispatchQueue.main.async {
+                tableView.reloadData()
+            }
+            // reload menu
+            menuController.showServers()
+        }
     }
 }
 
@@ -942,16 +987,18 @@ extension ConfigWindowController: NSTableViewDelegate {
                 newIndexOffset += 1
             }
         }
-
-        // move
-        V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
-        // set selected
-        self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
-        // reload table
-        self.serversTableView.reloadData()
-        // reload menu
-        menuController.showServers()
-
+        DispatchQueue.global().async {
+            // move
+            V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
+            DispatchQueue.main.async {
+                // set selected
+                self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
+                // reload table
+                self.serversTableView.reloadData()
+            }
+            // reload menu
+            menuController.showServers()
+        }
         return true
     }
 }

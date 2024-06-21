@@ -236,7 +236,7 @@ let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
 class V2raySubSync: NSObject {
     var V2raySubSyncing = false
-    let semaphore = DispatchSemaphore(value: 2) // work pool
+    let maxConcurrentTasks = 1 // work pool
 
     static var shared = V2raySubSync()
     // Initialization
@@ -253,8 +253,6 @@ class V2raySubSync: NSObject {
         }
         self.V2raySubSyncing = true
         NSLog("V2raySubSync start")
-
-        V2raySubscription.loadConfig()
         
         let list = V2raySubscription.list()
 
@@ -272,23 +270,29 @@ class V2raySubSync: NSObject {
     }
     
     func syncTaskGroup(items: [V2raySubItem]) async throws {
-        await withThrowingTaskGroup(of: Int.self) { group in
-            for item in items {
-                group.addTask {
-                    do {
-                        await self.semaphore.wait()
-                        defer {
-                            self.semaphore.signal()
-                        }
-                        try await self.dlFromUrl(url: item.url, subscribe: item.name)
-                    } catch let error {
-                        NSLog("syncTaskGroup error: \(error)")
-                    }
-                    return 1
-                }
-            }
+        let taskChunks = stride(from: 0, to: items.count, by: maxConcurrentTasks).map {
+            Array(items[$0..<min($0 + maxConcurrentTasks, items.count)])
         }
-        print("syncTaskGroup end")
+        NSLog("syncTaskGroup-start: taskChunks=\(taskChunks.count)")
+        for (i, chunk) in taskChunks.enumerated() {
+            NSLog("syncTaskGroup-start-\(i): count=\(chunk.count)")
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                for item in chunk {
+                    group.addTask {
+                        do {
+                            try await self.dlFromUrl(url: item.url, subscribe: item.name)
+                        } catch {
+                            NSLog("dlFromUrl error: \(error)")
+                        }
+                        return
+                    }
+                }
+                // 等待当前批次所有任务完成
+                try await group.waitForAll()
+            }
+            NSLog("syncTaskGroup-end-\(i)")
+        }
+        NSLog("syncTaskGroup-end")
         self.refreshMenu()
     }
     
@@ -298,10 +302,9 @@ class V2raySubSync: NSObject {
         usleep(useconds_t(1 * second))
         do {
             // refresh server
-            DispatchQueue.main.async {
-                menuController.showServers()
-            }
-            usleep(useconds_t(2 * second))
+            menuController.showServers()
+            // sleep 2
+            sleep(2)
             // do ping
             ping.pingAll()
         }
@@ -400,10 +403,6 @@ class V2raySubSync: NSObject {
         let list = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
         var count = 0
         for uri in list {
-            count += 1
-            if count > 50 {
-                break // limit 50
-            }
             // import every server
             if (uri.count > 0) {
                 let filterUri =  uri.trimmingCharacters(in: .whitespacesAndNewlines)

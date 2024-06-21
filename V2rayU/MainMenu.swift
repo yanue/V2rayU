@@ -31,6 +31,7 @@ class MenuController: NSObject, NSMenuDelegate {
     // when menu.xib loaded
     override func awakeFromNib() {
         print("awakeFromNib")
+        super.awakeFromNib()
         statusMenu.delegate = self
         statusItem.menu = statusMenu
 
@@ -42,89 +43,85 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     func setStatusOff() {
-        v2rayStatusItem.title = "v2ray-core: Off" + ("  (v" + appVersion + ")")
-        toggleV2rayItem.title = "Turn v2ray-core On"
+        DispatchQueue.main.async {
+            self.v2rayStatusItem.title = "v2ray-core: Off" + ("  (v" + appVersion + ")")
+            self.toggleV2rayItem.title = "Turn v2ray-core On"
 
-        if let button = statusItem.button {
-            // UI API called on a background thread: -[NSStatusBarButton setImage:]
-            DispatchQueue.main.async {
+            if let button = self.statusItem.button {
                 button.image = NSImage(named: NSImage.Name("IconOff"))
             }
+
+            self.pacMode.state = .off
+            self.globalMode.state = .off
+            self.manualMode.state = .off
+
+            // set off
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
         }
-
-        self.pacMode.state = .off
-        self.globalMode.state = .off
-        self.manualMode.state = .off
-
-        // set off
-        UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
     }
 
     func setModeIcon(mode: RunMode) {
-        var iconName = "IconOn"
+        DispatchQueue.main.async {
 
-        switch mode {
-        case .global:
-            iconName = "IconOnG"
-            self.pacMode.state = .off
-            self.globalMode.state = .on
-            self.manualMode.state = .off
-        case .manual:
-            iconName = "IconOnM"
-            self.pacMode.state = .off
-            self.globalMode.state = .off
-            self.manualMode.state = .on
-        case .pac:
-            iconName = "IconOnP"
-            self.pacMode.state = .on
-            self.globalMode.state = .off
-            self.manualMode.state = .off
-        default:
-            break
-        }
+            var iconName = "IconOn"
 
-        if let button = statusItem.button {
-            // UI API called on a background thread: -[NSStatusBarButton setImage:]
-            DispatchQueue.main.async {
+            switch mode {
+            case .global:
+                iconName = "IconOnG"
+                self.pacMode.state = .off
+                self.globalMode.state = .on
+                self.manualMode.state = .off
+            case .manual:
+                iconName = "IconOnM"
+                self.pacMode.state = .off
+                self.globalMode.state = .off
+                self.manualMode.state = .on
+            case .pac:
+                iconName = "IconOnP"
+                self.pacMode.state = .on
+                self.globalMode.state = .off
+                self.manualMode.state = .off
+            default:
+                break
+            }
+
+            if let button = self.statusItem.button {
                 button.image = NSImage(named: NSImage.Name(iconName))
             }
         }
     }
-    
+
     func setStatusOn(mode: RunMode) {
-        v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
-        toggleV2rayItem.title = "Turn v2ray-core Off"
-        
-        self.setModeIcon(mode: mode)
-        
-        // set on
-        UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+        DispatchQueue.main.async {
+            self.v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
+            self.toggleV2rayItem.title = "Turn v2ray-core Off"
+            self.setModeIcon(mode: mode)
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+        }
     }
 
     func setStatusMenuTip(pingTip: String) {
-        do {
-            DispatchQueue.main.async {
-                if self.statusMenu.item(withTag: 1) != nil {
-                    self.statusMenu.item(withTag: 1)!.title = pingTip
-                }
+        DispatchQueue.main.async {
+            if let item = self.statusMenu.item(withTag: 1) {
+                item.title = pingTip
             }
         }
     }
 
     func showServers() {
-        print("showServers")
-        let _subMenus = getServerMenus()
-        lock.lock()
-        do {
+        DispatchQueue.global().async {
+            self.lock.lock()
+            defer { self.lock.unlock() }
+            
+            print("showServers")
+            let _subMenus = self.getServerMenus()
+
             DispatchQueue.main.async {
                 self.serverItems.submenu = _subMenus
                 // fix: must be used from main thread only
-                if configWindow != nil && configWindow.serversTableView != nil  {
-                        configWindow.serversTableView.reloadData()
-                }
+                configWindow.reloadData()
             }
         }
-        lock.unlock()
     }
     
     func getServerMenus() -> NSMenu {
@@ -135,10 +132,8 @@ class MenuController: NSObject, NSMenuDelegate {
         var validCount = 0
         var groupMenus: Dictionary = [String: NSMenu]()
         var chooseGroup = ""
-        // reload servers
-        V2rayServer.loadConfig()
         // for each
-        for item in V2rayServer.list() {
+        for item in V2rayServer.all() {
             validCount+=1
             let menuItem: NSMenuItem = self.buildServerItem(item: item, curSer: curSer)
             var groupTag: String = item.subscribe
@@ -217,45 +212,43 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func openPreferenceGeneral(_ sender: NSMenuItem) {
-        preferencesWindowController.show(preferencePane: .generalTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .generalTab)
+        }
     }
 
     @IBAction func openPreferenceSubscribe(_ sender: NSMenuItem) {
-        preferencesWindowController.show(preferencePane: .subscribeTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .subscribeTab)
+        }
     }
 
     @IBAction func openPreferencePac(_ sender: NSMenuItem) {
-        preferencesWindowController.show(preferencePane: .pacTab)
+        DispatchQueue.main.async {
+            preferencesWindowController.show(preferencePane: .pacTab)
+        }
     }
 
-    // switch server
     @IBAction func switchServer(_ sender: NSMenuItem) {
         guard let obj = sender.representedObject as? V2rayItem else {
             NSLog("switchServer err")
             return
         }
-        // set current
         UserDefaults.set(forKey: .v2rayCurrentServerName, value: obj.name)
-        // restart
         V2rayLaunch.restartV2ray()
     }
 
-    // open config window
     @IBAction func openConfig(_ sender: NSMenuItem) {
         OpenConfigWindow()
     }
 
-    /// When a window was closed this methods takes care of releasing its controller.
-    ///
-    /// - parameter notification: The notification.
     @objc private func configWindowWillClose(notification: Notification) {
         guard let object = notification.object as? NSWindow else {
             return
         }
 
-        // config window title is "V2rayU"
         if object.title == "V2rayU" {
-            _ = showDock(state: false)
+           showDock(state: false)
         }
     }
 
@@ -276,7 +269,6 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.restartV2ray()
     }
 
-    // MARK: - actions
     @IBAction func switchGlobalMode(_ sender: NSMenuItem) {
         UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         V2rayLaunch.restartV2ray()

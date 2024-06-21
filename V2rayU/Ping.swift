@@ -18,7 +18,7 @@ let second: Double = 1000000
 let pingURL = URL(string: "http://www.gstatic.com/generate_204")!
 
 class PingSpeed: NSObject {
-    let semaphore = DispatchSemaphore(value: 30) // work pool
+    let maxConcurrentTasks = 30
 
     func pingAll() {
         NSLog("ping start")
@@ -33,7 +33,7 @@ class PingSpeed: NSObject {
         inPing = true
         
         killAllPing()
-
+        
         let itemList = V2rayServer.all()
         if itemList.count == 0 {
             NSLog("no items")
@@ -47,9 +47,7 @@ class PingSpeed: NSObject {
         } else {
             pingTip = "Ping Speed - 测试中"
         }
-        DispatchQueue.main.async {
-            menuController.setStatusMenuTip(pingTip: pingTip)
-        }
+        menuController.setStatusMenuTip(pingTip: pingTip)
         Task {
             do {
                 try await pingTaskGroup(items: itemList)
@@ -59,29 +57,36 @@ class PingSpeed: NSObject {
         }
     }
     
-    func pingTaskGroup(items: [V2rayItem]) async throws {
-        await withThrowingTaskGroup(of: Int.self) { group in
-            for item in items {
-                group.addTask {
-                    do {
-                        await self.semaphore.wait()
-                        defer {
-                            self.semaphore.signal()
-                        }
-                        try await self.pingEachServer(item: item)
-                    } catch let error {
-                        NSLog("pingEachServer error: \(error)")
-                    }
-                    return 1
-                }
-            }
+    func pingTaskGroup(items: [V2rayItem]) async throws  {
+        let taskChunks = stride(from: 0, to: items.count, by: maxConcurrentTasks).map {
+            Array(items[$0..<min($0 + maxConcurrentTasks, items.count)])
         }
-        print("pingTaskGroup end")
+        NSLog("pingTaskGroup-start: taskChunks=\(taskChunks.count)")
+        for (i, chunk) in taskChunks.enumerated() {
+            NSLog("pingTaskGroup-start-\(i): count=\(chunk.count)")
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                for item in chunk {
+                    group.addTask {
+                        do {
+                            try await self.pingEachServer(item: item)
+                        } catch {
+                            NSLog("pingEachServer error: \(error)")
+                        }
+                        return
+                    }
+                }
+                
+                // 等待当前批次所有任务完成
+                try await group.waitForAll()
+            }
+            NSLog("pingTaskGroup-end-\(i)")
+        }
+        NSLog("pingTaskGroup-end")
         self.pingEnd()
     }
 
     func pingEachServer(item: V2rayItem) async throws {
-        NSLog("ping \(item.name) - \(item.remark)")
+        NSLog("pingEachServer: \(item.name) - \(item.remark)")
         if !item.isValid {
             return
         }
@@ -99,11 +104,9 @@ class PingSpeed: NSObject {
         } else {
             pingTip = "Ping"
         }
-        print("pingTaskGroup pingEnd", pingTip)
-        DispatchQueue.main.async {
-            menuController.setStatusMenuTip(pingTip: pingTip)
-            menuController.showServers()
-        }
+        print("pingEnd", pingTip)
+        menuController.setStatusMenuTip(pingTip: pingTip)
+        menuController.showServers()
         // kill
         killAllPing()
     }
@@ -132,15 +135,16 @@ class PingServer: NSObject, URLSessionDataDelegate {
 
         // create v2ray config file
         createV2rayJsonFileForPing()
-
+        // 创建管道
+        let processPipe = Pipe()
         // Create a Process instance with async launch
         // use `/bin/bash -c cmd ...` and need kill subprocess
         let pingCmd = "cd \(AppHomePath) && ./v2ray-core/v2ray run -config \(_json_file)"
         NSLog("pingCmd: \(pingCmd)")
         process.launchPath = "/bin/bash"
         process.arguments = ["-c", pingCmd]
-//        process.standardError = nil
-//        process.standardOutput = nil
+        process.standardError = processPipe
+        process.standardOutput = processPipe
         process.terminationHandler = { _process in
             // 结束子进程
             if _process.terminationStatus != EXIT_SUCCESS {
@@ -264,8 +268,7 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
         let session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
         tryPing += 1
         do {
-            let (data, response) = try await session.data(for: URLRequest(url: pingURL))
-            print("doPing: ", data, response)
+            let (_,_) = try await session.data(for: URLRequest(url: pingURL))
         } catch let error {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
             NSLog("save json file fail: \(error)")
@@ -305,9 +308,7 @@ class PingCurrent: NSObject, URLSessionDataDelegate {
             }
         } else {
             inPingCurrent = false
-            DispatchQueue.main.async {
-                menuController.showServers()
-            }
+            menuController.showServers()
         }
     }
 

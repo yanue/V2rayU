@@ -175,12 +175,10 @@ class V2rayLaunch: NSObject {
             // start and show servers
             self.startV2rayCore()
         } else {
-            DispatchQueue.main.async {
-                // show off status
-                menuController.setStatusOff()
-                // show servers
-                menuController.showServers()
-            }
+            // show off status
+            menuController.setStatusOff()
+            // show servers
+            menuController.showServers()
         }
 
         // auto update subscribe servers
@@ -244,9 +242,8 @@ class V2rayLaunch: NSObject {
         self.setRunMode(mode: runMode)
 
         // reload menu
-        DispatchQueue.main.async {
-            menuController.showServers()
-        }
+        menuController.showServers()
+
         // ping current
         PingCurrent(item: v2ray).doPing()
     }
@@ -256,12 +253,10 @@ class V2rayLaunch: NSObject {
         V2rayLaunch.Stop()
         // off system proxy
         V2rayLaunch.setSystemProxy(mode: .off)
-        DispatchQueue.main.async {
-            // set status
-            menuController.setStatusOff()
-            // reload menu
-            menuController.showServers()
-        }
+        // set status
+        menuController.setStatusOff()
+        // reload menu
+        menuController.showServers()
     }
 
     static func Start() -> Bool {
@@ -279,8 +274,10 @@ class V2rayLaunch: NSObject {
                 toast = "http port \(httpPort) has been used, please replace it from advance setting"
                 title = "Port is already in use"
             }
-            _ = alertDialog(title: title, message: toast)
-            preferencesWindowController.show(preferencePane: .advanceTab)
+            alertDialog(title: title, message: toast)
+            DispatchQueue.main.async {
+                preferencesWindowController.show(preferencePane: .advanceTab)
+            }
             return false
         }
 
@@ -292,8 +289,10 @@ class V2rayLaunch: NSObject {
                 toast = "socks port \(sockPort) has been used, please replace it from advance setting"
                 title = "Port is already in use"
             }
-            _ = alertDialog(title: title, message: toast)
-            preferencesWindowController.show(preferencePane: .advanceTab)
+            alertDialog(title: title, message: toast)
+            DispatchQueue.main.async {
+                preferencesWindowController.show(preferencePane: .advanceTab)
+            }
             return false
         }
 
@@ -384,8 +383,10 @@ class V2rayLaunch: NSObject {
                     toast = "pac port \(pacPort) has been used, please replace from advance setting"
                     title = "Port is already in use"
                 }
-                _ = alertDialog(title: title, message: toast)
-                preferencesWindowController.show(preferencePane: .advanceTab)
+                alertDialog(title: title, message: toast)
+                DispatchQueue.main.async {
+                    preferencesWindowController.show(preferencePane: .advanceTab)
+                }
                 return
             }
 
@@ -468,11 +469,13 @@ func checkV2rayUVersion() {
             let curVer = newVer.replacingOccurrences(of: "v", with: "").versionToInt()
 
             // compare with [Int]
-            if oldVer.lexicographicallyPrecedes(curVer) {
-                menuController.newVersionItem.isHidden = false
-                menuController.newVersionItem.title = "has new version " + newVer
-            } else {
-                menuController.newVersionItem.isHidden = true
+            DispatchQueue.main.async {
+                if oldVer.lexicographicallyPrecedes(curVer) {
+                    menuController.newVersionItem.isHidden = false
+                    menuController.newVersionItem.title = "has new version " + newVer
+                } else {
+                    menuController.newVersionItem.isHidden = true
+                }
             }
         }
     }

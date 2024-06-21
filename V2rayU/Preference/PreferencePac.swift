@@ -60,9 +60,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
                 // save user rules into file
                 print("user-rules", str)
                 try str.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
-
+                
                 UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl.stringValue)
-
+                
                 if GeneratePACFile(rewrite: true) {
                     // Popup a user notification
                     tips.stringValue = "PAC has been updated by User Rules."
@@ -90,7 +90,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         }
         
         guard let reqUrl = URL(string: gfwPacListUrl) else {
-            self.tips.stringValue = "Failed to download latest GFW List: url is not valid"
+            DispatchQueue.main.async {
+                self.tips.stringValue = "Failed to download latest GFW List: url is not valid"
+            }
             return
         }
         
@@ -263,9 +265,6 @@ func getPacUserRules() -> String {
     }
     if !userRuleTxt.contains("github.io") {
         userRuleTxt.append("\n||github.io")
-    }
-    if !userRuleTxt.contains("api.github.com") {
-        userRuleTxt.append("\n||api.github.com")
     }
     if !userRuleTxt.contains("api.github.com") {
         userRuleTxt.append("\n||api.github.com")
