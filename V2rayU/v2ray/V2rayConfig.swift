@@ -297,8 +297,8 @@ class V2rayConfig: NSObject {
         var rules: [V2rayRoutingSettingRule] = []
 
         // rules
-        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp: V2rayRoutingSettingRule?
-
+        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp, ruleDirectIpDefault, ruleDirectDomainDefault: V2rayRoutingSettingRule?
+        print("ruleBlockDomain",self.routingBlockDomains)
         // proxy
         if self.routingProxyDomains.count > 0 {
             ruleProxyDomain = getRoutingRule(outTag: "proxy", domain: self.routingProxyDomains, ip: nil, port: nil)
@@ -317,7 +317,7 @@ class V2rayConfig: NSObject {
 
         // block
         if self.routingBlockDomains.count > 0 {
-            ruleBlockDomain = getRoutingRule(outTag: "block", domain: self.routingDirectDomains, ip: nil, port: nil)
+            ruleBlockDomain = getRoutingRule(outTag: "block", domain: self.routingBlockDomains, ip: nil, port: nil)
         }
         if self.routingBlockIps.count > 0 {
             ruleBlockIp = getRoutingRule(outTag: "block", domain: nil, ip: self.routingBlockIps, port: nil)
@@ -327,79 +327,60 @@ class V2rayConfig: NSObject {
         case .RoutingRuleGlobal:
             break
         case .RoutingRuleLAN:
-            if ruleDirectIp == nil {
-                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:private"], port: nil)
-            } else {
-                ruleDirectIp?.domain?.append("geoip:private")
-            }
-            if ruleDirectDomain == nil {
-                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["localhost"], ip: nil, port: nil)
-            } else {
-                ruleDirectDomain?.domain?.append("localhost")
-            }
+            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:private"], port: nil)
+            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["localhost"], ip: nil, port: nil)
             break
         case .RoutingRuleCn:
-            if ruleDirectIp == nil {
-                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn"], port: nil)
-            } else {
-                ruleDirectIp?.domain?.append("geoip:cn")
-            }
-            if ruleDirectDomain == nil {
-                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["geosite:cn"], ip: nil, port: nil)
-            } else {
-                ruleDirectDomain?.domain?.append("geosite:cn")
-            }
+            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn"], port: nil)
+            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["geosite:cn"], ip: nil, port: nil)
             break
         case .RoutingRuleLANAndCn:
-            if ruleDirectIp == nil {
-                ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn","geoip:private"], port: nil)
-            } else {
-                ruleDirectIp?.ip?.append("geoip:private")
-                ruleDirectIp?.ip?.append("geoip:cn")
-            }
-            if ruleDirectDomain == nil {
-                ruleDirectDomain = getRoutingRule(outTag: "direct", domain: ["geosite:cn","localhost"], ip: nil, port: nil)
-            } else {
-                ruleDirectDomain?.domain?.append("geosite:cn")
-                ruleDirectDomain?.domain?.append("localhost")
-            }
+            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn","geoip:private"], port: nil)
+            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["geosite:cn","localhost"], ip: nil, port: nil)
             break
         }
-        // 先block
+        // 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连 的优先级进行匹配
+        
+        // 域名阻断
         if ruleBlockDomain != nil {
             ruleBlockDomain?.ip = nil
             rules.append(ruleBlockDomain!)
         }
-        if ruleBlockIp != nil {
-            ruleBlockIp?.domain = nil
-            rules.append(ruleBlockIp!)
-        }
-        // 然后直连
-        if ruleDirectDomain != nil {
-            ruleDirectDomain!.ip = nil
-            rules.append(ruleDirectDomain!)
-        }
-        if ruleDirectIp != nil {
-            ruleDirectIp!.domain = nil
-            rules.append(ruleDirectIp!)
-        }
-        // 最后代理
+        // 域名代理
         if ruleProxyDomain != nil {
             ruleProxyDomain?.ip = nil
             rules.append(ruleProxyDomain!)
         }
+        // 域名直连
+        if ruleDirectDomain != nil {
+            ruleDirectDomain!.ip = nil
+            rules.append(ruleDirectDomain!)
+        }
+        // IP阻断
+        if ruleBlockIp != nil {
+            ruleBlockIp!.domain = nil
+            rules.append(ruleBlockIp!)
+        }
+        // IP代理
         if ruleProxyIp != nil {
-            ruleProxyIp?.domain = nil
+            ruleProxyIp!.domain = nil
             rules.append(ruleProxyIp!)
         }
-        
-        // 默认按端口全部代理
-        var ruleProxyPort = getRoutingRule(outTag: "proxy", domain: nil, ip: nil, port: "0-65535")
-        ruleProxyPort.outboundTag = "proxy"
-        ruleProxyPort.type = "field"
-        ruleProxyPort.port = "0-65535"
-//        rules.append(ruleProxyPort)
-
+        // IP直连
+        if ruleDirectIp != nil {
+            ruleDirectIp!.domain = nil
+            rules.append(ruleDirectIp!)
+        }
+        // 如果匹配失败，则私有地址和大陆境内地址直连，否则走代理。
+        if ruleDirectIpDefault != nil {
+            ruleDirectIpDefault!.domain = nil
+            rules.append(ruleDirectIpDefault!)
+        }
+        if ruleDirectDomainDefault != nil {
+            ruleDirectDomainDefault!.ip = nil
+            rules.append(ruleDirectDomainDefault!)
+        }
+        // 默认全部代理, 无需设置规则
         // 代理规则
         self.routing.settings.rules = rules
         // set v2ray routing

@@ -30,7 +30,17 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 
     @IBOutlet var gfwPacListUrl: NSTextField!
     @IBOutlet var userRulesView: NSTextView!
+    
+    @objc private func configWindowWillClose(notification: Notification) {
+        print("configWindowWillClose-pac",notification)
+        guard let object = notification.object as? NSWindow else {
+            return
+        }
 
+        if object.title == "V2rayU" {
+           showDock(state: false)
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         // fix: https://github.com/sindresorhus/Preferences/issues/31
@@ -274,6 +284,9 @@ func getPacUserRules() -> String {
     }
     if !userRuleTxt.contains("chat.openai.com") {
         userRuleTxt.append("\n||chat.openai.com")
+    }
+    if !userRuleTxt.contains("chatgpt.com") {
+        userRuleTxt.append("\n||chatgpt.com")
     }
     return userRuleTxt
 }

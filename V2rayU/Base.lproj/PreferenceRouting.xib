@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -23,7 +23,7 @@
             <rect key="frame" x="0.0" y="0.0" width="700" height="360"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jcb-hK-ckn">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jcb-hK-ckn">
                     <rect key="frame" x="18" y="323" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Domain Strategy:" id="22k-l7-G7a">
@@ -32,7 +32,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oz6-O3-feh">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oz6-O3-feh">
                     <rect key="frame" x="42" y="293" width="85" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Routing Rule:" id="4rB-9k-291">
@@ -121,23 +121,23 @@
                         </tabViewItem>
                         <tabViewItem label="Direct" identifier="" id="yc0-Po-cG1">
                             <view key="view" id="mlE-HX-BcJ">
-                                <rect key="frame" x="10" y="33" width="414" height="190"/>
+                                <rect key="frame" x="10" y="33" width="650" height="190"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kkR-uc-Qja">
-                                        <rect key="frame" x="12" y="12" width="389" height="171"/>
+                                        <rect key="frame" x="12" y="12" width="627" height="171"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="oot-vM-Y6a">
-                                            <rect key="frame" x="0.0" y="0.0" width="389" height="171"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="oot-vM-Y6a">
+                                            <rect key="frame" x="0.0" y="0.0" width="627" height="171"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="vYm-hy-3PV">
-                                                    <rect key="frame" x="0.0" y="0.0" width="389" height="171"/>
+                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="vYm-hy-3PV">
+                                                    <rect key="frame" x="0.0" y="0.0" width="627" height="171"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                    <size key="minSize" width="389" height="171"/>
-                                                    <size key="maxSize" width="394" height="10000000"/>
+                                                    <size key="minSize" width="627" height="171"/>
+                                                    <size key="maxSize" width="628" height="10000000"/>
                                                     <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 </textView>
                                             </subviews>
@@ -148,7 +148,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="9vp-fC-VPR">
-                                            <rect key="frame" x="373" y="0.0" width="16" height="171"/>
+                                            <rect key="frame" x="611" y="0.0" width="16" height="171"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
@@ -157,23 +157,23 @@
                         </tabViewItem>
                         <tabViewItem label="Block" identifier="" id="nsT-BW-R2Z">
                             <view key="view" id="OgP-Jb-qTh">
-                                <rect key="frame" x="10" y="33" width="414" height="190"/>
+                                <rect key="frame" x="10" y="33" width="650" height="190"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GOX-0f-UYf">
-                                        <rect key="frame" x="12" y="12" width="389" height="171"/>
+                                        <rect key="frame" x="12" y="12" width="627" height="171"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="lep-5k-Lk2">
-                                            <rect key="frame" x="0.0" y="0.0" width="389" height="171"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="lep-5k-Lk2">
+                                            <rect key="frame" x="0.0" y="0.0" width="627" height="171"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="UmH-oj-OeF">
-                                                    <rect key="frame" x="0.0" y="0.0" width="389" height="171"/>
+                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="UmH-oj-OeF">
+                                                    <rect key="frame" x="0.0" y="0.0" width="627" height="171"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                    <size key="minSize" width="389" height="171"/>
-                                                    <size key="maxSize" width="394" height="10000000"/>
+                                                    <size key="minSize" width="627" height="171"/>
+                                                    <size key="maxSize" width="633" height="10000000"/>
                                                     <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 </textView>
                                             </subviews>
@@ -184,7 +184,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="c7l-Gi-Vwn">
-                                            <rect key="frame" x="373" y="0.0" width="16" height="171"/>
+                                            <rect key="frame" x="611" y="0.0" width="16" height="171"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
@@ -193,7 +193,7 @@
                         </tabViewItem>
                     </tabViewItems>
                 </tabView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="abB-zF-WFz" userLabel="Set the rules line by line: domain or ip">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="abB-zF-WFz" userLabel="Set the rules line by line: domain or ip">
                     <rect key="frame" x="18" y="20" width="241" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="* Set the rules line by line: domain or ip" id="ccq-gn-C6Z" userLabel="Set the rules line by line: domain or ip">
