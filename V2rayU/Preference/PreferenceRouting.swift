@@ -82,6 +82,10 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane {
         (domains, ips) = self.parseDomainOrIp(domainIpStr: self.blockTextView.string)
         UserDefaults.setArray(forKey: .routingBlockDomains, value: domains)
         UserDefaults.setArray(forKey: .routingBlockIps, value: ips)
+        
+        
+        // 更新菜单
+        menuController.showRouring();
 
         // set current server item and reload v2ray-core
         V2rayLaunch.restartV2ray()
