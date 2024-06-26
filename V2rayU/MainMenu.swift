@@ -234,18 +234,21 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func openPreferenceGeneral(_ sender: NSMenuItem) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .generalTab)
+            showDock(state: true)
         }
     }
 
     @IBAction func openPreferenceSubscribe(_ sender: NSMenuItem) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .subscribeTab)
+            showDock(state: true)
         }
     }
 
     @IBAction func openPreferencePac(_ sender: NSMenuItem) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .pacTab)
+            showDock(state: true)
         }
     }
 
@@ -266,8 +269,9 @@ class MenuController: NSObject, NSMenuDelegate {
         guard let object = notification.object as? NSWindow else {
             return
         }
-
-        if object.title == "V2rayU" {
+        print("configWindowWillClose",object.title,object)
+        let allow_titles = ["V2rayU","About","Pac","Subscription","General","Advance","Dns","Routing"]
+        if allow_titles.contains(object.title) {
            showDock(state: false)
         }
     }
@@ -292,6 +296,7 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBAction func goRouting(_ sender: NSMenuItem) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .routingTab)
+            showDock(state: true)
         }
     }
 

@@ -886,18 +886,21 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBAction func goAdvanceSetting(_ sender: Any) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .advanceTab)
+            showDock(state: true)
         }
     }
 
     @IBAction func goSubscribeSetting(_ sender: Any) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .subscribeTab)
+            showDock(state: true)
         }
     }
 
     @IBAction func goRoutingRuleSetting(_ sender: Any) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .routingTab)
+            showDock(state: true)
         }
     }
 }

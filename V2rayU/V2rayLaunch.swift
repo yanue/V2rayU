@@ -277,6 +277,7 @@ class V2rayLaunch: NSObject {
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 preferencesWindowController.show(preferencePane: .advanceTab)
+                showDock(state: true)
             }
             return false
         }
@@ -292,6 +293,7 @@ class V2rayLaunch: NSObject {
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 preferencesWindowController.show(preferencePane: .advanceTab)
+                showDock(state: true)
             }
             return false
         }
@@ -386,6 +388,7 @@ class V2rayLaunch: NSObject {
                 alertDialog(title: title, message: toast)
                 DispatchQueue.main.async {
                     preferencesWindowController.show(preferencePane: .advanceTab)
+                    showDock(state: true)
                 }
                 return
             }
