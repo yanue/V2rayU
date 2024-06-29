@@ -72,7 +72,8 @@ extension UserDefaults {
         case routingDirectIps
         case routingBlockDomains
         case routingBlockIps
-        case Exception
+        // custom routing list
+        case routingCustomList
     }
 
     static func setBool(forKey key: KEY, value: Bool) {

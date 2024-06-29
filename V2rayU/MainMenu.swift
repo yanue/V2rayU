@@ -39,7 +39,7 @@ class MenuController: NSObject, NSMenuDelegate {
         // hide new version
         newVersionItem.isHidden = true
 
-        self.showRouring();
+        self.showRouting();
         
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
@@ -127,7 +127,7 @@ class MenuController: NSObject, NSMenuDelegate {
         }
     }
     
-    func showRouring() {
+    func showRouting() {
         let routingRule = Int(UserDefaults.get(forKey: .routingRule) ?? "0") ?? 0
         DispatchQueue.main.async {
             // 假设 routingMenu 已经连接并且有一个子菜单
@@ -302,7 +302,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     @IBAction func switchRouting(_ sender: NSMenuItem) {
         UserDefaults.set(forKey: .routingRule, value: String(sender.tag));
-        self.showRouring();
+        self.showRouting();
         V2rayLaunch.restartV2ray()
     }
     

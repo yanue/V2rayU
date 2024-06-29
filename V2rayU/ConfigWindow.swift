@@ -188,23 +188,23 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 
                 // delete server config
             case 1:
-                // get seleted index
-                let idx = self.serversTableView.selectedRow
-                // remove
-                V2rayServer.remove(idx: idx)
-                
-                // reload
-                V2rayServer.loadConfig()
-                menuController.showServers()
-                
-                // selected prev row
-                let cnt: Int = V2rayServer.count()
-                var rowIndex: Int = idx - 1
-                if idx > 0 && idx < cnt {
-                    rowIndex = idx
-                }
-                
                 DispatchQueue.main.sync {
+                    // get seleted index
+                    let idx = self.serversTableView.selectedRow
+                    // remove
+                    V2rayServer.remove(idx: idx)
+                    
+                    // reload
+                    V2rayServer.loadConfig()
+                    menuController.showServers()
+                    
+                    // selected prev row
+                    let cnt: Int = V2rayServer.count()
+                    var rowIndex: Int = idx - 1
+                    if idx > 0 && idx < cnt {
+                        rowIndex = idx
+                    }
+                    
                     // reload
                     self.serversTableView.reloadData()
                     // fix

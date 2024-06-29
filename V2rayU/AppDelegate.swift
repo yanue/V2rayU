@@ -35,8 +35,8 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceGeneralViewController(),
             PreferenceAdvanceViewController(),
             PreferenceSubscribeViewController(),
-            PreferencePacViewController(),
             PreferenceRoutingViewController(),
+            PreferencePacViewController(),
             PreferenceDnsViewController(),
             PreferenceAboutViewController(),
         ]
