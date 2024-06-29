@@ -112,6 +112,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         }
         V2rayServer.loadConfig()
+        V2rayRoutings.loadConfig()
+        V2raySubscription.loadConfig()
     }
 
     @objc func handleAppleEvent(event: NSAppleEventDescriptor, replyEvent: NSAppleEventDescriptor) {

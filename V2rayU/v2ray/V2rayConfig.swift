@@ -81,13 +81,6 @@ let jsSourceFormatConfig =
 
 
 class V2rayConfig: NSObject {
-    // routing rule tag
-    enum RoutingRule: Int {
-        case RoutingRuleGlobal = 0 // Global
-        case RoutingRuleLAN = 1 // Bypassing the LAN Address
-        case RoutingRuleCn = 2 // Bypassing mainland address
-        case RoutingRuleLANAndCn = 3 // Bypassing LAN and mainland address
-    }
 
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
@@ -131,15 +124,6 @@ class V2rayConfig: NSObject {
     var streamSecurity = "none" // none|tls|xtls|reality
     var securityTls = TlsSettings() // tls|xtls
     var securityReality = RealitySettings() // reality
-    
-    var routingDomainStrategy: V2rayRoutingSetting.domainStrategy = .AsIs
-    var routingRule: RoutingRule = .RoutingRuleGlobal
-    let routingProxyDomains = UserDefaults.getArray(forKey: .routingProxyDomains) ?? [];
-    let routingProxyIps = UserDefaults.getArray(forKey: .routingProxyIps) ?? [];
-    let routingDirectDomains = UserDefaults.getArray(forKey: .routingDirectDomains) ?? [];
-    let routingDirectIps = UserDefaults.getArray(forKey: .routingDirectIps) ?? [];
-    let routingBlockDomains = UserDefaults.getArray(forKey: .routingBlockDomains) ?? [];
-    let routingBlockIps = UserDefaults.getArray(forKey: .routingBlockIps) ?? [];
 
     private var foundHttpPort = false
     private var foundSockPort = false
@@ -161,10 +145,6 @@ class V2rayConfig: NSObject {
         self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
 
         self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
-
-        // routing
-        self.routingDomainStrategy = V2rayRoutingSetting.domainStrategy(rawValue: UserDefaults.get(forKey: .routingDomainStrategy) ?? "AsIs") ?? .AsIs
-        self.routingRule = RoutingRule(rawValue: Int(UserDefaults.get(forKey: .routingRule) ?? "0") ?? 0) ?? .RoutingRuleGlobal
     }
 
     // combine manual edited data
@@ -292,112 +272,14 @@ class V2rayConfig: NSObject {
         // ------------------------------------- outbound end ---------------------------------------------
 
         // ------------------------------------- routing start --------------------------------------------
-
-        self.routing.settings.domainStrategy = self.routingDomainStrategy
-        var rules: [V2rayRoutingSettingRule] = []
-
-        // rules
-        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp, ruleDirectIpDefault, ruleDirectDomainDefault: V2rayRoutingSettingRule?
-        print("ruleBlockDomain",self.routingBlockDomains)
-        // proxy
-        if self.routingProxyDomains.count > 0 {
-            ruleProxyDomain = getRoutingRule(outTag: "proxy", domain: self.routingProxyDomains, ip: nil, port: nil)
+        let routingRule = UserDefaults.get(forKey: .routingSelectedRule) ?? RoutingRuleGlobal
+        let rule = RoutingItem.load(name: routingRule)
+        if rule != nil{
+            self.v2ray.routing = rule!.parseRule()
         }
-        if self.routingProxyIps.count > 0 {
-            ruleProxyIp = getRoutingRule(outTag: "proxy", domain: nil, ip: self.routingProxyIps, port: nil)
-        }
-
-        // direct
-        if self.routingDirectDomains.count > 0 {
-            ruleDirectDomain = getRoutingRule(outTag: "direct", domain: self.routingDirectDomains, ip: nil, port: nil)
-        }
-        if self.routingDirectIps.count > 0 {
-            ruleDirectIp = getRoutingRule(outTag: "direct", domain: nil, ip: self.routingDirectIps, port: nil)
-        }
-
-        // block
-        if self.routingBlockDomains.count > 0 {
-            ruleBlockDomain = getRoutingRule(outTag: "block", domain: self.routingBlockDomains, ip: nil, port: nil)
-        }
-        if self.routingBlockIps.count > 0 {
-            ruleBlockIp = getRoutingRule(outTag: "block", domain: nil, ip: self.routingBlockIps, port: nil)
-        }
-
-        switch self.routingRule {
-        case .RoutingRuleGlobal:
-            break
-        case .RoutingRuleLAN:
-            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:private"], port: nil)
-            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["localhost"], ip: nil, port: nil)
-            break
-        case .RoutingRuleCn:
-            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn"], port: nil)
-            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["geosite:cn"], ip: nil, port: nil)
-            break
-        case .RoutingRuleLANAndCn:
-            ruleDirectIpDefault = getRoutingRule(outTag: "direct", domain: nil, ip: ["geoip:cn","geoip:private"], port: nil)
-            ruleDirectDomainDefault = getRoutingRule(outTag: "direct", domain: ["geosite:cn","localhost"], ip: nil, port: nil)
-            break
-        }
-        // 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连 的优先级进行匹配
-        
-        // 域名阻断
-        if ruleBlockDomain != nil {
-            ruleBlockDomain?.ip = nil
-            rules.append(ruleBlockDomain!)
-        }
-        // 域名代理
-        if ruleProxyDomain != nil {
-            ruleProxyDomain?.ip = nil
-            rules.append(ruleProxyDomain!)
-        }
-        // 域名直连
-        if ruleDirectDomain != nil {
-            ruleDirectDomain!.ip = nil
-            rules.append(ruleDirectDomain!)
-        }
-        // IP阻断
-        if ruleBlockIp != nil {
-            ruleBlockIp!.domain = nil
-            rules.append(ruleBlockIp!)
-        }
-        // IP代理
-        if ruleProxyIp != nil {
-            ruleProxyIp!.domain = nil
-            rules.append(ruleProxyIp!)
-        }
-        // IP直连
-        if ruleDirectIp != nil {
-            ruleDirectIp!.domain = nil
-            rules.append(ruleDirectIp!)
-        }
-        // 如果匹配失败，则私有地址和大陆境内地址直连，否则走代理。
-        if ruleDirectIpDefault != nil {
-            ruleDirectIpDefault!.domain = nil
-            rules.append(ruleDirectIpDefault!)
-        }
-        if ruleDirectDomainDefault != nil {
-            ruleDirectDomainDefault!.ip = nil
-            rules.append(ruleDirectDomainDefault!)
-        }
-        // 默认全部代理, 无需设置规则
-        // 代理规则
-        self.routing.settings.rules = rules
-        // set v2ray routing
-        self.v2ray.routing = self.routing
         // ------------------------------------- routing end ----------------------------------------------
     }
 
-    func getRoutingRule(outTag: String, domain:[String]?, ip: [String]?, port:String?) -> V2rayRoutingSettingRule {
-        var rule = V2rayRoutingSettingRule()
-        rule.outboundTag = outTag
-        rule.type = "field"
-        rule.domain = domain
-        rule.ip = ip
-        rule.port = port
-        return rule
-    }
-    
     func checkManualValid() {
         defer {
             if self.error != "" {

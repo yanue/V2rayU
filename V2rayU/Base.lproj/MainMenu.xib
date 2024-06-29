@@ -24,7 +24,7 @@
                 <outlet property="manualMode" destination="hTu-27-5OL" id="lHt-aQ-ZNU"/>
                 <outlet property="newVersionItem" destination="SdL-DD-qZe" id="WXr-Gw-0HS"/>
                 <outlet property="pacMode" destination="NrZ-oB-7yd" id="d3C-wO-jAI"/>
-                <outlet property="routingMenu" destination="ykF-uD-Nb1" id="qTS-BH-9rV"/>
+                <outlet property="routingMenu" destination="VNg-as-9we" id="NO1-L3-jsN"/>
                 <outlet property="serverItems" destination="cio-ej-HL5" id="0Z8-41-eCi"/>
                 <outlet property="statusMenu" destination="9n3-TW-9ur" id="Hgg-sa-fM8"/>
                 <outlet property="toggleV2rayItem" destination="SML-EF-rdT" id="am7-ue-GN3"/>
@@ -88,38 +88,7 @@
                 <menuItem isSeparatorItem="YES" id="EF9-7H-2Xy"/>
                 <menuItem title="Routing" id="VNg-as-9we" userLabel="Routing">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Routing" id="ykF-uD-Nb1">
-                        <items>
-                            <menuItem title="Routing..." tag="-1" id="tKM-4Z-Gyr">
-                                <attributedString key="attributedTitle"/>
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="goRouting:" target="hcZ-V7-Dui" id="gVK-Fb-7uq"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="pSb-Qp-dXC"/>
-                            <menuItem title="Global" identifier="routingGlobal" id="qhf-Kw-wBL" userLabel="Global">
-                                <connections>
-                                    <action selector="switchRouting:" target="hcZ-V7-Dui" id="j4n-az-30A"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Bypassing the LAN Address" tag="1" identifier="routingLan" id="xcE-uG-T3N">
-                                <connections>
-                                    <action selector="switchRouting:" target="hcZ-V7-Dui" id="ssU-OD-c6I"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Bypassing mainland address" tag="2" identifier="routingCn" id="Y6v-yx-HRg">
-                                <connections>
-                                    <action selector="switchRouting:" target="hcZ-V7-Dui" id="oYE-YR-VSp"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Bypassing LAN and mainland address" tag="3" identifier="routingLanAncCn" id="YQd-ir-Ilb">
-                                <connections>
-                                    <action selector="switchRouting:" target="hcZ-V7-Dui" id="OVM-pr-94W"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
+                    <menu key="submenu" title="Routing" id="ykF-uD-Nb1"/>
                     <connections>
                         <action selector="switchRouting:" target="hcZ-V7-Dui" id="cPc-yB-1qO"/>
                     </connections>

@@ -27,7 +27,7 @@ class MenuController: NSObject, NSMenuDelegate {
     @IBOutlet weak var v2rayStatusItem: NSMenuItem!
     @IBOutlet weak var serverItems: NSMenuItem!
     @IBOutlet weak var newVersionItem: NSMenuItem!
-    @IBOutlet weak var routingMenu: NSMenu!
+    @IBOutlet weak var routingMenu: NSMenuItem!
 
     // when menu.xib loaded
     override func awakeFromNib() {
@@ -128,20 +128,39 @@ class MenuController: NSObject, NSMenuDelegate {
     }
     
     func showRouting() {
-        let routingRule = Int(UserDefaults.get(forKey: .routingRule) ?? "0") ?? 0
-        DispatchQueue.main.async {
-            // 假设 routingMenu 已经连接并且有一个子菜单
-            if self.routingMenu.items != nil {
-                // 确保 routingMenu 已经连接
-                for item in self.routingMenu.items {
-                    if item.tag == routingRule {
-                        item.state = .on
-                    } else {
-                        item.state = .off
-                    }
-                }
-            }
-        }
+        DispatchQueue.global().async {
+           let rules = V2rayRoutings.all()
+           print("showRouting",rules)
+           let sumMenus = NSMenu()
+           // add Routing... menu and click event is goRouting
+           let routingMenuItem = NSMenuItem()
+           routingMenuItem.title = "Routing..."
+           routingMenuItem.target = self
+           routingMenuItem.action = #selector(self.goRouting(_:))
+           sumMenus.addItem(routingMenuItem)
+           // add separator menu item
+           let separator = NSMenuItem.separator()
+           sumMenus.addItem(separator)
+           // now add all rules    
+           let routingRule = UserDefaults.get(forKey: .routingSelectedRule)
+           for rule in rules {
+               let menuItem = NSMenuItem()
+               menuItem.title = rule.remark
+               menuItem.target = self
+               menuItem.action = #selector(self.switchRouting(_:))
+               menuItem.representedObject = rule
+               menuItem.isEnabled = true
+               if rule.name == routingRule {
+                   menuItem.state = NSControl.StateValue.on
+               }
+               sumMenus.addItem(menuItem)
+           }
+           print("showRouting",sumMenus)
+           // 假设 routingMenu 已经连接并且有一个子菜单
+           DispatchQueue.main.async {
+               self.routingMenu.submenu = sumMenus
+           }
+       }
     }
     
     func getServerMenus() -> NSMenu {
@@ -261,6 +280,16 @@ class MenuController: NSObject, NSMenuDelegate {
         V2rayLaunch.restartV2ray()
     }
 
+    @IBAction func switchRouting(_ sender: NSMenuItem) {
+        guard let obj = sender.representedObject as? RoutingItem else {
+            NSLog("switchRouting err")
+            return
+        }
+        UserDefaults.set(forKey: .routingSelectedRule, value: obj.name);
+        self.showRouting();
+        V2rayLaunch.restartV2ray()
+    }
+    
     @IBAction func openConfig(_ sender: NSMenuItem) {
         OpenConfigWindow()
     }
@@ -300,12 +329,6 @@ class MenuController: NSObject, NSMenuDelegate {
         }
     }
 
-    @IBAction func switchRouting(_ sender: NSMenuItem) {
-        UserDefaults.set(forKey: .routingRule, value: String(sender.tag));
-        self.showRouting();
-        V2rayLaunch.restartV2ray()
-    }
-    
     @IBAction func switchGlobalMode(_ sender: NSMenuItem) {
         UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         V2rayLaunch.restartV2ray()

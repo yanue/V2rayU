@@ -17,23 +17,17 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
     let tableViewDragType: String = "v2ray.routing"
 
     @IBOutlet weak var domainStrategy: NSPopUpButton!
-    @IBOutlet weak var routingRule: NSPopUpButton!
-    @IBOutlet var proxyTextView: NSTextView!
-    @IBOutlet var directTextView: NSTextView!
-    @IBOutlet var blockTextView: NSTextView!
+    @IBOutlet weak var proxyTextView: NSTextView!
+    @IBOutlet weak var directTextView: NSTextView!
+    @IBOutlet weak var blockTextView: NSTextView!
     @IBOutlet weak var routingRuleContent: NSTextView!
     @IBOutlet weak var routingRuleName: NSTextField!
+    @IBOutlet weak var defaulRoutingRuleName: NSTextField!
     @IBOutlet weak var errTip: NSTextField!
     @IBOutlet weak var routingsTableView: NSTableView!
     @IBOutlet weak var addRemoveButton: NSSegmentedControl!
-    
-    let default_rule_content =  """
-{
-    "domainStrategy": "AsIs",
-    "rules": [
-    ]
-}
-"""
+    @IBOutlet weak var customView: NSView!
+    @IBOutlet weak var defaultView: NSView!
     
     override var nibName: NSNib.Name? {
         return "PreferenceRouting"
@@ -53,62 +47,6 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
         self.routingsTableView.delegate = self
         self.routingsTableView.dataSource = self
         self.routingsTableView.reloadData()
-        
-        let domainStrategy = UserDefaults.get(forKey: .routingDomainStrategy) ?? "AsIs"
-        self.domainStrategy.selectItem(withTitle: domainStrategy)
-
-        let routingRule = Int(UserDefaults.get(forKey: .routingRule) ?? "0") ?? 0
-        self.routingRule.selectItem(withTag: routingRule)
-
-        let routingProxyDomains = UserDefaults.getArray(forKey: .routingProxyDomains) ?? [];
-        let routingProxyIps = UserDefaults.getArray(forKey: .routingProxyIps) ?? [];
-        let routingDirectDomains = UserDefaults.getArray(forKey: .routingDirectDomains) ?? [];
-        let routingDirectIps = UserDefaults.getArray(forKey: .routingDirectIps) ?? [];
-        let routingBlockDomains = UserDefaults.getArray(forKey: .routingBlockDomains) ?? [];
-        let routingBlockIps = UserDefaults.getArray(forKey: .routingBlockIps) ?? [];
-
-        let routingProxy = routingProxyDomains + routingProxyIps
-        let routingDirect = routingDirectDomains + routingDirectIps
-        let routingBlock = routingBlockDomains + routingBlockIps
-
-        print("routingProxy", routingProxy, routingDirect, routingBlock)
-        self.proxyTextView.string = routingProxy.joined(separator: "\n")
-        self.directTextView.string = routingDirect.joined(separator: "\n")
-        self.blockTextView.string = routingBlock.joined(separator: "\n")
-    }
-    
-    @IBAction func saveManualRouting(_ sender: Any) {
-        print("saveManualRouting")
-        
-        let routingRuleContent = self.routingRuleContent?.string
-        guard let routingRuleName = self.routingRuleName?.stringValue else {
-            self.set_tip(str: "missing custom routing rule name")
-            return
-        }
-        guard let routingRuleContent = self.routingRuleContent?.string else {
-            self.set_tip(str: "missing custom routing rule json content")
-            return
-        }
-        if routingRuleName.isEmpty {
-            self.set_tip(str: "missing custom routing rule name")
-            return
-        }
-        if routingRuleContent.isEmpty {
-            self.set_tip(str: "missing custom routing rule json content")
-            return
-        }
-
-        print("saveManualRouting1",self.routingsTableView.selectedRow,routingRuleName,routingRuleContent)
-        if self.routingsTableView.selectedRow > -1 {
-            V2rayRoutings.edit(rowIndex: self.routingsTableView.selectedRow, remark: routingRuleName, json: routingRuleContent)
-        } else {
-            V2rayRoutings.add(remark: routingRuleName, json: routingRuleContent)
-        }
-        
-        
-        self.routingsTableView.reloadData()
-        
-        menuController.showRouting()
     }
     
     func set_tip(str: String) {
@@ -120,9 +58,25 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
     
     func loadJsonData(rowIndex: Int) {
         print("loadJsonData", rowIndex)
-        if let item = V2rayRoutings.load(idx: rowIndex) {
-            self.routingRuleName.stringValue = item.remark
-            self.routingRuleContent.string = item.json
+        DispatchQueue.main.async {
+            self.defaultView.isHidden = true
+            self.customView.isHidden = true
+            if let item = V2rayRoutings.load(idx: rowIndex) {
+                let isDefaultRule = V2rayRoutings.isDefaultRule(name: item.name)
+                print("loadJsonData", item.domainStrategy,item.proxy,item.direct,item.block,item.json,isDefaultRule)
+                if isDefaultRule {
+                    self.defaultView.isHidden = false
+                    self.domainStrategy.selectItem(withTitle: item.domainStrategy)
+                    self.proxyTextView.string = item.proxy
+                    self.directTextView.string = item.direct
+                    self.blockTextView.string = item.block
+                    self.defaulRoutingRuleName.stringValue = item.remark
+                } else {
+                    self.customView.isHidden = false
+                    self.routingRuleName.stringValue = item.remark
+                    self.routingRuleContent.string = item.json
+                }
+            }
         }
     }
 
@@ -136,7 +90,7 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
                 // add server config
             case 0:
                 // add
-                V2rayRoutings.add(remark: "new-rule", json: self.default_rule_content)
+                V2rayRoutings.add(remark: "new-rule", json: V2rayRoutings.default_rule_content)
                 
                 DispatchQueue.main.sync {
                     V2rayRoutings.loadConfig()
@@ -207,75 +161,55 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
     }
 
     @IBAction func saveRouting(_ sender: Any) {
-        UserDefaults.set(forKey: .routingDomainStrategy, value: self.domainStrategy.titleOfSelectedItem!)
-        UserDefaults.set(forKey: .routingRule, value: String(self.routingRule.selectedTag()))
+        let selectedRule = self.routingsTableView.selectedRow
+        if selectedRule == -1 {
+            return
+        }
+        guard let rule = V2rayRoutings.load(idx: selectedRule) else {
+            return
+        }
 
-        var (domains, ips) = self.parseDomainOrIp(domainIpStr: self.proxyTextView.string)
-        UserDefaults.setArray(forKey: .routingProxyDomains, value: domains)
-        UserDefaults.setArray(forKey: .routingProxyIps, value: ips)
-
-        (domains, ips) = self.parseDomainOrIp(domainIpStr: self.directTextView.string)
-        UserDefaults.setArray(forKey: .routingDirectDomains, value: domains)
-        UserDefaults.setArray(forKey: .routingDirectIps, value: ips)
-
-        (domains, ips) = self.parseDomainOrIp(domainIpStr: self.blockTextView.string)
-        UserDefaults.setArray(forKey: .routingBlockDomains, value: domains)
-        UserDefaults.setArray(forKey: .routingBlockIps, value: ips)
+        if V2rayRoutings.isDefaultRule(name: rule.name) {
+            let domainStrategy = self.domainStrategy.titleOfSelectedItem
+            if domainStrategy != nil {
+                rule.domainStrategy = domainStrategy!
+            }
+            rule.proxy = self.proxyTextView.string
+            rule.direct = self.directTextView.string
+            rule.block = self.blockTextView.string
+        } else {
+            rule.remark = self.routingRuleName.stringValue
+            let (res, err) = parseRoutingRuleJson(json: self.routingRuleContent.string) 
+            if err != nil {
+                print("parseRoutingRuleJson err", err)
+                self.errTip.stringValue = "parse json err: \(err)"
+                // hide err     
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    self.errTip.stringValue = ""
+                }
+                return
+            } else {
+                self.errTip.stringValue = ""
+                rule.json = self.routingRuleContent.string
+            }
+        }
         
+        // save update
+        V2rayRoutings.save(routing: rule)
+
+       // reload table
+        self.routingsTableView.reloadData()
+        // set selected
+        self.routingsTableView.selectRowIndexes(NSIndexSet(index: selectedRule) as IndexSet, byExtendingSelection: false)
         
         // 更新菜单
         menuController.showRouting();
-
-        // set current server item and reload v2ray-core
-        V2rayLaunch.restartV2ray()
-    }
-
-    func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) {
-        let all = domainIpStr.split(separator: "\n")
-
-        var domains: [String] = []
-        var ips: [String] = []
-
-        for item in all {
-            let tmp = item.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            // is ip
-            if isIp(str: tmp) || tmp.contains("geoip:") {
-                ips.append(tmp)
-                continue
-            }
-
-            // is domain
-            if tmp.contains("domain:") || tmp.contains("geosite:") {
-                domains.append(tmp)
-                continue
-            }
-
-            if isDomain(str: tmp) {
-                domains.append(tmp)
-                continue
-            }
+        // if is selected rule name == rule.name, restart v2ray
+        let selectedRuleName = UserDefaults.get(forKey: .routingSelectedRule)
+        if selectedRuleName == rule.name {
+            // restart v2ray
+            V2rayLaunch.restartV2ray()
         }
-
-        print("ips", ips, "domains", domains)
-
-        return (domains, ips)
-    }
-
-    func isIp(str: String) -> Bool {
-        let pattern = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/[0-9]{2})?$"
-        if ((str.count == 0) || (str.range(of: pattern, options: .regularExpression) == nil)) {
-            return false
-        }
-        return true
-    }
-
-    func isDomain(str: String) -> Bool {
-        let pattern = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+"
-        if ((str.count == 0) || (str.range(of: pattern, options: .regularExpression) == nil)) {
-            return false
-        }
-        return true
     }
 }
 
@@ -295,31 +229,19 @@ extension PreferenceRoutingViewController: NSTableViewDataSource {
         }
         return nil
     }
-
-    // edit cell
-    func tableView(_ tableView: NSTableView, setObjectValue: Any?, for forTableColumn: NSTableColumn?, row: Int) {
-        guard let remark = setObjectValue as? String else {
-            NSLog("remark is nil")
-            return
-        }
-        DispatchQueue.global().async {
-            // edit item remark
-            V2rayRoutings.edit(rowIndex: row, remark: remark)
-            // reload table
-            DispatchQueue.main.async {
-                tableView.reloadData()
-            }
-            // reload menu
-            menuController.showRouting()
-        }
-    }
 }
 
 // NSTableViewDelegate
 extension PreferenceRoutingViewController: NSTableViewDelegate {
     // For NSTableViewDelegate
     func tableViewSelectionDidChange(_ notification: Notification) {
-        self.loadJsonData(rowIndex: self.routingsTableView.selectedRow)
+        // Ensure there's a valid selected row before calling loadJsonData
+        if self.routingsTableView.selectedRow >= 0 {
+            self.loadJsonData(rowIndex: self.routingsTableView.selectedRow)
+        } else {
+            // Handle the case where no row is selected or add a default behavior
+            print("No row selected")
+        }
         self.errTip.stringValue = ""
     }
 

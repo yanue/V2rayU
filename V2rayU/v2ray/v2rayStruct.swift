@@ -60,11 +60,6 @@ struct V2rayStats: Codable {
 }
 
 struct V2rayRouting: Codable {
-//    var strategy: String = "rules"
-    var settings: V2rayRoutingSetting = V2rayRoutingSetting()
-}
-
-struct V2rayRoutingSetting: Codable {
     enum domainStrategy: String, Codable {
         case AsIs
         case IPIfNonMatch

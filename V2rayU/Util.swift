@@ -63,17 +63,10 @@ extension UserDefaults {
         // pacPort
         case localPacPort
 
-        // for routing rule
-        case routingDomainStrategy
-        case routingRule
-        case routingProxyDomains
-        case routingProxyIps
-        case routingDirectDomains
-        case routingDirectIps
-        case routingBlockDomains
-        case routingBlockIps
         // custom routing list
         case routingCustomList
+        // routing selected rule
+        case routingSelectedRule
     }
 
     static func setBool(forKey key: KEY, value: Bool) {
