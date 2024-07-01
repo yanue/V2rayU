@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import Alamofire
 
 var v2rayConfig: V2rayConfig = V2rayConfig()
 
@@ -645,22 +644,6 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         if let importUri = ImportUri.importUri(uri: uri, checkExist: false) {
             self.saveImport(importUri: importUri)
-        } else {
-            // download json file
-            Alamofire.request(jsonUrl.stringValue).responseString { DataResponse in
-                if (DataResponse.error != nil) {
-                    DispatchQueue.main.async{
-                        self.errTip.stringValue = "error: " + DataResponse.error.debugDescription
-                    }
-                    return
-                }
-
-                if DataResponse.value != nil {
-                    DispatchQueue.main.async{
-                        self.configText.string = v2rayConfig.formatJson(json: DataResponse.value ?? text)
-                    }
-                }
-            }
         }
     }
 

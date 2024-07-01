@@ -8,7 +8,6 @@
 
 import Cocoa
 import Preferences
-import Alamofire
 import SwiftyJSON
 
 final class PreferenceSubscribeViewController: NSViewController, PreferencePane, NSTabViewDelegate {

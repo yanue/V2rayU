@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import Alamofire
 import SwiftyJSON
 import Yams
 

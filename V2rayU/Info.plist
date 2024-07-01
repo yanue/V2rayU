@@ -7,7 +7,11 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleGetInfoString</key>
 	<string></string>
+	<key>CFBundleDisplayName</key>
+	<true/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -47,14 +51,10 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2019 yanue. All rights reserved.</string>
+	<string>Copyright © 2024 yanue. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUFeedURL</key>
-	<string>https://v2rayu-61f76.web.app/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>PW8pDnr5VZkmC93gZjUDlHI8gkJSspPoDU3DdhsMkps</string>
 </dict>
 </plist>

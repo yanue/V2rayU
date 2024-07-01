@@ -8,8 +8,6 @@
 
 import Cocoa
 import ServiceManagement
-import Sparkle
-import Alamofire
 
 let menuController = (NSApplication.shared.delegate as? AppDelegate)?.statusMenu.delegate as! MenuController
 
@@ -335,8 +333,7 @@ class MenuController: NSObject, NSMenuDelegate {
     }
 
     @IBAction func checkForUpdate(_ sender: NSMenuItem) {
-        // need set SUFeedURL into plist
-        V2rayUpdater.checkForUpdates()
+        V2rayUpdater.checkForUpdates(showWindow: true)
     }
 
     @IBAction func generateQrcode(_ sender: NSMenuItem) {

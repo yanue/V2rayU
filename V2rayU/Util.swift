@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import Alamofire
 
 extension UserDefaults {
     enum KEY: String {

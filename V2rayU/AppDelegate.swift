@@ -10,12 +10,10 @@ import Cocoa
 import ServiceManagement
 import MASShortcut
 import Preferences
-import Sparkle
 import FirebaseCore
 
 let launcherAppIdentifier = "net.yanue.V2rayU.Launcher"
 let appVersion = getAppVersion()
-let V2rayUpdater = V2rayUpdaterController()
 
 let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
 let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
@@ -41,6 +39,9 @@ let preferencesWindowController = PreferencesWindowController(
             PreferenceAboutViewController(),
         ]
 )
+
+let langStr = Locale.current.languageCode
+let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {

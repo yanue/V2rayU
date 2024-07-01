@@ -6,7 +6,6 @@
 //  Copyright © 2019 yanue. All rights reserved.
 //
 
-import Alamofire
 import SwiftyJSON
 
 // ping and choose fastest v2ray

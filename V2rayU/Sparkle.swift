@@ -23,7 +23,7 @@ class V2rayUpdaterController: NSObject, SPUUpdaterDelegate {
 
     func checkForUpdates() {
         // check version by github release
-        checkV2rayUVersion()
+//        checkV2rayUVersion()
         // check by sparkle
         fetchAppcast(from: primaryFeedURL) { success in
             // 主线程
