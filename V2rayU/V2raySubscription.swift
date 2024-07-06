@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import SwiftyJSON
 import Yams
 
 // ----- v2ray subscribe manager -----

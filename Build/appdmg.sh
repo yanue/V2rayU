@@ -35,8 +35,6 @@ do
         echo "appdmg V2rayU-64.dmg"
         rm -f V2rayU-64.dmg
         appdmg appdmg.json "V2rayU-64.dmg"
-        #rm -fr release/V2rayU.app
-        ./sign_update "V2rayU-64.dmg"
 
         break
         ;;
@@ -48,8 +46,6 @@ do
         echo "appdmg V2rayU-arm64.dmg"
         rm -f V2rayU-arm64.dmg
         appdmg appdmg.json "V2rayU-arm64.dmg"
-                #rm -fr release/V2rayU.app
-        ./sign_update "V2rayU-64.dmg"
 
         break
         ;;

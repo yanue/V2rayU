@@ -8,7 +8,6 @@
 
 import Cocoa
 import Preferences
-import SwiftyJSON
 
 final class PreferenceSubscribeViewController: NSViewController, PreferencePane, NSTabViewDelegate {
     let preferencePaneIdentifier = PreferencePane.Identifier.subscribeTab

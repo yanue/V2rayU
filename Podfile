@@ -10,8 +10,7 @@ target 'V2rayU' do
   # Pods for V2rayU
   pod 'FirebaseAnalytics', '~> 10.24.0'
   pod 'FirebaseCrashlytics'
-  pod 'Alamofire'
-  pod 'SwiftyJSON'
+  pod 'SwiftyJSON'/
   # master branch
   pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
   pod 'QRCoder'
@@ -21,11 +20,11 @@ target 'V2rayU' do
   
 end
 
-# fix libarclite_macosx.a need min deploy target 10.14
+# fix libarclite_macosx.a need min deploy target 11.0
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '11.0'
     end
   end
 end

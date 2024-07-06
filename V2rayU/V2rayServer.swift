@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import SwiftyJSON
 
 // ----- v2ray server manager -----
 class V2rayServer: NSObject {

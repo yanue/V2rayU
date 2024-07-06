@@ -6,8 +6,6 @@
 //  Copyright © 2019 yanue. All rights reserved.
 //
 
-import SwiftyJSON
-
 // ping and choose fastest v2ray
 var inPing = false
 var inPingCurrent = false

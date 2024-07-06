@@ -1,45 +1,45 @@
 
-/* Class = "NSTextFieldCell"; title = "Domain Strategy:"; ObjectID = "22k-l7-G7a"; */
-"22k-l7-G7a.title" = "域名策略:";
+/* Class = "NSTextFieldCell"; title = "Block:"; ObjectID = "0Cd-bg-07K"; */
+"0Cd-bg-07K.title" = "Block:";
 
-/* Class = "NSMenuItem"; title = "Bypassing LAN and mainland address"; ObjectID = "3qq-dt-TS9"; */
-"3qq-dt-TS9.title" = "绕过局域网和大陆地址";
+/* Class = "NSMenuItem"; title = "IPOnDemand"; ObjectID = "2ST-s0-RrI"; */
+"2ST-s0-RrI.title" = "IPOnDemand";
 
-/* Class = "NSTextFieldCell"; title = "Routing Rule:"; ObjectID = "4rB-9k-291"; */
-"4rB-9k-291.title" = "路由模式:";
+/* Class = "NSTextFieldCell"; title = "Direct:"; ObjectID = "3hZ-qS-PUG"; */
+"3hZ-qS-PUG.title" = "Direct:";
 
 /* Class = "NSButtonCell"; title = "save"; ObjectID = "8g2-Nj-m07"; */
-"8g2-Nj-m07.title" = "保存";
+"8g2-Nj-m07.title" = "save";
 
-/* Class = "NSMenuItem"; title = "IPIfNonMatch"; ObjectID = "92h-JU-wqn"; */
-"92h-JU-wqn.title" = "IPIfNonMatch";
+/* Class = "NSTextFieldCell"; title = "Rouing Rules"; ObjectID = "E4W-rN-0eq"; */
+"E4W-rN-0eq.title" = "Rouing Rules";
 
-/* Class = "NSMenuItem"; title = "Bypassing the LAN Address"; ObjectID = "CoE-cp-7fn"; */
-"CoE-cp-7fn.title" = "绕过局域网地址";
+/* Class = "NSTextFieldCell"; title = "Custom Rule Name"; ObjectID = "Ecy-wl-v5i"; */
+"Ecy-wl-v5i.title" = "Custom Rule Name";
 
-/* Class = "NSMenuItem"; title = "Bypassing mainland address"; ObjectID = "EaD-tR-ldB"; */
-"EaD-tR-ldB.title" = "绕过大陆地址";
+/* Class = "NSTextFieldCell"; title = "Routing Rule:"; ObjectID = "J2T-Pf-s5D"; */
+"J2T-Pf-s5D.title" = "Routing Rule:";
 
-/* Class = "NSMenuItem"; title = "IPOnDemand"; ObjectID = "Js7-cb-bWa"; */
-"Js7-cb-bWa.title" = "IPOnDemand";
+/* Class = "NSMenuItem"; title = "AsIs"; ObjectID = "Kl2-gr-bsh"; */
+"Kl2-gr-bsh.title" = "AsIs";
 
-/* Class = "NSMenuItem"; title = "AsIs"; ObjectID = "LX1-ye-51i"; */
-"LX1-ye-51i.title" = "AsIs";
+/* Class = "NSTextFieldCell"; title = "Custom Rule JSON Text"; ObjectID = "Q0v-Ic-TRt"; */
+"Q0v-Ic-TRt.title" = "Custom Rule JSON Text";
 
-/* Class = "NSButtonCell"; title = "load default"; ObjectID = "RSN-g5-vmP"; */
-"RSN-g5-vmP.title" = "load default";
+/* Class = "NSTextFieldCell"; title = "Domain Strategy:"; ObjectID = "Qp3-K0-xA9"; */
+"Qp3-K0-xA9.title" = "Domain Strategy:";
 
-/* Class = "NSTextFieldCell"; title = "* Set the rules line by line: domain or ip"; ObjectID = "ccq-gn-C6Z"; */
-"ccq-gn-C6Z.title" = "*按行设置域名或ip";
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "YQ1-7i-YOl"; */
+"YQ1-7i-YOl.title" = "Text Cell";
 
-/* Class = "NSTabViewItem"; label = "Block"; ObjectID = "nsT-BW-R2Z"; */
-"nsT-BW-R2Z.label" = "阻止ip或域名";
+/* Class = "NSTextFieldCell"; title = "Proxy:"; ObjectID = "cfS-8I-8Au"; */
+"cfS-8I-8Au.title" = "Proxy:";
 
-/* Class = "NSTabViewItem"; label = "Proxy"; ObjectID = "pnL-Z8-fIK"; */
-"pnL-Z8-fIK.label" = "代理ip或域名";
+/* Class = "NSMenuItem"; title = "IPIfNonMatch"; ObjectID = "dSb-GT-n2n"; */
+"dSb-GT-n2n.title" = "IPIfNonMatch";
 
-/* Class = "NSTabViewItem"; label = "Direct"; ObjectID = "yc0-Po-cG1"; */
-"yc0-Po-cG1.label" = "直连ip或域名";
+/* Class = "NSTextFieldCell"; title = "like: { \"domainStrategy\": \"IPOnDemand\", \"rules\": []}"; ObjectID = "ejH-X7-8Fb"; */
+"ejH-X7-8Fb.title" = "like: { \"domainStrategy\": \"IPOnDemand\", \"rules\": []}";
 
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "zLf-pT-xlm"; */
-"zLf-pT-xlm.title" = "全局";
+/* Class = "NSTextFieldCell"; title = "* Set the rules line by line: domain or ip"; ObjectID = "ymo-ds-No9"; */
+"ymo-ds-No9.title" = "* Set the rules line by line: domain or ip";

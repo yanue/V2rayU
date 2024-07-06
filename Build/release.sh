@@ -13,26 +13,60 @@ APP_TITLE="${APP_NAME} - V${APP_Version}"
 AppCastDir=$HOME/swift/appcast
 
 function updatePlistVersion() {
+    echo "Updating plist version..."
     buildString=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}")
-    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $buildString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}"
+    if [ $? -eq 0 ]; then
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $buildString" "${BASE_DIR}/V2rayU/${INFOPLIST_FILE}"
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to set CFBundleVersion"
+            exit 1
+        fi
+    else
+        echo "Error: Failed to read CFBundleShortVersionString"
+        exit 1
+    fi
 }
 
 function build() {
-    echo "Building V2rayU."${APP_Version}
+    echo "Building V2rayU version ${APP_Version}"
+    
     echo "Cleaning up old archive & app..."
     rm -rf ${V2rayU_ARCHIVE} ${V2rayU_RELEASE}
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to clean up old archive & app"
+        exit 1
+    fi
 
     echo "Building archive... please wait a minute"
     xcodebuild -workspace ${BASE_DIR}/V2rayU.xcworkspace -config Release -scheme V2rayU -archivePath ${V2rayU_ARCHIVE} archive
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to build archive"
+        exit 1
+    fi
 
     echo "Exporting archive..."
     xcodebuild -archivePath ${V2rayU_ARCHIVE} -exportArchive -exportPath ${V2rayU_RELEASE} -exportOptionsPlist ./build.plist
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to export archive"
+        exit 1
+    fi
 
     echo "Cleaning up archive..."
     rm -rf ${V2rayU_ARCHIVE}
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to clean up archive"
+        exit 1
+    fi
 
+    echo "Setting permissions for resources..."
     chmod -R 755 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/v2ray-core"
     chmod -R 755 "${V2rayU_RELEASE}/${APP_NAME}.app/Contents/Resources/unzip.sh"
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to set permissions for resources"
+        exit 1
+    fi
+
+    echo "Build and export completed successfully."
 }
 
 function createDmg() {
@@ -209,9 +243,6 @@ function createDmgByAppdmg() {
     echo ${BUILD_DIR}/appdmg.json
     appdmg appdmg.json ${DMG_FINAL}
 
-    # appcast sign update
-    ${AppCastDir}/bin/sign_update ${DMG_FINAL}
-
 #    umount "/Volumes/${APP_NAME}"
 }
 
@@ -256,7 +287,7 @@ function makeDmg() {
 }
 
 
-
-
+#makeDmg
+createDmgByAppdmg
 
 echo 'done'

@@ -1,5 +1,4 @@
 PODS:
-  - Alamofire (4.8.2)
   - FirebaseAnalytics (10.24.0):
     - FirebaseAnalytics/AdIdSupport (= 10.24.0)
     - FirebaseCore (~> 10.0)
@@ -112,26 +111,22 @@ PODS:
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
   - QRCoder (1.1.0)
-  - Sparkle (2.6.2)
   - Swifter (1.4.7)
   - SwiftyJSON (5.0.0)
   - Yams (5.0.6)
 
 DEPENDENCIES:
-  - Alamofire
   - FirebaseAnalytics (~> 10.24.0)
   - FirebaseCrashlytics
   - MASShortcut
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
-  - Sparkle (~> 2.0)
   - Swifter
   - SwiftyJSON
   - Yams
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - Alamofire
     - FirebaseAnalytics
     - FirebaseCore
     - FirebaseCoreExtension
@@ -148,7 +143,6 @@ SPEC REPOS:
     - PromisesObjC
     - PromisesSwift
     - QRCoder
-    - Sparkle
     - Swifter
     - SwiftyJSON
     - Yams
@@ -163,7 +157,6 @@ CHECKOUT OPTIONS:
     :git: https://github.com/sindresorhus/Preferences.git
 
 SPEC CHECKSUMS:
-  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   FirebaseAnalytics: b5efc493eb0f40ec560b04a472e3e1a15d39ca13
   FirebaseCore: 11dc8a16dfb7c5e3c3f45ba0e191a33ac4f50894
   FirebaseCoreExtension: af5fd85e817ea9d19f9a2659a376cf9cf99f03c0
@@ -181,11 +174,10 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
-  Sparkle: a62c7dc4f410ced73beb2169cf1d3cc3f028a295
   Swifter: 2327ef5d872c638aebab79646ce494af508b0c8f
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   Yams: e10dae147f517ed57ecae37c5e8681bdf8fcab65
 
-PODFILE CHECKSUM: 071aabe40b11d56fb50a9b83f6ed47079838bdee
+PODFILE CHECKSUM: d61ad825ad5d61b2b98237544e21946c9babe3a0
 
 COCOAPODS: 1.15.2

@@ -9,7 +9,6 @@
 import Cocoa
 import SystemConfiguration
 import Swifter
-import Alamofire
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"

@@ -45,6 +45,16 @@ struct GithubAsset: Codable {
     }
 }
 
+struct GithubError: Codable {
+    let message: String
+    let documentationUrl: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case documentationUrl = "documentation_url"
+    }
+}
+
 let V2rayUpdater = AppCheckController()
 
 // AppCheckController - 检查新版本页面
@@ -169,22 +179,46 @@ class AppCheckController: NSWindowController {
                     }
                 }
             } catch {
-                print("Error decoding JSON: \(error)")
-                DispatchQueue.main.async {
-                    // update progress text
-                    self.bindData.progressText = "Check failed: \(error)"
-                    var title = "Check failed!"
-                    var toast = "\(error)"
-                    if isMainland {
-                        title = "检查失败"
-                        toast = "\(error)";
+                // 可能请求太频繁了
+                do {
+                    let decoder = JSONDecoder()
+                    
+                    // try decode data
+                    let data: GithubError = try decoder.decode(GithubError.self, from: data)
+                    DispatchQueue.main.async {
+                        // update progress text
+                        self.bindData.progressText = "Check failed: \(error)"
+                        var title = "Check failed!"
+                        if isMainland {
+                            title = "检查失败"
+                        }
+                        var toast = "\(data.message)\n\(data.documentationUrl)";
+                        // open dialog
+                        alertDialog(title: title, message: toast)
+                        // sleep 2s
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            // close window
+                            self.closeWindow()
+                        }
                     }
-                    // open dialog
-                    alertDialog(title: title, message: toast)
-                    // sleep 2s
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        // close window
-                        self.closeWindow()
+                } catch {
+                    print("Error decoding JSON: \(error)")
+                    DispatchQueue.main.async {
+                        // update progress text
+                        self.bindData.progressText = "Check failed: \(error)"
+                        var title = "Check failed!"
+                        var toast = "\(error)"
+                        if isMainland {
+                            title = "检查失败"
+                            toast = "\(error)";
+                        }
+                        // open dialog
+                        alertDialog(title: title, message: toast)
+                        // sleep 2s
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            // close window
+                            self.closeWindow()
+                        }
                     }
                 }
             }
@@ -258,7 +292,7 @@ class AppVersionController: NSWindowController {
        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 300),
                              styleMask: [.titled, .closable, .resizable],
                              backing: .buffered, defer: false)
-       window.title = "Software Update"
+       window.title = "V2rayU Update"
        window.contentView = contentView
         
        super.init(window: window)
@@ -272,19 +306,37 @@ class AppVersionController: NSWindowController {
     }
 
     func show(release: GithubRelease) {
-        bindData.title = "A new version of V2rayU is available!"
-        bindData.description = "V2rayU \(appVersion) is now available—you have \(release.tagName). Would you like to download it now?"
-        bindData.releaseNotes = release.name + "\n" + release.body
-        self.release = release
-        print("bindData.releaseNotes", bindData.releaseNotes)
-        // bring window to front
-        window?.orderFrontRegardless()
-        // center position
-        window?.center()
-        // make window key
-        window?.makeKeyAndOrderFront(nil)
-        // activate app
-        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.async {
+            self.release = release
+            if isMainland {
+                self.bindData.title = "A new version of V2rayU is available!"
+                if release.prerelease{
+                    self.bindData.description = "V2rayU \(release.tagName) preview is now available, you have \(appVersion). Would you like to download it now?"
+                } else {
+                    self.bindData.description = "V2rayU \(release.tagName) is now available, you have \(appVersion). Would you like to download it now?"
+                }
+                self.bindData.releaseNotes = release.name + "\n" + release.body
+            } else {
+                self.bindData.title = "V2rayU 有新版本上线了！"
+                if release.prerelease {
+                    self.bindData.description = "V2rayU 已上线 \(release.tagName) 预览版,您有的版本 \(appVersion) —,需要立即下载吗？"
+                } else {
+                    self.bindData.description = "V2rayU 已上线 \(release.tagName),您有的版本 \(appVersion) —,需要立即下载吗？"
+                }
+                self.bindData.releaseNotes = release.name + "\n" + release.body
+                self.bindData.releaseNodesTitle = "更新日志"
+                self.bindData.skipVersion = "跳过此版本"
+                self.bindData.installUpdate = "安装此版本"
+            }
+            // bring window to front
+            self.window?.orderFrontRegardless()
+            // center position
+            self.window?.center()
+            // make window key
+            self.window?.makeKeyAndOrderFront(nil)
+            // activate app
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -309,10 +361,10 @@ class AppVersionController: NSWindowController {
     
     func skipAction() {
         print("Skip action")
-        // UserDefaults 记录是否跳过版本更新
-        UserDefaults.standard.set(release.tagName, forKey: "skipAppVersion")
-        // 关闭窗口
         DispatchQueue.main.async {
+            // UserDefaults 记录是否跳过版本更新
+            UserDefaults.standard.set(self.release.tagName, forKey: "skipAppVersion")
+            // 关闭窗口
             self.window?.close()
         }
     }
@@ -320,8 +372,10 @@ class AppVersionController: NSWindowController {
     class BindData: ObservableObject {
         @Published var title = "A new version of V2rayU App is available!"
         @Published var description = ""
-        @Published var releaseNotes = """
-        """
+        @Published var releaseNotes = ""
+        @Published var releaseNodesTitle = "Release Notes:"
+        @Published var skipVersion = "Skip This Version!"
+        @Published var installUpdate = "Install Update!"
     }
 
     struct ContentView: View {
@@ -347,7 +401,7 @@ class AppVersionController: NSWindowController {
                         Text(bindData.description)
                             .padding(.trailing, 20)
                         
-                        Text("Release Notes:")
+                        Text(bindData.releaseNodesTitle)
                             .font(.headline)
                             .bold()
                             .padding(.top, 20)
@@ -364,22 +418,25 @@ class AppVersionController: NSWindowController {
                                
                             Spacer(minLength: 20) // 右边 margin 40
                         }
+                        
+                        HStack {
+                            Button(bindData.skipVersion) {
+                                skipAction()
+                            }
+                            
+                            Spacer()
+                            
+                            Button(bindData.installUpdate) {
+                                installAction()
+                            }
+                            .padding(.trailing, 20)
+                            .keyboardShortcut(.defaultAction)
+                        }
+                        .padding(.top,20)
+                        .padding(.bottom,20)
                     }
                 }
 
-                HStack {
-                    Button("Skip This Version") {
-                        skipAction()
-                    }
-                    
-                    Spacer()
-                    
-                    Button("Install Update") {
-                        installAction()
-                    }
-                    .keyboardShortcut(.defaultAction)
-                }
-                .padding(20)
             }
             .frame(width: 500, height: 300)
         }
