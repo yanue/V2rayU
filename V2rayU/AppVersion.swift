@@ -308,7 +308,7 @@ class AppVersionController: NSWindowController {
     func show(release: GithubRelease) {
         DispatchQueue.main.async {
             self.release = release
-            if isMainland {
+            if !isMainland {
                 self.bindData.title = "A new version of V2rayU is available!"
                 if release.prerelease{
                     self.bindData.description = "V2rayU \(release.tagName) preview is now available, you have \(appVersion). Would you like to download it now?"
@@ -550,7 +550,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
             }
         }
        
-        print("Installing V2rayU")
+        print("Installing V2rayU: \(String(describing: self.destinationURL))")
     }
     
     // ---------------------- ui 相关 --------------------------------
@@ -618,27 +618,43 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
         let downloadsDirectory = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-        destinationURL = downloadsDirectory.appendingPathComponent(downloadTask.response?.suggestedFilename ?? "V2rayU-macOS.dmg")
-        
+        let destUrl = downloadsDirectory.appendingPathComponent(downloadTask.response?.suggestedFilename ?? "V2rayU-macOS.dmg")
+
         do {
-            try fileManager.moveItem(at: location, to: destinationURL!)
+            print("destinationURL: \(destUrl)")
+            if fileManager.fileExists(atPath: destUrl.path) {
+                print("Download file already exists: \(destUrl.path) \(location)")
+                DispatchQueue.main.async {
+                    self.bindData.isDownloading = false
+                    self.bindData.progress = 100.0
+                    self.bindData.progressText = "Download Completed"
+                    self.destinationURL = destUrl
+                }
+                return
+            }
+            
+            try fileManager.moveItem(at: location, to: destUrl)
+
             DispatchQueue.main.async {
                 self.bindData.isDownloading = false
                 self.bindData.progress = 100.0
                 self.bindData.progressText = "Download Completed"
+                self.destinationURL = destUrl
             }
-            print("Download finished: \(destinationURL!)")
+
+            print("Download finished: \(destUrl)")
         } catch {
             DispatchQueue.main.async {
                 self.bindData.isDownloading = false
                 self.bindData.progressText = "File move error: \(error.localizedDescription)"
+                self.destinationURL = destUrl
                 var title = "Download failed!"
                 var toast = "\(error)"
                 if isMainland {
                     title = "移动文件失败"
-                    toast = "\(error)";
+                    toast = "\(error)"
                 }
-                // open dialog
+                // Ensure alertDialog function displays an alert to the user
                 alertDialog(title: title, message: toast)
             }
             print("File move error: \(error.localizedDescription)")
