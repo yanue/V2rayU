@@ -92,7 +92,7 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
                 // add
                 V2rayRoutings.add(remark: "new-rule", json: V2rayRoutings.default_rule_content)
                 
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     V2rayRoutings.loadConfig()
                     // reload data
                     self.routingsTableView.reloadData()
@@ -103,7 +103,7 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
                 
                 // delete server config
             case 1:
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     // get seleted index
                     let idx = self.routingsTableView.selectedRow
                     // remove

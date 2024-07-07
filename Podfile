@@ -9,8 +9,8 @@ target 'V2rayU' do
 
   # Pods for V2rayU
   pod 'FirebaseAnalytics', '~> 10.24.0'
-  pod 'FirebaseCrashlytics'
-  pod 'SwiftyJSON'/
+  pod 'FirebaseCrashlytics', '~> 10.24.0'
+  pod 'SwiftyJSON'
   # master branch
   pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
   pod 'QRCoder'

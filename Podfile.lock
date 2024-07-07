@@ -117,7 +117,7 @@ PODS:
 
 DEPENDENCIES:
   - FirebaseAnalytics (~> 10.24.0)
-  - FirebaseCrashlytics
+  - FirebaseCrashlytics (~> 10.24.0)
   - MASShortcut
   - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
   - QRCoder
@@ -178,6 +178,6 @@ SPEC CHECKSUMS:
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   Yams: e10dae147f517ed57ecae37c5e8681bdf8fcab65
 
-PODFILE CHECKSUM: d61ad825ad5d61b2b98237544e21946c9babe3a0
+PODFILE CHECKSUM: 94ab23e73805bd5279654adc5ea4b4c31f94b8af
 
 COCOAPODS: 1.15.2

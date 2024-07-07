@@ -176,7 +176,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 // add
                 V2rayServer.add()
                 
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     V2rayServer.loadConfig()
                     // reload data
                     self.serversTableView.reloadData()
@@ -187,7 +187,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 
                 // delete server config
             case 1:
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     // get seleted index
                     let idx = self.serversTableView.selectedRow
                     // remove
@@ -562,7 +562,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         v2rayConfig.parseJson(jsonText: self.configText.string)
         if v2rayConfig.errors.count > 0 {
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async {
                 self.errTip.stringValue = v2rayConfig.errors[0]
             }
         }
@@ -579,7 +579,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
             }
             self.refreshServerList(ok: errMsg.count == 0)
         } else {
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async {
                 self.errTip.stringValue = errMsg
             }
         }
@@ -898,14 +898,14 @@ extension ConfigWindowController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let v2rayItemList = V2rayServer.list()
         // set cell data
-        if v2rayItemList.count >= row {
+        if row < v2rayItemList.count {
             return v2rayItemList[row].remark
         }
         return nil
     }
 
     // edit cell
-    func tableView(_ tableView: NSTableView, setObjectValue: Any?, for forTableColumn: NSTableColumn?, row: Int) {
+    func tableView(_ tableView: NSTableView, setObjectValue: Any?, for tableColumn: NSTableColumn?, row: Int) {
         guard let remark = setObjectValue as? String else {
             NSLog("remark is nil")
             return
@@ -913,12 +913,12 @@ extension ConfigWindowController: NSTableViewDataSource {
         DispatchQueue.global().async {
             // edit item remark
             V2rayServer.edit(rowIndex: row, remark: remark)
-            // reload table
+            // reload table on main thread
             DispatchQueue.main.async {
                 tableView.reloadData()
+                // reload menu
+                menuController.showServers()
             }
-            // reload menu
-            menuController.showServers()
         }
     }
 }
@@ -942,25 +942,24 @@ extension ConfigWindowController: NSTableViewDelegate {
         if dropOperation == .above {
             return .move
         }
-        return NSDragOperation()
+        return []
     }
 
     func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
         var oldIndexes = [Int]()
-        info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:], using: {
-            (draggingItem: NSDraggingItem, idx: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+        info.enumerateDraggingItems(options: [], for: tableView, classes: [NSPasteboardItem.self], searchOptions: [:]) { (draggingItem, _, _) in
             if let str = (draggingItem.item as! NSPasteboardItem).string(forType: NSPasteboard.PasteboardType(rawValue: self.tableViewDragType)),
                let index = Int(str) {
                 oldIndexes.append(index)
             }
-        })
+        }
 
         var oldIndexOffset = 0
         var newIndexOffset = 0
         var oldIndexLast = 0
         var newIndexLast = 0
 
-        // For simplicity, the code below uses `tableView.moveRowAtIndex` to move rows around directly.
+        // For simplicity, the code below uses `tableView.moveRow(at:to:)` to move rows around directly.
         // You may want to move rows in your content array and then call `tableView.reloadData()` instead.
         for oldIndex in oldIndexes {
             if oldIndex < row {
@@ -978,12 +977,12 @@ extension ConfigWindowController: NSTableViewDelegate {
             V2rayServer.move(oldIndex: oldIndexLast, newIndex: newIndexLast)
             DispatchQueue.main.async {
                 // set selected
-                self.serversTableView.selectRowIndexes(NSIndexSet(index: newIndexLast) as IndexSet, byExtendingSelection: false)
+                self.serversTableView.selectRowIndexes(IndexSet(integer: newIndexLast), byExtendingSelection: false)
                 // reload table
                 self.serversTableView.reloadData()
+                // reload menu
+                menuController.showServers()
             }
-            // reload menu
-            menuController.showServers()
         }
         return true
     }
