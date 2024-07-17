@@ -169,23 +169,11 @@ extension String {
 // shell("/bin/bash",["-c","cd ~ && ls -la"])
 func shell(launchPath: String, arguments: [String]) -> String? {
     do {
-        let task = Process()
-        task.launchPath = launchPath
-        task.arguments = arguments
-        
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.launch()
-        
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: String.Encoding.utf8)!
-        
-        if output.count > 0 {
-            // remove newline character.
-            let lastIndex = output.index(before: output.endIndex)
-            return String(output[output.startIndex ..< lastIndex])
-        }
+        let output = try runCommand(at: launchPath, with: arguments)
         return output
+    } catch let error {
+        print("shell error: \(error)")
+        return ""
     }
 }
 
@@ -375,17 +363,14 @@ func findFreePort() -> UInt16 {
 }
 
 func isPortOpen(port: UInt16) -> Bool {
-    let process = Process()
-    process.launchPath = "/usr/sbin/lsof"
-    process.arguments = ["-i", ":\(port)"]
-
-    let pipe = Pipe()
-    process.standardOutput = pipe
-    process.launch()
-
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let output = String(data: data, encoding: .utf8)
-    return output?.contains("LISTEN") ?? false
+    do {
+        let output = try runCommand(at: "/usr/sbin/lsof", with: ["-i", ":\(port)"])
+        NSLog("isPortOpen: \(output)")
+        return output.contains("LISTEN")
+    } catch let error {
+        NSLog("isPortOpen: \(error)")
+    }
+    return false
 }
 
 func getUsablePort(port: UInt16) -> (Bool, UInt16) {
@@ -512,7 +497,6 @@ func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfigurati
     return configuration
 }
 
-
 func getHttpProxyPort() -> UInt16 {
     return UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1087") ?? 1087
 }
@@ -525,7 +509,7 @@ func getPacPort() -> UInt16 {
     return UInt16(UserDefaults.get(forKey: .localPacPort) ?? "11085") ?? 11085
 }
 
-func killAllPing(){
+func killAllPing() {
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     NSLog("killAllPing: \(String(describing: msg))")
@@ -534,17 +518,16 @@ func killAllPing(){
     NSLog("rmPingJson: \(String(describing: msg1))")
 }
 
-func killSelfV2ray(){
+func killSelfV2ray() {
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     NSLog("killSelfV2ray: \(String(describing: msg))")
 }
 
-
 func OpenLogs() {
     if !FileManager.default.fileExists(atPath: logFilePath) {
         let txt = ""
-        try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+        try! txt.write(to: URL(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
     }
 
     let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
@@ -558,7 +541,7 @@ func OpenLogs() {
 
 func ClearLogs() {
     let txt = ""
-    try! txt.write(to: URL.init(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+    try! txt.write(to: URL(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
 }
 
 func showDock(state: Bool) {
@@ -579,4 +562,45 @@ func showDock(state: Bool) {
 
 func noticeTip(title: String = "", informativeText: String = "") {
     makeToast(message: title + " : " + informativeText)
+}
+
+enum CommandExecutionError: Error {
+    case fileNotFound(String)
+    case insufficientPermissions(String)
+    case unknown(Error)
+}
+
+func runCommand(at path: String, with arguments: [String]) throws -> String {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: path)
+    process.arguments = arguments
+
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    process.standardError = pipe
+
+    do {
+        try process.run()
+        process.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        if let output = String(data: data, encoding: .utf8) {
+            return output
+        } else {
+            return ""
+        }
+    } catch {
+        if (error as NSError).domain == NSCocoaErrorDomain {
+            switch (error as NSError).code {
+            case NSFileNoSuchFileError:
+                throw CommandExecutionError.fileNotFound(path)
+            case NSFileReadNoPermissionError:
+                throw CommandExecutionError.insufficientPermissions(path)
+            default:
+                throw CommandExecutionError.unknown(error)
+            }
+        } else {
+            throw CommandExecutionError.unknown(error)
+        }
+    }
 }

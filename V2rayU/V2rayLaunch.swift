@@ -7,8 +7,8 @@
 //
 
 import Cocoa
-import SystemConfiguration
 import Swifter
+import SystemConfiguration
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
@@ -28,17 +28,22 @@ enum RunMode: String {
     case backup
     case restore
 }
-// Create a Process instance with async launch
-var v2rayProcess = Process()
+
+// 高版本macos执行NSAppleScript会出现授权失败
+func executeAppleScriptWithOsascript(script: String) {
+    do {
+        let output = try runCommand(at: "/usr/bin/osascript", with: ["-e", "do shell script \"" + script + "\" with administrator privileges"])
+        print("executeAppleScript-Output: \(output)")
+    } catch {
+        print("executeAppleScript-Error: \(error)")
+        let title = NSLocalizedString("InstallFailedTitle", comment: "")
+        let toast = String(format: NSLocalizedString("InstallFailedMessage", comment: ""),  error.localizedDescription, script)
+        alertDialog(title: title, message: toast)
+    }
+}
 
 class V2rayLaunch: NSObject {
-    
-    static func install() {
-        V2rayLaunch.Stop()
-
-        // generate plist
-        V2rayLaunch.generateLaunchAgentPlist()
-        
+    static func checkInstall() {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: AppHomePath) {
@@ -60,7 +65,7 @@ class V2rayLaunch: NSObject {
         if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
             needRunInstall = true
         }
-        if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayCorePath+"/geoip.dat") {
+        if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayCorePath + "/geoip.dat") {
             NSLog("\(v2rayCorePath)/geoip.dat not exists,need install")
             needRunInstall = true
         }
@@ -89,7 +94,7 @@ class V2rayLaunch: NSObject {
             let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
             NSLog("toolVersion - \(v2rayUTool): \(String(describing: toolVersion))")
             if toolVersion != nil {
-                let _version = toolVersion ?? ""            // old version
+                let _version = toolVersion ?? "" // old version
                 if _version.contains("Usage:") {
                     NSLog("\(v2rayUTool) old version,need install")
                     needRunInstall = true
@@ -110,16 +115,34 @@ class V2rayLaunch: NSObject {
             return
         }
 
-        let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
-        print("runAppleScript:" + doSh)
-        var error: NSDictionary?
-        if let scriptObject = NSAppleScript(source: "do shell script \"" + doSh + "\" with administrator privileges") {
-            let output: NSAppleEventDescriptor = scriptObject.executeAndReturnError(&error)
-            print(output.stringValue ?? "")
-            if (error != nil) {
-                print("error: \(String(describing: error))")
+        showInstallAlert()
+
+        V2rayLaunch.Stop()
+
+        // generate plist
+        V2rayLaunch.generateLaunchAgentPlist()
+    }
+
+    static func showInstallAlert() {
+        DispatchQueue.main.async {
+            let alert = NSAlert()
+            alert.messageText = NSLocalizedString("InstallAlertTitle", comment: "")
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: NSLocalizedString("Install", comment: ""))
+            alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
+            switch alert.runModal() {
+            case .alertFirstButtonReturn:
+                install()
+            default:
+                NSApp.terminate(self)
             }
         }
+    }
+
+    static func install() {
+        let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
+        // Create authorization reference for the user
+        executeAppleScriptWithOsascript(script: doSh)
     }
 
     static func generateLaunchAgentPlist() {
@@ -148,23 +171,22 @@ class V2rayLaunch: NSObject {
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
         // unload launch service(避免更改后无法生效)
-        Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["unload", "-F", launchAgentPlistFile]).waitUntilExit()
+        do {
+            _ = try runCommand(at: "/bin/launchctl", with: ["unload", "-F", launchAgentPlistFile])
+        } catch {
+        }
         // load launch service
-        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["load", "-wF", launchAgentPlistFile])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("launchctl load \(launchAgentPlistFile) succeeded.")
-        } else {
-            NSLog("launchctl load \(launchAgentPlistFile) failed.")
+        do {
+            let output = try runCommand(at: "/bin/launchctl", with: ["load", "-wF", launchAgentPlistFile])
+            NSLog("launchctl load \(launchAgentPlistFile) succeeded. \(output)")
+        } catch let error {
+            NSLog("launchctl load \(launchAgentPlistFile) failed. \(error)")
         }
     }
 
-    static func runAtStart(){
+    static func runAtStart() {
         // clear not available
         V2rayServer.clearItems()
-
-        // install before launch
-        V2rayLaunch.install()
 
         // start http server
         startHttpServer()
@@ -172,7 +194,7 @@ class V2rayLaunch: NSObject {
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start and show servers
-            self.startV2rayCore()
+            startV2rayCore()
         } else {
             // show off status
             menuController.setStatusOff()
@@ -198,7 +220,7 @@ class V2rayLaunch: NSObject {
         // set icon
         menuController.setStatusOn(mode: mode)
 
-        self.setSystemProxy(mode: mode)
+        setSystemProxy(mode: mode)
     }
 
     static func ToggleRunning() {
@@ -211,9 +233,9 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func restartV2ray(){
+    static func restartV2ray() {
         // start
-        self.startV2rayCore()
+        startV2rayCore()
     }
 
     // start v2ray core
@@ -228,7 +250,7 @@ class V2rayLaunch: NSObject {
         let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
 
         // create json file
-        self.createJsonFile(item: v2ray)
+        createJsonFile(item: v2ray)
 
         // launch
         let started = V2rayLaunch.Start()
@@ -238,7 +260,7 @@ class V2rayLaunch: NSObject {
         }
 
         // set run mode
-        self.setRunMode(mode: runMode)
+        setRunMode(mode: runMode)
 
         // reload menu
         menuController.showServers()
@@ -259,7 +281,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func Start() -> Bool {
-        self.Stop()
+        Stop()
 
         // close port
         let httpPort = getHttpProxyPort()
@@ -273,6 +295,7 @@ class V2rayLaunch: NSObject {
                 toast = "http port \(httpPort) has been used, please replace it from advance setting"
                 title = "Port is already in use"
             }
+            NSLocalizedString("", comment: "")
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 preferencesWindowController.show(preferencePane: .advanceTab)
@@ -298,53 +321,38 @@ class V2rayLaunch: NSObject {
         }
 
         // just start: stop is so slow
-        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["start", LAUNCH_AGENT_NAME])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("Start v2ray-core succeeded.")
+        do {
+            let output = try runCommand(at: "/bin/launchctl", with: ["start", LAUNCH_AGENT_NAME])
+            print("Start v2ray-core: ok \(output)")
             return true
-        } else {
-            NSLog("Start v2ray-core failed.")
-            makeToast(message: "Start v2ray-core failed.")
+        } catch let error {
+            alertDialog(title: "Start v2ray-core failed.", message: error.localizedDescription)
             return false
         }
     }
 
     static func Stop() {
-        let task = Process.launchedProcess(launchPath: "/bin/launchctl", arguments: ["stop", LAUNCH_AGENT_NAME])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("Stop v2ray-core succeeded.")
-        } else {
-            NSLog("Stop v2ray-core failed.")
-        }
-    }
-
-    static func checkV2rayUTool() {
-        // Ensure launch agent directory is existed.
-        if !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
-            self.install()
-        }
-
-        // Ensure permission with root admin
-        if !checkFileIsRootAdmin(file: v2rayUTool) {
-            self.install()
+        do {
+            let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
+            print("setSystemProxy: ok \(output)")
+        } catch let error {
+            alertDialog(title: "Stop Error", message: error.localizedDescription)
         }
     }
 
     static func checkV2rayCore() {
         if !FileManager.default.fileExists(atPath: v2rayCoreFile) {
             print("\(v2rayCoreFile) not exists,need install")
-            self.install()
+            install()
         }
         if !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
             print("\(v2rayCoreFile) not accessable")
-            self.install()
+            install()
         }
     }
 
     static func setSystemProxy(mode: RunMode) {
-        print("v2rayUTool", v2rayUTool,mode)
+        print("setSystemProxy", v2rayUTool, mode)
         let pacUrl = getPacUrl()
         var httpPort: String = ""
         var sockPort: String = ""
@@ -353,13 +361,12 @@ class V2rayLaunch: NSObject {
             httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
             sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         }
-
-        let task = Process.launchedProcess(launchPath: v2rayUTool, arguments: ["-mode", mode.rawValue, "-pac-url", pacUrl, "-http-port", httpPort, "-sock-port", sockPort])
-        task.waitUntilExit()
-        if task.terminationStatus == 0 {
-            NSLog("setSystemProxy " + mode.rawValue + " succeeded.")
-        } else {
-            NSLog("setSystemProxy " + mode.rawValue + " failed.")
+        do {
+            let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", pacUrl, "-http-port", httpPort, "-sock-port", sockPort])
+            print("setSystemProxy: ok \(output)")
+        } catch let error {
+            alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
+            showInstallAlert()
         }
     }
 
@@ -413,7 +420,7 @@ class V2rayLaunch: NSObject {
         jsonText = vCfg.combineManual()
 
         do {
-            let jsonFilePath = URL.init(fileURLWithPath: JsonConfigFilePath)
+            let jsonFilePath = URL(fileURLWithPath: JsonConfigFilePath)
 
             // delete before config
             if FileManager.default.fileExists(atPath: JsonConfigFilePath) {

@@ -131,7 +131,6 @@
 		665DC9BA22A542F90062337B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6662C20A240EA782000AF6CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceDns.xib; sourceTree = SOURCE_ROOT; };
 		6662C20C240EA794000AF6CD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
-		6662C20D240EA797000AF6CD /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceDns.strings"; sourceTree = "<group>"; };
 		667029D221AFB86E0079EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QrcodeWindow.xib; sourceTree = "<group>"; };
 		66784AFB2170486D00AD307F /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		667ECE6F2A9A05EB009B00EC /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -139,15 +138,6 @@
 		6683B1EA21C2AD1A004A1C5F /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pac; path = Build/pac; sourceTree = "<group>"; };
 		669468492C076C2800146109 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		669A73A7233776B800807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/MainMenu.strings"; sourceTree = "<group>"; };
-		669A73A8233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
-		669A73A9233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/QrcodeWindow.strings"; sourceTree = "<group>"; };
-		669A73AA233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceAbout.strings"; sourceTree = "<group>"; };
-		669A73AB233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceAdvance.strings"; sourceTree = "<group>"; };
-		669A73AC233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceGeneral.strings"; sourceTree = "<group>"; };
-		669A73AD233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferencePac.strings"; sourceTree = "<group>"; };
-		669A73AE233776B900807CF9 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "../zh-HK.lproj/PreferenceSubscription.strings"; sourceTree = "<group>"; };
-		66A358662C39517B00914A25 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		66A358672C39517F00914A25 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		66A358682C3959AE00914A25 /* build.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = build.plist; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -447,7 +437,6 @@
 				en,
 				Base,
 				"zh-Hans",
-				"zh-HK",
 			);
 			mainGroup = 664EB368216C9A5E00B6AE0D;
 			productRefGroup = 664EB372216C9A5E00B6AE0D /* Products */;
@@ -587,7 +576,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				66107B8922DEE445002FFB60 /* en */,
-				66A358662C39517B00914A25 /* zh-HK */,
 				66A358672C39517F00914A25 /* zh-Hans */,
 			);
 			name = Localizable.strings;
@@ -615,7 +603,6 @@
 			children = (
 				664EB379216C9A5F00B6AE0D /* Base */,
 				66F3029C22AAA0A600FCA4E2 /* zh-Hans */,
-				669A73A7233776B800807CF9 /* zh-HK */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -625,7 +612,6 @@
 			children = (
 				6662C20A240EA782000AF6CD /* Base */,
 				6662C20C240EA794000AF6CD /* zh-Hans */,
-				6662C20D240EA797000AF6CD /* zh-HK */,
 			);
 			name = PreferenceDns.xib;
 			sourceTree = "<group>";
@@ -635,7 +621,6 @@
 			children = (
 				667029D221AFB86E0079EF41 /* Base */,
 				66F3029E22AAA0A600FCA4E2 /* zh-Hans */,
-				669A73A9233776B900807CF9 /* zh-HK */,
 			);
 			name = QrcodeWindow.xib;
 			sourceTree = "<group>";
@@ -645,7 +630,6 @@
 			children = (
 				66FEAD4F217EE14C009DECF9 /* Base */,
 				66F3029D22AAA0A600FCA4E2 /* zh-Hans */,
-				669A73A8233776B900807CF9 /* zh-HK */,
 			);
 			name = ConfigWindow.xib;
 			sourceTree = "<group>";
@@ -655,7 +639,6 @@
 			children = (
 				6D6DFD730D8572B1FCAB1FFE /* Base */,
 				66F302A322AAA0A700FCA4E2 /* zh-Hans */,
-				669A73AE233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceSubscription.strings;
 			sourceTree = "<group>";
@@ -665,7 +648,6 @@
 			children = (
 				6D6DFE1CDFAD9828F2FDE1A5 /* Base */,
 				66F302A022AAA0A600FCA4E2 /* zh-Hans */,
-				669A73AB233776B900807CF9 /* zh-HK */,
 				66C5B194240B58B8008A22CA /* en */,
 			);
 			name = PreferenceAdvance.strings;
@@ -676,7 +658,6 @@
 			children = (
 				6D6DF3A2857899778B719CE1 /* Base */,
 				66F3029F22AAA0A600FCA4E2 /* zh-Hans */,
-				669A73AA233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferenceAbout.strings;
 			sourceTree = "<group>";
@@ -686,7 +667,6 @@
 			children = (
 				6D6DF81E59907A2C7579BFE2 /* Base */,
 				66F302A122AAA0A600FCA4E2 /* zh-Hans */,
-				669A73AC233776B900807CF9 /* zh-HK */,
 				662F0ACE2AB720C700884C17 /* en */,
 			);
 			name = PreferenceGeneral.strings;
@@ -697,7 +677,6 @@
 			children = (
 				6D6DF181C5D472DBBB71B72A /* Base */,
 				66F302A222AAA0A700FCA4E2 /* zh-Hans */,
-				669A73AD233776B900807CF9 /* zh-HK */,
 			);
 			name = PreferencePac.strings;
 			sourceTree = "<group>";
@@ -843,6 +822,7 @@
 				CURRENT_PROJECT_VERSION = 4.2.2;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -856,6 +836,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Common/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -878,6 +859,7 @@
 				CURRENT_PROJECT_VERSION = 4.2.2;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_ONLY_ACTIVE_RESOURCES = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
@@ -891,6 +873,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Common/V2rayU-Bridging-header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;

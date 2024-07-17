@@ -52,6 +52,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("applicationDidFinishLaunching")
         FirebaseApp.configure()
 
+        // check installed
+        V2rayLaunch.checkInstall()
+        
         // default settings
         self.checkDefault()
 

@@ -36,8 +36,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // hide new version
         newVersionItem.isHidden = true
-
-        self.showRouting();
         
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
@@ -123,6 +121,7 @@ class MenuController: NSObject, NSMenuDelegate {
                 configWindow.reloadData()
             }
         }
+        self.showRouting();
     }
     
     func showRouting() {
