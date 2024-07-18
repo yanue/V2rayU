@@ -182,6 +182,8 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                     self.serversTableView.reloadData()
                     // selected current row
                     self.serversTableView.selectRowIndexes(NSIndexSet(index: V2rayServer.count() - 1) as IndexSet, byExtendingSelection: false)
+                    
+                    menuController.showServers()
                 }
                 break
                 

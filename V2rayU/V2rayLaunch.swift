@@ -278,7 +278,7 @@ class V2rayLaunch: NSObject {
         menuController.showServers()
 
         // ping current
-        PingCurrent(item: v2ray).doPing()
+        PingCurrent.shared.startPing(with: v2ray)
     }
 
     static func stopV2rayCore() {

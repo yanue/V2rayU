@@ -437,7 +437,7 @@ class RoutingItem: NSObject, NSCoding {
             }
         }
 
-        print("ips", ips, "domains", domains)
+//        print("ips", ips, "domains", domains)
 
         return (domains, ips)
     }

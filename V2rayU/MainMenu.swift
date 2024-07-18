@@ -36,6 +36,8 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // hide new version
         newVersionItem.isHidden = true
+        
+        showRouting()
 
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
@@ -130,13 +132,12 @@ class MenuController: NSObject, NSMenuDelegate {
                 configWindow.reloadData()
             }
         }
-        showRouting()
     }
 
     func showRouting() {
         DispatchQueue.global().async {
             let rules = V2rayRoutings.all()
-            print("showRouting", rules)
+//            print("showRouting", rules)
             let sumMenus = NSMenu()
             // add Routing... menu and click event is goRouting
             let routingMenuItem = NSMenuItem()
@@ -165,7 +166,7 @@ class MenuController: NSObject, NSMenuDelegate {
                 }
                 sumMenus.addItem(menuItem)
             }
-            print("showRouting", sumMenus)
+//            print("showRouting", sumMenus)
             // 假设 routingMenu 已经连接并且有一个子菜单
             DispatchQueue.main.async {
                 self.routingMenu.submenu = sumMenus
