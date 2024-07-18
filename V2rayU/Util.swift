@@ -557,6 +557,10 @@ func showDock(state: Bool) {
         // Show / hide dock icon.
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
         TransformProcessType(&psn, transformState)
+        if state {
+            // bring to front
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 }
 

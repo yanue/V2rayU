@@ -64,43 +64,8 @@ class V2rayRoutings: NSObject {
         }
 
         // static reset
-        self.routings = []
-
-        // load name list from UserDefaults
-        var list = UserDefaults.getArray(forKey: .routingCustomList) ?? [];
-        
-        print("V2rayRoutings-loadConfig", list)
- 
-        let langStr = Locale.current.languageCode
-        let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
-        // for defaultRules
-        for (key, rule) in defaultRules {
-            // load and check
-            if nil == RoutingItem.load(name: key) {
-                if isMainland {
-                    rule.remark = defaultRuleCn[key] ?? rule.remark
-                } else {
-                    rule.remark = defaultRuleEn[key] ?? rule.remark
-                }
-                // create new
-                rule.store()
-            } 
-            // if not in list, append
-            if !list.contains(key) {
-                list.append(key)
-            }
-        }
-       
-        // load each RoutingItem
-        for item in list {
-            guard let routing = RoutingItem.load(name: item) else {
-                // delete from UserDefaults
-                RoutingItem.remove(name: item)
-                continue
-            }
-            // append
-            self.routings.append(routing)
-        }
+        self.routings = V2rayRoutings.all()
+        self.saveItemList()
         print("V2rayRoutings-loadConfig", self.routings.count)
     }
 
@@ -118,20 +83,37 @@ class V2rayRoutings: NSObject {
         var items : [RoutingItem] = []
 
         // load name list from UserDefaults
-        var list = UserDefaults.getArray(forKey: .routingCustomList)
-        if list == nil {
-            list = []
-        }
+        var list = UserDefaults.getArray(forKey: .routingCustomList) ?? [];
 
-        // load each V2rayItem
-        for item in list! {
+        print("V2rayRoutings-loadConfig", list)
+ 
+        // for defaultRules
+        for (key, rule) in defaultRules {
+            // load and check
+            if nil == RoutingItem.load(name: key) {
+                if isMainland {
+                    rule.remark = defaultRuleCn[key] ?? rule.remark
+                } else {
+                    rule.remark = defaultRuleEn[key] ?? rule.remark
+                }
+                // create new
+                rule.store()
+            }
+            // if not in list, append
+            if !list.contains(key) {
+                list.append(key)
+            }
+        }
+       
+        // load each RoutingItem
+        for item in list {
             guard let routing = RoutingItem.load(name: item) else {
                 // delete from UserDefaults
                 RoutingItem.remove(name: item)
                 continue
             }
             // append
-            items.append(routing) 
+            items.append(routing)
         }
         return items
     }
@@ -211,7 +193,7 @@ class V2rayRoutings: NSObject {
     // update server list UserDefaults
     static func saveItemList() {
         var routingCustomList: Array<String> = []
-        for item in V2rayRoutings.list() {
+        for item in self.routings {
             routingCustomList.append(item.name)
         }
         

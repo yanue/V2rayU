@@ -1,54 +1,57 @@
 
-/* Class = "NSMenuItem"; title = "Generate QR Code"; ObjectID = "0vX-fS-8FW"; */
+/* Class = "NSMenuItem"; title = "Share QR Code"; ObjectID = "0vX-fS-8FW"; */
 "0vX-fS-8FW.title" = "分享二维码";
 
 /* Class = "NSMenuItem"; title = "Make Lower Case"; ObjectID = "0zv-gA-dTG"; */
-"0zv-gA-dTG.title" = "转换小写";
+"0zv-gA-dTG.title" = "Make Lower Case";
 
 /* Class = "NSMenuItem"; title = "Quit"; ObjectID = "28U-8z-8lS"; */
 "28U-8z-8lS.title" = "退出";
 
 /* Class = "NSMenuItem"; title = "Edit"; ObjectID = "2CF-Be-R2r"; */
-"2CF-Be-R2r.title" = "编辑";
+"2CF-Be-R2r.title" = "Edit";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "2dI-3i-ukZ"; */
-"2dI-3i-ukZ.title" = "重做";
+"2dI-3i-ukZ.title" = "Redo";
 
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "2yB-5O-rLI"; */
-"2yB-5O-rLI.title" = "撤销";
+"2yB-5O-rLI.title" = "Undo";
 
 /* Class = "NSMenuItem"; title = "Capitalize"; ObjectID = "3Hg-b3-phw"; */
-"3Hg-b3-phw.title" = "转换大写";
+"3Hg-b3-phw.title" = "Capitalize";
 
-/* Class = "NSMenuItem"; title = "Show Logs..."; ObjectID = "52m-v5-TzY"; */
-"52m-v5-TzY.title" = "查看v2ray日志";
+/* Class = "NSMenuItem"; title = "View v2ray log"; ObjectID = "52m-v5-TzY"; */
+"52m-v5-TzY.title" = "查看v2ray日志";
 
 /* Class = "NSMenuItem"; title = "Smart Dashes"; ObjectID = "6aH-vb-Jom"; */
-"6aH-vb-Jom.title" = "智能破折号";
+"6aH-vb-Jom.title" = "Smart Dashes";
 
 /* Class = "NSMenuItem"; title = "Preferences..."; ObjectID = "6jp-RJ-ww9"; */
-"6jp-RJ-ww9.title" = "偏好设置";
+"6jp-RJ-ww9.title" = "偏好设置...";
 
 /* Class = "NSMenuItem"; title = "Speech"; ObjectID = "6ks-XF-0pf"; */
-"6ks-XF-0pf.title" = "言语";
+"6ks-XF-0pf.title" = "Speech";
 
 /* Class = "NSMenuItem"; title = "Text Replacement"; ObjectID = "7EO-ax-Qem"; */
-"7EO-ax-Qem.title" = "文本替换";
+"7EO-ax-Qem.title" = "Text Replacement";
 
 /* Class = "NSMenuItem"; title = "Smart Copy/Paste"; ObjectID = "7Fw-Hy-HhI"; */
-"7Fw-Hy-HhI.title" = "智能复制/粘贴";
+"7Fw-Hy-HhI.title" = "Smart Copy/Paste";
 
 /* Class = "NSMenuItem"; title = "Pac..."; ObjectID = "8ps-CD-zNp"; */
 "8ps-CD-zNp.title" = "Pac设置";
 
 /* Class = "NSMenuItem"; title = "Select All"; ObjectID = "8zL-Er-HLk"; */
-"8zL-Er-HLk.title" = "全选";
+"8zL-Er-HLk.title" = "Select All";
 
 /* Class = "NSMenu"; title = "V2rayU"; ObjectID = "9n3-TW-9ur"; */
 "9n3-TW-9ur.title" = "V2rayU";
 
 /* Class = "NSMenuItem"; title = "Use Selection for Find"; ObjectID = "9rd-LX-kku"; */
-"9rd-LX-kku.title" = "从选中文本查找";
+"9rd-LX-kku.title" = "Use Selection for Find";
+
+/* Class = "NSMenuItem"; title = "Ping Speed..."; ObjectID = "A9g-Ks-No1"; */
+"A9g-Ks-No1.title" = "Ping速度";
 
 /* Class = "NSMenuItem"; title = "Check Document Now"; ObjectID = "BQD-PL-x7i"; */
 "BQD-PL-x7i.title" = "Check Document Now";
@@ -66,13 +69,13 @@
 "JuC-lf-LpQ.title" = "订阅设置";
 
 /* Class = "NSMenuItem"; ibShadowedToolTip = "ss:// or vmess://"; ObjectID = "Kct-KD-qPN"; */
-"Kct-KD-qPN.ibShadowedToolTip" = "ss:// 或 vmess://";
+"Kct-KD-qPN.ibShadowedToolTip" = "ss:// or vmess://";
 
 /* Class = "NSMenuItem"; title = "Import Server From Pasteboard"; ObjectID = "Kct-KD-qPN"; */
-"Kct-KD-qPN.title" = "从粘贴板导入";
+"Kct-KD-qPN.title" = "从粘贴板导入服务器";
 
 /* Class = "NSMenu"; title = "Servers"; ObjectID = "NCx-DY-Hm4"; */
-"NCx-DY-Hm4.title" = "服务列表";
+"NCx-DY-Hm4.title" = "服务器列表";
 
 /* Class = "NSMenuItem"; title = "Substitutions"; ObjectID = "Ndr-EN-mCf"; */
 "Ndr-EN-mCf.title" = "Substitutions";
@@ -92,8 +95,14 @@
 /* Class = "NSMenuItem"; title = "Turn v2ray-core Off"; ObjectID = "SML-EF-rdT"; */
 "SML-EF-rdT.title" = "停用v2ray-core";
 
+/* Class = "NSMenuItem"; title = "has new version"; ObjectID = "SdL-DD-qZe"; */
+"SdL-DD-qZe.title" = "has new version";
+
 /* Class = "NSMenu"; title = "Substitutions"; ObjectID = "VH3-Bb-D9P"; */
 "VH3-Bb-D9P.title" = "Substitutions";
+
+/* Class = "NSMenuItem"; title = "Routing"; ObjectID = "VNg-as-9we"; */
+"VNg-as-9we.title" = "路由";
 
 /* Class = "NSMenu"; title = "Edit"; ObjectID = "VmT-t8-f8R"; */
 "VmT-t8-f8R.title" = "Edit";
@@ -111,7 +120,7 @@
 "YJ7-xF-H1b.title" = "Spelling and Grammar";
 
 /* Class = "NSMenuItem"; title = "Configure..."; ObjectID = "YoX-II-o27"; */
-"YoX-II-o27.title" = "服务器设置";
+"YoX-II-o27.title" = "服务器设置...";
 
 /* Class = "NSMenuItem"; title = "Start Speaking"; ObjectID = "Z1o-Jx-e0t"; */
 "Z1o-Jx-e0t.title" = "Start Speaking";
@@ -124,6 +133,9 @@
 
 /* Class = "NSMenuItem"; title = "Make Upper Case"; ObjectID = "aeo-mB-Ib5"; */
 "aeo-mB-Ib5.title" = "Make Upper Case";
+
+/* Class = "NSMenuItem"; title = "View config.json"; ObjectID = "b3o-tG-rp3"; */
+"b3o-tG-rp3.title" = "查看config.json";
 
 /* Class = "NSMenuItem"; title = "Servers"; ObjectID = "cio-ej-HL5"; */
 "cio-ej-HL5.title" = "服务器列表";
@@ -147,7 +159,7 @@
 "hGZ-5v-1Gx.title" = "Find…";
 
 /* Class = "NSMenuItem"; title = "Manual Mode"; ObjectID = "hTu-27-5OL"; */
-"hTu-27-5OL.title" = "手动模式";
+"hTu-27-5OL.title" = "手动模式(不改变系统代理)";
 
 /* Class = "NSMenuItem"; title = "Help"; ObjectID = "hWR-vJ-0Au"; */
 "hWR-vJ-0Au.title" = "帮助";
@@ -188,11 +200,14 @@
 /* Class = "NSMenuItem"; title = "Jump to Selection"; ObjectID = "vkH-fu-RjN"; */
 "vkH-fu-RjN.title" = "Jump to Selection";
 
+/* Class = "NSMenuItem"; title = "View pac file"; ObjectID = "vvd-2v-T8I"; */
+"vvd-2v-T8I.title" = "查看pac文件";
+
 /* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "wgi-Ri-oTY"; */
 "wgi-Ri-oTY.title" = "Paste and Match Style";
 
+/* Class = "NSMenu"; title = "Routing"; ObjectID = "ykF-uD-Nb1"; */
+"ykF-uD-Nb1.title" = "路由";
+
 /* Class = "NSMenuItem"; title = "Check Spelling While Typing"; ObjectID = "zAf-Lw-Sh2"; */
 "zAf-Lw-Sh2.title" = "Check Spelling While Typing";
-
-/* Class = "NSMenuItem"; title = "View config.json"; ObjectID = "b3o-tG-rp3"; */
-"b3o-tG-rp3.title" = "查看config.json";

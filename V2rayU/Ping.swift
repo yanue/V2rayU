@@ -37,9 +37,8 @@ class PingSpeed: NSObject {
             inPing = false
             return
         }
-        let langStr = Locale.current.languageCode
         var pingTip: String = ""
-        if langStr == "en" {
+        if isMainland {
             pingTip = "Ping Speed - In Testing "
         } else {
             pingTip = "Ping Speed - 测试中"
@@ -94,13 +93,7 @@ class PingSpeed: NSObject {
 
     func pingEnd() {
         inPing = false
-        let langStr = Locale.current.languageCode
-        var pingTip: String = ""
-        if langStr == "en" {
-            pingTip = "Ping Speed"
-        } else {
-            pingTip = "Ping"
-        }
+        var pingTip: String = "Ping"
         print("pingEnd", pingTip)
         menuController.setStatusMenuTip(pingTip: pingTip)
         menuController.showServers()

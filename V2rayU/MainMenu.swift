@@ -17,15 +17,15 @@ class MenuController: NSObject, NSMenuDelegate {
     var statusItemClicked: (() -> Void)?
     let lock = NSLock()
 
-    @IBOutlet weak var pacMode: NSMenuItem!
-    @IBOutlet weak var manualMode: NSMenuItem!
-    @IBOutlet weak var globalMode: NSMenuItem!
-    @IBOutlet weak var statusMenu: NSMenu!
-    @IBOutlet weak var toggleV2rayItem: NSMenuItem!
-    @IBOutlet weak var v2rayStatusItem: NSMenuItem!
-    @IBOutlet weak var serverItems: NSMenuItem!
-    @IBOutlet weak var newVersionItem: NSMenuItem!
-    @IBOutlet weak var routingMenu: NSMenuItem!
+    @IBOutlet var pacMode: NSMenuItem!
+    @IBOutlet var manualMode: NSMenuItem!
+    @IBOutlet var globalMode: NSMenuItem!
+    @IBOutlet var statusMenu: NSMenu!
+    @IBOutlet var toggleV2rayItem: NSMenuItem!
+    @IBOutlet var v2rayStatusItem: NSMenuItem!
+    @IBOutlet var serverItems: NSMenuItem!
+    @IBOutlet var newVersionItem: NSMenuItem!
+    @IBOutlet var routingMenu: NSMenuItem!
 
     // when menu.xib loaded
     override func awakeFromNib() {
@@ -36,15 +36,20 @@ class MenuController: NSObject, NSMenuDelegate {
 
         // hide new version
         newVersionItem.isHidden = true
-        
+
         // windowWillClose Notification
         NotificationCenter.default.addObserver(self, selector: #selector(configWindowWillClose(notification:)), name: NSWindow.willCloseNotification, object: nil)
     }
 
     func setStatusOff() {
         DispatchQueue.main.async {
-            self.v2rayStatusItem.title = "v2ray-core: Off" + ("  (v" + appVersion + ")")
-            self.toggleV2rayItem.title = "Turn v2ray-core On"
+            if isMainland {
+                self.v2rayStatusItem.title = "v2ray-core: 已关闭" + ("  (v" + appVersion + ")")
+                self.toggleV2rayItem.title = "开启 v2ray-core"
+            } else {
+                self.v2rayStatusItem.title = "v2ray-core: Off" + ("  (v" + appVersion + ")")
+                self.toggleV2rayItem.title = "Turn v2ray-core On"
+            }
 
             if let button = self.statusItem.button {
                 button.image = NSImage(named: NSImage.Name("IconOff"))
@@ -61,7 +66,6 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func setModeIcon(mode: RunMode) {
         DispatchQueue.main.async {
-
             var iconName = "IconOn"
 
             switch mode {
@@ -92,8 +96,13 @@ class MenuController: NSObject, NSMenuDelegate {
 
     func setStatusOn(mode: RunMode) {
         DispatchQueue.main.async {
-            self.v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
-            self.toggleV2rayItem.title = "Turn v2ray-core Off"
+            if isMainland {
+                self.v2rayStatusItem.title = "v2ray-core: 已启动" + ("  (v" + appVersion + ")")
+                self.toggleV2rayItem.title = "关闭 v2ray-core"
+            } else {
+                self.v2rayStatusItem.title = "v2ray-core: On" + ("  (v" + appVersion + ")")
+                self.toggleV2rayItem.title = "Turn v2ray-core Off"
+            }
             self.setModeIcon(mode: mode)
             UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
         }
@@ -111,7 +120,7 @@ class MenuController: NSObject, NSMenuDelegate {
         DispatchQueue.global().async {
             self.lock.lock()
             defer { self.lock.unlock() }
-            
+
             print("showServers")
             let _subMenus = self.getServerMenus()
 
@@ -121,45 +130,49 @@ class MenuController: NSObject, NSMenuDelegate {
                 configWindow.reloadData()
             }
         }
-        self.showRouting();
+        showRouting()
     }
-    
+
     func showRouting() {
         DispatchQueue.global().async {
-           let rules = V2rayRoutings.all()
-           print("showRouting",rules)
-           let sumMenus = NSMenu()
-           // add Routing... menu and click event is goRouting
-           let routingMenuItem = NSMenuItem()
-           routingMenuItem.title = "Routing..."
-           routingMenuItem.target = self
-           routingMenuItem.action = #selector(self.goRouting(_:))
-           sumMenus.addItem(routingMenuItem)
-           // add separator menu item
-           let separator = NSMenuItem.separator()
-           sumMenus.addItem(separator)
-           // now add all rules    
-           let routingRule = UserDefaults.get(forKey: .routingSelectedRule)
-           for rule in rules {
-               let menuItem = NSMenuItem()
-               menuItem.title = rule.remark
-               menuItem.target = self
-               menuItem.action = #selector(self.switchRouting(_:))
-               menuItem.representedObject = rule
-               menuItem.isEnabled = true
-               if rule.name == routingRule {
-                   menuItem.state = NSControl.StateValue.on
-               }
-               sumMenus.addItem(menuItem)
-           }
-           print("showRouting",sumMenus)
-           // 假设 routingMenu 已经连接并且有一个子菜单
-           DispatchQueue.main.async {
-               self.routingMenu.submenu = sumMenus
-           }
-       }
+            let rules = V2rayRoutings.all()
+            print("showRouting", rules)
+            let sumMenus = NSMenu()
+            // add Routing... menu and click event is goRouting
+            let routingMenuItem = NSMenuItem()
+            if isMainland {
+                routingMenuItem.title = "路由..."
+            } else {
+                routingMenuItem.title = "Routing..."
+            }
+            routingMenuItem.target = self
+            routingMenuItem.action = #selector(self.goRouting(_:))
+            sumMenus.addItem(routingMenuItem)
+            // add separator menu item
+            let separator = NSMenuItem.separator()
+            sumMenus.addItem(separator)
+            // now add all rules
+            let routingRule = UserDefaults.get(forKey: .routingSelectedRule)
+            for rule in rules {
+                let menuItem = NSMenuItem()
+                menuItem.title = rule.remark
+                menuItem.target = self
+                menuItem.action = #selector(self.switchRouting(_:))
+                menuItem.representedObject = rule
+                menuItem.isEnabled = true
+                if rule.name == routingRule {
+                    menuItem.state = NSControl.StateValue.on
+                }
+                sumMenus.addItem(menuItem)
+            }
+            print("showRouting", sumMenus)
+            // 假设 routingMenu 已经连接并且有一个子菜单
+            DispatchQueue.main.async {
+                self.routingMenu.submenu = sumMenus
+            }
+        }
     }
-    
+
     func getServerMenus() -> NSMenu {
         // default
         let curSer = UserDefaults.get(forKey: .v2rayCurrentServerName)
@@ -170,10 +183,10 @@ class MenuController: NSObject, NSMenuDelegate {
         var chooseGroup = ""
         // for each
         for item in V2rayServer.all() {
-            validCount+=1
-            let menuItem: NSMenuItem = self.buildServerItem(item: item, curSer: curSer)
+            validCount += 1
+            let menuItem: NSMenuItem = buildServerItem(item: item, curSer: curSer)
             var groupTag: String = item.subscribe
-            if (groupTag.isEmpty) {
+            if groupTag.isEmpty {
                 groupTag = "default"
                 _subMenus.addItem(menuItem)
                 continue
@@ -192,7 +205,7 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         // subscribe items
-        for (itemKey,menu) in groupMenus {
+        for (itemKey, menu) in groupMenus {
             if itemKey == "default" {
                 continue
             }
@@ -225,7 +238,7 @@ class MenuController: NSObject, NSMenuDelegate {
     func buildServerItem(item: V2rayItem, curSer: String?) -> NSMenuItem {
         let menuItem: NSMenuItem = NSMenuItem()
         menuItem.title = getMenuServerTitle(item: item)
-        menuItem.action = #selector(self.switchServer(_:))
+        menuItem.action = #selector(switchServer(_:))
         menuItem.representedObject = item
         menuItem.target = self
         menuItem.isEnabled = true
@@ -282,11 +295,11 @@ class MenuController: NSObject, NSMenuDelegate {
             NSLog("switchRouting err")
             return
         }
-        UserDefaults.set(forKey: .routingSelectedRule, value: obj.name);
-        self.showRouting();
+        UserDefaults.set(forKey: .routingSelectedRule, value: obj.name)
+        showRouting()
         V2rayLaunch.restartV2ray()
     }
-    
+
     @IBAction func openConfig(_ sender: NSMenuItem) {
         OpenConfigWindow()
     }
@@ -295,10 +308,9 @@ class MenuController: NSObject, NSMenuDelegate {
         guard let object = notification.object as? NSWindow else {
             return
         }
-        print("configWindowWillClose",object.title,object)
-        let allow_titles = ["V2rayU","About","Pac","Subscription","General","Advance","Dns","Routing"]
+        let allow_titles = ["V2rayU", "About", "Pac", "Subscription", "General", "Advance", "Dns", "Routing"]
         if allow_titles.contains(object.title) {
-           showDock(state: false)
+            showDock(state: false)
         }
     }
 
@@ -318,7 +330,7 @@ class MenuController: NSObject, NSMenuDelegate {
         UserDefaults.set(forKey: .runMode, value: RunMode.pac.rawValue)
         V2rayLaunch.restartV2ray()
     }
-    
+
     @IBAction func goRouting(_ sender: NSMenuItem) {
         DispatchQueue.main.async {
             preferencesWindowController.show(preferencePane: .routingTab)
@@ -365,7 +377,7 @@ class MenuController: NSObject, NSMenuDelegate {
         NSPasteboard.general.setString(command, forType: NSPasteboard.PasteboardType.string)
 
         // Show a toast notification.
-        noticeTip(title: "Export Command Copied.",  informativeText: "")
+        noticeTip(title: "Export Command Copied.", informativeText: "")
     }
 
     @IBAction func scanQrcode(_ sender: NSMenuItem) {
@@ -420,7 +432,7 @@ func getMenuServerTitle(item: V2rayItem) -> String {
     // littleSpace: 1,.
     if speed.contains(".") || speed.contains("1") {
         let littleSpaceCount = speed.filter({ $0 == "." }).count + speed.filter({ $0 == "1" }).count
-        spaceCnt = totalSpaceCnt - ((speed.count - littleSpaceCount) + Int((speed.count - littleSpaceCount)/2))
+        spaceCnt = totalSpaceCnt - ((speed.count - littleSpaceCount) + Int((speed.count - littleSpaceCount) / 2))
     }
     if speed.contains("-1ms") {
         spaceCnt = 9

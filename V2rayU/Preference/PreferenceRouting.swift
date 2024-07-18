@@ -98,6 +98,8 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
                     self.routingsTableView.reloadData()
                     // selected current row
                     self.routingsTableView.selectRowIndexes(NSIndexSet(index: V2rayRoutings.count() - 1) as IndexSet, byExtendingSelection: false)
+                    // refresh menu
+                    menuController.showRouting()
                 }
                 break
                 
@@ -132,10 +134,10 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
                     } else {
                         self.routingsTableView.becomeFirstResponder()
                     }
+                    // refresh menu
+                    menuController.showRouting()
                 }
                 
-                // refresh menu
-                menuController.showRouting()
                 break
                 
                 // unknown action
