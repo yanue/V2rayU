@@ -5,6 +5,3 @@
   Created by yanue on 2019/7/17.
   Copyright © 2019 yanue. All rights reserved.
 */
-"InstallAlertTitle" = "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool";
-"InstallFailedTitle" = "安装 V2rayUTool 失败"
-"InstallFailedMessage" = "安装失败: %s\n, 你需要在命令行手动执行一下: %s"

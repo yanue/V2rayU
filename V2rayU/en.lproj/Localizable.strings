@@ -5,7 +5,3 @@
   Created by yanue on 2019/7/17.
   Copyright © 2019 yanue. All rights reserved.
 */
-/* Alert titles */
-"InstallAlertTitle" = "V2rayU needs to install V2rayUTool into ~/.V2rayU/V2rayUTool with administrator privileges";
-"InstallFailedTitle" = "Install V2rayUTool Failed"
-"InstallFailedMessage" = "Error: %s,\nYou need execute scripts manually:\n %s"

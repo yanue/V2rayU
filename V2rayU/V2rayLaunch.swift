@@ -36,8 +36,12 @@ func executeAppleScriptWithOsascript(script: String) {
         print("executeAppleScript-Output: \(output)")
     } catch {
         print("executeAppleScript-Error: \(error)")
-        let title = NSLocalizedString("InstallFailedTitle", comment: "")
-        let toast = String(format: NSLocalizedString("InstallFailedMessage", comment: ""),  error.localizedDescription, script)
+        var title = "Install V2rayUTool Failed";
+        var toast =  "Error: \(error),\nYou need execute scripts manually:\n \(script)";
+        if isMainland {
+            title = "安装 V2rayUTool 失败"
+            toast = "安装失败: \(error)\n, 你需要在命令行手动执行一下: \(script)"
+        }
         alertDialog(title: title, message: toast)
     }
 }
@@ -126,10 +130,18 @@ class V2rayLaunch: NSObject {
     static func showInstallAlert() {
         DispatchQueue.main.async {
             let alert = NSAlert()
-            alert.messageText = NSLocalizedString("InstallAlertTitle", comment: "")
             alert.alertStyle = .warning
-            alert.addButton(withTitle: NSLocalizedString("Install", comment: ""))
-            alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
+            if isMainland {
+                alert.messageText = "安装V2rayUTool"
+                alert.informativeText = "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
+                alert.addButton(withTitle: "安装")
+                alert.addButton(withTitle: "退出")
+            } else {
+                alert.messageText = " Install V2rayUTool"
+                alert.informativeText = "V2rayU needs to install V2rayUTool into ~/.V2rayU/V2rayUTool with administrator privileges"
+                alert.addButton(withTitle: "Install")
+                alert.addButton(withTitle: "Quit")
+            }
             switch alert.runModal() {
             case .alertFirstButtonReturn:
                 install()
@@ -289,13 +301,12 @@ class V2rayLaunch: NSObject {
 
         // port has been used
         if isPortOpen(port: httpPort) {
-            var toast = "http端口 \(httpPort) 已被使用, 请更换"
-            var title = "端口已被占用"
-            if Locale.current.languageCode == "en" {
-                toast = "http port \(httpPort) has been used, please replace it from advance setting"
-                title = "Port is already in use"
+            var toast = "http port \(httpPort) has been used, please replace it from advance setting"
+            var title = "Port is already in use"
+            if isMainland {
+                 toast = "http端口 \(httpPort) 已被使用, 请更换"
+                 title = "端口已被占用"
             }
-            NSLocalizedString("", comment: "")
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 preferencesWindowController.show(preferencePane: .advanceTab)
@@ -306,11 +317,11 @@ class V2rayLaunch: NSObject {
 
         // port has been used
         if isPortOpen(port: sockPort) {
-            var toast = "socks端口 \(sockPort) 已被使用, 请更换"
-            var title = "端口已被占用"
-            if Locale.current.languageCode == "en" {
-                toast = "socks port \(sockPort) has been used, please replace it from advance setting"
-                title = "Port is already in use"
+            var toast = "socks port \(sockPort) has been used, please replace it from advance setting"
+            var title = "Port is already in use"
+            if isMainland {
+                toast = "socks端口 \(sockPort) 已被使用, 请更换"
+                title = "端口已被占用"
             }
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
@@ -385,11 +396,11 @@ class V2rayLaunch: NSObject {
             let pacPort = getPacPort()
             // port has been used
             if isPortOpen(port: pacPort) {
-                var toast = "pac端口 \(pacPort) 已被使用, 请更换"
-                var title = "端口已被占用"
-                if Locale.current.languageCode == "en" {
-                    toast = "pac port \(pacPort) has been used, please replace from advance setting"
-                    title = "Port is already in use"
+                var toast = "pac port \(pacPort) has been used, please replace from advance setting"
+                var title = "Port is already in use"
+                if isMainland {
+                    toast = "pac端口 \(pacPort) 已被使用, 请更换"
+                    title = "端口已被占用"
                 }
                 alertDialog(title: title, message: toast)
                 DispatchQueue.main.async {
