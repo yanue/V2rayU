@@ -149,14 +149,14 @@ final class PreferenceRoutingViewController: NSViewController, PreferencePane, N
 
     
     @IBAction func goHelp(_ sender: Any) {
-        guard let url = URL(string: "https://toutyrater.github.io/basic/routing/") else {
+        guard let url = URL(string: "https://xtls.github.io/config/routing.html#routingobject") else {
             return
         }
         NSWorkspace.shared.open(url)
     }
 
     @IBAction func goHelp2(_ sender: Any) {
-        guard let url = URL(string: "https://github.com/v2ray/domain-list-community") else {
+        guard let url = URL(string: "https://xtls.github.io/config/routing.html#routingobject") else {
             return
         }
         NSWorkspace.shared.open(url)

@@ -65,22 +65,42 @@ struct V2rayRouting: Codable {
         case IPIfNonMatch
         case IPOnDemand
     }
-
+    enum domainMatcher: String, Codable {
+        case hybrid
+        case linear
+    }
+    
     var domainStrategy: domainStrategy = .AsIs
-    var rules: [V2rayRoutingSettingRule] = []
+    var domainMatcher: domainMatcher? = .hybrid
+    var rules: [V2rayRoutingRule] = []
+    var balancers: [V2rayRoutingBalancer]? = []
 }
 
-struct V2rayRoutingSettingRule: Codable {
+struct V2rayRoutingRule: Codable {
+    var domainMatcher: String? = "hybrid"
     var type: String = "field"
     var domain: [String]? = []
     var ip: [String]? = []
     var port: String?
+    var sourcePort: String?
     var network: String?
     var source: [String]?
     var user: [String]?
     var inboundTag: [String]?
     var `protocol`: [String]? // ["http", "tls", "bittorrent"]
     var outboundTag: String? = "direct"
+    var balancerTag: String? = "balancer"
+}
+
+struct V2rayRoutingBalancer: Codable {
+    var selector: [String]?
+    var strategy: V2rayRoutingBalancerStrategy?
+    var tag: String?
+    var fallbackTag: String?
+}
+
+struct V2rayRoutingBalancerStrategy: Codable {
+    var type: String? // type : "random" | "roundRobin" | "leastPing" | "leastLoad"
 }
 
 struct V2rayPolicy: Codable {

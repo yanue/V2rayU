@@ -298,14 +298,14 @@ class RoutingItem: NSObject, NSCoding {
     // parse default settings 
     func parseDefaultSettings() -> V2rayRouting {
         
-        var rules: [V2rayRoutingSettingRule] = []
+        var rules: [V2rayRoutingRule] = []
 
         let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: self.block)
         let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: self.proxy)
         let (directDomains, directIps) = parseDomainOrIp(domainIpStr: self.direct)
 
         // // rules
-        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp, ruleDirectIpDefault, ruleDirectDomainDefault: V2rayRoutingSettingRule?
+        var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp, ruleDirectIpDefault, ruleDirectDomainDefault: V2rayRoutingRule?
         // proxy
         if proxyDomains.count > 0 {
             ruleProxyDomain = getRoutingRule(outTag: "proxy", domain: proxyDomains, ip: nil, port: nil)
@@ -400,8 +400,8 @@ class RoutingItem: NSObject, NSCoding {
         return settings
     }
 
-    func getRoutingRule(outTag: String, domain:[String]?, ip: [String]?, port:String?) -> V2rayRoutingSettingRule {
-        var rule = V2rayRoutingSettingRule()
+    func getRoutingRule(outTag: String, domain:[String]?, ip: [String]?, port:String?) -> V2rayRoutingRule {
+        var rule = V2rayRoutingRule()
         rule.outboundTag = outTag
         rule.type = "field"
         rule.domain = domain

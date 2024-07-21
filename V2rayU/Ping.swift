@@ -149,7 +149,7 @@ class PingServer: NSObject, URLSessionDataDelegate {
         vCfg.httpHost = "127.0.0.1"
         vCfg.socksHost = "127.0.0.1"
         vCfg.httpPort = String(bindPort)
-        vCfg.socksPort = String(bindPort + 1)
+        vCfg.socksPort = String(bindPort - 1)
         jsonText = vCfg.combineManual()
 
         do {
