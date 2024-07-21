@@ -205,9 +205,10 @@ struct QuicSettingHeader: Codable {
 }
 
 struct GrpcSettings: Codable {
+    var authority: String?
     var serviceName: String = ""
     var multiMode: Bool = false
-    var user_agent: String = ""
+    var user_agent: String?
     var idle_timeout: Int = 60
     var health_check_timeout: Int = 60
     var permit_without_stream: Bool = false

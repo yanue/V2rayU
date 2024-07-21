@@ -359,7 +359,7 @@ class ImportUri {
 
         // grpc
         v2ray.streamGrpc.serviceName = vmess.path
-        v2ray.streamGrpc.multiMode = vmess.type == "multi" // v2rayN
+        v2ray.streamGrpc.multiMode = vmess.grpcMode == "multi" // v2rayN
 
         // tcp
         v2ray.streamTcp.header.type = vmess.type

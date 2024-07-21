@@ -519,6 +519,7 @@ class VlessUri {
     var fp: String = "" // fingerprint
     var pbk: String = "" // reality public key
     var sid: String = "" // reality shortId
+    var grpcMode:String = ""
 
     // vless://f2a5064a-fabb-43ed-a2b6-8ffeb970df7f@00.com:443?flow=xtls-rprx-splite&encryption=none&security=xtls&sni=aaaaa&type=http&host=00.com&path=%2fvl#vless1
     func encode() -> String {
@@ -567,6 +568,9 @@ class VlessUri {
                 break
             case "flow":
                 self.flow = item.value as! String
+                if self.flow.isEmpty {
+                    self.flow = "xtls-rprx-vision"
+                }
                 break
             case "encryption":
                 self.encryption = item.value as! String
@@ -597,6 +601,12 @@ class VlessUri {
                 break
             case "sid":
                 self.sid = item.value as! String
+                break
+            case "serviceName":
+                self.path = item.value as! String
+                break
+            case "mode":
+                self.grpcMode = item.value as! String
                 break
             default:
                 break

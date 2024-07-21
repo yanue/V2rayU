@@ -528,7 +528,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
         // grpc
         self.grpcServiceName.stringValue = v2rayConfig.streamGrpc.serviceName
-        self.grpcUseragent.stringValue = v2rayConfig.streamGrpc.user_agent
+        self.grpcUseragent.stringValue = v2rayConfig.streamGrpc.user_agent ?? ""
         self.grpcMulti.intValue = v2rayConfig.streamGrpc.multiMode ? 1 : 0
 
         // ========================== stream end =======================
