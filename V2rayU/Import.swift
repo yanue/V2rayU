@@ -296,6 +296,16 @@ class ImportUri {
     }
 
     func importVless(vmess: VlessUri) {
+        if vmess.fp.isEmpty {
+            vmess.fp = "chrome"
+        }
+        if vmess.security.isEmpty {
+            vmess.security = "none"
+        }
+        if vmess.flow.isEmpty {
+            vmess.flow = "xtls-rprx-vision"
+        }
+        
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
 
@@ -398,7 +408,6 @@ class ImportUri {
         svr.address = trojan.host
         svr.port = trojan.port
         svr.password = trojan.password
-        svr.flow = trojan.flow
 
         v2ray.serverTrojan = svr
         v2ray.enableMux = false
@@ -492,7 +501,7 @@ func importByClash(clash: clashProxy) -> ImportUri? {
         item.address = clash.server
         item.port = clash.port
         item.id = clash.uuid ?? ""
-        item.security = clash.cipher ?? "auto"
+        item.security = clash.cipher ?? "none" // vless encryption
         item.type = clash.network ?? "tcp"
         item.sni = clash.sni ?? clash.server
         if clash.security == "reality" {

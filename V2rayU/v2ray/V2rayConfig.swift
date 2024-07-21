@@ -770,6 +770,12 @@ class V2rayConfig: NSObject {
                         user.id = val["id"].stringValue
                         user.flow = val["flow"].stringValue
                         user.encryption = val["encryption"].stringValue
+                        if user.flow.isEmpty {
+                            user.flow = "xtls-rprx-vision"
+                        }
+                        if user.encryption.isEmpty {
+                            user.encryption = "none"
+                        }
                         user.level = val["level"].intValue
                         users.append(user)
                     }

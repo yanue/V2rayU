@@ -109,14 +109,17 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         let session = URLSession(configuration: getProxyUrlSessionConfigure())
         let task = session.dataTask(with: URLRequest(url: reqUrl)){(data: Data?, response: URLResponse?, error: Error?) in
             if error != nil {
-                self.tips.stringValue = "Failed to download latest GFW List: \(String(describing: error))"
+                DispatchQueue.main.async {
+                    self.tips.stringValue = "Failed to download latest GFW List: \(String(describing: error))"
+                }
             } else {
                 if data != nil {
                     if let outputStr = String(data: data!, encoding: String.Encoding.utf8) {
                         do {
                             try outputStr.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
-                            
-                            self.tips.stringValue = "gfwList has been updated"
+                            DispatchQueue.main.async {
+                                self.tips.stringValue = "gfwList has been updated"
+                            }
                             NSLog("\(self.tips.stringValue)")
 
                             // save to UserDefaults
@@ -124,20 +127,28 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
 
                             if GeneratePACFile(rewrite: true) {
                                 // Popup a user notification
-                                self.tips.stringValue = "PAC has been updated by latest GFW List."
+                                DispatchQueue.main.async {
+                                    self.tips.stringValue = "PAC has been updated by latest GFW List."
+                                }
                                 NSLog("\(self.tips.stringValue)")
                             }
                         } catch {
                             // Popup a user notification
-                            self.tips.stringValue = "Failed to Write latest GFW List."
+                            DispatchQueue.main.async {
+                                self.tips.stringValue = "Failed to Write latest GFW List."
+                            }
                             NSLog("\(self.tips.stringValue)")
                         }
                     } else {
-                        self.tips.stringValue = "Failed to download latest GFW List."
+                        DispatchQueue.main.async {
+                            self.tips.stringValue = "Failed to download latest GFW List."
+                        }
                     }
                 } else {
                     // Popup a user notification
-                    self.tips.stringValue = "Failed to download latest GFW List."
+                    DispatchQueue.main.async {
+                        self.tips.stringValue = "Failed to download latest GFW List."
+                    }
                     self.tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
                 }
             }
@@ -153,7 +164,9 @@ final class PreferencePacViewController: NSViewController, PreferencePane {
         NSLog("curl result: \(msg)")
         if GeneratePACFile(rewrite: true) {
             // Popup a user notification
-            self.tips.stringValue = "PAC has been updated by latest GFW List."
+            DispatchQueue.main.async {
+                self.tips.stringValue = "PAC has been updated by latest GFW List."
+            }
         }
     }
 }
@@ -256,6 +269,7 @@ func getPacUserRules() -> String {
     ||github.com
     ||chat.openai.com
     ||openai.com
+    ||chatgpt.com
     """
     do {
         let url = URL(fileURLWithPath: PACUserRuleFilePath)
