@@ -250,7 +250,13 @@ class ImportUri {
 
         // tcp
         v2ray.streamTcp.header.type = vmess.type
-
+        if v2ray.streamNetwork == "tcp" && v2ray.streamTcp.header.type == "http" {
+            var tcpReq = TcpSettingHeaderRequest()
+            tcpReq.path = [vmess.netPath]
+            tcpReq.headers.host = [vmess.netHost]
+            v2ray.streamTcp.header.request = tcpReq
+        }
+            
         // quic
         v2ray.streamQuic.header.type = vmess.type
 

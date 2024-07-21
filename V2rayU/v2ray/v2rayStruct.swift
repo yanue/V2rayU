@@ -71,13 +71,13 @@ struct V2rayRouting: Codable {
     }
     
     var domainStrategy: domainStrategy = .AsIs
-    var domainMatcher: domainMatcher? = .hybrid
+    var domainMatcher: domainMatcher?
     var rules: [V2rayRoutingRule] = []
     var balancers: [V2rayRoutingBalancer]? = []
 }
 
 struct V2rayRoutingRule: Codable {
-    var domainMatcher: String? = "hybrid"
+    var domainMatcher: String?
     var type: String = "field"
     var domain: [String]? = []
     var ip: [String]? = []
@@ -89,7 +89,7 @@ struct V2rayRoutingRule: Codable {
     var inboundTag: [String]?
     var `protocol`: [String]? // ["http", "tls", "bittorrent"]
     var outboundTag: String? = "direct"
-    var balancerTag: String? = "balancer"
+    var balancerTag: String?
 }
 
 struct V2rayRoutingBalancer: Codable {

@@ -100,18 +100,18 @@ struct TcpSettingHeader: Codable {
 }
 
 struct TcpSettingHeaderRequest: Codable {
-    var version: String = ""
-    var method: String = ""
+    var version: String = "1.1"
+    var method: String = "GET"
     var path: [String] = []
     var headers: TcpSettingHeaderRequestHeaders = TcpSettingHeaderRequestHeaders()
 }
 
 struct TcpSettingHeaderRequestHeaders: Codable {
     var host: [String] = []
-    var userAgent: [String] = []
-    var acceptEncoding: [String] = []
-    var connection: [String] = []
-    var pragma: String = ""
+    var userAgent: [String] = ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"]
+    var acceptEncoding: [String] = ["gzip", "deflate"]
+    var connection: [String] = ["keep-alive"]
+    var pragma: String? = "no-cache"
 
     enum CodingKeys: String, CodingKey {
         case host = "Host"
