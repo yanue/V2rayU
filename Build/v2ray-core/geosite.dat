@@ -227,7 +227,7 @@ srtcdn.net
 
 ALI213
 ali213.net
-ˇB
+ˆC
 ALIBABAalibaba
 alipay
 taobao	tmalla.alimama.cn
@@ -329,7 +329,13 @@ g.tbcdn.cn
 ads$v6-adashx.ut.taobao.com
 adsw.m.taobao.com
 adsyiliao.hupan.com
-adsalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.comalibabadns.com
+adsalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.comalibabadns.com
 alicdn.comalicloudapi.comalidayu.com
 alidns.comalikunlun.comaliyun-inc.comaliyun-iot-share.com
 aliyun.comaliyuncdn.comcdngslb.comhichina.comica-alliance.orgkunlunaq.comkunlunar.comkunlunca.comkunluncan.comkunlunea.comkunlungem.comkunlungr.comkunlunhuf.comkunlunle.comkunlunli.comkunlunno.comkunlunpi.comkunlunra.comkunlunsa.comkunlunsc.comkunlunsl.comkunlunso.comkunlunta.comkunlunvi.comkunlunwe.commxhichina.commyalicdn.com,oss-ap-northeast-1.aliyuncs.com
@@ -349,14 +355,15 @@ aliyun.comaliyuncdn.comcdngslb.comhichina.comica-allianc
 !cn'oss-us-west-1.aliyuncs.com
 !cnddurl.todingding.xindingtalk.cndingtalk.comdingtalk.netdingtalkapps.comlaiwang.comlwurl.todoservice.com
 ele.me
-ele.toeleme.cneleme.ioelemecdn.cnelemecdn.com	elenet.meteambition.comteambition.netteambitionapis.com	uc.cn	ucweb.commobmore.com	umeng.comumengcloud.com	umsns.comumtrack.com
+ele.toeleme.cneleme.ioelemecdn.cnelemecdn.com	elenet.meteambition.comteambition.netteambitionapis.com	uc.cn	uc123.com	ucweb.comuczzd.cnmobmore.com	umeng.comumengcloud.com	umsns.comumtrack.com
 uyunad.comwhalecloud.comalog.umeng.com
 ads alog.umengcloud.com
 ads
 w.cnzz.com
 adsz.gds.cnzz.com
 ads25pp.com	56che.com	95095.com9game.cn
-aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+!cn
 aliimg.com
 alikmd.comalimama.comalimebot.com
 alimei.comalios.cn	alipay.cn
@@ -373,7 +380,8 @@ jhgtgb.com
 kanbox.com
 lazada.comliangxinyao.comm-now.cn
 maitix.com	mdeer.commei.commiaostreet.com	mshare.ccnic.xinphilanthropy.xinphpwind.comphpwind.netqingtingtrip.com	rexpos.cnsaee.org.cnshenjing.com	shuqi.comshuqireader.comsparenode.com	supet.com	ttpod.comwandoujia.comxin.xinxinlingshou.cnyowhale.comyunos-inc.com	yunos.comyushanfang.com
-zuodao.comaliexpress.comaliexpress.rualipayplus.com	alipay.hk
+zuodao.comaliexpress.comaliexpress.ru
+!cnalipayplus.com	alipay.hk
 !cnalipaymo.com
 !cnalicloudccp.com
 alipan.comaliyundrive.comaliyundrive.netcainiao.comcainiao.com.cncainiao-inc.comfreshhema.comhemamax.com
@@ -382,9 +390,11 @@ fund123.cn
 antfin.comantgroup.comantgroup-inc.cn	sm.cn1688.cometao.comjuhuasuan.comlingshoujia.com
 mashort.cnpailitao.com
 taobao.com
-taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.rutmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
+taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.ru
+!cntmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
 feizhu.com
-fliggy.com	fliggy.hk
+fliggy.com	fliggy.hk
+!cn
 iuynfg.coma-map.cna-map.co
 a-map.link	a-map.vipacloudrender.comamap.comamapauto.comanav.comautonavi.com	gaode.com	xiami.comxiami.fm	xiami.net
 koubei.comzhisheng.comnpmmirror.comgoofish.com
@@ -489,8 +499,14 @@ g.tbcdn.cn
 adsw.m.taobao.com
 adsyiliao.hupan.com
 ads
-À
-ALIBABACLOUDalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.com
+Å
+ALIBABACLOUDalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.com
 º
 ALIYUNalibabadns.com
 alicdn.comalicloudapi.comalidayu.com
@@ -608,11 +624,12 @@ P
 	ANANDTECHanandtech.com
 .
 ANDROIDandroid.comandroidify.com
-Ç
-ANIME	9anime.cz	9anime.id	9anime.to	9anime.wsanimedao-tv.comcrunchyroll.comfunimation.comgogo-load.comgogoanime.vcgogoanime.wikigogocdn.net
-hidive.com
-vrv.co
-age.tv	agedm.org
+Ê
+ANIME	9anime.cz	9anime.id	9anime.to	9anime.ws
+age.tv	agedm.orgagedm.tvagefans.com
+agemys.org	agedm.appanimedao-tv.comcrunchyroll.comfunimation.com
+vrv.cogogoanime.vcgogoanime.wikigogoanime3.cogogotaku.infogogo-load.comgogocdn.net
+hidive.com
 (
 ANON-V
 anon-v.com
@@ -1064,9 +1081,9 @@ ARTSTATIONartstation.comartstationmedia.com
 aiasahi.jpasagaku.com	asahi.comasahicom.jpasakonet.co.jpnikkansports.comasahishimbun.sc.omtrdc.net
 .
 ASPROEXasproex.comasproexapi.com
--
+X
 ASUSasus.comasus.com.cn
-cn
+cnasuscloud.comasuswebstorage.com
 å
 	ATLASSIANatlassian.comatlassian.netbitbucket.iobitbucket.orgstatuspage.io
 trello.comtrellocdn.com
@@ -1239,7 +1256,7 @@ b3itech.cn
 B3LOG	b3log.org
 Ö
 BAHAMUTbahamut.akamaized.netbahamut.com.twgamer.com.twgamer2-cds.cdn.hinet.netgamer-cds.cdn.hinet.net
-≥(
+´*
 BAIDUa.baidu.com
 adsad.duapps.com
 ads ad.player.baidu.com
@@ -1385,7 +1402,7 @@ b3itech.cn
 adszuoyebang.cczuoyebang.com
 zybang.com	baidu
 91.com
-aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaidubce.combaiducontent.combaidupcs.combaidustatic.com
+aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaiduapp.combaidubce.combaiducontent.combaidupcs.combaidustatic.com
 baifae.combaifubao.com
 bcebos.combdcloudapi.com	bdimg.combdstatic.combdtjrcv.com	bdydns.cn
 bdydns.com
@@ -1396,7 +1413,11 @@ hao123.comhao123img.com
 hao222.com
 haokan.comjomocdn.netjomodns.com
 mipcdn.com	nuomi.comquyaoya.com
-shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.com
+shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.comduxiaoman-int.comduxiaoman.comduxiaomanfintech.comduxiaomantech.comdxm-cdn.comdxm-int.com
+dxmlcf.comdxmlcfintech.com
+dxmpay.comdxmstatic.com
+dxmyqh.com
+paydxm.com
 ﬂ"
 	BAIDU-ADSa.baidu.com
 adsad.duapps.com
@@ -1606,7 +1627,7 @@ gsccdn.com	gslink.usonlinegeeksquad.comrocketfishproducts.com
 beth.gamesbethesda.netbethesdagamestudios.combethsoft.comdoom.comelderscrolls.com
 *
 BETTEREXPLAINEDbetterexplained.com
-Œ
+‡
 BILIBILIbilibiligame.cn
 cnbilibiligame.co
 cnbilibiligame.net
@@ -1619,8 +1640,10 @@ anitama.cnanitama.net
 b23.tv	bigfun.cnbigfunapp.cn	bili22.cnbili2233.cn	bili23.cn	bili33.cnbiliapi.combiliapi.netbilibili.ccbilibili.cnbilibili.combilibili.netbilibili.tv
 !cnbilibilipay.cnbilibilipay.combilicdn1.combilicdn2.combilicdn3.combilicdn4.combilicdn5.com
 biligo.combiliimg.combiliintl.com
-!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk	hdslb.com	hdslb.orgim9.commaoercdn.com
-mincdn.comyo9.com$ upos-hz-mirrorakam.akamaized.net
+!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk
+!cn	hdslb.com	hdslb.orgim9.commaoercdn.com
+mincdn.comyo9.com- upos-hz-mirrorakam.akamaized.net
+!cn
 ¥
 BILIBILI-GAMEbilibiligame.cn
 cnbilibiligame.co
@@ -3396,16 +3419,20 @@ psiphon.capsiphon3.comsagernet.orgshadowsocks.orgsspanel
 uproxy.orgvuvuzela.io
 whonix.orgwikileaks.orgwireguard.com
 zeronet.io
-ñ
+∫
 CATEGORY-BANK-CN
 boc.cnbank-of-china.combankofchina.combocfullertonbank.combocamchina.combocaviation.com	boccfc.cc	boccfc.cn	bocgi.combocgins.com	bochk.com
 !cnbocichina.cnbocichina.combocichina.com.cnbocifunds.cnbocifunds.combocifunds.com.cnbocigroup.com	bocim.combocservices.com.cnccb-life.com.cn
 ccb.cnccb.com
 ccb.com.cn
 ccbcos.com
-ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hkccbleasing.comccblife-test.com.cnccbseoul.comccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk	cmbimg.cn
+ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hk
+!cnccbleasing.comccblife-test.com.cnccbseoul.com
+!cnccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk
+!cn	cmbimg.cn
 cmbimg.comcmbt.cn
-cmbuat.com	cmburl.cncmbwinglungbank.comcmf.bizcmf.ltdcmfchina.com
+cmbuat.com	cmburl.cn cmbwinglungbank.com
+!cncmf.bizcmf.ltdcmfchina.com
 cmfunds.cntest-cignacmb.comicbc	95588.com95588.com.cndccnet.com.cnicbc-at.com
 !cnicbc-cz.com
 !cnicbc-ltd.com
@@ -3495,7 +3522,7 @@ nobitex.irok-ex.ioompfinex.comramzinex.comtabdeal.org
 chrome
 chrome.comchromium.orgbasilisk-browser.org	brave.combromite.orgbrowser.kagi.comcromite.orgdecentr.net	dothq.org
 floorp.appiridiumbrowser.dekiwibrowser.comkmeleonbrowser.orglibrewolf.netminbrowser.orgnetsurf-browser.org	opera.compalemoon.orgpulsebrowser.appqutebrowser.orgvivaldi.comwaterfox.net
-˝<
+á>
 CATEGORY-CASactalis.com
 actalis.itamazontrust.comawstrust.com
 ss2.us)certs-lb.apple.com.akadns.net
@@ -3520,10 +3547,16 @@ myatos.netcertificat2.comtrendmicro.com	gandi.netalphassl
 cnglobalsign.co.ukglobalsign.com
 cnglobalsign.com.auglobalsign.com.brglobalsign.com.hkglobalsign.com.sgglobalsign.esglobalsign.euglobalsign.frglobalsign.netglobalsign.nlglobalsigncdn.com
 cn4(cdn.globalsigncdn.com.cdn.cloudflare.net
-cngodaddy.comx.cogodaddypki.googclients1.google.compki.google.comcrl.pki.goog
+cngodaddy.comx.cogodaddypki.goog!pki-goog.l.google.com
+cn
+c.pki.goog
+cn
+i.pki.goog
+cn
+o.pki.goog
+cnpublicca.googleapis.com#preprod-publicca.googleapis.comclients1.google.compki.google.comcrl.pki.goog
 cncrls.pki.goog
 cnocsp.pki.goog
-cn!pki-goog.l.google.com
 cneca.hinet.netgtlsca.nat.gov.twhongkongpost.gov.hkecert.gov.hkidentrust.comidentrust.co.ukidentrust.net	lencr.orgletsencrypt.comletsencrypt.org
 msocsp.comcrl.microsoft.commscrl.microsoft.comocsp.microsoft.comoneocsp.microsoft.comwww.microsoft.com
 cnsecom.co.jpsecomtrust.netcybertrust.co.jpcybertrust.ne.jpmanagedpki.ne.jpenterprisessl.comhackerguardian.cominstantssl.com	oemssl.cn
@@ -3573,7 +3606,7 @@ telesco.pe
 tg.dev	tx.meusercontent.devgraph.whatsapp.com
 adsgraph.whatsapp.net
 ads	wa.mewhatsapp-plus.infowhatsapp-plus.mewhatsapp-plus.netwhatsapp.ccwhatsapp.comwhatsapp.infowhatsapp.netwhatsapp.orgwhatsapp.tvwhatsappbrand.com
-˛»	
+ùÕ	
 CATEGORY-COMPANIESacer-group.comacer.comacer.com.cn
 cn3dns-1.adobe.com3dns-2.adobe.com3dns-3.adobe.com3dns-4.adobe.com3dns-5.adobe.com3dns.adobe.comactivate-sea.adobe.comactivate-sjc0.adobe.comactivate.adobe.comactivate.wip1.adobe.comactivate.wip2.adobe.comactivate.wip3.adobe.comactivate.wip4.adobe.comadobe-dns-1.adobe.comadobe-dns-2.adobe.comadobe-dns-3.adobe.comadobe-dns-4.adobe.comadobe-dns.adobe.comadobeereg.comcrl.versign.netereg.adobe.comereg.wip.adobe.comereg.wip1.adobe.comereg.wip2.adobe.comereg.wip3.adobe.comereg.wip4.adobe.comhl2rcv.adobe.comhlrcv.stage.adobe.comlm.licenses.adobe.comlmlicenses.wip4.adobe.comna1r.services.adobe.comood.opsource.netpractivate.adobepractivate.adobe.compractivate.adobe.ipppractivate.adobe.newoapractivate.adobe.ntpwip.adobe.comwip1.adobe.comwip2.adobe.comwip3.adobe.comwip4.adobe.comwwis-dubc1-vip100.adobe.comwwis-dubc1-vip101.adobe.comwwis-dubc1-vip102.adobe.comwwis-dubc1-vip103.adobe.comwwis-dubc1-vip104.adobe.comwwis-dubc1-vip105.adobe.comwwis-dubc1-vip106.adobe.comwwis-dubc1-vip107.adobe.comwwis-dubc1-vip108.adobe.comwwis-dubc1-vip109.adobe.comwwis-dubc1-vip110.adobe.comwwis-dubc1-vip111.adobe.comwwis-dubc1-vip112.adobe.comwwis-dubc1-vip113.adobe.comwwis-dubc1-vip114.adobe.comwwis-dubc1-vip115.adobe.comwwis-dubc1-vip116.adobe.comwwis-dubc1-vip117.adobe.comwwis-dubc1-vip118.adobe.comwwis-dubc1-vip119.adobe.comwwis-dubc1-vip120.adobe.comwwis-dubc1-vip121.adobe.comwwis-dubc1-vip122.adobe.comwwis-dubc1-vip123.adobe.comwwis-dubc1-vip124.adobe.comwwis-dubc1-vip125.adobe.comwwis-dubc1-vip30.adobe.comwwis-dubc1-vip31.adobe.comwwis-dubc1-vip32.adobe.comwwis-dubc1-vip33.adobe.comwwis-dubc1-vip34.adobe.comwwis-dubc1-vip35.adobe.comwwis-dubc1-vip36.adobe.comwwis-dubc1-vip37.adobe.comwwis-dubc1-vip38.adobe.comwwis-dubc1-vip39.adobe.comwwis-dubc1-vip40.adobe.comwwis-dubc1-vip41.adobe.comwwis-dubc1-vip42.adobe.comwwis-dubc1-vip43.adobe.comwwis-dubc1-vip44.adobe.comwwis-dubc1-vip45.adobe.comwwis-dubc1-vip46.adobe.comwwis-dubc1-vip47.adobe.comwwis-dubc1-vip48.adobe.comwwis-dubc1-vip49.adobe.comwwis-dubc1-vip50.adobe.comwwis-dubc1-vip51.adobe.comwwis-dubc1-vip52.adobe.comwwis-dubc1-vip53.adobe.comwwis-dubc1-vip54.adobe.comwwis-dubc1-vip55.adobe.comwwis-dubc1-vip56.adobe.comwwis-dubc1-vip57.adobe.comwwis-dubc1-vip58.adobe.comwwis-dubc1-vip59.adobe.comwwis-dubc1-vip60.adobe.comwwis-dubc1-vip61.adobe.comwwis-dubc1-vip62.adobe.comwwis-dubc1-vip63.adobe.comwwis-dubc1-vip64.adobe.comwwis-dubc1-vip65.adobe.comwwis-dubc1-vip66.adobe.comwwis-dubc1-vip67.adobe.comwwis-dubc1-vip68.adobe.comwwis-dubc1-vip69.adobe.comwwis-dubc1-vip70.adobe.comwwis-dubc1-vip71.adobe.comwwis-dubc1-vip72.adobe.comwwis-dubc1-vip73.adobe.comwwis-dubc1-vip74.adobe.comwwis-dubc1-vip75.adobe.comwwis-dubc1-vip76.adobe.comwwis-dubc1-vip77.adobe.comwwis-dubc1-vip78.adobe.comwwis-dubc1-vip79.adobe.comwwis-dubc1-vip80.adobe.comwwis-dubc1-vip81.adobe.comwwis-dubc1-vip82.adobe.comwwis-dubc1-vip83.adobe.comwwis-dubc1-vip84.adobe.comwwis-dubc1-vip85.adobe.comwwis-dubc1-vip86.adobe.comwwis-dubc1-vip87.adobe.comwwis-dubc1-vip88.adobe.comwwis-dubc1-vip89.adobe.comwwis-dubc1-vip90.adobe.comwwis-dubc1-vip91.adobe.comwwis-dubc1-vip92.adobe.comwwis-dubc1-vip93.adobe.comwwis-dubc1-vip94.adobe.comwwis-dubc1-vip95.adobe.comwwis-dubc1-vip96.adobe.comwwis-dubc1-vip97.adobe.comwwis-dubc1-vip98.adobe.comwwis-dubc1-vip99.adobe.com"advertising.adobe.com
 adstubemogul.com
@@ -3586,7 +3619,13 @@ fotolia.ccfotolia.com
 fotolia.tvfotolja.comfptolia.comgfotolia.commotolia.comphotolia.nettenbyfotolia.comvotolia.combluefootcms.commageconf.commageconf.com.uamagento.commagento.netmagentocommerce.commagentomobile.commarketing-cloud.commarketo.co.ukmarketo.commarketo.net
 marketo.tvmarketodesigner.commarketolive.com
 mktdns.commkto-c0100.commktorest.commktroute.commobilemarketo.com&"revenue-performance-management.comtoutapp.comcompresspdf.newpdf.newsign.new
-scene7.comalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.com amazon-adsystem.com
+scene7.comalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.com amazon-adsystem.com
 adsserving-sys.com
 adsamazontrust.comawstrust.com
 ss2.us
@@ -4018,7 +4057,7 @@ touchid.tvtouchid.wangtracking-location.comtruedepth3d.com
 cnwww.apple.com
 cnxp.apple.com
 cnasus.comasus.com.cn
-cnatlassian.comatlassian.netbitbucket.iobitbucket.orgstatuspage.io
+cnasuscloud.comasuswebstorage.comatlassian.comatlassian.netbitbucket.iobitbucket.orgstatuspage.io
 trello.comtrellocdn.comaccbusiness.com
 atandt.comatt-bundles.comatt-japan.comatt-mail.comatt-promotions.comatt-rsvp.comatt.cn
 cnatt.comatt.jobsatt.net
@@ -4061,7 +4100,7 @@ mysdn.info	mysdn.netnetacad.comnetacad.netnetwork-auth.cn
 versly.comvideochampion.comvirtuata.comwballiance.com!whyiwantciscotelepresence.comwifi-mx.comyoutubecisco.comapp-dynamics.comappdynamics.co.ukappdynamics.comappdynamics.deappdynamics.frappdynamics.infoappdynamics.jpappdynamics.org
 mearki.commeraki-go.com	meraki.hkmerakigo.com
 tail-f.com	tailf.comcisco.evergage.comciscolivehls-i.akamaihd.netclco.cc
-cloudc.onecloudcone.comcloudcone.netcollabora.co.ukcollabora.comcollabora.orgcollaboraoffice.com
+cloudc.onecloudcone.comcloudcone.netcollabora.co.ukcollabora.comcollabora.orgcollaboraoffice.com	corel.com	corel.netcoreldraw.appcoreldraw.comcorelstore.com
 cfblob.comcloudchoose.comcloudvolumes.com
 cmpaas.com
 cpedge.comcrit-staging.comexperience-vmware.comgemfire.netgeodesummit.comgetboxer.comgitstar.comgitstar.netgopivotal.netgreenplum.nethwslabs.comimmidio.comitfromtheinside.comlatamvmwareforum.compivotalinitiative.comsnapvolumes.comssdevrd.comvcanedge.comvcloudair.netvfabric.netvidmpreview.com
@@ -4131,10 +4170,16 @@ golang.org2mdn-cn.net
 urchin.com
 ads!analytics.google.com
 ads>1^adservice\.google\.([a-z]{2}|com?)(\.[a-z]{2})?$
-adscharlestonroadregistry.comcrr.comregistry.googleget.appget.devget.howget.newget.pageget.rsvphey.booiam.soynew.dayxn--p8j9a0d9c9a.xn--q9jyb4cscholar.google.aescholar.google.atscholar.google.bescholar.google.bgscholar.google.cascholar.google.catscholar.google.chscholar.google.clscholar.google.cnscholar.google.co.crscholar.google.co.idscholar.google.co.ilscholar.google.co.inscholar.google.co.jpscholar.google.co.krscholar.google.co.nzscholar.google.co.thscholar.google.co.ukscholar.google.co.vescholar.google.co.zascholar.google.comscholar.google.com.arscholar.google.com.auscholar.google.com.boscholar.google.com.brscholar.google.com.coscholar.google.com.cuscholar.google.com.doscholar.google.com.ecscholar.google.com.egscholar.google.com.gtscholar.google.com.hkscholar.google.com.lyscholar.google.com.mxscholar.google.com.myscholar.google.com.nischolar.google.com.pascholar.google.com.pescholar.google.com.phscholar.google.com.pkscholar.google.com.prscholar.google.com.pyscholar.google.com.sgscholar.google.com.svscholar.google.com.trscholar.google.com.twscholar.google.com.uascholar.google.com.uyscholar.google.com.vnscholar.google.czscholar.google.descholar.google.dkscholar.google.esscholar.google.fischolar.google.frscholar.google.grscholar.google.hnscholar.google.hrscholar.google.huscholar.google.isscholar.google.itscholar.google.lischolar.google.ltscholar.google.luscholar.google.lvscholar.google.nlscholar.google.noscholar.google.plscholar.google.ptscholar.google.roscholar.google.ruscholar.google.sescholar.google.sischolar.google.sk!scholar.googleusercontent.comscholar.l.google.compki.googclients1.google.compki.google.comcrl.pki.goog
+adscharlestonroadregistry.comcrr.comregistry.googleget.appget.devget.howget.newget.pageget.rsvphey.booiam.soynew.dayxn--p8j9a0d9c9a.xn--q9jyb4cscholar.google.aescholar.google.atscholar.google.bescholar.google.bgscholar.google.cascholar.google.catscholar.google.chscholar.google.clscholar.google.cnscholar.google.co.crscholar.google.co.idscholar.google.co.ilscholar.google.co.inscholar.google.co.jpscholar.google.co.krscholar.google.co.nzscholar.google.co.thscholar.google.co.ukscholar.google.co.vescholar.google.co.zascholar.google.comscholar.google.com.arscholar.google.com.auscholar.google.com.boscholar.google.com.brscholar.google.com.coscholar.google.com.cuscholar.google.com.doscholar.google.com.ecscholar.google.com.egscholar.google.com.gtscholar.google.com.hkscholar.google.com.lyscholar.google.com.mxscholar.google.com.myscholar.google.com.nischolar.google.com.pascholar.google.com.pescholar.google.com.phscholar.google.com.pkscholar.google.com.prscholar.google.com.pyscholar.google.com.sgscholar.google.com.svscholar.google.com.trscholar.google.com.twscholar.google.com.uascholar.google.com.uyscholar.google.com.vnscholar.google.czscholar.google.descholar.google.dkscholar.google.esscholar.google.fischolar.google.frscholar.google.grscholar.google.hnscholar.google.hrscholar.google.huscholar.google.isscholar.google.itscholar.google.lischolar.google.ltscholar.google.luscholar.google.lvscholar.google.nlscholar.google.noscholar.google.plscholar.google.ptscholar.google.roscholar.google.ruscholar.google.sescholar.google.sischolar.google.sk!scholar.googleusercontent.comscholar.l.google.compki.goog!pki-goog.l.google.com
+cn
+c.pki.goog
+cn
+i.pki.goog
+cn
+o.pki.goog
+cnpublicca.googleapis.com#preprod-publicca.googleapis.comclients1.google.compki.google.comcrl.pki.goog
 cncrls.pki.goog
 cnocsp.pki.goog
-cn!pki-goog.l.google.com
 cnalt1-mtalk.google.comalt2-mtalk.google.comalt3-mtalk.google.comalt4-mtalk.google.comalt5-mtalk.google.comalt6-mtalk.google.comalt7-mtalk.google.comalt8-mtalk.google.commtalk.google.com
 kaggle.com	kaggle.io
 kaggle.netkaggleusercontent.comdeps.dev	deps.infoopensourceinsight.devopensourceinsights.devpolymer-project.orgpolymerproject.org
@@ -4232,7 +4277,7 @@ apture.comarea120.com
 asp-cc.comautodraw.combandpage.combaselinestudy.combaselinestudy.orgbazel.buildbdn.devbeatthatquote.com	blink.orgbrocaproject.com
 brotli.orgbumpshare.com
 bumptop.cabumptop.combumptop.netbumptop.orgbumptunes.comcampuslondon.com certificate-transparency.org
-chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgepisodic.comfeedburner.com
+chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgdocs.newepisodic.comfeedburner.com
 fflick.comfinanceleadsonline.com
 foofle.comfroogle.comfuchsia.dev	g-tun.comg.cn
 cng.co	g.dev
@@ -4260,11 +4305,13 @@ picasa.compicasaweb.compicasaweb.netpicasaweb.org
 picnik.compittpatt.com
 pixate.compostini.comprivacysandbox.comprojectara.comprojectbaseline.compublishproxy.comquestvisual.comquickoffice.comquiksee.com
 revolv.comridepenguin.comrun.appsavethedate.foo
-saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.comsnapseed.comsolveforx.com
+saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.com
+sheets.new
+slides.newsnapseed.comsolveforx.com
 stadia.devstcroixmosquito.comstcroixmosquitoproject.comstudywatchbyverily.comstudywatchbyverily.orgstxmosquito.comstxmosquitoproject.comstxmosquitoproject.netstxmosquitoproject.orgsynergyse.comtensorflow.org	tfhub.devthecleversense.comthegooglestore.comthinkquarterly.co.ukthinkquarterly.comthinkwithgoogle.comtiltbrush.comtxcloud.net	txvia.comunfiltered.newsuseplannr.comusvimosquito.comusvimosquitoproject.comvelostrata.com
 verily.comverilylifesciences.comverilystudyhub.comverilystudywatch.comverilystudywatch.org
 wallet.com	waymo.comwaze.comweb.appweb.devwebappfieldguide.comwebmproject.orgwebpkgcache.com
-webrtc.orgweltweitwachsen.dewhatbrowser.orgwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
+webrtc.orgweltweitwachsen.dewhatbrowser.org	whats.newwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
 x.teamxn--9kr7l.comxn--9trs65b.comxn--flw351e.comxn--ggle-55da.comxn--gogl-0nd52e.comxn--gogl-1nd42e.comxn--ngstr-lra8j.comxplr.cozukunftswerkstatt.dewww.recaptcha.net
 cn265.com
 cn2mdn-cn.net
@@ -4738,7 +4785,7 @@ geforce.cn
 cngputechconf.co.krgputechconf.comgputechconf.com.augputechconf.com.twgputechconf.eugputechconf.ingputechconf.jpnvidia.asia	nvidia.at	nvidia.be	nvidia.ch	nvidia.cn
 cnnvidia.co.atnvidia.co.innvidia.co.jpnvidia.co.krnvidia.co.uk
 nvidia.comnvidia.com.aunvidia.com.brnvidia.com.mxnvidia.com.penvidia.com.plnvidia.com.trnvidia.com.twnvidia.com.uanvidia.com.ve	nvidia.cz	nvidia.de	nvidia.dk	nvidia.es	nvidia.eu	nvidia.fi	nvidia.fr	nvidia.in	nvidia.it	nvidia.jp	nvidia.lu	nvidia.mx	nvidia.nl	nvidia.no	nvidia.pl	nvidia.ro	nvidia.ru	nvidia.se	nvidia.twnvidiaforhp.comnvidiagrid.netshotwithgeforce.comtegrazone.cotegrazone.co.krtegrazone.comtegrazone.jptegrazone.krnvidia.tt.omtrdc.netchatgpt.comoaistatic.comoaiusercontent.com
-openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net@<^chatgpt-async-webps-prod-eastus-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
+openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net=9^chatgpt-async-webps-prod-\s+-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
 ads openaicom.imgix.net
 adsopenweather.co.ukopenweathermap.org
 oracleateam-oracle.com
@@ -4760,7 +4807,7 @@ qprize.comqualcomm-email.comqualcomm.cn
 cn*qualcomm.cn.cdn.cloudflare.net
 cnqualcomm.co.idqualcomm.co.inqualcomm.co.jpqualcomm.co.krqualcomm.co.ukqualcomm.comqualcomm.com.brqualcomm.com.twqualcomm.dequalcomm.frqualcommhalo.comqualcommlabs.comqualcommmea.comqualcommretail.comqualcommventures.cnqualcommventures.comqualphone.comquicinc.comsnapdragon.cnsnapdragonbooth.com
 uplinq.comwipower.comwirelessreach.comxtracloud.cn
-cn
+cnxtracloud.net
 brewmp.comqualcomm.sc.omtrdc.net	qwant.comqwant.deqwant.frqwant.it	razer.comrazerapi.com
 cnrazerofficial.comrazersynapse.com
 cnrazersupport.comrazerzone.com
@@ -4769,7 +4816,7 @@ pardot.comquotable.comradian6.comrelateiq.comsalesforce.
 sforce.comsite.com
 social.comsteelbrick.comtwinprime.comweinvoiceit.comsamsung
 xn--cg4bkigalaxyappstore.comgalaxymobile.jpgame-platform.netknoxemm.comsamsung.comsamsungapps.comsamsungcloud.comsamsungdm.comsamsungeshop.com.cn
-cnsamsunggalaxyfriends.comsamsungknox.comsamsungqbe.combarkadahansasmartone.comhealthreach.hkhkcircleapp.comhomephoneplus.comip73.coms-cashonmobile.coms-rewards.hksahabatsetiasmartone.comsmartone.comsmartoneholdings.comsmartonerobotics.comsmartonesolutions.com.hksmartonesolutions.hkvaluegb.comwise-research.comsnapads.com
+cnsamsunggalaxyfriends.comsamsungknox.comsamsungqbe.comskyperfectjsat.spacesptvbroadcast.comspcc-sp.comskyperfectv.co.jphominis.media	jsati.comjsatmobile.combarkadahansasmartone.comhealthreach.hkhkcircleapp.comhomephoneplus.comip73.coms-cashonmobile.coms-rewards.hksahabatsetiasmartone.comsmartone.comsmartoneholdings.comsmartonerobotics.comsmartonesolutions.com.hksmartonesolutions.hkvaluegb.comwise-research.comsnapads.com
 ads
 sc-cdn.netsnap-dev.netsnap.comsnapchat.com
 snapkit.co,(impala-media-production.s3.amazonaws.complaystationplaystation.complaystation.net sonyentertainmentnetwork.comimageworks.commotionpictureser.complayshow.ioplayshowtv.comsonyclassics.comsonypictures.comsonypicturesanimation.comsonypicturesmuseum.comsonypicturesstudios.comsonypicturestelevision.com#sonypicturestelevisiongames.comwheelpop.com
@@ -4850,7 +4897,7 @@ kraken.com
 opensea.ioosl.com
 paxful.com
 ripple.comsatoshilabs.comtheblock.co	trezor.io	truefi.io	unisat.iouniswap.orgwalletconnect.comwintermute.com	zapper.fi
-∂[
+ˆ[
 CATEGORY-DEVanaconda.cloudanaconda.comanaconda.orgconda.ioandroid.comandroidify.comappleswift.com	swift.org
 swiftui.cn
 cnswiftui.com.cn
@@ -4924,13 +4971,13 @@ blazor.netbotframework.comcodethemicrobit.comdevopsassessment.
 cn
 sankie.netsqlserveronlinux.comtimelinestoryteller.comuwpcommunitytoolkit.comvisualstudio-staging.comvisualstudio.comvisualstudio.covisualstudio.co.ukvisualstudio.euvisualstudio.netvfsforgit.comvfsforgit.orgvsassets.io
 vscode.devvscode-cdn.netvscode-unpkg.netxamarin.comaz764295.vo.msecnd.net)%bingsettingssearch.trafficmanager.netdefault.exp-tas.comdeveloper.microsoft.com'#download.visualstudio.microsoft.comdtlgalleryint.cloudapp.net poshtestgallery.cloudapp.net"psg-int-centralus.cloudapp.netpsg-int-eastus.cloudapp.netrink.hockeyapp.net+'vscode-sync-insiders.trafficmanager.net"vscode-sync.trafficmanager.net vscode.blob.core.windows.netvscode.search.windows.net vsmarketplacebadge.apphb.commongodb.commongodb.org	nginx.com	nginx.org	nixos.orgchatgpt.comoaistatic.comoaiusercontent.com
-openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net@<^chatgpt-async-webps-prod-eastus-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
+openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net=9^chatgpt-async-webps-prod-\s+-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
 ads openaicom.imgix.net
 adsopenwrt.orglede-project.orgosdn.netperl.apache.orgperl.orgcpan.orgmetacpan.org
 modperl.plpolymer-project.orgpolymerproject.org	pycon.orgpypa.iopypi.iopypi.org
 python.orgpythonhosted.orgpiwheels.org	qt.ioqt-project.orgreadthedocs-hosted.comreadthedocs.comreadthedocs.ioreadthedocs.orgredis.ioredislabs.comremirepo.netruby-lang.orgrubygems.orgrust-lang.org	rustup.rs	crates.iodocs.rs
 redhat.com
-redhat.orgscala-lang.orgscala-sbt.orgsourcehut.org	sr.htaskubuntu.comblogoverflow.comcodeforaliving.iomathoverflow.netserverfault.comsstatic.netstackapps.comstackauth.comstackexchange.comstackmod.blogstackoverflow.blogstackoverflow.costackoverflow.comstackoverflow.emailstackoverflowbusiness.comstackoverflowcareers.comstacksnippets.netsuperuser.comtex-talk.netthesffblog.commystrikingly.comstrikingly.comstrikinglycdn.comopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+redhat.orgscala-lang.orgscala-sbt.orgsourcehut.org	sr.htaskubuntu.comblogoverflow.comcodeforaliving.iomathoverflow.netserverfault.comsstatic.netstackapps.comstackauth.comstackexchange.comstackmod.blogstackoverflow.blogstackoverflow.costackoverflow.comstackoverflow.emailstackoverflowbusiness.comstackoverflowcareers.comstacksnippets.netsuperuser.comtex-talk.netthesffblog.commystrikingly.comstrikingly.comstrikinglycdn.comopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cn
 termux.com
 termux.dev
@@ -5174,11 +5221,12 @@ yeshen.com
 cn
 Ÿ
 %CATEGORY-ENTERPRISE-QUERY-PLATFORM-CNaiqicha.baidu.comhongdunwang.com.cnqcc.comqichacha.comqichamao.com	qixin.comqyyjt.cnjindidata.comtianyancha.comx315.com
-û˝
-CATEGORY-ENTERTAINMENTabema.ioabema.tvabema-tv.com	adx.promoameba.jpamebame.comamebaownd.comamebaowndme.com	ameblo.jpbucketeer.jpdokusho-ojikan.jphayabusa.devhayabusa.iohayabusa.mediawinticket.jpabematv.akamaized.net#ds-linear-abematv.akamaized.net ds-vod-abematv.akamaized.net linear-abematv.akamaized.netvod-abematv.akamaized.netamc.comamcn.comamcnetworks.comamcplus.comrne5a6ae085b6c43020dea230eb0c0ecc33a188227507da97b8ecc05eb8beace6.us-east-1.prod.service.minerva.devices.a2z.com	9anime.cz	9anime.id	9anime.to	9anime.wsanimedao-tv.comcrunchyroll.comfunimation.comgogo-load.comgogoanime.vcgogoanime.wikigogocdn.net
-hidive.com
-vrv.co
-age.tv	agedm.orgao3.orgarchiveofourown.orgarchiveofourown.comarchiveofourown.net
+‰˛
+CATEGORY-ENTERTAINMENTabema.ioabema.tvabema-tv.com	adx.promoameba.jpamebame.comamebaownd.comamebaowndme.com	ameblo.jpbucketeer.jpdokusho-ojikan.jphayabusa.devhayabusa.iohayabusa.mediawinticket.jpabematv.akamaized.net#ds-linear-abematv.akamaized.net ds-vod-abematv.akamaized.net linear-abematv.akamaized.netvod-abematv.akamaized.netamc.comamcn.comamcnetworks.comamcplus.comrne5a6ae085b6c43020dea230eb0c0ecc33a188227507da97b8ecc05eb8beace6.us-east-1.prod.service.minerva.devices.a2z.com	9anime.cz	9anime.id	9anime.to	9anime.ws
+age.tv	agedm.orgagedm.tvagefans.com
+agemys.org	agedm.appanimedao-tv.comcrunchyroll.comfunimation.com
+vrv.cogogoanime.vcgogoanime.wikigogoanime3.cogogotaku.infogogo-load.comgogocdn.net
+hidive.comao3.orgarchiveofourown.orgarchiveofourown.comarchiveofourown.net
 att.tvatttvnow.comattwatchtv.comdirectv.com	dtvce.comnettyinternet.combahamut.akamaized.netbahamut.com.twgamer.com.twgamer2-cds.cdn.hinet.netgamer-cds.cdn.hinet.netbandcamp.com
 bcbits.comboomerang.com
 wbdnbo.netcatchplay.comtra-ww000-cp.akamaized.net
@@ -5361,8 +5409,8 @@ xboxab.comxboxgamepass.comxboxgamestudios.comxboxlive.cn
 cnxboxlive.com
 xboxone.coxboxone.com
 xboxone.euxboxplayanywhere.comxboxservices.comxboxstudios.com
-xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
-papermc.ioplanetminecraft.comprotondb.comspeedrun.comsteamdb.info	ptzwx.comquanben-xiaoshuo.com
+xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefabricmc.netfanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
+papermc.ioplanetminecraft.comprismlauncher.orgprotondb.comquiltmc.orgspeedrun.comsteamdb.info	ptzwx.comquanben-xiaoshuo.com
 quanben.iodailymotion.comdm-event.net	dmcdn.netdandanzan.cc	nunuyy.ccdazn-api.comdazn.com
 dazndn.com
 indazn.comindaznlab.comdeviantart.comdeviantart.netda-files.com*&content-ause1-ur-discovery1.uplynk.comdisco-api.comdiscoveryplus.comabc-studios.comabc.comedgedatg.combamgrid.comdmed.technologydtci.codtci.technology
@@ -5376,7 +5424,7 @@ dssott.comgo-disneyworldgo.com
 go.com	mickey.tvmoviesanywhere.comnomadlandmovie.chplaymation.comshopdisney.comshops-disney.comsorcerersarena.comspaindisney.comstar-brasil.comstar-latam.comstarwars.com#starwarsgalacticstarcruiser.comstarwarskids.comstreamingdisney.netthestationbymaker.comthisispolaris.comwatchdisneyfe.com	chobit.ccci-en.jp	ci-en.net
 dlsite.comdlsite.com.tw	dlsite.jpdlsitestudio.comnijiyome.jptriokini.comgimy.ccgimy.cogimy.togimy.tvgoodreads.comgr-assets.comapl-hamivideo.cdn.hinet.nethamivideo.hinet.net&"mobilelive-hamivideo.cdn.hinet.netpvr-hamivideo.cdn.hinet.netscc.ott.hinet.net"static-hamivideo.cdn.hinet.net&"tvcastlive-hamivideo.cdn.hinet.net#weblive-hamivideo.cdn.hinet.netcinemax.comforthethrone.comhbo.comhboasia.comhbogo.co.th	hbogo.comhbogo.euhbogoasia.comhbogoasia.hkhbogoasia.idhbogoasia.phhbogoasia.sghbogoasia.tw
 hbomax.comhbomaxcdn.com
-hbonow.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
+hbonow.commax.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
 112263.comcallhulu.comfindyourlimits.comfreehulu.com	hooloo.tv	hoolu.comhoolu.tvhu1u.comhuloo.cchuloo.tvhulu.comhulu.jphulu.tvhulu.ushuluaction.com
 huluad.comhuluapp.comhuluasks.comhulucall.comhulufree.comhulugans.comhulugermany.com
 hulugo.com
@@ -5401,6 +5449,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cnbiggggg.com	mudvod.tvnbys.tvnbys1.tvnbyy.tvnewpppp.comnivod.tv	nivodi.tv
 nivodz.com
@@ -5530,14 +5579,23 @@ youtube.vnyoutubeeducation.com($youtubeembeddedplayer.googleapis.com
 odysee.comomobi.cc
 oranum.comovercast.fmsyosetu.comthetvdb.com
 weverse.ioyande.reamp-api.podcast.apple.combag.itunes.apple.combookeeper.itunes.apple.com
-≤
-CATEGORY-FINANCE
+ª
+
+CATEGORY-FINANCEhsbchsbc.comhsbc.nethsbcinnovationbanking.comhsbcnet.comhsbcprivatebank.comhsbc.aehsbc.amhsbc.bm
+hsbc.co.id
+hsbc.co.in
+hsbc.co.kr
+hsbc.co.mu
+hsbc.co.nz
+hsbc.co.th
+hsbc.co.ukhsbc.ukhsbc.com.arhsbc.com.auhsbc.com.bdhsbc.com.bhhsbc.com.brhsbc.com.cnhsbc.com.eghsbc.com.hkhsbc.com.mohsbc.com.mthsbc.com.mxhsbc.com.myhsbcamanah.com.myhsbc.com.phhsbc.com.sghsbc.com.trhsbc.com.twhsbc.com.uyhsbc.com.vnhsbc.dehsbc-alternatives.dehsbc-transactionservices.dehsbc-zertifikate.dehsbc.lkhsbc.ca
+hsbc.co.jphsbc.frhsbctrinkaus.de
 fsmone.comfsmone.com.hkfsmone.com.myfundsupermart.comifastcapital.com.myifastcorp.comifastfinancial.com.hkifastfinancial.co.inifastgb.comifastgp.comifastgp.com.hkifastnetwork.comifastps.com.cn
 cnifasttv.comlongbridge.cloudlongbridge.globallongbridge.hklongbridge.sglongbridgeapp.comlongportapp.com	lbkrs.com	wbrks.comtransferwise.comwise.comfxcorporate.commql5.comtradingview.com
 v
 CATEGORY-FOOD-CN517lppz.comlppz.comlppzimg.com
 heytea.com3songshu.comhaidilao.com
-±
+ˆ
 CATEGORY-FORUMS4cdn.org	4chan.org4channel.org2ch.net5ch.net	6park.com6parkbbs.com6parknews.com
 cool18.com	ck101.com	ckcdn.comckck.fundcard.ccdcard.io
 dcard.linkdcard.twbroadbandreports.comdslr.netdslreports.comhkgolden.comhkgolden.media
@@ -5547,7 +5605,7 @@ pixnet.pro	pixnet.tw
 pixplug.in
 ptt.ccptt2.ccptt3.ccpoe.com
 poecdn.net	qr.ae	quora.comquoracdn.netredd.itreddit.app.link
-reddit.comreddithelp.comredditmail.comredditmedia.comredditstatic.comredd.itreddit.map.fastly.net
+reddit.comredditblog.comreddithelp.comredditinc.comredditmail.comredditmedia.comredditspace.comredditstatic.comredditstatus.comreddit.map.fastly.net
 yamibo.com	18p2p.comavsforum.comdisp.cc	doom9.orgeyny.comgab.comhydrogenaud.iomewe.com
 parler.compincong.rockssafechat.com
 sis001.comv2ex.com
@@ -5558,7 +5616,7 @@ sis001.comv2ex.com
 leigod.comtmjiasuqi.com
 uu.163.com
 xunyou.combohejiasuqi.comjiasu.bohe.com
-ÃÅ
+°Ç
 CATEGORY-GAMES
 2k.com2kcoretech.online2kgames.comtake2games.combilibiligame.cn
 cnbilibiligame.co
@@ -5613,6 +5671,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cnnexon.co.jp	nexon.comnexon.ionexoncdn.co.krnikke-de.comnikke-en.comnikke-fr.comnikke-jp.comnikke-kr.comnikke-sea.com100classicbooks.com
 amiibo.comayudanintendo.combowsersinsidestory.comexcitebots.comflipnotestudio.comgloryofheracles.comhackyourconsole.comkirbysuperstarultra.comkirbysepicyarn.comlegendofzelda.cn
@@ -5756,8 +5815,8 @@ xboxab.comxboxgamepass.comxboxgamestudios.comxboxlive.cn
 cnxboxlive.com
 xboxone.coxboxone.com
 xboxone.euxboxplayanywhere.comxboxservices.comxboxstudios.com
-xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
-papermc.ioplanetminecraft.comprotondb.comspeedrun.comsteamdb.info
+xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefabricmc.netfanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
+papermc.ioplanetminecraft.comprismlauncher.orgprotondb.comquiltmc.orgspeedrun.comsteamdb.info
 Â
 CATEGORY-GOV-IR
 adliran.iragrieng.org
@@ -6075,12 +6134,14 @@ saat24.comshabestan.irshana.ir
 I
 CATEGORY-NOVEL	ptzwx.comquanben-xiaoshuo.com
 quanben.io
-¥
+Ù
 CATEGORY-NTP^time(.euro)?.apple.com$!^time([1-5])?\.facebook\.com$^time([1-4])?.google.com$çà^((((ut1-wwv)|(ntp\-(b|d|wwv))|(time(\-(([a-e]\-(g|b))|([a-e]\-wwv)))?))\.nist\.gov)|((ntp-c|ut1-time)|(utcnist(2|3)?))\.colorado\.edu)$ ^ntp[0-7]\.ntp-servers\.net$clock.isc.orgntp.fiord.ru
 ntp.nat.ms
 ntp.nic.czntp.nict.jpntp.ripe.net
 ntp.se
 ntp.ufe.czpool.ntp.orgtime.cloudflare.comtime.nrc.catime.windows.com&^ntp([1-7])?\.aliyun\.com$
+cntime.izatcloud.net
+cntime.xtracloud.net
 cn'^ntp([1-5])?\.tencent\.com$
 cncn.pool.ntp.org
 cnntp.neu.edu.cn
@@ -6088,8 +6149,10 @@ ntp.ufe.czpool.ntp.orgtime.cloudflare.comtime.nrc.catime
 cn
 ntp.org.cn
 cn
-œ
+è
 CATEGORY-NTP-CN&^ntp([1-7])?\.aliyun\.com$
+cntime.izatcloud.net
+cntime.xtracloud.net
 cn'^ntp([1-5])?\.tencent\.com$
 cncn.pool.ntp.org
 cnntp.neu.edu.cn
@@ -6116,7 +6179,7 @@ change.orgglobalsecurity.orgiana.orgietf.orgitu.int
 payping.ir
 pec.ir	pep.co.irsadadpsp.ir
 sep.irshaparak.irweswap.digitalzarinpal.com
-§Á
+ÌÁ
 CATEGORY-PORN18comic-god.cc18comic-god.club18comic-god.xyz
 18comic.cc18comic.company18comic.org18comic.vipjmcomic.ltd
 jmcomic.mejmcomic.mobijmcomic.moejmcomic1.cityjmcomic1.mejmcomic1.mobijmcomic2.moe54647.global54647.io54647.online	54647.org
@@ -6321,7 +6384,7 @@ fanfox.netfangsung.comfanhaodian.comfanhowab.buzzfank.ru
 fans17.comfansnudes.com
 fansone.cofansteek.comfantasiasguatemala.comfantasti.ccfap-xxx.com	fap18.net
 fap666.comfapality.com
-fapcat.comfapdude.comfaperoni.comfapforfun.netfaphdporn.comfaphouse.comfapmovz.comfapnado.comfapopedia.netfappcelebs.comfappeningbook.comfappeningthots.comfappenist.comfapphub.com
+fapcat.comfapdude.comfapello.comfaperoni.comfapforfun.netfaphdporn.comfaphouse.comfapmovz.comfapnado.comfapomania.comfapopedia.netfappcelebs.comfappeningbook.comfappeningthots.comfappenist.comfapphub.com
 fapporn.mefaproulette.cofaproulette.onlinefapsafari.comfapster.xxxfapteencam.com
 fapvid.comfareastpornhub.comfastindianporn.comfatstube.comfavelaporno.comfavepornmovs.comfavepornvids.comfavjapaneseporn.comfbiqiyiav.buzz	fbjav.comfbooktaiwan.com	fc2ppv.tvfcw.xxx	fcww0.com	feet9.com
 fei.rufeipang.linkfemalestars.comfemdomcc.net
@@ -6464,7 +6527,7 @@ ksyp10.comku77.xyzkuaimao-app.comkuanrenxs.comkum.com
 la-mama.rulacomics.org
 ladies.comladybaba.netladyboygold.comladyboygold.euladyboypornonly.comlanasbigboobs.comlangsuirs.com
 lanmdh.netlanniser-ylo.shoplaosijifuli9009.toplaowang.viplargecamtube.comlargeporntube.comlatinaabuse.comlatintubeporn.comlaxd.comlazymike.comlbfmaddiction.com
-lbtube.comlcgirls.comleakedmeat.comleaksmodels.comleakxxx.comleliao1.comlemoncams.comlenkino.xxxlenporno.redleporno.orglepornochaud.comlepornofrais.comlesbian8.comlesbianpics.orglesbianpornvideos.comlesbiansubmission.comlesboerotica.net
+lbtube.comlcgirls.comleakedmeat.comleakedzone.comleaksmodels.comleakxxx.comleliao1.comlemoncams.comlenkino.xxxlenporno.redleporno.orglepornochaud.comlepornofrais.comlesbian8.comlesbianpics.orglesbianpornvideos.comlesbiansubmission.comlesboerotica.net
 letfap.comletmejerk.comletmejerk.funletsdoeit.comletsfuckme.netletsjerk.cclettherebeporn.comlevelsex.comlewdthots.comlewdvrgames.comlewdweb.net
 lezpoo.comlgbtq.gameslianhonghong.comlianjiajr.netliboggirls.netlibraryofthumbs.comlifeselector.comlightxxxtube.comlihksnap.comlikeseiyu.comliketruyen.netlikuoo.videolilhumpers.com
 liliav.comlilith-soft.comlimer.tw
@@ -6529,7 +6592,7 @@ norsk.mobinoveltrove.comnovinhabucetuda.comnovinhagostosa10.co
 nowjav.com	nozomi.lanrdh99.buzznrooms-dh.sbsnsfw.xxx
 nsfw247.tonsfwmemes.comntten-mg.buzz
 nu-bay.comnu36.vipnubilefilms.comnubiles-casting.comnubiles-porn.comnubiles.netnubileset.comnubilesunscripted.comnuddess.comnude-pics.orgnude-share.comnude.hunudeandhairy.comnudebeachpussy.comnudecams.camnudecelebforum.comnudedrawer.comnudedxxx.comnudeeroticteens.comnudefiles.netnudegfporn.comnudekenya.comnudelive.comnudematurewomenpics.comnudemilfporn.com
-nudes7.comnudespree.comnudeteen.orgnudeteenboys.netnudeteenladies.comnudevietnam.comnudevista.bestnudevista.clubnudevista.funnudevista.linknudevista.vipnudewifeporn.comnudewomenpics.netnudify.onlinenudistbeachporn.comnudistic.comnudistlog.comnudistsexvideos.comnudistvoyeurbeach.comnudity911.comnudography.comnuespournous.com	nuita.netnukemanga.comnuki-dokoro.com	nurgay.tonurumassage.netnurxxx.mobinushemale.comnuuporn.com	nuvid.com	nwxs8.comnyahentai.re	nym97.netobutsumania.com	obutu.comohentai.orgohgratisporrfilm.comohpornocasero.comohpornovideo.comohsesso.comohsexfilm.comohsexotube.comohyeah1080.com
+nudes7.comnudespree.comnudeteen.orgnudeteenboys.netnudeteenladies.comnudevietnam.comnudevista.bestnudevista.clubnudevista.funnudevista.linknudevista.vipnudewifeporn.comnudewomenpics.netnudify.onlinenudistbeachporn.comnudistic.comnudistlog.comnudistsexvideos.comnudistvoyeurbeach.comnudity911.comnudography.comnudostar.tvnuespournous.com	nuita.netnukemanga.comnuki-dokoro.com	nurgay.tonurumassage.netnurxxx.mobinushemale.comnuuporn.com	nuvid.com	nwxs8.comnyahentai.re	nym97.netobutsumania.com	obutu.comohentai.orgohgratisporrfilm.comohpornocasero.comohpornovideo.comohsesso.comohsexfilm.comohsexotube.comohyeah1080.com
 oiobbs.com
 ok.xxxokazudouga.blog.jpokazudouga.tokyookkisokuho.comolder-women-movies.comolder-women-porn.com
 older.tube	oldje.comoli-school.comomafotze.com	omg.adultomg.blogomgteens.comomorashi.jpomorashi.orgonahodouga.comonani-daisuki.com
@@ -7014,12 +7077,14 @@ cbsiam.com	cbsig.net
 cbsimg.netcbsinteractive.comcbsistatic.comcbsivideo.comcbsnews.comcbspressexpress.comcbssports.comcbsstatic.comcbssvideo.com
 viacbs.com
 viacom.comviacomcbs.comviacomcbspressexpress.comparamount.comamlg.iocbsaavideo.commtvnservices.comparamountplus.compplusstatic.comcbsi.live.ott.irdeto.com%!cbsplaylistserver.aws.syncbak.comcbsservice.aws.syncbak.comlink.theplatform.com
-¶
+∏
 CCBccb-life.com.cn
 ccb.cnccb.com
 ccb.com.cn
 ccbcos.com
-ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hkccbleasing.comccblife-test.com.cnccbseoul.comccbtrust.com.cn	ccbxt.com
+ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hk
+!cnccbleasing.comccblife-test.com.cnccbseoul.com
+!cnccbtrust.com.cn	ccbxt.com
 ò
 CCTVcctv.cncctv.comcctvpic.comchinaepg.cnchinalive.comcitv.net.cncnms.net.cncntv.cncntv.com.cn
 cctvlib.cncctvlibrary.cncctvlib.com.cncctvlibrary.com.cn
@@ -7070,15 +7135,25 @@ CHINAPOWERchinapower.csis.org
 &
 CHINASOchinaso.com
 pg0.cn
-Ã
-CHINATELECOM
-ctexcel.cactexcel.comctexcel.com.hk
-ctexcel.fr
-ctexcel.us
-189.cnchinatelecom-h.comchinatelecom.com.cnchinatelecomglobal.com
-chntel.com
-„
-CHINAUNICOM	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hkchinaunicomglobal.commychinaunicom.com	wo.cn	wo.com.cnwo116114.com
+£
+CHINATELECOM
+ctexcel.ca
+!cnctexcel.com
+!cnctexcel.com.hk
+!cn
+ctexcel.fr
+!cn
+ctexcel.us
+!cn
+189.cnchinatelecom-h.comchinatelecom.com.cn#chinatelecomglobal.com
+!cn
+chntel.comchinatelecomhk.com
+!cn
+ç
+CHINAUNICOM	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hk
+!cn"chinaunicomglobal.com
+!cnmychinaunicom.com	wo.cn	wo.com.cnwo116114.com	cuniq.com
+!cn
 (
 CHINAZ
 chinaz.com
@@ -7187,12 +7262,14 @@ cftest6.cn
 CLOUDINARYcloudinary.comcloudinary.net
 K
 	CLUBHOUSEclubhouse.comclubhouseapi.comjoinclubhouse.com
-¸
-CMB8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk	cmbimg.cn
+é
+CMB8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk
+!cn	cmbimg.cn
 cmbimg.comcmbt.cn
-cmbuat.com	cmburl.cncmbwinglungbank.comcmf.bizcmf.ltdcmfchina.com
+cmbuat.com	cmburl.cn cmbwinglungbank.com
+!cncmf.bizcmf.ltdcmfchina.com
 cmfunds.cntest-cignacmb.com
-≤⁄
+È‚
 CNcn	citic	baidu
 unicomsohuxn--zfr164b
 xn--fiqs8s
@@ -7226,9 +7303,13 @@ flycua.comhbhk.com.cn	jdair.netjuneyaoair.comluckyair.net
 ccb.cnccb.com
 ccb.com.cn
 ccbcos.com
-ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hkccbleasing.comccblife-test.com.cnccbseoul.comccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk	cmbimg.cn
+ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hk
+!cnccbleasing.comccblife-test.com.cnccbseoul.com
+!cnccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk
+!cn	cmbimg.cn
 cmbimg.comcmbt.cn
-cmbuat.com	cmburl.cncmbwinglungbank.comcmf.bizcmf.ltdcmfchina.com
+cmbuat.com	cmburl.cn cmbwinglungbank.com
+!cncmf.bizcmf.ltdcmfchina.com
 cmfunds.cntest-cignacmb.comicbc	95588.com95588.com.cndccnet.com.cnicbc-at.com
 !cnicbc-cz.com
 !cnicbc-ltd.com
@@ -7324,10 +7405,12 @@ howbuy.comlufunds.com	zlfund.cn	citicchinaamc.comcit
 !cn
 csc108.comcsci.hk
 !cn
-ecitic.com1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hkguba.com.cncebbank.comceblease.com
+ecitic.com1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hk
+!cnguba.com.cncebbank.comceblease.com
 eb-ind.comebasset.comebchina.comebchinaintl.com
 ebf.com.cn	ebfcn.comebfortune.comebtrust.comebscn-am.com	ebscn.comeverbright.com	secec.comsunlife-everbright.com
-pingan.compingan.com.cnpingan.com.hkyqb.comtaikang.comtaikanglife.comtaikangzhijia.comtkhealthcare.comhuangyuhui.net517lppz.comlppz.comlppzimg.com
+pingan.compingan.com.cnpingan.com.hk
+!cnyqb.comtaikang.comtaikanglife.comtaikangzhijia.comtkhealthcare.comhuangyuhui.net517lppz.comlppz.comlppzimg.com
 heytea.com3songshu.comhaidilao.com
 a2z.org.cn
 cnamazonaws.cn
@@ -7404,11 +7487,20 @@ funcdn.com	leigod.cn58ganji.com58ganji-corp.com	ganji.com
 58corp.com	58dns.org58lovepet.com	58uxd.com58v5.cn58xinghuo.cn58xinghuo.com58xueche.com
 anjuke.comanjukestatic.comchinahr.comchrstatic.com
 daojia.comdiandao.orgfang.com	sofun.comsoufunimg.com	jxedt.com	jxksw.net
-roomeet.cnxinchong.comzhuancorp.comzhuanspirit.comzhuanzhuan.comc-ctrip.comcolinker.comctrip.cnctrip.co.idctrip.co.krctrip.co.th	ctrip.comctrip.com.hkctrip.myctrip.sgctripbiz.comctripbuy.hkctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.twizuchebao.com	lvtds.com	shuntu.cn
+roomeet.cnxinchong.comzhuancorp.comzhuanspirit.comzhuanzhuan.comc-ctrip.comcolinker.comctrip.cnctrip.co.id
+!cnctrip.co.kr
+!cnctrip.co.th
+!cn	ctrip.comctrip.com.hk
+!cnctrip.my
+!cnctrip.sg
+!cnctripbiz.comctripbuy.hk
+!cnctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.tw
+!cnizuchebao.com	lvtds.com	shuntu.cn
 skysea.com	suanya.cn
 suanya.com
 tieyou.com
-toptown.cntoursbms.comtrip.comtripcdn.com
+toptown.cntoursbms.comtrip.com
+!cntripcdn.com
 vipdlt.comdangdang.comddimg.cndoservice.com
 ele.me
 ele.toeleme.cneleme.ioelemecdn.cnelemecdn.com	elenet.me1huizhan.com3.cn	300hu.com	360buy.cn
@@ -7417,8 +7509,12 @@ vipdlt.comdangdang.comddimg.cndoservice.com
 7fresh.combaitiao.comblackdragon.com	caiyu.comchicalot.cnchinabank.com.cncloud-beijing.comcloud-hebi.comcloud-ningbo.comcloud-ordos.comcloud-shenzhen.comcloud-shiyan.comcloud-wuhan.comcloud-xian.comcloud-xm.comcloud-zhaoqing.comcloud-zhongwei.comcloudanqing.comcloudbaoshan.comcloudbeibei.comcloudbinzhou.comcloudchangde.comcloudchangsha.comcloudchangzhou.comcloudchaozhou.comcloudchengde.comcloudchengdu.comcloudchuzhou.comcloudczs.comclouddalian.comclouddatong.comclouddongying.comcloudfoshan.comcloudfuqing.comcloudganzhou.comcloudguangzhou.comcloudhaidong.comcloudhefei.comcloudhengshui.comcloudhuaihua.comcloudhuizhou.comcloudjinan.comcloudjinchang.comcloudjingzhou.comcloudjining.comcloudjiujiang.comcloudkunming.comcloudleshan.comcloudlijiang.comcloudlishui.comcloudluohe.comcloudluoyang.comcloudmeishan.comcloudnanan.comcloudnanjing.comcloudnanning.comcloudnantong.comcloudquanzhou.comcloudsanya.comcloudshanghai.comcloudshaoyang.comcloudshenfuxingqu.comcloudsiping.comcloudsuqian.comcloudtangshan.comcloudtianjin.comcloudtongchuan.comcloudtongliang.comcloudweinan.comcloudxiangtan.comcloudxianyou.comcloudxining.comcloudyanan.comcloudyancheng.comcloudyantai.comcloudyinchuan.comcloudyueyang.comcloudyuncheng.comcloudyuxi.comcloudzhongshan.comcloudzhuhai.com
 dao123.comduiou.com.cngoselling.comhealthjd.comisvjcloud.com	isvjd.comjcloud-cache.comjcloud-cache.netjcloud-cdn.comjcloud-live.comjcloud-oss.com
 jcloud.comjcloudcache.comjcloudcache.netjcloudcs.comjclouddn.comjclouddns.comjclouddns.netjcloudec.comjcloudedge.comjcloudedge.netjcloudgslb.comjcloudgslb.netjcloudimg.comjcloudimg.netjcloudlb.comjcloudlb.netjcloudlive.comjcloudlv.comjcloudoss.comjcloudresolve.comjcloudresolve.netjcloudss.comjcloudstatic.comjcloudstatic.netjcloudvideo.comjcloudvideo.net	jclps.com
-jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
-jd.com	jd.com.cn	jd.hk	jd.id	jd.rujd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
+jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
+!cn
+jd.com	jd.com.cnjd.hk
+!cnjd.id
+!cnjd.ru
+!cnjd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
 jdgslb.com
 jdgslb.netjdh.comjdjinrong.com
 jdl.cnjdl.com
@@ -7468,8 +7564,10 @@ anitama.cnanitama.net
 b23.tv	bigfun.cnbigfunapp.cn	bili22.cnbili2233.cn	bili23.cn	bili33.cnbiliapi.combiliapi.netbilibili.ccbilibili.cnbilibili.combilibili.netbilibili.tv
 !cnbilibilipay.cnbilibilipay.combilicdn1.combilicdn2.combilicdn3.combilicdn4.combilicdn5.com
 biligo.combiliimg.combiliintl.com
-!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk	hdslb.com	hdslb.orgim9.commaoercdn.com
-mincdn.comyo9.com$ upos-hz-mirrorakam.akamaized.netciweimao.comhbooker.comkuangxiangit.comcowlevel.net	cdncl.netbiji.com
+!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk
+!cn	hdslb.com	hdslb.orgim9.commaoercdn.com
+mincdn.comyo9.com- upos-hz-mirrorakam.akamaized.net
+!cnciweimao.comhbooker.comkuangxiangit.comcowlevel.net	cdncl.netbiji.com
 ddmogo.com
 igetget.cnigetget.comluojilab.com	mogoo.com
 sao.cnsaolife.comdmzj.com	douyu.comdouyu.tvdouyucdn.cndouyucdn2.cndouyuscdn.comdouyutv.comdtstatic.comduitang.comgamersky.com
@@ -7519,6 +7617,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cn	muwai.com	pplive.cn
 pplive.compptv.comqingting.fmqtfm.cn	sfacg.com
@@ -7625,6 +7724,8 @@ afdian.netafdiancdn.comagora.io
 agoraio.cnagoralab.co
 antutu.combitauto.combitautoimg.comcheyisou.com	yiche.com	yccdn.comshimo.im	yuque.com	doc88.com	docin.com
 douding.cn&^ntp([1-7])?\.aliyun\.com$
+cntime.izatcloud.net
+cntime.xtracloud.net
 cn'^ntp([1-5])?\.tencent\.com$
 cncn.pool.ntp.org
 cnntp.neu.edu.cn
@@ -7763,7 +7864,13 @@ g.tbcdn.cn
 ads$v6-adashx.ut.taobao.com
 adsw.m.taobao.com
 adsyiliao.hupan.com
-adsalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.comalibabadns.com
+adsalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.comalibabadns.com
 alicdn.comalicloudapi.comalidayu.com
 alidns.comalikunlun.comaliyun-inc.comaliyun-iot-share.com
 aliyun.comaliyuncdn.comcdngslb.comhichina.comica-alliance.orgkunlunaq.comkunlunar.comkunlunca.comkunluncan.comkunlunea.comkunlungem.comkunlungr.comkunlunhuf.comkunlunle.comkunlunli.comkunlunno.comkunlunpi.comkunlunra.comkunlunsa.comkunlunsc.comkunlunsl.comkunlunso.comkunlunta.comkunlunvi.comkunlunwe.commxhichina.commyalicdn.com,oss-ap-northeast-1.aliyuncs.com
@@ -7781,8 +7888,9 @@ aliyun.comaliyuncdn.comcdngslb.comhichina.comica-allianc
 !cn'oss-me-east-1.aliyuncs.com
 !cn'oss-us-east-1.aliyuncs.com
 !cn'oss-us-west-1.aliyuncs.com
-!cnddurl.todingding.xindingtalk.cndingtalk.comdingtalk.netdingtalkapps.comlaiwang.comlwurl.toteambition.comteambition.netteambitionapis.com	uc.cn	ucweb.com25pp.com	56che.com	95095.com9game.cn
-aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+!cnddurl.todingding.xindingtalk.cndingtalk.comdingtalk.netdingtalkapps.comlaiwang.comlwurl.toteambition.comteambition.netteambitionapis.com	uc.cn	uc123.com	ucweb.comuczzd.cn25pp.com	56che.com	95095.com9game.cn
+aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+!cn
 aliimg.com
 alikmd.comalimama.comalimebot.com
 alimei.comalios.cn	alipay.cn
@@ -7799,7 +7907,8 @@ jhgtgb.com
 kanbox.com
 lazada.comliangxinyao.comm-now.cn
 maitix.com	mdeer.commei.commiaostreet.com	mshare.ccnic.xinphilanthropy.xinphpwind.comphpwind.netqingtingtrip.com	rexpos.cnsaee.org.cnshenjing.com	shuqi.comshuqireader.comsparenode.com	supet.com	ttpod.comwandoujia.comxin.xinxinlingshou.cnyowhale.comyunos-inc.com	yunos.comyushanfang.com
-zuodao.comaliexpress.comaliexpress.rualipayplus.com	alipay.hk
+zuodao.comaliexpress.comaliexpress.ru
+!cnalipayplus.com	alipay.hk
 !cnalipaymo.com
 !cnalicloudccp.com
 alipan.comaliyundrive.comaliyundrive.netcainiao.comcainiao.com.cncainiao-inc.comfreshhema.comhemamax.com
@@ -7808,9 +7917,11 @@ fund123.cn
 antfin.comantgroup.comantgroup-inc.cn	sm.cn1688.cometao.comjuhuasuan.comlingshoujia.com
 mashort.cnpailitao.com
 taobao.com
-taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.rutmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
+taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.ru
+!cntmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
 feizhu.com
-fliggy.com	fliggy.hk
+fliggy.com	fliggy.hk
+!cn
 iuynfg.coma-map.cna-map.co
 a-map.link	a-map.vipacloudrender.comamap.comamapauto.comanav.comautonavi.com	gaode.com	xiami.comxiami.fm	xiami.net
 koubei.comzhisheng.comnpmmirror.comgoofish.com	b3log.orga.baidu.com
@@ -7958,7 +8069,7 @@ koubei.comzhisheng.comnpmmirror.comgoofish.com	b3log.org
 adszuoyebang.cczuoyebang.com
 zybang.com	baidu
 91.com
-aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaidubce.combaiducontent.combaidupcs.combaidustatic.com
+aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaiduapp.combaidubce.combaiducontent.combaidupcs.combaidustatic.com
 baifae.combaifubao.com
 bcebos.combdcloudapi.com	bdimg.combdstatic.combdtjrcv.com	bdydns.cn
 bdydns.com
@@ -7969,7 +8080,11 @@ hao123.comhao123img.com
 hao222.com
 haokan.comjomocdn.netjomodns.com
 mipcdn.com	nuomi.comquyaoya.com
-shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.com	sl916.com
+shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.comduxiaoman-int.comduxiaoman.comduxiaomanfintech.comduxiaomantech.comdxm-cdn.comdxm-int.com
+dxmlcf.comdxmlcfintech.com
+dxmpay.comdxmstatic.com
+dxmyqh.com
+paydxm.com	sl916.com
 cnbluepoch.com
 cnactivity-zhendingtech.comchangdunovel.comfanqienovel.comfanqieopen.comfanqieopenpic.comfanqieopenstatic.comfanqieopenvod.comfanqiesdk.comfanqiesdkpic.comfanqiesdkstatic.comfanqiesdkvod.comfqnovel.comfqnovelim.comfqnovel-op.comfqnovelop.comfqnovelpic.comfqnovelstatic.comfqnovelvod.comihaohaoxuexi.com
 muyewx.comnovelfm.comnovelfmpic.comnovelfmstatic.comnovelfmvod.comqznovel.comqznovelpic.comqznovelstatic.comqznovelvod.comp3-novel.byteimg.comp6-novel.byteimg.com(ads3-normal-hl.zijieapi.com
@@ -8080,7 +8195,11 @@ ixigua.comixiguavideo.comixgvideo.combdxiguaimg.combdxig
 feishu.netfeishucdn.comfeishupkg.com
 wukong.comwukongwenda.cnwukongwenda.comdcarapi.comdcarimg.comdcarlive.comdcarstatic.comdcarvod.com
 dcdapp.comdongchedi.comdongchediapp.com	365yg.comgogokid.com.cngogokid.com	pipix.com	faceu.comulikecam.com
-rsproxy.cndidi-food.comdidi.cndidialift.comdidiaustralia.blogdidichuxing.comdidiglobal.comdidimobility.co.jpdidistatic.comdiditaxi.com.cn
+rsproxy.cndidi-food.com
+!cndidi.cndidialift.comdidiaustralia.blog
+!cndidichuxing.comdidiglobal.com
+!cndidimobility.co.jp
+!cndidistatic.comdiditaxi.com.cn
 udache.comxiaojukeji.comdji.comdji.net
 djicdn.com
 djiops.comdjiservice.orgskypixel.com
@@ -8145,8 +8264,10 @@ erp321.net	jsterp.cnjugongdan.comjushuitan.cnjushuitan.co
 scm121.com
 shopss.comshuiyaohuo.cnshuiyaohuo.com	surerp.cn
 surerp.com
-sursung.cnsursung.comcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comtestplus.cn
-wps.cnwps.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
+sursung.cnsursung.comcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comxoyocdn.comcbjq.comtestplus.cn
+wps.cnwps.com	wpscdn.cn
+wpscdn.com
+kscord.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
 ks-cdn.comks-cdn1.com	ksyun.comksyuncdn.comksyungslb.com
 lenovo.net
 baiying.cnbaiying.com.cncftsupport.comcon-c-hybris.lenovo.comileapcloud.comlenovocloudos.com	lenovo.cn
@@ -8169,7 +8290,7 @@ youdao.comzhuanzfx.comanalytics.163.com
 adscrash.163.com
 ads crashlytics.163.com
 ads	g.163.com
-adscoloros.comfinzfin.com
+adsallawntech.comcoloros.comfinzfin.com
 heytap.comheytapcs.comheytapdownload.comheytapimage.comheytapmobi.com
 myoppo.comnearme.com.cnoppo.cnoppo.com	oppo.mobioppodigital.com	oppoer.meoppomobile.comoppopay.comopposhop.cn
 realme.comrealmebbs.comrealmemobile.comoneplus.com
@@ -8358,7 +8479,7 @@ yufuid.netyunjitele.com.+\.dnse[0-5]\.(cn|com)$'#.+\.tdnsv([1-9]
 adspush.qq.com
 adspgdt.gtimg.cn
 adsugdtimg.com
-adsopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+adsopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cnbattlecare.net
 cngameitop.com
 cngameloop.com
@@ -8457,17 +8578,18 @@ scescdn.cn
 yuewen.comhongxiu.comlrts.meqdmm.com
 qidian.comreadnovel.comtingbook.comwebnovel.com
 xs8.cnxxsy.netqq.xn--fiqs8sxn--r70as2s.xn--fiqs8s
-apcdns.netfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
+apcdns.net	cdn-go.cnfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
 qq.com	qq.com.cnqq.wang
 qqmail.com	qzone.com
 rtx.com.cnservicewechat.com
 tencent.cntencent.co.id
-!cntencent.comtencent.com.cntencent.com.hktencent.nettencent.net.cntencentmusic.com
-tenpay.com	tfogc.com
+!cntencent.comtencent.com.cntencent.com.hk
+!cntencent.nettencent.net.cntencentmusic.com
+tenpay.com	tfogc.comtlivepush.comtxlivecdn.com
 wechat.comwechatpay.cn
 weiyun.comwetv.vip
 !cnwetvinfo.com
-!cnwetv.qq.com
+!cnwxlivecdn.comwetv.qq.com
 !cnalloyteam.comimweb.ioivweb.io	fyeds.com
 fyeds0.com
 fyeds1.com
@@ -8495,10 +8617,11 @@ fyeds9.comfymall0.comfymall1.comfymall4.comfymall7.com
 adstracking.miui.com
 ads
 mi-img.com
-mi.com	mifile.cnmiui.com
+mi.com	mifile.cn
+mijia.techmiui.com
 miwifi.com	xiaomi.cn
 xiaomi.com
-xiaomi.netxiaomiev.comxiaomimobile.comxiaomiyoupin.com
+xiaomi.netxiaomiev.comxiaomimobile.comxiaomixiaoai.comxiaomiyoupin.com
 saxyit.com
 sandai.netthunderurl.com
 xunlei.com	00cdn.com	88cdn.com	p2cdn.comthundercdn.comxycloud.com	xycdn.comnubia.cn	nubia.comredmagic.com
@@ -8506,12 +8629,22 @@ zte.com.cnztemall.com	ztems.combbs.ztedevices.comwww.zted
 !cn	ezpro.pro10099.com.cn
 chn.cn	ahitv.com	cqccn.comgcable.com.cnsc96655.com	isxtv.comsdgdwljt.com10086.cn139.comchinamobile.comchinamobileltd.commigucloud.commigu.cn
 cmvideo.cnmiguvideo.comandfx.cn	andfx.net
-cmicrwx.cncmpassport.comfetion-portal.comfetionpic.commmarket.commmarket6.com
-ctexcel.cactexcel.comctexcel.com.hk
-ctexcel.fr
-ctexcel.us
-189.cnchinatelecom-h.comchinatelecom.com.cnchinatelecomglobal.com
-chntel.com	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hkchinaunicomglobal.commychinaunicom.com	wo.cn	wo.com.cnwo116114.comjikipedia.comqiuwen.wikishidianbaike.com	51nod.com
+cmicrwx.cncmpassport.comfetion-portal.comfetionpic.commmarket.commmarket6.com
+ctexcel.ca
+!cnctexcel.com
+!cnctexcel.com.hk
+!cn
+ctexcel.fr
+!cn
+ctexcel.us
+!cn
+189.cnchinatelecom-h.comchinatelecom.com.cn#chinatelecomglobal.com
+!cn
+chntel.comchinatelecomhk.com
+!cn	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hk
+!cn"chinaunicomglobal.com
+!cnmychinaunicom.com	wo.cn	wo.com.cnwo116114.com	cuniq.com
+!cnjikipedia.comqiuwen.wikishidianbaike.com	51nod.com
 acwing.comhihocoder.comjisuanke.comluogu.com.cnoi-wiki.comopenjudge.cn
 uoj.ac	vijos.orgleetcode.cnleetcode-cn.comlingkou.xyzlingkou.com
 lingkou.cn
@@ -8664,7 +8797,7 @@ pubyun.com	qc188.comqcds.comqd8.comqd-metro.comqh24
 qschou.com
 qtmojo.com
 qudong.com
-qugame.com	qunar.comqunarzz.comqunjielong.comqyer.comrfchost.comrockyenglish.comrong360.comrtbasia.com	ruan8.com
+qugame.com	qunar.comqunarzz.comqunjielong.comqyer.comrockyenglish.comrong360.comrtbasia.com	ruan8.com
 runoob.comrzrc114.com	saibo.comsanguosha.com
 sanwen.net	scdng.comscoregg.com
 sczsxx.comsdo.comsec-wiki.com
@@ -8767,6 +8900,8 @@ comodo.netcomodoca.comcomodoca2.comcomodoca3.comcomodoca
 CONTENTFULcontentful.comctfassets.net
 H
 COOLAPKcoolapk.comcoolapkmarket.comcoolapkmarket.net
+_
+COREL	corel.com	corel.netcoreldraw.appcoreldraw.comcorelstore.com
 O
 COSTCOcostco-static.com
 costco.comcostcobusinessdelivery.com
@@ -8791,17 +8926,31 @@ gitbook.cn
 gitchat.cngitcode.comgitcode.net	iteye.comkaifayun.comprogrammer.com.cnprogrammer.net.cn
 4
 CSIScsis.orgcsis-prod.s3.amazonaws.com
-^
-CTEXCEL
-ctexcel.cactexcel.comctexcel.com.hk
-ctexcel.fr
-ctexcel.us
-Î
-CTRIPc-ctrip.comcolinker.comctrip.cnctrip.co.idctrip.co.krctrip.co.th	ctrip.comctrip.com.hkctrip.myctrip.sgctripbiz.comctripbuy.hkctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.twizuchebao.com	lvtds.com	shuntu.cn
+ã
+CTEXCEL
+ctexcel.ca
+!cnctexcel.com
+!cnctexcel.com.hk
+!cn
+ctexcel.fr
+!cn
+ctexcel.us
+!cn
+º
+CTRIPc-ctrip.comcolinker.comctrip.cnctrip.co.id
+!cnctrip.co.kr
+!cnctrip.co.th
+!cn	ctrip.comctrip.com.hk
+!cnctrip.my
+!cnctrip.sg
+!cnctripbiz.comctripbuy.hk
+!cnctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.tw
+!cnizuchebao.com	lvtds.com	shuntu.cn
 skysea.com	suanya.cn
 suanya.com
 tieyou.com
-toptown.cntoursbms.comtrip.comtripcdn.com
+toptown.cntoursbms.comtrip.com
+!cntripcdn.com
 vipdlt.com
 
 
@@ -8888,8 +9037,12 @@ DEVIANTARTdeviantart.comdeviantart.netda-files.com
 DGTLE	dgtle.com
 
 DIDA365dida365.com
-ﬂ
-DIDIdidi-food.comdidi.cndidialift.comdidiaustralia.blogdidichuxing.comdidiglobal.comdidimobility.co.jpdidistatic.comdiditaxi.com.cn
+É
+DIDIdidi-food.com
+!cndidi.cndidialift.comdidiaustralia.blog
+!cndidichuxing.comdidiglobal.com
+!cndidimobility.co.jp
+!cndidistatic.comdiditaxi.com.cn
 udache.comxiaojukeji.com
 Æ
 DIGICERT	dcocsp.cn
@@ -9063,8 +9216,9 @@ pvzgw2.compvzheroes.comseaofsolitude.comsimcity-buildit.com
 skate2.comspearhead.krstarwarsfallenorder.comstarwarsjedifallenorder.comstarwarstheoldrepublic.comswjedifallenorder.com	swjfo.com	swtor.com	swtor.net
 mysims.comthesims.comthesims3.comthesims4.comthesimssocial.comtitanfall.commythicentertainment.commythicentertainment.netmythicgames.comultimaonline.com
 uo.comuoherald.comxdsummit.comea.tt.omtrdc.neteaassets-a.akamaihd.net
-î
-	EASTMONEY1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hkguba.com.cn
+ù
+	EASTMONEY1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hk
+!cnguba.com.cn
 )
 EASYLISTeasylist.tolanik.us
 ¡:
@@ -9407,7 +9561,7 @@ gcores.com
 GEETESTgeetest.com#geetest.datasink.sensorsdata.cn
 `
 GEMFURY	fury.blogfury.cofury.dev	fury.helpfury.iogemfury.com
-ºª
+√√
 GEOLOCATION-!CNcolorfulstage.comcrypton.co.jplapriere.jpmagicalmirai.commikuexpo.com
 piapro.netsnowmiku.combowlroll.netpubmatic.compubmatic.co.jpads.pubmatic.com
 adstaboola.comcensorship.nocitizenlab.cacitizenlab.orgepicbrowser.comapplecensorship.comfreebrowser.orgfreewechat.comfreeweibo.comfreezhihu.orggreatfire.orgpao-pao.netwikiunblocked.orghaveibeenpwned.compwnedpasswords.comgetlantern.org
@@ -9710,10 +9864,16 @@ myatos.netcertificat2.comtrendmicro.com	gandi.netalphassl
 cnglobalsign.co.ukglobalsign.com
 cnglobalsign.com.auglobalsign.com.brglobalsign.com.hkglobalsign.com.sgglobalsign.esglobalsign.euglobalsign.frglobalsign.netglobalsign.nlglobalsigncdn.com
 cn4(cdn.globalsigncdn.com.cdn.cloudflare.net
-cngodaddy.comx.cogodaddypki.googclients1.google.compki.google.comcrl.pki.goog
+cngodaddy.comx.cogodaddypki.goog!pki-goog.l.google.com
+cn
+c.pki.goog
+cn
+i.pki.goog
+cn
+o.pki.goog
+cnpublicca.googleapis.com#preprod-publicca.googleapis.comclients1.google.compki.google.comcrl.pki.goog
 cncrls.pki.goog
 cnocsp.pki.goog
-cn!pki-goog.l.google.com
 cneca.hinet.netgtlsca.nat.gov.twhongkongpost.gov.hkecert.gov.hkidentrust.comidentrust.co.ukidentrust.net	lencr.orgletsencrypt.comletsencrypt.org
 msocsp.comcrl.microsoft.commscrl.microsoft.comocsp.microsoft.comoneocsp.microsoft.comwww.microsoft.com
 cnsecom.co.jpsecomtrust.netcybertrust.co.jpcybertrust.ne.jpmanagedpki.ne.jpenterprisessl.comhackerguardian.cominstantssl.com	oemssl.cn
@@ -9975,7 +10135,7 @@ egghead.io	ebi.ac.ukembl-hamburg.deembl.deembl.frem
 kaggle.com	kaggle.io
 kaggle.netkaggleusercontent.comkhanacademy.orgkastatic.org
 knovel.comlaracasts.comlibgen.life
-libgen.fungen.lib.rus.ec	libgen.is	libgen.me	libgen.rs	libgen.stlifewire.commasterclass.commzed.comoreil.lyoreilly.comoreilly.com.cn
+libgen.funlibrary.lolgen.lib.rus.ec	libgen.is	libgen.me	libgen.rs	libgen.stlifewire.commasterclass.commzed.comoreil.lyoreilly.comoreilly.com.cn
 cnoreilly.revieworeillystatic.com
 orl.lyactivelearnprimary.co.ukactivelearnprimary.com.auactiveteachonline.comaddison-wesley.chadobepress.ch
 btec.co.ukciscopress.chconnectionsacademy.comconnectionseducation.comconnectionslearning.comdombosco.com.brecpa.frescapestudios.co.ukilongman.comintegral7.com'#internationalconnectionsacademy.com
@@ -9987,10 +10147,11 @@ pearson.clpearson.co.inpearson.co.jppearson.compearson.c
 pearson.es
 pearson.fr
 pearson.plpearsonactivelearn.compearsonassessment.bepearsonassessment.depearsonassessment.dkpearsonassessment.frpearsonassessment.nlpearsonassessment.nopearsonassessment.sepearsonassessments.compearsoncanada.capearsonclinical.bepearsonclinical.capearsonclinical.co.ukpearsonclinical.com.aupearsonclinical.com.brpearsonclinical.depearsonclinical.dkpearsonclinical.espearsonclinical.eupearsonclinical.frpearsonclinical.inpearsonclinical.nlpearsonclinical.nopearsonclinical.sepearsoncmg.compearsoncred.compearsoned.co.nzpearsoned.compearsoneducacion.netpearsoneducationbooks.compearsonelt.chpearsonelt.compearsonenespanol.compearsonhighered.compearsoninstitute.ac.zapearsonlongman.chpearsononlineacademy.compearsonperu.pepearsonplaces.com.au%!pearsonschoolsandfecolleges.co.ukpearsonvue.compearsonvue.netpobl-content.com	pvue1.com	pvue2.comquatrum.com.brstark-verlag.chtalentlens.comthemathsfactor.comxn--pearsonenespaol-brb.comsitepoint.comskillshare.comspiceworks.comspiceworksstatic.comtechtimes.comted.com
-tedcdn.comudacity.com	udemy.comudemycdn.comw3schools.comchemequations.comabema.ioabema.tvabema-tv.com	adx.promoameba.jpamebame.comamebaownd.comamebaowndme.com	ameblo.jpbucketeer.jpdokusho-ojikan.jphayabusa.devhayabusa.iohayabusa.mediawinticket.jpabematv.akamaized.net#ds-linear-abematv.akamaized.net ds-vod-abematv.akamaized.net linear-abematv.akamaized.netvod-abematv.akamaized.netamc.comamcn.comamcnetworks.comamcplus.comrne5a6ae085b6c43020dea230eb0c0ecc33a188227507da97b8ecc05eb8beace6.us-east-1.prod.service.minerva.devices.a2z.com	9anime.cz	9anime.id	9anime.to	9anime.wsanimedao-tv.comcrunchyroll.comfunimation.comgogo-load.comgogoanime.vcgogoanime.wikigogocdn.net
-hidive.com
-vrv.co
-age.tv	agedm.orgao3.orgarchiveofourown.orgarchiveofourown.comarchiveofourown.net
+tedcdn.comudacity.com	udemy.comudemycdn.comw3schools.comchemequations.comabema.ioabema.tvabema-tv.com	adx.promoameba.jpamebame.comamebaownd.comamebaowndme.com	ameblo.jpbucketeer.jpdokusho-ojikan.jphayabusa.devhayabusa.iohayabusa.mediawinticket.jpabematv.akamaized.net#ds-linear-abematv.akamaized.net ds-vod-abematv.akamaized.net linear-abematv.akamaized.netvod-abematv.akamaized.netamc.comamcn.comamcnetworks.comamcplus.comrne5a6ae085b6c43020dea230eb0c0ecc33a188227507da97b8ecc05eb8beace6.us-east-1.prod.service.minerva.devices.a2z.com	9anime.cz	9anime.id	9anime.to	9anime.ws
+age.tv	agedm.orgagedm.tvagefans.com
+agemys.org	agedm.appanimedao-tv.comcrunchyroll.comfunimation.com
+vrv.cogogoanime.vcgogoanime.wikigogoanime3.cogogotaku.infogogo-load.comgogocdn.net
+hidive.comao3.orgarchiveofourown.orgarchiveofourown.comarchiveofourown.net
 att.tvatttvnow.comattwatchtv.comdirectv.com	dtvce.comnettyinternet.combahamut.akamaized.netbahamut.com.twgamer.com.twgamer2-cds.cdn.hinet.netgamer-cds.cdn.hinet.netbandcamp.com
 bcbits.comboomerang.com
 wbdnbo.netcatchplay.comtra-ww000-cp.akamaized.net
@@ -10173,8 +10334,8 @@ xboxab.comxboxgamepass.comxboxgamestudios.comxboxlive.cn
 cnxboxlive.com
 xboxone.coxboxone.com
 xboxone.euxboxplayanywhere.comxboxservices.comxboxstudios.com
-xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
-papermc.ioplanetminecraft.comprotondb.comspeedrun.comsteamdb.info	ptzwx.comquanben-xiaoshuo.com
+xbx.lvynoproject.netdodi-repacks.downloaddodi-repacks.sitefabricmc.netfanatical.comfitgirl-repacks.sitegame-repack.sitehumblebundle.comloverslab.comminecraft.wikimodrinth.comnexusmods.com
+papermc.ioplanetminecraft.comprismlauncher.orgprotondb.comquiltmc.orgspeedrun.comsteamdb.info	ptzwx.comquanben-xiaoshuo.com
 quanben.iodailymotion.comdm-event.net	dmcdn.netdandanzan.cc	nunuyy.ccdazn-api.comdazn.com
 dazndn.com
 indazn.comindaznlab.comdeviantart.comdeviantart.netda-files.com*&content-ause1-ur-discovery1.uplynk.comdisco-api.comdiscoveryplus.comabc-studios.comabc.comedgedatg.combamgrid.comdmed.technologydtci.codtci.technology
@@ -10187,7 +10348,7 @@ dilcdn.comdisney-asia.comdisney-discount.comdisney-plus.net!
 dssott.comgo-disneyworldgo.com
 go.com	mickey.tvmoviesanywhere.comnomadlandmovie.chplaymation.comshopdisney.comshops-disney.comsorcerersarena.comspaindisney.comstar-brasil.comstar-latam.comstarwars.com#starwarsgalacticstarcruiser.comstarwarskids.comstreamingdisney.netthestationbymaker.comthisispolaris.comwatchdisneyfe.comgimy.ccgimy.cogimy.togimy.tvgoodreads.comgr-assets.comapl-hamivideo.cdn.hinet.nethamivideo.hinet.net&"mobilelive-hamivideo.cdn.hinet.netpvr-hamivideo.cdn.hinet.netscc.ott.hinet.net"static-hamivideo.cdn.hinet.net&"tvcastlive-hamivideo.cdn.hinet.net#weblive-hamivideo.cdn.hinet.netcinemax.comforthethrone.comhbo.comhboasia.comhbogo.co.th	hbogo.comhbogo.euhbogoasia.comhbogoasia.hkhbogoasia.idhbogoasia.phhbogoasia.sghbogoasia.tw
 hbomax.comhbomaxcdn.com
-hbonow.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
+hbonow.commax.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
 112263.comcallhulu.comfindyourlimits.comfreehulu.com	hooloo.tv	hoolu.comhoolu.tvhu1u.comhuloo.cchuloo.tvhulu.comhulu.jphulu.tvhulu.ushuluaction.com
 huluad.comhuluapp.comhuluasks.comhulucall.comhulufree.comhulugans.comhulugermany.com
 hulugo.com
@@ -10212,6 +10373,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cnbiggggg.com	mudvod.tvnbys.tvnbys1.tvnbyy.tvnewpppp.comnivod.tv	nivodi.tv
 nivodz.com
@@ -10358,7 +10520,7 @@ pixnet.pro	pixnet.tw
 pixplug.in
 ptt.ccptt2.ccptt3.ccpoe.com
 poecdn.net	qr.ae	quora.comquoracdn.netredd.itreddit.app.link
-reddit.comreddithelp.comredditmail.comredditmedia.comredditstatic.comredd.itreddit.map.fastly.net
+reddit.comredditblog.comreddithelp.comredditinc.comredditmail.comredditmedia.comredditspace.comredditstatic.comredditstatus.comreddit.map.fastly.net
 yamibo.com	18p2p.comavsforum.comdisp.cc	doom9.orgeyny.comgab.comhydrogenaud.iomewe.com
 parler.compincong.rockssafechat.com
 sis001.comv2ex.combsky.appbsky.networkbsky.socialaboutfacebook.com accessfacebookfromschool.comacebooik.comacebook.comadvancediddetection.comaskfacebook.netaskfacebook.org
@@ -10710,7 +10872,7 @@ fanfox.netfangsung.comfanhaodian.comfanhowab.buzzfank.ru
 fans17.comfansnudes.com
 fansone.cofansteek.comfantasiasguatemala.comfantasti.ccfap-xxx.com	fap18.net
 fap666.comfapality.com
-fapcat.comfapdude.comfaperoni.comfapforfun.netfaphdporn.comfaphouse.comfapmovz.comfapnado.comfapopedia.netfappcelebs.comfappeningbook.comfappeningthots.comfappenist.comfapphub.com
+fapcat.comfapdude.comfapello.comfaperoni.comfapforfun.netfaphdporn.comfaphouse.comfapmovz.comfapnado.comfapomania.comfapopedia.netfappcelebs.comfappeningbook.comfappeningthots.comfappenist.comfapphub.com
 fapporn.mefaproulette.cofaproulette.onlinefapsafari.comfapster.xxxfapteencam.com
 fapvid.comfareastpornhub.comfastindianporn.comfatstube.comfavelaporno.comfavepornmovs.comfavepornvids.comfavjapaneseporn.comfbiqiyiav.buzz	fbjav.comfbooktaiwan.com	fc2ppv.tvfcw.xxx	fcww0.com	feet9.com
 fei.rufeipang.linkfemalestars.comfemdomcc.net
@@ -10853,7 +11015,7 @@ ksyp10.comku77.xyzkuaimao-app.comkuanrenxs.comkum.com
 la-mama.rulacomics.org
 ladies.comladybaba.netladyboygold.comladyboygold.euladyboypornonly.comlanasbigboobs.comlangsuirs.com
 lanmdh.netlanniser-ylo.shoplaosijifuli9009.toplaowang.viplargecamtube.comlargeporntube.comlatinaabuse.comlatintubeporn.comlaxd.comlazymike.comlbfmaddiction.com
-lbtube.comlcgirls.comleakedmeat.comleaksmodels.comleakxxx.comleliao1.comlemoncams.comlenkino.xxxlenporno.redleporno.orglepornochaud.comlepornofrais.comlesbian8.comlesbianpics.orglesbianpornvideos.comlesbiansubmission.comlesboerotica.net
+lbtube.comlcgirls.comleakedmeat.comleakedzone.comleaksmodels.comleakxxx.comleliao1.comlemoncams.comlenkino.xxxlenporno.redleporno.orglepornochaud.comlepornofrais.comlesbian8.comlesbianpics.orglesbianpornvideos.comlesbiansubmission.comlesboerotica.net
 letfap.comletmejerk.comletmejerk.funletsdoeit.comletsfuckme.netletsjerk.cclettherebeporn.comlevelsex.comlewdthots.comlewdvrgames.comlewdweb.net
 lezpoo.comlgbtq.gameslianhonghong.comlianjiajr.netliboggirls.netlibraryofthumbs.comlifeselector.comlightxxxtube.comlihksnap.comlikeseiyu.comliketruyen.netlikuoo.videolilhumpers.com
 liliav.comlilith-soft.comlimer.tw
@@ -10918,7 +11080,7 @@ norsk.mobinoveltrove.comnovinhabucetuda.comnovinhagostosa10.co
 nowjav.com	nozomi.lanrdh99.buzznrooms-dh.sbsnsfw.xxx
 nsfw247.tonsfwmemes.comntten-mg.buzz
 nu-bay.comnu36.vipnubilefilms.comnubiles-casting.comnubiles-porn.comnubiles.netnubileset.comnubilesunscripted.comnuddess.comnude-pics.orgnude-share.comnude.hunudeandhairy.comnudebeachpussy.comnudecams.camnudecelebforum.comnudedrawer.comnudedxxx.comnudeeroticteens.comnudefiles.netnudegfporn.comnudekenya.comnudelive.comnudematurewomenpics.comnudemilfporn.com
-nudes7.comnudespree.comnudeteen.orgnudeteenboys.netnudeteenladies.comnudevietnam.comnudevista.bestnudevista.clubnudevista.funnudevista.linknudevista.vipnudewifeporn.comnudewomenpics.netnudify.onlinenudistbeachporn.comnudistic.comnudistlog.comnudistsexvideos.comnudistvoyeurbeach.comnudity911.comnudography.comnuespournous.com	nuita.netnukemanga.comnuki-dokoro.com	nurgay.tonurumassage.netnurxxx.mobinushemale.comnuuporn.com	nuvid.com	nwxs8.comnyahentai.re	nym97.netobutsumania.com	obutu.comohentai.orgohgratisporrfilm.comohpornocasero.comohpornovideo.comohsesso.comohsexfilm.comohsexotube.comohyeah1080.com
+nudes7.comnudespree.comnudeteen.orgnudeteenboys.netnudeteenladies.comnudevietnam.comnudevista.bestnudevista.clubnudevista.funnudevista.linknudevista.vipnudewifeporn.comnudewomenpics.netnudify.onlinenudistbeachporn.comnudistic.comnudistlog.comnudistsexvideos.comnudistvoyeurbeach.comnudity911.comnudography.comnudostar.tvnuespournous.com	nuita.netnukemanga.comnuki-dokoro.com	nurgay.tonurumassage.netnurxxx.mobinushemale.comnuuporn.com	nuvid.com	nwxs8.comnyahentai.re	nym97.netobutsumania.com	obutu.comohentai.orgohgratisporrfilm.comohpornocasero.comohpornovideo.comohsesso.comohsexfilm.comohsexotube.comohyeah1080.com
 oiobbs.com
 ok.xxxokazudouga.blog.jpokazudouga.tokyookkisokuho.comolder-women-movies.comolder-women-porn.com
 older.tube	oldje.comoli-school.comomafotze.com	omg.adultomg.blogomgteens.comomorashi.jpomorashi.orgonahodouga.comonani-daisuki.com
@@ -11173,6 +11335,8 @@ ntp.nat.ms
 ntp.nic.czntp.nict.jpntp.ripe.net
 ntp.se
 ntp.ufe.czpool.ntp.orgtime.cloudflare.comtime.nrc.catime.windows.com&^ntp([1-7])?\.aliyun\.com$
+cntime.izatcloud.net
+cntime.xtracloud.net
 cn'^ntp([1-5])?\.tencent\.com$
 cncn.pool.ntp.org
 cnntp.neu.edu.cn
@@ -11303,13 +11467,13 @@ blazor.netbotframework.comcodethemicrobit.comdevopsassessment.
 cn
 sankie.netsqlserveronlinux.comtimelinestoryteller.comuwpcommunitytoolkit.comvisualstudio-staging.comvisualstudio.comvisualstudio.covisualstudio.co.ukvisualstudio.euvisualstudio.netvfsforgit.comvfsforgit.orgvsassets.io
 vscode.devvscode-cdn.netvscode-unpkg.netxamarin.comaz764295.vo.msecnd.net)%bingsettingssearch.trafficmanager.netdefault.exp-tas.comdeveloper.microsoft.com'#download.visualstudio.microsoft.comdtlgalleryint.cloudapp.net poshtestgallery.cloudapp.net"psg-int-centralus.cloudapp.netpsg-int-eastus.cloudapp.netrink.hockeyapp.net+'vscode-sync-insiders.trafficmanager.net"vscode-sync.trafficmanager.net vscode.blob.core.windows.netvscode.search.windows.net vsmarketplacebadge.apphb.commongodb.commongodb.org	nginx.com	nginx.org	nixos.orgchatgpt.comoaistatic.comoaiusercontent.com
-openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net@<^chatgpt-async-webps-prod-eastus-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
+openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net=9^chatgpt-async-webps-prod-\s+-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
 ads openaicom.imgix.net
 adsopenwrt.orglede-project.orgosdn.netperl.apache.orgperl.orgcpan.orgmetacpan.org
 modperl.plpolymer-project.orgpolymerproject.org	pycon.orgpypa.iopypi.iopypi.org
 python.orgpythonhosted.orgpiwheels.org	qt.ioqt-project.orgreadthedocs-hosted.comreadthedocs.comreadthedocs.ioreadthedocs.orgredis.ioredislabs.comremirepo.netruby-lang.orgrubygems.orgrust-lang.org	rustup.rs	crates.iodocs.rs
 redhat.com
-redhat.orgscala-lang.orgscala-sbt.orgsourcehut.org	sr.htaskubuntu.comblogoverflow.comcodeforaliving.iomathoverflow.netserverfault.comsstatic.netstackapps.comstackauth.comstackexchange.comstackmod.blogstackoverflow.blogstackoverflow.costackoverflow.comstackoverflow.emailstackoverflowbusiness.comstackoverflowcareers.comstacksnippets.netsuperuser.comtex-talk.netthesffblog.commystrikingly.comstrikingly.comstrikinglycdn.comopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+redhat.orgscala-lang.orgscala-sbt.orgsourcehut.org	sr.htaskubuntu.comblogoverflow.comcodeforaliving.iomathoverflow.netserverfault.comsstatic.netstackapps.comstackauth.comstackexchange.comstackmod.blogstackoverflow.blogstackoverflow.costackoverflow.comstackoverflow.emailstackoverflowbusiness.comstackoverflowcareers.comstacksnippets.netsuperuser.comtex-talk.netthesffblog.commystrikingly.comstrikingly.comstrikinglycdn.comopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cn
 termux.com
 termux.dev
@@ -11354,7 +11518,13 @@ fotolia.ccfotolia.com
 fotolia.tvfotolja.comfptolia.comgfotolia.commotolia.comphotolia.nettenbyfotolia.comvotolia.combluefootcms.commageconf.commageconf.com.uamagento.commagento.netmagentocommerce.commagentomobile.commarketing-cloud.commarketo.co.ukmarketo.commarketo.net
 marketo.tvmarketodesigner.commarketolive.com
 mktdns.commkto-c0100.commktorest.commktroute.commobilemarketo.com&"revenue-performance-management.comtoutapp.comcompresspdf.newpdf.newsign.new
-scene7.comalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.com amazon-adsystem.com
+scene7.comalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.com amazon-adsystem.com
 adsserving-sys.com
 ads
 a2z.org.cn
@@ -11769,7 +11939,7 @@ touchid.tvtouchid.wangtracking-location.comtruedepth3d.com
 cnwww.apple.com
 cnxp.apple.com
 cnasus.comasus.com.cn
-cnatlassian.comatlassian.netbitbucket.iobitbucket.orgstatuspage.ioaccbusiness.com
+cnasuscloud.comasuswebstorage.comatlassian.comatlassian.netbitbucket.iobitbucket.orgstatuspage.ioaccbusiness.com
 atandt.comatt-bundles.comatt-japan.comatt-mail.comatt-promotions.comatt-rsvp.comatt.cn
 cnatt.comatt.jobsatt.net
 att.tvattalascom.comattbelieves.comattbusiness.netattcenter.comattcollaborate.com
@@ -11811,7 +11981,7 @@ mysdn.info	mysdn.netnetacad.comnetacad.netnetwork-auth.cn
 versly.comvideochampion.comvirtuata.comwballiance.com!whyiwantciscotelepresence.comwifi-mx.comyoutubecisco.comapp-dynamics.comappdynamics.co.ukappdynamics.comappdynamics.deappdynamics.frappdynamics.infoappdynamics.jpappdynamics.org
 mearki.commeraki-go.com	meraki.hkmerakigo.com
 tail-f.com	tailf.comcisco.evergage.comciscolivehls-i.akamaihd.netclco.cc
-cloudc.onecloudcone.comcloudcone.netcollabora.co.ukcollabora.comcollabora.orgcollaboraoffice.com
+cloudc.onecloudcone.comcloudcone.netcollabora.co.ukcollabora.comcollabora.orgcollaboraoffice.com	corel.com	corel.netcoreldraw.appcoreldraw.comcorelstore.com
 cfblob.comcloudchoose.comcloudvolumes.com
 cmpaas.com
 cpedge.comcrit-staging.comexperience-vmware.comgemfire.netgeodesummit.comgetboxer.comgitstar.comgitstar.netgopivotal.netgreenplum.nethwslabs.comimmidio.comitfromtheinside.comlatamvmwareforum.compivotalinitiative.comsnapvolumes.comssdevrd.comvcanedge.comvcloudair.netvfabric.netvidmpreview.com
@@ -11890,7 +12060,7 @@ apture.comarea120.com
 asp-cc.comautodraw.combandpage.combaselinestudy.combaselinestudy.orgbazel.buildbdn.devbeatthatquote.com	blink.orgbrocaproject.com
 brotli.orgbumpshare.com
 bumptop.cabumptop.combumptop.netbumptop.orgbumptunes.comcampuslondon.com certificate-transparency.org
-chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgepisodic.comfeedburner.com
+chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgdocs.newepisodic.comfeedburner.com
 fflick.comfinanceleadsonline.com
 foofle.comfroogle.comfuchsia.dev	g-tun.comg.cn
 cng.co	g.dev
@@ -11918,11 +12088,13 @@ picasa.compicasaweb.compicasaweb.netpicasaweb.org
 picnik.compittpatt.com
 pixate.compostini.comprivacysandbox.comprojectara.comprojectbaseline.compublishproxy.comquestvisual.comquickoffice.comquiksee.com
 revolv.comridepenguin.comrun.appsavethedate.foo
-saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.comsnapseed.comsolveforx.com
+saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.com
+sheets.new
+slides.newsnapseed.comsolveforx.com
 stadia.devstcroixmosquito.comstcroixmosquitoproject.comstudywatchbyverily.comstudywatchbyverily.orgstxmosquito.comstxmosquitoproject.comstxmosquitoproject.netstxmosquitoproject.orgsynergyse.comtensorflow.org	tfhub.devthecleversense.comthegooglestore.comthinkquarterly.co.ukthinkquarterly.comthinkwithgoogle.comtiltbrush.comtxcloud.net	txvia.comunfiltered.newsuseplannr.comusvimosquito.comusvimosquitoproject.comvelostrata.com
 verily.comverilylifesciences.comverilystudyhub.comverilystudywatch.comverilystudywatch.org
 wallet.com	waymo.comwaze.comweb.appweb.devwebappfieldguide.comwebmproject.orgwebpkgcache.com
-webrtc.orgweltweitwachsen.dewhatbrowser.orgwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
+webrtc.orgweltweitwachsen.dewhatbrowser.org	whats.newwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
 x.teamxn--9kr7l.comxn--9trs65b.comxn--flw351e.comxn--ggle-55da.comxn--gogl-0nd52e.comxn--gogl-1nd42e.comxn--ngstr-lra8j.comxplr.cozukunftswerkstatt.dewww.recaptcha.net
 cn265.com
 cn2mdn-cn.net
@@ -12354,7 +12526,7 @@ qprize.comqualcomm-email.comqualcomm.cn
 cn*qualcomm.cn.cdn.cloudflare.net
 cnqualcomm.co.idqualcomm.co.inqualcomm.co.jpqualcomm.co.krqualcomm.co.ukqualcomm.comqualcomm.com.brqualcomm.com.twqualcomm.dequalcomm.frqualcommhalo.comqualcommlabs.comqualcommmea.comqualcommretail.comqualcommventures.cnqualcommventures.comqualphone.comquicinc.comsnapdragon.cnsnapdragonbooth.com
 uplinq.comwipower.comwirelessreach.comxtracloud.cn
-cn
+cnxtracloud.net
 brewmp.comqualcomm.sc.omtrdc.net	qwant.comqwant.deqwant.frqwant.it	razer.comrazerapi.com
 cnrazerofficial.comrazersynapse.com
 cnrazersupport.comrazerzone.com
@@ -12363,7 +12535,7 @@ pardot.comquotable.comradian6.comrelateiq.comsalesforce.
 sforce.comsite.com
 social.comsteelbrick.comtwinprime.comweinvoiceit.comsamsung
 xn--cg4bkigalaxyappstore.comgalaxymobile.jpgame-platform.netknoxemm.comsamsung.comsamsungapps.comsamsungcloud.comsamsungdm.comsamsungeshop.com.cn
-cnsamsunggalaxyfriends.comsamsungknox.comsamsungqbe.combarkadahansasmartone.comhealthreach.hkhkcircleapp.comhomephoneplus.comip73.coms-cashonmobile.coms-rewards.hksahabatsetiasmartone.comsmartone.comsmartoneholdings.comsmartonerobotics.comsmartonesolutions.com.hksmartonesolutions.hkvaluegb.comwise-research.comsnapads.com
+cnsamsunggalaxyfriends.comsamsungknox.comsamsungqbe.comskyperfectjsat.spacesptvbroadcast.comspcc-sp.comskyperfectv.co.jphominis.media	jsati.comjsatmobile.combarkadahansasmartone.comhealthreach.hkhkcircleapp.comhomephoneplus.comip73.coms-cashonmobile.coms-rewards.hksahabatsetiasmartone.comsmartone.comsmartoneholdings.comsmartonerobotics.comsmartonesolutions.com.hksmartonesolutions.hkvaluegb.comwise-research.comsnapads.com
 ads
 sc-cdn.netsnap-dev.netsnap.comsnapchat.com
 snapkit.co,(impala-media-production.s3.amazonaws.comsonyginzasonypark.jpsony-africa.comsony-asia.comsony-europe.comsony-hes.co.jpsony-latin.comsony-mea.comsony-olympus-medical.comsony-promotion.eusony-semicon.co.jpsony.atsony.basony.besony.bgsony.casony.chsony.cl
@@ -12520,7 +12692,7 @@ rea.global
 rea.iorea.techrealcommercial.com.aurealestate.com.aurealtor.comreastatic.netrumah123.comsmartexpos.comsmartline.com.auspacely.com.ausquarefoot.com.hkthinkofliving.comscenesource.me	scnsrc.mesbux.com.mysbuxcard.comstarbucks-stars.comstarbucks.adstarbucks.atstarbucks.bestarbucks.bgstarbucks.castarbucks.chstarbucks.co.idstarbucks.co.jpstarbucks.co.nzstarbucks.co.thstarbucks.co.ukstarbucks.co.zastarbucks.comstarbucks.com.arstarbucks.com.bnstarbucks.com.cn
 cnstarbucks.com.costarbucks.com.cystarbucks.com.grstarbucks.com.hkstarbucks.com.khstarbucks.com.kzstarbucks.com.mxstarbucks.com.mystarbucks.com.pestarbucks.com.sgstarbucks.com.trstarbucks.com.uystarbucks.destarbucks.dkstarbucks.esstarbucks.frstarbucks.hustarbucks.iestarbucks.instarbucks.itstarbucks.nlstarbucks.nostarbucks.phstarbucks.plstarbucks.ptstarbucks.rsstarbucks.rustarbucks.sestarbucks.ttstarbucks.vnstarbucksathome.comstarbucksavie.castarbuckscard.phstarbuckscardb2b.comstarbuckscoffee.czstarbuckscoffeegear.com starbuckscoffeegearstore.comstarbucksforlife.castarbucksforlife.comstarbuckspoq.comstarbucksreserve.comstarbucksrewardsstarland.ca starbucksrewardsstarland.comstarbucksromania.rostarbucksrtd.comstarbucksslovakia.skstarbuckssummergame.castarbuckssummergame.com
 tsquare.tv	windy.comxdty.org	xingrz.me
-Å÷
+∏ﬁ
 GEOLOCATION-CN
 42r.cn
 5566ua.comaurorapush.cn
@@ -12542,9 +12714,13 @@ flycua.comhbhk.com.cn	jdair.netjuneyaoair.comluckyair.net
 ccb.cnccb.com
 ccb.com.cn
 ccbcos.com
-ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hkccbleasing.comccblife-test.com.cnccbseoul.comccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk	cmbimg.cn
+ccbfund.cnccbfund.comccbfund.com.cnccbfutures.cnccbfutures.comccbintl.com.hk
+!cnccbleasing.comccblife-test.com.cnccbseoul.com
+!cnccbtrust.com.cn	ccbxt.com8008205555.cn8008205555.comcignacmb-ipmi.comcignacmb.comcignacmbamc.comcmb-leasing.comcmbchina.bizcmbchina.cncmbchina.comcmbi.com.hk
+!cn	cmbimg.cn
 cmbimg.comcmbt.cn
-cmbuat.com	cmburl.cncmbwinglungbank.comcmf.bizcmf.ltdcmfchina.com
+cmbuat.com	cmburl.cn cmbwinglungbank.com
+!cncmf.bizcmf.ltdcmfchina.com
 cmfunds.cntest-cignacmb.comicbc	95588.com95588.com.cndccnet.com.cnicbc-at.com
 !cnicbc-cz.com
 !cnicbc-ltd.com
@@ -12640,10 +12816,12 @@ howbuy.comlufunds.com	zlfund.cn	citicchinaamc.comcit
 !cn
 csc108.comcsci.hk
 !cn
-ecitic.com1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hkguba.com.cncebbank.comceblease.com
+ecitic.com1234567.com.cn	18.cn	18.com.cn	dfcfw.comeastmoney.comeastmoneyfutures.comemsec.hk
+!cnguba.com.cncebbank.comceblease.com
 eb-ind.comebasset.comebchina.comebchinaintl.com
 ebf.com.cn	ebfcn.comebfortune.comebtrust.comebscn-am.com	ebscn.comeverbright.com	secec.comsunlife-everbright.com
-pingan.compingan.com.cnpingan.com.hkyqb.comtaikang.comtaikanglife.comtaikangzhijia.comtkhealthcare.comhuangyuhui.net517lppz.comlppz.comlppzimg.com
+pingan.compingan.com.cnpingan.com.hk
+!cnyqb.comtaikang.comtaikanglife.comtaikangzhijia.comtkhealthcare.comhuangyuhui.net517lppz.comlppz.comlppzimg.com
 heytea.com3songshu.comhaidilao.com
 a2z.org.cn
 cnamazonaws.cn
@@ -12720,11 +12898,20 @@ funcdn.com	leigod.cn58ganji.com58ganji-corp.com	ganji.com
 58corp.com	58dns.org58lovepet.com	58uxd.com58v5.cn58xinghuo.cn58xinghuo.com58xueche.com
 anjuke.comanjukestatic.comchinahr.comchrstatic.com
 daojia.comdiandao.orgfang.com	sofun.comsoufunimg.com	jxedt.com	jxksw.net
-roomeet.cnxinchong.comzhuancorp.comzhuanspirit.comzhuanzhuan.comc-ctrip.comcolinker.comctrip.cnctrip.co.idctrip.co.krctrip.co.th	ctrip.comctrip.com.hkctrip.myctrip.sgctripbiz.comctripbuy.hkctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.twizuchebao.com	lvtds.com	shuntu.cn
+roomeet.cnxinchong.comzhuancorp.comzhuanspirit.comzhuanzhuan.comc-ctrip.comcolinker.comctrip.cnctrip.co.id
+!cnctrip.co.kr
+!cnctrip.co.th
+!cn	ctrip.comctrip.com.hk
+!cnctrip.my
+!cnctrip.sg
+!cnctripbiz.comctripbuy.hk
+!cnctripteam.comdoticloud.comeasytrip.comhhtravel.comhhtravel.com.tw
+!cnizuchebao.com	lvtds.com	shuntu.cn
 skysea.com	suanya.cn
 suanya.com
 tieyou.com
-toptown.cntoursbms.comtrip.comtripcdn.com
+toptown.cntoursbms.comtrip.com
+!cntripcdn.com
 vipdlt.comdangdang.comddimg.cndoservice.com
 ele.me
 ele.toeleme.cneleme.ioelemecdn.cnelemecdn.com	elenet.me1huizhan.com3.cn	300hu.com	360buy.cn
@@ -12733,8 +12920,12 @@ vipdlt.comdangdang.comddimg.cndoservice.com
 7fresh.combaitiao.comblackdragon.com	caiyu.comchicalot.cnchinabank.com.cncloud-beijing.comcloud-hebi.comcloud-ningbo.comcloud-ordos.comcloud-shenzhen.comcloud-shiyan.comcloud-wuhan.comcloud-xian.comcloud-xm.comcloud-zhaoqing.comcloud-zhongwei.comcloudanqing.comcloudbaoshan.comcloudbeibei.comcloudbinzhou.comcloudchangde.comcloudchangsha.comcloudchangzhou.comcloudchaozhou.comcloudchengde.comcloudchengdu.comcloudchuzhou.comcloudczs.comclouddalian.comclouddatong.comclouddongying.comcloudfoshan.comcloudfuqing.comcloudganzhou.comcloudguangzhou.comcloudhaidong.comcloudhefei.comcloudhengshui.comcloudhuaihua.comcloudhuizhou.comcloudjinan.comcloudjinchang.comcloudjingzhou.comcloudjining.comcloudjiujiang.comcloudkunming.comcloudleshan.comcloudlijiang.comcloudlishui.comcloudluohe.comcloudluoyang.comcloudmeishan.comcloudnanan.comcloudnanjing.comcloudnanning.comcloudnantong.comcloudquanzhou.comcloudsanya.comcloudshanghai.comcloudshaoyang.comcloudshenfuxingqu.comcloudsiping.comcloudsuqian.comcloudtangshan.comcloudtianjin.comcloudtongchuan.comcloudtongliang.comcloudweinan.comcloudxiangtan.comcloudxianyou.comcloudxining.comcloudyanan.comcloudyancheng.comcloudyantai.comcloudyinchuan.comcloudyueyang.comcloudyuncheng.comcloudyuxi.comcloudzhongshan.comcloudzhuhai.com
 dao123.comduiou.com.cngoselling.comhealthjd.comisvjcloud.com	isvjd.comjcloud-cache.comjcloud-cache.netjcloud-cdn.comjcloud-live.comjcloud-oss.com
 jcloud.comjcloudcache.comjcloudcache.netjcloudcs.comjclouddn.comjclouddns.comjclouddns.netjcloudec.comjcloudedge.comjcloudedge.netjcloudgslb.comjcloudgslb.netjcloudimg.comjcloudimg.netjcloudlb.comjcloudlb.netjcloudlive.comjcloudlv.comjcloudoss.comjcloudresolve.comjcloudresolve.netjcloudss.comjcloudstatic.comjcloudstatic.netjcloudvideo.comjcloudvideo.net	jclps.com
-jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
-jd.com	jd.com.cn	jd.hk	jd.id	jd.rujd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
+jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
+!cn
+jd.com	jd.com.cnjd.hk
+!cnjd.id
+!cnjd.ru
+!cnjd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
 jdgslb.com
 jdgslb.netjdh.comjdjinrong.com
 jdl.cnjdl.com
@@ -12784,8 +12975,10 @@ anitama.cnanitama.net
 b23.tv	bigfun.cnbigfunapp.cn	bili22.cnbili2233.cn	bili23.cn	bili33.cnbiliapi.combiliapi.netbilibili.ccbilibili.cnbilibili.combilibili.netbilibili.tv
 !cnbilibilipay.cnbilibilipay.combilicdn1.combilicdn2.combilicdn3.combilicdn4.combilicdn5.com
 biligo.combiliimg.combiliintl.com
-!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk	hdslb.com	hdslb.orgim9.commaoercdn.com
-mincdn.comyo9.com$ upos-hz-mirrorakam.akamaized.netciweimao.comhbooker.comkuangxiangit.comcowlevel.net	cdncl.netbiji.com
+!cnbilivideo.cnbilivideo.combilivideo.netdreamcast.hk
+!cn	hdslb.com	hdslb.orgim9.commaoercdn.com
+mincdn.comyo9.com- upos-hz-mirrorakam.akamaized.net
+!cnciweimao.comhbooker.comkuangxiangit.comcowlevel.net	cdncl.netbiji.com
 ddmogo.com
 igetget.cnigetget.comluojilab.com	mogoo.com
 sao.cnsaolife.comdmzj.com	douyu.comdouyu.tvdouyucdn.cndouyucdn2.cndouyuscdn.comdouyutv.comdtstatic.comduitang.comgamersky.com
@@ -12835,6 +13028,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cn	muwai.com	pplive.cn
 pplive.compptv.comqingting.fmqtfm.cn	sfacg.com
@@ -12941,6 +13135,8 @@ afdian.netafdiancdn.comagora.io
 agoraio.cnagoralab.co
 antutu.combitauto.combitautoimg.comcheyisou.com	yiche.com	yccdn.comshimo.im	yuque.com	doc88.com	docin.com
 douding.cn&^ntp([1-7])?\.aliyun\.com$
+cntime.izatcloud.net
+cntime.xtracloud.net
 cn'^ntp([1-5])?\.tencent\.com$
 cncn.pool.ntp.org
 cnntp.neu.edu.cn
@@ -13079,7 +13275,13 @@ g.tbcdn.cn
 ads$v6-adashx.ut.taobao.com
 adsw.m.taobao.com
 adsyiliao.hupan.com
-adsalibabacloud.co.inalibabacloud.comalibabacloud.com.aualibabacloud.com.hkalibabacloud.com.myalibabacloud.com.sgalibabacloud.com.twalicloud.comalibabadns.com
+adsalibabacloud.co.in
+!cnalibabacloud.com alibabacloud.com.au
+!cn alibabacloud.com.hk
+!cn alibabacloud.com.my
+!cn alibabacloud.com.sg
+!cn alibabacloud.com.tw
+!cnalicloud.comalibabadns.com
 alicdn.comalicloudapi.comalidayu.com
 alidns.comalikunlun.comaliyun-inc.comaliyun-iot-share.com
 aliyun.comaliyuncdn.comcdngslb.comhichina.comica-alliance.orgkunlunaq.comkunlunar.comkunlunca.comkunluncan.comkunlunea.comkunlungem.comkunlungr.comkunlunhuf.comkunlunle.comkunlunli.comkunlunno.comkunlunpi.comkunlunra.comkunlunsa.comkunlunsc.comkunlunsl.comkunlunso.comkunlunta.comkunlunvi.comkunlunwe.commxhichina.commyalicdn.com,oss-ap-northeast-1.aliyuncs.com
@@ -13097,8 +13299,9 @@ aliyun.comaliyuncdn.comcdngslb.comhichina.comica-allianc
 !cn'oss-me-east-1.aliyuncs.com
 !cn'oss-us-east-1.aliyuncs.com
 !cn'oss-us-west-1.aliyuncs.com
-!cnddurl.todingding.xindingtalk.cndingtalk.comdingtalk.netdingtalkapps.comlaiwang.comlwurl.toteambition.comteambition.netteambitionapis.com	uc.cn	ucweb.com25pp.com	56che.com	95095.com9game.cn
-aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+!cnddurl.todingding.xindingtalk.cndingtalk.comdingtalk.netdingtalkapps.comlaiwang.comlwurl.toteambition.comteambition.netteambitionapis.com	uc.cn	uc123.com	ucweb.comuczzd.cn25pp.com	56che.com	95095.com9game.cn
+aliapp.orgalibaba-inc.comalibaba.comalibabacapital.comalibabacorp.comalibabadoctor.comalibabafuturehotel.comalibabagroup.comalibabaplanet.comalibabaued.comalibabausercontent.comalifanyi.comalihealth.com.cnalihealth.hk
+!cn
 aliimg.com
 alikmd.comalimama.comalimebot.com
 alimei.comalios.cn	alipay.cn
@@ -13115,7 +13318,8 @@ jhgtgb.com
 kanbox.com
 lazada.comliangxinyao.comm-now.cn
 maitix.com	mdeer.commei.commiaostreet.com	mshare.ccnic.xinphilanthropy.xinphpwind.comphpwind.netqingtingtrip.com	rexpos.cnsaee.org.cnshenjing.com	shuqi.comshuqireader.comsparenode.com	supet.com	ttpod.comwandoujia.comxin.xinxinlingshou.cnyowhale.comyunos-inc.com	yunos.comyushanfang.com
-zuodao.comaliexpress.comaliexpress.rualipayplus.com	alipay.hk
+zuodao.comaliexpress.comaliexpress.ru
+!cnalipayplus.com	alipay.hk
 !cnalipaymo.com
 !cnalicloudccp.com
 alipan.comaliyundrive.comaliyundrive.netcainiao.comcainiao.com.cncainiao-inc.comfreshhema.comhemamax.com
@@ -13124,9 +13328,11 @@ fund123.cn
 antfin.comantgroup.comantgroup-inc.cn	sm.cn1688.cometao.comjuhuasuan.comlingshoujia.com
 mashort.cnpailitao.com
 taobao.com
-taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.rutmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
+taobao.orgtaobaocdn.comtaobizhong.comtaopiaopiao.com	tb.cntbcache.comtburl.in	tmall.comtmall.ru
+!cntmalltv.comtmjl.aiquark.cnalitrip.com	feizhu.cn
 feizhu.com
-fliggy.com	fliggy.hk
+fliggy.com	fliggy.hk
+!cn
 iuynfg.coma-map.cna-map.co
 a-map.link	a-map.vipacloudrender.comamap.comamapauto.comanav.comautonavi.com	gaode.com	xiami.comxiami.fm	xiami.net
 koubei.comzhisheng.comnpmmirror.comgoofish.com	b3log.orga.baidu.com
@@ -13274,7 +13480,7 @@ koubei.comzhisheng.comnpmmirror.comgoofish.com	b3log.org
 adszuoyebang.cczuoyebang.com
 zybang.com	baidu
 91.com
-aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaidubce.combaiducontent.combaidupcs.combaidustatic.com
+aipage.comapollo.autobaidu.cn	baidu.combaidu.com.cnbaiduapp.combaidubce.combaiducontent.combaidupcs.combaidustatic.com
 baifae.combaifubao.com
 bcebos.combdcloudapi.com	bdimg.combdstatic.combdtjrcv.com	bdydns.cn
 bdydns.com
@@ -13285,7 +13491,11 @@ hao123.comhao123img.com
 hao222.com
 haokan.comjomocdn.netjomodns.com
 mipcdn.com	nuomi.comquyaoya.com
-shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.com	sl916.com
+shifen.comsmartapps.cn	tieba.comtiebaimg.comxianfae.comxiaodutv.comduxiaoman-int.comduxiaoman.comduxiaomanfintech.comduxiaomantech.comdxm-cdn.comdxm-int.com
+dxmlcf.comdxmlcfintech.com
+dxmpay.comdxmstatic.com
+dxmyqh.com
+paydxm.com	sl916.com
 cnbluepoch.com
 cnactivity-zhendingtech.comchangdunovel.comfanqienovel.comfanqieopen.comfanqieopenpic.comfanqieopenstatic.comfanqieopenvod.comfanqiesdk.comfanqiesdkpic.comfanqiesdkstatic.comfanqiesdkvod.comfqnovel.comfqnovelim.comfqnovel-op.comfqnovelop.comfqnovelpic.comfqnovelstatic.comfqnovelvod.comihaohaoxuexi.com
 muyewx.comnovelfm.comnovelfmpic.comnovelfmstatic.comnovelfmvod.comqznovel.comqznovelpic.comqznovelstatic.comqznovelvod.comp3-novel.byteimg.comp6-novel.byteimg.com(ads3-normal-hl.zijieapi.com
@@ -13396,7 +13606,11 @@ ixigua.comixiguavideo.comixgvideo.combdxiguaimg.combdxig
 feishu.netfeishucdn.comfeishupkg.com
 wukong.comwukongwenda.cnwukongwenda.comdcarapi.comdcarimg.comdcarlive.comdcarstatic.comdcarvod.com
 dcdapp.comdongchedi.comdongchediapp.com	365yg.comgogokid.com.cngogokid.com	pipix.com	faceu.comulikecam.com
-rsproxy.cndidi-food.comdidi.cndidialift.comdidiaustralia.blogdidichuxing.comdidiglobal.comdidimobility.co.jpdidistatic.comdiditaxi.com.cn
+rsproxy.cndidi-food.com
+!cndidi.cndidialift.comdidiaustralia.blog
+!cndidichuxing.comdidiglobal.com
+!cndidimobility.co.jp
+!cndidistatic.comdiditaxi.com.cn
 udache.comxiaojukeji.comdji.comdji.net
 djicdn.com
 djiops.comdjiservice.orgskypixel.com
@@ -13461,8 +13675,10 @@ erp321.net	jsterp.cnjugongdan.comjushuitan.cnjushuitan.co
 scm121.com
 shopss.comshuiyaohuo.cnshuiyaohuo.com	surerp.cn
 surerp.com
-sursung.cnsursung.comcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comtestplus.cn
-wps.cnwps.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
+sursung.cnsursung.comcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comxoyocdn.comcbjq.comtestplus.cn
+wps.cnwps.com	wpscdn.cn
+wpscdn.com
+kscord.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
 ks-cdn.comks-cdn1.com	ksyun.comksyuncdn.comksyungslb.com
 lenovo.net
 baiying.cnbaiying.com.cncftsupport.comcon-c-hybris.lenovo.comileapcloud.comlenovocloudos.com	lenovo.cn
@@ -13485,7 +13701,7 @@ youdao.comzhuanzfx.comanalytics.163.com
 adscrash.163.com
 ads crashlytics.163.com
 ads	g.163.com
-adscoloros.comfinzfin.com
+adsallawntech.comcoloros.comfinzfin.com
 heytap.comheytapcs.comheytapdownload.comheytapimage.comheytapmobi.com
 myoppo.comnearme.com.cnoppo.cnoppo.com	oppo.mobioppodigital.com	oppoer.meoppomobile.comoppopay.comopposhop.cn
 realme.comrealmebbs.comrealmemobile.comoneplus.com
@@ -13674,7 +13890,7 @@ yufuid.netyunjitele.com.+\.dnse[0-5]\.(cn|com)$'#.+\.tdnsv([1-9]
 adspush.qq.com
 adspgdt.gtimg.cn
 adsugdtimg.com
-adsopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+adsopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cnbattlecare.net
 cngameitop.com
 cngameloop.com
@@ -13773,17 +13989,18 @@ scescdn.cn
 yuewen.comhongxiu.comlrts.meqdmm.com
 qidian.comreadnovel.comtingbook.comwebnovel.com
 xs8.cnxxsy.netqq.xn--fiqs8sxn--r70as2s.xn--fiqs8s
-apcdns.netfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
+apcdns.net	cdn-go.cnfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
 qq.com	qq.com.cnqq.wang
 qqmail.com	qzone.com
 rtx.com.cnservicewechat.com
 tencent.cntencent.co.id
-!cntencent.comtencent.com.cntencent.com.hktencent.nettencent.net.cntencentmusic.com
-tenpay.com	tfogc.com
+!cntencent.comtencent.com.cntencent.com.hk
+!cntencent.nettencent.net.cntencentmusic.com
+tenpay.com	tfogc.comtlivepush.comtxlivecdn.com
 wechat.comwechatpay.cn
 weiyun.comwetv.vip
 !cnwetvinfo.com
-!cnwetv.qq.com
+!cnwxlivecdn.comwetv.qq.com
 !cnalloyteam.comimweb.ioivweb.io	fyeds.com
 fyeds0.com
 fyeds1.com
@@ -13811,10 +14028,11 @@ fyeds9.comfymall0.comfymall1.comfymall4.comfymall7.com
 adstracking.miui.com
 ads
 mi-img.com
-mi.com	mifile.cnmiui.com
+mi.com	mifile.cn
+mijia.techmiui.com
 miwifi.com	xiaomi.cn
 xiaomi.com
-xiaomi.netxiaomiev.comxiaomimobile.comxiaomiyoupin.com
+xiaomi.netxiaomiev.comxiaomimobile.comxiaomixiaoai.comxiaomiyoupin.com
 saxyit.com
 sandai.netthunderurl.com
 xunlei.com	00cdn.com	88cdn.com	p2cdn.comthundercdn.comxycloud.com	xycdn.comnubia.cn	nubia.comredmagic.com
@@ -13822,12 +14040,22 @@ zte.com.cnztemall.com	ztems.combbs.ztedevices.comwww.zted
 !cn	ezpro.pro10099.com.cn
 chn.cn	ahitv.com	cqccn.comgcable.com.cnsc96655.com	isxtv.comsdgdwljt.com10086.cn139.comchinamobile.comchinamobileltd.commigucloud.commigu.cn
 cmvideo.cnmiguvideo.comandfx.cn	andfx.net
-cmicrwx.cncmpassport.comfetion-portal.comfetionpic.commmarket.commmarket6.com
-ctexcel.cactexcel.comctexcel.com.hk
-ctexcel.fr
-ctexcel.us
-189.cnchinatelecom-h.comchinatelecom.com.cnchinatelecomglobal.com
-chntel.com	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hkchinaunicomglobal.commychinaunicom.com	wo.cn	wo.com.cnwo116114.comjikipedia.comqiuwen.wikishidianbaike.com	51nod.com
+cmicrwx.cncmpassport.comfetion-portal.comfetionpic.commmarket.commmarket6.com
+ctexcel.ca
+!cnctexcel.com
+!cnctexcel.com.hk
+!cn
+ctexcel.fr
+!cn
+ctexcel.us
+!cn
+189.cnchinatelecom-h.comchinatelecom.com.cn#chinatelecomglobal.com
+!cn
+chntel.comchinatelecomhk.com
+!cn	10010.com10010.com.cn114menhu.comchinaunicom.comchinaunicom.com.cnchinaunicom.com.hk
+!cn"chinaunicomglobal.com
+!cnmychinaunicom.com	wo.cn	wo.com.cnwo116114.com	cuniq.com
+!cnjikipedia.comqiuwen.wikishidianbaike.com	51nod.com
 acwing.comhihocoder.comjisuanke.comluogu.com.cnoi-wiki.comopenjudge.cn
 uoj.ac	vijos.orgleetcode.cnleetcode-cn.comlingkou.xyzlingkou.com
 lingkou.cn
@@ -13980,7 +14208,7 @@ pubyun.com	qc188.comqcds.comqd8.comqd-metro.comqh24
 qschou.com
 qtmojo.com
 qudong.com
-qugame.com	qunar.comqunarzz.comqunjielong.comqyer.comrfchost.comrockyenglish.comrong360.comrtbasia.com	ruan8.com
+qugame.com	qunar.comqunarzz.comqunjielong.comqyer.comrockyenglish.comrong360.comrtbasia.com	ruan8.com
 runoob.comrzrc114.com	saibo.comsanguosha.com
 sanwen.net	scdng.comscoregg.com
 sczsxx.comsdo.comsec-wiki.com
@@ -14105,7 +14333,7 @@ golang.net
 golang.org
 1
 	GOODREADSgoodreads.comgr-assets.com
-œ∆
+ñ»
 GOOGLEandroid.comandroidify.comblogger.comblogblog.comblogspot.aeblogspot.alblogspot.amblogspot.bablogspot.beblogspot.bgblogspot.bjblogspot.cablogspot.cfblogspot.chblogspot.clblogspot.co.atblogspot.co.idblogspot.co.ilblogspot.co.keblogspot.co.nzblogspot.co.ukblogspot.co.zablogspot.comblogspot.com.arblogspot.com.aublogspot.com.brblogspot.com.byblogspot.com.coblogspot.com.cyblogspot.com.eeblogspot.com.egblogspot.com.esblogspot.com.mtblogspot.com.ngblogspot.com.trblogspot.com.uyblogspot.cvblogspot.czblogspot.deblogspot.dkblogspot.fiblogspot.frblogspot.grblogspot.hkblogspot.hrblogspot.hublogspot.ieblogspot.inblogspot.isblogspot.itblogspot.jpblogspot.krblogspot.liblogspot.ltblogspot.lublogspot.mdblogspot.mkblogspot.mxblogspot.myblogspot.nlblogspot.noblogspot.peblogspot.ptblogspot.qablogspot.reblogspot.roblogspot.rsblogspot.rublogspot.seblogspot.sgblogspot.siblogspot.skblogspot.snblogspot.tdblogspot.twblogspot.ugblogspot.vndart.devdartlang.orgdartpad.devfastlane.cifastlane.toolsfirebase.comfirebase.iofirebaseapp.comfirebaseio.com-!firebase-settings.crashlytics.com
 cnfirebase.google.comfirebase.googleapis.com#firebaseappcheck.googleapis.com,(firebasedynamiclinks-ipv4.googleapis.com,(firebasedynamiclinks-ipv6.googleapis.com'#firebasedynamiclinks.googleapis.com)%firebaseinappmessaging.googleapis.com($firebaseinstallations.googleapis.com%!firebaselogging-pa.googleapis.com"firebaselogging.googleapis.com+'firebaseperusertopics-pa.googleapis.com'#firebaseremoteconfig.googleapis.comflutter.devflutterapp.compub.devgo-lang.comgo-lang.netgo-lang.org
 go.dev	godoc.org
@@ -14156,10 +14384,16 @@ golang.org2mdn-cn.net
 urchin.com
 ads!analytics.google.com
 ads>1^adservice\.google\.([a-z]{2}|com?)(\.[a-z]{2})?$
-adscharlestonroadregistry.comcrr.comregistry.googleget.appget.devget.howget.newget.pageget.rsvphey.booiam.soynew.dayxn--p8j9a0d9c9a.xn--q9jyb4cscholar.google.aescholar.google.atscholar.google.bescholar.google.bgscholar.google.cascholar.google.catscholar.google.chscholar.google.clscholar.google.cnscholar.google.co.crscholar.google.co.idscholar.google.co.ilscholar.google.co.inscholar.google.co.jpscholar.google.co.krscholar.google.co.nzscholar.google.co.thscholar.google.co.ukscholar.google.co.vescholar.google.co.zascholar.google.comscholar.google.com.arscholar.google.com.auscholar.google.com.boscholar.google.com.brscholar.google.com.coscholar.google.com.cuscholar.google.com.doscholar.google.com.ecscholar.google.com.egscholar.google.com.gtscholar.google.com.hkscholar.google.com.lyscholar.google.com.mxscholar.google.com.myscholar.google.com.nischolar.google.com.pascholar.google.com.pescholar.google.com.phscholar.google.com.pkscholar.google.com.prscholar.google.com.pyscholar.google.com.sgscholar.google.com.svscholar.google.com.trscholar.google.com.twscholar.google.com.uascholar.google.com.uyscholar.google.com.vnscholar.google.czscholar.google.descholar.google.dkscholar.google.esscholar.google.fischolar.google.frscholar.google.grscholar.google.hnscholar.google.hrscholar.google.huscholar.google.isscholar.google.itscholar.google.lischolar.google.ltscholar.google.luscholar.google.lvscholar.google.nlscholar.google.noscholar.google.plscholar.google.ptscholar.google.roscholar.google.ruscholar.google.sescholar.google.sischolar.google.sk!scholar.googleusercontent.comscholar.l.google.compki.googclients1.google.compki.google.comcrl.pki.goog
+adscharlestonroadregistry.comcrr.comregistry.googleget.appget.devget.howget.newget.pageget.rsvphey.booiam.soynew.dayxn--p8j9a0d9c9a.xn--q9jyb4cscholar.google.aescholar.google.atscholar.google.bescholar.google.bgscholar.google.cascholar.google.catscholar.google.chscholar.google.clscholar.google.cnscholar.google.co.crscholar.google.co.idscholar.google.co.ilscholar.google.co.inscholar.google.co.jpscholar.google.co.krscholar.google.co.nzscholar.google.co.thscholar.google.co.ukscholar.google.co.vescholar.google.co.zascholar.google.comscholar.google.com.arscholar.google.com.auscholar.google.com.boscholar.google.com.brscholar.google.com.coscholar.google.com.cuscholar.google.com.doscholar.google.com.ecscholar.google.com.egscholar.google.com.gtscholar.google.com.hkscholar.google.com.lyscholar.google.com.mxscholar.google.com.myscholar.google.com.nischolar.google.com.pascholar.google.com.pescholar.google.com.phscholar.google.com.pkscholar.google.com.prscholar.google.com.pyscholar.google.com.sgscholar.google.com.svscholar.google.com.trscholar.google.com.twscholar.google.com.uascholar.google.com.uyscholar.google.com.vnscholar.google.czscholar.google.descholar.google.dkscholar.google.esscholar.google.fischolar.google.frscholar.google.grscholar.google.hnscholar.google.hrscholar.google.huscholar.google.isscholar.google.itscholar.google.lischolar.google.ltscholar.google.luscholar.google.lvscholar.google.nlscholar.google.noscholar.google.plscholar.google.ptscholar.google.roscholar.google.ruscholar.google.sescholar.google.sischolar.google.sk!scholar.googleusercontent.comscholar.l.google.compki.goog!pki-goog.l.google.com
+cn
+c.pki.goog
+cn
+i.pki.goog
+cn
+o.pki.goog
+cnpublicca.googleapis.com#preprod-publicca.googleapis.comclients1.google.compki.google.comcrl.pki.goog
 cncrls.pki.goog
 cnocsp.pki.goog
-cn!pki-goog.l.google.com
 cnalt1-mtalk.google.comalt2-mtalk.google.comalt3-mtalk.google.comalt4-mtalk.google.comalt5-mtalk.google.comalt6-mtalk.google.comalt7-mtalk.google.comalt8-mtalk.google.commtalk.google.com
 kaggle.com	kaggle.io
 kaggle.netkaggleusercontent.comdeps.dev	deps.infoopensourceinsight.devopensourceinsights.devpolymer-project.orgpolymerproject.org
@@ -14257,7 +14491,7 @@ apture.comarea120.com
 asp-cc.comautodraw.combandpage.combaselinestudy.combaselinestudy.orgbazel.buildbdn.devbeatthatquote.com	blink.orgbrocaproject.com
 brotli.orgbumpshare.com
 bumptop.cabumptop.combumptop.netbumptop.orgbumptunes.comcampuslondon.com certificate-transparency.org
-chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgepisodic.comfeedburner.com
+chrome.comchromebook.comchromecast.comchromeos.devchromium.orgchronicle.securitychroniclesec.comcloudburstresearch.comcloudfunctions.netcloudproxy.appcloudrobotics.comcobrasearch.comcodespot.comconscrypt.comconscrypt.orgcookiechoices.org	coova.com	coova.net	coova.orgcrossmediapanel.com	cs4hs.comdartsearch.netdataliberation.org	debug.comdebugproject.comdeepmind.comdevsitetest.howdialogflow.comdigitalassetlinks.orgdocs.newepisodic.comfeedburner.com
 fflick.comfinanceleadsonline.com
 foofle.comfroogle.comfuchsia.dev	g-tun.comg.cn
 cng.co	g.dev
@@ -14285,11 +14519,13 @@ picasa.compicasaweb.compicasaweb.netpicasaweb.org
 picnik.compittpatt.com
 pixate.compostini.comprivacysandbox.comprojectara.comprojectbaseline.compublishproxy.comquestvisual.comquickoffice.comquiksee.com
 revolv.comridepenguin.comrun.appsavethedate.foo
-saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.comsnapseed.comsolveforx.com
+saynow.comschemer.comscreenwisetrends.comscreenwisetrendspanel.com
+sheets.new
+slides.newsnapseed.comsolveforx.com
 stadia.devstcroixmosquito.comstcroixmosquitoproject.comstudywatchbyverily.comstudywatchbyverily.orgstxmosquito.comstxmosquitoproject.comstxmosquitoproject.netstxmosquitoproject.orgsynergyse.comtensorflow.org	tfhub.devthecleversense.comthegooglestore.comthinkquarterly.co.ukthinkquarterly.comthinkwithgoogle.comtiltbrush.comtxcloud.net	txvia.comunfiltered.newsuseplannr.comusvimosquito.comusvimosquitoproject.comvelostrata.com
 verily.comverilylifesciences.comverilystudyhub.comverilystudywatch.comverilystudywatch.org
 wallet.com	waymo.comwaze.comweb.appweb.devwebappfieldguide.comwebmproject.orgwebpkgcache.com
-webrtc.orgweltweitwachsen.dewhatbrowser.orgwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
+webrtc.orgweltweitwachsen.dewhatbrowser.org	whats.newwidevine.comwithgoogle.comwomenwill.comwomenwill.com.brwomenwill.idwomenwill.inwomenwill.mx	x.company
 x.teamxn--9kr7l.comxn--9trs65b.comxn--flw351e.comxn--ggle-55da.comxn--gogl-0nd52e.comxn--gogl-1nd42e.comxn--ngstr-lra8j.comxplr.cozukunftswerkstatt.dewww.recaptcha.net
 cn265.com
 cn2mdn-cn.net
@@ -14536,11 +14772,17 @@ urchin.com
 GOOGLE-REGISTRY-TLDmemeingfoozipmov	nexusdadphdprofesqrsvpboodaynewdevpageapphowsoyxn--q9jyb4c
 Ü
 GOOGLE-SCHOLARscholar.google.aescholar.google.atscholar.google.bescholar.google.bgscholar.google.cascholar.google.catscholar.google.chscholar.google.clscholar.google.cnscholar.google.co.crscholar.google.co.idscholar.google.co.ilscholar.google.co.inscholar.google.co.jpscholar.google.co.krscholar.google.co.nzscholar.google.co.thscholar.google.co.ukscholar.google.co.vescholar.google.co.zascholar.google.comscholar.google.com.arscholar.google.com.auscholar.google.com.boscholar.google.com.brscholar.google.com.coscholar.google.com.cuscholar.google.com.doscholar.google.com.ecscholar.google.com.egscholar.google.com.gtscholar.google.com.hkscholar.google.com.lyscholar.google.com.mxscholar.google.com.myscholar.google.com.nischolar.google.com.pascholar.google.com.pescholar.google.com.phscholar.google.com.pkscholar.google.com.prscholar.google.com.pyscholar.google.com.sgscholar.google.com.svscholar.google.com.trscholar.google.com.twscholar.google.com.uascholar.google.com.uyscholar.google.com.vnscholar.google.czscholar.google.descholar.google.dkscholar.google.esscholar.google.fischolar.google.frscholar.google.grscholar.google.hnscholar.google.hrscholar.google.huscholar.google.isscholar.google.itscholar.google.lischolar.google.ltscholar.google.luscholar.google.lvscholar.google.nlscholar.google.noscholar.google.plscholar.google.ptscholar.google.roscholar.google.ruscholar.google.sescholar.google.sischolar.google.sk!scholar.googleusercontent.comscholar.l.google.com
-≈
-GOOGLE-TRUST-SERVICESpki.googclients1.google.compki.google.comcrl.pki.goog
+œ
+GOOGLE-TRUST-SERVICESpki.goog!pki-goog.l.google.com
+cn
+c.pki.goog
+cn
+i.pki.goog
+cn
+o.pki.goog
+cnpublicca.googleapis.com#preprod-publicca.googleapis.comclients1.google.compki.google.comcrl.pki.goog
 cncrls.pki.goog
 cnocsp.pki.goog
-cn!pki-goog.l.google.com
 cn
 ˘
 	GOOGLEFCMalt1-mtalk.google.comalt2-mtalk.google.comalt3-mtalk.google.comalt4-mtalk.google.comalt5-mtalk.google.comalt6-mtalk.google.comalt7-mtalk.google.comalt8-mtalk.google.commtalk.google.com
@@ -14585,10 +14827,10 @@ B
 HASKELLhaskell.orghaskellstack.orgstackage.org
 @
 HAVEIBEENPWNEDhaveibeenpwned.compwnedpasswords.com
-π
+∆
 HBOcinemax.comforthethrone.comhbo.comhboasia.comhbogo.co.th	hbogo.comhbogo.euhbogoasia.comhbogoasia.hkhbogoasia.idhbogoasia.phhbogoasia.sghbogoasia.tw
 hbomax.comhbomaxcdn.com
-hbonow.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
+hbonow.commax.com	maxgo.comhbo.com.c.footprint.nethbo.com.edgesuite.nethbo.map.fastly.net$ hbomax-images.warnermediacdn.comhbomaxdash.s.llnwi.net
 E
 HCAPTCHAbotstop.comhcaptcha.comhcaptchastatus.com
 î
@@ -14674,6 +14916,16 @@ hpshop.comhpshoping.comhpshopping.hkhpsignage.comhpsmart
 hpstore.cn
 cnhpstore.comhpstorethailand.comhpsupport.comhpsuresupply.comhptechventures.comhpto.nethptouch.comhptouchpointmanager.comhptrainingcenter.com	hpuae.comhpuniversity.infohpusertraining.com
 hpveer.comhpvirtualthin.comhpwallart.comhpwellnesscentral.com	hpwsn.comi-123-hp.cominkchoice.cominstantink.comleavinghpinc.comlife-global.orgmyhpsupport.comprinteron.comprintersetupsupport.comprintspots.comprintspots.netserviceshp.comthecompaqstore.comtouchsmartpc.comtouchsmartpc.nettouchsmartpc.orgworkstations.tvwww8-hp.comxn--6eup7j.comxn--6eup7j.nethpstore.corpmerchandise.com
+è
+HSBChsbchsbc.comhsbc.nethsbcinnovationbanking.comhsbcnet.comhsbcprivatebank.comhsbc.aehsbc.amhsbc.bm
+hsbc.co.id
+hsbc.co.in
+hsbc.co.kr
+hsbc.co.mu
+hsbc.co.nz
+hsbc.co.th
+hsbc.co.ukhsbc.ukhsbc.com.arhsbc.com.auhsbc.com.bdhsbc.com.bhhsbc.com.brhsbc.com.cnhsbc.com.eghsbc.com.hkhsbc.com.mohsbc.com.mthsbc.com.mxhsbc.com.myhsbcamanah.com.myhsbc.com.phhsbc.com.sghsbc.com.trhsbc.com.twhsbc.com.uyhsbc.com.vnhsbc.dehsbc-alternatives.dehsbc-transactionservices.dehsbc-zertifikate.dehsbc.lkhsbc.ca
+hsbc.co.jphsbc.frhsbctrinkaus.de
 $
 HUANGHUAGANGhuanghuagang.org
 ¸0
@@ -15104,15 +15356,19 @@ $
 *
 JAVWIDEjavwide.com
 javwide.tv
-¬$
+Ê$
 JD1huizhan.com3.cn	300hu.com	360buy.cn
 360buy.com360buy.com.cn360buyimg.com360buyinternational.com
 360top.com
 7fresh.combaitiao.comblackdragon.com	caiyu.comchicalot.cnchinabank.com.cncloud-beijing.comcloud-hebi.comcloud-ningbo.comcloud-ordos.comcloud-shenzhen.comcloud-shiyan.comcloud-wuhan.comcloud-xian.comcloud-xm.comcloud-zhaoqing.comcloud-zhongwei.comcloudanqing.comcloudbaoshan.comcloudbeibei.comcloudbinzhou.comcloudchangde.comcloudchangsha.comcloudchangzhou.comcloudchaozhou.comcloudchengde.comcloudchengdu.comcloudchuzhou.comcloudczs.comclouddalian.comclouddatong.comclouddongying.comcloudfoshan.comcloudfuqing.comcloudganzhou.comcloudguangzhou.comcloudhaidong.comcloudhefei.comcloudhengshui.comcloudhuaihua.comcloudhuizhou.comcloudjinan.comcloudjinchang.comcloudjingzhou.comcloudjining.comcloudjiujiang.comcloudkunming.comcloudleshan.comcloudlijiang.comcloudlishui.comcloudluohe.comcloudluoyang.comcloudmeishan.comcloudnanan.comcloudnanjing.comcloudnanning.comcloudnantong.comcloudquanzhou.comcloudsanya.comcloudshanghai.comcloudshaoyang.comcloudshenfuxingqu.comcloudsiping.comcloudsuqian.comcloudtangshan.comcloudtianjin.comcloudtongchuan.comcloudtongliang.comcloudweinan.comcloudxiangtan.comcloudxianyou.comcloudxining.comcloudyanan.comcloudyancheng.comcloudyantai.comcloudyinchuan.comcloudyueyang.comcloudyuncheng.comcloudyuxi.comcloudzhongshan.comcloudzhuhai.com
 dao123.comduiou.com.cngoselling.comhealthjd.comisvjcloud.com	isvjd.comjcloud-cache.comjcloud-cache.netjcloud-cdn.comjcloud-live.comjcloud-oss.com
 jcloud.comjcloudcache.comjcloudcache.netjcloudcs.comjclouddn.comjclouddns.comjclouddns.netjcloudec.comjcloudedge.comjcloudedge.netjcloudgslb.comjcloudgslb.netjcloudimg.comjcloudimg.netjcloudlb.comjcloudlb.netjcloudlive.comjcloudlv.comjcloudoss.comjcloudresolve.comjcloudresolve.netjcloudss.comjcloudstatic.comjcloudstatic.netjcloudvideo.comjcloudvideo.net	jclps.com
-jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
-jd.com	jd.com.cn	jd.hk	jd.id	jd.rujd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
+jd-app.comjd-ex.cn	jd-ex.comjd-ex.com.cn	jd-ex.net	jd.cnjd.co.th
+!cn
+jd.com	jd.com.cnjd.hk
+!cnjd.id
+!cnjd.ru
+!cnjd.shopjdbusiness.comjdcache.com	jdcdn.comjdcloud-api.comjdcloud-api.netjdcloud-edu.comjdcloud-elite.comjdcloud-elive.comjdcloud-livebuy.comjdcloud-mail.comjdcloud-openapi.comjdcloud-oss.comjdcloud.comjdcloudcache.comjdcloudcache.netjdcloudcdn.comjdcloudcdn.netjdcloudcs.comjdclouddns.comjdclouddns.netjdcloudedge.comjdcloudedge.netjdcloudlb.comjdcloudlb.netjdcloudlive.comjdcloudlive.netjdcloudresolve.comjdcloudresolve.netjdcloudsite.comjdcloudstatic.comjdcloudstatic.netjdcloudstatus.comjdcloudstatus.netjdcloudvideo.comjdcloudvideo.netjdcloudwaf.comjddapeigou.comjddebug.comjddglobal.comjdemall.com	jdfw1.com
 jdgslb.com
 jdgslb.netjdh.comjdjinrong.com
 jdl.cnjdl.com
@@ -15248,9 +15504,11 @@ kindle.com	kindle.de	kindle.es	kindle.fr	kindle.in	kind
 KINDLE4RSSkindle4rss.com
 8
 KINGKONGLIVEkingkong.com.twkingkongapp.com
-ß
-KINGSOFTcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comtestplus.cn
-wps.cnwps.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
+ı
+KINGSOFTcmcm.comcmcmcdn.com	liebao.cnduba.comduba.netijinshan.comseasungames.comxishanju.comxoyo.comxoyocdn.comcbjq.comtestplus.cn
+wps.cnwps.com	wpscdn.cn
+wpscdn.com
+kscord.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cnkimg.cnkingsoft.comksmobile.com
 ks-cdn.comks-cdn1.com	ksyun.comksyuncdn.comksyungslb.com
 p
 KKBOX
@@ -15392,9 +15650,9 @@ lghvac.comlghvacstory.comlgrecyclingprogram.comlgsalesportal.c
 LIANJIAlianjia.com	ljcdn.com
 1
 	LIBERAPAYliberapay.comliberapay.org
-y
+ä
 LIBGENlibgen.life
-libgen.fungen.lib.rus.ec	libgen.is	libgen.me	libgen.rs	libgen.st
+libgen.funlibrary.lolgen.lib.rus.ec	libgen.is	libgen.me	libgen.rs	libgen.st
 ?
 LIEPIN
 liepin.com
@@ -15785,7 +16043,7 @@ vscode.devvscode-cdn.netvscode-unpkg.netxamarin.comaz764
 MICROSOFT-PKI
 msocsp.comcrl.microsoft.commscrl.microsoft.comocsp.microsoft.comoneocsp.microsoft.comwww.microsoft.com
 cn
-¢
+Ω
 MIHOYOgenshinimpact.comhonkaiimpact3.comhonkaistarrail.com	hoyo.linkhoyolab.comhoyoverse.comn0vadesktop.commhystatic.com
 cn	mhyurl.cn
 cn
@@ -15802,9 +16060,10 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cn
-ó
+≤
 	MIHOYO-CNmhystatic.com
 cn	mhyurl.cn
 cn
@@ -15821,6 +16080,7 @@ mihoyo.com
 cnbhsr.com
 cnthemisweeps.com
 cnyuanshen.com
+cnjuequling.com
 cn'^.+-mihayo\.akamaized\.net$
 cn
 O
@@ -16196,9 +16456,9 @@ f
 ads
 .
 OP	op.ggopgg-static.akamaized.net
-∫
+∑
 OPENAIchatgpt.comoaistatic.comoaiusercontent.com
-openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net@<^chatgpt-async-webps-prod-eastus-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
+openai.com!openai.com.cdn.cloudflare.net openaiapi-site.azureedge.net2.openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net1-openaicomproductionae4b.blob.core.windows.net.*production-openaicom-storage.azureedge.net=9^chatgpt-async-webps-prod-\s+-\d+\.webpubsub\.azure\.com$$o33249.ingest.sentry.io
 ads openaicom.imgix.net
 ads
 (
@@ -16223,8 +16483,8 @@ h
 ads openxenterprise.com
 adsopenxmarket.asia
 ads
-Î
-OPPOcoloros.comfinzfin.com
+ˇ
+OPPOallawntech.comcoloros.comfinzfin.com
 heytap.comheytapcs.comheytapdownload.comheytapimage.comheytapmobi.com
 myoppo.comnearme.com.cnoppo.cnoppo.com	oppo.mobioppodigital.com	oppoer.meoppomobile.comoppopay.comopposhop.cn
 realme.comrealmebbs.comrealmemobile.com
@@ -16345,9 +16605,10 @@ picsee.propise.pwpros.ee
 T
 	PINDUODUO
 pddpic.compinduoduo.compinduoduo.netyangkeduo.com
-K
+T
 PINGAN
-pingan.compingan.com.cnpingan.com.hkyqb.com
+pingan.compingan.com.cnpingan.com.hk
+!cnyqb.com
 v
 PINGCAP
 asktug.com
@@ -16415,8 +16676,8 @@ pplive.compptv.com
 PRIMEVIDEOaiv-cdn.netamazonprimevideo.cn
 cn#amazonprimevideo.com.cn
 cnamazonprimevideos.comamazonvideo.ccamazonvideo.comprime-video.comprimevideo.ccprimevideo.comprimevideo.infoprimevideo.orgprimevideo.tv
-ƒ
-PRIVATElanlocaldomainexampleinvalid	localhosttest	local	home.arpa10.in-addr.arpa16.172.in-addr.arpa17.172.in-addr.arpa18.172.in-addr.arpa19.172.in-addr.arpa20.172.in-addr.arpa21.172.in-addr.arpa22.172.in-addr.arpa23.172.in-addr.arpa24.172.in-addr.arpa25.172.in-addr.arpa26.172.in-addr.arpa27.172.in-addr.arpa28.172.in-addr.arpa29.172.in-addr.arpa30.172.in-addr.arpa31.172.in-addr.arpa168.192.in-addr.arpa0.in-addr.arpa127.in-addr.arpa254.169.in-addr.arpa2.0.192.in-addr.arpa100.51.198.in-addr.arpa113.0.203.in-addr.arpa 255.255.255.255.in-addr.arpaLH0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpaLH1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpad.f.ip6.arpa8.e.f.ip6.arpa9.e.f.ip6.arpaa.e.f.ip6.arpab.e.f.ip6.arpa8.b.d.0.1.0.0.2.ip6.arpa64.100.in-addr.arpa65.100.in-addr.arpa66.100.in-addr.arpa67.100.in-addr.arpa68.100.in-addr.arpa69.100.in-addr.arpa70.100.in-addr.arpa71.100.in-addr.arpa72.100.in-addr.arpa73.100.in-addr.arpa74.100.in-addr.arpa75.100.in-addr.arpa76.100.in-addr.arpa77.100.in-addr.arpa78.100.in-addr.arpa79.100.in-addr.arpa80.100.in-addr.arpa81.100.in-addr.arpa82.100.in-addr.arpa83.100.in-addr.arpa84.100.in-addr.arpa85.100.in-addr.arpa86.100.in-addr.arpa87.100.in-addr.arpa88.100.in-addr.arpa89.100.in-addr.arpa90.100.in-addr.arpa91.100.in-addr.arpa92.100.in-addr.arpa93.100.in-addr.arpa94.100.in-addr.arpa95.100.in-addr.arpa96.100.in-addr.arpa97.100.in-addr.arpa98.100.in-addr.arpa99.100.in-addr.arpa100.100.in-addr.arpa101.100.in-addr.arpa102.100.in-addr.arpa103.100.in-addr.arpa104.100.in-addr.arpa105.100.in-addr.arpa106.100.in-addr.arpa107.100.in-addr.arpa108.100.in-addr.arpa109.100.in-addr.arpa110.100.in-addr.arpa111.100.in-addr.arpa112.100.in-addr.arpa113.100.in-addr.arpa114.100.in-addr.arpa115.100.in-addr.arpa116.100.in-addr.arpa117.100.in-addr.arpa118.100.in-addr.arpa119.100.in-addr.arpa120.100.in-addr.arpa121.100.in-addr.arpa122.100.in-addr.arpa123.100.in-addr.arpa124.100.in-addr.arpa125.100.in-addr.arpa126.100.in-addr.arpa127.100.in-addr.arpa%!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$instant.arubanetworks.comsetmeup.arubanetworks.comcaptive.apple.com!connectivitycheck.gstatic.comasusrouter.comrouter.asus.comwww.asusrouter.comcp.cloudflare.comdetectportal.firefox.comnetworkcheck.kde.org!location.services.mozilla.comrouterlogin.comwww.routerlogin.com
+¨
+PRIVATElanlocaldomainexampleinvalid	localhosttest	local	home.arpa0.in-addr.arpa2.0.192.in-addr.arpa10.in-addr.arpa16.172.in-addr.arpa17.172.in-addr.arpa18.172.in-addr.arpa19.172.in-addr.arpa20.172.in-addr.arpa21.172.in-addr.arpa22.172.in-addr.arpa23.172.in-addr.arpa24.172.in-addr.arpa25.172.in-addr.arpa26.172.in-addr.arpa27.172.in-addr.arpa28.172.in-addr.arpa29.172.in-addr.arpa30.172.in-addr.arpa31.172.in-addr.arpa100.51.198.in-addr.arpa113.0.203.in-addr.arpa127.in-addr.arpa168.192.in-addr.arpa254.169.in-addr.arpa 255.255.255.255.in-addr.arpaLH0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpaLH1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa8.b.d.0.1.0.0.2.ip6.arpa8.e.f.ip6.arpa9.e.f.ip6.arpaa.e.f.ip6.arpab.e.f.ip6.arpad.f.ip6.arpa64.100.in-addr.arpa65.100.in-addr.arpa66.100.in-addr.arpa67.100.in-addr.arpa68.100.in-addr.arpa69.100.in-addr.arpa70.100.in-addr.arpa71.100.in-addr.arpa72.100.in-addr.arpa73.100.in-addr.arpa74.100.in-addr.arpa75.100.in-addr.arpa76.100.in-addr.arpa77.100.in-addr.arpa78.100.in-addr.arpa79.100.in-addr.arpa80.100.in-addr.arpa81.100.in-addr.arpa82.100.in-addr.arpa83.100.in-addr.arpa84.100.in-addr.arpa85.100.in-addr.arpa86.100.in-addr.arpa87.100.in-addr.arpa88.100.in-addr.arpa89.100.in-addr.arpa90.100.in-addr.arpa91.100.in-addr.arpa92.100.in-addr.arpa93.100.in-addr.arpa94.100.in-addr.arpa95.100.in-addr.arpa96.100.in-addr.arpa97.100.in-addr.arpa98.100.in-addr.arpa99.100.in-addr.arpa100.100.in-addr.arpa101.100.in-addr.arpa102.100.in-addr.arpa103.100.in-addr.arpa104.100.in-addr.arpa105.100.in-addr.arpa106.100.in-addr.arpa107.100.in-addr.arpa108.100.in-addr.arpa109.100.in-addr.arpa110.100.in-addr.arpa111.100.in-addr.arpa112.100.in-addr.arpa113.100.in-addr.arpa114.100.in-addr.arpa115.100.in-addr.arpa116.100.in-addr.arpa117.100.in-addr.arpa118.100.in-addr.arpa119.100.in-addr.arpa120.100.in-addr.arpa121.100.in-addr.arpa122.100.in-addr.arpa123.100.in-addr.arpa124.100.in-addr.arpa125.100.in-addr.arpa126.100.in-addr.arpa127.100.in-addr.arpa%!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$ping.archlinux.orginstant.arubanetworks.comsetmeup.arubanetworks.comcaptive.apple.com!connectivitycheck.gstatic.comasusrouter.comrouter.asus.comwww.asusrouter.comcp.cloudflare.comdetectportal.firefox.comoasisauth.h3c.comnetworkcheck.kde.orgconnect.rom.miui.com!location.services.mozilla.compush.services.mozilla.comrouterlogin.comwww.routerlogin.com
 hiwifi.comleike.cc	my.routerpeiluyou.com
 phicomm.me
 router.ctcplex.directlocalhost.sec.qq.comlocalhost.ptlogin2.qq.comtest.steampowered.comtendawifi.comtplinkwifi.net
@@ -16561,7 +16822,7 @@ qlinkto.cn
 cn
 #
 QT	qt.ioqt-project.org
-¸
+è
 QUALCOMMairgonetworks.comberkanawireless.comcdmatech.comdragoniscoming.comgobianywhere.comgpsonextra.net
 cnhellosmartbook.comimod.comipleadership.org
 iskoot.comizatcloud.net
@@ -16571,7 +16832,7 @@ qprize.comqualcomm-email.comqualcomm.cn
 cn*qualcomm.cn.cdn.cloudflare.net
 cnqualcomm.co.idqualcomm.co.inqualcomm.co.jpqualcomm.co.krqualcomm.co.ukqualcomm.comqualcomm.com.brqualcomm.com.twqualcomm.dequalcomm.frqualcommhalo.comqualcommlabs.comqualcommmea.comqualcommretail.comqualcommventures.cnqualcommventures.comqualphone.comquicinc.comsnapdragon.cnsnapdragonbooth.com
 uplinq.comwipower.comwirelessreach.comxtracloud.cn
-cn
+cnxtracloud.net
 brewmp.comqualcomm.sc.omtrdc.net
 
 QUANTILquantil.com
@@ -16717,9 +16978,9 @@ rea.global
 REALTYPErealtype.co.jprealtype.jp
 )
 	REBRANDLY	rb.gyrebrandly.com
-µ
+˙
 REDDITredd.itreddit.app.link
-reddit.comreddithelp.comredditmail.comredditmedia.comredditstatic.comredd.itreddit.map.fastly.net
+reddit.comredditblog.comreddithelp.comredditinc.comredditmail.comredditmedia.comredditspace.comredditstatic.comredditstatus.comreddit.map.fastly.net
 (
 REDHAT
 redhat.com
@@ -16816,8 +17077,8 @@ $
 i-scmp.com
 7
 SCPscp-wiki.net	scpdb.orgscpwiki.com
-N
-SEASUNseasungames.comxishanju.comxoyo.comtestplus.cn
+m
+SEASUNseasungames.comxishanju.comxoyo.comxoyocdn.comcbjq.comtestplus.cn
 n
 SECOMsecom.co.jpsecomtrust.netcybertrust.co.jpcybertrust.ne.jpmanagedpki.ne.jp
 ß
@@ -17033,6 +17294,9 @@ s
 SKILLSHAREskillshare.com
 ›
 SKYskysky.comskyassets.comskyoceanrescue.comskyoceanrescue.deskyoceanrescue.itskysports.comskysports.frskysports.ieskysportsonline.comskysportsracing.com
+õ
+
+SKYPERFECTskyperfectjsat.spacesptvbroadcast.comspcc-sp.comskyperfectv.co.jphominis.media	jsati.comjsatmobile.com
 ‹
 SLACKslack-core.comslack-edge.comslack-files.comslack-imgs.comslack-msgs.comslack-redir.net	slack.com
 slackb.comslackcertified.comslackdemo.comslackhq.com
@@ -17330,7 +17594,7 @@ telesec.de
 ads	kuyun.com
 ads!testads.api.my7v.com
 ads
-áX
+õY
 TENCENTcomsenz.com
 discuz.net
 discuz.orgdns.pub	dnsapi.cn	dnspod.cn
@@ -17427,7 +17691,7 @@ yufuid.netyunjitele.com.+\.dnse[0-5]\.(cn|com)$'#.+\.tdnsv([1-9]
 adspush.qq.com
 adspgdt.gtimg.cn
 adsugdtimg.com
-adsopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+adsopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cnbattlecare.net
 cngameitop.com
 cngameloop.com
@@ -17526,17 +17790,18 @@ scescdn.cn
 yuewen.comhongxiu.comlrts.meqdmm.com
 qidian.comreadnovel.comtingbook.comwebnovel.com
 xs8.cnxxsy.netqq.xn--fiqs8sxn--r70as2s.xn--fiqs8s
-apcdns.netfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
+apcdns.net	cdn-go.cnfoxmail.comfoxmail.com.cngtimg.cn	gtimg.comgtimg.com.cnidqqimg.comimqq.com	myapp.comqlogo.cnqpic.cn	qq.cn.com
 qq.com	qq.com.cnqq.wang
 qqmail.com	qzone.com
 rtx.com.cnservicewechat.com
 tencent.cntencent.co.id
-!cntencent.comtencent.com.cntencent.com.hktencent.nettencent.net.cntencentmusic.com
-tenpay.com	tfogc.com
+!cntencent.comtencent.com.cntencent.com.hk
+!cntencent.nettencent.net.cntencentmusic.com
+tenpay.com	tfogc.comtlivepush.comtxlivecdn.com
 wechat.comwechatpay.cn
 weiyun.comwetv.vip
 !cnwetvinfo.com
-!cnwetv.qq.com
+!cnwxlivecdn.comwetv.qq.com
 !cnalloyteam.comimweb.ioivweb.io	fyeds.com
 fyeds0.com
 fyeds1.com
@@ -17574,8 +17839,8 @@ fyeds9.comfymall0.comfymall1.comfymall4.comfymall7.com
 adspgdt.gtimg.cn
 adsugdtimg.com
 ads
-Æ
-TENCENT-DEVopenmidas.com	qq.designqqgamedesign.comtencent.designtjstats.comwegamedeveloper.comweixinbridge.comweui.io
+Ò
+TENCENT-DEVopenmidas.com	qq.designqqgamedesign.comtencent-cloud.cntencent-cloud.comtencent.designtencentcloud.comtjstats.comwegamedeveloper.comweixinbridge.comweui.io
 cn
 ≈
 TENCENT-GAMESbattlecare.net
@@ -17965,8 +18230,8 @@ ubuntu.com
 ubuntu.netubuntuforums.orgubuntu-touch.io
 5
 UBUNTUKYLINopenkylin.topubuntukylin.com
-
-UC	uc.cn	ucweb.com
+;
+UC	uc.cn	uc123.com	ucweb.comuczzd.cn
 ≠
 UCLOUD
 apimkt.net	cdndo.comclk1.cnclk1.topecloud-gdu.com	fshark.cnglobalrdp.cnglobalssh.cn	iprdp.net	ipssh.netme1.ltdslk1.net	u-cdn.net	ucgslb.cn
@@ -18280,9 +18545,11 @@ woolite.uswoolitecarpet.com
 ê
 	WORDPRESSvideopress.com	w.orgwordpress.comwordpress.orgwordpress.tvwp-themes.com
 wp.com	wpvip.com
-z
+©
 WPS
-wps.cnwps.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cn
+wps.cnwps.com	wpscdn.cn
+wpscdn.com
+kscord.com	51dzt.com	iciba.com	docer.comkdocs.cnpapocket.com	wpspdf.cn
 Ô
 WSJcareerjournal.comcollegejournal.comopinionjournal.comrealestatejournal.comstartupjournal.comwsj.comwsj.jobswsj.netwsjmediakit.comwsjplus.comwsjshop.comwsjwine.com
 '
@@ -18331,7 +18598,7 @@ B
 XIAOHONGSHU
 xhscdn.com
 xhscdn.netxiaohongshu.com
-ß
+Õ
 XIAOMI a.market.xiaomi.com
 adsad.intl.xiaomi.com
 ads	ad.mi.com
@@ -18349,10 +18616,11 @@ xhscdn.netxiaohongshu.com
 adstracking.miui.com
 ads
 mi-img.com
-mi.com	mifile.cnmiui.com
+mi.com	mifile.cn
+mijia.techmiui.com
 miwifi.com	xiaomi.cn
 xiaomi.com
-xiaomi.netxiaomiev.comxiaomimobile.comxiaomiyoupin.com
+xiaomi.netxiaomiev.comxiaomimobile.comxiaomixiaoai.comxiaomiyoupin.com
 saxyit.com
 Â
 

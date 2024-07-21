@@ -142,7 +142,6 @@
 		669468492C076C2800146109 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		66973EB621797719001FEA1E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		66A358672C39517F00914A25 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		66A358682C3959AE00914A25 /* build.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = build.plist; sourceTree = "<group>"; };
 		66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_V2rayU.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A77BE2268225790097A126 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		66ACB19F21757D5B005B5881 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
@@ -297,7 +296,6 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				66A358682C3959AE00914A25 /* build.plist */,
 				6625848E2AB746D500DFDC1E /* appdmg.sh */,
 				66FEAD45217D75FC009DECF9 /* release.sh */,
 				6D6DFD93CE866018306A090E /* pac */,
@@ -432,7 +430,7 @@
 			};
 			buildConfigurationList = 664EB36C216C9A5E00B6AE0D /* Build configuration list for PBXProject "V2rayU" */;
 			compatibilityVersion = "Xcode 9.3";
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
