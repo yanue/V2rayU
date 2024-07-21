@@ -28,6 +28,8 @@ class VmessUri {
     var alpn: String = ""
     var sni: String = ""
     var fp: String = ""
+    var grpcMode:String = ""
+    var kcpSeed:String = ""
 
     /**
     vmess://base64(security:uuid@host:port)?[urlencode(parameters)]
@@ -145,6 +147,13 @@ class VmessUri {
             case "remark":
                 self.remark = param[1].urlDecoded()
                 break
+            case "serviceName":
+                self.netPath = param[1]
+                break
+            case "mode":
+                self.grpcMode = param[1]
+            case "seed":
+                self.kcpSeed = param[1]
             default:
                 break
             }
@@ -219,6 +228,8 @@ class VmessUri {
         self.fp = json["fp"].stringValue
         // type:伪装类型（none\http\srtp\utp\wechat-video）
         self.type = json["type"].stringValue
+        self.kcpSeed = json["seed"].stringValue
+        self.grpcMode = json["mode"].stringValue
     }
 }
 
@@ -520,6 +531,7 @@ class VlessUri {
     var pbk: String = "" // reality public key
     var sid: String = "" // reality shortId
     var grpcMode:String = ""
+    var kcpSeed:String = ""
 
     // vless://f2a5064a-fabb-43ed-a2b6-8ffeb970df7f@00.com:443?flow=xtls-rprx-splite&encryption=none&security=xtls&sni=aaaaa&type=http&host=00.com&path=%2fvl#vless1
     func encode() -> String {
@@ -539,6 +551,9 @@ class VlessUri {
             URLQueryItem(name: "fp", value: self.fp),
             URLQueryItem(name: "pbk", value: self.pbk),
             URLQueryItem(name: "sid", value: self.sid),
+            URLQueryItem(name: "serviceName", value: self.path),
+            URLQueryItem(name: "mode", value: self.grpcMode),
+            URLQueryItem(name: "seed", value: self.kcpSeed)
         ]
 
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
@@ -601,6 +616,12 @@ class VlessUri {
                 break
             case "sid":
                 self.sid = item.value as! String
+                break
+            case "headerType":
+                self.type = item.value as! String
+                break
+            case "seed":
+                self.kcpSeed = item.value as! String
                 break
             case "serviceName":
                 self.path = item.value as! String

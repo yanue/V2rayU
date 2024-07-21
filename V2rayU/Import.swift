@@ -204,6 +204,16 @@ class ImportUri {
     }
 
     func importVmess(vmess: VmessUri) {
+        if vmess.fp.isEmpty {
+            vmess.fp = "chrome"
+        }
+        if vmess.security.isEmpty {
+            vmess.security = "none"
+        }
+        if vmess.sni.count == 0 {
+            vmess.sni = vmess.address
+        }
+        
         let v2ray = V2rayConfig()
 
         var vmessItem = V2rayOutboundVMessItem()
@@ -232,12 +242,10 @@ class ImportUri {
         v2ray.streamKcp.header.type = vmess.type
         v2ray.streamKcp.uplinkCapacity = vmess.uplinkCapacity
         v2ray.streamKcp.downlinkCapacity = vmess.downlinkCapacity
+        v2ray.streamKcp.seed = vmess.kcpSeed
 
         // h2
-        if v2ray.streamH2.host.count == 0 {
-            v2ray.streamH2.host = [""]
-        }
-        v2ray.streamH2.host[0] = vmess.netHost
+        v2ray.streamH2.host = [vmess.netHost]
         v2ray.streamH2.path = vmess.netPath
 
         // ws
@@ -311,6 +319,9 @@ class ImportUri {
         if vmess.flow.isEmpty {
             vmess.flow = "xtls-rprx-vision"
         }
+        if vmess.sni.count == 0 {
+            vmess.sni = vmess.address
+        }
         
         let v2ray = V2rayConfig()
         v2ray.serverProtocol = V2rayProtocolOutbound.vless.rawValue
@@ -325,10 +336,6 @@ class ImportUri {
         user.level = vmess.level
         vmessItem.users = [user]
         v2ray.serverVless = vmessItem
-
-        if vmess.sni.count == 0 {
-            vmess.sni = vmess.address
-        }
 
         // stream
         v2ray.streamNetwork = vmess.type
@@ -345,12 +352,10 @@ class ImportUri {
 
         // kcp
         v2ray.streamKcp.header.type = vmess.type
+        v2ray.streamKcp.seed = vmess.kcpSeed
 
         // h2
-        if v2ray.streamH2.host.count == 0 {
-            v2ray.streamH2.host = [""]
-        }
-        v2ray.streamH2.host[0] = vmess.host
+        v2ray.streamH2.host = [vmess.host]
         v2ray.streamH2.path = vmess.path
 
         // ws
@@ -363,7 +368,13 @@ class ImportUri {
 
         // tcp
         v2ray.streamTcp.header.type = vmess.type
-
+        if v2ray.streamNetwork == "tcp" && v2ray.streamTcp.header.type == "http" {
+            var tcpReq = TcpSettingHeaderRequest()
+            tcpReq.path = [vmess.path]
+            tcpReq.headers.host = [vmess.host]
+            v2ray.streamTcp.header.request = tcpReq
+        }
+        
         // quic
         v2ray.streamQuic.header.type = vmess.type
 

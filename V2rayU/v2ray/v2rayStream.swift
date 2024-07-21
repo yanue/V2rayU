@@ -147,6 +147,7 @@ struct KcpSettings: Codable {
     var congestion: Bool = false
     var readBufferSize: Int = 1
     var writeBufferSize: Int = 1
+    var seed:String = ""
     var header: KcpSettingsHeader = KcpSettingsHeader()
 }
 
