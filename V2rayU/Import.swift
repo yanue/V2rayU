@@ -316,9 +316,6 @@ class ImportUri {
         if vmess.security.isEmpty {
             vmess.security = "none"
         }
-        if vmess.flow.isEmpty {
-            vmess.flow = "xtls-rprx-vision"
-        }
         if vmess.sni.count == 0 {
             vmess.sni = vmess.address
         }

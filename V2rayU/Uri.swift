@@ -583,9 +583,6 @@ class VlessUri {
                 break
             case "flow":
                 self.flow = item.value as! String
-                if self.flow.isEmpty {
-                    self.flow = "xtls-rprx-vision"
-                }
                 break
             case "encryption":
                 self.encryption = item.value as! String
