@@ -102,7 +102,7 @@ struct TcpSettingHeader: Codable {
 struct TcpSettingHeaderRequest: Codable {
     var version: String = "1.1"
     var method: String = "GET"
-    var path: [String] = []
+    var path: [String] = [""]
     var headers: TcpSettingHeaderRequestHeaders = TcpSettingHeaderRequestHeaders()
 }
 

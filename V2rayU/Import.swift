@@ -335,7 +335,7 @@ class ImportUri {
         v2ray.serverVless = vmessItem
 
         // stream
-        v2ray.streamNetwork = vmess.type
+        v2ray.streamNetwork = vmess.network
         v2ray.streamSecurity = vmess.security
         v2ray.securityTls.serverName = vmess.sni // default tls sni
         v2ray.securityTls.fingerprint = vmess.fp
@@ -348,7 +348,7 @@ class ImportUri {
         }
 
         // kcp
-        v2ray.streamKcp.header.type = vmess.type
+        v2ray.streamKcp.header.type = vmess.headerType
         v2ray.streamKcp.seed = vmess.kcpSeed
 
         // h2
@@ -364,7 +364,7 @@ class ImportUri {
         v2ray.streamGrpc.multiMode = vmess.grpcMode == "multi" // v2rayN
 
         // tcp
-        v2ray.streamTcp.header.type = vmess.type
+        v2ray.streamTcp.header.type = vmess.headerType
         if v2ray.streamNetwork == "tcp" && v2ray.streamTcp.header.type == "http" {
             var tcpReq = TcpSettingHeaderRequest()
             tcpReq.path = [vmess.path]
@@ -373,8 +373,10 @@ class ImportUri {
         }
         
         // quic
-        v2ray.streamQuic.header.type = vmess.type
-
+        v2ray.streamQuic.header.type = vmess.headerType
+        
+        print("importVless-v2ray",v2ray.streamKcp,v2ray.streamKcp.seed)
+        
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
@@ -516,7 +518,7 @@ func importByClash(clash: clashProxy) -> ImportUri? {
         item.port = clash.port
         item.id = clash.uuid ?? ""
         item.security = clash.cipher ?? "none" // vless encryption
-        item.type = clash.network ?? "tcp"
+        item.network = clash.network ?? "tcp"
         item.sni = clash.sni ?? clash.server
         if clash.security == "reality" {
             item.sni = clash.servername ?? clash.server
@@ -527,7 +529,7 @@ func importByClash(clash: clashProxy) -> ImportUri? {
             }
         }
         // network ws
-        if item.type == "ws" {
+        if item.network == "ws" {
             item.host = clash.servername ?? clash.server
             item.path = "/"
             if clash.wsOpts != nil {
@@ -535,7 +537,7 @@ func importByClash(clash: clashProxy) -> ImportUri? {
             }
         }
         // network h2
-        if item.type == "h2" {
+        if item.network == "h2" {
             item.host = clash.servername ?? clash.server
             item.path = "/"
             if clash.h2Opts != nil {
@@ -547,7 +549,7 @@ func importByClash(clash: clashProxy) -> ImportUri? {
             }
         }
         // network grpc
-        if item.type == "grpc" {
+        if item.network == "grpc" {
             item.host = clash.servername ?? clash.server
             if clash.grpcOpts != nil {
                 item.path = clash.grpcOpts?.grpcServiceName ?? "/"

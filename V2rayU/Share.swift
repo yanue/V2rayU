@@ -11,14 +11,16 @@ struct VmessShare: Codable {
     var ps: String = ""
     var add: String = ""
     var port: String = ""
-    var id: String = ""
-    var aid: String = ""
-    var net: String = ""
-    var type: String = "none"
-    var host: String = ""
-    var path: String = ""
+    var id: String = "" // UUID
+    var aid: String = "" // alterId
+    var net: String = "" // network type: (tcp\kcp\ws\h2\quic\ds\grpc)
+    var type: String = "none" // 伪装类型(none\http\srtp\utp\wechat-video) *tcp or kcp or QUIC
+    var host: String = "" // host: 1)http(tcp)->host中间逗号(,)隔开,2)ws->host,3)h2->host,4)QUIC->securty
+    var path: String = "" // path: 1)ws->path,2)h2->path,3)QUIC->key/Kcp->seed,4)grpc->serviceName
     var tls: String = "tls"
-    var security: String = "auto"
+    var security: String = "auto" // 加密方式(security),没有时值默认auto
+    var scy: String = "auto" // 同security
+    var alpn: String = "" // h2,http/1.1
     var sni: String = ""
     var fp: String = ""
 }
@@ -99,6 +101,34 @@ class ShareUri {
         }
         self.share.net = self.v2ray.streamNetwork
 
+        if self.v2ray.streamNetwork == "tcp" {
+            self.share.type = self.v2ray.streamTcp.header.type
+            if self.v2ray.streamTcp.header.type == "http" {
+                if let req = self.v2ray.streamTcp.header.request {
+                    if req.path.count > 0 {
+                        self.share.path = req.path[0]
+                    }
+                    if req.headers.host.count>0 {
+                        self.share.host = req.headers.host[0]
+                    }
+                }
+            }
+        }
+        
+        if self.v2ray.streamNetwork == "kcp" {
+            self.share.type = self.v2ray.streamKcp.header.type
+            self.share.path = self.v2ray.streamKcp.seed
+        }
+        
+        if self.v2ray.streamNetwork == "quic" {
+            self.share.type = self.v2ray.streamQuic.header.type
+            self.share.path = self.v2ray.streamQuic.key
+        }
+        
+        if self.v2ray.streamNetwork == "domainsocket" {
+            self.share.path = self.v2ray.streamDs.path
+        }
+        
         if self.v2ray.streamNetwork == "h2" {
             if self.v2ray.streamH2.host.count > 0 {
                 self.share.host = self.v2ray.streamH2.host[0]
@@ -183,8 +213,36 @@ class ShareUri {
             ss.fp = self.v2ray.securityTls.fingerprint
         }
 
-        ss.type = self.v2ray.streamNetwork
+        ss.network = self.v2ray.streamNetwork
 
+        if self.v2ray.streamNetwork == "tcp" {
+            ss.headerType = self.v2ray.streamTcp.header.type
+            if self.v2ray.streamTcp.header.type == "http" {
+                if let req = self.v2ray.streamTcp.header.request {
+                    if req.path.count > 0 {
+                        ss.path = req.path[0]
+                    }
+                    if req.headers.host.count>0 {
+                        ss.host = req.headers.host[0]
+                    }
+                }
+            }
+        }
+        
+        if self.v2ray.streamNetwork == "kcp" {
+            ss.headerType = self.v2ray.streamKcp.header.type
+            ss.kcpSeed = self.v2ray.streamKcp.seed
+        }
+        
+        if self.v2ray.streamNetwork == "quic" {
+            ss.headerType = self.v2ray.streamQuic.header.type
+            ss.kcpSeed = self.v2ray.streamQuic.key
+        }
+        
+        if self.v2ray.streamNetwork == "domainsocket" {
+            ss.path = self.v2ray.streamDs.path
+        }
+        
         if self.v2ray.streamNetwork == "h2" {
             if self.v2ray.streamH2.host.count > 0 {
                 ss.host = self.v2ray.streamH2.host[0]

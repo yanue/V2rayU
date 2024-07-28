@@ -922,6 +922,7 @@ class V2rayConfig: NSObject {
 
             if transport.kcpSettings != nil {
                 self.streamKcp = transport.kcpSettings!
+                print("self.streamKcp",self.streamKcp)
             }
 
             if transport.wsSettings != nil {
@@ -1100,6 +1101,7 @@ class V2rayConfig: NSObject {
             kcpSettings.congestion = streamJson["kcpSettings"]["congestion"].boolValue
             kcpSettings.readBufferSize = streamJson["kcpSettings"]["readBufferSize"].intValue
             kcpSettings.writeBufferSize = streamJson["kcpSettings"]["writeBufferSize"].intValue
+            kcpSettings.seed = streamJson["kcpSettings"]["seed"].stringValue
             // "none"
             if KcpSettingsHeaderType.firstIndex(of: streamJson["kcpSettings"]["header"]["type"].stringValue) != nil {
                 kcpSettings.header.type = streamJson["kcpSettings"]["header"]["type"].stringValue

@@ -520,10 +520,11 @@ class VlessUri {
     var level: Int = 0
     var flow: String = ""
 
-    var encryption: String = "" // auto,aes-128-gcm,...
+    var encryption: String = "" // none,auto,aes-128-gcm,...
     var security: String = "" // xtls,tls,reality
-
-    var type: String = "" // tcp,http
+    
+    var network: String = "" // network type: tcp,http,kcp,h2,ws,quic,grpc,domainsocket
+    var headerType: String = "" // header type: tcp=["none","http"],quic,kcp=["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
     var host: String = ""
     var sni: String = ""
     var path: String = ""
@@ -544,7 +545,7 @@ class VlessUri {
             URLQueryItem(name: "flow", value: self.flow),
             URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "encryption", value: self.encryption),
-            URLQueryItem(name: "type", value: self.type),
+            URLQueryItem(name: "type", value: self.network), // 网络类型: tcp,http,kcp,h2,ws,quic,grpc,domainsocket
             URLQueryItem(name: "host", value: self.host),
             URLQueryItem(name: "path", value: self.path),
             URLQueryItem(name: "sni", value: self.sni),
@@ -552,6 +553,7 @@ class VlessUri {
             URLQueryItem(name: "pbk", value: self.pbk),
             URLQueryItem(name: "sid", value: self.sid),
             URLQueryItem(name: "serviceName", value: self.path),
+            URLQueryItem(name: "headerType", value: self.headerType),
             URLQueryItem(name: "mode", value: self.grpcMode),
             URLQueryItem(name: "seed", value: self.kcpSeed)
         ]
@@ -594,7 +596,7 @@ class VlessUri {
                 self.security = item.value as! String
                 break
             case "type":
-                self.type = item.value as! String
+                self.network = item.value as! String
                 break
             case "host":
                 self.host = item.value as! String
@@ -615,7 +617,7 @@ class VlessUri {
                 self.sid = item.value as! String
                 break
             case "headerType":
-                self.type = item.value as! String
+                self.headerType = item.value as! String
                 break
             case "seed":
                 self.kcpSeed = item.value as! String

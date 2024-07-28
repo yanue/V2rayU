@@ -108,12 +108,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var kcpTti: NSTextField!
     @IBOutlet weak var kcpUplinkCapacity: NSTextField!
     @IBOutlet weak var kcpDownlinkCapacity: NSTextField!
-    @IBOutlet weak var kcpReadBufferSize: NSTextField!
-    @IBOutlet weak var kcpWriteBufferSize: NSTextField!
+    @IBOutlet weak var kcpSeed: NSTextField!
     @IBOutlet weak var kcpHeader: NSPopUpButton!
     @IBOutlet weak var kcpCongestion: NSButton!
 
     @IBOutlet weak var tcpHeaderType: NSPopUpButton!
+    @IBOutlet weak var tcpHost: NSTextField!
+    @IBOutlet weak var tcpPath: NSTextField!
 
     @IBOutlet weak var wsHost: NSTextField!
     @IBOutlet weak var wsPath: NSTextField!
@@ -371,6 +372,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         if self.tcpHeaderType.indexOfSelectedItem >= 0 {
             v2rayConfig.streamTcp.header.type = self.tcpHeaderType.titleOfSelectedItem!
         }
+        if v2rayConfig.streamTcp.header.type == "http" {
+            var tcpRequest = TcpSettingHeaderRequest()
+            tcpRequest.path = [self.tcpPath.stringValue]
+            tcpRequest.headers.host = [self.tcpHost.stringValue]
+            v2rayConfig.streamTcp.header.request = tcpRequest
+        }
 
         // kcp
         if self.kcpHeader.indexOfSelectedItem >= 0 {
@@ -380,8 +387,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.streamKcp.tti = Int(self.kcpTti.intValue)
         v2rayConfig.streamKcp.uplinkCapacity = Int(self.kcpUplinkCapacity.intValue)
         v2rayConfig.streamKcp.downlinkCapacity = Int(self.kcpDownlinkCapacity.intValue)
-        v2rayConfig.streamKcp.readBufferSize = Int(self.kcpReadBufferSize.intValue)
-        v2rayConfig.streamKcp.writeBufferSize = Int(self.kcpWriteBufferSize.intValue)
+        v2rayConfig.streamKcp.seed = self.kcpSeed.stringValue
         v2rayConfig.streamKcp.congestion = self.kcpCongestion.state.rawValue > 0
 
         // h2
@@ -499,6 +505,17 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         
         // tcp
         self.tcpHeaderType.selectItem(withTitle: v2rayConfig.streamTcp.header.type)
+        if let req = v2rayConfig.streamTcp.header.request {
+            if req.path.count>0 {
+                self.tcpPath.stringValue = req.path[0]
+            }
+            if req.headers.host.count>0{
+                self.tcpHost.stringValue = req.headers.host[0]
+            }
+        } else {
+            self.tcpPath.stringValue = ""
+            self.tcpHost.stringValue = ""
+        }
 
         // kcp
         self.kcpHeader.selectItem(withTitle: v2rayConfig.streamKcp.header.type)
@@ -506,8 +523,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.kcpTti.intValue = Int32(v2rayConfig.streamKcp.tti)
         self.kcpUplinkCapacity.intValue = Int32(v2rayConfig.streamKcp.uplinkCapacity)
         self.kcpDownlinkCapacity.intValue = Int32(v2rayConfig.streamKcp.downlinkCapacity)
-        self.kcpReadBufferSize.intValue = Int32(v2rayConfig.streamKcp.readBufferSize)
-        self.kcpWriteBufferSize.intValue = Int32(v2rayConfig.streamKcp.writeBufferSize)
+        self.kcpSeed.stringValue = v2rayConfig.streamKcp.seed
         self.kcpCongestion.intValue = v2rayConfig.streamKcp.congestion ? 1 : 0
 
         // h2
