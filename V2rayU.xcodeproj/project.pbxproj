@@ -7,22 +7,48 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6689038D2CF17C7C0022EA7E /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6689038C2CF17C750022EA7E /* MenuView.swift */; };
 		66CBCEDB2C63B16400313949 /* V2rayUApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CBCEDA2C63B16400313949 /* V2rayUApp.swift */; };
-		66CBCEDD2C63B16400313949 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CBCEDC2C63B16400313949 /* ContentView.swift */; };
 		66CBCEDF2C63B16400313949 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CBCEDE2C63B16400313949 /* Item.swift */; };
 		66CBCEE12C63B16500313949 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66CBCEE02C63B16500313949 /* Assets.xcassets */; };
 		66CBCEE42C63B16500313949 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66CBCEE32C63B16500313949 /* Preview Assets.xcassets */; };
+		66E0D41A2CF1D1AC00152F40 /* ConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4192CF1D1A300152F40 /* ConfigView.swift */; };
+		66E0D41C2CF2F31700152F40 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41B2CF2F30800152F40 /* Main.swift */; };
+		66E0D4252CF2F74B00152F40 /* v2rayStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */; };
+		66E0D4262CF2F74B00152F40 /* v2rayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4202CF2F74B00152F40 /* v2rayStream.swift */; };
+		66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */; };
+		66E0D4282CF2F74B00152F40 /* v2rayOutbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */; };
+		66E0D42F2CF3059300152F40 /* V2rayProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D42E2CF3059300152F40 /* V2rayProxy.swift */; };
+		66E0D4312CF3064D00152F40 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4302CF3064D00152F40 /* AppVersion.swift */; };
+		66E0D4332CF3068400152F40 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4322CF3068400152F40 /* Util.swift */; };
+		66E0D4352CF3072400152F40 /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4342CF3072400152F40 /* ToastWindow.swift */; };
+		66E0D4372CF334D900152F40 /* ConfigTransportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4362CF334D800152F40 /* ConfigTransportView.swift */; };
+		66E0D4392CF3353000152F40 /* ConfigStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4382CF3352B00152F40 /* ConfigStreamView.swift */; };
+		66E0D43B2CF3356800152F40 /* ConfigServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D43A2CF3356500152F40 /* ConfigServerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6638F5EB2C64FF090091FFF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6689038C2CF17C750022EA7E /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEDA2C63B16400313949 /* V2rayUApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayUApp.swift; sourceTree = "<group>"; };
-		66CBCEDC2C63B16400313949 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		66CBCEDE2C63B16400313949 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		66CBCEE02C63B16500313949 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		66CBCEE52C63B16500313949 /* V2rayU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayU.entitlements; sourceTree = "<group>"; };
+		66E0D4192CF1D1A300152F40 /* ConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigView.swift; sourceTree = "<group>"; };
+		66E0D41B2CF2F30800152F40 /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayStruct.swift; sourceTree = "<group>"; };
+		66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayInbound.swift; sourceTree = "<group>"; };
+		66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayOutbound.swift; sourceTree = "<group>"; };
+		66E0D4202CF2F74B00152F40 /* v2rayStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayStream.swift; sourceTree = "<group>"; };
+		66E0D42E2CF3059300152F40 /* V2rayProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayProxy.swift; sourceTree = "<group>"; };
+		66E0D4302CF3064D00152F40 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
+		66E0D4322CF3068400152F40 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		66E0D4342CF3072400152F40 /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
+		66E0D4362CF334D800152F40 /* ConfigTransportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigTransportView.swift; sourceTree = "<group>"; };
+		66E0D4382CF3352B00152F40 /* ConfigStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigStreamView.swift; sourceTree = "<group>"; };
+		66E0D43A2CF3356500152F40 /* ConfigServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigServerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,10 +81,14 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				66E0D4342CF3072400152F40 /* ToastWindow.swift */,
+				66E0D4302CF3064D00152F40 /* AppVersion.swift */,
+				66E0D4232CF2F74B00152F40 /* v2ray */,
+				66E0D4182CF1D19200152F40 /* Views */,
 				6638F5EB2C64FF090091FFF8 /* Info.plist */,
 				66CBCEDA2C63B16400313949 /* V2rayUApp.swift */,
-				66CBCEDC2C63B16400313949 /* ContentView.swift */,
 				66CBCEDE2C63B16400313949 /* Item.swift */,
+				66E0D4322CF3068400152F40 /* Util.swift */,
 				66CBCEE02C63B16500313949 /* Assets.xcassets */,
 				66CBCEE52C63B16500313949 /* V2rayU.entitlements */,
 				66CBCEE22C63B16500313949 /* Preview Content */,
@@ -72,6 +102,31 @@
 				66CBCEE32C63B16500313949 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		66E0D4182CF1D19200152F40 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				66E0D4192CF1D1A300152F40 /* ConfigView.swift */,
+				66E0D43A2CF3356500152F40 /* ConfigServerView.swift */,
+				66E0D4382CF3352B00152F40 /* ConfigStreamView.swift */,
+				66E0D4362CF334D800152F40 /* ConfigTransportView.swift */,
+				66E0D41B2CF2F30800152F40 /* Main.swift */,
+				6689038C2CF17C750022EA7E /* MenuView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		66E0D4232CF2F74B00152F40 /* v2ray */ = {
+			isa = PBXGroup;
+			children = (
+				66E0D42E2CF3059300152F40 /* V2rayProxy.swift */,
+				66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */,
+				66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */,
+				66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */,
+				66E0D4202CF2F74B00152F40 /* v2rayStream.swift */,
+			);
+			path = v2ray;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,9 +199,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66CBCEDD2C63B16400313949 /* ContentView.swift in Sources */,
+				66E0D41C2CF2F31700152F40 /* Main.swift in Sources */,
 				66CBCEDF2C63B16400313949 /* Item.swift in Sources */,
+				66E0D41A2CF1D1AC00152F40 /* ConfigView.swift in Sources */,
+				66E0D4352CF3072400152F40 /* ToastWindow.swift in Sources */,
+				66E0D4392CF3353000152F40 /* ConfigStreamView.swift in Sources */,
+				6689038D2CF17C7C0022EA7E /* MenuView.swift in Sources */,
 				66CBCEDB2C63B16400313949 /* V2rayUApp.swift in Sources */,
+				66E0D4252CF2F74B00152F40 /* v2rayStruct.swift in Sources */,
+				66E0D42F2CF3059300152F40 /* V2rayProxy.swift in Sources */,
+				66E0D4372CF334D900152F40 /* ConfigTransportView.swift in Sources */,
+				66E0D4332CF3068400152F40 /* Util.swift in Sources */,
+				66E0D4262CF2F74B00152F40 /* v2rayStream.swift in Sources */,
+				66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */,
+				66E0D43B2CF3356800152F40 /* ConfigServerView.swift in Sources */,
+				66E0D4282CF2F74B00152F40 /* v2rayOutbound.swift in Sources */,
+				66E0D4312CF3064D00152F40 /* AppVersion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

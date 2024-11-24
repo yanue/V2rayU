@@ -1,25 +1,37 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
+
+let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
+let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
+let AppHomePath = NSHomeDirectory() + "/.V2rayU"
+let v2rayUTool = AppHomePath + "/V2rayUTool"
+let v2rayCorePath = AppHomePath + "/v2ray-core"
+let v2rayCoreFile = v2rayCorePath + "/v2ray"
+let logFilePath = AppHomePath + "/v2ray-core.log"
+let JsonConfigFilePath = AppHomePath + "/config.json"
 
 @main
 struct V2rayUApp: App {
     @State private var windowController: NSWindowController?
-    private var windowDelegate = WindowDelegate()
     @State private var aboutWindowController: NSWindowController?
+    
+    private var windowDelegate = WindowDelegate()
 
     init() {
         // 已设置 Application is agent (UIElement) 为 YES
         // 初始化
+        let fileManager = FileManager.default
+        if let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            print("Application Support Directory: \(appSupportURL)")
+        }
     }
 
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([Item.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -28,14 +40,15 @@ struct V2rayUApp: App {
     var body: some Scene {
         // 显示 MenuBar
         MenuBarExtra("V2rayU", image: "IconOn") {
-            AppMenu(openContentViewWindow: openContentViewWindow,openAboutWindow: openAboutWindow)
-        }
-        // 不需要 contentView 了
+            AppMenuView(openContentViewWindow: openContentViewWindow)
+        }.menuBarExtraStyle(.window) // 重点,按窗口显示
     }
-    
+
     func openContentViewWindow() {
         if windowController == nil {
-            let contentView = ContentView().modelContainer(sharedModelContainer)
+//            let contentView = ContentView().modelContainer(sharedModelContainer)
+            let item = ProxyModel(protocol: .trojan,  address: "aaa", port: 443, id: "xxxx-bbb-ccccc", security: "none", remark: "test02")
+            let contentView = ConfigView(item: item)
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(contentViewController: hostingController)
@@ -48,7 +61,7 @@ struct V2rayUApp: App {
         }
 
         windowController?.showWindow(nil)
-        
+
         // 确保窗口在最前面
         windowController?.window?.makeKeyAndOrderFront(nil)
         NSApp.setActivationPolicy(.regular)
@@ -59,29 +72,28 @@ struct V2rayUApp: App {
             self.windowController?.window?.orderFrontRegardless()
         }
     }
-    
 
     func openAboutWindow() {
-       if aboutWindowController == nil {
-           // 创建自定义 About 窗口
-           let aboutView = VStack {
-               Text("V2rayU")
-                   .font(.largeTitle)
-               Text("版本 1.0.0")
-               Text("版权所有 © 2024")
-               .padding()
-           }.frame(width: 400,height: 200)
-           .padding()
-           let hostingController = NSHostingController(rootView: aboutView)
-           let window = NSWindow(contentViewController: hostingController)
-           window.title = "About V2rayU"
-           window.styleMask = [.titled, .closable]
-           window.setContentSize(NSSize(width: 600, height: 400))
-           window.isReleasedWhenClosed = false
-           window.delegate = windowDelegate
+        if aboutWindowController == nil {
+            // 创建自定义 About 窗口
+            let aboutView = VStack {
+                Text("V2rayU")
+                    .font(.largeTitle)
+                Text("版本 1.0.0")
+                Text("版权所有 © 2024")
+                    .padding()
+            }.frame(width: 400, height: 200)
+                .padding()
+            let hostingController = NSHostingController(rootView: aboutView)
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "About V2rayU"
+            window.styleMask = [.titled, .closable]
+            window.setContentSize(NSSize(width: 600, height: 400))
+            window.isReleasedWhenClosed = false
+            window.delegate = windowDelegate
 
-           aboutWindowController = NSWindowController(window: window)
-       }
+            aboutWindowController = NSWindowController(window: window)
+        }
         // 确保窗口在最前面
         aboutWindowController?.window?.makeKeyAndOrderFront(nil)
         NSApp.setActivationPolicy(.regular)
@@ -91,35 +103,9 @@ struct V2rayUApp: App {
         DispatchQueue.main.async {
             self.aboutWindowController?.window?.orderFrontRegardless()
         }
-       }
-    
-    func showWindow(){
-        
-    }
-}
-
-struct AppMenu: View {
-    var openContentViewWindow: () -> Void
-    var openAboutWindow: () -> Void
-
-    func action1() {
-        openContentViewWindow()
-    }
-    func action2() {
-        openAboutWindow()
-    }
-    func action3() {
-        
     }
 
-    var body: some View {
-        CustomMenuItemView()
-        Button(action: action1, label: { Text("Setting") })
-        Button(action: action2, label: { Text("About") })
-        
-        Divider()
-
-        Button(action: action3, label: { Text("Quit") })
+    func showWindow() {
     }
 }
 
