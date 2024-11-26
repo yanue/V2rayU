@@ -14,7 +14,7 @@ struct ConfigTransportView: View {
             VStack{
                 Section(header: Text("Transport Settings")) {
                     HStack {
-                        Text("Security").frame(width: 120, alignment: .trailing)
+                        Text("Security").frame(width: 100, alignment: .trailing)
                         Spacer()
                         Picker("", selection: $item.streamSecurity) {
                             ForEach(V2rayStreamSecurity.allCases) { pick in
@@ -23,7 +23,7 @@ struct ConfigTransportView: View {
                         }
                     }
                     HStack {
-                        Text("serverName(SNI)").frame(width: 120, alignment: .trailing)
+                        Text("serverName(SNI)").frame(width: 100, alignment: .trailing)
                         Spacer()
 
                         TextField("Enter serverName(SNI)", text: $item.sni)
@@ -35,7 +35,7 @@ struct ConfigTransportView: View {
                             .toggleStyle(SwitchToggleStyle(tint: .blue))
                     }
                     HStack {
-                        Text("fingerprint").frame(width: 120, alignment: .trailing)
+                        Text("fingerprint").frame(width: 100, alignment: .trailing)
                         Spacer()
                         Picker("", selection: $item.fingerprint) {
                             ForEach(V2rayStreamFingerprint.allCases) { pick in
@@ -45,21 +45,21 @@ struct ConfigTransportView: View {
                     }
                     if item.streamSecurity == .reality {
                         HStack {
-                            Text("PublicKey").frame(width: 120, alignment: .trailing)
+                            Text("PublicKey").frame(width: 100, alignment: .trailing)
                             Spacer()
                             TextField("Enter PublicKey", text: $item.publicKey)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding(.leading,8)
                         }
                         HStack {
-                            Text("ShortId").frame(width: 120, alignment: .trailing)
+                            Text("ShortId").frame(width: 100, alignment: .trailing)
                             Spacer()
                             TextField("Enter ShortId", text: $item.shortId)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .padding(.leading,8)
                         }
                         HStack {
-                            Text("spiderX").frame(width: 120, alignment: .trailing)
+                            Text("spiderX").frame(width: 100, alignment: .trailing)
                             Spacer()
                             TextField("Enter spiderX", text: $item.spiderX)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -68,7 +68,7 @@ struct ConfigTransportView: View {
                         }
                     } else {
                         HStack {
-                            Text("Alpn").frame(width: 120, alignment: .trailing)
+                            Text("Alpn").frame(width: 100, alignment: .trailing)
                             Spacer()
                             Picker("", selection: $item.alpn) {
                                 ForEach(V2rayStreamAlpn.allCases) { pick in

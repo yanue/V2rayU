@@ -52,7 +52,7 @@ struct V2rayUApp: App {
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(contentViewController: hostingController)
-            window.setContentSize(NSSize(width: 800, height: 600))
+            window.setContentSize(NSSize(width: 760, height: 600))
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
             window.isReleasedWhenClosed = false
             window.delegate = windowDelegate

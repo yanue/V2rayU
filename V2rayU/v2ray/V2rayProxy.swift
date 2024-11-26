@@ -50,8 +50,9 @@ import Cocoa
    PRIMARY KEY("indexId")
  );
  */
+import SwiftUI
 
-class ProxyModel: ObservableObject {
+class ProxyModel: ObservableObject, Identifiable {
     @Published var `protocol`: V2rayProtocolOutbound
     @Published var subid: String
     @Published var address: String
@@ -73,7 +74,12 @@ class ProxyModel: ObservableObject {
     @Published var publicKey: String = ""
     @Published var shortId: String = ""
     @Published var spiderX: String = ""
-
+    
+    // 对应编码的 `CodingKeys` 枚举
+    enum CodingKeys: String, CodingKey {
+        case `protocol`, subid, address, port, id, alterId, security, network, remark, headerType, requestHost, path, streamSecurity, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+    }
+    
     // 提供默认值的初始化器
     init(
         `protocol`: V2rayProtocolOutbound,
@@ -98,26 +104,66 @@ class ProxyModel: ObservableObject {
         shortId: String = "",
         spiderX: String = ""
     ) {
-        self.`protocol` = `protocol`
-        self.address = address
-        self.port = port
-        self.id = id
-        self.alterId = alterId
-        self.security = security
-        self.network = network
-        self.remark = remark
-        self.headerType = headerType
-        self.requestHost = requestHost
-        self.path = path
-        self.streamSecurity = streamSecurity
-        self.allowInsecure = allowInsecure
-        self.subid = subid
-        self.flow = flow
-        self.sni = sni
-        self.alpn = alpn
-        self.fingerprint = fingerprint
-        self.publicKey = publicKey
-        self.shortId = shortId
-        self.spiderX = spiderX
+        self.protocol = `protocol`  // Initialize protocol
+        self.address = address      // Initialize address
+        self.port = port            // Initialize port
+        self.id = id                // Initialize id
+        self.alterId = alterId      // Initialize alterId
+        self.security = security    // Initialize security
+        self.network = network      // Initialize network
+        self.remark = remark        // Initialize remark
+        self.headerType = headerType  // Initialize headerType
+        self.requestHost = requestHost  // Initialize requestHost
+        self.path = path              // Initialize path
+        self.streamSecurity = streamSecurity  // Initialize streamSecurity
+        self.allowInsecure = allowInsecure  // Initialize allowInsecure
+        self.subid = subid          // Initialize subid
+        self.flow = flow            // Initialize flow
+        self.sni = sni              // Initialize sni
+        self.alpn = alpn            // Initialize alpn
+        self.fingerprint = fingerprint // Initialize fingerprint
+        self.publicKey = publicKey  // Initialize publicKey
+        self.shortId = shortId      // Initialize shortId
+        self.spiderX = spiderX      // Initialize spiderX
+    }
+    
+
+    // 生成 JSON 字符串的方法
+    func generateJSON() -> String {
+        let dictionary: [String: Any] = [
+            "protocol": `protocol`.rawValue,  // 这里的 `protocol` 是一个自定义类型
+            "subid": subid,
+            "address": address,
+            "port": port,
+            "id": id,
+            "alterId": alterId,
+            "security": security,
+            "network": network.rawValue,  // 假设 V2rayStreamNetwork 是一个枚举类型
+            "remark": remark,
+            "headerType": headerType.rawValue,  // 假设 V2rayHeaderType 是一个枚举类型
+            "requestHost": requestHost,
+            "path": path,
+            "streamSecurity": streamSecurity.rawValue,  // 假设 V2rayStreamSecurity 是一个枚举类型
+            "allowInsecure": allowInsecure,
+            "flow": flow,
+            "sni": sni,
+            "alpn": alpn.rawValue,  // 假设 V2rayStreamAlpn 是一个枚举类型
+            "fingerprint": fingerprint.rawValue,  // 假设 V2rayStreamFingerprint 是一个枚举类型
+            "publicKey": publicKey,
+            "shortId": shortId,
+            "spiderX": spiderX
+        ]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            } else {
+                return "{}"
+            }
+        } catch {
+            print("JSONSerialization 错误: \(error)")
+            return "{}"
+        }
     }
 }
