@@ -18,7 +18,7 @@ struct JSONTextView: NSViewRepresentable {
         
         // 创建 NSTextView
         let textView = NSTextView()
-        textView.isEditable = true
+        textView.isEditable = false
         textView.isSelectable = true
         textView.drawsBackground = true
         textView.backgroundColor = NSColor.clear

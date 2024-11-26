@@ -8,20 +8,6 @@
 
 import Cocoa
 
-struct V2rayTransport: Codable {
-    var tlsSettings: TlsSettings?
-    var xtlsSettings: TlsSettings?
-    var realitySettings: RealitySettings?
-    var tcpSettings: TcpSettings?
-    var kcpSettings: KcpSettings?
-    var wsSettings: WsSettings?
-    var httpSettings: HttpSettings?
-    var dsSettings: DsSettings?
-    var quicSettings: QuicSettings?
-    var grpcSettings: GrpcSettings?
-}
-
-
 // protocol
 enum V2rayStreamNetwork: String, Codable, CaseIterable, Identifiable {
     case tcp
@@ -76,26 +62,8 @@ enum V2rayHeaderType: String, Codable, CaseIterable, Identifiable {
 
 
 struct V2rayStreamSettings: Codable {
-    enum network: String, Codable {
-        case tcp
-        case kcp
-        case ws
-        case http
-        case h2
-        case domainsocket
-        case quic
-        case grpc
-    }
-
-    enum security: String, Codable {
-        case none
-        case tls
-        case xtls
-        case reality // for vless
-    }
-
-    var network: network = .tcp
-    var security: security = .none
+    var network: V2rayStreamNetwork = .tcp
+    var security: V2rayStreamSecurity = .none
     var sockopt: V2rayStreamSettingSockopt?
     // transport
     var tcpSettings: TcpSettings?

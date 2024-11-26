@@ -8,163 +8,79 @@
 
 import Cocoa
 
-// protocol
-enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
-    case vmess
-    case vless
-    case trojan
-    case shadowsocks
-    case socks
-    case dns
-    case http
-    case blackhole
-    case freedom
+protocol V2rayOutboundSettings: Codable {}
 
+// MARK: - Protocol Definitions
+enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
+    case vmess, vless, trojan, shadowsocks, socks, dns, http, blackhole, freedom
     var id: Self { self }
 }
 
-struct V2rayOutbound: Codable {
+// MARK: - V2rayOutbound Definition
+final class V2rayOutbound: Codable {
     var sendThrough: String?
     var `protocol`: V2rayProtocolOutbound = .freedom
-    var tag: String? = ""
+    var tag: String?
     var streamSettings: V2rayStreamSettings?
     var proxySettings: ProxySettings?
     var mux: V2rayOutboundMux?
-
-    var settingBlackhole: V2rayOutboundBlackhole?
-    var settingFreedom: V2rayOutboundFreedom?
-    var settingShadowsocks: V2rayOutboundShadowsocks?
-    var settingSocks: V2rayOutboundSocks?
-    var settingVMess: V2rayOutboundVMess?
-    var settingDns: V2rayOutboundDns?
-    var settingHttp: V2rayOutboundHttp?
-    var settingVLess: V2rayOutboundVLess?
-    var settingTrojan: V2rayOutboundTrojan?
+    var settings: V2rayOutboundSettings?
 
     enum CodingKeys: String, CodingKey {
-        case sendThrough
-        case `protocol`
-        case tag
-        case streamSettings
-        case proxySettings
-        case mux
-        case settings // auto switch by protocol
+        case sendThrough, `protocol`, tag, streamSettings, proxySettings, mux, settings
     }
-}
-
-extension V2rayOutbound {
+    
+    // 空 init 初始化器
+    init() {}
+    
+    // MARK: - Decoding
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: CodingKeys.`protocol`)
-        tag = try container.decode(String.self, forKey: CodingKeys.tag)
+        sendThrough = try? container.decode(String.self, forKey: .sendThrough)
+        `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: .`protocol`)
+        tag = try? container.decode(String.self, forKey: .tag)
+        streamSettings = try? container.decode(V2rayStreamSettings.self, forKey: .streamSettings)
+        proxySettings = try? container.decode(ProxySettings.self, forKey: .proxySettings)
+        mux = try? container.decode(V2rayOutboundMux.self, forKey: .mux)
 
-        // ignore nil
-        if !(try container.decodeNil(forKey: .sendThrough)) {
-            sendThrough = try container.decode(String.self, forKey: CodingKeys.sendThrough)
-        }
-
-        // ignore nil
-        if !(try container.decodeNil(forKey: .proxySettings)) {
-            proxySettings = try container.decode(ProxySettings.self, forKey: CodingKeys.proxySettings)
-        }
-
-        // ignore nil
-        if !(try container.decodeNil(forKey: .streamSettings)) {
-            streamSettings = try container.decode(V2rayStreamSettings.self, forKey: CodingKeys.streamSettings)
-        }
-
-        // ignore nil
-        if !(try container.decodeNil(forKey: .mux)) {
-            mux = try container.decode(V2rayOutboundMux.self, forKey: CodingKeys.mux)
-        }
-
-        // decode settings depends on `protocol`
+        // Dynamically decode settings based on protocol
         switch `protocol` {
-        case .blackhole:
-            settingBlackhole = try container.decode(V2rayOutboundBlackhole.self, forKey: CodingKeys.settings)
-            break
-        case .freedom:
-            settingFreedom = try container.decode(V2rayOutboundFreedom.self, forKey: CodingKeys.settings)
-            break
-        case .shadowsocks:
-            settingShadowsocks = try container.decode(V2rayOutboundShadowsocks.self, forKey: CodingKeys.settings)
-            break
-        case .socks:
-            settingSocks = try container.decode(V2rayOutboundSocks.self, forKey: CodingKeys.settings)
-            break
-        case .vmess:
-            settingVMess = try container.decode(V2rayOutboundVMess.self, forKey: CodingKeys.settings)
-            break
-        case .dns:
-            settingDns = try container.decode(V2rayOutboundDns.self, forKey: CodingKeys.settings)
-            break
-        case .http:
-            settingHttp = try container.decode(V2rayOutboundHttp.self, forKey: CodingKeys.settings)
-            break
-        case .vless:
-            settingVLess = try container.decode(V2rayOutboundVLess.self, forKey: CodingKeys.settings)
-            break
-        case .trojan:
-            settingTrojan = try container.decode(V2rayOutboundTrojan.self, forKey: CodingKeys.settings)
-            break
+        case .blackhole: settings = try? container.decode(V2rayOutboundBlackhole.self, forKey: .settings)
+        case .freedom: settings = try? container.decode(V2rayOutboundFreedom.self, forKey: .settings)
+        case .shadowsocks: settings = try? container.decode(V2rayOutboundShadowsocks.self, forKey: .settings)
+        case .socks: settings = try? container.decode(V2rayOutboundSocks.self, forKey: .settings)
+        case .vmess: settings = try? container.decode(V2rayOutboundVMess.self, forKey: .settings)
+        case .dns: settings = try? container.decode(V2rayOutboundDns.self, forKey: .settings)
+        case .http: settings = try? container.decode(V2rayOutboundHttp.self, forKey: .settings)
+        case .vless: settings = try? container.decode(V2rayOutboundVLess.self, forKey: .settings)
+        case .trojan: settings = try? container.decode(V2rayOutboundTrojan.self, forKey: .settings)
         }
     }
 
+    // MARK: - Encoding
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encodeIfPresent(sendThrough, forKey: .sendThrough)
         try container.encode(`protocol`, forKey: .`protocol`)
-        try container.encode(tag, forKey: .tag)
+        try container.encodeIfPresent(tag, forKey: .tag)
+        try container.encodeIfPresent(streamSettings, forKey: .streamSettings)
+        try container.encodeIfPresent(proxySettings, forKey: .proxySettings)
+        try container.encodeIfPresent(mux, forKey: .mux)
 
-        // ignore nil
-        if streamSettings != nil {
-            try container.encode(streamSettings, forKey: .streamSettings)
-        }
-
-        // ignore nil
-        if sendThrough != nil && sendThrough!.count > 0 {
-            try container.encode(sendThrough, forKey: .sendThrough)
-        }
-
-        // ignore nil
-        if proxySettings != nil {
-            try container.encode(proxySettings, forKey: .proxySettings)
-        }
-
-        // ignore nil
-        if mux != nil {
-            try container.encode(mux, forKey: .mux)
-        }
-
-        // encode settings depends on `protocol`
-        switch `protocol` {
-        case .shadowsocks:
-            try container.encode(self.settingShadowsocks, forKey: .settings)
-            break
-        case .socks:
-            try container.encode(self.settingSocks, forKey: .settings)
-            break
-        case .vmess:
-            try container.encode(self.settingVMess, forKey: .settings)
-            break
-        case .blackhole:
-            try container.encode(self.settingBlackhole, forKey: .settings)
-            break
-        case .freedom:
-            try container.encode(self.settingFreedom, forKey: .settings)
-            break
-        case .dns:
-            try container.encode(self.settingDns, forKey: .settings)
-            break
-        case .http:
-            try container.encode(self.settingHttp, forKey: .settings)
-            break
-        case .vless:
-            try container.encode(self.settingVLess, forKey: .settings)
-            break
-        case .trojan:
-            try container.encode(self.settingTrojan, forKey: .settings)
-            break
+        // Dynamically encode settings based on protocol
+        switch settings {
+        case let value as V2rayOutboundBlackhole: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundFreedom: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundShadowsocks: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundSocks: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundVMess: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundDns: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundHttp: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundVLess: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundTrojan: try container.encode(value, forKey: .settings)
+        default: break
         }
     }
 }
@@ -176,7 +92,7 @@ struct V2rayOutboundMux: Codable {
 
 // protocol
 // Blackhole
-struct V2rayOutboundBlackhole: Codable {
+struct V2rayOutboundBlackhole: V2rayOutboundSettings {
     var response: V2rayOutboundBlackholeResponse = V2rayOutboundBlackholeResponse()
 }
 
@@ -184,14 +100,14 @@ struct V2rayOutboundBlackholeResponse: Codable {
     var type: String? = "none" // none | http
 }
 
-struct V2rayOutboundFreedom: Codable {
+struct V2rayOutboundFreedom: V2rayOutboundSettings {
     // Freedom
     var domainStrategy: String = "UseIP"// UseIP | AsIs
     var redirect: String?
     var userLevel: Int = 0
 }
 
-struct V2rayOutboundShadowsocks: Codable {
+struct V2rayOutboundShadowsocks: V2rayOutboundSettings {
     var servers: [V2rayOutboundShadowsockServer] = [V2rayOutboundShadowsockServer()]
 }
 
@@ -201,14 +117,13 @@ struct V2rayOutboundShadowsockServer: Codable {
     var email: String = ""
     var address: String = ""
     var port: Int = 0
-    // V2rayOutboundShadowsockMethod
     var method: String = "aes-256-gcm"
     var password: String = ""
     var ota: Bool = false
     var level: Int = 0
 }
 
-struct V2rayOutboundSocks: Codable {
+struct V2rayOutboundSocks: V2rayOutboundSettings {
     var servers: [V2rayOutboundSockServer] = [V2rayOutboundSockServer()]
 }
 
@@ -224,7 +139,7 @@ struct V2rayOutboundSockUser: Codable {
     var level: Int = 0
 }
 
-struct V2rayOutboundVMess: Codable {
+struct V2rayOutboundVMess: V2rayOutboundSettings {
     var vnext: [V2rayOutboundVMessItem] = [V2rayOutboundVMessItem()]
 }
 
@@ -239,18 +154,17 @@ let V2rayOutboundVMessSecurity = ["aes-128-gcm", "chacha20-poly1305", "auto", "n
 struct V2rayOutboundVMessUser: Codable {
     var id: String = ""
     var alterId: Int = 64// 0-65535
-    var level: Int = 0
     // V2rayOutboundVMessSecurity
     var security: String = "auto" // aes-128-gcm/chacha20-poly1305/auto/none
 }
 
-struct V2rayOutboundDns: Codable {
+struct V2rayOutboundDns: V2rayOutboundSettings {
     var network: String = "" // "tcp" | "udp" | ""
     var address: String = ""
     var port: Int?
 }
 
-struct V2rayOutboundHttp: Codable {
+struct V2rayOutboundHttp: V2rayOutboundSettings {
     var servers: [V2rayOutboundHttpServer] = [V2rayOutboundHttpServer()]
 }
 
@@ -265,7 +179,7 @@ struct V2rayOutboundHttpUser: Codable {
     var pass: String = ""
 }
 
-struct V2rayOutboundVLess: Codable {
+struct V2rayOutboundVLess: V2rayOutboundSettings {
     var vnext: [V2rayOutboundVLessItem] = [V2rayOutboundVLessItem()]
 }
 
@@ -282,7 +196,7 @@ struct V2rayOutboundVLessUser: Codable {
     var level: Int = 0
 }
 
-struct V2rayOutboundTrojan: Codable {
+struct V2rayOutboundTrojan: V2rayOutboundSettings {
     var servers: [V2rayOutboundTrojanServer] = [V2rayOutboundTrojanServer()]
 }
 
