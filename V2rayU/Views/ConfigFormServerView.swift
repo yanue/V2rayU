@@ -15,7 +15,7 @@ struct ConfigServerView: View {
             VStack {
                 Section(header: Text("Server Settings")) {
                     HStack {
-                        Text("Protocol").frame(width: 100, alignment: .trailing)
+                        Text("Protocol").frame(width: 120, alignment: .trailing)
                         Spacer()
                         Picker("", selection: $item.protocol) {
                             ForEach(V2rayProtocolOutbound.allCases) { pick in
@@ -26,7 +26,7 @@ struct ConfigServerView: View {
 //                    .pickerStyle(.segmented)
                     if item.protocol == .trojan {
                         HStack {
-                            Text("remote-addr").frame(width: 100, alignment: .trailing)
+                            Text("remote-addr").frame(width: 120, alignment: .trailing)
                             Spacer()
                             TextField("Enter remote-addr", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -35,11 +35,11 @@ struct ConfigServerView: View {
                             Text("remote-port")
                             TextField("Enter remote-port", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                         }
                       
                         HStack {
-                            Text("password").frame(width: 100, alignment: .trailing)
+                            Text("password").frame(width: 120, alignment: .trailing)
                             Spacer()
                             TextField("Enter password", text: $item.id)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -48,7 +48,7 @@ struct ConfigServerView: View {
                     }
                     if item.protocol == .vmess {
                         HStack {
-                            Text("address").frame(width: 100, alignment: .trailing)
+                            Text("address").frame(width: 120, alignment: .trailing)
                             Spacer()
                             TextField("Enter address", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -57,10 +57,10 @@ struct ConfigServerView: View {
                             Text("port")
                             TextField("Enter port", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                         }
                           HStack {
-                              Text("id").frame(width: 100, alignment: .trailing)
+                              Text("id").frame(width: 120, alignment: .trailing)
                               Spacer()
                               TextField("Enter id", text: $item.id)
                                   .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -68,10 +68,10 @@ struct ConfigServerView: View {
                               
                           }
                         HStack {
-                            Text("alterId").frame(width: 100, alignment: .trailing)
+                            Text("alterId").frame(width: 120, alignment: .trailing)
                             TextField("Enter alterId", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                             Spacer()
                             Text("security")
                             Picker("", selection: $item.security) {
@@ -83,7 +83,7 @@ struct ConfigServerView: View {
                     }
                     if item.protocol == .vless {
                         HStack {
-                            Text("address").frame(width: 100, alignment: .trailing)
+                            Text("address").frame(width: 120, alignment: .trailing)
                             Spacer()
                             TextField("Enter address", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -92,10 +92,10 @@ struct ConfigServerView: View {
                             Text("port")
                             TextField("Enter port", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                         }
                           HStack {
-                              Text("id").frame(width: 100, alignment: .trailing)
+                              Text("id").frame(width: 120, alignment: .trailing)
                               Spacer()
                               TextField("Enter id", text: $item.id)
                                   .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -104,10 +104,10 @@ struct ConfigServerView: View {
                           }
                         
                         HStack {
-                            Text("alterId").frame(width: 100, alignment: .trailing)
+                            Text("alterId").frame(width: 120, alignment: .trailing)
                             TextField("Enter alterId", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                             Spacer()
                             Text("security")
                             Picker("", selection: $item.security) {
@@ -118,17 +118,17 @@ struct ConfigServerView: View {
                         }
                     
                         HStack {
-                            Text("flow").frame(width: 100, alignment: .trailing)
+                            Text("flow").frame(width: 120, alignment: .trailing)
                             TextField("Enter flow", text: $item.address)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 100)
+                                .padding(.leading, 8).frame(width: 120)
                             
                         }
                     }
                 }
                 if item.protocol == .shadowsocks {
                     HStack {
-                        Text("address").frame(width: 100, alignment: .trailing)
+                        Text("address").frame(width: 120, alignment: .trailing)
                         Spacer()
                         TextField("Enter address", text: $item.address)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -137,17 +137,17 @@ struct ConfigServerView: View {
                         Text("port")
                         TextField("Enter port", text: $item.address)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.leading, 8).frame(width: 100)
+                            .padding(.leading, 8).frame(width: 120)
                     }
                     HStack {
-                        Text("password").frame(width: 100, alignment: .trailing)
+                        Text("password").frame(width: 120, alignment: .trailing)
                         Spacer()
                         TextField("Enter password", text: $item.id)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(.leading, 8)
                     }
                     HStack {
-                        Text("method").frame(width: 100, alignment: .trailing)
+                        Text("method").frame(width: 120, alignment: .trailing)
                         Picker("", selection: $item.security) {
                             ForEach(V2rayProtocolOutbound.allCases) { pick in
                                 Text(pick.rawValue)
@@ -156,7 +156,10 @@ struct ConfigServerView: View {
                     }
                 }
             }
-        }.padding(20)
+        }
+        .padding(20)
+        .border(Color.secondary, width: 1) // 黑色边框，宽度为 2
+
         Spacer()
     }
 }

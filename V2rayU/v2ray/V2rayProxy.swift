@@ -129,27 +129,27 @@ class ProxyModel: ObservableObject, Identifiable {
         shortId: String = "",
         spiderX: String = ""
     ) {
-        self.protocol = `protocol` // Initialize protocol
-        self.address = address // Initialize address
-        self.port = port // Initialize port
-        self.id = id // Initialize id
-        self.alterId = alterId // Initialize alterId
-        self.security = security // Initialize security
-        self.network = network // Initialize network
-        self.remark = remark // Initialize remark
-        self.headerType = headerType // Initialize headerType
-        self.requestHost = requestHost // Initialize requestHost
-        self.path = path // Initialize path
-        self.streamSecurity = streamSecurity // Initialize streamSecurity
-        self.allowInsecure = allowInsecure // Initialize allowInsecure
-        self.subid = subid // Initialize subid
-        self.flow = flow // Initialize flow
-        self.sni = sni // Initialize sni
-        self.alpn = alpn // Initialize alpn
-        self.fingerprint = fingerprint // Initialize fingerprint
-        self.publicKey = publicKey // Initialize publicKey
-        self.shortId = shortId // Initialize shortId
-        self.spiderX = spiderX // Initialize spiderX
+        self.protocol = `protocol`
+        self.address = address
+        self.port = port
+        self.id = id
+        self.alterId = alterId
+        self.security = security
+        self.network = network
+        self.remark = remark
+        self.headerType = headerType
+        self.requestHost = requestHost
+        self.path = path
+        self.streamSecurity = streamSecurity
+        self.allowInsecure = allowInsecure
+        self.subid = subid
+        self.flow = flow
+        self.sni = sni
+        self.alpn = alpn
+        self.fingerprint = fingerprint
+        self.publicKey = publicKey
+        self.shortId = shortId
+        self.spiderX = spiderX
         // 初始化时调用更新方法
         updateServerSettings()
         updateStreamSettings()

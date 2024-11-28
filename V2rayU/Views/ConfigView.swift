@@ -11,7 +11,7 @@ struct ConfigView: View {
 
     var body: some View {
         HStack {
-            ConfigFormView(item: item).frame(width: 400) // 左
+            ConfigFormView(item: item).frame(width: 460) // 左
 
             Divider().frame(width: 0) // 分隔线，适当调整宽度
 
