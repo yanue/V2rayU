@@ -85,6 +85,18 @@ final class V2rayOutbound: Codable {
     }
 }
 
+extension V2rayOutbound {
+    func toJSON() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+        guard let jsonData = try? encoder.encode(self),
+              let jsonString = String(data: jsonData, encoding: .utf8) else {
+            return "{}"
+        }
+        return jsonString
+    }
+}
+
 struct V2rayOutboundMux: Codable {
     var enabled: Bool = false
     var concurrency: Int = 8

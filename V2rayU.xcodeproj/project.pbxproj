@@ -27,7 +27,6 @@
 		66E0D43B2CF3356800152F40 /* ConfigServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D43A2CF3356500152F40 /* ConfigServerView.swift */; };
 		66E0D4412CF4A2F200152F40 /* ConfigForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4402CF4A2E400152F40 /* ConfigForm.swift */; };
 		66E0D4432CF4A30000152F40 /* ConfigShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4422CF4A2FB00152F40 /* ConfigShow.swift */; };
-		66E0D4852CF4ADE600152F40 /* Highlight in Frameworks */ = {isa = PBXBuildFile; productRef = 66E0D4842CF4ADE600152F40 /* Highlight */; };
 		66E0D49B2CF4B60B00152F40 /* JsonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D49A2CF4B60600152F40 /* JsonView.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,7 +62,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66E0D4852CF4ADE600152F40 /* Highlight in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,7 +183,6 @@
 			);
 			mainGroup = 66CBCECE2C63B16400313949;
 			packageReferences = (
-				66E0D4832CF4ADE600152F40 /* XCRemoteSwiftPackageReference "Highlight" */,
 			);
 			productRefGroup = 66CBCED82C63B16400313949 /* Products */;
 			projectDirPath = "";
@@ -438,25 +435,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		66E0D4832CF4ADE600152F40 /* XCRemoteSwiftPackageReference "Highlight" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nkristek/Highlight.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		66E0D4842CF4ADE600152F40 /* Highlight */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 66E0D4832CF4ADE600152F40 /* XCRemoteSwiftPackageReference "Highlight" */;
-			productName = Highlight;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 66CBCECF2C63B16400313949 /* Project object */;
 }

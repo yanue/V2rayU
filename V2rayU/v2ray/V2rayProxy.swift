@@ -54,18 +54,9 @@ import SwiftUI
 
 class ProxyModel: ObservableObject, Identifiable {
     // 公共属性
-    @Published var `protocol`: V2rayProtocolOutbound {
-        didSet { updateServerSettings() }
-    }
-
-    @Published var network: V2rayStreamNetwork = .tcp {
-        didSet { updateStreamSettings() }
-    }
-
-    @Published var streamSecurity: V2rayStreamSecurity = .none {
-        didSet { updateSecuritySettings() }
-    }
-
+    @Published var `protocol`: V2rayProtocolOutbound
+    @Published var network: V2rayStreamNetwork = .tcp
+    @Published var streamSecurity: V2rayStreamSecurity = .none
     @Published var subid: String
     @Published var address: String
     @Published var port: Int
@@ -104,10 +95,14 @@ class ProxyModel: ObservableObject, Identifiable {
     // security settings
     private(set) var securityTls = TlsSettings() // tls|xtls
     private(set) var securityReality = RealitySettings() // reality
+    
+    // outbound
+    private(set) var outbound = V2rayOutbound()
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case `protocol`, subid, address, port, id, alterId, security, network, remark, headerType, requestHost, path, streamSecurity, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+        case `protocol`, subid, address, port, id, alterId, security, network, remark,
+             headerType, requestHost, path, streamSecurity, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
     }
 
     // 提供默认值的初始化器
@@ -158,7 +153,6 @@ class ProxyModel: ObservableObject, Identifiable {
         // 初始化时调用更新方法
         updateServerSettings()
         updateStreamSettings()
-        updateSecuritySettings()
     }
 
     // 更新 server 配置
@@ -175,6 +169,10 @@ class ProxyModel: ObservableObject, Identifiable {
             serverVmess.address = self.address
             serverVmess.port = self.port
             serverVmess.users = [user]
+            var vmess = V2rayOutboundVMess()
+            vmess.vnext = [serverVmess]
+            outbound.settings = vmess
+            
         case .vless:
             // user
             var user = V2rayOutboundVLessUser()
@@ -186,12 +184,20 @@ class ProxyModel: ObservableObject, Identifiable {
             serverVless.address = self.address
             serverVless.port = self.port
             serverVless.users = [user]
+            var vless = V2rayOutboundVLess()
+            vless.vnext = [serverVless]
+            outbound.settings = vless
+
         case .shadowsocks:
             serverShadowsocks = V2rayOutboundShadowsockServer()
             serverShadowsocks.address = self.address
             serverShadowsocks.port = self.port
             serverShadowsocks.method = self.security
             serverShadowsocks.password = self.id
+            var ss = V2rayOutboundShadowsocks()
+            ss.servers = [serverShadowsocks]
+            outbound.settings = ss
+
         case .socks:
             // user
             var user = V2rayOutboundSockUser()
@@ -202,41 +208,71 @@ class ProxyModel: ObservableObject, Identifiable {
             serverSocks5.address = self.address
             serverSocks5.port = self.port
             serverSocks5.users = [user]
+            var socks = V2rayOutboundSocks()
+            socks.servers = [serverSocks5]
+            outbound.settings = socks
+            
         case .trojan:
             serverTrojan = V2rayOutboundTrojanServer()
             serverTrojan.address = self.address
             serverTrojan.port = self.port
             serverTrojan.password = self.id
             serverTrojan.flow = self.flow
+            var outboundTrojan = V2rayOutboundTrojan()
+            outboundTrojan.servers = [serverTrojan]
+            outbound.settings = outboundTrojan
+            
         default:
             break
         }
     }
-
-    // 更新 stream 配置
+    
     private func updateStreamSettings() {
+        var streamSettings = V2rayStreamSettings()
+        streamSettings.network = self.network
+        
+        // 根据网络类型配置
+        configureStreamSettings(network: self.network, settings: &streamSettings)
+        
+        // 根据安全设置配置
+        configureSecuritySettings(security: self.streamSecurity, settings: &streamSettings)
+        
+        outbound.streamSettings = streamSettings
+    }
+    
+    // 提取网络类型配置
+    private func configureStreamSettings(network: V2rayStreamNetwork, settings: inout V2rayStreamSettings) {
         switch network {
         case .tcp:
-            streamTcp = TcpSettings(
-            )
+            streamTcp.header.type = self.headerType.rawValue
+            settings.tcpSettings = streamTcp
         case .kcp:
-            streamKcp = KcpSettings()
-        case .domainsocket:
-            streamDs = DsSettings()
-        case .ws:
-            streamWs = WsSettings()
+            streamKcp.header.type = self.headerType.rawValue
+            settings.kcpSettings = streamKcp
         case .http, .h2:
-            streamH2 = HttpSettings()
+            streamH2.path = self.path
+            streamH2.host = [self.requestHost]
+            settings.httpSettings = streamH2
+        case .ws:
+            streamWs.path = self.path
+            streamWs.headers.host = self.requestHost
+            settings.wsSettings = streamWs
+        case .domainsocket:
+            streamDs.path = self.path
+            settings.dsSettings = streamDs
         case .quic:
-            streamQuic = QuicSettings()
+            streamQuic.key = self.path
+            settings.quicSettings = streamQuic
         case .grpc:
-            streamGrpc = GrpcSettings()
+            streamGrpc.serviceName = self.path
+            settings.grpcSettings = streamGrpc
         }
     }
 
-    // 更新 security 配置
-    private func updateSecuritySettings() {
-        switch streamSecurity {
+    // 提取安全配置
+    private func configureSecuritySettings(security: V2rayStreamSecurity, settings: inout V2rayStreamSettings) {
+        settings.security = security
+        switch security {
         case .tls, .xtls:
             securityTls = TlsSettings(
                 serverName: sni,
@@ -244,6 +280,7 @@ class ProxyModel: ObservableObject, Identifiable {
                 alpn: alpn.rawValue,
                 fingerprint: fingerprint.rawValue
             )
+            settings.tlsSettings = securityTls
         case .reality:
             securityReality = RealitySettings(
                 fingerprint: fingerprint.rawValue,
@@ -251,159 +288,15 @@ class ProxyModel: ObservableObject, Identifiable {
                 shortId: shortId,
                 spiderX: spiderX
             )
+            settings.realitySettings = securityReality
         default:
             break
         }
     }
 
-    // 生成 JSON 字符串的方法
-    func generateJSON() -> String {
-        // 获取 outbound 配置
-        let outbound = getOutbound()
-
-        // 使用 JSONEncoder 将对象转换为 JSON 数据
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted // 美化输出（如果需要）
-        
-        do {
-            // 将对象编码为 JSON 数据
-            let jsonData = try encoder.encode(outbound)
-            
-            // 将 JSON 数据转换为字符串
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                return jsonString
-            } else {
-                return "{}" // 如果转换失败，返回空 JSON 字符串
-            }
-        } catch {
-            print("JSON 编码错误: \(error)")
-            return "{}" // 出现错误时返回空 JSON 字符串
-        }
-    }
-    
-    func generateSortedJSON() -> String {
-        // 获取 outbound 配置
-        let outbound = getOutbound()
-
-        // 使用 JSONEncoder 将对象转换为 JSON 数据
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted // 美化输出（如果需要）
-
-        do {
-            // 将对象编码为 JSON 数据
-            let jsonData = try encoder.encode(outbound)
-            
-            // 将 JSON 数据转换为字典
-            if let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
-                // 排序字典的键
-                let sortedJsonObject = jsonObject.sorted { $0.key < $1.key }
-                
-                // 将排序后的字典重新转换为 JSON 数据
-                let sortedJsonData = try JSONSerialization.data(withJSONObject: sortedJsonObject, options: .prettyPrinted)
-                
-                // 将排序后的 JSON 数据转换为字符串
-                if let sortedJsonString = String(data: sortedJsonData, encoding: .utf8) {
-                    return sortedJsonString
-                } else {
-                    print("无法将排序后的 JSON 数据转换为字符串")
-                    return "{}"
-                }
-            } else {
-                print("JSON 数据转换为字典失败")
-                return "{}"
-            }
-        } catch let error {
-            // 捕获编码错误并打印详细信息
-            print("JSON 编码错误: \(error)")
-            return "{}"
-        }
-    }
-
-
-
-    private func getOutbound() -> V2rayOutbound {
-        var outbound = V2rayOutbound()
-        outbound.protocol = self.protocol
-        outbound.tag = "proxy"
-
-        // 设置协议对应的 settings
-        outbound.settings = getProtocolSettings()
-        outbound.mux = V2rayOutboundMux()
-        outbound.streamSettings = getStreamSettings()
-
-        return outbound
-    }
-
-    // 根据用户选择的协议动态生成设置
-    private func getProtocolSettings() -> V2rayOutboundSettings? {
-        switch self.protocol {
-        case .vmess:
-            var vmess = V2rayOutboundVMess()
-            vmess.vnext = [serverVmess]
-            return vmess
-
-        case .vless:
-            var vless = V2rayOutboundVLess()
-            vless.vnext = [serverVless]
-            return vless
-
-        case .shadowsocks:
-            var ss = V2rayOutboundShadowsocks()
-            ss.servers = [serverShadowsocks]
-            return ss
-
-        case .socks:
-            var socks5 = V2rayOutboundSocks()
-            socks5.servers = [serverSocks5]
-            return socks5
-            
-        case .trojan:
-            var trojan = V2rayOutboundTrojan()
-            trojan.servers = [serverTrojan]
-            return trojan
-
-        default:
-            return nil
-        }
-    }
-
-    // 动态生成 streamSettings
-    private func getStreamSettings() -> V2rayStreamSettings {
-        var streamSettings = V2rayStreamSettings()
-        streamSettings.network = network
-        // 根据网络类型动态设置
-        switch streamSettings.network {
-        case .tcp:
-            streamSettings.tcpSettings = streamTcp
-        case .kcp:
-            streamSettings.kcpSettings = streamKcp
-        case .http, .h2:
-            streamSettings.httpSettings = streamH2
-        case .ws:
-            streamSettings.wsSettings = streamWs
-        case .domainsocket:
-            streamSettings.dsSettings = streamDs
-        case .quic:
-            streamSettings.quicSettings = streamQuic
-        case .grpc:
-            streamSettings.grpcSettings = streamGrpc
-        }
-
-        // 根据安全设置动态生成
-        switch streamSecurity {
-        case .tls:
-            streamSettings.security = .tls
-            streamSettings.tlsSettings = securityTls
-        case .xtls:
-            streamSettings.security = .xtls
-            streamSettings.xtlsSettings = securityTls
-        case .reality:
-            streamSettings.security = .reality
-            streamSettings.realitySettings = securityReality
-        default:
-            break
-        }
-
-        return streamSettings
+    func toJSON() -> String {
+        updateServerSettings()
+        updateStreamSettings()
+        return outbound.toJSON()
     }
 }
