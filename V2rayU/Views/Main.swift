@@ -8,7 +8,6 @@ import SwiftUI
 
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
     @State private var isOverrideEnabled = false
     @State private var isRewriteEnabled = false
     @State private var isMitMEnabled = false
@@ -26,14 +25,14 @@ struct ContentView: View {
                 // 列表
             }.padding()
             
+            Divider() // 分隔线，适当调整宽度
+
             VStack{
-                Text("BBB")
+                ConfigListView()
             }.padding()
             
-            Spacer()
         }
     }
-    
     
     private func createTabView(image: String, text: String, isOn: Binding<Bool>) -> some View {
         VStack(spacing: 10) {
@@ -55,5 +54,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

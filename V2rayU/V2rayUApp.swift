@@ -9,13 +9,13 @@ let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
+@MainActor let windowDelegate = WindowDelegate()
 
 @main
 struct V2rayUApp: App {
     @State private var windowController: NSWindowController?
     @State private var aboutWindowController: NSWindowController?
     
-    private var windowDelegate = WindowDelegate()
 
     init() {
         // 已设置 Application is agent (UIElement) 为 YES
@@ -26,17 +26,7 @@ struct V2rayUApp: App {
         }
     }
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Item.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            return container
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+   
     var body: some Scene {
         // 显示 MenuBar
         MenuBarExtra("V2rayU", image: "IconOn") {
@@ -47,8 +37,9 @@ struct V2rayUApp: App {
     func openContentViewWindow() {
         if windowController == nil {
 //            let contentView = ContentView().modelContainer(sharedModelContainer)
-            let item = ProxyModel(protocol: .trojan,  address: "aaa", port: 443, id: "xxxx-bbb-ccccc", security: "none", remark: "test02")
-            let contentView = ConfigView(item: item)
+//            let item = ProxyModel(protocol: .trojan,  address: "aaa", port: 443, id: "xxxx-bbb-ccccc", security: "none", remark: "test02")
+//            let contentView = ConfigView(item: item)
+            let contentView = ContentView()
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(contentViewController: hostingController)

@@ -95,7 +95,7 @@ class ProxyModel: ObservableObject, Identifiable {
     // security settings
     private(set) var securityTls = TlsSettings() // tls|xtls
     private(set) var securityReality = RealitySettings() // reality
-    
+
     // outbound
     private(set) var outbound = V2rayOutbound()
 
@@ -161,28 +161,28 @@ class ProxyModel: ObservableObject, Identifiable {
         case .vmess:
             // user
             var user = V2rayOutboundVMessUser()
-            user.id = self.id
-            user.alterId = Int(self.alterId)
-            user.security = self.security
+            user.id = id
+            user.alterId = Int(alterId)
+            user.security = security
             // vmess
             serverVmess = V2rayOutboundVMessItem()
-            serverVmess.address = self.address
-            serverVmess.port = self.port
+            serverVmess.address = address
+            serverVmess.port = port
             serverVmess.users = [user]
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [serverVmess]
             outbound.settings = vmess
-            
+
         case .vless:
             // user
             var user = V2rayOutboundVLessUser()
-            user.id = self.id
-            user.flow = self.flow
-            user.encryption = self.security
+            user.id = id
+            user.flow = flow
+            user.encryption = security
             // vless
             serverVless = V2rayOutboundVLessItem()
-            serverVless.address = self.address
-            serverVless.port = self.port
+            serverVless.address = address
+            serverVless.port = port
             serverVless.users = [user]
             var vless = V2rayOutboundVLess()
             vless.vnext = [serverVless]
@@ -190,10 +190,10 @@ class ProxyModel: ObservableObject, Identifiable {
 
         case .shadowsocks:
             serverShadowsocks = V2rayOutboundShadowsockServer()
-            serverShadowsocks.address = self.address
-            serverShadowsocks.port = self.port
-            serverShadowsocks.method = self.security
-            serverShadowsocks.password = self.id
+            serverShadowsocks.address = address
+            serverShadowsocks.port = port
+            serverShadowsocks.method = security
+            serverShadowsocks.password = id
             var ss = V2rayOutboundShadowsocks()
             ss.servers = [serverShadowsocks]
             outbound.settings = ss
@@ -201,70 +201,70 @@ class ProxyModel: ObservableObject, Identifiable {
         case .socks:
             // user
             var user = V2rayOutboundSockUser()
-            user.user = self.id
-            user.pass = self.id
+            user.user = id
+            user.pass = id
             // socks5
             serverSocks5 = V2rayOutboundSockServer()
-            serverSocks5.address = self.address
-            serverSocks5.port = self.port
+            serverSocks5.address = address
+            serverSocks5.port = port
             serverSocks5.users = [user]
             var socks = V2rayOutboundSocks()
             socks.servers = [serverSocks5]
             outbound.settings = socks
-            
+
         case .trojan:
             serverTrojan = V2rayOutboundTrojanServer()
-            serverTrojan.address = self.address
-            serverTrojan.port = self.port
-            serverTrojan.password = self.id
-            serverTrojan.flow = self.flow
+            serverTrojan.address = address
+            serverTrojan.port = port
+            serverTrojan.password = id
+            serverTrojan.flow = flow
             var outboundTrojan = V2rayOutboundTrojan()
             outboundTrojan.servers = [serverTrojan]
             outbound.settings = outboundTrojan
-            
+
         default:
             break
         }
     }
-    
+
     private func updateStreamSettings() {
         var streamSettings = V2rayStreamSettings()
-        streamSettings.network = self.network
-        
+        streamSettings.network = network
+
         // 根据网络类型配置
-        configureStreamSettings(network: self.network, settings: &streamSettings)
-        
+        configureStreamSettings(network: network, settings: &streamSettings)
+
         // 根据安全设置配置
-        configureSecuritySettings(security: self.streamSecurity, settings: &streamSettings)
-        
+        configureSecuritySettings(security: streamSecurity, settings: &streamSettings)
+
         outbound.streamSettings = streamSettings
     }
-    
+
     // 提取网络类型配置
     private func configureStreamSettings(network: V2rayStreamNetwork, settings: inout V2rayStreamSettings) {
         switch network {
         case .tcp:
-            streamTcp.header.type = self.headerType.rawValue
+            streamTcp.header.type = headerType.rawValue
             settings.tcpSettings = streamTcp
         case .kcp:
-            streamKcp.header.type = self.headerType.rawValue
+            streamKcp.header.type = headerType.rawValue
             settings.kcpSettings = streamKcp
         case .http, .h2:
-            streamH2.path = self.path
-            streamH2.host = [self.requestHost]
+            streamH2.path = path
+            streamH2.host = [requestHost]
             settings.httpSettings = streamH2
         case .ws:
-            streamWs.path = self.path
-            streamWs.headers.host = self.requestHost
+            streamWs.path = path
+            streamWs.headers.host = requestHost
             settings.wsSettings = streamWs
         case .domainsocket:
-            streamDs.path = self.path
+            streamDs.path = path
             settings.dsSettings = streamDs
         case .quic:
-            streamQuic.key = self.path
+            streamQuic.key = path
             settings.quicSettings = streamQuic
         case .grpc:
-            streamGrpc.serviceName = self.path
+            streamGrpc.serviceName = path
             settings.grpcSettings = streamGrpc
         }
     }

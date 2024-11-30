@@ -8,6 +8,7 @@
 
 import Cocoa
 
+@MainActor
 var toastWindow =  ToastWindowController()
 
 func makeToast(message: String, displayDuration: Double? = 3) {

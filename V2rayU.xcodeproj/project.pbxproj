@@ -28,6 +28,8 @@
 		66E0D4412CF4A2F200152F40 /* ConfigForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4402CF4A2E400152F40 /* ConfigForm.swift */; };
 		66E0D4432CF4A30000152F40 /* ConfigShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4422CF4A2FB00152F40 /* ConfigShow.swift */; };
 		66E0D49B2CF4B60B00152F40 /* JsonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D49A2CF4B60600152F40 /* JsonView.swift */; };
+		66E0D4A42CFAE6A100152F40 /* ConfigList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4A32CFAE69C00152F40 /* ConfigList.swift */; };
+		66E0D4A62CFB1AAD00152F40 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4A52CFB1AA600152F40 /* Common.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +57,8 @@
 		66E0D4402CF4A2E400152F40 /* ConfigForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigForm.swift; sourceTree = "<group>"; };
 		66E0D4422CF4A2FB00152F40 /* ConfigShow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigShow.swift; sourceTree = "<group>"; };
 		66E0D49A2CF4B60600152F40 /* JsonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonView.swift; sourceTree = "<group>"; };
+		66E0D4A32CFAE69C00152F40 /* ConfigList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigList.swift; sourceTree = "<group>"; };
+		66E0D4A52CFB1AA600152F40 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +117,8 @@
 		66E0D4182CF1D19200152F40 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				66E0D4A52CFB1AA600152F40 /* Common.swift */,
+				66E0D4A32CFAE69C00152F40 /* ConfigList.swift */,
 				66E0D49A2CF4B60600152F40 /* JsonView.swift */,
 				66E0D4192CF1D1A300152F40 /* ConfigView.swift */,
 				66E0D4402CF4A2E400152F40 /* ConfigForm.swift */,
@@ -219,9 +225,11 @@
 				66CBCEDB2C63B16400313949 /* V2rayUApp.swift in Sources */,
 				66E0D4252CF2F74B00152F40 /* v2rayStruct.swift in Sources */,
 				66E0D4412CF4A2F200152F40 /* ConfigForm.swift in Sources */,
+				66E0D4A42CFAE6A100152F40 /* ConfigList.swift in Sources */,
 				66E0D42F2CF3059300152F40 /* V2rayProxy.swift in Sources */,
 				66E0D4432CF4A30000152F40 /* ConfigShow.swift in Sources */,
 				66E0D4372CF334D900152F40 /* ConfigFormSecruityView.swift in Sources */,
+				66E0D4A62CFB1AAD00152F40 /* Common.swift in Sources */,
 				66E0D4332CF3068400152F40 /* Util.swift in Sources */,
 				66E0D4262CF2F74B00152F40 /* v2rayStream.swift in Sources */,
 				66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */,
@@ -373,13 +381,13 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -403,13 +411,13 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};

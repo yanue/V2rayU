@@ -59,6 +59,8 @@ struct GithubError: Codable {
     }
 }
 
+
+@MainActor
 let V2rayUpdater = AppCheckController()
 
 // AppCheckController - 检查新版本页面
@@ -619,7 +621,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
     // ---------------------- 下载相关 --------------------------------
     
     // MARK: - URLSessionDownloadDelegate
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
         let downloadsDirectory = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first!
         let destUrl = downloadsDirectory.appendingPathComponent(downloadTask.response?.suggestedFilename ?? "V2rayU-macOS.dmg")
@@ -665,13 +667,13 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         DispatchQueue.main.async {
             self.bindData.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite) * 100
         }
     }
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             DispatchQueue.main.async {
                 self.bindData.isDownloading = false

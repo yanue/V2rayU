@@ -14,66 +14,21 @@ struct ConfigServerView: View {
         HStack {
             VStack {
                 Section(header: Text("Server Settings")) {
-                    HStack {
-                        Text("Protocol").frame(width: 120, alignment: .trailing)
-                        Spacer()
-                        Picker("", selection: $item.protocol) {
-                            ForEach(V2rayProtocolOutbound.allCases) { pick in
-                                Text(pick.rawValue)
-                            }
-                        }
-                    }
-//                    .pickerStyle(.segmented)
+                    getPickerWithLabel(label: "Protocol", selection: $item.protocol)
                     if item.protocol == .trojan {
-                        HStack {
-                            Text("remote-addr").frame(width: 120, alignment: .trailing)
-                            Spacer()
-                            TextField("Enter remote-addr", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8)
-                            Spacer()
-                            Text("remote-port")
-                            TextField("Enter remote-port", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                        }
-                      
-                        HStack {
-                            Text("password").frame(width: 120, alignment: .trailing)
-                            Spacer()
-                            TextField("Enter password", text: $item.id)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8)
-                        }
+                        getTextFieldWithLabel(label: "address", text: $item.address)
+                        getNumFieldWithLabel(label: "port", num: $item.port)
+                        getTextFieldWithLabel(label: "password", text: $item.id)
                     }
                     if item.protocol == .vmess {
+                        getTextFieldWithLabel(label: "address", text: $item.address)
+                        getNumFieldWithLabel(label: "port", num: $item.port)
+                        getTextFieldWithLabel(label: "id", text: $item.id)
+                        getNumFieldWithLabel(label: "alterId", num: $item.alterId)
+
                         HStack {
-                            Text("address").frame(width: 120, alignment: .trailing)
+                            getTextLabel(label: "security")
                             Spacer()
-                            TextField("Enter address", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8)
-                            Spacer()
-                            Text("port")
-                            TextField("Enter port", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                        }
-                          HStack {
-                              Text("id").frame(width: 120, alignment: .trailing)
-                              Spacer()
-                              TextField("Enter id", text: $item.id)
-                                  .textFieldStyle(RoundedBorderTextFieldStyle())
-                                  .padding(.leading, 8)
-                              
-                          }
-                        HStack {
-                            Text("alterId").frame(width: 120, alignment: .trailing)
-                            TextField("Enter alterId", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                            Spacer()
-                            Text("security")
                             Picker("", selection: $item.security) {
                                 ForEach(V2rayProtocolOutbound.allCases) { pick in
                                     Text(pick.rawValue)
@@ -82,72 +37,27 @@ struct ConfigServerView: View {
                         }
                     }
                     if item.protocol == .vless {
+                        getTextFieldWithLabel(label: "address", text: $item.address)
+                        getNumFieldWithLabel(label: "port", num: $item.port)
+                        getTextFieldWithLabel(label: "id", text: $item.id)
+                        getTextFieldWithLabel(label: "flow", text: $item.flow)
                         HStack {
-                            Text("address").frame(width: 120, alignment: .trailing)
+                            getTextLabel(label: "security")
                             Spacer()
-                            TextField("Enter address", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8)
-                            Spacer()
-                            Text("port")
-                            TextField("Enter port", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                        }
-                          HStack {
-                              Text("id").frame(width: 120, alignment: .trailing)
-                              Spacer()
-                              TextField("Enter id", text: $item.id)
-                                  .textFieldStyle(RoundedBorderTextFieldStyle())
-                                  .padding(.leading, 8)
-                              
-                          }
-                        
-                        HStack {
-                            Text("alterId").frame(width: 120, alignment: .trailing)
-                            TextField("Enter alterId", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                            Spacer()
-                            Text("security")
                             Picker("", selection: $item.security) {
                                 ForEach(V2rayProtocolOutbound.allCases) { pick in
                                     Text(pick.rawValue)
                                 }
                             }
                         }
-                    
-                        HStack {
-                            Text("flow").frame(width: 120, alignment: .trailing)
-                            TextField("Enter flow", text: $item.address)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.leading, 8).frame(width: 120)
-                            
-                        }
                     }
                 }
                 if item.protocol == .shadowsocks {
+                    getTextFieldWithLabel(label: "address", text: $item.address)
+                    getNumFieldWithLabel(label: "port", num: $item.port)
+                    getTextFieldWithLabel(label: "password", text: $item.id)
                     HStack {
-                        Text("address").frame(width: 120, alignment: .trailing)
-                        Spacer()
-                        TextField("Enter address", text: $item.address)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.leading, 8)
-                        Spacer()
-                        Text("port")
-                        TextField("Enter port", text: $item.address)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.leading, 8).frame(width: 120)
-                    }
-                    HStack {
-                        Text("password").frame(width: 120, alignment: .trailing)
-                        Spacer()
-                        TextField("Enter password", text: $item.id)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.leading, 8)
-                    }
-                    HStack {
-                        Text("method").frame(width: 120, alignment: .trailing)
+                        getTextLabel(label: "method")
                         Picker("", selection: $item.security) {
                             ForEach(V2rayProtocolOutbound.allCases) { pick in
                                 Text(pick.rawValue)

@@ -11,13 +11,17 @@ struct ConfigView: View {
 
     var body: some View {
         HStack {
-            ConfigFormView(item: item).frame(width: 460) // 左
+            ConfigFormView(item: item).frame(width: 400) // 左
 
             Divider().frame(width: 0) // 分隔线，适当调整宽度
 
             ConfigShowView(item: item) // 右
 
         }.padding()
+            .frame(width: 660)
+            .onAppear {
+                print("ConfigView appeared with item: \(item.id)")
+            }
     }
 }
 

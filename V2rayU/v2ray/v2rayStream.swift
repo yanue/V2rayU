@@ -173,7 +173,7 @@ struct KcpSettings: Codable {
     var header: KcpSettingsHeader = KcpSettingsHeader()
 }
 
-var KcpSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
+let KcpSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
 
 struct KcpSettingsHeader: Codable {
     // KcpSettingsHeaderType
@@ -211,7 +211,7 @@ struct V2rayStreamSettingSockopt: Codable {
 }
 
 
-var QuicSettingsSecurity = ["none", "aes-128-gcm", "chacha20-poly1305"]
+let QuicSettingsSecurity = ["none", "aes-128-gcm", "chacha20-poly1305"]
 
 struct QuicSettings: Codable {
     //  QuicSettingsSecurity
@@ -220,7 +220,7 @@ struct QuicSettings: Codable {
     var header: QuicSettingHeader = QuicSettingHeader()
 }
 
-var QuicSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
+let QuicSettingsHeaderType = ["none", "srtp", "utp", "wechat-video", "dtls", "wireguard"]
 
 struct QuicSettingHeader: Codable {
     // QuicSettingsHeaderType
