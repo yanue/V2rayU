@@ -6,7 +6,7 @@
 //  Copyright © 2019 yanue. All rights reserved.
 //
 
-import Cocoa
+import UniformTypeIdentifiers
 
 /**
  - {"type":"ss","name":"v2rayse_test_1","server":"198.57.27.218","port":5004,"cipher":"aes-256-gcm","password":"g5MeD6Ft3CWlJId"}
@@ -52,38 +52,35 @@ import Cocoa
  */
 import SwiftUI
 
-
 class GroupModel: ObservableObject, Identifiable, Hashable {
     static func == (lhs: GroupModel, rhs: GroupModel) -> Bool {
-       return lhs.group == rhs.group
-   }
+        return lhs.group == rhs.group
+    }
 
-   func hash(into hasher: inout Hasher) {
-       hasher.combine(group) // 使用 group 来计算哈希值
-   }
-    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(group) // 使用 group 来计算哈希值
+    }
+
     @Published var name: String = "全部"
     @Published var group: String = ""
-    
+
     enum CodingKeys: String, CodingKey {
-        case  name,group
+        case name, group
     }
-    
-    init(name:String,group:String){
+
+    init(name: String, group: String) {
         self.name = name
         self.group = group
     }
-    
-     var id: String { // 提供唯一的标识符
-         return group
-     }
 
-     
+    var id: String { // 提供唯一的标识符
+        return group
+    }
 }
 
 @MainActor let defaultGroup = GroupModel(name: "全部", group: "")
 
-class ProxyModel: ObservableObject, Identifiable {
+class ProxyModel: ObservableObject, Identifiable, Codable {
     var index: Int = 0
     // 公共属性
     @Published var uuid: UUID
@@ -134,12 +131,66 @@ class ProxyModel: ObservableObject, Identifiable {
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case `protocol`, subid, address, port, id, alterId, security, network, remark,
+        case uuid, `protocol`, subid, address, port, id, alterId, security, network, remark,
              headerType, requestHost, path, streamSecurity, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+    }
+
+    // 需要手动实现 `init(from:)` 和 `encode(to:)`，如果你使用自定义类型时
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uuid = try container.decode(UUID.self, forKey: .uuid)
+        `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: .protocol)
+        network = try container.decode(V2rayStreamNetwork.self, forKey: .network)
+        streamSecurity = try container.decode(V2rayStreamSecurity.self, forKey: .streamSecurity)
+        subid = try container.decode(String.self, forKey: .subid)
+        address = try container.decode(String.self, forKey: .address)
+        port = try container.decode(Int.self, forKey: .port)
+        id = try container.decode(String.self, forKey: .id)
+        alterId = try container.decode(Int.self, forKey: .alterId)
+        security = try container.decode(String.self, forKey: .security)
+        remark = try container.decode(String.self, forKey: .remark)
+        headerType = try container.decode(V2rayHeaderType.self, forKey: .headerType)
+        requestHost = try container.decode(String.self, forKey: .requestHost)
+        path = try container.decode(String.self, forKey: .path)
+        allowInsecure = try container.decode(Bool.self, forKey: .allowInsecure)
+        flow = try container.decode(String.self, forKey: .flow)
+        sni = try container.decode(String.self, forKey: .sni)
+        alpn = try container.decode(V2rayStreamAlpn.self, forKey: .alpn)
+        fingerprint = try container.decode(V2rayStreamFingerprint.self, forKey: .fingerprint)
+        publicKey = try container.decode(String.self, forKey: .publicKey)
+        shortId = try container.decode(String.self, forKey: .shortId)
+        spiderX = try container.decode(String.self, forKey: .spiderX)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(uuid, forKey: .uuid)
+        try container.encode(`protocol`, forKey: .protocol)
+        try container.encode(network, forKey: .network)
+        try container.encode(streamSecurity, forKey: .streamSecurity)
+        try container.encode(subid, forKey: .subid)
+        try container.encode(address, forKey: .address)
+        try container.encode(port, forKey: .port)
+        try container.encode(id, forKey: .id)
+        try container.encode(alterId, forKey: .alterId)
+        try container.encode(security, forKey: .security)
+        try container.encode(remark, forKey: .remark)
+        try container.encode(headerType, forKey: .headerType)
+        try container.encode(requestHost, forKey: .requestHost)
+        try container.encode(path, forKey: .path)
+        try container.encode(allowInsecure, forKey: .allowInsecure)
+        try container.encode(flow, forKey: .flow)
+        try container.encode(sni, forKey: .sni)
+        try container.encode(alpn, forKey: .alpn)
+        try container.encode(fingerprint, forKey: .fingerprint)
+        try container.encode(publicKey, forKey: .publicKey)
+        try container.encode(shortId, forKey: .shortId)
+        try container.encode(spiderX, forKey: .spiderX)
     }
 
     // 提供默认值的初始化器
     init(
+        uuid: UUID = UUID(),
         protocol: V2rayProtocolOutbound,
         address: String,
         port: Int,
@@ -332,5 +383,13 @@ class ProxyModel: ObservableObject, Identifiable {
         updateServerSettings()
         updateStreamSettings()
         return outbound.toJSON()
+    }
+}
+
+extension ProxyModel: Transferable {
+    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: ProxyModel.draggableType)
     }
 }

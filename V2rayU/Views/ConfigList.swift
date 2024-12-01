@@ -15,6 +15,7 @@ struct ConfigListView: View {
     @State private var selectGroup: GroupModel = defaultGroup
     @State private var groups: [GroupModel] = []
     @State private var searchText = ""
+    @State private var draggedRow: ProxyModel?
 
     var filteredAndSortedItems: [ProxyModel] {
         let filtered = list.filter { item in
@@ -89,10 +90,15 @@ struct ConfigListView: View {
             } rows: {
                 ForEach(filteredAndSortedItems) { row in
                     TableRow(row)
-                        .contextMenu {
-                            contextMenuProvider(item: row)
-                        }
+                    // 启用拖拽功能
+                    .draggable(row)
+                    // 右键菜单
+                    .contextMenu {
+                        contextMenuProvider(item: row)
+                    }
                 }
+                // 处理拖动逻辑
+                .dropDestination(for: ProxyModel.self, action: handleDrop)
             }
         }
         .sheet(item: $selectedProxy) { proxy in
@@ -109,7 +115,19 @@ struct ConfigListView: View {
             loadData()
         }
     }
-    
+
+    // 处理拖拽排序逻辑:
+    // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
+    func handleDrop(index: Int, rows: [ProxyModel]) {
+        guard let firstRow = rows.first, let firstRemoveIndex = list.firstIndex(where: { $0.id == firstRow.id }) else { return }
+
+        list.removeAll(where: { row in
+            rows.contains(where: { insertRow in insertRow.id == row.id })
+        })
+
+        list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
+    }
+
     private func contextMenuProvider(item: ProxyModel) -> some View {
         Group {
             Button("Edit") {
