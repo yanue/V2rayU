@@ -86,6 +86,7 @@ class GroupModel: ObservableObject, Identifiable, Hashable {
 class ProxyModel: ObservableObject, Identifiable {
     var index: Int = 0
     // 公共属性
+    @Published var uuid: UUID
     @Published var `protocol`: V2rayProtocolOutbound
     @Published var network: V2rayStreamNetwork = .tcp
     @Published var streamSecurity: V2rayStreamSecurity = .none
@@ -182,6 +183,7 @@ class ProxyModel: ObservableObject, Identifiable {
         self.publicKey = publicKey
         self.shortId = shortId
         self.spiderX = spiderX
+        self.uuid = UUID()
         // 初始化时调用更新方法
         updateServerSettings()
         updateStreamSettings()

@@ -70,21 +70,28 @@ struct ConfigListView: View {
                 }
             }
 
-            Table(filteredAndSortedItems, selection: $selection, sortOrder: $sortOrder) {
+            Table(of: ProxyModel.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { item in
                     Text("\(item.index + 1)") // 显示 1-based 索引
                 }
                 .width(30)
-                TableColumn("Type", value: \.`protocol`.rawValue)
-                TableColumn("Remark", value: \.remark)
+                TableColumn("Type", value: \.protocol.rawValue)
+                TableColumn("Remark") { proxy in
+                    Text(proxy.remark)
+                        .onTapGesture(count: 2) { // 双击事件
+                            selectedProxy = proxy
+                        }
+                }
                 TableColumn("Address", value: \.address)
                 TableColumn("Port", value: \.port.description)
                 TableColumn("Network", value: \.network.rawValue)
                 TableColumn("TLS", value: \.streamSecurity.rawValue)
-            }
-            .contextMenu(forSelectionType: ProxyModel.ID.self) { items in
-                if let selectedItem = items.first {
-                    contextMenuProvider(item: selectedItem)
+            } rows: {
+                ForEach(filteredAndSortedItems) { row in
+                    TableRow(row)
+                        .contextMenu {
+                            contextMenuProvider(item: row)
+                        }
                 }
             }
         }
@@ -102,13 +109,11 @@ struct ConfigListView: View {
             loadData()
         }
     }
-
-    private func contextMenuProvider(item: ProxyModel.ID) -> some View {
+    
+    private func contextMenuProvider(item: ProxyModel) -> some View {
         Group {
-            if let proxy = list.first(where: { $0.id == item }) {
-                Button("Edit") {
-                    self.selectedProxy = proxy
-                }
+            Button("Edit") {
+                self.selectedProxy = item
             }
 
             Divider()
