@@ -29,6 +29,8 @@ struct ContentView: View {
 
             VStack{
                 ConfigListView()
+                RoutingListView()
+                SubListView()
             }.padding()
             
         }

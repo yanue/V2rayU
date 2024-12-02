@@ -1,11 +1,11 @@
 //
-//  V2raySubscription.swift
+//  ProxyModel.swift
 //  V2rayU
 //
-//  Created by yanue on 2019/5/15.
-//  Copyright © 2019 yanue. All rights reserved.
+//  Created by yanue on 2024/12/2.
 //
 
+import SwiftUI
 import UniformTypeIdentifiers
 
 /**
@@ -18,67 +18,6 @@ import UniformTypeIdentifiers
  - {"type":"socks5","name":"socks5_proxy","server":"124.15.12.24","port":2312,"udp":true}
  - {"type":"socks5","name":"telegram_proxy","server":"1.2.3.4","port":123,"username":"username","password":"password","udp":true}
  */
-/**
- CREATE TABLE "ProfileItem" (
-   "indexId"  varchar NOT NULL,
-   "configType"  integer,
-   "configVersion"  integer,
-   "address"  varchar,
-   "port"  integer,
-   "id"  varchar,
-   "alterId"  integer,
-   "security"  varchar,
-   "network"  varchar,
-   "remarks"  varchar,
-   "headerType"  varchar,
-   "requestHost"  varchar,
-   "path"  varchar,
-   "streamSecurity"  varchar,
-   "allowInsecure"  varchar,
-   "subid"  varchar,
-   "isSub"  integer,
-   "flow"  varchar,
-   "sni"  varchar,
-   "alpn"  varchar,
-   "coreType"  integer,
-   "preSocksPort"  integer,
-   "fingerprint"  varchar,
-   "displayLog"  integer,
-   "publicKey"  varchar,
-   "shortId"  varchar,
-   "spiderX"  varchar,
-   PRIMARY KEY("indexId")
- );
- */
-import SwiftUI
-
-class GroupModel: ObservableObject, Identifiable, Hashable {
-    static func == (lhs: GroupModel, rhs: GroupModel) -> Bool {
-        return lhs.group == rhs.group
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(group) // 使用 group 来计算哈希值
-    }
-
-    @Published var name: String = "全部"
-    @Published var group: String = ""
-
-    enum CodingKeys: String, CodingKey {
-        case name, group
-    }
-
-    init(name: String, group: String) {
-        self.name = name
-        self.group = group
-    }
-
-    var id: String { // 提供唯一的标识符
-        return group
-    }
-}
-
-@MainActor let defaultGroup = GroupModel(name: "全部", group: "")
 
 class ProxyModel: ObservableObject, Identifiable, Codable {
     var index: Int = 0
@@ -239,7 +178,17 @@ class ProxyModel: ObservableObject, Identifiable, Codable {
         updateServerSettings()
         updateStreamSettings()
     }
+}
 
+extension ProxyModel: Transferable {
+    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: ProxyModel.draggableType)
+    }
+}
+
+extension ProxyModel {
     // 更新 server 配置
     private func updateServerSettings() {
         switch `protocol` {
@@ -383,13 +332,5 @@ class ProxyModel: ObservableObject, Identifiable, Codable {
         updateServerSettings()
         updateStreamSettings()
         return outbound.toJSON()
-    }
-}
-
-extension ProxyModel: Transferable {
-    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
-
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: ProxyModel.draggableType)
     }
 }

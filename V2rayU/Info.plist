@@ -36,7 +36,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Proxy</string>
+			<string>Dragable</string>
 			<key>UTTypeIcons</key>
 			<dict/>
 			<key>UTTypeIdentifier</key>
@@ -44,7 +44,6 @@
 			<key>UTTypeTagSpecification</key>
 			<dict/>
 		</dict>
-		<dict/>
 	</array>
 </dict>
 </plist>

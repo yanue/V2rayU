@@ -11,7 +11,7 @@ struct ConfigListView: View {
     @State private var list: [ProxyModel] = []
     @State private var sortOrder: [KeyPathComparator<ProxyModel>] = []
     @State private var selection: Set<ProxyModel.ID> = []
-    @State private var selectedProxy: ProxyModel? = nil
+    @State private var selectedRow: ProxyModel? = nil
     @State private var selectGroup: GroupModel = defaultGroup
     @State private var groups: [GroupModel] = []
     @State private var searchText = ""
@@ -77,11 +77,11 @@ struct ConfigListView: View {
                 }
                 .width(30)
                 TableColumn("Type", value: \.protocol.rawValue)
-                TableColumn("Remark") { proxy in
-                    Text(proxy.remark)
-                        .onTapGesture(count: 2) { // 双击事件
-                            selectedProxy = proxy
-                        }
+                TableColumn("Remark") { row in
+                    // 双击事件
+                    Text(row.remark).onTapGesture(count: 2) {
+                        selectedRow = row
+                    }
                 }
                 TableColumn("Address", value: \.address)
                 TableColumn("Port", value: \.port.description)
@@ -90,22 +90,22 @@ struct ConfigListView: View {
             } rows: {
                 ForEach(filteredAndSortedItems) { row in
                     TableRow(row)
-                    // 启用拖拽功能
-                    .draggable(row)
-                    // 右键菜单
-                    .contextMenu {
-                        contextMenuProvider(item: row)
-                    }
+                        // 启用拖拽功能
+                        .draggable(row)
+                        // 右键菜单
+                        .contextMenu {
+                            contextMenuProvider(item: row)
+                        }
                 }
                 // 处理拖动逻辑
                 .dropDestination(for: ProxyModel.self, action: handleDrop)
             }
         }
-        .sheet(item: $selectedProxy) { proxy in
+        .sheet(item: $selectedRow) { proxy in
             VStack {
                 Button("Close") {
-                    // 如果需要关闭 `sheet`，将 `selectedProxy` 设置为 `nil`
-                    selectedProxy = nil
+                    // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
+                    selectedRow = nil
                 }
                 ConfigView(item: proxy)
                     .padding()
@@ -131,7 +131,7 @@ struct ConfigListView: View {
     private func contextMenuProvider(item: ProxyModel) -> some View {
         Group {
             Button("Edit") {
-                self.selectedProxy = item
+                self.selectedRow = item
             }
 
             Divider()
