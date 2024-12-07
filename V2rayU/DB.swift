@@ -10,13 +10,14 @@ import Foundation
 
 enum DatabaseError: Error {
     case databaseUnavailable
+    case recordNotFound
 }
 
 protocol DatabaseModel {
     static var tableName: String { get }
     static func initSql() -> String
     static func fromRow(_ row: Row) throws -> Self
-    func toInsertValues() -> [String: SQLite.Setter]
+    func toInsertValues() -> [SQLite.Setter]
     // 新增方法：提供主键条件
     func primaryKeyCondition() -> SQLite.Expression<Bool>
 }
@@ -24,7 +25,7 @@ protocol DatabaseModel {
 actor DatabaseManager {
     private var db: Connection?
 
-    func initDB () {
+    func initDB() {
         do {
             db = try Connection(databasePath)
             print("DatabaseManager", databasePath, db as Any)
@@ -38,10 +39,9 @@ actor DatabaseManager {
             try db.execute(ProxyModel.initSql())
         } catch {
             print("Database Init failed: \(error)")
-
         }
     }
-    
+
     /// fetchOne - 根据条件查询单条数据
     /// conditions:
     ///  [
@@ -49,27 +49,25 @@ actor DatabaseManager {
     ///     Expression<String>(value: "name") == name
     ///  ]
     /// sort: Expression<String>(value: "xxx").desc
-    func fetchOne<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [],sort:Expressible? = nil) async throws -> T? {
+    func fetchOne(table: String, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) async throws -> Row {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(T.tableName)
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    var query = table
-                    // 应用所有条件
-                    for condition in conditions {
-                        query = query.filter(condition)
-                    }
-                    if let row = try db.pluck(query) {
-                        let object = try T.fromRow(row)
-                        continuation.resume(returning: object)
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+        var query = Table(table)
+        do {
+            // 应用所有条件
+            for condition in conditions {
+                query = query.filter(condition)
             }
+            // 应用排序
+            if sort != nil {
+                query = query.order([sort!])
+            }
+            if let row = try db.pluck(query) {
+                return row
+            } else {
+                throw DatabaseError.recordNotFound // record not found
+            }
+        } catch {
+            throw error
         }
     }
 
@@ -80,13 +78,10 @@ actor DatabaseManager {
     ///     Expression<String>(value: "name") == name
     ///  ]
     /// sort: Expression<String>(value: "xxx").desc
-    func fetchAll(table: String, conditions: [SQLite.Expression<Bool>] = [],sort:Expressible? = nil) async throws -> [Row] {
+    func fetchAll(table: String, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) async throws -> [Row] {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(table)
-
+        var query = Table(table)
         do {
-            var query = table
-
             // 应用所有条件
             for condition in conditions {
                 query = query.filter(condition)
@@ -107,62 +102,41 @@ actor DatabaseManager {
             throw error
         }
     }
-    
-    
-    func insert<T: DatabaseModel>(_ model: T) async throws {
-        guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(T.tableName)
-        let values = model.toInsertValues()
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    // 使用 SQLite.Setter 构建插入语句
-                    let insert = table.insert(values.map { _, value in
-                        value // 直接使用 Setter
-                    })
 
-                    try db.run(insert)
-                    continuation.resume()
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
+    func insert(table: String, values: [Setter]) async throws {
+        guard let db = db else { throw DatabaseError.databaseUnavailable }
+        let table = Table(table)
+        do {
+            // 使用 SQLite.Setter 构建插入语句
+            let insert = table.insert(values)
+            try db.run(insert)
         }
     }
 
-    func update<T: DatabaseModel>(_ model: T, matching condition: SQLite.Expression<Bool>) async throws {
+    func update(table: String, conditions: [SQLite.Expression<Bool>] = [], values: [Setter]) async throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(T.tableName)
-        let setters = model.toInsertValues().map { _, value in
-            value // 直接使用 Setter
-        }
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    // 构造更新查询，使用 Setter 进行更新
-                    let updateQuery = table.filter(condition).update(setters)
-                    try db.run(updateQuery)
-                    continuation.resume()
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+        var table = Table(table)
+        do {
+            // 应用所有条件
+            for condition in conditions {
+                table = table.filter(condition)
             }
+            // 构造更新查询，使用 Setter 进行更新
+            let updateQuery = table.update(values)
+            try db.run(updateQuery)
         }
     }
-    
-    func delete<T: DatabaseModel>(modelType: T.Type, matching condition: SQLite.Expression<Bool>) async throws {
+
+    func delete(table: String, conditions: [SQLite.Expression<Bool>] = []) async throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(T.tableName)
-        try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    let deleteQuery = table.filter(condition).delete()
-                    try db.run(deleteQuery)
-                    continuation.resume()
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+        var query = Table(table)
+        do {
+            // 应用所有条件
+            for condition in conditions {
+                query = query.filter(condition)
             }
+            let deleteQuery = query.delete()
+            try db.run(deleteQuery)
         }
     }
 }

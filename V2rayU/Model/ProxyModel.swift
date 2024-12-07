@@ -5,9 +5,9 @@
 //  Created by yanue on 2024/12/2.
 //
 
+import SQLite
 import SwiftUI
 import UniformTypeIdentifiers
-import SQLite
 
 /**
  - {"type":"ss","name":"v2rayse_test_1","server":"198.57.27.218","port":5004,"cipher":"aes-256-gcm","password":"g5MeD6Ft3CWlJId"}
@@ -337,15 +337,14 @@ extension ProxyModel {
 }
 
 extension ProxyModel: DatabaseModel {
-    
     static var tableName: String {
         return "proxy"
     }
-    
+
     func primaryKeyCondition() -> SQLite.Expression<Bool> {
         return Expression<String>("uuid") == uuid.uuidString
     }
-    
+
     static func initSql() -> String {
         """
         CREATE TABLE IF NOT EXISTS \(tableName) (
@@ -374,7 +373,7 @@ extension ProxyModel: DatabaseModel {
         );
         """
     }
-    
+
     static func fromRow(_ row: Row) throws -> Self {
         // 提取字段，使用value标签
         let uuidString = try row.get(Expression<String>(value: "uuid"))
@@ -382,7 +381,7 @@ extension ProxyModel: DatabaseModel {
 
         let protocolValue = try row.get(Expression<String>(value: "protocol"))
         let address = try row.get(Expression<String>(value: "address"))
-        
+
         // 尝试将 port 字段从 String 转换为 Int
         let portString = try row.get(Expression<String>(value: "port"))
         let port = Int(portString) ?? 0
@@ -443,32 +442,31 @@ extension ProxyModel: DatabaseModel {
         )
     }
 
-
     // 返回要插入到数据库的数据
-    func toInsertValues() -> [String: SQLite.Setter] {
+    func toInsertValues() -> [SQLite.Setter] {
         return [
-            "uuid": Expression<String>("uuid") <- uuid.uuidString,
-            "protocol": Expression<String>("protocol") <- `protocol`.rawValue,
-            "network": Expression<String>("network") <- network.rawValue,
-            "streamSecurity": Expression<String>("streamSecurity") <- streamSecurity.rawValue,
-            "subid": Expression<String>("subid") <- subid,
-            "address": Expression<String>("address") <- address,
-            "port": Expression<Int>("port") <- port,
-            "id": Expression<String>("id") <- id,
-            "alterId": Expression<Int>("alterId") <- alterId,
-            "security": Expression<String>("security") <- security,
-            "remark": Expression<String>("remark") <- remark,
-            "headerType": Expression<String>("headerType") <- headerType.rawValue,
-            "requestHost": Expression<String>("requestHost") <- requestHost,
-            "path": Expression<String>("path") <- path,
-            "allowInsecure": Expression<Bool>("allowInsecure") <- allowInsecure,
-            "flow": Expression<String>("flow") <- flow,
-            "sni": Expression<String>("sni") <- sni,
-            "alpn": Expression<String>("alpn") <- alpn.rawValue,
-            "fingerprint": Expression<String>("fingerprint") <- fingerprint.rawValue,
-            "publicKey": Expression<String>("publicKey") <- publicKey,
-            "shortId": Expression<String>("shortId") <- shortId,
-            "spiderX": Expression<String>("spiderX") <- spiderX
+            Expression<String>("uuid") <- uuid.uuidString,
+            Expression<String>("protocol") <- `protocol`.rawValue,
+            Expression<String>("network") <- network.rawValue,
+            Expression<String>("streamSecurity") <- streamSecurity.rawValue,
+            Expression<String>("subid") <- subid,
+            Expression<String>("address") <- address,
+            Expression<Int>("port") <- port,
+            Expression<String>("id") <- id,
+            Expression<Int>("alterId") <- alterId,
+            Expression<String>("security") <- security,
+            Expression<String>("remark") <- remark,
+            Expression<String>("headerType") <- headerType.rawValue,
+            Expression<String>("requestHost") <- requestHost,
+            Expression<String>("path") <- path,
+            Expression<Bool>("allowInsecure") <- allowInsecure,
+            Expression<String>("flow") <- flow,
+            Expression<String>("sni") <- sni,
+            Expression<String>("alpn") <- alpn.rawValue,
+            Expression<String>("fingerprint") <- fingerprint.rawValue,
+            Expression<String>("publicKey") <- publicKey,
+            Expression<String>("shortId") <- shortId,
+            Expression<String>("spiderX") <- spiderX,
         ]
     }
 }
