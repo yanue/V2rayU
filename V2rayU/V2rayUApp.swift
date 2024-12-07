@@ -12,6 +12,7 @@ let logFilePath = AppHomePath + "/v2ray-core.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 @MainActor let windowDelegate = WindowDelegate()
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+let dbManager = DatabaseManager()
 
 @main
 struct V2rayUApp: App {
@@ -28,7 +29,6 @@ struct V2rayUApp: App {
         }
         print("NSHomeDirectory()",NSHomeDirectory())
         print("userHomeDirectory",userHomeDirectory)
-        dbManager.initDB()
     }
 
    

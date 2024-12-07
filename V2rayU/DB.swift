@@ -8,12 +8,6 @@
 import Foundation
 @preconcurrency import SQLite
 
-nonisolated(unsafe) let dbManager = DatabaseManager()
-
-let init_sql = """
-
-"""
-
 enum DatabaseError: Error {
     case databaseUnavailable
 }
@@ -27,7 +21,7 @@ protocol DatabaseModel {
     func primaryKeyCondition() -> SQLite.Expression<Bool>
 }
 
-class DatabaseManager {
+actor DatabaseManager {
     private var db: Connection?
 
     func initDB () {
@@ -47,34 +41,31 @@ class DatabaseManager {
 
         }
     }
-
-    func getConntion() -> Connection {
-        return self.db!
-    }
     
-    func executeSQL(_ sql: String) async throws {
-        guard let db = db else { throw DatabaseError.databaseUnavailable }
-        try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    try db.execute(sql)
-                    continuation.resume()
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
-    func delete<T: DatabaseModel>(modelType: T.Type, matching condition: SQLite.Expression<Bool>) async throws {
+    /// fetchOne - 根据条件查询单条数据
+    /// conditions:
+    ///  [
+    ///     Expression<Int64>(value: "id") == id,
+    ///     Expression<String>(value: "name") == name
+    ///  ]
+    /// sort: Expression<String>(value: "xxx").desc
+    func fetchOne<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [],sort:Expressible? = nil) async throws -> T? {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
         let table = Table(T.tableName)
-        try await withCheckedThrowingContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global().async {
                 do {
-                    let deleteQuery = table.filter(condition).delete()
-                    try db.run(deleteQuery)
-                    continuation.resume()
+                    var query = table
+                    // 应用所有条件
+                    for condition in conditions {
+                        query = query.filter(condition)
+                    }
+                    if let row = try db.pluck(query) {
+                        let object = try T.fromRow(row)
+                        continuation.resume(returning: object)
+                    } else {
+                        continuation.resume(returning: nil)
+                    }
                 } catch {
                     continuation.resume(throwing: error)
                 }
@@ -82,6 +73,42 @@ class DatabaseManager {
         }
     }
 
+    /// fetchAll - 根据条件查询全部数据
+    /// conditions:
+    ///  [
+    ///     Expression<Int64>(value: "id") == id,
+    ///     Expression<String>(value: "name") == name
+    ///  ]
+    /// sort: Expression<String>(value: "xxx").desc
+    func fetchAll(table: String, conditions: [SQLite.Expression<Bool>] = [],sort:Expressible? = nil) async throws -> [Row] {
+        guard let db = db else { throw DatabaseError.databaseUnavailable }
+        let table = Table(table)
+
+        do {
+            var query = table
+
+            // 应用所有条件
+            for condition in conditions {
+                query = query.filter(condition)
+            }
+
+            // 应用排序
+            if sort != nil {
+                query = query.order([sort!])
+            }
+
+            var results: [Row] = []
+            for row in try db.prepare(query) {
+                results.append(row)
+            }
+            return results
+
+        } catch {
+            throw error
+        }
+    }
+    
+    
     func insert<T: DatabaseModel>(_ model: T) async throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
         let table = Table(T.tableName)
@@ -122,51 +149,16 @@ class DatabaseManager {
             }
         }
     }
-
-    func fetchOne<T: DatabaseModel>(model: T.Type, matching condition: SQLite.Expression<Bool>) async throws -> T? {
+    
+    func delete<T: DatabaseModel>(modelType: T.Type, matching condition: SQLite.Expression<Bool>) async throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
         let table = Table(T.tableName)
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global().async {
                 do {
-                    if let row = try db.pluck(table.filter(condition)) {
-                        let object = try T.fromRow(row)
-                        continuation.resume(returning: object)
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
-    func fetchAll(table: String, conditions: [SQLite.Expression<Bool>] = [],order: [Expressible] = []) async throws -> [Row] {
-        guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(table)
-        
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global().async {
-                do {
-                    var query = table
-                    
-                    // 应用所有条件
-                    for condition in conditions {
-                        query = query.filter(condition)
-                    }
-                    
-                    // 应用排序
-                    if !order.isEmpty {
-                        query = query.order(order)
-                    }
-                    
-                    var results: [Row] = []
-                    for row in try db.prepare(query) {
-                        results.append(row)
-                    }
-                    
-                    continuation.resume(returning: results)
+                    let deleteQuery = table.filter(condition).delete()
+                    try db.run(deleteQuery)
+                    continuation.resume()
                 } catch {
                     continuation.resume(throwing: error)
                 }

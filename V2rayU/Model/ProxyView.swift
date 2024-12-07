@@ -16,10 +16,10 @@ class ProxyViewModel {
     func getList(selectGroup: String) async {
         var conditions: [SQLite.Expression<Bool>] = []
         if selectGroup != "" {
-            conditions.append(Expression<String>("subid") == selectGroup)
+            conditions.append(Expression<String>(value: "subid") == selectGroup)
         }
         do {
-            let fetchedData = try await dbManager.fetchAll(table: "proxy", conditions: conditions)
+            let fetchedData = try await dbManager.fetchAll(table: "proxy", conditions: conditions,sort: Expression<String>(value: "name").desc)
             // Ensure thread-safe access to _list
             var _list: [ProxyModel] = []
             for row in fetchedData {
