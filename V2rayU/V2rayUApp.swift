@@ -4,12 +4,14 @@ import SwiftUI
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
+let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
 let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
 let logFilePath = AppHomePath + "/v2ray-core.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 @MainActor let windowDelegate = WindowDelegate()
+let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 
 @main
 struct V2rayUApp: App {
@@ -22,8 +24,11 @@ struct V2rayUApp: App {
         // 初始化
         let fileManager = FileManager.default
         if let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-            print("Application Support Directory: \(appSupportURL)")
+//            print("Application Support Directory: \(appSupportURL)")
         }
+        print("NSHomeDirectory()",NSHomeDirectory())
+        print("userHomeDirectory",userHomeDirectory)
+        dbManager.initDB()
     }
 
    

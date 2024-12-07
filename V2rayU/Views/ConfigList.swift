@@ -46,8 +46,8 @@ struct ConfigListView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Button("刷新") {
-                    withAnimation {
-                        loadData()
+                    Task {
+                        await loadData()
                     }
                 }
                 Button("Ping") {
@@ -112,7 +112,9 @@ struct ConfigListView: View {
             }
         }
         .task {
-            loadData()
+            Task{
+                await loadData()
+            }
         }
     }
 
@@ -146,20 +148,13 @@ struct ConfigListView: View {
         }
     }
 
-    private func loadData() {
-        // Simulate data fetching
-        let fetchedData = [
-            ProxyModel(protocol: .trojan, address: "dss111", port: 443, id: "aaa", security: "auto2", remark: "testa01"),
-            ProxyModel(protocol: .trojan, address: "dss222", port: 443, id: "bbbs", security: "auto1", remark: "testb02"),
-        ]
-        let groupsData = [
-            defaultGroup,
-            GroupModel(name: "Yanue", group: "yanue"),
-        ]
-        withAnimation {
-            list = fetchedData
-            groups = groupsData
+    private func loadData() async {
+        let model = ProxyViewModel()
+        Task {
+            let currentGroup = selectGroup.group // 本地复制
+            await model.getList(selectGroup: currentGroup)
         }
+        self.list = model.list
     }
 }
 

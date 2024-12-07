@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import SQLite
 
 /**
  - {"type":"ss","name":"v2rayse_test_1","server":"198.57.27.218","port":5004,"cipher":"aes-256-gcm","password":"g5MeD6Ft3CWlJId"}
@@ -19,7 +20,7 @@ import UniformTypeIdentifiers
  - {"type":"socks5","name":"telegram_proxy","server":"1.2.3.4","port":123,"username":"username","password":"password","udp":true}
  */
 
-class ProxyModel: ObservableObject, Identifiable, Codable {
+final class ProxyModel: ObservableObject, Identifiable, Codable {
     var index: Int = 0
     // 公共属性
     @Published var uuid: UUID
@@ -128,7 +129,7 @@ class ProxyModel: ObservableObject, Identifiable, Codable {
     }
 
     // 提供默认值的初始化器
-    init(
+    required init(
         uuid: UUID = UUID(),
         protocol: V2rayProtocolOutbound,
         address: String,
@@ -332,5 +333,142 @@ extension ProxyModel {
         updateServerSettings()
         updateStreamSettings()
         return outbound.toJSON()
+    }
+}
+
+extension ProxyModel: DatabaseModel {
+    
+    static var tableName: String {
+        return "proxy"
+    }
+    
+    func primaryKeyCondition() -> SQLite.Expression<Bool> {
+        return Expression<String>("uuid") == uuid.uuidString
+    }
+    
+    static func initSql() -> String {
+        """
+        CREATE TABLE IF NOT EXISTS \(tableName) (
+            uuid TEXT PRIMARY KEY,
+            protocol TEXT,
+            network TEXT,
+            streamSecurity TEXT,
+            subid TEXT,
+            address TEXT,
+            port INTEGER,
+            id TEXT,
+            alterId INTEGER,
+            security TEXT,
+            remark TEXT,
+            headerType TEXT,
+            requestHost TEXT,
+            path TEXT,
+            allowInsecure BOOLEAN,
+            flow TEXT,
+            sni TEXT,
+            alpn TEXT,
+            fingerprint TEXT,
+            publicKey TEXT,
+            shortId TEXT,
+            spiderX TEXT
+        );
+        """
+    }
+    
+    static func fromRow(_ row: Row) throws -> Self {
+        // 提取字段，使用value标签
+        let uuidString = try row.get(Expression<String>(value: "uuid"))
+        let uuid = UUID(uuidString: uuidString) ?? UUID()
+
+        let protocolValue = try row.get(Expression<String>(value: "protocol"))
+        let address = try row.get(Expression<String>(value: "address"))
+        
+        // 尝试将 port 字段从 String 转换为 Int
+        let portString = try row.get(Expression<String>(value: "port"))
+        let port = Int(portString) ?? 0
+
+        let id = try row.get(Expression<String>(value: "id"))
+        let alterIdString = try row.get(Expression<Int>(value: "alterId"))
+        let alterId = Int(alterIdString) ?? 0
+        let security = try row.get(Expression<String>(value: "security"))
+        let networkValue = try row.get(Expression<String>(value: "network"))
+        let remark = try row.get(Expression<String>(value: "remark"))
+        let headerTypeValue = try row.get(Expression<String>(value: "headerType"))
+        let requestHost = try row.get(Expression<String>(value: "requestHost"))
+        let path = try row.get(Expression<String>(value: "path"))
+        let streamSecurityValue = try row.get(Expression<String>(value: "streamSecurity"))
+        let allowInsecureString = try row.get(Expression<String>(value: "allowInsecure"))
+        let allowInsecure = allowInsecureString == "1"
+        let subid = try row.get(Expression<String>(value: "subid"))
+        let flow = try row.get(Expression<String>(value: "flow"))
+        let sni = try row.get(Expression<String>(value: "sni"))
+        let alpnValue = try row.get(Expression<String>(value: "alpn"))
+        let fingerprintValue = try row.get(Expression<String>(value: "fingerprint"))
+        let publicKey = try row.get(Expression<String>(value: "publicKey"))
+        let shortId = try row.get(Expression<String>(value: "shortId"))
+        let spiderX = try row.get(Expression<String>(value: "spiderX"))
+
+        // 将从数据库获取的字段值转化为相应的枚举类型
+        let protocolEnum = V2rayProtocolOutbound(rawValue: protocolValue) ?? .vmess
+        let networkEnum = V2rayStreamNetwork(rawValue: networkValue) ?? .tcp
+        let headerTypeEnum = V2rayHeaderType(rawValue: headerTypeValue) ?? .none
+        let streamSecurityEnum = V2rayStreamSecurity(rawValue: streamSecurityValue) ?? .none
+        let alpnEnum = V2rayStreamAlpn(rawValue: alpnValue) ?? .h2h1
+        let fingerprintEnum = V2rayStreamFingerprint(rawValue: fingerprintValue) ?? .chrome
+
+        // 使用提取的值来初始化模型，传递默认值
+        return Self(
+            uuid: uuid, // 使用从数据库提取的 UUID
+            protocol: protocolEnum,
+            address: address,
+            port: port,
+            id: id,
+            alterId: alterId,
+            security: security,
+            network: networkEnum,
+            remark: remark,
+            headerType: headerTypeEnum,
+            requestHost: requestHost,
+            path: path,
+            streamSecurity: streamSecurityEnum,
+            allowInsecure: allowInsecure,
+            subid: subid,
+            flow: flow,
+            sni: sni,
+            alpn: alpnEnum,
+            fingerprint: fingerprintEnum,
+            publicKey: publicKey,
+            shortId: shortId,
+            spiderX: spiderX
+        )
+    }
+
+
+    // 返回要插入到数据库的数据
+    func toInsertValues() -> [String: SQLite.Setter] {
+        return [
+            "uuid": Expression<String>("uuid") <- uuid.uuidString,
+            "protocol": Expression<String>("protocol") <- `protocol`.rawValue,
+            "network": Expression<String>("network") <- network.rawValue,
+            "streamSecurity": Expression<String>("streamSecurity") <- streamSecurity.rawValue,
+            "subid": Expression<String>("subid") <- subid,
+            "address": Expression<String>("address") <- address,
+            "port": Expression<Int>("port") <- port,
+            "id": Expression<String>("id") <- id,
+            "alterId": Expression<Int>("alterId") <- alterId,
+            "security": Expression<String>("security") <- security,
+            "remark": Expression<String>("remark") <- remark,
+            "headerType": Expression<String>("headerType") <- headerType.rawValue,
+            "requestHost": Expression<String>("requestHost") <- requestHost,
+            "path": Expression<String>("path") <- path,
+            "allowInsecure": Expression<Bool>("allowInsecure") <- allowInsecure,
+            "flow": Expression<String>("flow") <- flow,
+            "sni": Expression<String>("sni") <- sni,
+            "alpn": Expression<String>("alpn") <- alpn.rawValue,
+            "fingerprint": Expression<String>("fingerprint") <- fingerprint.rawValue,
+            "publicKey": Expression<String>("publicKey") <- publicKey,
+            "shortId": Expression<String>("shortId") <- shortId,
+            "spiderX": Expression<String>("spiderX") <- spiderX
+        ]
     }
 }
