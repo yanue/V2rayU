@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct ConfigListView: View {
+    @StateObject private var viewModel = ProxyViewModel()  
     @State private var list: [ProxyModel] = []
     @State private var sortOrder: [KeyPathComparator<ProxyModel>] = []
     @State private var selection: Set<ProxyModel.ID> = []
     @State private var selectedRow: ProxyModel? = nil
     @State private var selectGroup: GroupModel = defaultGroup
-    @State private var groups: [GroupModel] = []
     @State private var searchText = ""
     @State private var draggedRow: ProxyModel?
 
     var filteredAndSortedItems: [ProxyModel] {
-        let filtered = list.filter { item in
+        let filtered = viewModel.list.filter { item in
             (selectGroup.group == "" || selectGroup.group == item.subid) &&
                 (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
         }
@@ -34,7 +34,7 @@ struct ConfigListView: View {
         VStack {
             HStack {
                 Picker("选择组", selection: $selectGroup) {
-                    ForEach(groups) { group in // 使用 groups 数组并遍历
+                    ForEach(viewModel.groups) { group in // 使用 groups 数组并遍历
                         Text(group.name).tag(group as GroupModel) // 使用 .tag 来绑定选中的项
                     }
                 }
@@ -46,9 +46,7 @@ struct ConfigListView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Button("刷新") {
-                    Task {
-                        await loadData()
-                    }
+                    loadData()
                 }
                 Button("Ping") {
                     withAnimation {
@@ -66,7 +64,8 @@ struct ConfigListView: View {
                 Button("新增") {
                     withAnimation {
                         let newProxy = ProxyModel(protocol: .trojan, address: "newAddress", port: 443, id: UUID().uuidString, security: "auto", remark: "New Remark")
-                        list.append(newProxy)
+//                        list.append(newProxy)
+                        self.selectedRow = newProxy
                     }
                 }
             }
@@ -104,6 +103,8 @@ struct ConfigListView: View {
         .sheet(item: $selectedRow) { proxy in
             VStack {
                 Button("Close") {
+                    print("upsert, \(proxy)",proxy.id, proxy.network,proxy.address)
+                    viewModel.upsert(item: proxy)
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
                 }
@@ -112,9 +113,7 @@ struct ConfigListView: View {
             }
         }
         .task {
-            Task{
-                await loadData()
-            }
+            loadData()
         }
     }
 
@@ -148,13 +147,8 @@ struct ConfigListView: View {
         }
     }
 
-    private func loadData() async {
-        let model = ProxyViewModel()
-        Task {
-            let currentGroup = selectGroup.group // 本地复制
-            await model.getList(selectGroup: currentGroup)
-        }
-        self.list = model.list
+    private func loadData() {
+        viewModel.getList()  // Load data when the view appears
     }
 }
 

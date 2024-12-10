@@ -22,15 +22,15 @@ struct ContentView: View {
                     createTabView(image: "lock", text: "MitM", isOn: $isMitMEnabled)
                     createTabView(image: "f.square", text: "Script", isOn: $isScriptEnabled)
                 }
-                // 列表
+                 // 列表
             }.padding()
             
             Divider() // 分隔线，适当调整宽度
 
             VStack{
                 ConfigListView()
-                RoutingListView()
-                SubListView()
+//                RoutingListView()
+//                SubListView()
             }.padding()
             
         }

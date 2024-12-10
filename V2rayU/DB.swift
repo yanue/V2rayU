@@ -8,6 +8,9 @@
 import Foundation
 @preconcurrency import SQLite
 
+// 修复 Missing argument label 'value:' in call
+typealias Expression = SQLite.Expression
+
 enum DatabaseError: Error {
     case databaseUnavailable
     case recordNotFound
@@ -17,20 +20,29 @@ protocol DatabaseModel {
     static var tableName: String { get }
     static func initSql() -> String
     static func fromRow(_ row: Row) throws -> Self
-    func toInsertValues() -> [SQLite.Setter]
+    func toInsertValues() -> [Setter]
     // 新增方法：提供主键条件
     func primaryKeyCondition() -> SQLite.Expression<Bool>
 }
 
-actor DatabaseManager {
+class DatabaseManager {
     private var db: Connection?
 
+    // 全局的串行队列
+    private static let dbQueue = DispatchQueue(label: "net.yanue.V2rayU.dbQueue")
+
+    required init() {
+        initDB()
+    }
+
+    /// 初始化数据库连接
+    /// 此方法尝试建立数据库连接，并设置表格。
     func initDB() {
         do {
             db = try Connection(databasePath)
             print("DatabaseManager", databasePath, db as Any)
         } catch {
-            print("Database initialization failed: \(error)")
+            print("数据库初始化失败: \(error)")
             // todo
         }
         do {
@@ -38,63 +50,63 @@ actor DatabaseManager {
             // 初始化表格
             try db.execute(ProxyModel.initSql())
         } catch {
-            print("Database Init failed: \(error)")
+            print("数据库初始化失败: \(error)")
         }
     }
 
-    /// fetchOne - 根据条件查询单条数据
-    /// conditions:
-    ///  [
-    ///     Expression<Int64>(value: "id") == id,
-    ///     Expression<String>(value: "name") == name
-    ///  ]
-    /// sort: Expression<String>(value: "xxx").desc
-    func fetchOne(table: String, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) async throws -> Row {
+    /// 根据条件查询单条记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - conditions: 过滤查询的条件数组，示例：[Expression<Int64>("id") == id]
+    ///   - sort: 一个可选的排序表达式，指定查询结果的排序方式，示例：`Expression<String>("name").desc`
+    /// - Returns: 返回类型为 `T` 的单个模型实例
+    /// - Throws: 如果没有找到记录，抛出 `DatabaseError.recordNotFound` 错误
+    func fetchOne<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) throws -> T {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        var query = Table(table)
+        var query = Table(T.tableName)
         do {
-            // 应用所有条件
+            // 应用所有过滤条件
             for condition in conditions {
                 query = query.filter(condition)
             }
-            // 应用排序
+            // 如果提供了排序表达式，应用排序
             if sort != nil {
                 query = query.order([sort!])
             }
             if let row = try db.pluck(query) {
-                return row
+                return try T.fromRow(row) // 将查询到的行数据转换为模型类型
             } else {
-                throw DatabaseError.recordNotFound // record not found
+                throw DatabaseError.recordNotFound // 没有找到记录
             }
         } catch {
             throw error
         }
     }
 
-    /// fetchAll - 根据条件查询全部数据
-    /// conditions:
-    ///  [
-    ///     Expression<Int64>(value: "id") == id,
-    ///     Expression<String>(value: "name") == name
-    ///  ]
-    /// sort: Expression<String>(value: "xxx").desc
-    func fetchAll(table: String, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) async throws -> [Row] {
+    /// 根据条件查询所有记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - conditions: 过滤查询的条件数组，示例：[Expression<Int64>("id") == id]
+    ///   - sort: 一个可选的排序表达式，指定查询结果的排序方式，示例：`Expression<String>("name").desc`
+    /// - Returns: 返回类型为 `T` 的模型数组
+    /// - Throws: 查询过程中可能抛出的任何错误
+    func fetchAll<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [], sort: Expressible? = nil) throws -> [T] {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        var query = Table(table)
+        var query = Table(model.tableName)
         do {
-            // 应用所有条件
+            // 应用所有过滤条件
             for condition in conditions {
                 query = query.filter(condition)
             }
 
-            // 应用排序
+            // 如果提供了排序表达式，应用排序
             if sort != nil {
                 query = query.order([sort!])
             }
 
-            var results: [Row] = []
+            var results: [T] = []
             for row in try db.prepare(query) {
-                results.append(row)
+                results.append(try T.fromRow(row)) // 将每一行数据转换为模型类型并添加到结果数组
             }
             return results
 
@@ -103,40 +115,118 @@ actor DatabaseManager {
         }
     }
 
-    func insert(table: String, values: [Setter]) async throws {
+    /// 插入一条记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - values: 一个包含 `Setter` 的数组，表示插入的字段值
+    /// - Throws: 插入过程中可能抛出的任何错误
+    // 插入数据，等待操作完成并抛出错误
+    func insert<T: DatabaseModel>(model: T.Type, values: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        let table = Table(table)
-        do {
-            // 使用 SQLite.Setter 构建插入语句
-            let insert = table.insert(values)
-            try db.run(insert)
+        let table = Table(T.tableName)
+        let dispatchGroup = DispatchGroup() // 创建 DispatchGroup
+        // 使用全局队列执行插入操作
+        DatabaseManager.dbQueue.async(group: dispatchGroup) {
+            do {
+                // 使用事务，保证原子性
+                try db.transaction {
+                    let insertQuery = table.insert(values)
+                    try db.run(insertQuery)
+                }
+            } catch {
+                print("插入失败: \(error)")
+            }
         }
+        // 等待队列中的任务完成
+        dispatchGroup.wait() // 等待操作完成
     }
 
-    func update(table: String, conditions: [SQLite.Expression<Bool>] = [], values: [Setter]) async throws {
+    /// 更新一条记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - conditions: 过滤更新的条件数组，示例：[Expression<Int64>("id") == id]
+    ///   - values: 一个包含 `Setter` 的数组，表示更新的字段值
+    /// - Throws: 更新过程中可能抛出的任何错误
+    func update<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [], values: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        var table = Table(table)
-        do {
-            // 应用所有条件
-            for condition in conditions {
-                table = table.filter(condition)
+        // 创建 DispatchGroup
+        let dispatchGroup = DispatchGroup()
+        // 使用全局队列执行删除操作
+        DatabaseManager.dbQueue.async(group: dispatchGroup) {
+            do {
+                var query = Table(T.tableName)
+                // 应用所有条件
+                for condition in conditions {
+                    query = query.filter(condition)
+                }
+                // 使用事务，保证原子性
+                try db.transaction {
+                    let updateQuery = query.update(values)
+                    try db.run(updateQuery)
+                }
+            } catch {
+                print("更新失败: \(error)")
             }
-            // 构造更新查询，使用 Setter 进行更新
-            let updateQuery = table.update(values)
-            try db.run(updateQuery)
         }
+        // 等待队列中的任务完成
+        dispatchGroup.wait() // 等待操作完成
     }
 
-    func delete(table: String, conditions: [SQLite.Expression<Bool>] = []) async throws {
+    /// 插入或更新一条记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - onConflict: 用于处理冲突的字段表达式，示例：`Expression<String>("uuid")`
+    ///   - insertValues: 用于插入的字段值，包含 `Setter`
+    ///   - setValues: 用于更新的字段值，包含 `Setter`
+    /// - Throws: 执行过程中可能抛出的任何错误
+    func upsert<T: DatabaseModel>(model: T.Type, onConflict: Expressible, insertValues: [Setter], setValues: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        var query = Table(table)
-        do {
-            // 应用所有条件
-            for condition in conditions {
-                query = query.filter(condition)
+        // 创建 DispatchGroup
+        let dispatchGroup = DispatchGroup()
+        let table = Table(T.tableName)
+        // 使用全局队列执行 upsert 操作
+        DatabaseManager.dbQueue.async(group: dispatchGroup) {
+            do {
+                // 使用事务，保证原子性
+                try db.transaction {
+                    let upsertQuery = table.upsert(insertValues, onConflictOf: onConflict, set: setValues)
+                    try db.run(upsertQuery)
+                }
+            } catch {
+                print("Upsert 失败: \(error)")
             }
-            let deleteQuery = query.delete()
-            try db.run(deleteQuery)
         }
+        // 等待队列中的任务完成
+        dispatchGroup.wait() // 等待操作完成
+    }
+
+    /// 删除记录
+    /// - Parameters:
+    ///   - model: 一个符合 `DatabaseModel` 协议的模型类型
+    ///   - conditions: 过滤删除的条件数组，示例：[Expression<Int64>("id") == id]
+    /// - Throws: 删除过程中可能抛出的任何错误
+    func delete<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = []) throws {
+        guard let db = db else { throw DatabaseError.databaseUnavailable }
+        // 创建 DispatchGroup
+        let dispatchGroup = DispatchGroup()
+        // 使用全局队列执行删除操作
+        DatabaseManager.dbQueue.async(group: dispatchGroup) {
+            do {
+                var query = Table(T.tableName)
+                // 应用所有条件
+                for condition in conditions {
+                    query = query.filter(condition)
+                }
+                // 使用事务，保证原子性
+                try db.transaction {
+                    let deleteQuery = query.delete()
+                    try db.run(deleteQuery)
+                }
+            } catch {
+                print("删除失败:\(error)")
+            }
+        }
+        // 等待队列中的任务完成
+        dispatchGroup.wait() // 等待操作完成
     }
 }

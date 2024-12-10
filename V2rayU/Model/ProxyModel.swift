@@ -376,36 +376,36 @@ extension ProxyModel: DatabaseModel {
 
     static func fromRow(_ row: Row) throws -> Self {
         // 提取字段，使用value标签
-        let uuidString = try row.get(Expression<String>(value: "uuid"))
+        let uuidString = try row.get(Expression<String>("uuid"))
         let uuid = UUID(uuidString: uuidString) ?? UUID()
 
-        let protocolValue = try row.get(Expression<String>(value: "protocol"))
-        let address = try row.get(Expression<String>(value: "address"))
+        let protocolValue = try row.get(Expression<String>("protocol"))
+        let address = try row.get(Expression<String>("address"))
 
         // 尝试将 port 字段从 String 转换为 Int
-        let portString = try row.get(Expression<String>(value: "port"))
+        let portString = try row.get(Expression<String>("port"))
         let port = Int(portString) ?? 0
 
-        let id = try row.get(Expression<String>(value: "id"))
-        let alterIdString = try row.get(Expression<Int>(value: "alterId"))
-        let alterId = Int(alterIdString) ?? 0
-        let security = try row.get(Expression<String>(value: "security"))
-        let networkValue = try row.get(Expression<String>(value: "network"))
-        let remark = try row.get(Expression<String>(value: "remark"))
-        let headerTypeValue = try row.get(Expression<String>(value: "headerType"))
-        let requestHost = try row.get(Expression<String>(value: "requestHost"))
-        let path = try row.get(Expression<String>(value: "path"))
-        let streamSecurityValue = try row.get(Expression<String>(value: "streamSecurity"))
-        let allowInsecureString = try row.get(Expression<String>(value: "allowInsecure"))
+        let id = try row.get(Expression<String>("id"))
+        let alterIdString = try row.get(Expression<Int>("alterId"))
+        let alterId = Int(alterIdString)
+        let security = try row.get(Expression<String>("security"))
+        let networkValue = try row.get(Expression<String>("network"))
+        let remark = try row.get(Expression<String>("remark"))
+        let headerTypeValue = try row.get(Expression<String>("headerType"))
+        let requestHost = try row.get(Expression<String>("requestHost"))
+        let path = try row.get(Expression<String>("path"))
+        let streamSecurityValue = try row.get(Expression<String>("streamSecurity"))
+        let allowInsecureString = try row.get(Expression<String>("allowInsecure"))
         let allowInsecure = allowInsecureString == "1"
-        let subid = try row.get(Expression<String>(value: "subid"))
-        let flow = try row.get(Expression<String>(value: "flow"))
-        let sni = try row.get(Expression<String>(value: "sni"))
-        let alpnValue = try row.get(Expression<String>(value: "alpn"))
-        let fingerprintValue = try row.get(Expression<String>(value: "fingerprint"))
-        let publicKey = try row.get(Expression<String>(value: "publicKey"))
-        let shortId = try row.get(Expression<String>(value: "shortId"))
-        let spiderX = try row.get(Expression<String>(value: "spiderX"))
+        let subid = try row.get(Expression<String>("subid"))
+        let flow = try row.get(Expression<String>("flow"))
+        let sni = try row.get(Expression<String>("sni"))
+        let alpnValue = try row.get(Expression<String>("alpn"))
+        let fingerprintValue = try row.get(Expression<String>("fingerprint"))
+        let publicKey = try row.get(Expression<String>("publicKey"))
+        let shortId = try row.get(Expression<String>("shortId"))
+        let spiderX = try row.get(Expression<String>("spiderX"))
 
         // 将从数据库获取的字段值转化为相应的枚举类型
         let protocolEnum = V2rayProtocolOutbound(rawValue: protocolValue) ?? .vmess
@@ -443,7 +443,7 @@ extension ProxyModel: DatabaseModel {
     }
 
     // 返回要插入到数据库的数据
-    func toInsertValues() -> [SQLite.Setter] {
+    func toInsertValues() -> [Setter] {
         return [
             Expression<String>("uuid") <- uuid.uuidString,
             Expression<String>("protocol") <- `protocol`.rawValue,
