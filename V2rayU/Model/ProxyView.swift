@@ -18,6 +18,7 @@ class ProxyViewModel: DatabaseManager, ObservableObject {
         do {
             list = try fetchAll(model: ProxyModel.self, conditions: conditions)
         } catch {
+            print("getList error \(error)")
         }
     }
 
@@ -35,16 +36,15 @@ class ProxyViewModel: DatabaseManager, ObservableObject {
         do {
             try delete(model: ProxyModel.self, conditions: conditions)
         } catch {
-            
+            print("delete error \(error)")
         }
         self.getList()
     }
     
     func upsert(item: ProxyModel) {
-
         let onConflict: Expressible =  Table(ProxyModel.tableName)[Expression<String>("uuid")]
         do {
-            try upsert(model: ProxyModel.self, onConflict: onConflict, insertValues: item.toInsertValues(),setValues: item.toInsertValues())
+            try upsert(model: ProxyModel.self, onConflict: onConflict, values: item.toInsertValues())
         } catch {
             print("upsert: \(error)")
         }

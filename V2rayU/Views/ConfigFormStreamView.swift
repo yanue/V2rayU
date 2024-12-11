@@ -53,5 +53,5 @@ struct ConfigStreamView: View {
 }
 
 #Preview {
-    ConfigStreamView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, id: "aaa", security: "auto", remark: "test01"))
+    ConfigStreamView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
 }

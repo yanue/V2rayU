@@ -30,7 +30,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
     @Published var subid: String
     @Published var address: String
     @Published var port: Int
-    @Published var id: String
+    @Published var password: String
     @Published var alterId: Int
     @Published var security: String
     @Published var remark: String
@@ -68,10 +68,13 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
 
     // outbound
     private(set) var outbound = V2rayOutbound()
-
+    // Identifiable 协议的要求
+  var id: UUID {
+      return uuid
+  }
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, `protocol`, subid, address, port, id, alterId, security, network, remark,
+        case uuid, `protocol`, subid, address, port, password, alterId, security, network, remark,
              headerType, requestHost, path, streamSecurity, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
     }
 
@@ -85,7 +88,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
         subid = try container.decode(String.self, forKey: .subid)
         address = try container.decode(String.self, forKey: .address)
         port = try container.decode(Int.self, forKey: .port)
-        id = try container.decode(String.self, forKey: .id)
+        password = try container.decode(String.self, forKey: .password)
         alterId = try container.decode(Int.self, forKey: .alterId)
         security = try container.decode(String.self, forKey: .security)
         remark = try container.decode(String.self, forKey: .remark)
@@ -111,7 +114,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
         try container.encode(subid, forKey: .subid)
         try container.encode(address, forKey: .address)
         try container.encode(port, forKey: .port)
-        try container.encode(id, forKey: .id)
+        try container.encode(password, forKey: .password)
         try container.encode(alterId, forKey: .alterId)
         try container.encode(security, forKey: .security)
         try container.encode(remark, forKey: .remark)
@@ -134,7 +137,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
         protocol: V2rayProtocolOutbound,
         address: String,
         port: Int,
-        id: String,
+        password: String,
         alterId: Int = 0,
         security: String,
         network: V2rayStreamNetwork = .tcp,
@@ -156,7 +159,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
         self.protocol = `protocol`
         self.address = address
         self.port = port
-        self.id = id
+        self.password = password
         self.alterId = alterId
         self.security = security
         self.network = network
@@ -174,7 +177,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
         self.publicKey = publicKey
         self.shortId = shortId
         self.spiderX = spiderX
-        self.uuid = UUID()
+        self.uuid = uuid
         // 初始化时调用更新方法
         updateServerSettings()
         updateStreamSettings()
@@ -196,7 +199,7 @@ extension ProxyModel {
         case .vmess:
             // user
             var user = V2rayOutboundVMessUser()
-            user.id = id
+            user.id = password
             user.alterId = Int(alterId)
             user.security = security
             // vmess
@@ -211,7 +214,7 @@ extension ProxyModel {
         case .vless:
             // user
             var user = V2rayOutboundVLessUser()
-            user.id = id
+            user.id = password
             user.flow = flow
             user.encryption = security
             // vless
@@ -228,7 +231,7 @@ extension ProxyModel {
             serverShadowsocks.address = address
             serverShadowsocks.port = port
             serverShadowsocks.method = security
-            serverShadowsocks.password = id
+            serverShadowsocks.password = password
             var ss = V2rayOutboundShadowsocks()
             ss.servers = [serverShadowsocks]
             outbound.settings = ss
@@ -236,8 +239,8 @@ extension ProxyModel {
         case .socks:
             // user
             var user = V2rayOutboundSockUser()
-            user.user = id
-            user.pass = id
+            user.user = password
+            user.pass = password
             // socks5
             serverSocks5 = V2rayOutboundSockServer()
             serverSocks5.address = address
@@ -251,7 +254,7 @@ extension ProxyModel {
             serverTrojan = V2rayOutboundTrojanServer()
             serverTrojan.address = address
             serverTrojan.port = port
-            serverTrojan.password = id
+            serverTrojan.password = password
             serverTrojan.flow = flow
             var outboundTrojan = V2rayOutboundTrojan()
             outboundTrojan.servers = [serverTrojan]
@@ -355,7 +358,7 @@ extension ProxyModel: DatabaseModel {
             subid TEXT,
             address TEXT,
             port INTEGER,
-            id TEXT,
+            password TEXT,
             alterId INTEGER,
             security TEXT,
             remark TEXT,
@@ -378,17 +381,11 @@ extension ProxyModel: DatabaseModel {
         // 提取字段，使用value标签
         let uuidString = try row.get(Expression<String>("uuid"))
         let uuid = UUID(uuidString: uuidString) ?? UUID()
-
         let protocolValue = try row.get(Expression<String>("protocol"))
         let address = try row.get(Expression<String>("address"))
-
-        // 尝试将 port 字段从 String 转换为 Int
-        let portString = try row.get(Expression<String>("port"))
-        let port = Int(portString) ?? 0
-
-        let id = try row.get(Expression<String>("id"))
-        let alterIdString = try row.get(Expression<Int>("alterId"))
-        let alterId = Int(alterIdString)
+        let port = try row.get(Expression<Int>("port"))
+        let password = try row.get(Expression<String>("password"))
+        let alterId = try row.get(Expression<Int>("alterId"))
         let security = try row.get(Expression<String>("security"))
         let networkValue = try row.get(Expression<String>("network"))
         let remark = try row.get(Expression<String>("remark"))
@@ -396,8 +393,8 @@ extension ProxyModel: DatabaseModel {
         let requestHost = try row.get(Expression<String>("requestHost"))
         let path = try row.get(Expression<String>("path"))
         let streamSecurityValue = try row.get(Expression<String>("streamSecurity"))
-        let allowInsecureString = try row.get(Expression<String>("allowInsecure"))
-        let allowInsecure = allowInsecureString == "1"
+        let allowInsecureString = try row.get(Expression<Int>("allowInsecure"))
+        let allowInsecure = allowInsecureString == 1
         let subid = try row.get(Expression<String>("subid"))
         let flow = try row.get(Expression<String>("flow"))
         let sni = try row.get(Expression<String>("sni"))
@@ -421,7 +418,7 @@ extension ProxyModel: DatabaseModel {
             protocol: protocolEnum,
             address: address,
             port: port,
-            id: id,
+            password: password,
             alterId: alterId,
             security: security,
             network: networkEnum,
@@ -452,7 +449,7 @@ extension ProxyModel: DatabaseModel {
             Expression<String>("subid") <- subid,
             Expression<String>("address") <- address,
             Expression<Int>("port") <- port,
-            Expression<String>("id") <- id,
+            Expression<String>("password") <- password,
             Expression<Int>("alterId") <- alterId,
             Expression<String>("security") <- security,
             Expression<String>("remark") <- remark,

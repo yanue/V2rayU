@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigListView: View {
-    @StateObject private var viewModel = ProxyViewModel()  
+    @StateObject private var viewModel = ProxyViewModel()
     @State private var list: [ProxyModel] = []
     @State private var sortOrder: [KeyPathComparator<ProxyModel>] = []
     @State private var selection: Set<ProxyModel.ID> = []
@@ -55,7 +55,11 @@ struct ConfigListView: View {
 
                 Button("删除") {
                     withAnimation {
-                        list.removeAll { selection.contains($0.id) }
+                        // 删数据
+                        for selectedID in self.selection {
+                            viewModel.delete(uuid: selectedID) // 使用找到的模型的 uuid 字段
+                        }
+                        // 移除选择
                         selection.removeAll()
                     }
                 }
@@ -63,8 +67,7 @@ struct ConfigListView: View {
 
                 Button("新增") {
                     withAnimation {
-                        let newProxy = ProxyModel(protocol: .trojan, address: "newAddress", port: 443, id: UUID().uuidString, security: "auto", remark: "New Remark")
-//                        list.append(newProxy)
+                        let newProxy = ProxyModel(protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, security: "auto", remark: "New Remark")
                         self.selectedRow = newProxy
                     }
                 }
@@ -103,7 +106,7 @@ struct ConfigListView: View {
         .sheet(item: $selectedRow) { proxy in
             VStack {
                 Button("Close") {
-                    print("upsert, \(proxy)",proxy.id, proxy.network,proxy.address)
+                    print("upsert, \(proxy)", proxy.id, proxy.network, proxy.address)
                     viewModel.upsert(item: proxy)
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
@@ -141,14 +144,16 @@ struct ConfigListView: View {
                 // Handle ping action
             }
 
-            Button("Action 3") {
+            Button("Delete") {
                 // Handle another action
+                print("item.uuid", item.id, item.uuid)
+                viewModel.delete(uuid: item.uuid)
             }
         }
     }
 
     private func loadData() {
-        viewModel.getList()  // Load data when the view appears
+        viewModel.getList() // Load data when the view appears
     }
 }
 

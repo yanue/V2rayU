@@ -28,8 +28,8 @@ protocol DatabaseModel {
 class DatabaseManager {
     private var db: Connection?
 
-    // 全局的串行队列
-    private static let dbQueue = DispatchQueue(label: "net.yanue.V2rayU.dbQueue")
+    // 全局写锁
+    private static let dbLock = NSLock()
 
     required init() {
         initDB()
@@ -47,6 +47,10 @@ class DatabaseManager {
         }
         do {
             guard let db = db else { throw DatabaseError.databaseUnavailable }
+            // 配置 trace 方法
+             db.trace { sql in
+                 print("Executing SQL: \(sql)")
+             }
             // 初始化表格
             try db.execute(ProxyModel.initSql())
         } catch {
@@ -124,21 +128,19 @@ class DatabaseManager {
     func insert<T: DatabaseModel>(model: T.Type, values: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
         let table = Table(T.tableName)
-        let dispatchGroup = DispatchGroup() // 创建 DispatchGroup
-        // 使用全局队列执行插入操作
-        DatabaseManager.dbQueue.async(group: dispatchGroup) {
-            do {
-                // 使用事务，保证原子性
-                try db.transaction {
-                    let insertQuery = table.insert(values)
-                    try db.run(insertQuery)
-                }
-            } catch {
-                print("插入失败: \(error)")
+
+        DatabaseManager.dbLock.lock() // 加锁
+        defer { DatabaseManager.dbLock.unlock() } // 确保锁在操作结束后释放
+
+        do {
+            // 使用事务，保证原子性
+            try db.transaction {
+                let insertQuery = table.insert(values)
+                try db.run(insertQuery)
             }
+        } catch {
+            throw error
         }
-        // 等待队列中的任务完成
-        dispatchGroup.wait() // 等待操作完成
     }
 
     /// 更新一条记录
@@ -149,27 +151,24 @@ class DatabaseManager {
     /// - Throws: 更新过程中可能抛出的任何错误
     func update<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = [], values: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        // 创建 DispatchGroup
-        let dispatchGroup = DispatchGroup()
-        // 使用全局队列执行删除操作
-        DatabaseManager.dbQueue.async(group: dispatchGroup) {
-            do {
-                var query = Table(T.tableName)
-                // 应用所有条件
-                for condition in conditions {
-                    query = query.filter(condition)
-                }
-                // 使用事务，保证原子性
-                try db.transaction {
-                    let updateQuery = query.update(values)
-                    try db.run(updateQuery)
-                }
-            } catch {
-                print("更新失败: \(error)")
+
+        DatabaseManager.dbLock.lock() // 加锁
+        defer { DatabaseManager.dbLock.unlock() } // 确保锁在操作结束后释放
+
+        do {
+            var query = Table(T.tableName)
+            // 应用所有条件
+            for condition in conditions {
+                query = query.filter(condition)
             }
+            // 使用事务，保证原子性
+            try db.transaction {
+                let updateQuery = query.update(values)
+                try db.run(updateQuery)
+            }
+        } catch {
+            throw error
         }
-        // 等待队列中的任务完成
-        dispatchGroup.wait() // 等待操作完成
     }
 
     /// 插入或更新一条记录
@@ -179,25 +178,22 @@ class DatabaseManager {
     ///   - insertValues: 用于插入的字段值，包含 `Setter`
     ///   - setValues: 用于更新的字段值，包含 `Setter`
     /// - Throws: 执行过程中可能抛出的任何错误
-    func upsert<T: DatabaseModel>(model: T.Type, onConflict: Expressible, insertValues: [Setter], setValues: [Setter]) throws {
+    func upsert<T: DatabaseModel>(model: T.Type, onConflict: Expressible, values: [Setter]) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        // 创建 DispatchGroup
-        let dispatchGroup = DispatchGroup()
-        let table = Table(T.tableName)
-        // 使用全局队列执行 upsert 操作
-        DatabaseManager.dbQueue.async(group: dispatchGroup) {
-            do {
-                // 使用事务，保证原子性
-                try db.transaction {
-                    let upsertQuery = table.upsert(insertValues, onConflictOf: onConflict, set: setValues)
-                    try db.run(upsertQuery)
-                }
-            } catch {
-                print("Upsert 失败: \(error)")
+
+        DatabaseManager.dbLock.lock() // 加锁
+        defer { DatabaseManager.dbLock.unlock() } // 确保锁在操作结束后释放
+
+        do {
+            let query = Table(T.tableName)
+            // 使用事务，保证原子性
+            try db.transaction {
+                let upsertQuery = query.upsert(values, onConflictOf: onConflict)
+                try db.run(upsertQuery)
             }
+        } catch {
+            throw error
         }
-        // 等待队列中的任务完成
-        dispatchGroup.wait() // 等待操作完成
     }
 
     /// 删除记录
@@ -207,26 +203,23 @@ class DatabaseManager {
     /// - Throws: 删除过程中可能抛出的任何错误
     func delete<T: DatabaseModel>(model: T.Type, conditions: [SQLite.Expression<Bool>] = []) throws {
         guard let db = db else { throw DatabaseError.databaseUnavailable }
-        // 创建 DispatchGroup
-        let dispatchGroup = DispatchGroup()
-        // 使用全局队列执行删除操作
-        DatabaseManager.dbQueue.async(group: dispatchGroup) {
-            do {
-                var query = Table(T.tableName)
-                // 应用所有条件
-                for condition in conditions {
-                    query = query.filter(condition)
-                }
-                // 使用事务，保证原子性
-                try db.transaction {
-                    let deleteQuery = query.delete()
-                    try db.run(deleteQuery)
-                }
-            } catch {
-                print("删除失败:\(error)")
+
+        DatabaseManager.dbLock.lock() // 加锁
+        defer { DatabaseManager.dbLock.unlock() } // 确保锁在操作结束后释放
+
+        do {
+            var query = Table(T.tableName)
+            // 应用所有条件
+            for condition in conditions {
+                query = query.filter(condition)
             }
+            // 使用事务，保证原子性
+            try db.transaction {
+                let deleteQuery = query.delete()
+                try db.run(deleteQuery)
+            }
+        } catch {
+            throw error
         }
-        // 等待队列中的任务完成
-        dispatchGroup.wait() // 等待操作完成
     }
 }

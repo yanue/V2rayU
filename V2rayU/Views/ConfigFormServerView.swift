@@ -18,12 +18,12 @@ struct ConfigServerView: View {
                     if item.protocol == .trojan {
                         getTextFieldWithLabel(label: "address", text: $item.address)
                         getNumFieldWithLabel(label: "port", num: $item.port)
-                        getTextFieldWithLabel(label: "password", text: $item.id)
+                        getTextFieldWithLabel(label: "password", text: $item.password)
                     }
                     if item.protocol == .vmess {
                         getTextFieldWithLabel(label: "address", text: $item.address)
                         getNumFieldWithLabel(label: "port", num: $item.port)
-                        getTextFieldWithLabel(label: "id", text: $item.id)
+                        getTextFieldWithLabel(label: "id", text: $item.password)
                         getNumFieldWithLabel(label: "alterId", num: $item.alterId)
 
                         HStack {
@@ -39,7 +39,7 @@ struct ConfigServerView: View {
                     if item.protocol == .vless {
                         getTextFieldWithLabel(label: "address", text: $item.address)
                         getNumFieldWithLabel(label: "port", num: $item.port)
-                        getTextFieldWithLabel(label: "id", text: $item.id)
+                        getTextFieldWithLabel(label: "id", text: $item.password)
                         getTextFieldWithLabel(label: "flow", text: $item.flow)
                         HStack {
                             getTextLabel(label: "security")
@@ -55,7 +55,7 @@ struct ConfigServerView: View {
                 if item.protocol == .shadowsocks {
                     getTextFieldWithLabel(label: "address", text: $item.address)
                     getNumFieldWithLabel(label: "port", num: $item.port)
-                    getTextFieldWithLabel(label: "password", text: $item.id)
+                    getTextFieldWithLabel(label: "password", text: $item.password)
                     HStack {
                         getTextLabel(label: "method")
                         Picker("", selection: $item.security) {
@@ -75,5 +75,5 @@ struct ConfigServerView: View {
 }
 
 #Preview {
-    ConfigServerView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, id: "aaa", security: "auto", remark: "test01"))
+    ConfigServerView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
 }

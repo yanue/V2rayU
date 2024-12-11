@@ -24,5 +24,5 @@ struct ConfigShowView: View {
 
 
 #Preview {
-    ConfigShowView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, id: "aaa", security: "auto", remark: "test01"))
+    ConfigShowView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
 }
