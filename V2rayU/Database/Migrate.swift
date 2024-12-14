@@ -20,7 +20,9 @@ extension AppDatabase {
       
         // 注册所有模型的迁移逻辑
         ProxyModel.registerMigrations(in: &migrator)
-
+        SubModel.registerMigrations(in: &migrator)
+        RoutingModel.registerMigrations(in: &migrator)
+        
         return migrator
     }
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SubListView: View {
+    @StateObject private var viewModel = SubViewModel()
+
     @State private var list: [SubModel] = []
     @State private var sortOrder: [KeyPathComparator<SubModel>] = []
     @State private var selection: Set<SubModel.ID> = []
@@ -15,7 +17,7 @@ struct SubListView: View {
     @State private var draggedRow: SubModel?
 
     var filteredAndSortedItems: [SubModel] {
-        let filtered = list.sorted(using: sortOrder)
+        let filtered = viewModel.list.sorted(using: sortOrder)
         // 循环增加序号
         filtered.enumerated().forEach { index, item in
             item.index = index
@@ -35,15 +37,18 @@ struct SubListView: View {
 
                 Button("删除") {
                     withAnimation {
-                        list.removeAll { selection.contains($0.id) }
+                        // 删数据
+                        for selectedID in self.selection {
+                            viewModel.delete(uuid: selectedID) // 使用找到的模型的 uuid 字段
+                        }
+                        // 移除选择
                         selection.removeAll()
                     }
                 }
                 .disabled(selection.isEmpty)
                 Button("新增") {
                     withAnimation {
-                        let newProxy = SubModel(remark: "new", url: "")
-                        list.append(newProxy)
+                        self.selectedRow = SubModel(remark: "test", url: "http://acb.dd")
                     }
                 }
             }
@@ -77,13 +82,15 @@ struct SubListView: View {
                 .dropDestination(for: SubModel.self, action: handleDrop)
             }
         }
-        .sheet(item: $selectedRow) { sub in
+        .sheet(item: $selectedRow) { row in
             VStack {
                 Button("Close") {
+                    print("upsert, \(row)")
+                    viewModel.upsert(item: row)
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
                 }
-                SubFormView(item: sub).padding()
+                SubFormView(item: row).padding()
             }
         }
         .task {
@@ -112,18 +119,14 @@ struct SubListView: View {
             Divider()
 
             Button("Delete") {
+                viewModel.delete(uuid: item.uuid)
             }
         }
     }
 
     private func loadData() {
-        // Simulate data fetching
-        let fetchedData = [
-            SubModel(remark: "sub1", url: "https://yanue.net/v/aa"),
-            SubModel(remark: "sub2", url: "https://yanue.net/v/bb"),
-        ]
         withAnimation {
-            list = fetchedData
+            viewModel.getList()
         }
     }
 }

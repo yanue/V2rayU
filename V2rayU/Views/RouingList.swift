@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RoutingListView: View {
+    @StateObject private var viewModel = RoutingViewModel()
+
     @State private var list: [RoutingModel] = []
     @State private var sortOrder: [KeyPathComparator<RoutingModel>] = []
     @State private var selection: Set<RoutingModel.ID> = []
@@ -15,7 +17,7 @@ struct RoutingListView: View {
     @State private var draggedRow: RoutingModel?
 
     var filteredAndSortedItems: [RoutingModel] {
-        let filtered = list.sorted(using: sortOrder)
+        let filtered = viewModel.list.sorted(using: sortOrder)
         // 循环增加序号
         filtered.enumerated().forEach { index, item in
             item.index = index
@@ -35,7 +37,11 @@ struct RoutingListView: View {
 
                 Button("删除") {
                     withAnimation {
-                        list.removeAll { selection.contains($0.id) }
+                        // 删数据
+                        for selectedID in self.selection {
+                            viewModel.delete(uuid: selectedID) // 使用找到的模型的 uuid 字段
+                        }
+                        // 移除选择
                         selection.removeAll()
                     }
                 }
@@ -43,7 +49,7 @@ struct RoutingListView: View {
                 Button("新增") {
                     withAnimation {
                         let newProxy = RoutingModel(name: "newRouting", remark: "newRouting")
-                        list.append(newProxy)
+                        self.selectedRow = newProxy
                     }
                 }
             }
@@ -81,6 +87,8 @@ struct RoutingListView: View {
         .sheet(item: $selectedRow) { row in
             VStack {
                 Button("Close") {
+                    print("upsert, \(row)")
+                    viewModel.upsert(item: row)
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
                 }
@@ -113,13 +121,14 @@ struct RoutingListView: View {
             Divider()
 
             Button("Delete") {
+                viewModel.delete(uuid: item.uuid)
             }
         }
     }
 
     private func loadData() {
         withAnimation {
-            list = defaultRules.values.map { $0 }
+            viewModel.getList()
         }
     }
 }

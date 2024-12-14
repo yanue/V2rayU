@@ -5,7 +5,9 @@
 //  Created by yanue on 2024/12/14.
 //
 
+import Combine
 import Foundation
+import GRDB
 
 class Routing: RoutingModel {
     // 实现 Decodable 协议的初始化方法
@@ -13,21 +15,21 @@ class Routing: RoutingModel {
         // 先调用父类的初始化方法，解码父类的属性
         try super.init(from: decoder)
     }
-    
+
     // 从 ProxyModel 初始化
     init(from model: RoutingModel) {
         // 通过传入的 model 初始化 Proxy 类的所有属性
         super.init(
-            name : model.name,
-            remark : model.remark,
-            json : model.json,
+            name: model.name,
+            remark: model.remark,
+            json: model.json,
             domainStrategy: model.domainStrategy,
-            block : model.block,
-            proxy : model.proxy,
+            block: model.block,
+            proxy: model.proxy,
             direct: model.direct
         )
     }
-    
+
     // parse default settings
     func parseDefaultSettings() -> V2rayRouting {
         var rules: [V2rayRoutingRule] = []

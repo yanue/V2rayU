@@ -1,19 +1,18 @@
 //
-//  ProxyView.swift
+//  ProxyList.swift
 //  V2rayU
 //
-//  Created by yanue on 2024/12/5.
+//  Created by yanue on 2024/12/14.
 //
 
 import Combine
-import Foundation
 import GRDB
+import Foundation
 
 class ProxyViewModel: ObservableObject {
     @Published var list: [ProxyModel] = []
     @Published var groups: [GroupModel] = []
 
-    /// Fetches all `ProxyModel` records and updates the `list` property.
     func getList() {
         do {
             let dbReader = AppDatabase.shared.reader

@@ -103,15 +103,14 @@ struct ConfigListView: View {
                 .dropDestination(for: ProxyModel.self, action: handleDrop)
             }
         }
-        .sheet(item: $selectedRow) { proxy in
+        .sheet(item: $selectedRow) { row in
             VStack {
                 Button("Close") {
-                    print("upsert, \(proxy)", proxy.id, proxy.network, proxy.address)
-                    viewModel.upsert(item: proxy)
+                    viewModel.upsert(item: row)
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
                 }
-                ConfigView(item: proxy)
+                ConfigView(item: row)
                     .padding()
             }
         }

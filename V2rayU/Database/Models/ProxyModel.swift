@@ -168,6 +168,7 @@ extension ProxyModel: Transferable {
     }
 }
 
+// 实现GRDB
 extension ProxyModel: TableRecord, FetchableRecord, PersistableRecord  {
     // 自定义表名
     static var databaseTableName: String {

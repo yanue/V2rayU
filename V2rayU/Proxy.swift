@@ -13,36 +13,42 @@ class Proxy: ProxyModel {
         // 先调用父类的初始化方法，解码父类的属性
         try super.init(from: decoder)
     }
-    
+
     // 从 ProxyModel 初始化
-   init(from model: ProxyModel) {
-       // 通过传入的 model 初始化 Proxy 类的所有属性
-       super.init(
-           uuid: model.uuid,
-           protocol: model.protocol,
-           address: model.address,
-           port: model.port,
-           password: model.password,
-           alterId: model.alterId,
-           security: model.security,
-           network: model.network,
-           remark: model.remark,
-           headerType: model.headerType,
-           requestHost: model.requestHost,
-           path: model.path,
-           streamSecurity: model.streamSecurity,
-           allowInsecure: model.allowInsecure,
-           subid: model.subid,
-           flow: model.flow,
-           sni: model.sni,
-           alpn: model.alpn,
-           fingerprint: model.fingerprint,
-           publicKey: model.publicKey,
-           shortId: model.shortId,
-           spiderX: model.spiderX
-       )
-   }
-    
+    init(from model: ProxyModel) {
+        // 通过传入的 model 初始化 Proxy 类的所有属性
+        super.init(
+            uuid: model.uuid,
+            protocol: model.protocol,
+            address: model.address,
+            port: model.port,
+            password: model.password,
+            alterId: model.alterId,
+            security: model.security,
+            network: model.network,
+            remark: model.remark,
+            headerType: model.headerType,
+            requestHost: model.requestHost,
+            path: model.path,
+            streamSecurity: model.streamSecurity,
+            allowInsecure: model.allowInsecure,
+            subid: model.subid,
+            flow: model.flow,
+            sni: model.sni,
+            alpn: model.alpn,
+            fingerprint: model.fingerprint,
+            publicKey: model.publicKey,
+            shortId: model.shortId,
+            spiderX: model.spiderX
+        )
+    }
+
+    func toJSON() -> String {
+        updateServerSettings()
+        updateStreamSettings()
+        return outbound.toJSON()
+    }
+
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
     private(set) var serverSocks5 = V2rayOutboundSockServer()
@@ -203,11 +209,5 @@ class Proxy: ProxyModel {
         default:
             break
         }
-    }
-
-    func toJSON() -> String {
-        updateServerSettings()
-        updateStreamSettings()
-        return outbound.toJSON()
     }
 }
