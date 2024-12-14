@@ -5,10 +5,9 @@
 //  Created by yanue on 2024/12/2.
 //
 
-import SQLite
+import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
-
 /**
  - {"type":"ss","name":"v2rayse_test_1","server":"198.57.27.218","port":5004,"cipher":"aes-256-gcm","password":"g5MeD6Ft3CWlJId"}
  - {"type":"ssr","name":"v2rayse_test_3","server":"20.239.49.44","port":59814,"protocol":"origin","cipher":"dummy","obfs":"plain","password":"3df57276-03ef-45cf-bdd4-4edb6dfaa0ef"}
@@ -20,10 +19,10 @@ import UniformTypeIdentifiers
  - {"type":"socks5","name":"telegram_proxy","server":"1.2.3.4","port":123,"username":"username","password":"password","udp":true}
  */
 
-final class ProxyModel: ObservableObject, Identifiable, Codable {
+final class ProxyModel: ObservableObject, Identifiable, Codable, Equatable {
     var index: Int = 0
     // 公共属性
-    @Published var uuid: UUID
+    @Published var uuid: String
     @Published var `protocol`: V2rayProtocolOutbound
     @Published var network: V2rayStreamNetwork = .tcp
     @Published var streamSecurity: V2rayStreamSecurity = .none
@@ -45,6 +44,15 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
     @Published var publicKey: String = ""
     @Published var shortId: String = ""
     @Published var spiderX: String = ""
+    // Identifiable 协议的要求
+    var id: String {
+        return uuid
+    }
+
+    // Equatable
+    static func == (lhs: ProxyModel, rhs: ProxyModel) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
 
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
@@ -68,10 +76,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
 
     // outbound
     private(set) var outbound = V2rayOutbound()
-    // Identifiable 协议的要求
-  var id: UUID {
-      return uuid
-  }
+
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
         case uuid, `protocol`, subid, address, port, password, alterId, security, network, remark,
@@ -81,7 +86,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
     // 需要手动实现 `init(from:)` 和 `encode(to:)`，如果你使用自定义类型时
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        uuid = try container.decode(UUID.self, forKey: .uuid)
+        uuid = try container.decode(String.self, forKey: .uuid)
         `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: .protocol)
         network = try container.decode(V2rayStreamNetwork.self, forKey: .network)
         streamSecurity = try container.decode(V2rayStreamSecurity.self, forKey: .streamSecurity)
@@ -133,7 +138,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
 
     // 提供默认值的初始化器
     required init(
-        uuid: UUID = UUID(),
+        uuid: String = UUID().uuidString,
         protocol: V2rayProtocolOutbound,
         address: String,
         port: Int,
@@ -184,6 +189,7 @@ final class ProxyModel: ObservableObject, Identifiable, Codable {
     }
 }
 
+// 拖动排序
 extension ProxyModel: Transferable {
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
 
@@ -339,131 +345,67 @@ extension ProxyModel {
     }
 }
 
-extension ProxyModel: DatabaseModel {
-    static var tableName: String {
-        return "proxy"
+extension ProxyModel: FetchableRecord, PersistableRecord {
+    // 自定义表名
+    static var databaseTableName: String {
+        return "proxy" // 设置你的表名
     }
 
-    func primaryKeyCondition() -> SQLite.Expression<Bool> {
-        return Expression<String>("uuid") == uuid.uuidString
+    // 定义数据库列
+    enum Columns {
+        static let uuid = Column(CodingKeys.uuid)
+        static let `protocol` = Column(CodingKeys.protocol)
+        static let subid = Column(CodingKeys.subid)
+        static let address = Column(CodingKeys.address)
+        static let port = Column(CodingKeys.port)
+        static let password = Column(CodingKeys.password)
+        static let alterId = Column(CodingKeys.alterId)
+        static let security = Column(CodingKeys.security)
+        static let network = Column(CodingKeys.network)
+        static let remark = Column(CodingKeys.remark)
+        static let headerType = Column(CodingKeys.headerType)
+        static let requestHost = Column(CodingKeys.requestHost)
+        static let path = Column(CodingKeys.path)
+        static let streamSecurity = Column(CodingKeys.streamSecurity)
+        static let allowInsecure = Column(CodingKeys.allowInsecure)
+        static let flow = Column(CodingKeys.flow)
+        static let sni = Column(CodingKeys.sni)
+        static let alpn = Column(CodingKeys.alpn)
+        static let fingerprint = Column(CodingKeys.fingerprint)
+        static let publicKey = Column(CodingKeys.publicKey)
+        static let shortId = Column(CodingKeys.shortId)
+        static let spiderX = Column(CodingKeys.spiderX)
     }
 
-    static func initSql() -> String {
-        """
-        CREATE TABLE IF NOT EXISTS \(tableName) (
-            uuid TEXT PRIMARY KEY,
-            protocol TEXT,
-            network TEXT,
-            streamSecurity TEXT,
-            subid TEXT,
-            address TEXT,
-            port INTEGER,
-            password TEXT,
-            alterId INTEGER,
-            security TEXT,
-            remark TEXT,
-            headerType TEXT,
-            requestHost TEXT,
-            path TEXT,
-            allowInsecure BOOLEAN,
-            flow TEXT,
-            sni TEXT,
-            alpn TEXT,
-            fingerprint TEXT,
-            publicKey TEXT,
-            shortId TEXT,
-            spiderX TEXT
-        );
-        """
-    }
-
-    static func fromRow(_ row: Row) throws -> Self {
-        // 提取字段，使用value标签
-        let uuidString = try row.get(Expression<String>("uuid"))
-        let uuid = UUID(uuidString: uuidString) ?? UUID()
-        let protocolValue = try row.get(Expression<String>("protocol"))
-        let address = try row.get(Expression<String>("address"))
-        let port = try row.get(Expression<Int>("port"))
-        let password = try row.get(Expression<String>("password"))
-        let alterId = try row.get(Expression<Int>("alterId"))
-        let security = try row.get(Expression<String>("security"))
-        let networkValue = try row.get(Expression<String>("network"))
-        let remark = try row.get(Expression<String>("remark"))
-        let headerTypeValue = try row.get(Expression<String>("headerType"))
-        let requestHost = try row.get(Expression<String>("requestHost"))
-        let path = try row.get(Expression<String>("path"))
-        let streamSecurityValue = try row.get(Expression<String>("streamSecurity"))
-        let allowInsecureString = try row.get(Expression<Int>("allowInsecure"))
-        let allowInsecure = allowInsecureString == 1
-        let subid = try row.get(Expression<String>("subid"))
-        let flow = try row.get(Expression<String>("flow"))
-        let sni = try row.get(Expression<String>("sni"))
-        let alpnValue = try row.get(Expression<String>("alpn"))
-        let fingerprintValue = try row.get(Expression<String>("fingerprint"))
-        let publicKey = try row.get(Expression<String>("publicKey"))
-        let shortId = try row.get(Expression<String>("shortId"))
-        let spiderX = try row.get(Expression<String>("spiderX"))
-
-        // 将从数据库获取的字段值转化为相应的枚举类型
-        let protocolEnum = V2rayProtocolOutbound(rawValue: protocolValue) ?? .vmess
-        let networkEnum = V2rayStreamNetwork(rawValue: networkValue) ?? .tcp
-        let headerTypeEnum = V2rayHeaderType(rawValue: headerTypeValue) ?? .none
-        let streamSecurityEnum = V2rayStreamSecurity(rawValue: streamSecurityValue) ?? .none
-        let alpnEnum = V2rayStreamAlpn(rawValue: alpnValue) ?? .h2h1
-        let fingerprintEnum = V2rayStreamFingerprint(rawValue: fingerprintValue) ?? .chrome
-
-        // 使用提取的值来初始化模型，传递默认值
-        return Self(
-            uuid: uuid, // 使用从数据库提取的 UUID
-            protocol: protocolEnum,
-            address: address,
-            port: port,
-            password: password,
-            alterId: alterId,
-            security: security,
-            network: networkEnum,
-            remark: remark,
-            headerType: headerTypeEnum,
-            requestHost: requestHost,
-            path: path,
-            streamSecurity: streamSecurityEnum,
-            allowInsecure: allowInsecure,
-            subid: subid,
-            flow: flow,
-            sni: sni,
-            alpn: alpnEnum,
-            fingerprint: fingerprintEnum,
-            publicKey: publicKey,
-            shortId: shortId,
-            spiderX: spiderX
-        )
-    }
-
-    // 返回要插入到数据库的数据
-    func toInsertValues() -> [Setter] {
-        return [
-            Expression<String>("uuid") <- uuid.uuidString,
-            Expression<String>("protocol") <- `protocol`.rawValue,
-            Expression<String>("network") <- network.rawValue,
-            Expression<String>("streamSecurity") <- streamSecurity.rawValue,
-            Expression<String>("subid") <- subid,
-            Expression<String>("address") <- address,
-            Expression<Int>("port") <- port,
-            Expression<String>("password") <- password,
-            Expression<Int>("alterId") <- alterId,
-            Expression<String>("security") <- security,
-            Expression<String>("remark") <- remark,
-            Expression<String>("headerType") <- headerType.rawValue,
-            Expression<String>("requestHost") <- requestHost,
-            Expression<String>("path") <- path,
-            Expression<Bool>("allowInsecure") <- allowInsecure,
-            Expression<String>("flow") <- flow,
-            Expression<String>("sni") <- sni,
-            Expression<String>("alpn") <- alpn.rawValue,
-            Expression<String>("fingerprint") <- fingerprint.rawValue,
-            Expression<String>("publicKey") <- publicKey,
-            Expression<String>("shortId") <- shortId,
-            Expression<String>("spiderX") <- spiderX,
-        ]
+    // 定义迁移
+    static func registerMigrations(in migrator: inout DatabaseMigrator) {
+        // 创建表
+        migrator.registerMigration("createProxyTable") { db in
+            try db.create(table: ProxyModel.databaseTableName) { t in
+                t.column(ProxyModel.Columns.uuid.name, .text).notNull().primaryKey()
+                t.column(ProxyModel.Columns.protocol.name, .text).notNull()
+                t.column(ProxyModel.Columns.subid.name, .text)
+                t.column(ProxyModel.Columns.address.name, .text).notNull()
+                t.column(ProxyModel.Columns.port.name, .integer).notNull()
+                t.column(ProxyModel.Columns.password.name, .text)
+                t.column(ProxyModel.Columns.alterId.name, .integer)
+                t.column(ProxyModel.Columns.security.name, .text)
+                t.column(ProxyModel.Columns.network.name, .text)
+                t.column(ProxyModel.Columns.remark.name, .text)
+                t.column(ProxyModel.Columns.headerType.name, .text)
+                t.column(ProxyModel.Columns.requestHost.name, .text)
+                t.column(ProxyModel.Columns.path.name, .text)
+                t.column(ProxyModel.Columns.streamSecurity.name, .text)
+                t.column(ProxyModel.Columns.allowInsecure.name, .boolean)
+                t.column(ProxyModel.Columns.flow.name, .text)
+                t.column(ProxyModel.Columns.sni.name, .text)
+                t.column(ProxyModel.Columns.alpn.name, .text)
+                t.column(ProxyModel.Columns.fingerprint.name, .text)
+                t.column(ProxyModel.Columns.publicKey.name, .text)
+                t.column(ProxyModel.Columns.shortId.name, .text)
+                t.column(ProxyModel.Columns.spiderX.name, .text)
+            }
+        }
+        //
     }
 }
