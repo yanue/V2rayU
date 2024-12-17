@@ -28,6 +28,11 @@ struct SubListView: View {
     var body: some View {
         VStack {
             HStack {
+                // Header Section
+                Text("Subscription")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
                 Button("刷新") {
                     withAnimation {
                         loadData()

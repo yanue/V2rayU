@@ -33,6 +33,10 @@ struct ConfigListView: View {
     var body: some View {
         VStack {
             HStack {
+                Text("Prixies")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
                 Picker("选择组", selection: $selectGroup) {
                     ForEach(viewModel.groups) { group in // 使用 groups 数组并遍历
                         Text(group.name).tag(group as GroupModel) // 使用 .tag 来绑定选中的项

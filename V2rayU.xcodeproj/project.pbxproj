@@ -15,6 +15,9 @@
 		6603303B2D0D81B6009FEB56 /* ProxyListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6603303A2D0D81B0009FEB56 /* ProxyListModel.swift */; };
 		6603303D2D0D8201009FEB56 /* SubListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6603303C2D0D81FB009FEB56 /* SubListModel.swift */; };
 		6603303F2D0D820C009FEB56 /* RoutingListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6603303E2D0D820A009FEB56 /* RoutingListModel.swift */; };
+		660330532D11AFF6009FEB56 /* Overview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660330522D11AFF1009FEB56 /* Overview.swift */; };
+		660330572D11B0CE009FEB56 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660330562D11B0C9009FEB56 /* Setting.swift */; };
+		6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 660330592D11BF28009FEB56 /* KeyboardShortcuts */; };
 		6627FB722D0D14F8009B736F /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 6627FB712D0D14F8009B736F /* GRDB */; };
 		6689038D2CF17C7C0022EA7E /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6689038C2CF17C750022EA7E /* MenuView.swift */; };
 		66956AD02CFDE90D00B2AAC4 /* SubList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66956ACF2CFDE90D00B2AAC4 /* SubList.swift */; };
@@ -68,6 +71,8 @@
 		6603303A2D0D81B0009FEB56 /* ProxyListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyListModel.swift; sourceTree = "<group>"; };
 		6603303C2D0D81FB009FEB56 /* SubListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubListModel.swift; sourceTree = "<group>"; };
 		6603303E2D0D820A009FEB56 /* RoutingListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingListModel.swift; sourceTree = "<group>"; };
+		660330522D11AFF1009FEB56 /* Overview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overview.swift; sourceTree = "<group>"; };
+		660330562D11B0C9009FEB56 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		6638F5EB2C64FF090091FFF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6689038C2CF17C750022EA7E /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		66956ACF2CFDE90D00B2AAC4 /* SubList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubList.swift; sourceTree = "<group>"; };
@@ -109,6 +114,7 @@
 			files = (
 				6627FB722D0D14F8009B736F /* GRDB in Frameworks */,
 				66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */,
+				6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */,
 				660330042D0D5504009FEB56 /* GRDB in Frameworks */,
 				660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */,
 			);
@@ -197,7 +203,9 @@
 		66E0D4182CF1D19200152F40 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				660330562D11B0C9009FEB56 /* Setting.swift */,
 				66E0D4A52CFB1AA600152F40 /* Common.swift */,
+				660330522D11AFF1009FEB56 /* Overview.swift */,
 				66A078AF2CFDF0C800490469 /* RouingList.swift */,
 				66956ACF2CFDE90D00B2AAC4 /* SubList.swift */,
 				66E0D4A32CFAE69C00152F40 /* ConfigList.swift */,
@@ -273,6 +281,7 @@
 			packageReferences = (
 				66A078BA2D008A3700490469 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 				660330022D0D5504009FEB56 /* XCRemoteSwiftPackageReference "GRDB" */,
+				660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			productRefGroup = 66CBCED82C63B16400313949 /* Products */;
 			projectDirPath = "";
@@ -304,6 +313,7 @@
 				66A078B52CFDF41800490469 /* SubModel.swift in Sources */,
 				6603303F2D0D820C009FEB56 /* RoutingListModel.swift in Sources */,
 				66CBCEDF2C63B16400313949 /* Item.swift in Sources */,
+				660330572D11B0CE009FEB56 /* Setting.swift in Sources */,
 				660330372D0D72DE009FEB56 /* Proxy.swift in Sources */,
 				66E0D41A2CF1D1AC00152F40 /* ConfigView.swift in Sources */,
 				66E0D4352CF3072400152F40 /* ToastWindow.swift in Sources */,
@@ -326,6 +336,7 @@
 				66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */,
 				66A078B32CFDF1F000490469 /* RoutingModel.swift in Sources */,
 				66A078BF2D008CBF00490469 /* Database.swift in Sources */,
+				660330532D11AFF6009FEB56 /* Overview.swift in Sources */,
 				66A078B02CFDF0C800490469 /* RouingList.swift in Sources */,
 				66E0D43B2CF3356800152F40 /* ConfigFormServerView.swift in Sources */,
 				660330312D0D614C009FEB56 /* Migrate.swift in Sources */,
@@ -557,6 +568,14 @@
 				kind = branch;
 			};
 		};
+		660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.4;
+			};
+		};
 		6627FB702D0D14F8009B736F /* XCRemoteSwiftPackageReference "GRDB" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/groue/GRDB.swift";
@@ -585,6 +604,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 660330022D0D5504009FEB56 /* XCRemoteSwiftPackageReference "GRDB" */;
 			productName = GRDBSQLite;
+		};
+		660330592D11BF28009FEB56 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 		6627FB712D0D14F8009B736F /* GRDB */ = {
 			isa = XCSwiftPackageProductDependency;

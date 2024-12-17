@@ -6,17 +6,15 @@
 //
 import SwiftUI
 struct ContentView: View {
-    @State private var selectedTab: Tab = .screenshot // 当前选中的按钮
+    @State private var selectedTab: Tab = .activity // 当前选中的按钮
 
     // 定义 Tab 枚举
     enum Tab: String {
-        case screenshot
-        case annotate
-        case pin
-        case pickColor
-        case recordScreen
-        case recordAudio
-        case ocr
+        case activity
+        case server
+        case subscription
+        case routing
+        case setting
     }
 
     var body: some View {
@@ -34,41 +32,38 @@ struct ContentView: View {
                 }
                 .padding(.vertical,20)
 
-                SidebarButton(tab: .screenshot, title: "Screenshot", icon: "camera.fill", selectedTab: $selectedTab)
-                SidebarButton(tab: .annotate, title: "Annotate", icon: "pencil.tip", selectedTab: $selectedTab)
-                SidebarButton(tab: .pin, title: "Pin", icon: "pin.fill", selectedTab: $selectedTab)
-                SidebarButton(tab: .pickColor, title: "Pick Color", icon: "eyedropper", selectedTab: $selectedTab)
-                SidebarButton(tab: .recordScreen, title: "Record Screen", icon: "record.circle", selectedTab: $selectedTab)
-                SidebarButton(tab: .recordAudio, title: "Record Audio", icon: "mic.fill", selectedTab: $selectedTab)
-                SidebarButton(tab: .ocr, title: "OCR", icon: "text.viewfinder", selectedTab: $selectedTab)
+                SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters", selectedTab: $selectedTab)
+                SidebarButton(tab: .server, title: "proxies", icon: "network.badge.shield.half.filled", selectedTab: $selectedTab)
+                SidebarButton(tab: .subscription, title: "Subscription", icon: "personalhotspot", selectedTab: $selectedTab)
+                SidebarButton(tab: .routing, title: "Routing", icon: "bonjour", selectedTab: $selectedTab)
+                SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)
 
                 Spacer()
             }
             .frame(width: 160)
             .padding(.leading, 16)
+            
 
             // 右侧内容区，根据选中状态切换
             VStack {
                 switch selectedTab {
-                case .screenshot:
+                case .activity:
+                    ActivityView()
+                case .server:
                     ConfigListView()
-                case .annotate:
+                case .subscription:
                     SubListView()
-                case .pin:
+                case .routing:
                     RoutingListView()
-                case .pickColor:
-                    RoutingListView()
-                case .recordScreen:
-                    RoutingListView()
-                case .recordAudio:
-                    RoutingListView()
-                case .ocr:
-                    RoutingListView()
+                case .setting:
+                    SettingView()
                 }
+                Spacer()
             }
             .padding(16)
             .background()
             .padding(.all, 16)
+            .frame(width: 600)
         }
     }
 
@@ -79,7 +74,7 @@ struct ContentView: View {
         }) {
             HStack(spacing: 10) { // Adjust spacing between icon and text
                 Image(systemName: icon)
-                    .frame(width: 16, height: 16) // Consistent icon size
+                    .frame(width: 20, height: 20) // Consistent icon size
                 Text(title)
                     .font(.body) // Adjust font size for better readability
             }

@@ -28,6 +28,11 @@ struct RoutingListView: View {
     var body: some View {
         VStack {
             HStack {
+                // Header Section
+                Text("Routing")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
                 Button("刷新") {
                     withAnimation {
                         loadData()
