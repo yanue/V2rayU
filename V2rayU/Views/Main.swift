@@ -66,7 +66,7 @@ struct ContentView: View {
             .frame(width: 600)
         }
     }
-
+  
     func SidebarButton(tab: Tab, title: String, icon: String, selectedTab: Binding<Tab>) -> some View {
         let isSelected = selectedTab.wrappedValue == tab
         return Button(action: {
