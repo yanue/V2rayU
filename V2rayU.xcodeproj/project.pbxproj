@@ -20,7 +20,9 @@
 		6603305F2D13067D009FEB56 /* General.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6603305E2D130679009FEB56 /* General.swift */; };
 		660330612D130683009FEB56 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660330602D130681009FEB56 /* Setting.swift */; };
 		660330632D130722009FEB56 /* Advance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660330622D13071C009FEB56 /* Advance.swift */; };
-		6627FB722D0D14F8009B736F /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 6627FB712D0D14F8009B736F /* GRDB */; };
+		6620EF5E2D144A33000D9604 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6620EF5D2D144A30000D9604 /* Language.swift */; };
+		6620EF602D144ED8000D9604 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6620EF5F2D144ED2000D9604 /* Theme.swift */; };
+		6620EF682D145ABC000D9604 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6620EF662D145ABC000D9604 /* Localizable.strings */; };
 		6689038D2CF17C7C0022EA7E /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6689038C2CF17C750022EA7E /* MenuView.swift */; };
 		66956AD02CFDE90D00B2AAC4 /* SubList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66956ACF2CFDE90D00B2AAC4 /* SubList.swift */; };
 		66A078B02CFDF0C800490469 /* RouingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A078AF2CFDF0C800490469 /* RouingList.swift */; };
@@ -77,9 +79,11 @@
 		6603305E2D130679009FEB56 /* General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = General.swift; sourceTree = "<group>"; };
 		660330602D130681009FEB56 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		660330622D13071C009FEB56 /* Advance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Advance.swift; sourceTree = "<group>"; };
-		660330662D13119B009FEB56 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		660330682D13119E009FEB56 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		660330692D13127E009FEB56 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		6620EF5D2D144A30000D9604 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		6620EF5F2D144ED2000D9604 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		6620EF632D145ABC000D9604 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6620EF642D145ABC000D9604 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		6620EF652D145ABC000D9604 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6638F5EB2C64FF090091FFF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6689038C2CF17C750022EA7E /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		66956ACF2CFDE90D00B2AAC4 /* SubList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubList.swift; sourceTree = "<group>"; };
@@ -119,7 +123,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6627FB722D0D14F8009B736F /* GRDB in Frameworks */,
 				66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */,
 				6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */,
 				660330042D0D5504009FEB56 /* GRDB in Frameworks */,
@@ -143,8 +146,18 @@
 				660330602D130681009FEB56 /* Setting.swift */,
 				6603305E2D130679009FEB56 /* General.swift */,
 				660330622D13071C009FEB56 /* Advance.swift */,
+				6620EF5D2D144A30000D9604 /* Language.swift */,
+				6620EF5F2D144ED2000D9604 /* Theme.swift */,
 			);
 			path = Setting;
+			sourceTree = "<group>";
+		};
+		6620EF672D145ABC000D9604 /* locales */ = {
+			isa = PBXGroup;
+			children = (
+				6620EF662D145ABC000D9604 /* Localizable.strings */,
+			);
+			path = locales;
 			sourceTree = "<group>";
 		};
 		6627FB752D0D1656009B736F /* Database */ = {
@@ -191,7 +204,7 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
-				660330672D13119B009FEB56 /* Localizable.strings */,
+				6620EF672D145ABC000D9604 /* locales */,
 				660330382D0D7C23009FEB56 /* Routing.swift */,
 				660330362D0D72D9009FEB56 /* Proxy.swift */,
 				6627FB752D0D1656009B736F /* Database */,
@@ -289,7 +302,7 @@
 			};
 			buildConfigurationList = 66CBCED22C63B16400313949 /* Build configuration list for PBXProject "V2rayU" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -317,6 +330,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66CBCEE42C63B16500313949 /* Preview Assets.xcassets in Resources */,
+				6620EF682D145ABC000D9604 /* Localizable.strings in Resources */,
 				66CBCEE12C63B16500313949 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -333,6 +347,7 @@
 				6603303F2D0D820C009FEB56 /* RoutingListModel.swift in Sources */,
 				66CBCEDF2C63B16400313949 /* Item.swift in Sources */,
 				660330372D0D72DE009FEB56 /* Proxy.swift in Sources */,
+				6620EF5E2D144A33000D9604 /* Language.swift in Sources */,
 				66E0D41A2CF1D1AC00152F40 /* ConfigView.swift in Sources */,
 				66E0D4352CF3072400152F40 /* ToastWindow.swift in Sources */,
 				66E0D4392CF3353000152F40 /* ConfigFormStreamView.swift in Sources */,
@@ -357,6 +372,7 @@
 				66A078BF2D008CBF00490469 /* Database.swift in Sources */,
 				660330532D11AFF6009FEB56 /* Overview.swift in Sources */,
 				66A078B02CFDF0C800490469 /* RouingList.swift in Sources */,
+				6620EF602D144ED8000D9604 /* Theme.swift in Sources */,
 				66E0D43B2CF3356800152F40 /* ConfigFormServerView.swift in Sources */,
 				6603305F2D13067D009FEB56 /* General.swift in Sources */,
 				660330312D0D614C009FEB56 /* Migrate.swift in Sources */,
@@ -371,12 +387,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		660330672D13119B009FEB56 /* Localizable.strings */ = {
+		6620EF662D145ABC000D9604 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				660330662D13119B009FEB56 /* zh-Hans */,
-				660330682D13119E009FEB56 /* en */,
-				660330692D13127E009FEB56 /* zh-HK */,
+				6620EF632D145ABC000D9604 /* en */,
+				6620EF642D145ABC000D9604 /* zh-Hans */,
+				6620EF652D145ABC000D9604 /* zh-HK */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -610,14 +626,6 @@
 				minimumVersion = 2.2.4;
 			};
 		};
-		6627FB702D0D14F8009B736F /* XCRemoteSwiftPackageReference "GRDB" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/groue/GRDB.swift";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		66A078BA2D008A3700490469 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver";
@@ -643,11 +651,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
-		};
-		6627FB712D0D14F8009B736F /* GRDB */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6627FB702D0D14F8009B736F /* XCRemoteSwiftPackageReference "GRDB" */;
-			productName = GRDB;
 		};
 		66A078BB2D008A3700490469 /* SwiftyBeaver */ = {
 			isa = XCSwiftPackageProductDependency;

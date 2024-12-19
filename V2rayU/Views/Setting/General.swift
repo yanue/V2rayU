@@ -9,39 +9,6 @@ import Foundation
 import SwiftUI
 import KeyboardShortcuts
 
-enum Theme: String, CaseIterable {
-    case System = "Follow System"
-    case Light = "Light"
-    case Dark = "Dark"
-    var localized: String {
-        return NSLocalizedString(rawValue, comment: "")
-    }
-}
-
-enum Language: String, CaseIterable {
-    case system = "System Default"  // 跟随系统语言
-    case en = "English"
-    case zhHans = "Simplified Chinese" // 简体中文
-    case zhHant = "Traditional Chinese" // 繁体中文
-    
-    var localeIdentifier: String {
-        switch self {
-        case .en:
-            return "en"
-        case .zhHans:
-            return "zh-Hans"
-        case .zhHant:
-            return "zh-Hant"
-        case .system:
-            return Locale.preferredLanguages.first ?? "en"  // 默认跟随系统语言
-        }
-    }
-    
-    var localized: String {
-        return NSLocalizedString(self.rawValue, comment: "")
-    }
-}
-
 struct GeneralView: View {
     @State private var launchAtLogin = true
     @State private var checkForUpdates = false
@@ -49,8 +16,8 @@ struct GeneralView: View {
     @State private var selectFastestServer = false
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
-    @State private var theme = Theme.System // 默认设置为浅色模式
-    @AppStorage("selectedLanguage") private var language: String = Language.system.rawValue
+    @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var languageManager: LanguageManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -62,30 +29,24 @@ struct GeneralView: View {
                     Toggle("Automatically select fastest server", isOn: $selectFastestServer)
                 }
                 Spacer()
+                
                 // 语言选择器
-               Picker("Language", selection: $language) {
+               Picker("Language", selection: $languageManager.selectedLanguage) {
                    ForEach(Language.allCases, id: \.self) { item in
                        Text(item.localized).tag(item.rawValue)
                    }
                }
                .padding()
-               .onChange(of: language) {
-                   setLanguage(language)
-               }
+
                
-               
-                Picker("Theme", selection: $theme) {
+                Picker("Theme", selection: $themeManager.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
-                        Text(item.localized).tag(item)
+                        Text(item.localized).tag(item.rawValue)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle()) // 分段选择样式
-                .padding(0)
-                .onChange(of: theme) {
-                    // 在这里确保外观变更
-                    setAppearance(for: theme)
-                }
-
+                .padding()
+                
                 Spacer()
                 Section(header: Text("Shortcuts")) {
                     HStack {
@@ -116,40 +77,8 @@ struct GeneralView: View {
             .padding()
         }
         .frame(width: 500, height: 400)
+
     }
 
-    // 更新应用外观的方法
-    private func setAppearance(for theme: Theme) {
-        print("setAppearance", theme)
-        if #available(macOS 10.14, *) {
-            switch theme {
-            case .Light:
-                // 浅色模式
-                NSApp.appearance = NSAppearance(named: .aqua)
-            case .Dark:
-                // 深色模式
-                NSApp.appearance = NSAppearance(named: .darkAqua)
-            default:
-                // 系统默认模式
-                NSApp.appearance = nil
-            }
-        }
-    }
     
-   // 设置语言
-    private func setLanguage(_ languageRawValue: String) {
-        if let language = Language(rawValue: languageRawValue) {
-            if language == .system {
-                // 如果选择系统语言，直接使用系统语言
-                let systemLanguage = Locale.preferredLanguages.first ?? "en"
-                UserDefaults.standard.set([systemLanguage], forKey: "AppleLanguages")
-                UserDefaults.standard.synchronize()
-            } else {
-                // 设置其他语言
-                let locale = Locale(identifier: language.localeIdentifier)
-                UserDefaults.standard.set([locale.identifier], forKey: "AppleLanguages")
-                UserDefaults.standard.synchronize()
-            }
-        }
-   }
 }
