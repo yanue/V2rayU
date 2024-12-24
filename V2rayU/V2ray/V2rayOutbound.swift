@@ -100,6 +100,8 @@ extension V2rayOutbound {
 struct V2rayOutboundMux: Codable {
     var enabled: Bool = false
     var concurrency: Int = 8
+    var xudpConcurrency: Int = 16
+    var xudpProxyUDP443: Bool = false // 控制 Mux 对于被代理的 UDP/443（QUIC）流量的处理方式: reject-默认,allow-允许,skip-跳过
 }
 
 // protocol
@@ -109,14 +111,12 @@ struct V2rayOutboundBlackhole: V2rayOutboundSettings {
 }
 
 struct V2rayOutboundBlackholeResponse: Codable {
-    var type: String? = "none" // none | http
+    var type: String = "http" // none | http - Blackhole 会发回一个简单的 HTTP 403 数据包，然后关闭连接。
 }
 
+// Freedom
 struct V2rayOutboundFreedom: V2rayOutboundSettings {
-    // Freedom
-    var domainStrategy: String = "UseIP"// UseIP | AsIs
-    var redirect: String?
-    var userLevel: Int = 0
+    var domainStrategy: String? = "AsIs" // UseIP | AsIs
 }
 
 struct V2rayOutboundShadowsocks: V2rayOutboundSettings {
@@ -126,13 +126,14 @@ struct V2rayOutboundShadowsocks: V2rayOutboundSettings {
 let V2rayOutboundShadowsockMethod = ["2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", "chacha20-ietf-poly1305", "chacha20-poly1305", "aes-128-gcm", "aes-256-gcm", "rc4-md5", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr",  "aes-192-gcm", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "bf-cfb", "salsa20", "chacha20", "chacha20-ietf"]
 
 struct V2rayOutboundShadowsockServer: Codable {
-    var email: String = ""
     var address: String = ""
     var port: Int = 0
     var method: String = "aes-256-gcm"
     var password: String = ""
-    var ota: Bool = false
-    var level: Int = 0
+    var uot: Bool = false // 必填。是否启用udp over tcp。
+    var UoTVersion: Int = 2 // UDP over TCP 的实现版本。
+    var email: String? // 选填
+    var level: Int? // 选填,默认 0
 }
 
 struct V2rayOutboundSocks: V2rayOutboundSettings {
@@ -151,6 +152,7 @@ struct V2rayOutboundSockUser: Codable {
     var level: Int = 0
 }
 
+// VMess 依赖于系统时间，请确保使用 Xray 的系统 UTC 时间误差在 120 秒之内，时区无关。
 struct V2rayOutboundVMess: V2rayOutboundSettings {
     var vnext: [V2rayOutboundVMessItem] = [V2rayOutboundVMessItem()]
 }
@@ -166,7 +168,6 @@ let V2rayOutboundVMessSecurity = ["aes-128-gcm", "chacha20-poly1305", "auto", "n
 struct V2rayOutboundVMessUser: Codable {
     var id: String = ""
     var alterId: Int = 64// 0-65535
-    // V2rayOutboundVMessSecurity
     var security: String = "auto" // aes-128-gcm/chacha20-poly1305/auto/none
 }
 
@@ -174,6 +175,8 @@ struct V2rayOutboundDns: V2rayOutboundSettings {
     var network: String = "" // "tcp" | "udp" | ""
     var address: String = ""
     var port: Int?
+    var nonIPQuery: String? // drop | skip
+    var blockTypes: [Int]? // 如 "blockTypes":[65,28] 表示屏蔽type 65(HTTPS) 和 28(AAAA)
 }
 
 struct V2rayOutboundHttp: V2rayOutboundSettings {
@@ -203,9 +206,15 @@ struct V2rayOutboundVLessItem: Codable {
 
 struct V2rayOutboundVLessUser: Codable {
     var id: String = ""
+    // 流控模式，用于选择 XTLS 的算法。
+    // 目前出站协议中有以下流控模式可选：
+    // 无 flow 或者 空字符： 使用普通 TLS 代理
+    // xtls-rprx-vision：使用新 XTLS 模式 包含内层握手随机填充 支持 uTLS 模拟客户端指纹
+    // xtls-rprx-vision-udp443：同 xtls-rprx-vision, 但是不会拦截目标为 443 端口的 UDP 流量
+    // 此外，目前 XTLS 仅支持 TCP+TLS/Reality。
     var flow: String = ""
-    var encryption: String = "none"
-    var level: Int = 0
+    var encryption: String = "none" // 必填,不能为空字符串,默认 none, 暂时只支持 none
+    var level: Int? // 选填,默认 0
 }
 
 struct V2rayOutboundTrojan: V2rayOutboundSettings {
@@ -216,7 +225,6 @@ struct V2rayOutboundTrojanServer: Codable {
     var address: String = ""
     var port: Int = 0
     var password: String = ""
-    var level: Int = 0
-    var email: String = ""
-    var flow: String = ""
+    var email: String? // 选填
+    var level: Int? // 选填,默认 0
 }

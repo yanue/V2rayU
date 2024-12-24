@@ -14,21 +14,19 @@ struct V2rayStruct: Codable {
     var log: V2rayLog = V2rayLog()
     var api: V2rayApi?
     var dns: V2rayDns = V2rayDns()
-    var stats: V2rayStats?
+    var stats: V2rayStats = V2rayStats()
     var routing: V2rayRouting = V2rayRouting()
     var policy: V2rayPolicy?
-    var inbounds: [V2rayInbound]? // > 4.0
-    var outbounds: [V2rayOutbound]? // > 4.0
+    var inbounds: [V2rayInbound]?
+    var outbounds: [V2rayOutbound]?
+    var observatory: V2rayObservatory = V2rayObservatory()
 }
 
 // protocol
 enum V2rayProtocolInbound: String, CaseIterable, Codable {
     case http
-    case shadowsocks
     case socks
-    case vmess
-    case vless
-    case trojan
+    case dokodemoDoor = "dokodemo-door"
 }
 
 // log
@@ -47,15 +45,17 @@ struct V2rayLog: Codable {
 }
 
 struct V2rayApi: Codable {
-
+    var tag: String = "api" // 用于标识 API 的标识符,需要在 routing 中设置增加规则: {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
+    var listen: String = "127.0.0.1:1085" // 1.8.12起 这里不设置就需要在 inbounds 中设置
+    var services: [String] = ["StatsService"]
 }
 
 struct V2rayDns: Codable {
-    var servers: [String]?
+    // 复杂的配置,直接替换整个结构体即可
 }
 
 struct V2rayStats: Codable {
-
+    // 没有配置,空结构体{}即可统计,需配合policy使用
 }
 
 struct V2rayRouting: Codable {
@@ -103,4 +103,19 @@ struct V2rayRoutingBalancerStrategy: Codable {
 }
 
 struct V2rayPolicy: Codable {
+    var system: SystemPolicy = SystemPolicy()
+}
+
+struct SystemPolicy: Codable {
+    var statsInboundUplink: Bool = true
+    var statsInboundDownlink: Bool = true
+    var statsOutboundUplink: Bool = true
+    var statsOutboundDownlink: Bool = true
+}
+
+struct V2rayObservatory: Codable {
+    var subjectSelector: [String] = ["outbound"]
+    var probeUrl: String = "https://www.google.com/generate_204"
+    var probeInterval: String = "10s"
+    var enableConcurrency: Bool = false
 }

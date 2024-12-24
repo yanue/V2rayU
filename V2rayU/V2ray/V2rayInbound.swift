@@ -20,10 +20,7 @@ struct V2rayInbound: Codable {
 
     var settingHttp: V2rayInboundHttp = V2rayInboundHttp()
     var settingSocks: V2rayInboundSocks = V2rayInboundSocks()
-    var settingShadowsocks: V2rayInboundShadowsocks?
-    var settingVMess: V2rayInboundVMess?
-    var settingVLess: V2rayInboundVLess?
-    var settingTrojan: V2rayInboundTrojan?
+    var settingDokodemoDoor: V2rayInboundDokodemoDoor = V2rayInboundDokodemoDoor()
 
     enum CodingKeys: String, CodingKey {
         case port
@@ -60,20 +57,11 @@ extension V2rayInbound {
         case .http:
             settingHttp = try container.decode(V2rayInboundHttp.self, forKey: CodingKeys.settings)
             break
-        case .shadowsocks:
-            settingShadowsocks = try container.decode(V2rayInboundShadowsocks.self, forKey: CodingKeys.settings)
-            break
         case .socks:
             settingSocks = try container.decode(V2rayInboundSocks.self, forKey: CodingKeys.settings)
             break
-        case .vmess:
-            settingVMess = try container.decode(V2rayInboundVMess.self, forKey: CodingKeys.settings)
-            break
-        case .vless:
-            settingVLess = try container.decode(V2rayInboundVLess.self, forKey: CodingKeys.settings)
-            break
-        case .trojan:
-            settingTrojan = try container.decode(V2rayInboundTrojan.self, forKey: CodingKeys.settings)
+        case .docodemoDoor:
+            settingSocks = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
             break
         }
     }
@@ -104,20 +92,11 @@ extension V2rayInbound {
         case .http:
             try container.encode(self.settingHttp, forKey: .settings)
             break
-        case .shadowsocks:
-            try container.encode(self.settingShadowsocks, forKey: .settings)
-            break
         case .socks:
             try container.encode(self.settingSocks, forKey: .settings)
             break
-        case .vmess:
-            try container.encode(self.settingVMess, forKey: .settings)
-            break
-        case .vless:
-            try container.encode(self.settingVLess, forKey: .settings)
-            break
-        case .trojan:
-            try container.encode(self.settingTrojan, forKey: .settings)
+        case .docodemoDoor:
+            try container.encode(self.settingDokodemoDoor, forKey: .settings)
             break
         }
     }
@@ -160,14 +139,6 @@ struct V2rayInboundHttpAccount: Codable {
     var pass: String?
 }
 
-struct V2rayInboundShadowsocks: Codable {
-    var email, method, password: String?
-    var udp: Bool = false
-    var level: Int = 0
-    var ota: Bool = true
-    var network: String = "tcp" // "tcp" | "udp" | "tcp,udp"
-}
-
 struct V2rayInboundSocks: Codable {
     var auth: String = "noauth" // noauth | password
     var accounts: [V2rayInboundSockAccount]?
@@ -181,64 +152,10 @@ struct V2rayInboundSockAccount: Codable {
     var pass: String?
 }
 
-struct V2rayInboundVMess: Codable {
-    var clients: [V2RayInboundVMessClient]?
-    var `default`: V2RayInboundVMessDefault? = V2RayInboundVMessDefault()
-    var detour: V2RayInboundVMessDetour?
-    var disableInsecureEncryption: Bool = false
-}
-
-struct V2RayInboundVMessClient: Codable {
-    var id: String?
-    var level: Int = 0
-    var alterId: Int = 64
-    var email: String?
-}
-
-struct V2RayInboundVMessDetour: Codable {
-    var to: String?
-}
-
-struct V2RayInboundVMessDefault: Codable {
-    var level: Int = 0
-    var alterId: Int = 64
-}
-
-struct V2rayInboundVLess: Codable {
-    var clients: [V2rayInboundVLessClient]?
-    var decryption: String = "none"
-    var fallbacks: [V2rayInboundVLessFallback]? = [V2rayInboundVLessFallback()]
-}
-
-struct V2rayInboundVLessClient: Codable {
-    var id: String?
-    var flow: String = ""
-    var level: Int = 0
-    var email: String?
-}
-
-struct V2rayInboundVLessFallback: Codable {
-    var alpn: String? = ""
-    var path: String? = ""
-    var dest: Int = 80
-    var xver: Int = 0
-}
-
-struct V2rayInboundTrojan: Codable {
-    var clients: [V2rayInboundTrojanClient]?
-    var decryption: String = "none"
-    var fallbacks: [V2rayInboundTrojanFallback]? = [V2rayInboundTrojanFallback()]
-}
-
-struct V2rayInboundTrojanClient: Codable {
-    var password: String = ""
-    var level: Int = 0
-    var email: String?
-}
-
-struct V2rayInboundTrojanFallback: Codable {
-    var alpn: String? = ""
-    var path: String? = ""
-    var dest: Int = 80
-    var xver: Int = 0
+struct V2rayInboundDokodemoDoor: Codable {
+    var address: String
+    var port: Int
+    var network: String = "tcp"
+    var followRedirect: Bool = false
+    var userLevel: Int = 0
 }
