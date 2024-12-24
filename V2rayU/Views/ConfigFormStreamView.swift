@@ -15,8 +15,8 @@ struct ConfigStreamView: View {
             VStack {
                 Section(header: Text("Stream Settings")) {
                     getPickerWithLabel(label: "Network", selection: $item.network)
-                    if item.network == .tcp || item.network == .ws || item.network == .h2  || item.network == .http {
-                        if item.network == .tcp || item.network == .http {
+                    if item.network == .tcp || item.network == .ws || item.network == .h2  {
+                        if item.network == .tcp || item.network == .h2 {
                             getPickerWithLabel(label: "header type", selection: $item.headerType)
                         }
                         getTextFieldWithLabel(label: "request host",text: $item.requestHost)
@@ -41,6 +41,10 @@ struct ConfigStreamView: View {
                         getNumFieldWithLabel(label: "tti", num: $item.port)
                         getNumFieldWithLabel(label: "uplinkCapacity", num: $item.port)
                         getNumFieldWithLabel(label: "downlinkCapacity", num: $item.port)
+                    }
+                    if item.network == .xhttp {
+                        getTextFieldWithLabel(label: "path",text: $item.path)
+                        getTextFieldWithLabel(label: "host",text: $item.requestHost)
                     }
                 }
             }

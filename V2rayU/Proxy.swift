@@ -64,6 +64,7 @@ class Proxy: ProxyModel {
     private(set) var streamH2 = HttpSettings()
     private(set) var streamQuic = QuicSettings()
     private(set) var streamGrpc = GrpcSettings()
+    private(set) var streamXhttp = XhttpSettings()
 
     // security settings
     private(set) var securityTls = TlsSettings() // tls|xtls
@@ -134,7 +135,6 @@ class Proxy: ProxyModel {
             serverTrojan.address = address
             serverTrojan.port = port
             serverTrojan.password = password
-            serverTrojan.flow = flow
             var outboundTrojan = V2rayOutboundTrojan()
             outboundTrojan.servers = [serverTrojan]
             outbound.settings = outboundTrojan
@@ -166,13 +166,13 @@ class Proxy: ProxyModel {
         case .kcp:
             streamKcp.header.type = headerType.rawValue
             settings.kcpSettings = streamKcp
-        case .http, .h2:
+        case .h2:
             streamH2.path = path
             streamH2.host = [requestHost]
             settings.httpSettings = streamH2
         case .ws:
             streamWs.path = path
-            streamWs.headers.host = requestHost
+            streamWs.headers.Host = requestHost
             settings.wsSettings = streamWs
         case .domainsocket:
             streamDs.path = path
@@ -183,6 +183,10 @@ class Proxy: ProxyModel {
         case .grpc:
             streamGrpc.serviceName = path
             settings.grpcSettings = streamGrpc
+        case .xhttp:
+            streamXhttp.path = path
+            streamXhttp.host = requestHost
+            settings.xhttpSettings = streamXhttp
         }
     }
 

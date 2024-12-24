@@ -38,10 +38,10 @@
 		66CBCEE42C63B16500313949 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66CBCEE32C63B16500313949 /* Preview Assets.xcassets */; };
 		66E0D41A2CF1D1AC00152F40 /* ConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4192CF1D1A300152F40 /* ConfigView.swift */; };
 		66E0D41C2CF2F31700152F40 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41B2CF2F30800152F40 /* Main.swift */; };
-		66E0D4252CF2F74B00152F40 /* v2rayStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */; };
-		66E0D4262CF2F74B00152F40 /* v2rayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4202CF2F74B00152F40 /* v2rayStream.swift */; };
-		66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */; };
-		66E0D4282CF2F74B00152F40 /* v2rayOutbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */; };
+		66E0D4252CF2F74B00152F40 /* V2rayStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41D2CF2F74B00152F40 /* V2rayStruct.swift */; };
+		66E0D4262CF2F74B00152F40 /* V2rayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4202CF2F74B00152F40 /* V2rayStream.swift */; };
+		66E0D4272CF2F74B00152F40 /* V2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41E2CF2F74B00152F40 /* V2rayInbound.swift */; };
+		66E0D4282CF2F74B00152F40 /* V2rayOutbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D41F2CF2F74B00152F40 /* V2rayOutbound.swift */; };
 		66E0D4312CF3064D00152F40 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4302CF3064D00152F40 /* AppVersion.swift */; };
 		66E0D4332CF3068400152F40 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4322CF3068400152F40 /* Util.swift */; };
 		66E0D4352CF3072400152F40 /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0D4342CF3072400152F40 /* ToastWindow.swift */; };
@@ -101,10 +101,10 @@
 		66CBCEE52C63B16500313949 /* V2rayU.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = V2rayU.entitlements; sourceTree = "<group>"; };
 		66E0D4192CF1D1A300152F40 /* ConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigView.swift; sourceTree = "<group>"; };
 		66E0D41B2CF2F30800152F40 /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
-		66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayStruct.swift; sourceTree = "<group>"; };
-		66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayInbound.swift; sourceTree = "<group>"; };
-		66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayOutbound.swift; sourceTree = "<group>"; };
-		66E0D4202CF2F74B00152F40 /* v2rayStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v2rayStream.swift; sourceTree = "<group>"; };
+		66E0D41D2CF2F74B00152F40 /* V2rayStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStruct.swift; sourceTree = "<group>"; };
+		66E0D41E2CF2F74B00152F40 /* V2rayInbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayInbound.swift; sourceTree = "<group>"; };
+		66E0D41F2CF2F74B00152F40 /* V2rayOutbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayOutbound.swift; sourceTree = "<group>"; };
+		66E0D4202CF2F74B00152F40 /* V2rayStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStream.swift; sourceTree = "<group>"; };
 		66E0D4302CF3064D00152F40 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		66E0D4322CF3068400152F40 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		66E0D4342CF3072400152F40 /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
@@ -210,7 +210,7 @@
 				6627FB752D0D1656009B736F /* Database */,
 				66E0D4342CF3072400152F40 /* ToastWindow.swift */,
 				66E0D4302CF3064D00152F40 /* AppVersion.swift */,
-				66E0D4232CF2F74B00152F40 /* v2ray */,
+				66E0D4232CF2F74B00152F40 /* V2ray */,
 				66E0D4182CF1D19200152F40 /* Views */,
 				6638F5EB2C64FF090091FFF8 /* Info.plist */,
 				66CBCEDA2C63B16400313949 /* V2rayUApp.swift */,
@@ -253,15 +253,15 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		66E0D4232CF2F74B00152F40 /* v2ray */ = {
+		66E0D4232CF2F74B00152F40 /* V2ray */ = {
 			isa = PBXGroup;
 			children = (
-				66E0D41D2CF2F74B00152F40 /* v2rayStruct.swift */,
-				66E0D41E2CF2F74B00152F40 /* v2rayInbound.swift */,
-				66E0D41F2CF2F74B00152F40 /* v2rayOutbound.swift */,
-				66E0D4202CF2F74B00152F40 /* v2rayStream.swift */,
+				66E0D41D2CF2F74B00152F40 /* V2rayStruct.swift */,
+				66E0D41E2CF2F74B00152F40 /* V2rayInbound.swift */,
+				66E0D41F2CF2F74B00152F40 /* V2rayOutbound.swift */,
+				66E0D4202CF2F74B00152F40 /* V2rayStream.swift */,
 			);
-			path = v2ray;
+			path = V2ray;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -355,7 +355,7 @@
 				6603303B2D0D81B6009FEB56 /* ProxyListModel.swift in Sources */,
 				6689038D2CF17C7C0022EA7E /* MenuView.swift in Sources */,
 				66CBCEDB2C63B16400313949 /* V2rayUApp.swift in Sources */,
-				66E0D4252CF2F74B00152F40 /* v2rayStruct.swift in Sources */,
+				66E0D4252CF2F74B00152F40 /* V2rayStruct.swift in Sources */,
 				66A078B72CFDF64E00490469 /* GroupModel.swift in Sources */,
 				6603303D2D0D8201009FEB56 /* SubListModel.swift in Sources */,
 				66E0D4412CF4A2F200152F40 /* ConfigForm.swift in Sources */,
@@ -365,9 +365,9 @@
 				66E0D4372CF334D900152F40 /* ConfigFormSecruityView.swift in Sources */,
 				66E0D4A62CFB1AAD00152F40 /* Common.swift in Sources */,
 				66E0D4332CF3068400152F40 /* Util.swift in Sources */,
-				66E0D4262CF2F74B00152F40 /* v2rayStream.swift in Sources */,
+				66E0D4262CF2F74B00152F40 /* V2rayStream.swift in Sources */,
 				660330632D130722009FEB56 /* Advance.swift in Sources */,
-				66E0D4272CF2F74B00152F40 /* v2rayInbound.swift in Sources */,
+				66E0D4272CF2F74B00152F40 /* V2rayInbound.swift in Sources */,
 				66A078B32CFDF1F000490469 /* RoutingModel.swift in Sources */,
 				66A078BF2D008CBF00490469 /* Database.swift in Sources */,
 				660330532D11AFF6009FEB56 /* Overview.swift in Sources */,
@@ -376,7 +376,7 @@
 				66E0D43B2CF3356800152F40 /* ConfigFormServerView.swift in Sources */,
 				6603305F2D13067D009FEB56 /* General.swift in Sources */,
 				660330312D0D614C009FEB56 /* Migrate.swift in Sources */,
-				66E0D4282CF2F74B00152F40 /* v2rayOutbound.swift in Sources */,
+				66E0D4282CF2F74B00152F40 /* V2rayOutbound.swift in Sources */,
 				660330612D130683009FEB56 /* Setting.swift in Sources */,
 				66E0D49B2CF4B60B00152F40 /* JsonView.swift in Sources */,
 				66E0D4312CF3064D00152F40 /* AppVersion.swift in Sources */,

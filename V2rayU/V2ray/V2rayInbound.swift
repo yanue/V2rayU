@@ -8,6 +8,13 @@
 
 import Cocoa
 
+// protocol
+enum V2rayProtocolInbound: String, CaseIterable, Codable {
+    case http
+    case socks
+    case dokodemoDoor = "dokodemo-door"
+}
+
 // Inbound
 struct V2rayInbound: Codable {
     var port: String = "1080"
@@ -60,8 +67,10 @@ extension V2rayInbound {
         case .socks:
             settingSocks = try container.decode(V2rayInboundSocks.self, forKey: CodingKeys.settings)
             break
-        case .docodemoDoor:
-            settingSocks = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
+        case .dokodemoDoor:
+            settingDokodemoDoor = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
+            break
+        default:
             break
         }
     }
@@ -95,8 +104,10 @@ extension V2rayInbound {
         case .socks:
             try container.encode(self.settingSocks, forKey: .settings)
             break
-        case .docodemoDoor:
+        case .dokodemoDoor:
             try container.encode(self.settingDokodemoDoor, forKey: .settings)
+            break
+        default:
             break
         }
     }
@@ -153,8 +164,8 @@ struct V2rayInboundSockAccount: Codable {
 }
 
 struct V2rayInboundDokodemoDoor: Codable {
-    var address: String
-    var port: Int
+    var address: String = "127.0.0.1"
+    var port: Int = 1085
     var network: String = "tcp"
     var followRedirect: Bool = false
     var userLevel: Int = 0

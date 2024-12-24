@@ -22,13 +22,6 @@ struct V2rayStruct: Codable {
     var observatory: V2rayObservatory = V2rayObservatory()
 }
 
-// protocol
-enum V2rayProtocolInbound: String, CaseIterable, Codable {
-    case http
-    case socks
-    case dokodemoDoor = "dokodemo-door"
-}
-
 // log
 struct V2rayLog: Codable {
     enum logLevel: String, Codable {
