@@ -6,6 +6,7 @@
 //  Copyright © 2024 yanue. All rights reserved.
 
 import Foundation
+import Cocoa
 
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
@@ -93,3 +94,6 @@ func noticeTip(title: String = "", informativeText: String = "") {
 }
 
 
+func vold() {
+    
+}

@@ -334,7 +334,6 @@ class V2rayLaunch: NSObject {
 
     static func setSystemProxy(mode: RunMode) {
         print("setSystemProxy", v2rayUTool, mode)
-        let pacUrl = getPacUrl()
         var httpPort: String = ""
         var sockPort: String = ""
         // reload
@@ -343,7 +342,7 @@ class V2rayLaunch: NSObject {
             sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         }
         do {
-            let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", pacUrl, "-http-port", httpPort, "-sock-port", sockPort])
+            let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])
             print("setSystemProxy: ok \(output)")
         } catch let error {
             alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)

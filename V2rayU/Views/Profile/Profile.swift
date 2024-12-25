@@ -19,7 +19,7 @@ struct ConfigListView: View {
 
     var filteredAndSortedItems: [ProfileModel] {
         let filtered = viewModel.list.filter { item in
-            (selectGroup.group == "" || selectGroup == item.subid) &&
+            (selectGroup == "" || selectGroup == item.subid) &&
                 (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
         }
         .sorted(using: sortOrder)
@@ -38,9 +38,9 @@ struct ConfigListView: View {
                     .fontWeight(.bold)
                 
                 Picker("选择组", selection: $selectGroup) {
-                    ForEach(viewModel.groups) { group in // 使用 groups 数组并遍历
-                        Text(group.name).tag(group as GroupModel) // 使用 .tag 来绑定选中的项
-                    }
+//                    ForEach(viewModel.groups) { group in // 使用 groups 数组并遍历
+//                        Text(group).tag(group) // 使用 .tag 来绑定选中的项
+//                    }
                 }
                 .pickerStyle(MenuPickerStyle()) // 可根据需要选择不同的 Picker 样式
                 .padding()

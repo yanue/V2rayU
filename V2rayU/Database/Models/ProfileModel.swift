@@ -162,7 +162,7 @@ extension ProfileModel: Transferable {
 extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
     // 自定义表名
     static var databaseTableName: String {
-        return "proxy" // 设置你的表名
+        return "profile" // 设置你的表名
     }
 
     // 定义数据库列

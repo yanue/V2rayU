@@ -187,7 +187,7 @@ struct KcpSettingsHeader: Codable {
 
 struct WsSettings: Codable {
     var path: String = "/" // 默认 "/"
-    var host: [String] = [""] // 为了兼容旧版,设置host同时设置headers.Host
+    var host: String = "" // 为了兼容旧版,设置host同时设置headers.Host
     var heartbeatPeriod: Int? // 心跳周期，单位秒。默认值 0 表示不发送心跳。
     var headers: WsSettingsHeader = WsSettingsHeader()
 }

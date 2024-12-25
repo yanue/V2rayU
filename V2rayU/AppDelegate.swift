@@ -1,9 +1,9 @@
 import SwiftUI
 import Foundation
-import FirebaseCore
-import AppCenter
-import AppCenterAnalytics
-import AppCenterCrashes
+//import FirebaseCore
+//import AppCenter
+//import AppCenterAnalytics
+//import AppCenterCrashes
 
 let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
@@ -46,7 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // 自动检查更新
-            V2rayUpdater.checkForUpdates()
+//            V2rayUpdater.checkForUpdates()
         }
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             // 自动更新订阅服务器

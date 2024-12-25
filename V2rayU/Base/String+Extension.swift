@@ -9,6 +9,14 @@
 import Foundation
 
 extension String {
+    // version compare
+    func versionToInt() -> [Int] {
+        return components(separatedBy: ".")
+            .map {
+                Int($0) ?? 0
+            }
+    }
+
     //: ### Base64 encoding a string
     func base64Encoded() -> String? {
         if let data = data(using: .utf8) {
