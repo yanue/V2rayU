@@ -250,7 +250,7 @@ struct GrpcSettings: Codable {
 struct XhttpSettings: Codable {
     var path: String = "/" // 无论是 TLS 还是 REALITY，一般来说 XHTTP 配置只需填 path，其它不填即可
     var host: String = "" // host 的行为与 Xray 其它基于 HTTP 的传输层一致，客户端发送 host 的优先级为 host > serverName > address。服务端若设了 host，将会检查客户端发来的值是否一致，否则不会检查，建议没事别设。host 不可填在 headers 内。
-    var mode: String = "auto"
+    var mode: String = "auto" // auto | packet-up | stream-up | stream-one
     // extra 是 host、path、mode 以外的所有参数的原始 JSON 分享方案，当 extra 存在时，只有该四项会生效。且分享链接中只有这四项，
     // GUI 一般也只有这四项，因为 extra 中的参数都相对低频，且应当由服务发布者直接下发给客户端，不应该让客户端随意改。
     var extra: XhttpSettingExtra?

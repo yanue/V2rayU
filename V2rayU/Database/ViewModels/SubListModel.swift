@@ -27,7 +27,7 @@ class SubViewModel: ObservableObject {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
             guard let model = try SubModel.filter(SubModel.Columns.uuid == uuid).fetchOne(db) else {
-                throw NSError(domain: "SubModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProxyModel not found for uuid: \(uuid)"])
+                throw NSError(domain: "SubModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
             }
             return model
         }

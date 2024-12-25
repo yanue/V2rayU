@@ -7,13 +7,13 @@
 import SwiftUI
 
 struct ConfigShowView: View {
-    @ObservedObject var item: ProxyModel
+    @ObservedObject var item: ProfileModel
 
     var body: some View {
         HStack {
             VStack {
                 Section(header: Text("Outbound Preview")) {
-                    JSONTextView(jsonString: Proxy(from: item).toJSON())
+                    JSONTextView(jsonString: ProfileHandler(from: item).toJSON())
                 }
                 Spacer()
             }
@@ -24,5 +24,5 @@ struct ConfigShowView: View {
 
 
 #Preview {
-    ConfigShowView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
+    ConfigShowView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
 }

@@ -9,16 +9,16 @@ import Combine
 import Foundation
 import GRDB
 
-class Routing: RoutingModel {
+class RoutingHandler: RoutingModel {
     // 实现 Decodable 协议的初始化方法
     required init(from decoder: Decoder) throws {
         // 先调用父类的初始化方法，解码父类的属性
         try super.init(from: decoder)
     }
 
-    // 从 ProxyModel 初始化
+    // 从 ProfileModel 初始化
     init(from model: RoutingModel) {
-        // 通过传入的 model 初始化 Proxy 类的所有属性
+        // 通过传入的 model 初始化 Profile 类的所有属性
         super.init(
             name: model.name,
             remark: model.remark,

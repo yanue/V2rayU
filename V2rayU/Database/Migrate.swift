@@ -19,7 +19,7 @@ extension AppDatabase {
         var migrator = DatabaseMigrator()
       
         // 注册所有模型的迁移逻辑
-        ProxyModel.registerMigrations(in: &migrator)
+        ProfileModel.registerMigrations(in: &migrator)
         SubModel.registerMigrations(in: &migrator)
         RoutingModel.registerMigrations(in: &migrator)
         

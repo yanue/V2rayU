@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct ConfigFormView: View {
-    @ObservedObject var item: ProxyModel
+    @ObservedObject var item: ProfileModel
 
     var body: some View {
         VStack{
@@ -20,5 +20,5 @@ struct ConfigFormView: View {
 
 
 #Preview {
-    ConfigFormView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
+    ConfigFormView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
 }

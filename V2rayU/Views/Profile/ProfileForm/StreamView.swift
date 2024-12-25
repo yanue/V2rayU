@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigStreamView: View {
-    @ObservedObject var item: ProxyModel
+    @ObservedObject var item: ProfileModel
     
     var body: some View {
         HStack {
@@ -19,7 +19,7 @@ struct ConfigStreamView: View {
                         if item.network == .tcp || item.network == .h2 {
                             getPickerWithLabel(label: "header type", selection: $item.headerType)
                         }
-                        getTextFieldWithLabel(label: "request host",text: $item.requestHost)
+                        getTextFieldWithLabel(label: "request host",text: $item.host)
                         getTextFieldWithLabel(label: "request path",text: $item.path)
                     }
                     if item.network == .grpc {
@@ -44,7 +44,7 @@ struct ConfigStreamView: View {
                     }
                     if item.network == .xhttp {
                         getTextFieldWithLabel(label: "path",text: $item.path)
-                        getTextFieldWithLabel(label: "host",text: $item.requestHost)
+                        getTextFieldWithLabel(label: "host",text: $item.host)
                     }
                 }
             }
@@ -57,5 +57,5 @@ struct ConfigStreamView: View {
 }
 
 #Preview {
-    ConfigStreamView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
+    ConfigStreamView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
 }

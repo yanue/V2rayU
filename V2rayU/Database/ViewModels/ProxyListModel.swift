@@ -10,25 +10,25 @@ import GRDB
 import Foundation
 
 class ProxyViewModel: ObservableObject {
-    @Published var list: [ProxyModel] = []
-    @Published var groups: [GroupModel] = []
+    @Published var list: [ProfileModel] = []
+    @Published var groups: [String] = []
 
     func getList() {
         do {
             let dbReader = AppDatabase.shared.reader
             try dbReader.read { db in
-                list = try ProxyModel.fetchAll(db)
+                list = try ProfileModel.fetchAll(db)
             }
         } catch {
             print("getList error: \(error)")
         }
     }
 
-    func fetchOne(uuid: String) throws -> ProxyModel {
+    func fetchOne(uuid: String) throws -> ProfileModel {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
-            guard let model = try ProxyModel.filter(ProxyModel.Columns.uuid == uuid).fetchOne(db) else {
-                throw NSError(domain: "ProxyViewModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProxyModel not found for uuid: \(uuid)"])
+            guard let model = try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db) else {
+                throw NSError(domain: "ProxyViewModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
             }
             return model
         }
@@ -38,7 +38,7 @@ class ProxyViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try ProxyModel.filter(ProxyModel.Columns.uuid == uuid).deleteAll(db)
+                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
             }
             getList()
         } catch {
@@ -46,7 +46,7 @@ class ProxyViewModel: ObservableObject {
         }
     }
 
-    func upsert(item: ProxyModel) {
+    func upsert(item: ProfileModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in

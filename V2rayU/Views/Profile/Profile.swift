@@ -9,17 +9,17 @@ import SwiftUI
 
 struct ConfigListView: View {
     @StateObject private var viewModel = ProxyViewModel()
-    @State private var list: [ProxyModel] = []
-    @State private var sortOrder: [KeyPathComparator<ProxyModel>] = []
-    @State private var selection: Set<ProxyModel.ID> = []
-    @State private var selectedRow: ProxyModel? = nil
-    @State private var selectGroup: GroupModel = defaultGroup
+    @State private var list: [ProfileModel] = []
+    @State private var sortOrder: [KeyPathComparator<ProfileModel>] = []
+    @State private var selection: Set<ProfileModel.ID> = []
+    @State private var selectedRow: ProfileModel? = nil
+    @State private var selectGroup: String = ""
     @State private var searchText = ""
-    @State private var draggedRow: ProxyModel?
+    @State private var draggedRow: ProfileModel?
 
-    var filteredAndSortedItems: [ProxyModel] {
+    var filteredAndSortedItems: [ProfileModel] {
         let filtered = viewModel.list.filter { item in
-            (selectGroup.group == "" || selectGroup.group == item.subid) &&
+            (selectGroup.group == "" || selectGroup == item.subid) &&
                 (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
         }
         .sorted(using: sortOrder)
@@ -71,13 +71,13 @@ struct ConfigListView: View {
 
                 Button("新增") {
                     withAnimation {
-                        let newProxy = ProxyModel(protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, security: "auto", remark: "New Remark")
+                        let newProxy = ProfileModel(protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, encryption: "auto", remark: "New Remark")
                         self.selectedRow = newProxy
                     }
                 }
             }
 
-            Table(of: ProxyModel.self, selection: $selection, sortOrder: $sortOrder) {
+            Table(of: ProfileModel.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { item in
                     Text("\(item.index + 1)") // 显示 1-based 索引
                 }
@@ -92,7 +92,7 @@ struct ConfigListView: View {
                 TableColumn("Address", value: \.address)
                 TableColumn("Port", value: \.port.description)
                 TableColumn("Network", value: \.network.rawValue)
-                TableColumn("TLS", value: \.streamSecurity.rawValue)
+                TableColumn("TLS", value: \.security.rawValue)
             } rows: {
                 ForEach(filteredAndSortedItems) { row in
                     TableRow(row)
@@ -104,7 +104,7 @@ struct ConfigListView: View {
                         }
                 }
                 // 处理拖动逻辑
-                .dropDestination(for: ProxyModel.self, action: handleDrop)
+                .dropDestination(for: ProfileModel.self, action: handleDrop)
             }
         }
         .sheet(item: $selectedRow) { row in
@@ -125,7 +125,7 @@ struct ConfigListView: View {
 
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
-    func handleDrop(index: Int, rows: [ProxyModel]) {
+    func handleDrop(index: Int, rows: [ProfileModel]) {
         guard let firstRow = rows.first, let firstRemoveIndex = list.firstIndex(where: { $0.id == firstRow.id }) else { return }
 
         list.removeAll(where: { row in
@@ -135,7 +135,7 @@ struct ConfigListView: View {
         list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
     }
 
-    private func contextMenuProvider(item: ProxyModel) -> some View {
+    private func contextMenuProvider(item: ProfileModel) -> some View {
         Group {
             Button("Edit") {
                 self.selectedRow = item

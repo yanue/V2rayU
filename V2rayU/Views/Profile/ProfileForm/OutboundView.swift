@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigServerView: View {
-    @ObservedObject var item: ProxyModel
+    @ObservedObject var item: ProfileModel
 
     var body: some View {
         HStack {
@@ -27,9 +27,9 @@ struct ConfigServerView: View {
                         getNumFieldWithLabel(label: "alterId", num: $item.alterId)
 
                         HStack {
-                            getTextLabel(label: "security")
+                            getTextLabel(label: "encryption")
                             Spacer()
-                            Picker("", selection: $item.security) {
+                            Picker("", selection: $item.encryption) {
                                 ForEach(V2rayProtocolOutbound.allCases) { pick in
                                     Text(pick.rawValue)
                                 }
@@ -42,9 +42,9 @@ struct ConfigServerView: View {
                         getTextFieldWithLabel(label: "id", text: $item.password)
                         getTextFieldWithLabel(label: "flow", text: $item.flow)
                         HStack {
-                            getTextLabel(label: "security")
+                            getTextLabel(label: "encryption")
                             Spacer()
-                            Picker("", selection: $item.security) {
+                            Picker("", selection: $item.encryption) {
                                 ForEach(V2rayProtocolOutbound.allCases) { pick in
                                     Text(pick.rawValue)
                                 }
@@ -58,7 +58,7 @@ struct ConfigServerView: View {
                     getTextFieldWithLabel(label: "password", text: $item.password)
                     HStack {
                         getTextLabel(label: "method")
-                        Picker("", selection: $item.security) {
+                        Picker("", selection: $item.encryption) {
                             ForEach(V2rayProtocolOutbound.allCases) { pick in
                                 Text(pick.rawValue)
                             }
@@ -75,5 +75,5 @@ struct ConfigServerView: View {
 }
 
 #Preview {
-    ConfigServerView(item: ProxyModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", security: "auto", remark: "test01"))
+    ConfigServerView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
 }
