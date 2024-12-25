@@ -24,6 +24,18 @@ class ProxyViewModel: ObservableObject {
         }
     }
 
+    func all() -> [ProfileModel] {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                return try ProfileModel.fetchAll(db)
+            }
+        } catch {
+            print("getList error: \(error)")
+            return []
+        }
+    }
+
     func fetchOne(uuid: String) throws -> ProfileModel {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in

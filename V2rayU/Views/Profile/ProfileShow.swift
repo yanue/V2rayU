@@ -13,7 +13,7 @@ struct ConfigShowView: View {
         HStack {
             VStack {
                 Section(header: Text("Outbound Preview")) {
-                    JSONTextView(jsonString: ProfileHandler(from: item).toJSON())
+                    JSONTextView(jsonString: V2rayOutboundHandler(from: item).toJSON())
                 }
                 Spacer()
             }

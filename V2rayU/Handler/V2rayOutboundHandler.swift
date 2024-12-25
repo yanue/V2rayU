@@ -1,5 +1,5 @@
 //
-//  Profile.swift
+//  V2rayOutboundHandler.swift
 //  V2rayU
 //
 //  Created by yanue on 2024/12/14.
@@ -18,48 +18,8 @@ import Foundation
  - {"type":"socks5","name":"telegram_proxy","server":"1.2.3.4","port":123,"username":"username","password":"password","udp":true}
  */
 
-class ProfileHandler: ProfileModel {
-    // 实现 Decodable 协议的初始化方法
-    required init(from decoder: Decoder) throws {
-        // 先调用父类的初始化方法，解码父类的属性
-        try super.init(from: decoder)
-    }
-
-    // 从 ProfileModel 初始化
-    init(from model: ProfileModel) {
-        // 通过传入的 model 初始化 Profile 类的所有属性
-        super.init(
-            uuid: model.uuid,
-            protocol: model.protocol,
-            address: model.address,
-            port: model.port,
-            password: model.password,
-            alterId: model.alterId,
-            encryption: model.encryption,
-            network: model.network,
-            remark: model.remark,
-            headerType: model.headerType,
-            host: model.host,
-            path: model.path,
-            security: model.security,
-            allowInsecure: model.allowInsecure,
-            subid: model.subid,
-            flow: model.flow,
-            sni: model.sni,
-            alpn: model.alpn,
-            fingerprint: model.fingerprint,
-            publicKey: model.publicKey,
-            shortId: model.shortId,
-            spiderX: model.spiderX
-        )
-    }
-
-    func toJSON() -> String {
-        updateServerSettings()
-        updateStreamSettings()
-        return outbound.toJSON()
-    }
-
+class V2rayOutboundHandler {
+    var profile: ProfileModel
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
     private(set) var serverSocks5 = V2rayOutboundSockServer()
@@ -84,19 +44,37 @@ class ProfileHandler: ProfileModel {
     // outbound
     private(set) var outbound = V2rayOutbound()
 
+    // 从 ProfileModel 初始化
+    init(from model: ProfileModel) {
+        // 通过传入的 model 初始化 Profile 类的所有属性
+        self.profile = model
+    }
+
+    func toJSON() -> String {
+        self.updateServerSettings()
+        self.updateStreamSettings()
+        return outbound.toJSON()
+    }
+
+    func getOutbound() -> V2rayOutbound {
+        self.updateServerSettings()
+        self.updateStreamSettings()
+        return outbound
+    }
+
     // 更新 server 配置
     private func updateServerSettings() {
         switch `protocol` {
         case .vmess:
             // user
             var user = V2rayOutboundVMessUser()
-            user.id = password
-            user.alterId = Int(alterId)
-            user.security = encryption
+            user.id = self.profile.password
+            user.alterId = Int(self.profile.alterId)
+            user.security = self.profile.encryption
             // vmess
             serverVmess = V2rayOutboundVMessItem()
-            serverVmess.address = address
-            serverVmess.port = port
+            serverVmess.address = self.profile.address
+            serverVmess.port = self.profile.port
             serverVmess.users = [user]
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [serverVmess]
@@ -105,13 +83,13 @@ class ProfileHandler: ProfileModel {
         case .vless:
             // user
             var user = V2rayOutboundVLessUser()
-            user.id = password
-            user.flow = flow
-            user.encryption = encryption
+            user.id = self.profile.password
+            user.flow = self.profile.flow
+            user.encryption = self.profile.encryption
             // vless
             serverVless = V2rayOutboundVLessItem()
-            serverVless.address = address
-            serverVless.port = port
+            serverVless.address = self.profile.address
+            serverVless.port = self.profile.port
             serverVless.users = [user]
             var vless = V2rayOutboundVLess()
             vless.vnext = [serverVless]
@@ -119,10 +97,10 @@ class ProfileHandler: ProfileModel {
 
         case .shadowsocks:
             serverShadowsocks = V2rayOutboundShadowsockServer()
-            serverShadowsocks.address = address
-            serverShadowsocks.port = port
-            serverShadowsocks.method = encryption
-            serverShadowsocks.password = password
+            serverShadowsocks.address = self.profile.address
+            serverShadowsocks.port = self.profile.port
+            serverShadowsocks.method = self.profile.encryption
+            serverShadowsocks.password = self.profile.password
             var ss = V2rayOutboundShadowsocks()
             ss.servers = [serverShadowsocks]
             outbound.settings = ss
@@ -130,12 +108,12 @@ class ProfileHandler: ProfileModel {
         case .socks:
             // user
             var user = V2rayOutboundSockUser()
-            user.user = password
-            user.pass = password
+            user.user = self.profile.alterId // todo
+            user.pass = self.profile.password
             // socks5
             serverSocks5 = V2rayOutboundSockServer()
-            serverSocks5.address = address
-            serverSocks5.port = port
+            serverSocks5.address = self.profile.ddress
+            serverSocks5.port = self.profile.port
             serverSocks5.users = [user]
             var socks = V2rayOutboundSocks()
             socks.servers = [serverSocks5]
@@ -143,9 +121,9 @@ class ProfileHandler: ProfileModel {
 
         case .trojan:
             serverTrojan = V2rayOutboundTrojanServer()
-            serverTrojan.address = address
-            serverTrojan.port = port
-            serverTrojan.password = password
+            serverTrojan.address = self.profile.address
+            serverTrojan.port = self.profile.port
+            serverTrojan.password = self.profile.password
             var outboundTrojan = V2rayOutboundTrojan()
             outboundTrojan.servers = [serverTrojan]
             outbound.settings = outboundTrojan
@@ -172,33 +150,33 @@ class ProfileHandler: ProfileModel {
     private func configureStreamSettings(network: V2rayStreamNetwork, settings: inout V2rayStreamSettings) {
         switch network {
         case .tcp:
-            streamTcp.header.type = headerType.rawValue
+            streamTcp.header.type = self.profile.headerType.rawValue
             settings.tcpSettings = streamTcp
         case .kcp:
-            streamKcp.header.type = headerType.rawValue
-            streamKcp.seed = path
+            streamKcp.header.type = self.profile.headerType.rawValue
+            streamKcp.seed = self.profile.path
             settings.kcpSettings = streamKcp
         case .h2:
-            streamH2.path = path
-            streamH2.host = [host]
+            streamH2.path = self.profile.path
+            streamH2.host = [self.profile.host]
             settings.httpSettings = streamH2
         case .ws:
-            streamWs.path = path
-            streamWs.host = host
-            streamWs.headers.Host = host
+            streamWs.path = self.profile.path
+            streamWs.host = self.profile.host
+            streamWs.headers.Host = self.profile.host
             settings.wsSettings = streamWs
         case .domainsocket:
-            streamDs.path = path
+            streamDs.path = self.profile.path
             settings.dsSettings = streamDs
         case .quic:
-            streamQuic.key = path
+            streamQuic.key = self.profile.path
             settings.quicSettings = streamQuic
         case .grpc:
-            streamGrpc.serviceName = path
+            streamGrpc.serviceName = self.profile.path
             settings.grpcSettings = streamGrpc
         case .xhttp:
-            streamXhttp.path = path
-            streamXhttp.host = host
+            streamXhttp.path = self.profile.path
+            streamXhttp.host = self.profile.host
             settings.xhttpSettings = streamXhttp
         }
     }
@@ -209,18 +187,18 @@ class ProfileHandler: ProfileModel {
         switch security {
         case .tls:
             securityTls = TlsSettings(
-                serverName: sni,
-                allowInsecure: allowInsecure,
-                alpn: alpn.rawValue,
-                fingerprint: fingerprint.rawValue
+                serverName: self.profile.sni,
+                allowInsecure: self.profile.allowInsecure,
+                alpn: self.profile.alpn.rawValue,
+                fingerprint: self.profile.fingerprint.rawValue
             )
             settings.tlsSettings = securityTls
         case .reality:
             securityReality = RealitySettings(
-                fingerprint: fingerprint.rawValue,
-                serverName: sni,
-                shortId: shortId,
-                spiderX: spiderX
+                fingerprint: self.profile.fingerprint.rawValue,
+                serverName: self.profile.sni,
+                shortId: self.profile.shortId,
+                spiderX: self.profile.spiderX
             )
             settings.realitySettings = securityReality
         default:

@@ -22,6 +22,18 @@ struct V2rayStruct: Codable {
     var observatory: V2rayObservatory = V2rayObservatory()
 }
 
+extension V2rayStruct {
+    func toJSON() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+        guard let jsonData = try? encoder.encode(self),
+              let jsonString = String(data: jsonData, encoding: .utf8) else {
+            return "{}"
+        }
+        return jsonString
+    }
+}
+
 // log
 struct V2rayLog: Codable {
     enum logLevel: String, Codable {
