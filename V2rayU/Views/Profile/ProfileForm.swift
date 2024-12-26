@@ -20,5 +20,5 @@ struct ConfigFormView: View {
 
 
 #Preview {
-    ConfigFormView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
+    ConfigFormView(item: ProfileModel(remark: "test01", protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto"))
 }

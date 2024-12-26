@@ -9,7 +9,7 @@ import Combine
 import GRDB
 import Foundation
 
-class ProxyViewModel: ObservableObject {
+class ProfileViewModel: ObservableObject {
     @Published var list: [ProfileModel] = []
     @Published var groups: [String] = []
 
@@ -24,7 +24,7 @@ class ProxyViewModel: ObservableObject {
         }
     }
 
-    func all() -> [ProfileModel] {
+    static func all() -> [ProfileModel] {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
@@ -40,7 +40,7 @@ class ProxyViewModel: ObservableObject {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
             guard let model = try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db) else {
-                throw NSError(domain: "ProxyViewModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
+                throw NSError(domain: "ProfileViewModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
             }
             return model
         }

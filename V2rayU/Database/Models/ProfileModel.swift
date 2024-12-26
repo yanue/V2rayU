@@ -221,4 +221,15 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
             }
         }
     }
+    
+    func save() {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                try self.save(db)
+            }
+        } catch {
+            print("save error: \(error)")
+        }
+    }
 }

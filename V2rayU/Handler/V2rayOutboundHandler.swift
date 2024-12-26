@@ -64,7 +64,7 @@ class V2rayOutboundHandler {
 
     // 更新 server 配置
     private func updateServerSettings() {
-        switch `protocol` {
+        switch self.profile.protocol {
         case .vmess:
             // user
             var user = V2rayOutboundVMessUser()
@@ -108,11 +108,11 @@ class V2rayOutboundHandler {
         case .socks:
             // user
             var user = V2rayOutboundSockUser()
-            user.user = self.profile.alterId // todo
+//            user.user = self.profile.alterId // todo
             user.pass = self.profile.password
             // socks5
             serverSocks5 = V2rayOutboundSockServer()
-            serverSocks5.address = self.profile.ddress
+            serverSocks5.address = self.profile.address
             serverSocks5.port = self.profile.port
             serverSocks5.users = [user]
             var socks = V2rayOutboundSocks()
@@ -135,13 +135,13 @@ class V2rayOutboundHandler {
 
     private func updateStreamSettings() {
         var streamSettings = V2rayStreamSettings()
-        streamSettings.network = network
+        streamSettings.network = self.profile.network
 
         // 根据网络类型配置
-        configureStreamSettings(network: network, settings: &streamSettings)
+        configureStreamSettings(network: self.profile.network, settings: &streamSettings)
 
         // 根据安全设置配置
-        configureSecuritySettings(security: security, settings: &streamSettings)
+        configureSecuritySettings(security: self.profile.security, settings: &streamSettings)
 
         outbound.streamSettings = streamSettings
     }

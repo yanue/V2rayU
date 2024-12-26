@@ -23,7 +23,7 @@ class Scanner {
         for i in 0 ..< displayCount {
             let str = getQrcodeStr(displayID: activeDisplays[Int(i)])
             // support: ss:// | ssr:// | vmess://
-            if ImportUri.supportProtocol(uri: str) {
+            if supportProtocol(uri: str) {
                 qrStr = str
                 break
             }

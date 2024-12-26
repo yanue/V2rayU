@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ConfigListView: View {
-    @StateObject private var viewModel = ProxyViewModel()
+    @StateObject private var viewModel = ProfileViewModel()
     @State private var list: [ProfileModel] = []
     @State private var sortOrder: [KeyPathComparator<ProfileModel>] = []
     @State private var selection: Set<ProfileModel.ID> = []
@@ -71,7 +71,7 @@ struct ConfigListView: View {
 
                 Button("新增") {
                     withAnimation {
-                        let newProxy = ProfileModel(protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, encryption: "auto", remark: "New Remark")
+                        let newProxy = ProfileModel(remark: "New Remark", protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, encryption: "auto")
                         self.selectedRow = newProxy
                     }
                 }

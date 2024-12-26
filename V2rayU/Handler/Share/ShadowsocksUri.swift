@@ -1,18 +1,17 @@
 import Foundation
 
 // link: https://github.com/shadowsocks/ShadowsocksX-NG
-class ShadowsocksUri {
-
-    private var profile: ProfileModel
-    private var error: String?
+class ShadowsocksUri: BaseShareUri {
+    var profile: ProfileModel
+    var error: String?
 
     // 初始化
     init() {
-        self.profile = ProfileModel(remark: "ss",`protocol`: .ss)
+        self.profile = ProfileModel(remark: "ss", `protocol`: .shadowsocks)
     }
 
     // 从 ProfileModel 初始化
-    init(from model: ProfileModel) {
+    required init(from model: ProfileModel) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         self.profile = model
     }
@@ -21,20 +20,12 @@ class ShadowsocksUri {
         return self.profile
     }
 
-    var host: String = ""
-    var port: Int = 8379
-    var method: String = "aes-128-gcm"
-    var password: String = ""
-    var remark: String = ""
-
-    var error: String = ""
-
     // ss://bf-cfb:test@192.168.100.1:8888#remark
     func encode() -> String {
-        let base64 = self.method + ":" + self.password + "@" + self.host + ":" + String(self.port)
+        let base64 = self.profile.encryption + ":" + self.profile.password + "@" + self.profile.host + ":" + String(self.profile.port)
         let ss = base64.base64Encoded()
         if ss != nil {
-            return "ss://" + ss! + "#" + self.remark
+            return "ss://" + ss! + "#" + self.profile.remark.urlEncoded()
         }
         self.error = "encode base64 fail"
         return ""
@@ -65,7 +56,7 @@ class ShadowsocksUri {
         self.profile.remark = (parsedUrl.queryItems?.filter({ $0.name == "Remark" }).first?.value ?? _tag ?? "").urlDecoded()
 
         if let password = parsedUrl.password {
-            self.profile.method = user.lowercased()
+            self.profile.encryption = user.lowercased()
             self.profile.password = password
             if let tag = _tag {
                self.profile.remark = tag
@@ -89,6 +80,7 @@ class ShadowsocksUri {
                 self.profile.remark = profileName.urlDecoded()
             }
         }
+        return nil
     }
 
     func decodeUrl(url: URL) -> (String?, String?) {

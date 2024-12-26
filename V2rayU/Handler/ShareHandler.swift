@@ -6,7 +6,7 @@ class ShareUri {
 
     func qrcode(item: ProfileModel) {
 
-        switch item.`protocol` {
+        switch item.protocol {
         case .trojan:
             self.uri = TrojanUri(from: item).encode()
             break
@@ -18,6 +18,8 @@ class ShareUri {
             break
         case .shadowsocks:
             self.uri = ShadowsocksUri(from: item).encode()
+            break
+        default:
             break
         }
 

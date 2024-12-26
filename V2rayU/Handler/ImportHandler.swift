@@ -30,6 +30,13 @@ func importUri(url: String) {
     }
 }
 
+func supportProtocol(uri: String) -> Bool {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") {
+        return true
+    }
+    return false
+}
+
 class ImportUri {
     var isValid: Bool = false
     var error: String = ""
@@ -44,7 +51,7 @@ class ImportUri {
         var url = URL(string: share_uri)
         if url == nil {
             // 标准url不支持非url-encoded
-            let aUri = uri.split(separator: "#")
+            let aUri = self.share_uri.split(separator: "#")
             url = URL(string: String(aUri[0]))
             if url == nil {
                 self.error = "invalid url"
@@ -73,7 +80,7 @@ class ImportUri {
 
         // 解析 URI
         if let handler = uriHandler {
-            let parseError = handler.parse(url: url)
+            let parseError = handler.parse(url: url!)
             if let error = parseError {
                 // 如果解析失败，返回 nil
                 return nil
@@ -89,10 +96,4 @@ class ImportUri {
         return nil
     }
 
-    func supportProtocol(uri: String) -> Bool {
-        if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") {
-            return true
-        }
-        return false
-    }
 }

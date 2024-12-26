@@ -28,9 +28,7 @@ class V2rayConfigHandler {
     var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson) ?? ""
 
     // Initialization
-    override init() {
-        super.init()
-
+    init() {
         self.enableMux = UserDefaults.getBool(forKey: .enableMux)
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -46,31 +44,33 @@ class V2rayConfigHandler {
     }
 
     // ping配置
-    func toJSON(enableSocks: bool,httpPort: Int, item: ProfileModel) -> String {
+    func toJSON(enableSocks: Bool, httpPort: Int, item: ProfileModel) -> String {
         self.enableSocks = enableSocks
         self.httpPort = String(httpPort)
         let outbound = V2rayOutboundHandler(from: item).getOutbound()
-        self.combine(outbounds: [outbound])
+        self.combine(_outbounds: [outbound])
         return self.v2ray.toJSON()
     }
 
     // 单个配置
     func toJSON(item: ProfileModel) -> String {
         let outbound = V2rayOutboundHandler(from: item).getOutbound()
-        self.combine(outbounds: [outbound])
+        self.combine(_outbounds: [outbound])
         return self.v2ray.toJSON()
     }
 
     // 组合配置
     func toJSON(items: [ProfileModel]) -> String {
-        let outbounds: [V2rayOutbound] = []
+        var _outbounds: [V2rayOutbound] = []
         for (_, item) in items.enumerated() {
-            outbounds.append(item)
+            let outbound = V2rayOutboundHandler(from: item).getOutbound()
+            _outbounds.append(outbound)
         }
+        self.combine(_outbounds: _outbounds)
         return self.v2ray.toJSON()
     }
 
-    func combine(outbounds: [V2rayOutbound]) {
+    func combine(_outbounds: [V2rayOutbound]) {
         // base
         self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
 
@@ -107,28 +107,30 @@ class V2rayConfigHandler {
 
         // ------------------------------------- inbound end ----------------------------------------------
         // outbound Freedom
-        var outboundFreedom = V2rayOutbound()
+        let outboundFreedom = V2rayOutbound()
         outboundFreedom.protocol = V2rayProtocolOutbound.freedom
         outboundFreedom.tag = "direct"
-        outboundFreedom.settingFreedom = V2rayOutboundFreedom()
+        outboundFreedom.settings = V2rayOutboundFreedom()
 
         // outbound Blackhole
-        var outboundBlackhole = V2rayOutbound()
+        let outboundBlackhole = V2rayOutbound()
         outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
         outboundBlackhole.tag = "block"
-        outboundBlackhole.settingBlackhole = V2rayOutboundBlackhole()
-
+        outboundBlackhole.settings = V2rayOutboundBlackhole()
+        
         // outbounds
+        var outbounds: [V2rayOutbound] = []
+        outbounds.append(contentsOf: _outbounds)
         outbounds.append(outboundFreedom)
         outbounds.append(outboundBlackhole)
 
         self.v2ray.outbounds = outbounds
         // ------------------------------------- routing start --------------------------------------------
-        let routingRule = UserDefaults.get(forKey: .routingSelectedRule) ?? RoutingRuleGlobal
-        let rule = RoutingItem.load(name: routingRule)
-        if rule != nil{
-            self.v2ray.routing = rule!.parseRule()
-        }
+//        let routingRule = UserDefaults.get(forKey: .routingSelectedRule) ?? RoutingRuleGlobal
+//        let rule = RoutingItem.load(name: routingRule)
+//        if rule != nil{
+//            self.v2ray.routing = rule!.parseRule()
+//        }
         // ------------------------------------- routing end ----------------------------------------------
     }
 }

@@ -31,11 +31,11 @@ class VlessUri: BaseShareUri {
 
     // 初始化
     init() {
-        self.profile = ProfileModel(remark: "vless",`protocol`: .vless)
+        self.profile = ProfileModel(remark: "vless", protocol: .vless)
     }
 
     // 从 ProfileModel 初始化
-    init(from model: ProfileModel) {
+    required init(from model: ProfileModel) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         self.profile = model
     }
@@ -48,26 +48,26 @@ class VlessUri: BaseShareUri {
     func encode() -> String {
         var uri = URLComponents()
         uri.scheme = "vless"
-        uri.user = self.id
-        uri.host = self.address
-        uri.port = self.port
+        uri.user = self.profile.id
+        uri.host = self.profile.address
+        uri.port = self.profile.port
         uri.queryItems = [
-            URLQueryItem(name: "flow", value: self.flow),
-            URLQueryItem(name: "security", value: self.security),
-            URLQueryItem(name: "encryption", value: self.encryption),
-            URLQueryItem(name: "type", value: self.network), // 网络类型: tcp,http,kcp,h2,ws,quic,grpc,domainsocket
-            URLQueryItem(name: "host", value: self.host),
-            URLQueryItem(name: "path", value: self.path),
-            URLQueryItem(name: "sni", value: self.sni),
-            URLQueryItem(name: "fp", value: self.fingerprint),
-            URLQueryItem(name: "pbk", value: self.publicKey),
-            URLQueryItem(name: "sid", value: self.shortId),
-            URLQueryItem(name: "serviceName", value: self.path),
-            URLQueryItem(name: "headerType", value: self.headerType),
-            URLQueryItem(name: "seed", value: self.path)
+            URLQueryItem(name: "flow", value: self.profile.flow),
+            URLQueryItem(name: "security", value: self.profile.security.rawValue),
+            URLQueryItem(name: "encryption", value: self.profile.encryption),
+            URLQueryItem(name: "type", value: self.profile.network.rawValue), // 网络类型: tcp,http,kcp,h2,ws,quic,grpc,domainsocket
+            URLQueryItem(name: "host", value: self.profile.host),
+            URLQueryItem(name: "path", value: self.profile.path),
+            URLQueryItem(name: "sni", value: self.profile.sni),
+            URLQueryItem(name: "fp", value: self.profile.fingerprint.rawValue),
+            URLQueryItem(name: "pbk", value: self.profile.publicKey),
+            URLQueryItem(name: "sid", value: self.profile.shortId),
+            URLQueryItem(name: "serviceName", value: self.profile.path),
+            URLQueryItem(name: "headerType", value: self.profile.headerType.rawValue),
+            URLQueryItem(name: "seed", value: self.profile.path)
         ]
 
-        return (uri.url?.absoluteString ?? "") + "#" + self.remark
+        return (uri.url?.absoluteString ?? "") + "#" + self.profile.remark.urlEncoded()
     }
 
     func parse(url: URL) -> Error? {
@@ -96,10 +96,10 @@ class VlessUri: BaseShareUri {
                 }
                 break
             case "security":
-                self.profile.security = item.value as! String
+                profile.security = V2rayStreamSecurity(rawValue: item.value as? String ?? "") ?? .none
                 break
             case "type":
-                self.profile.network = item.value as! String
+                self.profile.network = V2rayStreamNetwork(rawValue: item.value as! String) ?? .tcp
                 break
             case "host":
                 self.profile.host = item.value as! String
@@ -111,7 +111,7 @@ class VlessUri: BaseShareUri {
                 self.profile.path = item.value as! String
                 break
             case "fp":
-                self.profile.fingerprint = item.value as! String
+                self.profile.fingerprint = V2rayStreamFingerprint(rawValue: item.value as! String) ?? .chrome
                 break
             case "pbk":
                 self.profile.publicKey = item.value as! String
@@ -120,7 +120,7 @@ class VlessUri: BaseShareUri {
                 self.profile.shortId = item.value as! String
                 break
             case "headerType":
-                self.profile.headerType = item.value as! String
+                self.profile.headerType = V2rayHeaderType(rawValue: item.value as! String) ?? .none
                 break
             case "seed":
                 self.profile.path = item.value as! String
@@ -134,9 +134,10 @@ class VlessUri: BaseShareUri {
         }
 
         if self.profile.sni.count == 0 {
-            self.profile.sni = address
+            self.profile.sni = host
         }
 
-        self.remark = (url.fragment ?? "vless").urlDecoded()
+        self.profile.remark = (url.fragment ?? "vless").urlDecoded()
+        return nil
     }
 }

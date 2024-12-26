@@ -20,10 +20,8 @@
 		662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C72D1BED9B006E8450 /* UserDefaults.swift */; };
 		662CC4072D1BED9B006E8450 /* OutboundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EA2D1BED9B006E8450 /* OutboundView.swift */; };
 		662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EB2D1BED9B006E8450 /* SecurityView.swift */; };
-		662CC4092D1BED9B006E8450 /* SubListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D02D1BED9B006E8450 /* SubListModel.swift */; };
 		662CC40A2D1BED9B006E8450 /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */; };
 		662CC40B2D1BED9B006E8450 /* StreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EC2D1BED9B006E8450 /* StreamView.swift */; };
-		662CC40C2D1BED9B006E8450 /* ProxyListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CE2D1BED9B006E8450 /* ProxyListModel.swift */; };
 		662CC40D2D1BED9B006E8450 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C12D1BED9B006E8450 /* AppVersion.swift */; };
 		662CC40E2D1BED9B006E8450 /* SubList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FF2D1BED9B006E8450 /* SubList.swift */; };
 		662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D32D1BED9B006E8450 /* Migrate.swift */; };
@@ -47,7 +45,6 @@
 		662CC4212D1BED9B006E8450 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FC2D1BED9B006E8450 /* MenuView.swift */; };
 		662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */; };
 		662CC4232D1BED9B006E8450 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3BF2D1BED9B006E8450 /* App.swift */; };
-		662CC4242D1BED9B006E8450 /* ProfileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D52D1BED9B006E8450 /* ProfileHandler.swift */; };
 		662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C62D1BED9B006E8450 /* Url+Extension.swift */; };
 		662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E62D1BED9B006E8450 /* V2rayStream.swift */; };
 		662CC4272D1BED9B006E8450 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EE2D1BED9B006E8450 /* Profile.swift */; };
@@ -56,13 +53,24 @@
 		662CC42A2D1BED9B006E8450 /* V2rayOutbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E52D1BED9B006E8450 /* V2rayOutbound.swift */; };
 		662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EF2D1BED9B006E8450 /* ProfileForm.swift */; };
 		662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F02D1BED9B006E8450 /* ProfileShow.swift */; };
-		662CC42D2D1BED9B006E8450 /* RoutingListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CF2D1BED9B006E8450 /* RoutingListModel.swift */; };
 		662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3C22D1BED9B006E8450 /* Assets.xcassets */; };
-		662CC42F2D1BED9B006E8450 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3DE2D1BED9B006E8450 /* Preview Assets.xcassets */; };
 		662CC4302D1BED9B006E8450 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3D82D1BED9B006E8450 /* Info.plist */; };
 		662CC4312D1BED9B006E8450 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3DC2D1BED9B006E8450 /* Localizable.strings */; };
+		662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4342D1C4CE9006E8450 /* ImportHandler.swift */; };
+		662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4362D1C4CE9006E8450 /* ShadowsocksRUri.swift */; };
+		662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4382D1C4CE9006E8450 /* TrojanUri.swift */; };
+		662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4352D1C4CE9006E8450 /* BaseShareUri.swift */; };
+		662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC43A2D1C4CE9006E8450 /* VmessUri.swift */; };
+		662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */; };
+		662CC4452D1C4CE9006E8450 /* V2rayOutboundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */; };
+		662CC4462D1C4CE9006E8450 /* VlessUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4392D1C4CE9006E8450 /* VlessUri.swift */; };
+		662CC4472D1C4CE9006E8450 /* ShadowsocksUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4372D1C4CE9006E8450 /* ShadowsocksUri.swift */; };
+		662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */; };
+		662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */; };
+		662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */; };
+		662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44B2D1C4D38006E8450 /* SubViewModel.swift */; };
+		662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44F2D1C4D46006E8450 /* Scanner.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
-		66CBCEE42C63B16500313949 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66CBCEE32C63B16500313949 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,12 +100,8 @@
 		662CC3CA2D1BED9B006E8450 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
 		662CC3CB2D1BED9B006E8450 /* RoutingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingModel.swift; sourceTree = "<group>"; };
 		662CC3CC2D1BED9B006E8450 /* SubModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModel.swift; sourceTree = "<group>"; };
-		662CC3CE2D1BED9B006E8450 /* ProxyListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyListModel.swift; sourceTree = "<group>"; };
-		662CC3CF2D1BED9B006E8450 /* RoutingListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingListModel.swift; sourceTree = "<group>"; };
-		662CC3D02D1BED9B006E8450 /* SubListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubListModel.swift; sourceTree = "<group>"; };
 		662CC3D22D1BED9B006E8450 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		662CC3D32D1BED9B006E8450 /* Migrate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrate.swift; sourceTree = "<group>"; };
-		662CC3D52D1BED9B006E8450 /* ProfileHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHandler.swift; sourceTree = "<group>"; };
 		662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingHandler.swift; sourceTree = "<group>"; };
 		662CC3D82D1BED9B006E8450 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		662CC3D92D1BED9B006E8450 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -131,6 +135,20 @@
 		662CC3FD2D1BED9B006E8450 /* Overview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overview.swift; sourceTree = "<group>"; };
 		662CC3FE2D1BED9B006E8450 /* RouingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouingList.swift; sourceTree = "<group>"; };
 		662CC3FF2D1BED9B006E8450 /* SubList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubList.swift; sourceTree = "<group>"; };
+		662CC4342D1C4CE9006E8450 /* ImportHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportHandler.swift; sourceTree = "<group>"; };
+		662CC4352D1C4CE9006E8450 /* BaseShareUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseShareUri.swift; sourceTree = "<group>"; };
+		662CC4362D1C4CE9006E8450 /* ShadowsocksRUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowsocksRUri.swift; sourceTree = "<group>"; };
+		662CC4372D1C4CE9006E8450 /* ShadowsocksUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowsocksUri.swift; sourceTree = "<group>"; };
+		662CC4382D1C4CE9006E8450 /* TrojanUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrojanUri.swift; sourceTree = "<group>"; };
+		662CC4392D1C4CE9006E8450 /* VlessUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VlessUri.swift; sourceTree = "<group>"; };
+		662CC43A2D1C4CE9006E8450 /* VmessUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VmessUri.swift; sourceTree = "<group>"; };
+		662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHandler.swift; sourceTree = "<group>"; };
+		662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayConfigHandler.swift; sourceTree = "<group>"; };
+		662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayOutboundHandler.swift; sourceTree = "<group>"; };
+		662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingViewModel.swift; sourceTree = "<group>"; };
+		662CC44B2D1C4D38006E8450 /* SubViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubViewModel.swift; sourceTree = "<group>"; };
+		662CC44F2D1C4D46006E8450 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -162,6 +180,7 @@
 		662CC3C92D1BED9B006E8450 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				662CC44F2D1C4D46006E8450 /* Scanner.swift */,
 				662CC3C32D1BED9B006E8450 /* Port.swift */,
 				662CC3C42D1BED9B006E8450 /* Shell.swift */,
 				662CC3C52D1BED9B006E8450 /* String+Extension.swift */,
@@ -185,9 +204,9 @@
 		662CC3D12D1BED9B006E8450 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				662CC3CE2D1BED9B006E8450 /* ProxyListModel.swift */,
-				662CC3CF2D1BED9B006E8450 /* RoutingListModel.swift */,
-				662CC3D02D1BED9B006E8450 /* SubListModel.swift */,
+				662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */,
+				662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */,
+				662CC44B2D1C4D38006E8450 /* SubViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -206,7 +225,11 @@
 		662CC3D72D1BED9B006E8450 /* Handler */ = {
 			isa = PBXGroup;
 			children = (
-				662CC3D52D1BED9B006E8450 /* ProfileHandler.swift */,
+				662CC4342D1C4CE9006E8450 /* ImportHandler.swift */,
+				662CC43B2D1C4CE9006E8450 /* Share */,
+				662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */,
+				662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */,
+				662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */,
 				662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */,
 			);
 			path = Handler;
@@ -296,6 +319,19 @@
 				662CC3FF2D1BED9B006E8450 /* SubList.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		662CC43B2D1C4CE9006E8450 /* Share */ = {
+			isa = PBXGroup;
+			children = (
+				662CC4352D1C4CE9006E8450 /* BaseShareUri.swift */,
+				662CC4362D1C4CE9006E8450 /* ShadowsocksRUri.swift */,
+				662CC4372D1C4CE9006E8450 /* ShadowsocksUri.swift */,
+				662CC4382D1C4CE9006E8450 /* TrojanUri.swift */,
+				662CC4392D1C4CE9006E8450 /* VlessUri.swift */,
+				662CC43A2D1C4CE9006E8450 /* VmessUri.swift */,
+			);
+			path = Share;
 			sourceTree = "<group>";
 		};
 		66CBCECE2C63B16400313949 = {
@@ -414,9 +450,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66CBCEE42C63B16500313949 /* Preview Assets.xcassets in Resources */,
 				662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */,
-				662CC42F2D1BED9B006E8450 /* Preview Assets.xcassets in Resources */,
 				662CC4302D1BED9B006E8450 /* Info.plist in Resources */,
 				662CC4312D1BED9B006E8450 /* Localizable.strings in Resources */,
 			);
@@ -431,16 +465,24 @@
 			files = (
 				662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */,
 				662CC4022D1BED9B006E8450 /* AppDelegate.swift in Sources */,
+				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
+				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
+				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
+				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
+				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,
+				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
+				662CC4452D1C4CE9006E8450 /* V2rayOutboundHandler.swift in Sources */,
+				662CC4462D1C4CE9006E8450 /* VlessUri.swift in Sources */,
+				662CC4472D1C4CE9006E8450 /* ShadowsocksUri.swift in Sources */,
+				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */,
 				662CC4042D1BED9B006E8450 /* Theme.swift in Sources */,
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* OutboundView.swift in Sources */,
 				662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */,
-				662CC4092D1BED9B006E8450 /* SubListModel.swift in Sources */,
 				662CC40A2D1BED9B006E8450 /* V2rayLaunch.swift in Sources */,
 				662CC40B2D1BED9B006E8450 /* StreamView.swift in Sources */,
-				662CC40C2D1BED9B006E8450 /* ProxyListModel.swift in Sources */,
 				662CC40D2D1BED9B006E8450 /* AppVersion.swift in Sources */,
 				662CC40E2D1BED9B006E8450 /* SubList.swift in Sources */,
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
@@ -454,6 +496,7 @@
 				662CC4172D1BED9B006E8450 /* RoutingModel.swift in Sources */,
 				662CC4182D1BED9B006E8450 /* Language.swift in Sources */,
 				662CC4192D1BED9B006E8450 /* SubModel.swift in Sources */,
+				662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */,
 				662CC41A2D1BED9B006E8450 /* Database.swift in Sources */,
 				662CC41B2D1BED9B006E8450 /* Main.swift in Sources */,
 				662CC41C2D1BED9B006E8450 /* ProfileModel.swift in Sources */,
@@ -464,16 +507,17 @@
 				662CC4212D1BED9B006E8450 /* MenuView.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
-				662CC4242D1BED9B006E8450 /* ProfileHandler.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
 				662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */,
 				662CC4272D1BED9B006E8450 /* Profile.swift in Sources */,
 				662CC4282D1BED9B006E8450 /* Common.swift in Sources */,
 				662CC4292D1BED9B006E8450 /* ToastWindow.swift in Sources */,
 				662CC42A2D1BED9B006E8450 /* V2rayOutbound.swift in Sources */,
+				662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */,
+				662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */,
+				662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
-				662CC42D2D1BED9B006E8450 /* RoutingListModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

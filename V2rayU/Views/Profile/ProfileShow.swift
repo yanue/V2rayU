@@ -24,5 +24,5 @@ struct ConfigShowView: View {
 
 
 #Preview {
-    ConfigShowView(item: ProfileModel(protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto", remark: "test01"))
+    ConfigShowView(item: ProfileModel(remark: "test01", protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto"))
 }
