@@ -50,6 +50,8 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uuid = try container.decode(String.self, forKey: .uuid)
+        speed = try container.decode(Int.self, forKey: .speed)
+        sort = try container.decode(Int.self, forKey: .sort)
         `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: .protocol)
         network = try container.decode(V2rayStreamNetwork.self, forKey: .network)
         security = try container.decode(V2rayStreamSecurity.self, forKey: .security)
@@ -76,6 +78,9 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(uuid, forKey: .uuid)
+        try container.encode(remark, forKey: .remark)
+        try container.encode(speed, forKey: .speed)
+        try container.encode(sort, forKey: .sort)
         try container.encode(`protocol`, forKey: .protocol)
         try container.encode(network, forKey: .network)
         try container.encode(security, forKey: .security)
@@ -85,7 +90,6 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
         try container.encode(password, forKey: .password)
         try container.encode(alterId, forKey: .alterId)
         try container.encode(encryption, forKey: .encryption)
-        try container.encode(remark, forKey: .remark)
         try container.encode(headerType, forKey: .headerType)
         try container.encode(host, forKey: .host)
         try container.encode(path, forKey: .path)
@@ -103,6 +107,8 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     init(
         uuid: String = UUID().uuidString,
         remark: String,
+        speed: Int = -1,
+        sort: Int = 0,
         protocol: V2rayProtocolOutbound,
         address: String = "",
         port: Int = 0,
@@ -124,6 +130,10 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
         shortId: String = "",
         spiderX: String = ""
     ) {
+        self.uuid = uuid
+        self.speed = speed
+        self.sort = sort
+        self.remark = remark
         self.protocol = `protocol`
         self.address = address
         self.port = port
@@ -131,7 +141,6 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
         self.alterId = alterId
         self.encryption = encryption
         self.network = network
-        self.remark = remark
         self.headerType = headerType
         self.host = host
         self.path = path
@@ -145,7 +154,6 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
         self.publicKey = publicKey
         self.shortId = shortId
         self.spiderX = spiderX
-        self.uuid = uuid
     }
 }
 
@@ -168,6 +176,9 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
     // 定义数据库列
     enum Columns {
         static let uuid = Column(CodingKeys.uuid)
+        static let remark = Column(CodingKeys.remark)
+        static let speed = Column(CodingKeys.speed)
+        static let sort = Column(CodingKeys.sort)
         static let `protocol` = Column(CodingKeys.protocol)
         static let subid = Column(CodingKeys.subid)
         static let address = Column(CodingKeys.address)
@@ -176,7 +187,6 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
         static let alterId = Column(CodingKeys.alterId)
         static let encryption = Column(CodingKeys.encryption)
         static let network = Column(CodingKeys.network)
-        static let remark = Column(CodingKeys.remark)
         static let headerType = Column(CodingKeys.headerType)
         static let host = Column(CodingKeys.host)
         static let path = Column(CodingKeys.path)
@@ -197,6 +207,9 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
         migrator.registerMigration("createProfileTable") { db in
             try db.create(table: ProfileModel.databaseTableName) { t in
                 t.column(ProfileModel.Columns.uuid.name, .text).notNull().primaryKey()
+                t.column(ProfileModel.Columns.remark.name, .text).notNull()
+                t.column(ProfileModel.Columns.speed.name, .integer).notNull()
+                t.column(ProfileModel.Columns.sort.name, .integer).notNull()
                 t.column(ProfileModel.Columns.protocol.name, .text).notNull()
                 t.column(ProfileModel.Columns.subid.name, .text)
                 t.column(ProfileModel.Columns.address.name, .text).notNull()
@@ -205,7 +218,6 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
                 t.column(ProfileModel.Columns.alterId.name, .integer)
                 t.column(ProfileModel.Columns.encryption.name, .text)
                 t.column(ProfileModel.Columns.network.name, .text)
-                t.column(ProfileModel.Columns.remark.name, .text)
                 t.column(ProfileModel.Columns.headerType.name, .text)
                 t.column(ProfileModel.Columns.host.name, .text)
                 t.column(ProfileModel.Columns.path.name, .text)

@@ -53,8 +53,10 @@ extension UserDefaults {
         // pacPort
         case localPacPort
 
-        // routing selected rule
-        case routingSelectedRule
+        // selected routing uuid
+        case runningRouting
+        // selected profile uuid
+        case runningProfile
     }
 
     static func setBool(forKey key: KEY, value: Bool) {

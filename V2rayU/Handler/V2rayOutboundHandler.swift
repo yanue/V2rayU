@@ -19,7 +19,7 @@ import Foundation
  */
 
 class V2rayOutboundHandler {
-    var profile: ProfileModel
+    private(set) var profile: ProfileModel
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
     private(set) var serverSocks5 = V2rayOutboundSockServer()

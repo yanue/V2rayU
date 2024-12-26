@@ -10,13 +10,6 @@ import Cocoa
 import SystemConfiguration
 import Tun2SocksKit
 
-enum RunMode: String {
-    case global
-    case off
-    case manual
-    case tunnel
-}
-
 // 高版本macos执行NSAppleScript会出现授权失败
 func executeAppleScriptWithOsascript(script: String) {
     do {
@@ -46,27 +39,16 @@ class V2rayLaunch: NSObject {
         // make sure new version
         NSLog("install", AppResourcesPath)
         var needRunInstall = false
-        if !FileManager.default.fileExists(atPath: v2rayCoreFile) {
-            NSLog("\(v2rayCoreFile) not exists,need install")
-            needRunInstall = true
-        }
         if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
             NSLog("\(v2rayCoreFile) not accessable")
             needRunInstall = true
         }
-        if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayUTool) {
+        // Ensure permission with root admin
+        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
             needRunInstall = true
         }
         if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayCorePath + "/geoip.dat") {
             NSLog("\(v2rayCorePath)/geoip.dat not exists,need install")
-            needRunInstall = true
-        }
-        if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayUTool) {
-            NSLog("\(v2rayUTool) not exists,need install")
-            needRunInstall = true
-        }
-        // Ensure permission with root admin
-        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
             needRunInstall = true
         }
         if !needRunInstall {
@@ -153,8 +135,8 @@ class V2rayLaunch: NSObject {
             "StandardOutPath": logFilePath,
             "StandardErrorPath": logFilePath,
             "ProgramArguments": agentArguments,
-            "RunAtLoad": false, // can not set true
-            "KeepAlive": false, // can not set true
+            "RunAtLoad": false, // 不能开机自启(需要停止)
+            "KeepAlive": false, // 不能自动重启(需要停止)
         ]
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
@@ -179,7 +161,7 @@ class V2rayLaunch: NSObject {
             startV2rayCore()
         } else {
             // show off status
-//            menuController.setStatusOff()
+            appState.shared.setRunMode(.off)
 //            // show servers
 //            menuController.showServers()
         }
@@ -196,11 +178,9 @@ class V2rayLaunch: NSObject {
     }
 
     static func setRunMode(mode: RunMode) {
-        // save
-        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
 
         // set icon
-//        menuController.setStatusOn(mode: mode)
+        appState.shared.setRunMode(mode)
 
         setSystemProxy(mode: mode)
     }
@@ -223,11 +203,11 @@ class V2rayLaunch: NSObject {
     // start v2ray core
     static func startV2rayCore() {
         NSLog("start v2ray-core begin")
-//        guard let v2ray = V2rayServer.loadSelectedItem() else {
-//            noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
-//            menuController.setStatusOff()
-//            return
-//        }
+        guard let v2ray = ProfileViewModel.getRunning() else {
+            noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
+            menuController.setStatusOff()
+            return
+        }
 
         let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
 
@@ -237,7 +217,7 @@ class V2rayLaunch: NSObject {
         // launch
         let started = V2rayLaunch.Start()
         if !started {
-//            menuController.setStatusOff()
+            appState.shared.setRunMode(.off)
             return
         }
 

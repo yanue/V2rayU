@@ -16,8 +16,8 @@ struct GeneralView: View {
     @State private var selectFastestServer = false
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
-    @EnvironmentObject var themeManager: ThemeManager
-    @EnvironmentObject var languageManager: LanguageManager
+
+    @ObservedObject var appState = AppState.shared // 引用单例
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -31,15 +31,15 @@ struct GeneralView: View {
                 Spacer()
                 
                 // 语言选择器
-               Picker("Language", selection: $languageManager.selectedLanguage) {
-                   ForEach(Language.allCases, id: \.self) { item in
+                Picker("Language", selection: $appState.languageManager.selectedLanguage) {
+                    ForEach(Language.allCases, id: \.self) { item in
                        Text(item.localized).tag(item.rawValue)
-                   }
-               }
+                    }
+                }
                .padding()
 
                
-                Picker("Theme", selection: $themeManager.selectedTheme) {
+                Picker("Theme", selection: $appState.themeManager.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
                         Text(item.localized).tag(item.rawValue)
                     }
@@ -79,6 +79,4 @@ struct GeneralView: View {
         .frame(width: 500, height: 400)
 
     }
-
-    
 }

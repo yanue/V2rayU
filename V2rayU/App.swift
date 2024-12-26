@@ -3,12 +3,6 @@ import SwiftUI
 
 @main
 struct V2rayUApp: App {
-    @State private var windowController: NSWindowController?
-    @State private var aboutWindowController: NSWindowController?
-    @StateObject private var languageManager = LanguageManager()
-    @StateObject private var themeManager = ThemeManager()
-    @State private var forceUpdate = false // 添加一个 dummy 变量
-
     init() {
         // 已设置 Application is agent (UIElement) 为 YES
         // 初始化
@@ -26,7 +20,7 @@ struct V2rayUApp: App {
    
     var body: some Scene {
         // 显示 MenuBar
-        MenuBarExtra("V2rayU", image: "IconOn") {
+        MenuBarExtra("V2rayU", image: appState.shared.runMode.icon) {
             AppMenuView(openContentViewWindow: openContentViewWindow)
         }.menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
@@ -40,8 +34,7 @@ struct V2rayUApp: App {
 //            let contentView = ConfigView(item: item)
             let contentView = ContentView()
                 .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
-                .environmentObject(languageManager)
-                .environmentObject(themeManager)
+                .environmentObject(appState.shared)
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(contentViewController: hostingController)

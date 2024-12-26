@@ -26,6 +26,7 @@ class V2rayConfigHandler {
     var enableSniffing = false
     var mux = 8
     var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson) ?? ""
+    var forPing = false
 
     // Initialization
     init() {
@@ -44,8 +45,11 @@ class V2rayConfigHandler {
     }
 
     // ping配置
-    func toJSON(enableSocks: Bool, httpPort: Int, item: ProfileModel) -> String {
-        self.enableSocks = enableSocks
+    func toJSON(item: ProfileModel,ping: Bool) -> String {
+        if ping {
+            self.forPing = true
+            self.enableSocks = false
+        }
         self.httpPort = String(httpPort)
         let outbound = V2rayOutboundHandler(from: item).getOutbound()
         self.combine(_outbounds: [outbound])
@@ -126,11 +130,9 @@ class V2rayConfigHandler {
 
         self.v2ray.outbounds = outbounds
         // ------------------------------------- routing start --------------------------------------------
-//        let routingRule = UserDefaults.get(forKey: .routingSelectedRule) ?? RoutingRuleGlobal
-//        let rule = RoutingItem.load(name: routingRule)
-//        if rule != nil{
-//            self.v2ray.routing = rule!.parseRule()
-//        }
+        if !self.forPing {
+            self.v2ray.routing = RoutingViewModel.getRunning()
+        }
         // ------------------------------------- routing end ----------------------------------------------
     }
 }

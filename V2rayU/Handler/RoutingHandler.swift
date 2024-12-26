@@ -9,34 +9,29 @@ import Combine
 import Foundation
 import GRDB
 
-class RoutingHandler: RoutingModel {
-    // 实现 Decodable 协议的初始化方法
-    required init(from decoder: Decoder) throws {
-        // 先调用父类的初始化方法，解码父类的属性
-        try super.init(from: decoder)
-    }
+class RoutingHandler {
+    private(set) var routing: RoutingModel
 
-    // 从 ProfileModel 初始化
     init(from model: RoutingModel) {
-        // 通过传入的 model 初始化 Profile 类的所有属性
-        super.init(
-            name: model.name,
-            remark: model.remark,
-            json: model.json,
-            domainStrategy: model.domainStrategy,
-            block: model.block,
-            proxy: model.proxy,
-            direct: model.direct
-        )
+        self.routing = model
     }
 
     // parse default settings
-    func parseDefaultSettings() -> V2rayRouting {
+    func getRouting() -> V2rayRouting {
+        // 根据json配置生成
+        let (res, err) = parseRoutingRuleJson(json: self.routing.json)
+        if err != nil {
+            print("parseRule err", err)
+        } else {
+            return res
+        }
+
+        // 根据默认规则生成
         var rules: [V2rayRoutingRule] = []
 
-        let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: block)
-        let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: proxy)
-        let (directDomains, directIps) = parseDomainOrIp(domainIpStr: direct)
+        let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: self.routing.block)
+        let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: self.routing.proxy)
+        let (directDomains, directIps) = parseDomainOrIp(domainIpStr: self.routing.direct)
 
         // // rules
         var ruleProxyDomain, ruleProxyIp, ruleDirectDomain, ruleDirectIp, ruleBlockDomain, ruleBlockIp, ruleDirectIpDefault, ruleDirectDomainDefault: V2rayRoutingRule?
@@ -124,10 +119,10 @@ class RoutingHandler: RoutingModel {
         }
         // 默认全部代理, 无需设置规则
         var settings = V2rayRouting()
-        if V2rayRouting.domainStrategy(rawValue: domainStrategy) == nil {
+        if V2rayRouting.domainStrategy(rawValue: self.routing.domainStrategy) == nil {
             settings.domainStrategy = .AsIs
         } else {
-            settings.domainStrategy = V2rayRouting.domainStrategy(rawValue: domainStrategy) ?? .AsIs
+            settings.domainStrategy = V2rayRouting.domainStrategy(rawValue: self.routing.domainStrategy) ?? .AsIs
         }
         settings.rules = rules
         return settings
@@ -191,32 +186,6 @@ class RoutingHandler: RoutingModel {
         return true
     }
 }
-
-let RoutingRuleGlobal = "routing.global"
-let RoutingRuleLAN = "routing.lan"
-let RoutingRuleCn = "routing.cn"
-let RoutingRuleLANAndCn = "routing.lanAndCn"
-
-let defaultRuleCn = Dictionary(uniqueKeysWithValues: [
-    (RoutingRuleGlobal, "🌏 全局"),
-    (RoutingRuleLAN, "🌏 绕过局域网"),
-    (RoutingRuleCn, "🌏 绕过中国大陆"),
-    (RoutingRuleLANAndCn, "🌏 绕过局域网和中国大陆"),
-])
-
-let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
-    (RoutingRuleGlobal, "🌏 Global"),
-    (RoutingRuleLAN, "🌏 Bypassing the LAN Address"),
-    (RoutingRuleCn, "🌏 Bypassing mainland address"),
-    (RoutingRuleLANAndCn, "🌏 Bypassing LAN and mainland address"),
-])
-
-@MainActor let defaultRules = Dictionary(uniqueKeysWithValues: [
-    (RoutingRuleGlobal, RoutingModel(name: RoutingRuleGlobal, remark: "")),
-    (RoutingRuleLAN, RoutingModel(name: RoutingRuleLAN, remark: "")),
-    (RoutingRuleCn, RoutingModel(name: RoutingRuleCn, remark: "")),
-    (RoutingRuleLANAndCn, RoutingModel(name: RoutingRuleLANAndCn, remark: "")),
-])
 
 // parse json to V2rayRouting
 func parseRoutingRuleJson(json: String) -> (V2rayRouting, err: Error?) {
