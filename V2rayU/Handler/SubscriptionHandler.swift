@@ -1,86 +1,78 @@
 import Cocoa
+import Combine
 import Yams
 
 // ----- v2ray subscribe  updater -----
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
-class V2raySubSync: NSObject {
-    var V2raySubSyncing = false
-    let maxConcurrentTasks = 1 // work pool
-
-    static var shared = V2raySubSync()
-    // Initialization
-    override init() {
-        super.init()
-        NSLog("V2raySubSync init")
-    }
-
+actor SubscriptionHandler {
+    static var shared = SubscriptionHandler()
+    
+    private var SubscriptionHandlering = false
+    private let maxConcurrentTasks = 1 // work pool
+    private var cancellables = Set<AnyCancellable>()
+    
     // sync from Subscription list
     public func sync() {
-        if V2raySubSyncing {
-            NSLog("V2raySubSync Syncing ...")
+        if SubscriptionHandlering {
+            NSLog("SubscriptionHandler Syncing ...")
             return
         }
-        self.V2raySubSyncing = true
-        NSLog("V2raySubSync start")
+        SubscriptionHandlering = true
+        NSLog("SubscriptionHandler start")
 
-        let list = V2raySubscription.list()
+        let list = SubViewModel.all()
 
         if list.count == 0 {
-            self.logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
+            logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
         }
-        // sync queue with DispatchGroup
-        Task {
-            do {
-                try await self.syncTaskGroup(items: list)
-            } catch let error {
-                NSLog("pingTaskGroup error: \(error)")
-            }
-        }
+        
+        // 开始执行异步任务
+        syncTaskGroup(items: list)
     }
 
-    func syncTaskGroup(items: [V2raySubItem]) async throws {
-        let taskChunks = stride(from: 0, to: items.count, by: maxConcurrentTasks).map {
-            Array(items[$0..<min($0 + maxConcurrentTasks, items.count)])
-        }
-        NSLog("syncTaskGroup-start: taskChunks=\(taskChunks.count)")
-        for (i, chunk) in taskChunks.enumerated() {
-            NSLog("syncTaskGroup-start-\(i): count=\(chunk.count)")
-            try await withThrowingTaskGroup(of: Void.self) { group in
-                for item in chunk {
-                    group.addTask {
-                        do {
-                            try await self.dlFromUrl(url: item.url, subscribe: item.name)
-                        } catch {
-                            NSLog("dlFromUrl error: \(error)")
-                        }
-                        return
+    func syncTaskGroup(items: [SubModel]) {
+        // 使用 Combine 处理多个异步任务
+        items.publisher.flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
+            Future<Void, Error> { promise in
+                Task {
+                    do {
+                        try await self.dlFromUrl(url: item.url, sub: item)
+                        promise(.success(()))
+                    } catch {
+                        promise(.failure(error))
                     }
                 }
-                // 等待当前批次所有任务完成
-                try await group.waitForAll()
             }
-            NSLog("syncTaskGroup-end-\(i)")
         }
-        NSLog("syncTaskGroup-end")
-        self.refreshMenu()
+        .collect()
+        .sink(receiveCompletion: { completion in
+            switch completion {
+            case .finished:
+                NSLog("All tasks completed")
+            case let .failure(error):
+                NSLog("Error: \(error)")
+            }
+            self.SubscriptionHandlering = false
+            self.refreshMenu()
+        }, receiveValue: { _ in })
+        .store(in: &cancellables)
     }
 
-    func refreshMenu()  {
-        NSLog("V2raySubSync refreshMenu")
-        self.V2raySubSyncing = false
-        usleep(useconds_t(1 * second))
+    func refreshMenu() {
+        NSLog("SubscriptionHandler refreshMenu")
+        self.SubscriptionHandlering = false
         do {
             // refresh server
-            menuController.showServers()
+//            menuController.showServers()
             // sleep 2
             sleep(2)
             // do ping
-            ping.pingAll()
+//            ping.pingAll()
         }
     }
 
-    public func dlFromUrl(url: String, subscribe: String) async throws {
+    public func dlFromUrl(url: String, sub: SubModel) async throws {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         guard let reqUrl = URL(string: url) else {
@@ -93,9 +85,9 @@ class V2raySubSync: NSObject {
         do {
             let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
             if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
-                self.handle(base64Str: outputStr, subscribe: subscribe, url: url)
+                handle(base64Str: outputStr, sub: sub, url: url)
             } else {
-                self.logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
+                logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
             }
         } catch let error {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
@@ -103,60 +95,52 @@ class V2raySubSync: NSObject {
         }
     }
 
-    func handle(base64Str: String, subscribe: String, url: String) {
+    func handle(base64Str: String, sub: SubModel, url: String) {
         guard let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded() else {
-            self.logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
+            logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
             return
         }
 
-        self.logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
+        logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
 
-        if self.importByYaml(strTmp: strTmp, subscribe: subscribe) {
+        if importByYaml(strTmp: strTmp, sub: sub) {
             return
         }
-        self.importByNormal(strTmp: strTmp, subscribe: subscribe)
+        importByNormal(strTmp: strTmp, sub: sub)
     }
 
-    func getOld(subscribe: String) -> [String] {
+    func getOldCount(sub: SubModel) -> Int {
         // reload all
-        V2rayServer.loadConfig()
-        // get old
-        var oldList: [String] = []
-        for (_, item) in V2rayServer.list().enumerated() {
-            if item.subscribe == subscribe {
-                oldList.append(item.name)
-            }
-        }
-        return oldList
+        return ProfileViewModel.count(filter: [ProfileModel.Columns.subid.name: sub.uuid])
     }
 
-    func importByYaml(strTmp: String, subscribe: String) -> Bool {
+    func importByYaml(strTmp: String, sub: SubModel) -> Bool {
+        var list: [ProfileModel] = []
+        let oldCount = getOldCount(sub: sub)
+
         // parse clash yaml
         do {
-            let oldList = getOld(subscribe: subscribe)
-            var exists: Dictionary = [String: Bool]()
-
             let decoder = YAMLDecoder()
             let decoded = try decoder.decode(Clash.self, from: strTmp)
-            for item in decoded.proxies {
-                if let importUri = importByClash(clash: item) {
-                    importUri.remark = item.name
-                    if let v2rayOld = self.saveImport(importUri: importUri, subscribe: subscribe) {
-                        exists[v2rayOld.name] = true
-                    }
+            if decoded.proxies.isEmpty {
+                return false
+            }
+            for clash in decoded.proxies {
+                if let item = clash.toProfile() {
+                    list.append(item)
                 }
             }
 
-            logTip(title: "need remove?: ", informativeText: "old=\(oldList.count) - new=\(exists.count)")
+            logTip(title: "importByYaml: ", informativeText: "old=\(oldCount) - new=\(list.count)")
 
-            // remove not exist
-            for name in oldList {
-                if !(exists[name] ?? false) {
-                    // delete from v2ray UserDefaults
-                    V2rayItem.remove(name: name)
-                    logTip(title: "remove: ", informativeText: name)
-                }
+            if list.isEmpty {
+                return false
             }
+            // 删除旧的
+            ProfileViewModel.delete(filter: [ProfileModel.Columns.subid.name: sub.uuid])
+
+            // 插入新的
+            ProfileViewModel.insert_many(items: list)
 
             return true
         } catch {
@@ -166,67 +150,34 @@ class V2raySubSync: NSObject {
         return false
     }
 
-    func importByNormal(strTmp: String, subscribe: String)  {
-        let oldList = getOld(subscribe: subscribe)
-        var exists: Dictionary = [String: Bool]()
+    func importByNormal(strTmp: String, sub: SubModel) {
+        var list: [ProfileModel] = []
+        let oldCount = getOldCount(sub: sub)
 
-        let list = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
+        let lines = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
         var count = 0
-        for uri in list {
+        for uri in lines {
+            let filterUri = uri.trimmingCharacters(in: .whitespacesAndNewlines)
             // import every server
-            if (uri.count > 0) {
-                let filterUri =  uri.trimmingCharacters(in: .whitespacesAndNewlines)
-                if let importUri = ImportUri.importUri(uri: filterUri,checkExist: false) {
-                    if let v2rayOld = self.saveImport(importUri: importUri, subscribe: subscribe) {
-                        exists[v2rayOld.name] = true
-                    }
-                }
+            if filterUri.count == 0 {
+                continue
             }
-        }
-
-        logTip(title: "need remove?: ", informativeText: "old=\(oldList.count) - new=\(exists.count)")
-
-        // remove not exist
-        for name in oldList {
-            if !(exists[name] ?? false) {
-                // delete from v2ray UserDefaults
-                V2rayItem.remove(name: name)
-                logTip(title: "remove: ", informativeText: name)
-            }
-        }
-
-    }
-
-    func saveImport(importUri: ImportUri, subscribe: String) -> V2rayItem? {
-        if importUri.isValid {
-            var newUri = importUri.uri
-            // clash has no uri
-            if newUri.count == 0 {
-                // old share uri
-                let v2ray = V2rayItem(name: "tmp", remark: importUri.remark, isValid: importUri.isValid, json: importUri.json, url: "", subscribe: subscribe)
-                let share = ShareUri()
-                share.qrcode(item: v2ray)
-                newUri = share.uri
-            }
-
-            print("\(importUri.remark) - \(newUri)")
-
-            if let v2rayOld = V2rayServer.existItem(url: newUri) {
-                v2rayOld.json = importUri.json
-                v2rayOld.isValid = importUri.isValid
-                v2rayOld.remark = importUri.remark
-                v2rayOld.store()
-                logTip(title: "success update: ", informativeText: importUri.remark)
-                return v2rayOld
+            let importTask = ImportUri(share_uri: filterUri)
+            if let profile = importTask.doImport() {
+                profile.subid = sub.uuid
+                list.append(profile)
             } else {
-                // add server
-                V2rayServer.add(remark: importUri.remark, json: importUri.json, isValid: true, url: newUri, subscribe: subscribe)
-                logTip(title: "success add: ", informativeText: importUri.remark)
+                logTip()
             }
-        } else {
-            logTip(title: "fail: ", informativeText: importUri.error)
         }
-        return nil
+
+        logTip(title: "importByNormal: ", informativeText: "old=\(oldCount) - new=\(list.count)")
+
+        // 删除旧的
+        ProfileViewModel.delete(filter: [ProfileModel.Columns.subid.name: sub.uuid])
+
+        // 插入新的
+        ProfileViewModel.insert_many(items: list)
     }
 
     func logTip(title: String = "", uri: String = "", informativeText: String = "") {

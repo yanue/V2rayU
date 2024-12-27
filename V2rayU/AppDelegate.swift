@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             // 自动更新订阅服务器
-//            V2raySubSync.shared.sync()
+//            SubscriptionHandler.shared.sync()
         }
         // ping
 //        ping.pingAll()

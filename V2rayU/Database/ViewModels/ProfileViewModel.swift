@@ -6,8 +6,8 @@
 //
 
 import Combine
-import GRDB
 import Foundation
+import GRDB
 
 class ProfileViewModel: ObservableObject {
     @Published var list: [ProfileModel] = []
@@ -23,30 +23,18 @@ class ProfileViewModel: ObservableObject {
             print("getList error: \(error)")
         }
     }
-    
+
     func delete(uuid: String) {
         Self.delete(uuid: uuid)
-        self.getList()
+        getList()
     }
-    
+
     func upsert(item: ProfileModel) {
         Self.upsert(item: item)
-        self.getList()
+        getList()
     }
-    
-    /// Mark: - Static
 
-    static func all() -> [ProfileModel] {
-        do {
-            let dbReader = AppDatabase.shared.reader
-            return try dbReader.read { db in
-                return try ProfileModel.fetchAll(db)
-            }
-        } catch {
-            print("getList error: \(error)")
-            return []
-        }
-    }
+    // MARK: - Static
 
     // 获取当前正在运行配置
     static func getRunning() -> ProfileModel? {
@@ -64,11 +52,36 @@ class ProfileViewModel: ObservableObject {
         return item
     }
 
+    static func all() -> [ProfileModel] {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                try ProfileModel.fetchAll(db)
+            }
+        } catch {
+            print("getList error: \(error)")
+            return []
+        }
+    }
+
+    // filter: ["id": 1,"conlmn":"value"]
+    static func count(filter: [String: (any DatabaseValueConvertible)?]?) -> Int {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                try ProfileModel.filter(key: filter).fetchCount(db)
+            }
+        } catch {
+            print("count error: \(error)")
+            return 0
+        }
+    }
+
     static func getFastOne() -> ProfileModel? {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                return try ProfileModel.order(ProfileModel.Columns.speed.desc).fetchOne(db)
+                try ProfileModel.order(ProfileModel.Columns.speed.desc).fetchOne(db)
             }
         } catch {
             print("getFastOne error: \(error)")
@@ -80,7 +93,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                return try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db)
+                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db)
             }
         } catch {
             print("fetchOne error: \(error)")
@@ -99,6 +112,18 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
+    // filter: ["id": 1,"conlmn":"value"]
+    static func delete(filter: [String: (any DatabaseValueConvertible)?]?) {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                try ProfileModel.filter(key: filter).deleteAll(db)
+            }
+        } catch {
+            print("delete error: \(error)")
+        }
+    }
+
     static func upsert(item: ProfileModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
@@ -107,6 +132,19 @@ class ProfileViewModel: ObservableObject {
             }
         } catch {
             print("upsert error: \(error)")
+        }
+    }
+
+    static func insert_many(items: [ProfileModel]) {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                try items.forEach { item in
+                    try item.save(db)
+                }
+            }
+        } catch {
+            print("insert_many error: \(error)")
         }
     }
 }

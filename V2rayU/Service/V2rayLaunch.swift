@@ -174,7 +174,9 @@ class V2rayLaunch: NSObject {
         
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
-//            V2raySubSync.shared.sync()
+            Task {
+                await SubscriptionHandler.shared.sync()
+            }
         }
     }
 

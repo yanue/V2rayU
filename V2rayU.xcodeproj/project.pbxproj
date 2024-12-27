@@ -72,6 +72,9 @@
 		662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44F2D1C4D46006E8450 /* Scanner.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66F66F832D1E450000E77C64 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F822D1E450000E77C64 /* AppState.swift */; };
+		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
+		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
+		66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 66F66F8A2D1E7DE300E77C64 /* Yams */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -153,6 +156,8 @@
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
+		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +169,7 @@
 				6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */,
 				662CC33A2D1AE8CA006E8450 /* Tun2SocksKitC in Frameworks */,
 				660330042D0D5504009FEB56 /* GRDB in Frameworks */,
+				66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */,
 				662CC3382D1AE8CA006E8450 /* Tun2SocksKit in Frameworks */,
 				660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */,
 			);
@@ -229,6 +235,7 @@
 			children = (
 				662CC4342D1C4CE9006E8450 /* ImportHandler.swift */,
 				662CC43B2D1C4CE9006E8450 /* Share */,
+				66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */,
 				662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */,
 				662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */,
 				662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */,
@@ -326,6 +333,7 @@
 		662CC43B2D1C4CE9006E8450 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				66F66F852D1E7D6A00E77C64 /* Clash.swift */,
 				662CC4352D1C4CE9006E8450 /* BaseShareUri.swift */,
 				662CC4362D1C4CE9006E8450 /* ShadowsocksRUri.swift */,
 				662CC4372D1C4CE9006E8450 /* ShadowsocksUri.swift */,
@@ -438,6 +446,7 @@
 				662CC3362D1AE8CA006E8450 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */,
 				662CC4322D1BEE94006E8450 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				662CC4332D1BEEDB006E8450 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
+				66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */,
 			);
 			productRefGroup = 66CBCED82C63B16400313949 /* Products */;
 			projectDirPath = "";
@@ -471,6 +480,7 @@
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
+				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
 				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
 				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
@@ -493,6 +503,7 @@
 				662CC4112D1BED9B006E8450 /* Tunnel.swift in Sources */,
 				662CC4122D1BED9B006E8450 /* General.swift in Sources */,
 				662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */,
+				66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */,
 				662CC4142D1BED9B006E8450 /* Overview.swift in Sources */,
 				662CC4152D1BED9B006E8450 /* RoutingHandler.swift in Sources */,
 				662CC4162D1BED9B006E8450 /* Setting.swift in Sources */,
@@ -799,6 +810,14 @@
 				version = 2.1.1;
 			};
 		};
+		66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jpsim/Yams.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -831,6 +850,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 66A078BA2D008A3700490469 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
 			productName = SwiftyBeaver;
+		};
+		66F66F8A2D1E7DE300E77C64 /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

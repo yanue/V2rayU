@@ -107,10 +107,10 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     // 提供默认值的初始化器
     init(
         uuid: String = UUID().uuidString,
-        remark: String,
+        remark: String = "",
         speed: Int = -1,
         sort: Int = 0,
-        protocol: V2rayProtocolOutbound,
+        protocol: V2rayProtocolOutbound = .freedom,
         address: String = "",
         port: Int = 0,
         password: String = "",

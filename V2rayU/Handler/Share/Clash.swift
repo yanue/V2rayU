@@ -23,7 +23,7 @@ struct Clash: Codable {
     var rules: [String]?
 }
 
-// MARK: - Proxy
+// MARK: - ClashProxy
 struct clashProxy: Codable {
     var type: String
     var name: String
@@ -52,6 +52,88 @@ struct clashProxy: Codable {
     var h2Opts: clashH2Opts? // vmess
     var grpcOpts: grpcOpts? // vmess
     var realityOpts: realityOpts? // vless
+}
+
+extension clashProxy {
+    func toProfile() -> ProfileModel? {
+        let profile = ProfileModel()
+        
+        profile.remark = self.name
+        profile.address = self.server
+        profile.port = self.port
+        profile.uuid = self.uuid ?? ""
+        profile.sni = self.sni ?? self.server
+        profile.allowInsecure = self.skipCERTVerify ?? true
+        profile.security = self.security.flatMap { V2rayStreamSecurity(rawValue: $0) } ?? .none
+        profile.flow = self.flow ?? ""
+        
+        // Set type-specific fields
+        switch self.type {
+        case "trojan":
+            profile.protocol = .trojan
+            profile.password = self.password ?? ""
+            profile.fingerprint = self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
+
+        case "vmess":
+            profile.protocol = .vmess
+            profile.password = self.uuid ?? ""
+            profile.alterId = self.alterId ?? 0
+            profile.encryption = self.cipher ?? "auto"
+            profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
+            
+            if profile.network == .ws {
+                profile.host = self.servername ?? self.server
+                profile.path = self.wsOpts?.path ?? "/"
+            } else if profile.network == .h2 {
+                profile.host = self.h2Opts?.host?.first ?? self.servername ?? self.server
+                profile.path = self.h2Opts?.path ?? "/"
+            } else if profile.network == .grpc {
+                profile.path = self.grpcOpts?.grpcServiceName ?? "/"
+            }
+
+        case "vless":
+            profile.protocol = .vless
+            profile.password = self.uuid ?? ""
+            profile.encryption = self.cipher ?? "none"
+            profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
+            
+            if self.security == "reality" {
+                profile.sni = self.servername ?? self.server
+                profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
+                profile.publicKey = self.realityOpts?.publicKey ?? ""
+                profile.shortId = self.realityOpts?.shortId ?? ""
+            }
+            
+            if profile.network == .ws {
+                profile.host = self.servername ?? self.server
+                profile.path = self.wsOpts?.path ?? "/"
+            } else if profile.network == .h2 {
+                profile.host = self.h2Opts?.host?.first ?? self.servername ?? self.server
+                profile.path = self.h2Opts?.path ?? "/"
+            } else if profile.network == .grpc {
+                profile.path = self.grpcOpts?.grpcServiceName ?? "/"
+            }
+
+        case "ss", "ssr":
+            profile.protocol = .shadowsocks
+            profile.encryption = self.cipher ?? ""
+            profile.password = self.password ?? ""
+
+        case "socks5":
+            profile.protocol = .socks
+            profile.password = self.password ?? ""
+
+        case "http":
+            profile.protocol = .http
+            profile.password = self.password ?? ""
+            profile.host = self.servername ?? self.server
+
+        default:
+            return nil
+        }
+        
+        return profile
+    }
 }
 
 struct clashWsOpts: Codable {
