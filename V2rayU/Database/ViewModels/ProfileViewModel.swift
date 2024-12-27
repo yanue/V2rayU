@@ -23,6 +23,18 @@ class ProfileViewModel: ObservableObject {
             print("getList error: \(error)")
         }
     }
+    
+    func delete(uuid: String) {
+        Self.delete(uuid: uuid)
+        self.getList()
+    }
+    
+    func upsert(item: ProfileModel) {
+        Self.upsert(item: item)
+        self.getList()
+    }
+    
+    /// Mark: - Static
 
     static func all() -> [ProfileModel] {
         do {
@@ -37,13 +49,13 @@ class ProfileViewModel: ObservableObject {
     }
 
     // 获取当前正在运行配置
-    static func getRunning() -> RoutingModel? {
-        var item: RoutingModel?
+    static func getRunning() -> ProfileModel? {
+        var item: ProfileModel?
         // 获取当前运行配置
         let runningProfile = UserDefaults.get(forKey: .runningProfile) ?? ""
         if !runningProfile.isEmpty {
             // 根据uuid获取配置
-            item = ProfileViewModel().fetchOne(uuid: runningProfile)
+            item = ProfileViewModel.fetchOne(uuid: runningProfile)
         }
         if item == nil {
             // 没有配置，获取速度最快的配置
@@ -52,47 +64,47 @@ class ProfileViewModel: ObservableObject {
         return item
     }
 
-    static func getFastOne() -> RoutingModel? {
+    static func getFastOne() -> ProfileModel? {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                return try RoutingModel.filter().orderBy(RoutingModel.Columns.speed, .desc).fetchOne(db)
+                return try ProfileModel.order(ProfileModel.Columns.speed.desc).fetchOne(db)
             }
         } catch {
-            print("getOne error: \(error)")
+            print("getFastOne error: \(error)")
             return nil
         }
     }
 
-    func fetchOne(uuid: String) throws -> ProfileModel {
-        let dbReader = AppDatabase.shared.reader
-        return try dbReader.read { db in
-            guard let model = try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db) else {
-                throw NSError(domain: "ProfileViewModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
+    static func fetchOne(uuid: String) -> ProfileModel? {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                return try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db)
             }
-            return model
+        } catch {
+            print("fetchOne error: \(error)")
+            return nil
         }
     }
 
-    func delete(uuid: String) {
+    static func delete(uuid: String) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
                 try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
             }
-            getList()
         } catch {
             print("delete error: \(error)")
         }
     }
 
-    func upsert(item: ProfileModel) {
+    static func upsert(item: ProfileModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
                 try item.save(db)
             }
-            getList()
         } catch {
             print("upsert error: \(error)")
         }

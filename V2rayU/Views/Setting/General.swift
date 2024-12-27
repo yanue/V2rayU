@@ -18,6 +18,9 @@ struct GeneralView: View {
     @State private var proxyModeShortcut: String = ""
 
     @ObservedObject var appState = AppState.shared // 引用单例
+    @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var languageManager: LanguageManager
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -29,24 +32,24 @@ struct GeneralView: View {
                     Toggle("Automatically select fastest server", isOn: $selectFastestServer)
                 }
                 Spacer()
-                
+
                 // 语言选择器
-                Picker("Language", selection: $appState.languageManager.selectedLanguage) {
+                Picker("Language", selection: $languageManager.selectedLanguage) {
                     ForEach(Language.allCases, id: \.self) { item in
                        Text(item.localized).tag(item.rawValue)
                     }
                 }
                .padding()
 
-               
-                Picker("Theme", selection: $appState.themeManager.selectedTheme) {
+
+                Picker("Theme", selection: $themeManager.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
                         Text(item.localized).tag(item.rawValue)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle()) // 分段选择样式
                 .padding()
-                
+
                 Spacer()
                 Section(header: Text("Shortcuts")) {
                     HStack {

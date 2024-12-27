@@ -14,6 +14,8 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     // 公共属性
     @Published var uuid: String // 唯一标识
     @Published var remark: String // 备注
+    @Published var speed: Int = -1 // 速度
+    @Published var sort: Int = 0 // 排序
     @Published var `protocol`: V2rayProtocolOutbound // 协议
     @Published var network: V2rayStreamNetwork = .tcp // 网络: tcp, kcp, ws, domainsocket, xhttp, h2, grpc, quic
     @Published var security: V2rayStreamSecurity = .none // 底层传输安全加密方式: none, tls, reality
@@ -42,14 +44,14 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, `protocol`, subid, address, port, password, alterId, encryption, network, remark,
-             headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+        case uuid,remark,speed,sort,`protocol`, subid, address, port, password, alterId, encryption, network,headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
     }
 
     // 需要手动实现 `init(from:)` 和 `encode(to:)`，如果你使用自定义类型时
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uuid = try container.decode(String.self, forKey: .uuid)
+        remark = try container.decode(String.self, forKey: .remark)
         speed = try container.decode(Int.self, forKey: .speed)
         sort = try container.decode(Int.self, forKey: .sort)
         `protocol` = try container.decode(V2rayProtocolOutbound.self, forKey: .protocol)
@@ -61,7 +63,6 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
         password = try container.decode(String.self, forKey: .password)
         alterId = try container.decode(Int.self, forKey: .alterId)
         encryption = try container.decode(String.self, forKey: .encryption)
-        remark = try container.decode(String.self, forKey: .remark)
         headerType = try container.decode(V2rayHeaderType.self, forKey: .headerType)
         host = try container.decode(String.self, forKey: .host)
         path = try container.decode(String.self, forKey: .path)

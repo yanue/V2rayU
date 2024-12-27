@@ -158,14 +158,20 @@ class V2rayLaunch: NSObject {
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start and show servers
-            startV2rayCore()
+            Task {
+                await AppState.shared.setRunMode(mode: .global)
+            }
+//            startV2rayCore()
         } else {
             // show off status
-            appState.shared.setRunMode(.off)
-//            // show servers
+            Task {
+                await AppState.shared.setRunMode(mode: .off)
+            }
 //            menuController.showServers()
         }
-        runTun2Socks()
+//        runTun2Socks()
+        
+        
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
 //            V2raySubSync.shared.sync()
@@ -178,9 +184,9 @@ class V2rayLaunch: NSObject {
     }
 
     static func setRunMode(mode: RunMode) {
-
-        // set icon
-        appState.shared.setRunMode(mode)
+        Task {
+            await AppState.shared.setRunMode(mode: mode)
+        }
 
         setSystemProxy(mode: mode)
     }
@@ -205,7 +211,9 @@ class V2rayLaunch: NSObject {
         NSLog("start v2ray-core begin")
         guard let v2ray = ProfileViewModel.getRunning() else {
             noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
-            menuController.setStatusOff()
+            Task {
+                await AppState.shared.setRunMode(mode: .off)
+            }
             return
         }
 
@@ -217,7 +225,9 @@ class V2rayLaunch: NSObject {
         // launch
         let started = V2rayLaunch.Start()
         if !started {
-            appState.shared.setRunMode(.off)
+            Task {
+                await AppState.shared.setRunMode(mode: .off)
+            }
             return
         }
 

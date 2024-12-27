@@ -131,7 +131,7 @@ class V2rayConfigHandler {
         self.v2ray.outbounds = outbounds
         // ------------------------------------- routing start --------------------------------------------
         if !self.forPing {
-            self.v2ray.routing = RoutingViewModel.getRunning()
+            self.v2ray.routing = RoutingManager().getRunning()
         }
         // ------------------------------------- routing end ----------------------------------------------
     }

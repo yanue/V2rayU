@@ -3,6 +3,11 @@ import SwiftUI
 
 @main
 struct V2rayUApp: App {
+    @State  var windowController: NSWindowController?
+    @State  var aboutWindowController: NSWindowController?
+    @StateObject var languageManager = LanguageManager()
+    @StateObject var themeManager = ThemeManager()
+
     init() {
         // 已设置 Application is agent (UIElement) 为 YES
         // 初始化
@@ -13,14 +18,13 @@ struct V2rayUApp: App {
         print("NSHomeDirectory()",NSHomeDirectory())
         print("userHomeDirectory",userHomeDirectory)
         V2rayLaunch.checkInstall()
-        V2rayLaunch.runTun2Socks()
+        V2rayLaunch.runAtStart()
+//        V2rayLaunch.runTun2Socks()
     }
-    
 
-   
     var body: some Scene {
         // 显示 MenuBar
-        MenuBarExtra("V2rayU", image: appState.shared.runMode.icon) {
+        MenuBarExtra("V2rayU", image: AppState.shared.runMode.icon) {
             AppMenuView(openContentViewWindow: openContentViewWindow)
         }.menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
@@ -34,7 +38,7 @@ struct V2rayUApp: App {
 //            let contentView = ConfigView(item: item)
             let contentView = ContentView()
                 .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
-                .environmentObject(appState.shared)
+                .environmentObject(AppState.shared)
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(contentViewController: hostingController)

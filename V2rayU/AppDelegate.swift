@@ -19,6 +19,7 @@ let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 @MainActor let windowDelegate = WindowDelegate()
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
 

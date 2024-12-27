@@ -22,8 +22,32 @@ class SubViewModel: ObservableObject {
             print("getList error: \(error)")
         }
     }
+    
+    func delete(uuid: String) {
+        Self.delete(uuid: uuid)
+        self.getList()
+    }
+    
+    func upsert(item: SubModel) {
+        Self.upsert(item: item)
+        self.getList()
+    }
+    
+    /// Mark: - Static
 
-    func fetchOne(uuid: String) throws -> SubModel {
+    static func all() -> [SubModel] {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                return try SubModel.fetchAll(db)
+            }
+        } catch {
+            print("getList error: \(error)")
+            return []
+        }
+    }
+    
+    static func fetchOne(uuid: String) throws -> SubModel {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
             guard let model = try SubModel.filter(SubModel.Columns.uuid == uuid).fetchOne(db) else {
@@ -33,25 +57,23 @@ class SubViewModel: ObservableObject {
         }
     }
 
-    func delete(uuid: String) {
+    static func delete(uuid: String) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
                 try SubModel.filter(SubModel.Columns.uuid == uuid).deleteAll(db)
             }
-            getList()
         } catch {
             print("delete error: \(error)")
         }
     }
 
-    func upsert(item: SubModel) {
+    static func upsert(item: SubModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
                 try item.save(db)
             }
-            getList()
         } catch {
             print("upsert error: \(error)")
         }
