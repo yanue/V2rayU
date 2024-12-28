@@ -110,6 +110,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func install() {
+
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         // Create authorization reference for the user
         executeAppleScriptWithOsascript(script: doSh)
@@ -155,6 +156,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func runAtStart() {
+
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start and show servers
@@ -240,7 +242,7 @@ class V2rayLaunch: NSObject {
 //        menuController.showServers()
 
         // ping current
-//        PingRunning.shared.startPing(with: v2ray)
+//        PingCurrent.shared.startPing(with: v2ray)
     }
 
     static func stopV2rayCore() {

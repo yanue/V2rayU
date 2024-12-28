@@ -21,7 +21,8 @@ actor PingAll {
             return
         }
         inPing = true
-
+        
+        killAllPing()
 
         let items = ProfileViewModel.all()
         guard !items.isEmpty else {
@@ -57,6 +58,7 @@ actor PingAll {
                 NSLog("Error: \(error)")
             }
             self.inPing = false
+            killAllPing()
 //            self.refreshMenu()
         }, receiveValue: { _ in })
         .store(in: &cancellables)

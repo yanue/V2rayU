@@ -9,7 +9,6 @@ struct V2rayUApp: App {
     @StateObject var themeManager = ThemeManager()
 
     init() {
-        // 已设置 Application is agent (UIElement) 为 YES
         // 初始化
         let fileManager = FileManager.default
         if fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first != nil {
@@ -18,7 +17,7 @@ struct V2rayUApp: App {
         print("NSHomeDirectory()",NSHomeDirectory())
         print("userHomeDirectory",userHomeDirectory)
         V2rayLaunch.checkInstall()
-        V2rayLaunch.runAtStart()
+//        V2rayLaunch.runAtStart()
 //        V2rayLaunch.runTun2Socks()
     }
 
@@ -28,7 +27,6 @@ struct V2rayUApp: App {
             AppMenuView(openContentViewWindow: openContentViewWindow)
         }.menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
-
     }
 
     func openContentViewWindow() {

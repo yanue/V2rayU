@@ -7,23 +7,7 @@
 //
 
 import Cocoa
-
-@MainActor
-var toastWindow =  ToastWindowController()
-
-func makeToast(message: String, displayDuration: Double? = 3) {
-    // UI 更新需要在主线程上执行
-    DispatchQueue.main.async {
-        print("makeToast", message)
-        toastWindow.close()
-        toastWindow = ToastWindowController()
-        toastWindow.message = message
-        toastWindow.showWindow(Any.self)
-        toastWindow.fadeInHud(displayDuration)
-        
-        NSApp.activate(ignoringOtherApps: true)
-    }
-}
+import SwiftUI
 
 func alertDialog(title: String, message: String) {
     DispatchQueue.main.async {
@@ -41,120 +25,75 @@ func alertDialog(title: String, message: String) {
     }
 }
 
-class ToastWindowController: NSWindowController {
+func makeToast(message: String, displayDuration: Double? = 3) {
+    // 确保调用 makeToast 时在主线程上
+    DispatchQueue.main.async {
+        // 错误处理
+        ToastManager.shared.makeToast(message: message, displayDuration: displayDuration ?? 3)
+    }
+}
 
-    override var windowNibName: String? {
-        return "ToastWindow" // no extension .xib here
+// 将 ToastManager 类标记为 @MainActor，确保线程安全
+@MainActor
+class ToastManager {
+    static let shared = ToastManager()
+    private init() {}
+
+    private var popover: NSPopover?
+
+    // 显示 Toast 的方法
+    func makeToast(message: String, displayDuration: Double = 3) {
+        self.showPopover(message: message, displayDuration: displayDuration)
     }
 
-    var message: String = ""
+    // 显示 Popover
+    private func showPopover(message: String, displayDuration: Double) {
+        // 创建 Toast 的视图
+        let toastView = ToastView(message: message)
 
-    @IBOutlet weak var titleTextField: NSTextField!
-    @IBOutlet weak var panelView: NSView!
+        // 使用 NSHostingView 包装 SwiftUI 视图
+        let hostingView = NSHostingView(rootView: toastView)
 
-    let kHudFadeInDuration: Double = 0.35
-    let kHudFadeOutDuration: Double = 0.35
-    var kHudDisplayDuration: Double = 2
+        // 创建 Popover 并设置其内容视图控制器
+        let popover = NSPopover()
+        popover.contentSize = NSSize(width: 200, height: 50)  // 定制大小
+        popover.behavior = .transient
+        popover.animates = true
+        popover.contentViewController = NSViewController()
+        popover.contentViewController?.view = hostingView  // 设置为 NSHostingView
 
-    let kHudAlphaValue: CGFloat = 0.75
-    let kHudCornerRadius: CGFloat = 18.0
-    let kHudHorizontalMargin: CGFloat = 30
-    let kHudHeight: CGFloat = 90.0
+        // 设置 Popover 的透明效果
+        popover.appearance = NSAppearance(named: .vibrantLight)
 
-    var timerToFadeOut: Timer? = nil
-    var fadingOut: Bool = false
-    
-    var isShow: Bool = false
+        // 获取菜单栏图标的位置，并在其下方显示 Popover
+        if let button = NSApp.keyWindow?.contentView?.superview {
+            print("button",button)
+            _ = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength).length
+            let menuBarFrame = button.frame
+            let position = CGPoint(x: menuBarFrame.origin.x + (menuBarFrame.size.width / 2), y: menuBarFrame.origin.y)
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+            popover.show(relativeTo: NSRect(x: position.x, y: position.y, width: 0, height: 0), of: button, preferredEdge: .minY)
+        }
 
-        self.shouldCascadeWindows = false
+        // 显示完毕后，自动隐藏
+        DispatchQueue.main.asyncAfter(deadline: .now() + displayDuration) {
+            popover.performClose(nil)
+        }
 
-        let viewLayer: CALayer = CALayer()
-        viewLayer.backgroundColor = CGColor.init(red: 0.05, green: 0.05, blue: 0.05, alpha: kHudAlphaValue)
-        viewLayer.cornerRadius = kHudCornerRadius
-        panelView.wantsLayer = true
-        panelView.layer = viewLayer
-        panelView.layer?.opacity = 0.0
-
-        self.titleTextField.stringValue = self.message
-
-        setupHud()
+        self.popover = popover
     }
+}
 
-    func setupHud() -> Void {
-        titleTextField.sizeToFit()
+// Toast 的视图内容
+struct ToastView: View {
+    var message: String
 
-        var labelFrame: CGRect = titleTextField.frame
-        var hudWindowFrame: CGRect = self.window!.frame
-        hudWindowFrame.size.width = labelFrame.size.width + kHudHorizontalMargin * 2
-        hudWindowFrame.size.height = kHudHeight
-        if NSScreen.screens.count == 0 {
-            return
-        }
-        let screenRect: NSRect = NSScreen.screens[0].visibleFrame
-        hudWindowFrame.origin.x = (screenRect.size.width - hudWindowFrame.size.width) / 2
-        hudWindowFrame.origin.y = (screenRect.size.height - hudWindowFrame.size.height) / 2
-        self.window!.setFrame(hudWindowFrame, display: true)
-
-        var viewFrame: NSRect = hudWindowFrame;
-        viewFrame.origin.x = 0
-        viewFrame.origin.y = 0
-        panelView.frame = viewFrame
-
-        labelFrame.origin.x = kHudHorizontalMargin
-        labelFrame.origin.y = (hudWindowFrame.size.height - labelFrame.size.height) / 2
-        titleTextField.frame = labelFrame
-    }
-
-    func fadeInHud(_ displayDuration: Double?) -> Void {
-        if timerToFadeOut != nil {
-            timerToFadeOut?.invalidate()
-            timerToFadeOut = nil
-        }
-
-        // set time to display
-        if displayDuration != nil {
-            kHudDisplayDuration = displayDuration!
-        }
-
-        fadingOut = false
-
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(kHudFadeInDuration)
-        CATransaction.setCompletionBlock {
-            self.didFadeIn()
-        }
-        panelView.layer?.opacity = 1.0
-        CATransaction.commit()
-    }
-
-    func didFadeIn() -> Void {
-        timerToFadeOut = Timer.scheduledTimer(
-                timeInterval: kHudDisplayDuration,
-                target: self,
-                selector: #selector(fadeOutHud),
-                userInfo: nil,
-                repeats: false)
-    }
-
-    @objc func fadeOutHud() -> Void {
-        fadingOut = true
-
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(kHudFadeOutDuration)
-        CATransaction.setCompletionBlock {
-            self.didFadeOut()
-        }
-        panelView.layer?.opacity = 0.0
-        CATransaction.commit()
-    }
-
-    func didFadeOut() -> Void {
-        if fadingOut {
-            self.window?.orderOut(self)
-        }
-        fadingOut = false
+    var body: some View {
+        Text(message)
+            .padding()
+            .background(Color.black.opacity(0.8))
+            .cornerRadius(10)
+            .foregroundColor(.white)
+            .font(.body)
     }
 }

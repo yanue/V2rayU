@@ -111,6 +111,8 @@ struct ConfigListView: View {
             VStack {
                 Button("Close") {
                     viewModel.upsert(item: row)
+                    makeToast(message: "upsert")
+
                     // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
                     selectedRow = nil
                 }
