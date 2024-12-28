@@ -25,6 +25,7 @@ final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
 
     @Published var runMode: RunMode = .off
+    @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204")!
 
     func setRunMode(mode: RunMode) async {
         self.runMode = mode

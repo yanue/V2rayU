@@ -124,6 +124,17 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
+    static func update_speed(uuid: String, speed: Int) {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: 0)])
+            }
+        } catch {
+            print("delete error: \(error)")
+        }
+    }
+    
     static func upsert(item: ProfileModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

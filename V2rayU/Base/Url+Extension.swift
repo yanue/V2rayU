@@ -10,16 +10,47 @@ import Foundation
 extension URL {
     func queryParams() -> [String: Any] {
         var dict = [String: Any]()
-
         if let components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             if let queryItems = components.queryItems {
                 for item in queryItems {
-                    dict[item.name] = item.value!
+                    dict[item.name] = item.value
                 }
             }
             return dict
         } else {
             return [:]
+        }
+    }
+}
+
+// 自定义的 metrics 代理
+class MetricsCollectorDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let completion: @Sendable (URLSessionTaskMetrics) -> Void
+    private let queue = DispatchQueue(label: "MetricsCollectorDelegate.queue")
+
+    init(completion: @escaping @Sendable (URLSessionTaskMetrics) -> Void) {
+        self.completion = completion
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        // 确保 completion 在安全的队列上调用
+        queue.async {
+            self.completion(metrics)
+        }
+    }
+}
+
+// 扩展 URLSession 以支持 metrics
+extension URLSession {
+    /// 获取请求的 metrics
+    func metrics(for request: URLRequest) async throws -> URLSessionTaskMetrics {
+        let task = dataTask(with: request)
+        return try await withCheckedThrowingContinuation { continuation in
+            let delegate = MetricsCollectorDelegate { metrics in
+                continuation.resume(with: .success(metrics))
+            }
+            task.delegate = delegate
+            task.resume()
         }
     }
 }

@@ -75,6 +75,9 @@
 		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
 		66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 66F66F8A2D1E7DE300E77C64 /* Yams */; };
+		66F66F972D1F8A7800E77C64 /* PingRunning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F952D1F8A7800E77C64 /* PingRunning.swift */; };
+		66F66F982D1F8A7800E77C64 /* Ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F962D1F8A7800E77C64 /* Ping.swift */; };
+		66F66F992D1F8A7800E77C64 /* PingAll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F942D1F8A7800E77C64 /* PingAll.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -158,6 +161,9 @@
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
+		66F66F942D1F8A7800E77C64 /* PingAll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingAll.swift; sourceTree = "<group>"; };
+		66F66F952D1F8A7800E77C64 /* PingRunning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingRunning.swift; sourceTree = "<group>"; };
+		66F66F962D1F8A7800E77C64 /* Ping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ping.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -263,6 +269,7 @@
 		662CC3E22D1BED9B006E8450 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				66F66F9A2D1FA34E00E77C64 /* Ping */,
 				662CC3E02D1BED9B006E8450 /* Tunnel.swift */,
 				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 			);
@@ -391,6 +398,16 @@
 				66CBCEE32C63B16500313949 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		66F66F9A2D1FA34E00E77C64 /* Ping */ = {
+			isa = PBXGroup;
+			children = (
+				66F66F962D1F8A7800E77C64 /* Ping.swift */,
+				66F66F942D1F8A7800E77C64 /* PingAll.swift */,
+				66F66F952D1F8A7800E77C64 /* PingRunning.swift */,
+			);
+			path = Ping;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -533,6 +550,9 @@
 				662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
+				66F66F972D1F8A7800E77C64 /* PingRunning.swift in Sources */,
+				66F66F982D1F8A7800E77C64 /* Ping.swift in Sources */,
+				66F66F992D1F8A7800E77C64 /* PingAll.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

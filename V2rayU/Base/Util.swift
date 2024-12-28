@@ -97,3 +97,7 @@ func noticeTip(title: String = "", informativeText: String = "") {
 func vold() {
     
 }
+
+func getRandomPort() -> UInt16 {
+    return UInt16.random(in: 49152...65535)
+}

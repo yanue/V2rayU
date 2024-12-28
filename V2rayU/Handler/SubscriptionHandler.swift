@@ -31,7 +31,7 @@ actor SubscriptionHandler {
         syncTaskGroup(items: list)
     }
 
-    func syncTaskGroup(items: [SubModel]) {
+    private func syncTaskGroup(items: [SubModel]) {
         // 使用 Combine 处理多个异步任务
         items.publisher.flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
             Future<Void, Error> { promise in
@@ -68,7 +68,9 @@ actor SubscriptionHandler {
             // sleep 2
             sleep(2)
             // do ping
-//            ping.pingAll()
+            Task {
+                await PingAll.shared.run()
+            }
         }
     }
 

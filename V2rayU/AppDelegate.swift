@@ -54,7 +54,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //            SubscriptionHandler.shared.sync()
         }
         // ping
-//        ping.pingAll()
+        Task {
+            await PingAll.shared.run()
+        }
     }
 
     @objc func onSleepNote(note: NSNotification) {
