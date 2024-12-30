@@ -5,7 +5,7 @@ struct AppMenuView: View {
     @State private var isRewriteEnabled = false
     @State private var isMitMEnabled = false
     @State private var isScriptEnabled = false
-
+    @State private var isPresenting  = false
     var openContentViewWindow: () -> Void
     var body: some View {
         VStack() {
@@ -27,7 +27,9 @@ struct AppMenuView: View {
                 LinearGradient(gradient: Gradient(colors: [Color.blue, Color.blue]), startPoint: .leading, endPoint: .trailing)
             )
             .cornerRadius(10)
-            
+            Button("Show Toast"){
+                isPresenting.toggle()
+            }
             HStack(spacing: 20) {
                 Button("打开配置") {
                     openContentViewWindow()
@@ -86,7 +88,6 @@ struct AppMenuView: View {
             .background(Color(NSColor.windowBackgroundColor))
             .cornerRadius(6)
             .padding()
-        }.onAppear(){
         }
     }
     

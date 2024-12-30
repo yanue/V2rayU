@@ -26,74 +26,121 @@ func alertDialog(title: String, message: String) {
 }
 
 func makeToast(message: String, displayDuration: Double? = 3) {
+    print("makeToast: message=\(message),displayDuration=\(String(describing: displayDuration))")
     // 确保调用 makeToast 时在主线程上
     DispatchQueue.main.async {
-        // 错误处理
-        ToastManager.shared.makeToast(message: message, displayDuration: displayDuration ?? 3)
+        ToastManager.shared.makeToast(message: message,displayDuration: displayDuration ?? 3)
     }
 }
 
-// 将 ToastManager 类标记为 @MainActor，确保线程安全
+/// 全局管理 Toast 显示的单例类
+/// 支持消息更新防抖和自动隐藏功能
 @MainActor
-class ToastManager {
+class ToastManager: ObservableObject {
     static let shared = ToastManager()
-    private init() {}
-
-    private var popover: NSPopover?
-
-    // 显示 Toast 的方法
-    func makeToast(message: String, displayDuration: Double = 3) {
-        self.showPopover(message: message, displayDuration: displayDuration)
+    
+    @Published private(set) var message: String = ""
+    private var toastWindow: NSWindow?
+    private var hideTask: Task<Void, Never>?
+    private var isDisplaying = false
+    private var lastUpdateTime: Date = .distantPast
+    private let minimumUpdateInterval: TimeInterval = 0.5  // 最小更新间隔为0.5秒
+    
+    private init() {
+        setupToastWindow()
     }
-
-    // 显示 Popover
-    private func showPopover(message: String, displayDuration: Double) {
-        // 创建 Toast 的视图
-        let toastView = ToastView(message: message)
-
-        // 使用 NSHostingView 包装 SwiftUI 视图
-        let hostingView = NSHostingView(rootView: toastView)
-
-        // 创建 Popover 并设置其内容视图控制器
-        let popover = NSPopover()
-        popover.contentSize = NSSize(width: 200, height: 50)  // 定制大小
-        popover.behavior = .transient
-        popover.animates = true
-        popover.contentViewController = NSViewController()
-        popover.contentViewController?.view = hostingView  // 设置为 NSHostingView
-
-        // 设置 Popover 的透明效果
-        popover.appearance = NSAppearance(named: .vibrantLight)
-
-        // 获取菜单栏图标的位置，并在其下方显示 Popover
-        if let button = NSApp.keyWindow?.contentView?.superview {
-            print("button",button)
-            _ = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength).length
-            let menuBarFrame = button.frame
-            let position = CGPoint(x: menuBarFrame.origin.x + (menuBarFrame.size.width / 2), y: menuBarFrame.origin.y)
-
-            popover.show(relativeTo: NSRect(x: position.x, y: position.y, width: 0, height: 0), of: button, preferredEdge: .minY)
+    
+    /// 显示或更新 Toast 消息
+    /// - Parameters:
+    ///   - message: 要显示的消息内容
+    ///   - displayDuration: 显示持续时间，默认3秒
+    func makeToast(message: String, displayDuration: Double = 3) {
+        let now = Date()
+        guard now.timeIntervalSince(lastUpdateTime) >= minimumUpdateInterval else {
+            return  // 防止频繁更新
         }
-
-        // 显示完毕后，自动隐藏
-        DispatchQueue.main.asyncAfter(deadline: .now() + displayDuration) {
-            popover.performClose(nil)
+        
+        self.message = message
+        self.lastUpdateTime = now
+        
+        if !isDisplaying {
+            toastWindow?.makeKeyAndOrderFront(nil)
+            isDisplaying = true
         }
-
-        self.popover = popover
+        
+        adjustWindowSize(for: message)
+        scheduleHideToast(after: displayDuration)
+    }
+    
+    /// 初始化 Toast 窗口及其基本配置
+    private func setupToastWindow() {
+        let screen = NSScreen.main!
+        let frame = CGRect(
+            x: (screen.frame.width - 300) / 2,
+            y: screen.frame.height - 50,
+            width: 300,
+            height: 50
+        )
+        
+        let hostingView = NSHostingView(rootView: ToastView(manager: self))
+        toastWindow = NSWindow(
+            contentRect: frame,
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        toastWindow?.isOpaque = false
+        toastWindow?.backgroundColor = .clear
+        toastWindow?.level = .floating
+        toastWindow?.contentView = hostingView
+        toastWindow?.isReleasedWhenClosed = false
+    }
+    
+    /// 根据消息内容动态调整窗口大小
+    private func adjustWindowSize(for message: String) {
+        guard let toastWindow = self.toastWindow else { return }
+        
+        let tempView = NSHostingView(rootView: ToastView(manager: self))
+        let fittingSize = tempView.fittingSize
+        
+        let screen = NSScreen.main!
+        let newFrame = CGRect(
+            x: (screen.frame.width - fittingSize.width) / 2,
+            y: screen.frame.height - 50,
+            width: fittingSize.width,
+            height: fittingSize.height
+        )
+        toastWindow.setFrame(newFrame, display: true)
+    }
+    
+    /// 调度 Toast 的自动隐藏任务
+    /// - Parameter duration: 显示持续时间
+    private func scheduleHideToast(after duration: Double) {
+        hideTask?.cancel()  // 取消之前的隐藏任务
+        
+        hideTask = Task {
+            do {
+                try await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+                if !Task.isCancelled {
+                    toastWindow?.orderOut(nil)
+                    isDisplaying = false
+                }
+            } catch {
+                print("Hide task cancelled")
+            }
+        }
     }
 }
 
-// Toast 的视图内容
+/// Toast 视图组件
 struct ToastView: View {
-    var message: String
-
+    @ObservedObject var manager: ToastManager
+    
     var body: some View {
-        Text(message)
+        Text(manager.message)
             .padding()
             .background(Color.black.opacity(0.8))
-            .cornerRadius(10)
             .foregroundColor(.white)
-            .font(.body)
+            .cornerRadius(8)
     }
 }
