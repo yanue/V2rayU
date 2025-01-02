@@ -59,6 +59,22 @@ extension UserDefaults {
         case runningProfile
     }
 
+    static func del(forKey key: KEY) {
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
+    }
+    
+    static func setInt(forKey key: KEY, value: Int) {
+        UserDefaults.standard.set(value, forKey: key.rawValue)
+    }
+
+    static func getInt(forKey key: KEY, defaultValue: Int = 0) -> Int {
+        let num = UserDefaults.standard.integer(forKey: key.rawValue)
+        if num != 0 {
+            return num
+        }
+        return defaultValue
+    }
+
     static func setBool(forKey key: KEY, value: Bool) {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }
@@ -73,10 +89,6 @@ extension UserDefaults {
 
     static func get(forKey key: KEY) -> String? {
         return UserDefaults.standard.string(forKey: key.rawValue)
-    }
-
-    static func del(forKey key: KEY) {
-        UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
 
     static func setArray(forKey key: KEY, value: [String]) {

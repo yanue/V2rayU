@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Tun2SocksKit
 
 extension V2rayLaunch {
     static let tunUpScriptPath: String = AppHomePath + "/tun_up.sh"
@@ -67,14 +66,14 @@ extension V2rayLaunch {
             .replacingOccurrences(of: "{{ socksPort }}", with: "1080") // Example port
         print("Tun2Socks config: \(stringConfigContent)")
         // Run Tun2Socks
-        Socks5Tunnel.run(withConfig: .string(content: stringConfigContent)) { code in
-            print("Tun2Socks exited with code: \(code)")
-            logStats()
-        }
+//        Socks5Tunnel.run(withConfig: .string(content: stringConfigContent)) { code in
+//            print("Tun2Socks exited with code: \(code)")
+//            logStats()
+//        }
     }
     
     static func stopTun2Socks() {
-        Socks5Tunnel.quit()
+//        Socks5Tunnel.quit()
     }
 
     // Create script and set executable permissions
@@ -92,12 +91,12 @@ extension V2rayLaunch {
 
     // 打印统计信息
     static func logStats() {
-        let stats = Socks5Tunnel.stats
-        print("Tun2Socks stats: \(stats)")
-        
-        DispatchQueue.global().asyncAfter(deadline: .now() + 10) {
-            let updatedStats = Socks5Tunnel.stats
-            print("Tun2Socks updated stats: \(updatedStats)")
-        }
+//        let stats = Socks5Tunnel.stats
+//        print("Tun2Socks stats: \(stats)")
+//        
+//        DispatchQueue.global().asyncAfter(deadline: .now() + 10) {
+//            let updatedStats = Socks5Tunnel.stats
+//            print("Tun2Socks updated stats: \(updatedStats)")
+//        }
     }
 }

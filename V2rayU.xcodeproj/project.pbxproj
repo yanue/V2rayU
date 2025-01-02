@@ -10,8 +10,6 @@
 		660330042D0D5504009FEB56 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 660330032D0D5504009FEB56 /* GRDB */; };
 		660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 660330082D0D5540009FEB56 /* GRDBSQLite */; };
 		6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 660330592D11BF28009FEB56 /* KeyboardShortcuts */; };
-		662CC3382D1AE8CA006E8450 /* Tun2SocksKit in Frameworks */ = {isa = PBXBuildFile; productRef = 662CC3372D1AE8CA006E8450 /* Tun2SocksKit */; };
-		662CC33A2D1AE8CA006E8450 /* Tun2SocksKitC in Frameworks */ = {isa = PBXBuildFile; productRef = 662CC3392D1AE8CA006E8450 /* Tun2SocksKitC */; };
 		662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FE2D1BED9B006E8450 /* RouingList.swift */; };
 		662CC4022D1BED9B006E8450 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C02D1BED9B006E8450 /* AppDelegate.swift */; };
 		662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C52D1BED9B006E8450 /* String+Extension.swift */; };
@@ -42,7 +40,7 @@
 		662CC41E2D1BED9B006E8450 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F12D1BED9B006E8450 /* ProfileView.swift */; };
 		662CC41F2D1BED9B006E8450 /* JsonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FA2D1BED9B006E8450 /* JsonView.swift */; };
 		662CC4202D1BED9B006E8450 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C82D1BED9B006E8450 /* Util.swift */; };
-		662CC4212D1BED9B006E8450 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FC2D1BED9B006E8450 /* MenuView.swift */; };
+		662CC4212D1BED9B006E8450 /* AppMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FC2D1BED9B006E8450 /* AppMenuView.swift */; };
 		662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */; };
 		662CC4232D1BED9B006E8450 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3BF2D1BED9B006E8450 /* App.swift */; };
 		662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C62D1BED9B006E8450 /* Url+Extension.swift */; };
@@ -138,7 +136,7 @@
 		662CC3F92D1BED9B006E8450 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		662CC3FA2D1BED9B006E8450 /* JsonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonView.swift; sourceTree = "<group>"; };
 		662CC3FB2D1BED9B006E8450 /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
-		662CC3FC2D1BED9B006E8450 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		662CC3FC2D1BED9B006E8450 /* AppMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenuView.swift; sourceTree = "<group>"; };
 		662CC3FD2D1BED9B006E8450 /* Overview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overview.swift; sourceTree = "<group>"; };
 		662CC3FE2D1BED9B006E8450 /* RouingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouingList.swift; sourceTree = "<group>"; };
 		662CC3FF2D1BED9B006E8450 /* SubList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubList.swift; sourceTree = "<group>"; };
@@ -173,10 +171,8 @@
 			files = (
 				66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */,
 				6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */,
-				662CC33A2D1AE8CA006E8450 /* Tun2SocksKitC in Frameworks */,
 				660330042D0D5504009FEB56 /* GRDB in Frameworks */,
 				66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */,
-				662CC3382D1AE8CA006E8450 /* Tun2SocksKit in Frameworks */,
 				660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -329,7 +325,7 @@
 				662CC3F92D1BED9B006E8450 /* Common.swift */,
 				662CC3FA2D1BED9B006E8450 /* JsonView.swift */,
 				662CC3FB2D1BED9B006E8450 /* Main.swift */,
-				662CC3FC2D1BED9B006E8450 /* MenuView.swift */,
+				662CC3FC2D1BED9B006E8450 /* AppMenuView.swift */,
 				662CC3FD2D1BED9B006E8450 /* Overview.swift */,
 				662CC3FE2D1BED9B006E8450 /* RouingList.swift */,
 				662CC3FF2D1BED9B006E8450 /* SubList.swift */,
@@ -460,7 +456,6 @@
 				66A078BA2D008A3700490469 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 				660330022D0D5504009FEB56 /* XCRemoteSwiftPackageReference "GRDB" */,
 				660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				662CC3362D1AE8CA006E8450 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */,
 				662CC4322D1BEE94006E8450 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				662CC4332D1BEEDB006E8450 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */,
@@ -535,7 +530,7 @@
 				662CC41E2D1BED9B006E8450 /* ProfileView.swift in Sources */,
 				662CC41F2D1BED9B006E8450 /* JsonView.swift in Sources */,
 				662CC4202D1BED9B006E8450 /* Util.swift in Sources */,
-				662CC4212D1BED9B006E8450 /* MenuView.swift in Sources */,
+				662CC4212D1BED9B006E8450 /* AppMenuView.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
@@ -708,6 +703,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 yanue. All rights reserved.";
@@ -741,6 +737,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = V2rayU/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 yanue. All rights reserved.";
@@ -798,14 +795,6 @@
 				minimumVersion = 2.2.4;
 			};
 		};
-		662CC3362D1AE8CA006E8450 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/EbrahimTahernejad/Tun2SocksKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.7.6;
-			};
-		};
 		662CC4322D1BEE94006E8450 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -855,16 +844,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
-		};
-		662CC3372D1AE8CA006E8450 /* Tun2SocksKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 662CC3362D1AE8CA006E8450 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */;
-			productName = Tun2SocksKit;
-		};
-		662CC3392D1AE8CA006E8450 /* Tun2SocksKitC */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 662CC3362D1AE8CA006E8450 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */;
-			productName = Tun2SocksKitC;
 		};
 		66A078BB2D008A3700490469 /* SwiftyBeaver */ = {
 			isa = XCSwiftPackageProductDependency;

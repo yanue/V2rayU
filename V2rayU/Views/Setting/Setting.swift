@@ -44,7 +44,7 @@ struct SettingView: View {
                 case .general:
                     GeneralView()
                 case .advance:
-                    TrafficView()
+                    AdvanceView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -8,7 +8,6 @@
 
 import Cocoa
 import SystemConfiguration
-import Tun2SocksKit
 
 // 高版本macos执行NSAppleScript会出现授权失败
 func executeAppleScriptWithOsascript(script: String) {
