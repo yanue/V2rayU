@@ -53,7 +53,7 @@ struct SubListView: View {
                 .disabled(selection.isEmpty)
                 Button("新增") {
                     withAnimation {
-                        self.selectedRow = SubModel(remark: "test", url: "http://acb.dd")
+                        self.selectedRow = SubModel(remark: "", url: "")
                     }
                 }
             }

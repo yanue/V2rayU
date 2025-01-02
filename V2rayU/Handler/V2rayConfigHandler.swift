@@ -34,7 +34,7 @@ class V2rayConfigHandler {
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
 
-        self.httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
+        self.httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087") ?? "1087"
         self.httpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
         self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
         self.socksHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
@@ -76,7 +76,7 @@ class V2rayConfigHandler {
 
     func combine(_outbounds: [V2rayOutbound]) {
         // base
-        self.v2ray.log.loglevel = V2rayLog.logLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel) ?? "info") ?? V2rayLog.logLevel.info
+        self.v2ray.log.loglevel = V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info
 
         // ------------------------------------- inbound start ---------------------------------------------
         var inSocks = V2rayInbound()

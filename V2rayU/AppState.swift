@@ -1,5 +1,5 @@
-import SwiftUI
 import Combine
+import SwiftUI
 
 enum RunMode: String {
     case global
@@ -26,16 +26,16 @@ final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
 
     @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204")!
-    
+
     @Published var runMode: RunMode = .off
-    
+
     @Published var launchAtLogin: Bool = true
     @Published var checkForUpdates: Bool = true
     @Published var autoUpdateServers: Bool = true
     @Published var selectFastestServer: Bool = true
     @Published var enableStat = true
 
-    @Published var logLevel = V2rayLog.logLevel.info
+    @Published var logLevel = V2rayLogLevel.info
     @Published var socksPort = 1080
     @Published var socksHost = "127.0.0.1"
     @Published var httpPort = 1087
@@ -45,33 +45,33 @@ final class AppState: ObservableObject {
     @Published var enableMux = false
     @Published var mux = 8
     @Published var dnsJson = ""
-    
+
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        self.runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
-        self.enableMux = UserDefaults.getBool(forKey: .enableMux)
-        self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
-        self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
-        self.enableStat = UserDefaults.getBool(forKey: .enableStat)
+        runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
+        enableMux = UserDefaults.getBool(forKey: .enableMux)
+        enableUdp = UserDefaults.getBool(forKey: .enableUdp)
+        enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
+        enableStat = UserDefaults.getBool(forKey: .enableStat)
 
-        self.httpPort = UserDefaults.getInt(forKey: .localHttpPort, defaultValue: 1087)
-        self.httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
-        self.socksPort = UserDefaults.getInt(forKey: .localSockPort,defaultValue: 1080)
-        self.socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
-        self.mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
+        httpPort = UserDefaults.getInt(forKey: .localHttpPort, defaultValue: 1087)
+        httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
+        socksPort = UserDefaults.getInt(forKey: .localSockPort, defaultValue: 1080)
+        socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
+        mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
 
-        self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLog.logLevel.self, defaultValue: .info)
+        logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
 
-        self.launchAtLogin = UserDefaults.getBool(forKey: .autoLaunch)
-        self.autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
-        self.checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)
-        self.selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
-        print("AppState init", self.launchAtLogin, self.autoUpdateServers, self.checkForUpdates, self.selectFastestServer)
-        
-        self.setupBindings()
+        launchAtLogin = UserDefaults.getBool(forKey: .autoLaunch)
+        autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
+        checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)
+        selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
+        print("AppState init", launchAtLogin, autoUpdateServers, checkForUpdates, selectFastestServer)
+
+        setupBindings()
     }
-    
+
     private func setupBindings() {
         $runMode
             .sink { mode in
@@ -84,7 +84,7 @@ final class AppState: ObservableObject {
                 UserDefaults.setBool(forKey: .autoLaunch, value: launch)
             }
             .store(in: &cancellables)
-        
+
         $autoUpdateServers
             .sink { _bool in
                 UserDefaults.setBool(forKey: .autoUpdateServers, value: _bool)
@@ -96,16 +96,16 @@ final class AppState: ObservableObject {
                 UserDefaults.setBool(forKey: .autoCheckVersion, value: _bool)
             }
             .store(in: &cancellables)
-        
+
         $selectFastestServer
             .sink { _bool in
                 UserDefaults.setBool(forKey: .autoSelectFastestServer, value: _bool)
             }
             .store(in: &cancellables)
-        
+
         $logLevel
             .sink { level in
-                UserDefaults.set(forKey: .v2rayLogLevel, value: level)
+                UserDefaults.set(forKey: .v2rayLogLevel, value: level.rawValue)
             }
             .store(in: &cancellables)
 
@@ -162,11 +162,15 @@ final class AppState: ObservableObject {
                 UserDefaults.set(forKey: .v2rayDnsJson, value: json)
             }
             .store(in: &cancellables)
+
+        $enableStat
+            .sink { enabled in
+                UserDefaults.setBool(forKey: .enableStat, value: enabled)
+            }
+            .store(in: &cancellables)
     }
 
-    
     func setRunMode(mode: RunMode) async {
-        self.runMode = mode
+        runMode = mode
     }
-
 }

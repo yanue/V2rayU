@@ -34,17 +34,18 @@ extension V2rayStruct {
     }
 }
 
+enum V2rayLogLevel: String, Codable, CaseIterable, Identifiable {
+    case debug
+    case info
+    case warning
+    case error
+    case none
+    var id: Self { self }
+}
+
 // log
 struct V2rayLog: Codable {
-    enum logLevel: String, Codable {
-        case debug
-        case info
-        case warning
-        case error
-        case none
-    }
-
-    var loglevel: logLevel = .info
+    var loglevel: V2rayLogLevel = .info
     var error: String = ""
     var access: String = ""
 }

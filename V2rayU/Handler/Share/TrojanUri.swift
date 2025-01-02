@@ -72,10 +72,10 @@ class TrojanUri: BaseShareUri {
         profile.password = password
 
         let query = url.queryParams()
-        profile.network = query.getEnum("type", V2rayStreamNetwork.self, defaultValue: .tcp)
-        profile.security = query.getEnum("security", V2rayStreamSecurity.self, defaultValue: .tls)
-        profile.sni = query.getString("sni", defaultValue: profile.address)
-        profile.fingerprint = query.getEnum("fp", V2rayStreamFingerprint.self, defaultValue: .chrome)
+        profile.network = query.getEnum(forKey: "type", type: V2rayStreamNetwork.self, defaultValue: .tcp)
+        profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
+        profile.sni = query.getString(forKey: "sni", defaultValue: profile.address)
+        profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
         // security 不能为 none
         if profile.security == .none {
             profile.security = .tls
@@ -87,15 +87,15 @@ class TrojanUri: BaseShareUri {
         // 判断 network 类型
         switch profile.network {
         case .tcp:
-            profile.headerType = query.getEnum("headerType", V2rayStreamHeaderType.self, defaultValue: .none)
+            profile.headerType = query.getEnum(forKey: "headerType", type: V2rayHeaderType.self, defaultValue: .none)
             break
         case .ws, .h2:
-            profile.host = query.getString("host", defaultValue: profile.address)
-            profile.path = query.getString("path", defaultValue: "/")
+            profile.host = query.getString(forKey: "host", defaultValue: profile.address)
+            profile.path = query.getString(forKey: "path", defaultValue: "/")
             break
         case .grpc:
             // grpcServiceName: 先从 query 中获取 serviceName，如果没有则获取 path，如果都没有则默认为 "/"
-            profile.path = query.getString("serviceName", defaultValue: query.getString("path", defaultValue: "/"))
+            profile.path = query.getString(forKey: "serviceName", defaultValue: query.getString(forKey: "path", defaultValue: "/"))
             break
         default:
             break

@@ -188,98 +188,39 @@ class VmessUri: BaseShareUri {
 
         // params
         let query = url.queryParams()
-        profile.network = query.getEnum("network", V2rayStreamNetwork.self, defaultValue: .tcp)
-        profile.security = query.getEnum("tls", V2rayStreamSecurity.self, defaultValue: .tls)
-        profile.sni = query.getString("tlsServer", defaultValue:  query.getString("sni", defaultValue: profile.address))
-        profile.fingerprint = query.getEnum("fp", V2rayStreamFingerprint.self, defaultValue: .none)
-        profile.allowInsecure = query.getString("allowInsecure", defaultValue: "1") == "1" ? true : false
-        profile.alterId = query.getInt("aid", defaultValue: 0)
-        profile.remark = query.getString("remark", defaultValue: "vmess")
+        profile.network = query.getEnum(forKey: "network", type: V2rayStreamNetwork.self, defaultValue: .tcp)
+        profile.security = query.getEnum(forKey: "tls", type: V2rayStreamSecurity.self, defaultValue: .tls)
+        profile.sni = query.getString(forKey: "tlsServer", defaultValue:  query.getString(forKey: "sni", defaultValue: profile.address))
+        profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .none)
+        profile.allowInsecure = query.getString(forKey: "allowInsecure", defaultValue: "1") == "1" ? true : false
+        profile.alterId = query.getInt(forKey: "aid", defaultValue: 0)
+        profile.remark = query.getString(forKey: "remark", defaultValue: "vmess")
         switch profile.network {
         case .tcp:
             break
         case .ws:
-            profile.path = query.getString("wsPath", defaultValue: "/")
-            profile.host = query.getString("wsHost", defaultValue: profile.address)
+            profile.path = query.getString(forKey: "wsPath", defaultValue: "/")
+            profile.host = query.getString(forKey: "wsHost", defaultValue: profile.address)
             break
         case .h2:
-            profile.path = query.getString("h2Path", defaultValue: "/")
-            profile.host = query.getString("h2Host", defaultValue: profile.address)
+            profile.path = query.getString(forKey: "h2Path", defaultValue: "/")
+            profile.host = query.getString(forKey: "h2Host", defaultValue: profile.address)
             break
         case .kcp:
-            profile.headerType = query.getEnum("kcpHeader", V2rayHeaderType.self, defaultValue: .none)
-            profile.path = query.getString("seed", defaultValue: "") // seed
-            profile.uplinkCapacity = query.getInt("uplinkCapacity", defaultValue: 5)
-            profile.downlinkCapacity = query.getInt("downlinkCapacity", defaultValue: 20)
+            profile.headerType = query.getEnum(forKey: "kcpHeader", type: V2rayHeaderType.self, defaultValue: .none)
+            profile.path = query.getString(forKey: "seed", defaultValue: "") // seed
             break
         case .grpc:
-            profile.path = query.getString("serviceName", defaultValue: "/")
+            profile.path = query.getString(forKey: "serviceName", defaultValue: "/")
             break
         case .quic:
-            profile.path = query.getString("path", defaultValue: "/")
+            profile.path = query.getString(forKey: "path", defaultValue: "/")
             break
         case .domainsocket:
-            profile.path = query.getString("path", defaultValue: "/")
+            profile.path = query.getString(forKey: "path", defaultValue: "/")
             break
         default:
             break
-        }
-
-        for item in queryItems {
-            let value = item.value as? String ?? ""
-            switch item.key {
-            case "network":
-                profile.network = V2rayStreamNetwork(rawValue: value) ?? .tcp
-                break
-            case "h2path":
-                profile.path = value
-                break
-            case "h2host":
-                profile.host = value
-                break
-            case "aid":
-                profile.alterId = Int(value) ?? 0
-                break
-            case "tls":
-                profile.security = V2rayStreamSecurity(rawValue: value) ?? .tls
-                break
-            case "allowInsecure":
-                profile.allowInsecure = value == "1" ? true : false
-                break
-            case "tlsServer":
-                profile.sni = value
-                break
-            case "sni":
-                profile.sni = value
-                break
-            case "fp":
-                profile.fingerprint = V2rayStreamFingerprint(rawValue: value) ?? .none
-                break
-            case "type":
-                profile.headerType = V2rayHeaderType(rawValue: value) ?? .none
-                break
-            case "alpn":
-                profile.alpn = V2rayStreamAlpn(rawValue: value) ?? .none
-                break
-            case "encryption":
-                profile.encryption = value
-                break
-            case "kcpHeader":
-                // type 是所有传输方式的伪装类型
-                profile.headerType = V2rayHeaderType(rawValue: value) ?? .none
-                break
-            case "remark":
-                profile.remark = value
-                break
-            case "serviceName":
-                profile.path = value
-                break
-            case "seed":
-                profile.path = value
-                break
-            default:
-                break
-            }
         }
     }
 
