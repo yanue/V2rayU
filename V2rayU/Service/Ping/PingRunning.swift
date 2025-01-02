@@ -18,11 +18,13 @@ actor PingRunning {
     private var item: ProfileModel = ProfileModel()
 
     /// 开始 Ping 流程
-    func startPing(item: ProfileModel) async {
+    func startPing(item: ProfileModel) async throws {
         guard !isExecuting else {
             print("Ping task is already running.")
             return
         }
+        // 睡眠
+        try await Task.sleep(nanoseconds: 2 * 1_000_000_000) // Wait for 2 seconds
         // 替换
         self.item = item
         // 控制

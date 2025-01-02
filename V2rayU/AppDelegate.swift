@@ -51,7 +51,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             // 自动更新订阅服务器
-//            SubscriptionHandler.shared.sync()
+            Task{
+                await SubscriptionHandler.shared.sync()
+            }
         }
         // ping
         Task {

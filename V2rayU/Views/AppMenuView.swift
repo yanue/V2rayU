@@ -6,6 +6,8 @@ struct AppMenuView: View {
     @State private var isMitMEnabled = false
     @State private var isScriptEnabled = false
     @State private var isPresenting  = false
+    @ObservedObject var appState = AppState.shared // 引用单例
+
     var openContentViewWindow: () -> Void
     var body: some View {
         VStack() {
@@ -16,7 +18,16 @@ struct AppMenuView: View {
                     noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// from Pasteboard")
                 }
             })
-            
+            Toggle("启动", isOn: $appState.v2rayTurnOn)
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .onChange(of: appState.v2rayTurnOn) { newValue in
+                    if newValue {
+                        V2rayLaunch.startV2rayCore()
+                    } else {
+                        V2rayLaunch.stopV2rayCore()
+                    }
+            }
+
             HStack(spacing: 20) {
                 Button("打开配置") {
                     openContentViewWindow()

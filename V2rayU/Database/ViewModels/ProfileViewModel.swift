@@ -40,7 +40,7 @@ class ProfileViewModel: ObservableObject {
     static func getRunning() -> ProfileModel? {
         var item: ProfileModel?
         // 获取当前运行配置
-        let runningProfile = UserDefaults.get(forKey: .runningProfile) ?? ""
+        let runningProfile = UserDefaults.get(forKey: .runningProfile)
         if !runningProfile.isEmpty {
             // 根据uuid获取配置
             item = ProfileViewModel.fetchOne(uuid: runningProfile)

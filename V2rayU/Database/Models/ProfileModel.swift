@@ -246,3 +246,11 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
         }
     }
 }
+
+extension ProfileModel {
+    func deepCopy() -> ProfileModel {
+        let jsonData = try! JSONEncoder().encode(self)
+        let copy = try! JSONDecoder().decode(ProfileModel.self, from: jsonData)
+        return copy
+    }
+}

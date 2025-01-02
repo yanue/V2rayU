@@ -159,10 +159,7 @@ class V2rayLaunch: NSObject {
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start and show servers
-            Task {
-                await AppState.shared.setRunMode(mode: .global)
-            }
-//            startV2rayCore()
+            startV2rayCore()
         } else {
             // show off status
             Task {
@@ -187,11 +184,10 @@ class V2rayLaunch: NSObject {
     }
 
     static func setRunMode(mode: RunMode) {
+        setSystemProxy(mode: mode)
         Task {
             await AppState.shared.setRunMode(mode: mode)
         }
-
-        setSystemProxy(mode: mode)
     }
 
     static func ToggleRunning() {
@@ -211,37 +207,31 @@ class V2rayLaunch: NSObject {
 
     // start v2ray core
     static func startV2rayCore() {
-        NSLog("start v2ray-core begin")
-        guard let v2ray = ProfileViewModel.getRunning() else {
-            noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
-            Task {
+        Task{
+            NSLog("start v2ray-core begin")
+            guard let v2ray = ProfileViewModel.getRunning() else {
+                noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
                 await AppState.shared.setRunMode(mode: .off)
+                return
             }
-            return
-        }
-
-        let runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "global") ?? .global
-
-        // create json file
-//        createJsonFile(item: v2ray)
-
-        // launch
-        let started = V2rayLaunch.Start()
-        if !started {
-            Task {
+            // create json file
+            createJsonFile(item: v2ray)
+            // launch
+            let started = V2rayLaunch.Start()
+            if !started {
+                NSLog("start v2ray-core failed")
                 await AppState.shared.setRunMode(mode: .off)
+                return
             }
-            return
+            // set run mode
+            var runMode = await AppState.shared.runMode
+            if runMode == .off {
+                runMode = .global
+            }
+            setRunMode(mode: runMode)
+            // ping current
+//            try await PingRunning.shared.startPing(item: v2ray)
         }
-
-        // set run mode
-        setRunMode(mode: runMode)
-
-        // reload menu
-//        menuController.showServers()
-
-        // ping current
-//        PingCurrent.shared.startPing(with: v2ray)
     }
 
     static func stopV2rayCore() {
@@ -250,11 +240,23 @@ class V2rayLaunch: NSObject {
         // off system proxy
         V2rayLaunch.setSystemProxy(mode: .off)
         // set status
-//        menuController.setStatusOff()
-        // reload menu
-//        menuController.showServers()
+        Task {
+            await AppState.shared.setRunMode(mode: .off)
+        }
     }
-
+    
+    static func createJsonFile(item: ProfileModel) {
+        let vCfg = V2rayConfigHandler()
+        let jsonText = vCfg.toJSON(item: item)
+        do {
+            NSLog("createJsonFile: \(JsonConfigFilePath)")
+            try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Failed to write JSON file: \(error)")
+            noticeTip(title: "Failed to write JSON file: \(error)")
+        }
+    }
+    
     static func Start() -> Bool {
         Stop()
 
@@ -331,8 +333,8 @@ class V2rayLaunch: NSObject {
         var sockPort: String = ""
         // reload
         if mode == .global {
-            httpPort = UserDefaults.get(forKey: .localHttpPort) ?? "1087"
-            sockPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
+            httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087")
+            sockPort = UserDefaults.get(forKey: .localSockPort,defaultValue: "1080")
         }
         do {
             let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])

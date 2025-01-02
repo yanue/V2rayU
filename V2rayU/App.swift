@@ -7,6 +7,8 @@ struct V2rayUApp: App {
     @State  var aboutWindowController: NSWindowController?
     @StateObject var languageManager = LanguageManager()
     @StateObject var themeManager = ThemeManager()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var appState = AppState.shared
 
     init() {
         // 初始化
@@ -17,13 +19,13 @@ struct V2rayUApp: App {
         print("NSHomeDirectory()",NSHomeDirectory())
         print("userHomeDirectory",userHomeDirectory)
         V2rayLaunch.checkInstall()
-//        V2rayLaunch.runAtStart()
+        V2rayLaunch.runAtStart()
 //        V2rayLaunch.runTun2Socks()
     }
 
     var body: some Scene {
         // 显示 MenuBar
-        MenuBarExtra("V2rayU", image: AppState.shared.runMode.icon) {
+        MenuBarExtra("V2rayU", image: appState.icon) {
             AppMenuView(openContentViewWindow: openContentViewWindow)
         }.menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale

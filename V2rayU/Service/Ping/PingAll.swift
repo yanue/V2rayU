@@ -90,7 +90,7 @@ actor PingServer {
         self.item = item
         
         self.bindPort = getRandomPort()
-        self.jsonFile = "\(AppHomePath)/.\(item.uuid).json"
+        self.jsonFile = "\(AppHomePath)/.config.\(item.uuid).json"
         
         self.createV2rayJsonFileForPing()
 
@@ -127,7 +127,7 @@ actor PingServer {
     
     private func createV2rayJsonFileForPing() {
         let vCfg = V2rayConfigHandler()
-        let jsonText = vCfg.toJSON(item: item, ping:true)
+        let jsonText = vCfg.toJSON(item: item, httpPort: String(self.bindPort))
         do {
             try jsonText.write(to: URL(fileURLWithPath: jsonFile), atomically: true, encoding: .utf8)
         } catch {
@@ -139,6 +139,8 @@ actor PingServer {
         let process = Process()
         process.launchPath = "/bin/bash"
         process.arguments = ["-c", command]
+        process.standardOutput = nil
+        process.standardError = nil
         process.terminationHandler = { _process in
             if _process.terminationStatus != EXIT_SUCCESS {
                 _process.terminate()

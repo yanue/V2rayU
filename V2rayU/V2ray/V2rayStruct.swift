@@ -19,7 +19,7 @@ struct V2rayStruct: Codable {
     var policy: V2rayPolicy?
     var inbounds: [V2rayInbound]?
     var outbounds: [V2rayOutbound]?
-    var observatory: V2rayObservatory = V2rayObservatory()
+    var observatory: V2rayObservatory?
 }
 
 extension V2rayStruct {

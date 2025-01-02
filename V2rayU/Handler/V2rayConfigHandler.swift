@@ -15,7 +15,7 @@ class V2rayConfigHandler {
     var errors: [String] = []
 
     // base
-    var logLevel = "info"
+    var logLevel: V2rayLogLevel = .info
     var socksPort = "1080"
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
@@ -25,7 +25,7 @@ class V2rayConfigHandler {
     var enableMux = false
     var enableSniffing = false
     var mux = 8
-    var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson) ?? ""
+    var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson)
     var forPing = false
 
     // Initialization
@@ -34,22 +34,20 @@ class V2rayConfigHandler {
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
 
-        self.httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087") ?? "1087"
-        self.httpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
-        self.socksPort = UserDefaults.get(forKey: .localSockPort) ?? "1080"
-        self.socksHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
+        self.httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087")
+        self.httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
+        self.socksPort = UserDefaults.get(forKey: .localSockPort, defaultValue: "1080")
+        self.socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
 
-        self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
+        self.mux = UserDefaults.getInt(forKey: .muxConcurrent ,defaultValue: 8)
 
-        self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
+        self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
     }
 
     // ping配置
-    func toJSON(item: ProfileModel,ping: Bool) -> String {
-        if ping {
-            self.forPing = true
-            self.enableSocks = false
-        }
+    func toJSON(item: ProfileModel, httpPort: String) -> String {
+        self.forPing = true
+        self.enableSocks = false
         self.httpPort = String(httpPort)
         let outbound = V2rayOutboundHandler(from: item).getOutbound()
         self.combine(_outbounds: [outbound])
@@ -77,7 +75,10 @@ class V2rayConfigHandler {
     func combine(_outbounds: [V2rayOutbound]) {
         // base
         self.v2ray.log.loglevel = V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info
-
+        if !self.forPing {
+            self.v2ray.log.access = logFilePath
+            self.v2ray.log.error = logFilePath
+        }
         // ------------------------------------- inbound start ---------------------------------------------
         var inSocks = V2rayInbound()
         inSocks.port = self.socksPort
@@ -103,7 +104,7 @@ class V2rayConfigHandler {
         // inbounds
         var inbounds: [V2rayInbound] = []
         // for ping just use http
-        if self.enableSocks {
+        if !self.forPing {
             inbounds.append(inSocks)
         }
         inbounds.append(inHttp)
@@ -121,12 +122,14 @@ class V2rayConfigHandler {
         outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
         outboundBlackhole.tag = "block"
         outboundBlackhole.settings = V2rayOutboundBlackhole()
-        
+                
         // outbounds
         var outbounds: [V2rayOutbound] = []
         outbounds.append(contentsOf: _outbounds)
-        outbounds.append(outboundFreedom)
-        outbounds.append(outboundBlackhole)
+        if !self.forPing {
+            outbounds.append(outboundFreedom)
+            outbounds.append(outboundBlackhole)
+        }
 
         self.v2ray.outbounds = outbounds
         // ------------------------------------- routing start --------------------------------------------

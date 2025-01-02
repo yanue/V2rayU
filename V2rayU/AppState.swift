@@ -26,7 +26,10 @@ final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
 
     @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204")!
+    
+    @Published var icon: String = "IconOff" // 默认图标
 
+    @Published var v2rayTurnOn = true
     @Published var runMode: RunMode = .off
 
     @Published var launchAtLogin: Bool = true
@@ -50,6 +53,7 @@ final class AppState: ObservableObject {
 
     init() {
         runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
+        v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
         enableMux = UserDefaults.getBool(forKey: .enableMux)
         enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -171,6 +175,8 @@ final class AppState: ObservableObject {
     }
 
     func setRunMode(mode: RunMode) async {
-        runMode = mode
+        NSLog("setRunMode: \(mode)")
+        self.runMode = mode
+        self.icon = mode.icon // 更新图标
     }
 }
