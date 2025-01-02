@@ -50,7 +50,7 @@ struct ContentView: View {
                 case .activity:
                     ActivityView()
                 case .server:
-                    ConfigListView()
+                    ProfileListView()
                 case .subscription:
                     SubListView()
                 case .routing:

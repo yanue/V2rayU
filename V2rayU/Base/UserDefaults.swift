@@ -30,6 +30,8 @@ extension UserDefaults {
         case autoSelectFastestServer
         // pac|manual|global
         case runMode
+        // enable Traffic Statistics
+        case enableStat
 
         // base settings
         // http host
@@ -87,19 +89,20 @@ extension UserDefaults {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }
 
-    static func get(forKey key: KEY) -> String? {
-        return UserDefaults.standard.string(forKey: key.rawValue)
+    static func get(forKey key: KEY, defaultValue: String = "") -> String {
+        let rawValue = UserDefaults.standard.string(forKey: key.rawValue)
+        if rawValue != nil && rawValue != "" {
+            return defaultValue
+        }
+        return defaultValue
     }
 
-    static func setArray(forKey key: KEY, value: [String]) {
-        UserDefaults.standard.set(value, forKey: key.rawValue)
-    }
-
-    static func getArray(forKey key: KEY) -> [String]? {
-        return UserDefaults.standard.array(forKey: key.rawValue) as? [String]
-    }
-
-    static func delArray(forKey key: KEY) {
-        UserDefaults.standard.removeObject(forKey: key.rawValue)
+    // MARK: 获取枚举类型
+    static func getEnum<T: RawRepresentable>(forKey key: KEY, type: T.Type, defaultValue: T) -> T where T.RawValue == String {
+        guard let rawValue = UserDefaults.standard.string(forKey: key.rawValue),
+              let enumValue = T(rawValue: rawValue) else {
+            return defaultValue
+        }
+        return enumValue
     }
 }

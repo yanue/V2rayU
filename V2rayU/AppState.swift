@@ -33,38 +33,36 @@ final class AppState: ObservableObject {
     @Published var checkForUpdates: Bool = true
     @Published var autoUpdateServers: Bool = true
     @Published var selectFastestServer: Bool = true
+    @Published var enableStat = true
 
-    @Published var logLevel = "info"
+    @Published var logLevel = V2rayLog.logLevel.info
     @Published var socksPort = 1080
     @Published var socksHost = "127.0.0.1"
     @Published var httpPort = 1087
     @Published var httpHost = "127.0.0.1"
-    @Published var enableSocks = true
     @Published var enableUdp = false
+    @Published var enableSniffing = true
     @Published var enableMux = false
-    @Published var enableSniffing = false
     @Published var mux = 8
     @Published var dnsJson = ""
     
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        self.runMode = RunMode(rawValue: UserDefaults.get(forKey: .runMode) ?? "off") ?? .off
+        self.runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
         self.enableMux = UserDefaults.getBool(forKey: .enableMux)
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
+        self.enableStat = UserDefaults.getBool(forKey: .enableStat)
 
-        self.httpPort = UserDefaults.getInt(forKey: .localHttpPort)
-        if self.httpPort == 0 {
-            self.httpPort = 1080
-        }
-        self.httpHost = UserDefaults.get(forKey: .localHttpHost) ?? "127.0.0.1"
+        self.httpPort = UserDefaults.getInt(forKey: .localHttpPort, defaultValue: 1087)
+        self.httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
         self.socksPort = UserDefaults.getInt(forKey: .localSockPort,defaultValue: 1080)
-        self.socksHost = UserDefaults.get(forKey: .localSockHost) ?? "127.0.0.1"
-        self.mux = Int(UserDefaults.get(forKey: .muxConcurrent) ?? "8") ?? 8
+        self.socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
+        self.mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
 
-        self.logLevel = UserDefaults.get(forKey: .v2rayLogLevel) ?? "info"
-        
+        self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLog.logLevel.self, defaultValue: .info)
+
         self.launchAtLogin = UserDefaults.getBool(forKey: .autoLaunch)
         self.autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
         self.checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)

@@ -36,7 +36,7 @@ struct ConfigStreamView: View {
                     if item.network == .kcp {
                         getTextFieldWithLabel(label: "seed",text: $item.path)
                         getPickerWithLabel(label: "header-type", selection: $item.headerType)
-                        getBoolWithLabel(label: "congestion", isOn: $item.allowInsecure)
+                        getBoolFieldWithLabel(label: "congestion", isOn: $item.allowInsecure)
                         getNumFieldWithLabel(label: "mtu", num: $item.port)
                         getNumFieldWithLabel(label: "tti", num: $item.port)
                         getNumFieldWithLabel(label: "uplinkCapacity", num: $item.port)

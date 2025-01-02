@@ -51,21 +51,49 @@ class VlessUri: BaseShareUri {
         uri.user = self.profile.id
         uri.host = self.profile.address
         uri.port = self.profile.port
-        uri.queryItems = [
+        var queryItems = [
             URLQueryItem(name: "flow", value: self.profile.flow),
             URLQueryItem(name: "security", value: self.profile.security.rawValue),
             URLQueryItem(name: "encryption", value: self.profile.encryption),
             URLQueryItem(name: "type", value: self.profile.network.rawValue), // 网络类型: tcp,http,kcp,h2,ws,quic,grpc,domainsocket
-            URLQueryItem(name: "host", value: self.profile.host),
-            URLQueryItem(name: "path", value: self.profile.path),
             URLQueryItem(name: "sni", value: self.profile.sni),
             URLQueryItem(name: "fp", value: self.profile.fingerprint.rawValue),
             URLQueryItem(name: "pbk", value: self.profile.publicKey),
             URLQueryItem(name: "sid", value: self.profile.shortId),
-            URLQueryItem(name: "serviceName", value: self.profile.path),
-            URLQueryItem(name: "headerType", value: self.profile.headerType.rawValue),
-            URLQueryItem(name: "seed", value: self.profile.path)
         ]
+        switch self.profile.network {
+        case .tcp:
+            queryItems.append(URLQueryItem(name: "headerType", value: self.profile.headerType.rawValue))
+            break
+        case .xhttp:
+            queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
+            queryItems.append(URLQueryItem(name: "host", value: self.profile.host))
+            break
+        case .ws:
+            queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
+            queryItems.append(URLQueryItem(name: "host", value: self.profile.host))
+            break
+        case .h2:
+            queryItems.append(URLQueryItem(name: "host", value: self.profile.host))
+            queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
+            break
+        case .grpc:
+            queryItems.append(URLQueryItem(name: "serviceName", value: self.profile.path))
+            break
+        case .domainsocket:
+            queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
+            break
+        case kcp:
+            queryItems.append(URLQueryItem(name: "seed", value: self.profile.path))
+            queryItems.append(URLQueryItem(name: "headerType", value: self.profile.headerType.rawValue))
+            break
+        case .quic:
+            queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
+            break
+        default:
+            break
+        }
+        uri.queryItems = queryItems
 
         return (uri.url?.absoluteString ?? "") + "#" + self.profile.remark.urlEncoded()
     }
@@ -83,58 +111,59 @@ class VlessUri: BaseShareUri {
         self.profile.address = host
         self.profile.port = Int(port)
         self.profile.password = password
-        let queryItems = url.queryParams()
-        for item in queryItems {
-            switch item.key {
-            case "flow":
-                self.profile.flow = item.value as! String
-                break
-            case "encryption":
-                self.profile.encryption = item.value as! String
-                if self.profile.encryption.count == 0 {
-                    self.profile.encryption = "none"
-                }
-                break
-            case "security":
-                profile.security = V2rayStreamSecurity(rawValue: item.value as? String ?? "") ?? .none
-                break
-            case "type":
-                self.profile.network = V2rayStreamNetwork(rawValue: item.value as! String) ?? .tcp
-                break
-            case "host":
-                self.profile.host = item.value as! String
-                break
-            case "sni":
-                self.profile.sni = item.value as! String
-                break
-            case "path":
-                self.profile.path = item.value as! String
-                break
-            case "fp":
-                self.profile.fingerprint = V2rayStreamFingerprint(rawValue: item.value as! String) ?? .chrome
-                break
-            case "pbk":
-                self.profile.publicKey = item.value as! String
-                break
-            case "sid":
-                self.profile.shortId = item.value as! String
-                break
-            case "headerType":
-                self.profile.headerType = V2rayHeaderType(rawValue: item.value as! String) ?? .none
-                break
-            case "seed":
-                self.profile.path = item.value as! String
-                break
-            case "serviceName":
-                self.profile.path = item.value as! String
-                break
-            default:
-                break
-            }
+        let query = url.queryParams()
+        self.profile.network = query.getEnum("type", V2rayStreamNetwork.self, defaultValue: .tcp)
+        self.profile.security = query.getEnum("security", V2rayStreamSecurity.self, defaultValue: .xtls)
+        self.profile.sni = query.getString("sni", defaultValue: host)
+        self.profile.fingerprint = query.getEnum("fp", V2rayStreamFingerprint.self, defaultValue: .chrome)
+
+        switch self.profile.network {
+        case .tcp:
+            self.profile.headerType = query.getEnum("headerType", V2rayHeaderType.self, defaultValue: .none)
+            break
+        case .xhttp:
+            self.profile.path = query.getString("path", defaultValue: "/")
+            self.profile.host = query.getString("host", defaultValue: host)
+            break
+        case .ws:
+            self.profile.path = query.getString("path", defaultValue: "/")
+            self.profile.host = query.getString("host", defaultValue: host)
+            break
+        case .h2:
+            self.profile.host = query.getString("host", defaultValue: host)
+            self.profile.path = query.getString("path", defaultValue: "/")
+            break
+        case .grpc:
+            self.profile.path = query.getString("serviceName", defaultValue: "/")
+            break
+        case .domainsocket:
+            self.profile.path = query.getString("path", defaultValue: "/")
+            break
+        case .kcp:
+            self.profile.path = query.getString("seed", defaultValue: "")
+            self.profile.headerType = query.getEnum("headerType", V2rayHeaderType.self, defaultValue: .none)
+            break
+        case .quic:
+            self.profile.path = query.getString("path", defaultValue: "/")
+            break
+        default:
+            break
+        }
+
+        if self.profile.security == .none {
+            self.profile.security = .tls
         }
 
         if self.profile.sni.count == 0 {
             self.profile.sni = host
+        }
+
+        switch self.profile.security {
+        case .reality: // reality
+            self.profile.publicKey = query.getString("pbk", defaultValue: "")
+            self.profile.shortId = query.getString("sid", defaultValue: "")
+        default:
+            break
         }
 
         self.profile.remark = (url.fragment ?? "vless").urlDecoded()

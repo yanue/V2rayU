@@ -57,7 +57,7 @@ func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: St
 }
 
 @MainActor
-func getBoolWithLabel(label: String, isOn: Binding<Bool>) -> some View {
+func getBoolFieldWithLabel(label: String, isOn: Binding<Bool>) -> some View {
     HStack {
         Text(label).frame(width: 120, alignment: .trailing)
         Spacer()

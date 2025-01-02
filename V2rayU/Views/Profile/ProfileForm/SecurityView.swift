@@ -14,7 +14,7 @@ struct ConfigTransportView: View {
             VStack{
                 Section(header: Text("Transport Settings")) {
                     getPickerWithLabel(label: "Security", selection: $item.security)
-                    getBoolWithLabel(label: "allowInsecure", isOn: $item.allowInsecure)
+                    getBoolFieldWithLabel(label: "allowInsecure", isOn: $item.allowInsecure)
                     getTextFieldWithLabel(label: "serverName(SNI)", text: $item.sni)
                     getPickerWithLabel(label: "fingerprint", selection: $item.fingerprint)
                     if item.security == .reality {

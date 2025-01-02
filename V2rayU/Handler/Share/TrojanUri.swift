@@ -27,12 +27,32 @@ class TrojanUri: BaseShareUri {
         uri.password = profile.password
         uri.host = profile.address
         uri.port = profile.port
-        uri.queryItems = [
-            URLQueryItem(name: "flow", value: profile.flow),
+        var queryItems = [
+            URLQueryItem(name: "type", value: profile.network.rawValue),
             URLQueryItem(name: "security", value: profile.security.rawValue),
             URLQueryItem(name: "sni", value: profile.sni),
             URLQueryItem(name: "fp", value: profile.fingerprint.rawValue),
         ]
+        // 判断 network 类型
+        switch profile.network {
+        case .tcp:
+            queryItems.append(URLQueryItem(name: "headerType", value: profile.headerType.rawValue))
+            break
+        case .ws:
+            queryItems.append(URLQueryItem(name: "path", value: profile.path))
+            queryItems.append(URLQueryItem(name: "host", value: profile.host))
+            break
+        case .h2:
+            queryItems.append(URLQueryItem(name: "host", value: profile.host))
+            queryItems.append(URLQueryItem(name: "path", value: profile.path))
+            break
+        case .grpc:
+            queryItems.append(URLQueryItem(name: "serviceName", value: profile.path))
+            break
+        default:
+            break
+        }
+        uri.queryItems = queryItems
         return (uri.url?.absoluteString ?? "") + "#" + profile.remark.urlEncoded()
     }
 
@@ -47,30 +67,39 @@ class TrojanUri: BaseShareUri {
             return NSError(domain: "TrojanUriError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Missing password"])
         }
 
-        profile.host = host
+        profile.address = host
         profile.port = port
         profile.password = password
 
-        let queryItems = url.queryParams()
-        for item in queryItems {
-            switch item.key {
-            case "sni":
-                profile.sni = item.value as? String ?? ""
-            case "flow":
-                profile.flow = item.value as? String ?? ""
-            case "security":
-                profile.security = V2rayStreamSecurity(rawValue: item.value as? String ?? "") ?? .none
-            case "fp":
-                profile.fingerprint = V2rayStreamFingerprint(rawValue: item.value as? String ?? "") ?? .chrome
-            default:
-                break
-            }
-        }
-
+        let query = url.queryParams()
+        profile.network = query.getEnum("type", V2rayStreamNetwork.self, defaultValue: .tcp)
+        profile.security = query.getEnum("security", V2rayStreamSecurity.self, defaultValue: .tls)
+        profile.sni = query.getString("sni", defaultValue: profile.address)
+        profile.fingerprint = query.getEnum("fp", V2rayStreamFingerprint.self, defaultValue: .chrome)
+        // security 不能为 none
         if profile.security == .none {
             profile.security = .tls
         }
-
+        // 如果 sni 为空，则将 host 赋值给 sni
+        if self.profile.sni.count == 0 {
+            self.profile.sni = host
+        }
+        // 判断 network 类型
+        switch profile.network {
+        case .tcp:
+            profile.headerType = query.getEnum("headerType", V2rayStreamHeaderType.self, defaultValue: .none)
+            break
+        case .ws, .h2:
+            profile.host = query.getString("host", defaultValue: profile.address)
+            profile.path = query.getString("path", defaultValue: "/")
+            break
+        case .grpc:
+            // grpcServiceName: 先从 query 中获取 serviceName，如果没有则获取 path，如果都没有则默认为 "/"
+            profile.path = query.getString("serviceName", defaultValue: query.getString("path", defaultValue: "/"))
+            break
+        default:
+            break
+        }
         profile.remark = (url.fragment ?? "trojan").urlDecoded()
         return nil
     }

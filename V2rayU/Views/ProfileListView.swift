@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConfigListView: View {
+struct ProfileListView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var list: [ProfileModel] = []
     @State private var sortOrder: [KeyPathComparator<ProfileModel>] = []
@@ -163,5 +163,5 @@ struct ConfigListView: View {
 }
 
 #Preview {
-    ConfigListView()
+    ProfileListView()
 }

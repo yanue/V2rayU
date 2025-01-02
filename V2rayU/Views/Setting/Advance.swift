@@ -17,7 +17,19 @@ struct AdvanceView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Form {
-                    getNumFieldWithLabel(label: "httpPort", num: $appState.httpPort)
+                getTextFieldWithLabel(label: "Local Http Listen Host", num: $appState.httpHost)
+                getNumFieldWithLabel(label: "Local Http Listen Port", num: $appState.httpPort)
+                getTextFieldWithLabel(label: "Local Socks Listen Host", num: $appState.socksHost)
+                getNumFieldWithLabel(label: "Local Socks Listen Port", num: $appState.socksPort)
+                getBoolFieldWithLabel(label: "Enable UDP", bool: $appState.enableUdp)
+                HStack {
+                    getBoolFieldWithLabel(label: "Enable Mux", bool: $appState.enableMux)
+                    Spacer()
+                    getNumFieldWithLabel(label: "mux", num: $appState.mux)
+                }
+                getBoolFieldWithLabel(label: "Enable Sniffing", bool: $appState.enableSniffing)
+                Toggle("Enable Traffic Statistics", isOn: $appState.enableStat)
+                getPathFieldWithLabel(label: "V2ray Core Log Level", path: $appState.logLevel)
             }
         }
         .frame(width: 500, height: 400)

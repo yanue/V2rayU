@@ -7,19 +7,61 @@
 
 import Foundation
 
+// URL 扩展：用于从 URL 获取查询参数
 extension URL {
-    func queryParams() -> [String: Any] {
-        var dict = [String: Any]()
+    func queryParams() -> QueryParameters {
+        var dict = QueryParameters()
         if let components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             if let queryItems = components.queryItems {
                 for item in queryItems {
-                    dict[item.name] = item.value
+                    dict.add(key: item.name, value: item.value ?? "")
                 }
             }
-            return dict
-        } else {
-            return [:]
         }
+        return dict
+    }
+}
+
+// 更合适的命名：用于存储 URL 查询参数的类
+class QueryParameters: NSObject {
+    private var dict = [String: String]()
+
+    override init() {
+        super.init()
+    }
+
+    // 添加查询参数
+    func add(key: String, value: String) {
+        dict[key] = value
+    }
+
+    // 获取 String 类型的参数
+    func getString(forKey key: String, defaultValue: String = "") -> String {
+        return dict[key] ?? defaultValue
+    }
+
+    // 获取 Int 类型的参数
+    func getInt(forKey key: String, defaultValue: Int = 0) -> Int {
+        if let stringValue = dict[key], let intValue = Int(stringValue) {
+            return intValue
+        }
+        return defaultValue
+    }
+
+    // 获取 Bool 类型的参数
+    func getBool(forKey key: String, defaultValue: Bool = false) -> Bool {
+        if let stringValue = dict[key] {
+            return stringValue.lowercased() == "true" || stringValue == "1"
+        }
+        return defaultValue
+    }
+
+    // 获取 Enum 类型的参数
+    func getEnum<T: RawRepresentable>(forKey key: String, type: T.Type, defaultValue: T) -> T where T.RawValue == String {
+        if let rawValue = dict[key], let enumValue = T(rawValue: rawValue) {
+            return enumValue
+        }
+        return defaultValue
     }
 }
 

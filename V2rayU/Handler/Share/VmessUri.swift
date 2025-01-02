@@ -187,7 +187,44 @@ class VmessUri: BaseShareUri {
         print("VmessUri self", self)
 
         // params
-        let queryItems = url.queryParams()
+        let query = url.queryParams()
+        profile.network = query.getEnum("network", V2rayStreamNetwork.self, defaultValue: .tcp)
+        profile.security = query.getEnum("tls", V2rayStreamSecurity.self, defaultValue: .tls)
+        profile.sni = query.getString("tlsServer", defaultValue:  query.getString("sni", defaultValue: profile.address))
+        profile.fingerprint = query.getEnum("fp", V2rayStreamFingerprint.self, defaultValue: .none)
+        profile.allowInsecure = query.getString("allowInsecure", defaultValue: "1") == "1" ? true : false
+        profile.alterId = query.getInt("aid", defaultValue: 0)
+        profile.remark = query.getString("remark", defaultValue: "vmess")
+        switch profile.network {
+        case .tcp:
+            break
+        case .ws:
+            profile.path = query.getString("wsPath", defaultValue: "/")
+            profile.host = query.getString("wsHost", defaultValue: profile.address)
+            break
+        case .h2:
+            profile.path = query.getString("h2Path", defaultValue: "/")
+            profile.host = query.getString("h2Host", defaultValue: profile.address)
+            break
+        case .kcp:
+            profile.headerType = query.getEnum("kcpHeader", V2rayHeaderType.self, defaultValue: .none)
+            profile.path = query.getString("seed", defaultValue: "") // seed
+            profile.uplinkCapacity = query.getInt("uplinkCapacity", defaultValue: 5)
+            profile.downlinkCapacity = query.getInt("downlinkCapacity", defaultValue: 20)
+            break
+        case .grpc:
+            profile.path = query.getString("serviceName", defaultValue: "/")
+            break
+        case .quic:
+            profile.path = query.getString("path", defaultValue: "/")
+            break
+        case .domainsocket:
+            profile.path = query.getString("path", defaultValue: "/")
+            break
+        default:
+            break
+        }
+
         for item in queryItems {
             let value = item.value as? String ?? ""
             switch item.key {
