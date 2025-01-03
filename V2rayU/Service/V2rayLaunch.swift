@@ -155,7 +155,9 @@ class V2rayLaunch: NSObject {
     }
 
     static func runAtStart() {
-
+        Task {
+            await V2rayTrafficStats.shared.initialize()
+        }
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             // start and show servers

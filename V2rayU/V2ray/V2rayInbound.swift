@@ -165,8 +165,8 @@ struct V2rayInboundSockAccount: Codable {
 
 struct V2rayInboundDokodemoDoor: Codable {
     var address: String = "127.0.0.1"
-    var port: Int = 1085
-    var network: String = "tcp"
-    var followRedirect: Bool = false
-    var userLevel: Int = 0
+    var port: Int? // 1085
+    var network: String? // "tcp"
+    var followRedirect: Bool? // false
+    var userLevel: Int? // 0
 }

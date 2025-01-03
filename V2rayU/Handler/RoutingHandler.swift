@@ -83,9 +83,12 @@ class RoutingHandler {
         } else {
             return res
         }
+        
+        // api-rule:  {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
+        let apiRule = getRoutingRule(outTag: "metrics_out", domain: nil, ip: nil, port: nil,inboundTag: ["metrics_in"])
 
         // 根据默认规则生成
-        var rules: [V2rayRoutingRule] = []
+        var rules: [V2rayRoutingRule] = [apiRule]
 
         let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: self.routing.block)
         let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: self.routing.proxy)
@@ -182,13 +185,17 @@ class RoutingHandler {
         } else {
             settings.domainStrategy = V2rayRouting.domainStrategy(rawValue: self.routing.domainStrategy) ?? .AsIs
         }
+        // 最后添加默认规则
+//        let proxyRule = getRoutingRule(outTag: "proxy", domain: nil, ip: nil, port: nil)
+//        rules.append(proxyRule)
         settings.rules = rules
         return settings
     }
 
-    func getRoutingRule(outTag: String, domain: [String]?, ip: [String]?, port: String?) -> V2rayRoutingRule {
+    func getRoutingRule(outTag: String, domain: [String]?, ip: [String]?, port: String?, inboundTag: [String]? = nil) -> V2rayRoutingRule {
         var rule = V2rayRoutingRule()
         rule.outboundTag = outTag
+        rule.inboundTag = inboundTag
         rule.type = "field"
         rule.domain = domain
         rule.ip = ip

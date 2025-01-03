@@ -12,9 +12,9 @@ import Cocoa
 
 struct V2rayStruct: Codable {
     var log: V2rayLog = V2rayLog()
-    var api: V2rayApi?
-    var dns: V2rayDns = V2rayDns()
-    var stats: V2rayStats = V2rayStats()
+    var metrics: v2rayMetrics?
+    var dns: V2rayDns?
+    var stats: V2rayStats?
     var routing: V2rayRouting = V2rayRouting()
     var policy: V2rayPolicy?
     var inbounds: [V2rayInbound]?
@@ -50,9 +50,13 @@ struct V2rayLog: Codable {
     var access: String = ""
 }
 
+struct v2rayMetrics: Codable {
+    var tag: String = "metrics_out"
+}
+
 struct V2rayApi: Codable {
     var tag: String = "api" // 用于标识 API 的标识符,需要在 routing 中设置增加规则: {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
-    var listen: String = "127.0.0.1:1085" // 1.8.12起 这里不设置就需要在 inbounds 中设置
+    var listen: String? // 1.8.12起 这里不设置就需要在 inbounds 中设置
     var services: [String] = ["StatsService"]
 }
 
@@ -78,7 +82,7 @@ struct V2rayRouting: Codable {
     var domainStrategy: domainStrategy = .AsIs
     var domainMatcher: domainMatcher?
     var rules: [V2rayRoutingRule] = []
-    var balancers: [V2rayRoutingBalancer]? = []
+    var balancers: [V2rayRoutingBalancer]?
 }
 
 struct V2rayRoutingRule: Codable {
@@ -120,8 +124,8 @@ struct SystemPolicy: Codable {
 }
 
 struct V2rayObservatory: Codable {
-    var subjectSelector: [String] = ["outbound"]
-    var probeUrl: String = "https://www.google.com/generate_204"
-    var probeInterval: String = "10s"
-    var enableConcurrency: Bool = false
+    var subjectSelector: [String] = ["proxy"]
+    var probeUrl: String = "http://www.gstatic.com/generate_204"
+    var probeInterval: String = "5s"
+    var enableConcurrency: Bool?
 }

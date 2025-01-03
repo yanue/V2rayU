@@ -80,34 +80,21 @@ class V2rayConfigHandler {
             self.v2ray.log.error = logFilePath
         }
         // ------------------------------------- inbound start ---------------------------------------------
-        var inSocks = V2rayInbound()
-        inSocks.port = self.socksPort
-        inSocks.listen = self.socksHost
-        inSocks.protocol = V2rayProtocolInbound.socks
-        inSocks.settingSocks.udp = self.enableUdp
-        if self.enableSniffing {
-            inSocks.sniffing = V2rayInboundSniffing()
-        }
 
         // check same
         if self.httpPort == self.socksPort {
             self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
         }
-        var inHttp = V2rayInbound()
-        inHttp.port = self.httpPort
-        inHttp.listen = self.httpHost
-        inHttp.protocol = V2rayProtocolInbound.http
-        if self.enableSniffing {
-            inHttp.sniffing = V2rayInboundSniffing()
-        }
-
+        let inHttp = getInbound(protocol: .http, listen: self.httpHost, port: self.httpPort , enableSniffing: self.enableSniffing)
         // inbounds
-        var inbounds: [V2rayInbound] = []
+        var inbounds: [V2rayInbound] = [inHttp]
         // for ping just use http
         if !self.forPing {
+            let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort , enableSniffing: self.enableSniffing)
             inbounds.append(inSocks)
+            let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
+            inbounds.append(inApi)
         }
-        inbounds.append(inHttp)
         self.v2ray.inbounds = inbounds
 
         // ------------------------------------- inbound end ----------------------------------------------
@@ -134,8 +121,24 @@ class V2rayConfigHandler {
         self.v2ray.outbounds = outbounds
         // ------------------------------------- routing start --------------------------------------------
         if !self.forPing {
-            self.v2ray.routing = RoutingManager().getRunning()
+            self.v2ray.routing = RoutingManager().getRunning() // 路由
+            self.v2ray.stats = V2rayStats() // 开启统计
+            self.v2ray.metrics = v2rayMetrics() // 启用 metrics,用于请求统计数据
+            self.v2ray.policy = V2rayPolicy() // 统计规则
+            self.v2ray.observatory = V2rayObservatory() // 观察者
         }
         // ------------------------------------- routing end ----------------------------------------------
+    }
+    
+    func getInbound(`protocol`: V2rayProtocolInbound, listen: String, port: String, enableSniffing:Bool, tag: String? = nil) -> V2rayInbound {
+        var inbound = V2rayInbound()
+        inbound.tag = tag
+        inbound.listen = listen
+        inbound.port = port
+        inbound.protocol = `protocol`
+        if enableSniffing {
+            inbound.sniffing = V2rayInboundSniffing()
+        }
+        return inbound
     }
 }

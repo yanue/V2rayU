@@ -65,6 +65,7 @@ class V2rayOutboundHandler {
     // 更新 server 配置
     private func updateServerSettings() {
         outbound.protocol = self.profile.protocol
+        outbound.tag = "proxy"
         switch self.profile.protocol {
         case .vmess:
             // user

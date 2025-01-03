@@ -62,6 +62,7 @@
 		662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44B2D1C4D38006E8450 /* SubViewModel.swift */; };
 		662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44F2D1C4D46006E8450 /* Scanner.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
+		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
 		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
@@ -69,6 +70,7 @@
 		66E94B392D26B971003745B5 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B382D26B971003745B5 /* SettingView.swift */; };
 		66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B362D26B971003745B5 /* AppContentView.swift */; };
 		66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B372D26B971003745B5 /* ProfileListView.swift */; };
+		66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B3C2D27E74C003745B5 /* V2rayStats.swift */; };
 		66F66F832D1E450000E77C64 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F822D1E450000E77C64 /* AppState.swift */; };
 		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
@@ -147,6 +149,7 @@
 		662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingViewModel.swift; sourceTree = "<group>"; };
 		662CC44B2D1C4D38006E8450 /* SubViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubViewModel.swift; sourceTree = "<group>"; };
 		662CC44F2D1C4D46006E8450 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
+		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
@@ -156,6 +159,7 @@
 		66E94B362D26B971003745B5 /* AppContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentView.swift; sourceTree = "<group>"; };
 		66E94B372D26B971003745B5 /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 		662CC3E22D1BED9B006E8450 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
 				66F66F9A2D1FA34E00E77C64 /* Ping */,
 				662CC3E02D1BED9B006E8450 /* Tunnel.swift */,
 				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
@@ -275,6 +280,7 @@
 		662CC3E82D1BED9B006E8450 /* V2ray */ = {
 			isa = PBXGroup;
 			children = (
+				66B1B5302D282D990032DD09 /* V2rayMetrics.swift */,
 				662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */,
 				662CC3E52D1BED9B006E8450 /* V2rayOutbound.swift */,
 				662CC3E62D1BED9B006E8450 /* V2rayStream.swift */,
@@ -502,6 +508,7 @@
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				66E94B342D26B95D003745B5 /* Theme.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
+				66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
 				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
@@ -517,6 +524,7 @@
 				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */,
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
+				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* OutboundView.swift in Sources */,
 				662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */,
