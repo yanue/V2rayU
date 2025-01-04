@@ -1,0 +1,26 @@
+{
+  "title": "V2rayU Installer",
+  "icon": "V2rayU.icns",
+  "icon-size": 80,
+  "background": "V2rayU-dmg@2x.png",
+  "window": {
+    "size": {
+      "width": 500,
+      "height": 292
+    }
+  },
+  "contents": [
+    {
+      "x": 380,
+      "y": 120,
+      "type": "link",
+      "path": "/Applications"
+    },
+    {
+      "x": 120,
+      "y": 120,
+      "type": "file",
+      "path": "release/V2rayU.app"
+    }
+  ]
+}

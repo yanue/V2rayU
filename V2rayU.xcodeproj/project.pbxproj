@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -64,6 +64,10 @@
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5322D2913000032DD09 /* ProfileStatModel.swift */; };
+		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		66B1B55A2D297B140032DD09 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5592D297B140032DD09 /* install.sh */; };
+		66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */; };
+		66B1B5842D297D030032DD09 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5832D297D030032DD09 /* v2ray-core */; };
 		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
 		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
@@ -81,15 +85,44 @@
 		66F66F992D1F8A7800E77C64 /* PingAll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F942D1F8A7800E77C64 /* PingAll.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		66B1B5532D2979530032DD09 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66CBCECF2C63B16400313949 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66B1B54B2D2979060032DD09;
+			remoteInfo = V2rayUTool;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		6627FB9D2D0D2324009B736F /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 6;
 			files = (
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66B1B54A2D2979060032DD09 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		66B1B5552D2979B40032DD09 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -152,6 +185,27 @@
 		662CC44F2D1C4D46006E8450 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B5322D2913000032DD09 /* ProfileStatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatModel.swift; sourceTree = "<group>"; };
+		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		66B1B5592D297B140032DD09 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
+		66B1B55E2D297B590032DD09 /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
+		66B1B55F2D297B590032DD09 /* jetbrains.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jetbrains.png; sourceTree = "<group>"; };
+		66B1B5602D297B590032DD09 /* abp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
+		66B1B5612D297B590032DD09 /* gfwlist.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
+		66B1B5622D297B590032DD09 /* user-rule.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
+		66B1B5642D297B590032DD09 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
+		66B1B5652D297B590032DD09 /* bg.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg.sketch; sourceTree = "<group>"; };
+		66B1B5662D297B590032DD09 /* icns.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icns.sketch; sourceTree = "<group>"; };
+		66B1B5672D297B590032DD09 /* icon.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icon.sketch; sourceTree = "<group>"; };
+		66B1B5692D297B590032DD09 /* geoip.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = geoip.dat; sourceTree = "<group>"; };
+		66B1B56A2D297B590032DD09 /* geoip-only-cn-private.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "geoip-only-cn-private.dat"; sourceTree = "<group>"; };
+		66B1B56B2D297B590032DD09 /* geosite.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = geosite.dat; sourceTree = "<group>"; };
+		66B1B56C2D297B590032DD09 /* v2ray */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = v2ray; sourceTree = "<group>"; };
+		66B1B56D2D297B590032DD09 /* v2ray-arm64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "v2ray-arm64"; sourceTree = "<group>"; };
+		66B1B56F2D297B590032DD09 /* V2rayU.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = V2rayU.icns; sourceTree = "<group>"; };
+		66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "V2rayU-dmg@2x.png"; sourceTree = "<group>"; };
+		66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		66B1B5832D297D030032DD09 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
@@ -170,7 +224,18 @@
 		66F66F962D1F8A7800E77C64 /* Ping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ping.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		66B1B54D2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTool; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		66B1B5492D2979060032DD09 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		66CBCED42C63B16400313949 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -353,10 +418,69 @@
 			path = Share;
 			sourceTree = "<group>";
 		};
+		66B1B5582D297AE60032DD09 /* Scpipts */ = {
+			isa = PBXGroup;
+			children = (
+				66B1B5592D297B140032DD09 /* install.sh */,
+			);
+			path = Scpipts;
+			sourceTree = "<group>";
+		};
+		66B1B55C2D297B3F0032DD09 /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				66B1B55D2D297B590032DD09 /* appdmg.json */,
+				66B1B55E2D297B590032DD09 /* appdmg.sh */,
+				66B1B55F2D297B590032DD09 /* jetbrains.png */,
+				66B1B5632D297B590032DD09 /* pac */,
+				66B1B5642D297B590032DD09 /* release.sh */,
+				66B1B5682D297B590032DD09 /* sketch */,
+				66B1B56E2D297B590032DD09 /* v2ray-core */,
+				66B1B56F2D297B590032DD09 /* V2rayU.icns */,
+				66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */,
+			);
+			path = Build;
+			sourceTree = "<group>";
+		};
+		66B1B5632D297B590032DD09 /* pac */ = {
+			isa = PBXGroup;
+			children = (
+				66B1B5602D297B590032DD09 /* abp.js */,
+				66B1B5612D297B590032DD09 /* gfwlist.txt */,
+				66B1B5622D297B590032DD09 /* user-rule.txt */,
+			);
+			path = pac;
+			sourceTree = "<group>";
+		};
+		66B1B5682D297B590032DD09 /* sketch */ = {
+			isa = PBXGroup;
+			children = (
+				66B1B5652D297B590032DD09 /* bg.sketch */,
+				66B1B5662D297B590032DD09 /* icns.sketch */,
+				66B1B5672D297B590032DD09 /* icon.sketch */,
+			);
+			path = sketch;
+			sourceTree = "<group>";
+		};
+		66B1B56E2D297B590032DD09 /* v2ray-core */ = {
+			isa = PBXGroup;
+			children = (
+				66B1B5692D297B590032DD09 /* geoip.dat */,
+				66B1B56A2D297B590032DD09 /* geoip-only-cn-private.dat */,
+				66B1B56B2D297B590032DD09 /* geosite.dat */,
+				66B1B56C2D297B590032DD09 /* v2ray */,
+				66B1B56D2D297B590032DD09 /* v2ray-arm64 */,
+			);
+			path = "v2ray-core";
+			sourceTree = "<group>";
+		};
 		66CBCECE2C63B16400313949 = {
 			isa = PBXGroup;
 			children = (
+				66B1B5832D297D030032DD09 /* v2ray-core */,
+				66B1B55C2D297B3F0032DD09 /* Build */,
 				66CBCED92C63B16400313949 /* V2rayU */,
+				66B1B54D2D2979060032DD09 /* V2rayUTool */,
 				660330072D0D5540009FEB56 /* Frameworks */,
 				66CBCED82C63B16400313949 /* Products */,
 			);
@@ -366,6 +490,7 @@
 			isa = PBXGroup;
 			children = (
 				66CBCED72C63B16400313949 /* V2rayU.app */,
+				66B1B54C2D2979060032DD09 /* V2rayUTool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -373,12 +498,14 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
 				66F66F822D1E450000E77C64 /* AppState.swift */,
 				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
 				662CC3C12D1BED9B006E8450 /* AppVersion.swift */,
 				662CC3E32D1BED9B006E8450 /* ToastWindow.swift */,
 				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
+				66B1B5582D297AE60032DD09 /* Scpipts */,
 				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D42D1BED9B006E8450 /* Database */,
 				662CC3D72D1BED9B006E8450 /* Handler */,
@@ -426,6 +553,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		66B1B54B2D2979060032DD09 /* V2rayUTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66B1B5502D2979060032DD09 /* Build configuration list for PBXNativeTarget "V2rayUTool" */;
+			buildPhases = (
+				66B1B5482D2979060032DD09 /* Sources */,
+				66B1B5492D2979060032DD09 /* Frameworks */,
+				66B1B54A2D2979060032DD09 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				66B1B54D2D2979060032DD09 /* V2rayUTool */,
+			);
+			name = V2rayUTool;
+			packageProductDependencies = (
+			);
+			productName = V2rayUTool;
+			productReference = 66B1B54C2D2979060032DD09 /* V2rayUTool */;
+			productType = "com.apple.product-type.tool";
+		};
 		66CBCED62C63B16400313949 /* V2rayU */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66CBCEE82C63B16500313949 /* Build configuration list for PBXNativeTarget "V2rayU" */;
@@ -434,10 +583,12 @@
 				66CBCED42C63B16400313949 /* Frameworks */,
 				66CBCED52C63B16400313949 /* Resources */,
 				6627FB9D2D0D2324009B736F /* Embed Frameworks */,
+				66B1B5552D2979B40032DD09 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				66B1B5542D2979530032DD09 /* PBXTargetDependency */,
 			);
 			name = V2rayU;
 			productName = V2rayU;
@@ -451,9 +602,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
+					66B1B54B2D2979060032DD09 = {
+						CreatedOnToolsVersion = 16.1;
+					};
 					66CBCED62C63B16400313949 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -482,6 +636,7 @@
 			projectRoot = "";
 			targets = (
 				66CBCED62C63B16400313949 /* V2rayU */,
+				66B1B54B2D2979060032DD09 /* V2rayUTool */,
 			);
 		};
 /* End PBXProject section */
@@ -491,8 +646,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66B1B5842D297D030032DD09 /* v2ray-core in Resources */,
+				66B1B55A2D297B140032DD09 /* install.sh in Resources */,
 				662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */,
 				662CC4302D1BED9B006E8450 /* Info.plist in Resources */,
+				66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */,
 				662CC4312D1BED9B006E8450 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -500,6 +658,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		66B1B5482D2979060032DD09 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		66CBCED32C63B16400313949 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -573,6 +738,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		66B1B5542D2979530032DD09 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66B1B54B2D2979060032DD09 /* V2rayUTool */;
+			targetProxy = 66B1B5532D2979530032DD09 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		662CC3DC2D1BED9B006E8450 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
@@ -587,6 +760,34 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		66B1B5512D2979060032DD09 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		66B1B5522D2979060032DD09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		66CBCEE62C63B16500313949 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -778,6 +979,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		66B1B5502D2979060032DD09 /* Build configuration list for PBXNativeTarget "V2rayUTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66B1B5512D2979060032DD09 /* Debug */,
+				66B1B5522D2979060032DD09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		66CBCED22C63B16400313949 /* Build configuration list for PBXProject "V2rayU" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
