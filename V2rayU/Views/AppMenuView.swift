@@ -5,27 +5,49 @@ struct AppMenuView: View {
     @State private var isRewriteEnabled = false
     @State private var isMitMEnabled = false
     @State private var isScriptEnabled = false
-    @State private var isPresenting  = false
+    @State private var isPresenting = false
     @ObservedObject var appState = AppState.shared // 引用单例
 
     var openContentViewWindow: () -> Void
     var body: some View {
-        VStack() {
-            MenuItemView(title: "Import Server From Pasteboard", action: {
-                if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
-                    importUri(url: uri)
-                } else {
-                    noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// from Pasteboard")
+        VStack {
+            Spacer()
+            VStack (spacing: 20) {
+                HStack {
+                    Toggle("启动", isOn: $appState.v2rayTurnOn)
+                        .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        .onChange(of: appState.v2rayTurnOn) { newValue in
+                            if newValue {
+                                V2rayLaunch.startV2rayCore()
+                            } else {
+                                V2rayLaunch.stopV2rayCore()
+                            }
+                        }
+                    Text("●").foregroundColor(appState.v2rayTurnOn ? .green : .gray)
+                    Text("\(String(format: "%.0f", appState.latency)) ms")
                 }
-            })
-            Toggle("启动", isOn: $appState.v2rayTurnOn)
-                .toggleStyle(SwitchToggleStyle(tint: .blue))
-                .onChange(of: appState.v2rayTurnOn) { newValue in
-                    if newValue {
-                        V2rayLaunch.startV2rayCore()
-                    } else {
-                        V2rayLaunch.stopV2rayCore()
-                    }
+            }
+            // direct: 0.0 B/s↑ | 0.0 B/s↓
+            VStack {
+                HStack {
+                    Text("direct:")
+                    Text("\(String(format: "%.2f", appState.directUpSpeed)) KB/s ↑")
+                        .foregroundColor(.green)
+                    Text("|")
+                    Text("\(String(format: "%.2f", appState.directDownSpeed)) KB/s ↓")
+                        .foregroundColor(.green)
+                }
+            }
+            // proxy: 0.0 B/s↑ | 0.0 B/s↓
+            VStack {
+                HStack {
+                    Text("proxy:")
+                    Text("\(String(format: "%.2f", appState.proxyUpSpeed)) KB/s ↑")
+                        .foregroundColor(.green)
+                    Text("|")
+                    Text("\(String(format: "%.2f", appState.proxyDownSpeed)) KB/s ↓")
+                        .foregroundColor(.green)
+                }
             }
 
             HStack(spacing: 20) {
@@ -33,7 +55,7 @@ struct AppMenuView: View {
                     openContentViewWindow()
                 }
             }
-    
+
             VStack(alignment: .leading, spacing: 0) {
                 MenuItemView(title: "Import Server From Pasteboard", action: {
                     if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
@@ -52,20 +74,20 @@ struct AppMenuView: View {
                     }
                 })
                 Divider()
-                MenuItemView(title: "Quit", action: {NSApplication.shared.terminate(nil) })
+                MenuItemView(title: "Quit", action: { NSApplication.shared.terminate(nil) })
             }
             .background(Color(NSColor.windowBackgroundColor))
             .cornerRadius(6)
             .padding()
         }
     }
-    
+
     private func createToggleView(image: String, text: String, isOn: Binding<Bool>) -> some View {
         VStack(spacing: 10) {
             Image(systemName: image)
                 .resizable()
                 .frame(width: 30, height: 30)
-            
+
             Toggle(isOn: isOn) {
                 Text(text)
                     .font(.body)
@@ -77,7 +99,6 @@ struct AppMenuView: View {
         .cornerRadius(10)
     }
 }
-
 
 struct MenuItemView: View {
     var title: String

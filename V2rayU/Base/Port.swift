@@ -74,7 +74,6 @@ func findFreePort() -> UInt16 {
 func isPortOpen(port: UInt16) -> Bool {
     do {
         let output = try runCommand(at: "/usr/sbin/lsof", with: ["-i", ":\(port)"])
-        NSLog("isPortOpen: \(output)")
         return output.contains("LISTEN")
     } catch let error {
         NSLog("isPortOpen: \(error)")

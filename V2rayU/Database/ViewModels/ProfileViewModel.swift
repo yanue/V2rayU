@@ -134,7 +134,7 @@ class ProfileViewModel: ObservableObject {
             print("delete error: \(error)")
         }
     }
-    
+
     static func upsert(item: ProfileModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

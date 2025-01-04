@@ -17,7 +17,7 @@ struct V2rayMetricsVars: Codable {
 
 struct V2rayMetricObservatory: Codable {
     var alive: Bool
-    var delay: Int
+    var delay: Double
     var outbound_tag: String
     var last_seen_time: Int
 }

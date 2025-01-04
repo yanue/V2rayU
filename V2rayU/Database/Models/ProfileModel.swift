@@ -8,7 +8,7 @@
 import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
-// vless://E810CEBF-FD2F-4B9F-ACF0-A459E431C624@vlh.yanue.net:443?encryption=none&security=tls&sni=vlh.yanue.net&fp=chrome&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&allowInsecure=1&type=http&host=vlh.yanue.net&path=%2Fvlh2#yanue-vless_h2
+
 class ProfileModel: ObservableObject, Identifiable, Codable {
     var index: Int = 0
     // 公共属性
@@ -244,13 +244,5 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
         } catch {
             print("save error: \(error)")
         }
-    }
-}
-
-extension ProfileModel {
-    func deepCopy() -> ProfileModel {
-        let jsonData = try! JSONEncoder().encode(self)
-        let copy = try! JSONDecoder().decode(ProfileModel.self, from: jsonData)
-        return copy
     }
 }

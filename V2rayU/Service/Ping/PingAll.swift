@@ -59,7 +59,6 @@ actor PingAll {
             }
             self.inPing = false
             killAllPing()
-//            self.refreshMenu()
         }, receiveValue: { _ in })
         .store(in: &cancellables)
     }

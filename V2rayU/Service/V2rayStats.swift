@@ -5,8 +5,52 @@
 //  Created by yanue on 2025/1/3.
 //
 
-
+import SwiftUI
 import Foundation
+
+
+actor V2raySpeed {
+    static let shared = V2raySpeed()
+    
+    private var directUpLink = 0
+    private var directDownLink = 0
+    private var proxyUpLink = 0
+    private var proxyDownLink = 0
+
+    var lastUpdate = Date()
+    
+    init() {}
+    
+    func setSpeed(latency: Double, directUpLink: Int, directDownLink: Int, proxyUpLink: Int, proxyDownLink: Int) {
+        let now = Date()
+        let timeInterval = now.timeIntervalSince(lastUpdate)
+        lastUpdate = now
+        if timeInterval < 1 {
+            return
+        }
+        // 计算速度
+        let directUpSpeed = (Double(directUpLink - self.directUpLink) / 1024  / timeInterval)
+        let directDownSpeed = (Double(directDownLink - self.directDownLink) / 1024 / timeInterval)
+        let proxyUpSpeed = (Double(proxyUpLink - self.proxyUpLink) / 1024 /  timeInterval)
+        let proxyDownSpeed = (Double(proxyDownLink - self.proxyDownLink) / 1024 / timeInterval)
+        // 替换
+        self.directUpLink = directUpLink
+        self.directDownLink = directDownLink
+        self.proxyUpLink = proxyUpLink
+        self.proxyDownLink = proxyDownLink
+        // 计算流量(代理流量=代理上行+代理下行)
+        let up = directUpLink + proxyUpLink
+        let down = directDownLink + proxyDownLink
+        Task {
+            // 更新到 UI
+            await AppState.shared.setSpeed(latency: latency, directUpSpeed: directUpSpeed, directDownSpeed: directDownSpeed, proxyUpSpeed: proxyUpSpeed, proxyDownSpeed: proxyDownSpeed)
+            let uuid = await AppState.shared.runningProfile
+            // print("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
+            // 更新到数据库
+            try ProfileStatModel.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
+        }
+    }
+}
 
 actor V2rayTrafficStats {
     static let shared = V2rayTrafficStats()
@@ -17,7 +61,7 @@ actor V2rayTrafficStats {
     func startPeriodicFetch() {
         // 确保在主线程创建和调度 Timer
         DispatchQueue.main.async {
-            let timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+            let timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
                 // 创建新的 Task 来执行异步操作
                 Task {
                     await self?.fetchV2RayStats()
@@ -64,8 +108,29 @@ actor V2rayTrafficStats {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601 // 解析日期
             // try decode data
-            let stats: V2rayMetricsVars = try decoder.decode(V2rayMetricsVars.self, from: jsonData)
-            NSLog("Parsed V2Ray Stats: \(stats)")
+            let vars: V2rayMetricsVars = try decoder.decode(V2rayMetricsVars.self, from: jsonData)
+            var latency = 0.0
+            var directUpLink = 0
+            var directDownLink = 0
+            var proxyUpLink = 0
+            var proxyDownLink = 0
+            guard let stats = vars.stats else {
+                NSLog("Invalid V2Ray Stats")
+                return
+            }
+            if let latencyValue = vars.observatory?["proxy"] {
+                latency = latencyValue.delay
+            }
+            if let directUpLinkValue = stats.outbound["direct"] {
+                directUpLink = directUpLinkValue.uplink
+                directDownLink = directUpLinkValue.downlink
+            }
+            if let proxyUpLinkValue = stats.outbound["proxy"] {
+                proxyUpLink = proxyUpLinkValue.uplink
+                proxyDownLink = proxyUpLinkValue.downlink
+            }
+            await V2raySpeed.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
+//            NSLog("Parsed V2Ray Stats: \(stats)")
         } catch {
             NSLog("Failed to parse JSON: \(error.localizedDescription)")
         }

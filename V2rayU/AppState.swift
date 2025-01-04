@@ -29,8 +29,10 @@ final class AppState: ObservableObject {
     
     @Published var icon: String = "IconOff" // 默认图标
 
-    @Published var v2rayTurnOn = true
-    @Published var runMode: RunMode = .off
+    @Published var v2rayTurnOn = true // 是否开启v2ray
+    @Published var runMode: RunMode = .off // 运行模式
+    @Published var runningProfile: String = "" // 当前运行的配置
+    @Published var runningRouting: String = "" // 当前运行的路由
 
     @Published var launchAtLogin: Bool = true
     @Published var checkForUpdates: Bool = true
@@ -48,12 +50,21 @@ final class AppState: ObservableObject {
     @Published var enableMux = false
     @Published var mux = 8
     @Published var dnsJson = ""
-
+    
+    @Published var latency = 0.0 // 网络延迟(ping值ms)
+    @Published var directUpSpeed = 0.0
+    @Published var directDownSpeed = 0.0
+    @Published var proxyUpSpeed = 0.0
+    @Published var proxyDownSpeed = 0.0
+    
     private var cancellables = Set<AnyCancellable>()
 
     init() {
         runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
         v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
+        runningProfile = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
+        runningRouting = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
+        
         enableMux = UserDefaults.getBool(forKey: .enableMux)
         enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -71,7 +82,6 @@ final class AppState: ObservableObject {
         autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
         checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)
         selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
-        print("AppState init", launchAtLogin, autoUpdateServers, checkForUpdates, selectFastestServer)
 
         setupBindings()
     }
@@ -174,9 +184,25 @@ final class AppState: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func setRunMode(mode: RunMode) async {
+    func setRunMode(mode: RunMode) {
         NSLog("setRunMode: \(mode)")
         self.runMode = mode
         self.icon = mode.icon // 更新图标
+    }
+    
+    func setRunning(profile: String, mode: RunMode) {
+        self.runMode = mode
+        self.icon = mode.icon
+        self.runningProfile = profile
+        UserDefaults.set(forKey: .runningProfile, value: profile)
+        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    }
+    
+    func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
+        self.latency = latency
+        self.directUpSpeed = directUpSpeed
+        self.directDownSpeed = directDownSpeed
+        self.proxyUpSpeed = proxyUpSpeed
+        self.proxyDownSpeed = proxyDownSpeed
     }
 }

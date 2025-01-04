@@ -167,10 +167,7 @@ class V2rayLaunch: NSObject {
             Task {
                 await AppState.shared.setRunMode(mode: .off)
             }
-//            menuController.showServers()
         }
-//        runTun2Socks()
-        
         
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
@@ -183,13 +180,6 @@ class V2rayLaunch: NSObject {
     static func SwitchProxyMode() {
         print("SwitchProxyMode")
         V2rayLaunch.startV2rayCore()
-    }
-
-    static func setRunMode(mode: RunMode) {
-        setSystemProxy(mode: mode)
-        Task {
-            await AppState.shared.setRunMode(mode: mode)
-        }
     }
 
     static func ToggleRunning() {
@@ -230,7 +220,10 @@ class V2rayLaunch: NSObject {
             if runMode == .off {
                 runMode = .global
             }
-            setRunMode(mode: runMode)
+            setSystemProxy(mode: runMode)
+            Task {
+                await AppState.shared.setRunning(profile: v2ray.uuid, mode: runMode)
+            }
             // ping current
 //            try await PingRunning.shared.startPing(item: v2ray)
         }
