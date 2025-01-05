@@ -7,6 +7,32 @@
 
 import Foundation
 
+let defaultDns = """
+{
+"hosts": {
+},
+"servers": [
+  {
+    "address": "223.5.5.5",
+    "domains": [
+      "geosite:cn"
+    ],
+    "expectIPs": [
+      "geoip:cn"
+    ]
+  },
+  "1.1.1.1",
+  "8.8.8.8",
+  "https://dns.google/dns-query",
+  {
+    "address": "223.5.5.5",
+    "domains": [
+    ]
+  }
+]
+}
+"""
+
 class V2rayConfigHandler {
     var v2ray: V2rayStruct = V2rayStruct()
     var isValid = false
@@ -25,7 +51,6 @@ class V2rayConfigHandler {
     var enableMux = false
     var enableSniffing = false
     var mux = 8
-    var dnsJson = UserDefaults.get(forKey: .v2rayDnsJson)
     var forPing = false
 
     // Initialization
@@ -126,8 +151,23 @@ class V2rayConfigHandler {
             self.v2ray.metrics = v2rayMetrics() // 启用 metrics,用于请求统计数据
             self.v2ray.policy = V2rayPolicy() // 统计规则
             self.v2ray.observatory = V2rayObservatory() // 观察者
+            self.v2ray.dns = self.getDns() // dns
         }
         // ------------------------------------- routing end ----------------------------------------------
+    }
+    
+    func getDns() -> V2rayDns {
+        let dnsJson = UserDefaults.get(forKey: .v2rayDnsJson, defaultValue: defaultDns)
+        if let jsonData = dnsJson.data(using: .utf8) {
+            do {
+                let decoder = JSONDecoder()
+                let dns = try decoder.decode(V2rayDns.self, from: jsonData)
+                return dns
+            } catch {
+                print("解析 JSON 失败: \(error)")
+            }
+        }
+        return V2rayDns()
     }
     
     func getInbound(`protocol`: V2rayProtocolInbound, listen: String, port: String, enableSniffing:Bool, tag: String? = nil) -> V2rayInbound {

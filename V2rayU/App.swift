@@ -20,7 +20,7 @@ struct V2rayUApp: App {
         print("userHomeDirectory",userHomeDirectory)
         V2rayLaunch.checkInstall()
         V2rayLaunch.runAtStart()
-//        V2rayLaunch.runTun2Socks()
+        V2rayLaunch.runTun2Socks()
     }
 
     var body: some Scene {

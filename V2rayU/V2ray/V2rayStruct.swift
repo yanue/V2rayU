@@ -61,7 +61,78 @@ struct V2rayApi: Codable {
 }
 
 struct V2rayDns: Codable {
-    // 复杂的配置,直接替换整个结构体即可
+    var hosts: [String: HostValue]?
+    var servers: [Server]?
+    var clientIp: String?
+    var queryStrategy: String?
+    var disableCache: Bool?
+    var disableFallback: Bool?
+    var disableFallbackIfMatch: Bool?
+    var tag: String?
+
+    // 自定义类型，用于处理 hosts 中的值，可能是 String 或 [String]
+    enum HostValue: Codable {
+        case single(String)
+        case multiple([String])
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if let singleValue = try? container.decode(String.self) {
+                self = .single(singleValue)
+            } else if let multipleValues = try? container.decode([String].self) {
+                self = .multiple(multipleValues)
+            } else {
+                throw DecodingError.typeMismatch(HostValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Invalid HostValue"))
+            }
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+            case .single(let value):
+                try container.encode(value)
+            case .multiple(let values):
+                try container.encode(values)
+            }
+        }
+    }
+
+    // 自定义类型，用于处理 servers 中的值，可能是 String 或包含多个字段的对象
+    enum Server: Codable {
+        case address(String)
+        case detailed(ServerDetail)
+
+        struct ServerDetail: Codable {
+            var address: String
+            var port: Int?
+            var domains: [String]?
+            var expectIPs: [String]?
+            var skipFallback: Bool?
+            var clientIP: String?
+            var queryStrategy: String?
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if let address = try? container.decode(String.self) {
+                self = .address(address)
+            } else if let detailedValue = try? container.decode(ServerDetail.self) {
+                self = .detailed(detailedValue)
+            } else {
+                throw DecodingError.typeMismatch(Server.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Invalid Server value"))
+            }
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+            case .address(let address):
+                try container.encode(address)
+            case .detailed(let detailed):
+                try container.encode(detailed)
+            }
+        }
+    }
 }
 
 struct V2rayStats: Codable {

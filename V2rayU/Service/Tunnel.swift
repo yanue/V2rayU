@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import NetworkExtension
+import Tun2SocksKit
 
 extension V2rayLaunch {
     static let tunUpScriptPath: String = AppHomePath + "/tun_up.sh"
@@ -14,10 +16,7 @@ extension V2rayLaunch {
     static let stringConfigTemplate = """
     tunnel:
       mtu: 9000
-      name: utun
-      ipv4: 198.18.0.1
-      post-up-script: {{ tun_up_sh }}
-      pre-down-script: {{ tun_down_sh }}
+      name: utun99
     
     socks5:
       # Socks5 server port
@@ -56,8 +55,8 @@ extension V2rayLaunch {
     
     static func runTun2Socks() {
         // Write and configure scripts
-        createScript(at: tunUpScriptPath, content: tunUpScriptContent)
-        createScript(at: tunDownScriptPath, content: tunDownScriptContent)
+//        createScript(at: tunUpScriptPath, content: tunUpScriptContent)
+//        createScript(at: tunDownScriptPath, content: tunDownScriptContent)
         
         // Replace placeholders in configuration
         let stringConfigContent = stringConfigTemplate
@@ -65,15 +64,16 @@ extension V2rayLaunch {
             .replacingOccurrences(of: "{{ tun_down_sh }}", with: tunDownScriptPath)
             .replacingOccurrences(of: "{{ socksPort }}", with: "1080") // Example port
         print("Tun2Socks config: \(stringConfigContent)")
+        sleep(10)
         // Run Tun2Socks
-//        Socks5Tunnel.run(withConfig: .string(content: stringConfigContent)) { code in
-//            print("Tun2Socks exited with code: \(code)")
-//            logStats()
-//        }
+        Socks5Tunnel.run(withConfig: .string(content: stringConfigContent)) { code in
+            print("Tun2Socks exited with code: \(code)")
+            logStats()
+        }
     }
     
     static func stopTun2Socks() {
-//        Socks5Tunnel.quit()
+        Socks5Tunnel.quit()
     }
 
     // Create script and set executable permissions
@@ -91,12 +91,14 @@ extension V2rayLaunch {
 
     // 打印统计信息
     static func logStats() {
-//        let stats = Socks5Tunnel.stats
-//        print("Tun2Socks stats: \(stats)")
-//        
-//        DispatchQueue.global().asyncAfter(deadline: .now() + 10) {
-//            let updatedStats = Socks5Tunnel.stats
-//            print("Tun2Socks updated stats: \(updatedStats)")
-//        }
+        let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+            // 创建新的 Task 来执行异步操作
+            Task {
+                let updatedStats = Socks5Tunnel.stats
+                print("Tun2Socks updated stats: \(updatedStats)")
+            }
+        }
+        // 将 timer 添加到当前 RunLoop
+        RunLoop.current.add(timer, forMode: .common)
     }
 }

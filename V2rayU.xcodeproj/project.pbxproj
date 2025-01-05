@@ -68,6 +68,8 @@
 		66B1B55A2D297B140032DD09 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5592D297B140032DD09 /* install.sh */; };
 		66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */; };
 		66B1B5842D297D030032DD09 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5832D297D030032DD09 /* v2ray-core */; };
+		66B1B5872D2980E40032DD09 /* Tun2SocksKit in Frameworks */ = {isa = PBXBuildFile; productRef = 66B1B5862D2980E40032DD09 /* Tun2SocksKit */; };
+		66B1B5892D2980E40032DD09 /* Tun2SocksKitC in Frameworks */ = {isa = PBXBuildFile; productRef = 66B1B5882D2980E40032DD09 /* Tun2SocksKitC */; };
 		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
 		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
@@ -189,10 +191,6 @@
 		66B1B5592D297B140032DD09 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
 		66B1B55E2D297B590032DD09 /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
-		66B1B55F2D297B590032DD09 /* jetbrains.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jetbrains.png; sourceTree = "<group>"; };
-		66B1B5602D297B590032DD09 /* abp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = abp.js; sourceTree = "<group>"; };
-		66B1B5612D297B590032DD09 /* gfwlist.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gfwlist.txt; sourceTree = "<group>"; };
-		66B1B5622D297B590032DD09 /* user-rule.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
 		66B1B5642D297B590032DD09 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66B1B5652D297B590032DD09 /* bg.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg.sketch; sourceTree = "<group>"; };
 		66B1B5662D297B590032DD09 /* icns.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icns.sketch; sourceTree = "<group>"; };
@@ -242,8 +240,10 @@
 			files = (
 				66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */,
 				6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */,
+				66B1B5872D2980E40032DD09 /* Tun2SocksKit in Frameworks */,
 				660330042D0D5504009FEB56 /* GRDB in Frameworks */,
 				66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */,
+				66B1B5892D2980E40032DD09 /* Tun2SocksKitC in Frameworks */,
 				660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,8 +431,6 @@
 			children = (
 				66B1B55D2D297B590032DD09 /* appdmg.json */,
 				66B1B55E2D297B590032DD09 /* appdmg.sh */,
-				66B1B55F2D297B590032DD09 /* jetbrains.png */,
-				66B1B5632D297B590032DD09 /* pac */,
 				66B1B5642D297B590032DD09 /* release.sh */,
 				66B1B5682D297B590032DD09 /* sketch */,
 				66B1B56E2D297B590032DD09 /* v2ray-core */,
@@ -440,16 +438,6 @@
 				66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */,
 			);
 			path = Build;
-			sourceTree = "<group>";
-		};
-		66B1B5632D297B590032DD09 /* pac */ = {
-			isa = PBXGroup;
-			children = (
-				66B1B5602D297B590032DD09 /* abp.js */,
-				66B1B5612D297B590032DD09 /* gfwlist.txt */,
-				66B1B5622D297B590032DD09 /* user-rule.txt */,
-			);
-			path = pac;
 			sourceTree = "<group>";
 		};
 		66B1B5682D297B590032DD09 /* sketch */ = {
@@ -630,6 +618,7 @@
 				662CC4322D1BEE94006E8450 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				662CC4332D1BEEDB006E8450 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */,
+				66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */,
 			);
 			productRefGroup = 66CBCED82C63B16400313949 /* Products */;
 			projectDirPath = "";
@@ -791,6 +780,7 @@
 		66CBCEE62C63B16500313949 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -855,6 +845,7 @@
 		66CBCEE72C63B16500313949 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1049,6 +1040,14 @@
 				version = 2.1.1;
 			};
 		};
+		66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/EbrahimTahernejad/Tun2SocksKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.7.6;
+			};
+		};
 		66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jpsim/Yams.git";
@@ -1079,6 +1078,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 66A078BA2D008A3700490469 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
 			productName = SwiftyBeaver;
+		};
+		66B1B5862D2980E40032DD09 /* Tun2SocksKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */;
+			productName = Tun2SocksKit;
+		};
+		66B1B5882D2980E40032DD09 /* Tun2SocksKitC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */;
+			productName = Tun2SocksKitC;
 		};
 		66F66F8A2D1E7DE300E77C64 /* Yams */ = {
 			isa = XCSwiftPackageProductDependency;

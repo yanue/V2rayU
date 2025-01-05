@@ -78,10 +78,10 @@ class V2rayLaunch: NSObject {
 
         showInstallAlert()
 
-        V2rayLaunch.Stop()
+        Self.Stop()
 
         // generate plist
-        V2rayLaunch.generateLaunchAgentPlist()
+        Self.generateLaunchAgentPlist()
     }
 
     static func showInstallAlert() {
@@ -179,16 +179,16 @@ class V2rayLaunch: NSObject {
 
     static func SwitchProxyMode() {
         print("SwitchProxyMode")
-        V2rayLaunch.startV2rayCore()
+        Self.startV2rayCore()
     }
 
     static func ToggleRunning() {
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             print("ToggleRunning stop")
-            V2rayLaunch.stopV2rayCore()
+            Self.stopV2rayCore()
         } else {
             print("ToggleRunning start")
-            V2rayLaunch.startV2rayCore()
+            Self.startV2rayCore()
         }
     }
 
@@ -209,7 +209,7 @@ class V2rayLaunch: NSObject {
             // create json file
             createJsonFile(item: v2ray)
             // launch
-            let started = V2rayLaunch.Start()
+            let started = Self.Start()
             if !started {
                 NSLog("start v2ray-core failed")
                 await AppState.shared.setRunMode(mode: .off)
@@ -231,9 +231,9 @@ class V2rayLaunch: NSObject {
 
     static func stopV2rayCore() {
         // stop launch
-        V2rayLaunch.Stop()
+        Self.Stop()
         // off system proxy
-        V2rayLaunch.setSystemProxy(mode: .off)
+        Self.setSystemProxy(mode: .off)
         // set status
         Task {
             await AppState.shared.setRunMode(mode: .off)
