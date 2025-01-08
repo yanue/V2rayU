@@ -53,7 +53,7 @@ actor PingAll {
         .sink(receiveCompletion: { completion in
             switch completion {
             case .finished:
-                NSLog("All tasks completed")
+                NSLog("Ping completed")
             case let .failure(error):
                 NSLog("Error: \(error)")
             }

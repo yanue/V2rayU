@@ -84,8 +84,11 @@ class RoutingHandler {
             return res
         }
         
+        // dns-rule:  { "type": "field", "outboundTag": "dns-out", "network": "udp", "port": 53 }
+        let dnsRule = getRoutingRule(outTag: "dns_out", port: "53", network: "udp")
+        print("dnsRule: \(dnsRule)")
         // api-rule:  {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
-        let apiRule = getRoutingRule(outTag: "metrics_out", domain: nil, ip: nil, port: nil,inboundTag: ["metrics_in"])
+        let apiRule = getRoutingRule(outTag: "metrics_out", inboundTag: ["metrics_in"])
 
         // 根据默认规则生成
         var rules: [V2rayRoutingRule] = [apiRule]
@@ -186,13 +189,13 @@ class RoutingHandler {
             settings.domainStrategy = V2rayRouting.domainStrategy(rawValue: self.routing.domainStrategy) ?? .AsIs
         }
         // 最后添加默认规则
-//        let proxyRule = getRoutingRule(outTag: "proxy", domain: nil, ip: nil, port: nil)
+//        let proxyRule = getRoutingRule(outTag: "proxy", )
 //        rules.append(proxyRule)
         settings.rules = rules
         return settings
     }
 
-    func getRoutingRule(outTag: String, domain: [String]?, ip: [String]?, port: String?, inboundTag: [String]? = nil) -> V2rayRoutingRule {
+    func getRoutingRule(outTag: String, domain: [String]? = nil, ip: [String]? = nil, port: String? = nil, inboundTag: [String]? = nil, network: String? = nil) -> V2rayRoutingRule {
         var rule = V2rayRoutingRule()
         rule.outboundTag = outTag
         rule.inboundTag = inboundTag
@@ -200,6 +203,7 @@ class RoutingHandler {
         rule.domain = domain
         rule.ip = ip
         rule.port = port
+        rule.network = network
         return rule
     }
 

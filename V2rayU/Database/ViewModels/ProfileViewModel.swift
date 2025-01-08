@@ -66,16 +66,24 @@ class ProfileViewModel: ObservableObject {
 
     // filter: ["id": 1,"conlmn":"value"]
     static func count(filter: [String: (any DatabaseValueConvertible)?]?) -> Int {
+        guard let filter = filter else { return 0 }
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                try ProfileModel.filter(key: filter).fetchCount(db)
+                var query = ProfileModel.all()
+                for (column, value) in filter {
+                    if let value = value {
+                        query = query.filter(Column(column) == value)
+                    }
+                }
+                return try query.fetchCount(db)
             }
         } catch {
             print("count error: \(error)")
             return 0
         }
     }
+
 
     static func getFastOne() -> ProfileModel? {
         do {
@@ -114,10 +122,17 @@ class ProfileViewModel: ObservableObject {
 
     // filter: ["id": 1,"conlmn":"value"]
     static func delete(filter: [String: (any DatabaseValueConvertible)?]?) {
+        guard let filter = filter else { return }
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try ProfileModel.filter(key: filter).deleteAll(db)
+                var query = ProfileModel.all()
+                for (column, value) in filter {
+                    if let value = value {
+                        query = query.filter(Column(column) == value)
+                    }
+                }
+                try query.deleteAll(db)
             }
         } catch {
             print("delete error: \(error)")

@@ -156,7 +156,7 @@ class V2rayLaunch: NSObject {
 
     static func runAtStart() {
         Task {
-            await V2rayTrafficStats.shared.initialize()
+            await V2rayTrafficStats.shared.initTask()
         }
         // start or show servers
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
@@ -170,9 +170,9 @@ class V2rayLaunch: NSObject {
         }
         
         // auto update subscribe servers
-        if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            Task {
-                await SubscriptionHandler.shared.sync()
+        Task {
+            if await AppState.shared.autoUpdateServers {
+                    await SubscriptionHandler.shared.sync()
             }
         }
     }
@@ -199,13 +199,15 @@ class V2rayLaunch: NSObject {
 
     // start v2ray core
     static func startV2rayCore() {
-        Task{
+        Task {
             NSLog("start v2ray-core begin")
             guard let v2ray = ProfileViewModel.getRunning() else {
                 noticeTip(title: "start v2ray fail", informativeText: "v2ray config not found")
                 await AppState.shared.setRunMode(mode: .off)
                 return
             }
+            // 清除流量统计
+            await V2rayTraffics.shared.resetData()
             // create json file
             createJsonFile(item: v2ray)
             // launch

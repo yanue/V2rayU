@@ -9,28 +9,16 @@ import Foundation
 
 let defaultDns = """
 {
-"hosts": {
-},
-"servers": [
-  {
-    "address": "223.5.5.5",
-    "domains": [
-      "geosite:cn"
+    "servers": [
+      "8.8.8.8",
+      "1.1.1.1",
+      {
+        "address": "119.29.29.29",
+        "domains": ["geosite:cn"]  
+      }
     ],
-    "expectIPs": [
-      "geoip:cn"
-    ]
-  },
-  "1.1.1.1",
-  "8.8.8.8",
-  "https://dns.google/dns-query",
-  {
-    "address": "223.5.5.5",
-    "domains": [
-    ]
+    "queryStrategy": "UseIPv4"
   }
-]
-}
 """
 
 class V2rayConfigHandler {
@@ -123,24 +111,33 @@ class V2rayConfigHandler {
         self.v2ray.inbounds = inbounds
 
         // ------------------------------------- inbound end ----------------------------------------------
-        // outbound Freedom
-        let outboundFreedom = V2rayOutbound()
-        outboundFreedom.protocol = V2rayProtocolOutbound.freedom
-        outboundFreedom.tag = "direct"
-        outboundFreedom.settings = V2rayOutboundFreedom()
-
-        // outbound Blackhole
-        let outboundBlackhole = V2rayOutbound()
-        outboundBlackhole.protocol = V2rayProtocolOutbound.blackhole
-        outboundBlackhole.tag = "block"
-        outboundBlackhole.settings = V2rayOutboundBlackhole()
-                
+       
         // outbounds
         var outbounds: [V2rayOutbound] = []
         outbounds.append(contentsOf: _outbounds)
         if !self.forPing {
+            // outbound Freedom
+            let outboundFreedom = V2rayOutbound()
+            outboundFreedom.protocol = .freedom
+            outboundFreedom.tag = "direct"
+            outboundFreedom.settings = V2rayOutboundFreedom()
+
+            // outbound Blackhole
+            let outboundBlackhole = V2rayOutbound()
+            outboundBlackhole.protocol = .blackhole
+            outboundBlackhole.tag = "block"
+            outboundBlackhole.settings = V2rayOutboundBlackhole()
+            
+            // outbound Dns
+            let outboundDns = V2rayOutbound()
+            outboundBlackhole.protocol = .dns
+            outboundBlackhole.tag = "dns_out"
+            outboundBlackhole.settings = V2rayOutboundDns()
+            
+            // 添加
             outbounds.append(outboundFreedom)
             outbounds.append(outboundBlackhole)
+//            outbounds.append(outboundDns)
         }
 
         self.v2ray.outbounds = outbounds

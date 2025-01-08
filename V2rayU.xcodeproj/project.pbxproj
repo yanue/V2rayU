@@ -61,6 +61,11 @@
 		662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */; };
 		662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44B2D1C4D38006E8450 /* SubViewModel.swift */; };
 		662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44F2D1C4D46006E8450 /* Scanner.swift */; };
+		663745332D2EA0F90093A101 /* ProfilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745322D2EA0E40093A101 /* ProfilePanel.swift */; };
+		663745352D2EAF4F0093A101 /* RoutingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745342D2EAF420093A101 /* RoutingPanel.swift */; };
+		663745372D2EC8840093A101 /* MenuSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745362D2EC87F0093A101 /* MenuSpeed.swift */; };
+		663745392D2ECAE40093A101 /* MenuHead.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745382D2ECAE00093A101 /* MenuHead.swift */; };
+		6637453B2D2ECF590093A101 /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6637453A2D2ECF530093A101 /* MenuItem.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5322D2913000032DD09 /* ProfileStatModel.swift */; };
@@ -185,6 +190,11 @@
 		662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingViewModel.swift; sourceTree = "<group>"; };
 		662CC44B2D1C4D38006E8450 /* SubViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubViewModel.swift; sourceTree = "<group>"; };
 		662CC44F2D1C4D46006E8450 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
+		663745322D2EA0E40093A101 /* ProfilePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePanel.swift; sourceTree = "<group>"; };
+		663745342D2EAF420093A101 /* RoutingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingPanel.swift; sourceTree = "<group>"; };
+		663745362D2EC87F0093A101 /* MenuSpeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSpeed.swift; sourceTree = "<group>"; };
+		663745382D2ECAE00093A101 /* MenuHead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuHead.swift; sourceTree = "<group>"; };
+		6637453A2D2ECF530093A101 /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItem.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B5322D2913000032DD09 /* ProfileStatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatModel.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -390,6 +400,7 @@
 		662CC4002D1BED9B006E8450 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				663745312D2EA0D10093A101 /* AppMenu */,
 				66E94B312D26B95D003745B5 /* Base */,
 				662CC3F22D1BED9B006E8450 /* Profile */,
 				662CC3F82D1BED9B006E8450 /* Setting */,
@@ -416,6 +427,18 @@
 				662CC43A2D1C4CE9006E8450 /* VmessUri.swift */,
 			);
 			path = Share;
+			sourceTree = "<group>";
+		};
+		663745312D2EA0D10093A101 /* AppMenu */ = {
+			isa = PBXGroup;
+			children = (
+				6637453A2D2ECF530093A101 /* MenuItem.swift */,
+				663745382D2ECAE00093A101 /* MenuHead.swift */,
+				663745362D2EC87F0093A101 /* MenuSpeed.swift */,
+				663745342D2EAF420093A101 /* RoutingPanel.swift */,
+				663745322D2EA0E40093A101 /* ProfilePanel.swift */,
+			);
+			path = AppMenu;
 			sourceTree = "<group>";
 		};
 		66B1B5582D297AE60032DD09 /* Scpipts */ = {
@@ -487,6 +510,7 @@
 			isa = PBXGroup;
 			children = (
 				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
+				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
 				66F66F822D1E450000E77C64 /* AppState.swift */,
 				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
@@ -497,7 +521,6 @@
 				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D42D1BED9B006E8450 /* Database */,
 				662CC3D72D1BED9B006E8450 /* Handler */,
-				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3DD2D1BED9B006E8450 /* Locales */,
 				662CC3DF2D1BED9B006E8450 /* Preview Content */,
 				662CC3E22D1BED9B006E8450 /* Service */,
@@ -667,23 +690,27 @@
 				66E94B342D26B95D003745B5 /* Theme.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
 				66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */,
+				663745352D2EAF4F0093A101 /* RoutingPanel.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
 				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
 				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
 				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,
+				6637453B2D2ECF590093A101 /* MenuItem.swift in Sources */,
 				66E94B392D26B971003745B5 /* SettingView.swift in Sources */,
 				66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */,
 				66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
 				662CC4452D1C4CE9006E8450 /* V2rayOutboundHandler.swift in Sources */,
 				662CC4462D1C4CE9006E8450 /* VlessUri.swift in Sources */,
+				663745332D2EA0F90093A101 /* ProfilePanel.swift in Sources */,
 				662CC4472D1C4CE9006E8450 /* ShadowsocksUri.swift in Sources */,
 				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */,
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
 				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
+				663745372D2EC8840093A101 /* MenuSpeed.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* OutboundView.swift in Sources */,
 				662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */,
 				662CC40A2D1BED9B006E8450 /* V2rayLaunch.swift in Sources */,
@@ -711,6 +738,7 @@
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
 				662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */,
+				663745392D2ECAE40093A101 /* MenuHead.swift in Sources */,
 				662CC4292D1BED9B006E8450 /* ToastWindow.swift in Sources */,
 				662CC42A2D1BED9B006E8450 /* V2rayOutbound.swift in Sources */,
 				662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */,

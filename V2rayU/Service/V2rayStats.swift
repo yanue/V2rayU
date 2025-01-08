@@ -9,8 +9,8 @@ import SwiftUI
 import Foundation
 
 
-actor V2raySpeed {
-    static let shared = V2raySpeed()
+actor V2rayTraffics {
+    static let shared = V2rayTraffics()
     
     private var directUpLink = 0
     private var directDownLink = 0
@@ -20,6 +20,13 @@ actor V2raySpeed {
     var lastUpdate = Date()
     
     init() {}
+    
+    func resetData() {
+        self.directDownLink = 0
+        self.directUpLink = 0
+        self.proxyDownLink = 0
+        self.proxyUpLink = 0
+    }
     
     func setSpeed(latency: Double, directUpLink: Int, directDownLink: Int, proxyUpLink: Int, proxyDownLink: Int) {
         let now = Date()
@@ -57,8 +64,10 @@ actor V2rayTrafficStats {
     private var timer: Timer?
     
     private init() {}
-    
-    func startPeriodicFetch() {
+
+    func initTask() {
+        NSLog("TrafficStats initialize")
+        // 确保在主线程调用
         // 确保在主线程创建和调度 Timer
         DispatchQueue.main.async {
             let timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
@@ -70,12 +79,6 @@ actor V2rayTrafficStats {
             // 将 timer 添加到当前 RunLoop
             RunLoop.current.add(timer, forMode: .common)
         }
-    }
-    
-    func initialize() {
-        NSLog("TrafficStats initialize")
-        // 确保在主线程调用
-        startPeriodicFetch()
     }
     
     // 将 fetchV2RayStats 改为异步函数
@@ -129,7 +132,7 @@ actor V2rayTrafficStats {
                 proxyUpLink = proxyUpLinkValue.uplink
                 proxyDownLink = proxyUpLinkValue.downlink
             }
-            await V2raySpeed.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
+            await V2rayTraffics.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
 //            NSLog("Parsed V2Ray Stats: \(stats)")
         } catch {
             NSLog("Failed to parse JSON: \(error.localizedDescription)")

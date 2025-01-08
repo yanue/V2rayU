@@ -57,6 +57,8 @@ final class AppState: ObservableObject {
     @Published var proxyUpSpeed = 0.0
     @Published var proxyDownSpeed = 0.0
     
+    @StateObject var viewModel = ProfileViewModel()
+
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -196,6 +198,18 @@ final class AppState: ObservableObject {
         self.runningProfile = profile
         UserDefaults.set(forKey: .runningProfile, value: profile)
         UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    }
+    
+    func runRouting(uuid: String) {
+        UserDefaults.set(forKey: .runningRouting, value: uuid)
+        self.runningRouting = uuid
+        V2rayLaunch.startV2rayCore()
+    }
+    
+    func runProfile(uuid: String) {
+        UserDefaults.set(forKey: .runningProfile, value: uuid)
+        self.runningProfile = uuid
+        V2rayLaunch.startV2rayCore()
     }
     
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {

@@ -112,7 +112,6 @@ actor SubscriptionHandler {
     }
 
     func getOldCount(sub: SubModel) -> Int {
-        // reload all
         return ProfileViewModel.count(filter: [ProfileModel.Columns.subid.name: sub.uuid])
     }
 

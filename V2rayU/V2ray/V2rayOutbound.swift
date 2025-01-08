@@ -172,8 +172,8 @@ struct V2rayOutboundVMessUser: Codable {
 }
 
 struct V2rayOutboundDns: V2rayOutboundSettings {
-    var network: String = "" // "tcp" | "udp" | ""
-    var address: String = ""
+    var network: String? // "tcp" | "udp" | ""
+    var address: String? // dns地址如: 1.1.1.1
     var port: Int?
     var nonIPQuery: String? // drop | skip
     var blockTypes: [Int]? // 如 "blockTypes":[65,28] 表示屏蔽type 65(HTTPS) 和 28(AAAA)

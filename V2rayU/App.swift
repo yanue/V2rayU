@@ -9,6 +9,7 @@ struct V2rayUApp: App {
     @StateObject var themeManager = ThemeManager()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var appState = AppState.shared
+    @Environment(\.colorScheme) var colorScheme // 获取当前系统主题模式
 
     init() {
         // 初始化
@@ -20,14 +21,18 @@ struct V2rayUApp: App {
         print("userHomeDirectory",userHomeDirectory)
         V2rayLaunch.checkInstall()
         V2rayLaunch.runAtStart()
-        V2rayLaunch.runTun2Socks()
+        // 加载
+        appState.viewModel.getList()
+//        V2rayLaunch.runTun2Socks()
     }
+
 
     var body: some Scene {
         // 显示 MenuBar
         MenuBarExtra("V2rayU", image: appState.icon) {
             AppMenuView(openContentViewWindow: openContentViewWindow)
-        }.menuBarExtraStyle(.window) // 重点,按窗口显示
+        }
+        .menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
     }
 
@@ -96,6 +101,31 @@ struct V2rayUApp: App {
     }
 
     func showWindow() {
+    }
+}
+
+struct VisualEffectBackground: View {
+    @Environment(\.colorScheme) var colorScheme // 获取当前系统的颜色模式
+    
+    var body: some View {
+        VisualEffectView(effect: colorScheme == .dark ? .dark : .light)
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+
+struct VisualEffectView: NSViewRepresentable {
+    var effect: NSVisualEffectView.Material
+    
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let visualEffectView = NSVisualEffectView()
+        visualEffectView.blendingMode = .withinWindow
+        visualEffectView.material = effect
+        visualEffectView.state = .active
+        return visualEffectView
+    }
+    
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = effect
     }
 }
 
