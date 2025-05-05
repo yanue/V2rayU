@@ -94,6 +94,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var kcpView: NSView!
     @IBOutlet weak var dsView: NSView!
     @IBOutlet weak var wsView: NSView!
+    @IBOutlet weak var xhttpView: NSView!
     @IBOutlet weak var h2View: NSView!
     @IBOutlet weak var quicView: NSView!
     @IBOutlet weak var grpcView: NSView!
@@ -118,6 +119,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
 
     @IBOutlet weak var wsHost: NSTextField!
     @IBOutlet weak var wsPath: NSTextField!
+    
+    @IBOutlet weak var xhttpMode: NSTextField!
+    @IBOutlet weak var xhttpPath: NSTextField!
 
     @IBOutlet weak var h2Host: NSTextField!
     @IBOutlet weak var h2Path: NSTextField!
@@ -135,6 +139,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var streamSecurity: NSPopUpButton!
     @IBOutlet weak var streamTlsAllowInsecure: NSButton!
     @IBOutlet weak var streamTlsServerName: NSTextField!
+    @IBOutlet weak var streamTlsAlpn: NSTextField!
     @IBOutlet weak var streamRealityServerName: NSTextField!
     @IBOutlet weak var streamRealityPublicKey: NSTextField!
     @IBOutlet weak var streamRealityShortId: NSTextField!
@@ -362,6 +367,12 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // tls
         v2rayConfig.securityTls.allowInsecure = self.streamTlsAllowInsecure.state.rawValue > 0
         v2rayConfig.securityTls.serverName = self.streamTlsServerName.stringValue
+        let streamTlsAlpn = self.streamTlsAlpn.stringValue
+        if streamTlsAlpn.count != 0 {
+            v2rayConfig.securityTls.alpn = [streamTlsAlpn]
+        } else {
+            v2rayConfig.securityTls.alpn = []
+        }
         // reality
         v2rayConfig.securityReality.serverName = self.streamRealityServerName.stringValue
         v2rayConfig.securityReality.publicKey = self.streamRealityPublicKey.stringValue
@@ -399,6 +410,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         }
         v2rayConfig.streamH2.path = self.h2Path.stringValue
 
+        // xhttp
+        v2rayConfig.streamXhttp.mode = self.xhttpMode.stringValue
+        v2rayConfig.streamXhttp.path = self.xhttpPath.stringValue
+        
         // ws
         v2rayConfig.streamWs.path = self.wsPath.stringValue
         v2rayConfig.streamWs.headers.host = self.wsHost.stringValue
@@ -496,6 +511,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamSecurity.selectItem(withTitle: v2rayConfig.streamSecurity)
         self.streamTlsAllowInsecure.intValue = v2rayConfig.securityTls.allowInsecure ? 1 : 0
         self.streamTlsServerName.stringValue = v2rayConfig.securityTls.serverName
+        self.streamTlsAlpn.stringValue = v2rayConfig.securityTls.alpn.count > 0 ? v2rayConfig.securityTls.alpn[0] : ""
         
         // reality
         self.streamRealityServerName.stringValue = v2rayConfig.securityReality.serverName
@@ -530,6 +546,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.h2Host.stringValue = v2rayConfig.streamH2.host.count > 0 ? v2rayConfig.streamH2.host[0] : ""
         self.h2Path.stringValue = v2rayConfig.streamH2.path
 
+        // xhttp
+        self.xhttpMode.stringValue = v2rayConfig.streamXhttp.mode
+        self.xhttpPath.stringValue = v2rayConfig.streamXhttp.path
+        
         // ws
         self.wsPath.stringValue = v2rayConfig.streamWs.path
         self.wsHost.stringValue = v2rayConfig.streamWs.headers.host
@@ -737,6 +757,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
                 break;
             case "ws":
                 self.wsView.isHidden = false
+                break;
+            case "xhttp":
+                self.xhttpView.isHidden = false
                 break;
             case "h2":
                 self.h2View.isHidden = false

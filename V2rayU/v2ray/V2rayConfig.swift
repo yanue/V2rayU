@@ -115,6 +115,7 @@ class V2rayConfig: NSObject {
     var streamKcp = KcpSettings()
     var streamDs = DsSettings()
     var streamWs = WsSettings()
+    var streamXhttp = XhttpSettings()
     var streamH2 = HttpSettings()
     var streamQuic = QuicSettings()
     var streamGrpc = GrpcSettings()
@@ -461,6 +462,9 @@ class V2rayConfig: NSObject {
             break
         case .kcp:
             streamSettings.kcpSettings = self.streamKcp
+            break
+        case .xhttp:
+            streamSettings.xhttpSettings = self.streamXhttp
             break
         case .http, .h2:
             streamSettings.httpSettings = self.streamH2
@@ -885,6 +889,7 @@ class V2rayConfig: NSObject {
         stream.tcpSettings = transport.tcpSettings
         stream.kcpSettings = transport.kcpSettings
         stream.wsSettings = transport.wsSettings
+        stream.xhttpSettings = transport.xhttpSettings
         stream.httpSettings = transport.httpSettings
         stream.dsSettings = transport.dsSettings
         stream.quicSettings = transport.quicSettings
@@ -902,6 +907,7 @@ class V2rayConfig: NSObject {
                 self.securityTls.serverName = transport.tlsSettings!.serverName
                 self.securityTls.fingerprint = transport.tlsSettings!.fingerprint
                 self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
+                self.securityTls.alpn = transport.tlsSettings!.alpn
             }
             
             if transport.realitySettings != nil {
@@ -929,6 +935,10 @@ class V2rayConfig: NSObject {
                 self.streamWs = transport.wsSettings!
             }
 
+            if transport.xhttpSettings != nil {
+                self.streamXhttp = transport.xhttpSettings!
+            }
+            
             if transport.httpSettings != nil {
                 self.streamH2 = transport.httpSettings!
             }
@@ -956,7 +966,9 @@ class V2rayConfig: NSObject {
             let settings = streamJson["tlsSettings"]
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
-            tlsSettings.alpn = settings["alpn"].stringValue
+            tlsSettings.alpn = settings["alpn"].arrayValue.map {
+                $0.stringValue
+            }
             tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
             tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
             // certificates
@@ -981,7 +993,9 @@ class V2rayConfig: NSObject {
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
             tlsSettings.fingerprint = settings["fingerprint"].stringValue  // 必填，使用 uTLS 库模拟客户端 TLS 指纹
-            tlsSettings.alpn = settings["alpn"].stringValue
+            tlsSettings.alpn = settings["alpn"].arrayValue.map {
+                $0.stringValue
+            }
             tlsSettings.allowInsecure = settings["allowInsecure"].boolValue
             tlsSettings.allowInsecureCiphers = settings["allowInsecureCiphers"].boolValue
             // certificates
@@ -1062,7 +1076,7 @@ class V2rayConfig: NSObject {
 
             // response
             if streamJson["tcpSettings"]["header"]["response"].dictionaryValue.count > 0 {
-                var responseJson = streamJson["tcpSettings"]["header"]["response"]
+                let responseJson = streamJson["tcpSettings"]["header"]["response"]
                 var tcpResponse = TcpSettingHeaderResponse()
 
                 tcpResponse.version = responseJson["version"].stringValue
@@ -1127,6 +1141,14 @@ class V2rayConfig: NSObject {
             httpSettings.path = streamJson["httpSettings"]["path"].stringValue
 
             stream.httpSettings = httpSettings
+        }
+        
+        // xhttpSettings
+        if streamJson["xhttpSettings"].dictionaryValue.count > 0 && streamJson["xhttpSettings"].dictionaryValue.count > 0 {
+            var xhttpSettings = XhttpSettings()
+            xhttpSettings.mode = streamJson["xhttpSettings"]["mode"].stringValue
+            xhttpSettings.path = streamJson["xhttpSettings"]["path"].stringValue
+            stream.xhttpSettings = xhttpSettings
         }
 
         // dsSettings
