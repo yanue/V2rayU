@@ -15,6 +15,7 @@ struct V2rayTransport: Codable {
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
+    var xhttpSettings: XhttpSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
@@ -26,6 +27,7 @@ struct V2rayStreamSettings: Codable {
         case tcp
         case kcp
         case ws
+        case xhttp
         case http
         case h2
         case domainsocket
@@ -47,6 +49,7 @@ struct V2rayStreamSettings: Codable {
     var tcpSettings: TcpSettings?
     var kcpSettings: KcpSettings?
     var wsSettings: WsSettings?
+    var xhttpSettings: XhttpSettings?
     var httpSettings: HttpSettings?
     var dsSettings: DsSettings?
     var quicSettings: QuicSettings?
@@ -62,7 +65,7 @@ struct TlsSettings: Codable {
     var allowInsecure: Bool = true
     var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
-    var alpn: String?
+    var alpn: [String] = [""]
     var fingerprint: String = "chrome" // 必填，使用 tls 库模拟客户端 TLS 指纹
 }
 
@@ -165,6 +168,11 @@ struct WsSettings: Codable {
 
 struct WsSettingsHeader: Codable {
     var host: String = ""
+}
+
+struct XhttpSettings: Codable {
+    var mode: String = ""
+    var path: String = ""
 }
 
 struct HttpSettings: Codable {
