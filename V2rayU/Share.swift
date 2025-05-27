@@ -184,6 +184,7 @@ class ShareUri {
         ss.security = "tls"
         ss.fp = self.v2ray.securityTls.fingerprint
         ss.flow = self.v2ray.serverTrojan.flow
+        ss.sni = self.v2ray.securityTls.serverName
 
         self.uri = ss.encode()
         self.error = ss.error

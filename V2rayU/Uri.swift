@@ -418,6 +418,7 @@ class ShadowsockRUri: ShadowsockUri {
 // trojan
 class TrojanUri {
     var host: String = ""
+    var path: String = ""
     var port: Int = 443
     var password: String = ""
     var remark: String = ""
@@ -426,7 +427,11 @@ class TrojanUri {
     var security: String = "tls"
     var fp: String = ""
     var error: String = ""
-
+    var network: String = "tcp" // network type: tcp,ws,h2,grpc,domainsocket
+    var netHost: String = "" // host for ws,h2
+    var netPath: String = "" // path for ws,h2,grpc,ds,kcp
+    var headerType: String = "none" // header type: none,http,wireguard,srtp,utp,wechat-video,dtls
+    
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
     func encode() -> String {
         var uri = URLComponents()
@@ -439,6 +444,11 @@ class TrojanUri {
             URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "sni", value: self.sni),
             URLQueryItem(name: "fp", value: self.fp),
+            URLQueryItem(name: "type", value: self.network),
+            URLQueryItem(name: "host", value: self.netHost),
+            URLQueryItem(name: "path", value: self.netPath),
+            URLQueryItem(name: "headerType", value: self.headerType),
+            URLQueryItem(name: "serviceName", value: self.netPath)
         ]
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
@@ -473,6 +483,21 @@ class TrojanUri {
                 break
             case "fp":
                 self.fp = item.value as! String
+                break
+            case "type":
+                self.network = item.value as! String
+                break
+            case "path":
+                self.netPath = item.value as! String
+                break
+            case "host":
+                self.netHost = item.value as! String
+                break
+            case "serviceName":
+                self.netPath = item.value as! String
+                break
+            case "headerType":
+                self.headerType = item.value as! String
                 break
             default:
                 break

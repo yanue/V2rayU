@@ -14,7 +14,7 @@ let RoutingRuleCn = "routing.cn"
 let RoutingRuleLANAndCn = "routing.lanAndCn"
 
 let defaultRuleCn = Dictionary(uniqueKeysWithValues: [
-    (RoutingRuleGlobal, "🌏全局"),
+    (RoutingRuleGlobal, "🌏 全局"),
     (RoutingRuleLAN, "🌏 绕过局域网"),
     (RoutingRuleCn, "🌏 绕过中国大陆"),
     (RoutingRuleLANAndCn, "🌏 绕过局域网和中国大陆")
