@@ -200,7 +200,9 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
             }
             let userRuleLines = userRules.components(separatedBy: CharacterSet.newlines)
             var lines = gfwlist.components(separatedBy: CharacterSet.newlines)
-            lines = lines + userRuleLines
+
+            // 应先 userRules 后 gfwlist(匹配到就退出,短路逻辑)
+            lines = userRuleLines + lines
 
             // Filter empty and comment lines
             lines = lines.filter({ (s: String) -> Bool in
