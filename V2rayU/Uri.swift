@@ -152,8 +152,64 @@ class VmessUri {
                 break
             case "mode":
                 self.grpcMode = param[1]
+                break
             case "seed":
                 self.kcpSeed = param[1]
+                break
+                // 以下是 shadowrocket 的分享参数:
+                // remarks=vmess_ws&obfsParam=ws.host.domain&path=/vmwss&obfs=websocket&tls=1&peer=ws.sni.domain&alterId=64
+            case "obfs":
+                // 这里是 ws 的
+                if param[1] == "websocket" || param[1] == "ws" {
+                    self.network = "ws"
+                } else if param[1] == "h2" {
+                    self.network = "h2"
+                } else if param[1] == "http" {
+                    self.network = "tcp" //
+                    self.type = "http" // headerType
+                } else if param[1] == "grpc" {
+                    self.network = "grpc"
+                } else if param[1] == "domainsocket" {
+                    self.network = "domainsocket"
+                } else if param[1] == "quic" {
+                    self.network = "quic"
+                } else if param[1] == "kcp" || param[1] == "mkcp" {
+                    self.network = "kcp"
+                } else {
+                    self.network = "tcp"
+                    self.type = param[1]
+                }
+                break
+            case "alterId":
+                // 这里是 alterId
+                self.alterId = Int(param[1]) ?? 0
+                break
+            case "obfsParam":
+                // 这里是 ws,h2 的 host
+                self.netHost = param[1]
+                // params的obfs=mkcp情况下, 获取 kcp seed: obfsParam=%7B%22seed%22:%22111%22,%22Host%22:%22xxx.xx%22%7D
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    // 先 urldecode, 解析 kcp seed: {"seed":"111","Host":""}
+                    if let decodedParam = param[1].removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSON(data: data) {
+                            self.kcpSeed = json["seed"].stringValue
+                            self.netHost = json["Host"].stringValue
+                        }
+                    }
+                }
+                break
+            case "path":
+                // 这里是 ws,h2 的 path, tcp 的 header path
+                self.netPath = param[1]
+                break
+            case "remarks":
+                // 这里是备注
+                self.remark = param[1].urlDecoded()
+                break
+            case "peer":
+                // 这里是 sni
+                self.sni = param[1]
+                break
             default:
                 break
             }
@@ -436,7 +492,7 @@ class TrojanUri {
     func encode() -> String {
         var uri = URLComponents()
         uri.scheme = "trojan"
-        uri.password = self.password
+        uri.user = self.password // 因没有 user，所以这里用 password, 不然会多一个 :
         uri.host = self.host
         uri.port = self.port
         uri.queryItems = [
