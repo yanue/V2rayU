@@ -181,7 +181,39 @@ class ShareUri {
         ss.port = self.v2ray.serverTrojan.port
         ss.password = self.v2ray.serverTrojan.password
         ss.remark = self.remark
-        ss.security = "tls"
+        ss.security = self.v2ray.streamSecurity
+        ss.network = self.v2ray.streamNetwork
+        if self.v2ray.streamNetwork == "tcp" {
+            ss.headerType = self.v2ray.streamTcp.header.type
+            if self.v2ray.streamTcp.header.type == "http" {
+                if let req = self.v2ray.streamTcp.header.request {
+                    if req.path.count > 0 {
+                        ss.path = req.path[0]
+                    }
+                    if req.headers.host.count>0 {
+                        ss.host = req.headers.host[0]
+                    }
+                }
+            }
+        } else if self.v2ray.streamNetwork == "kcp" {
+            ss.headerType = self.v2ray.streamKcp.header.type
+            ss.netPath = self.v2ray.streamKcp.seed
+        } else if self.v2ray.streamNetwork == "quic" {
+            ss.headerType = self.v2ray.streamQuic.header.type
+            ss.netPath = self.v2ray.streamQuic.key
+        } else if self.v2ray.streamNetwork == "domainsocket" {
+            ss.netPath = self.v2ray.streamDs.path
+        } else if self.v2ray.streamNetwork == "h2" {
+            if self.v2ray.streamH2.host.count > 0 {
+                ss.netHost = self.v2ray.streamH2.host[0]
+            }
+            ss.netPath = self.v2ray.streamH2.path
+        } else if self.v2ray.streamNetwork == "ws" {
+            ss.netHost = self.v2ray.streamWs.headers.host
+            ss.netPath = self.v2ray.streamWs.path
+        } else if self.v2ray.streamNetwork == "grpc" {
+            ss.netPath = self.v2ray.streamGrpc.serviceName
+        }
         ss.fp = self.v2ray.securityTls.fingerprint
         ss.flow = self.v2ray.serverTrojan.flow
         ss.sni = self.v2ray.securityTls.serverName

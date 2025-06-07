@@ -518,9 +518,14 @@ class TrojanUri {
             self.error = "error:missing port"
             return
         }
-        guard let password = url.user else {
+        guard var password = url.user else {
             self.error = "error:missing password"
             return
+        }
+        // shadowrocket trojan url: trojan://%3Apassword@host:port?query#remark
+        if url.absoluteString.contains("trojan://%3A") {
+            // 去掉前面的 %3A,即:
+            password = password.replacingOccurrences(of: "%3A", with: "").replacingOccurrences(of: ":", with: "")
         }
         self.host = host
         self.port = Int(port)
@@ -554,6 +559,69 @@ class TrojanUri {
                 break
             case "headerType":
                 self.headerType = item.value as! String
+                break
+            // 以下是 shadowrocket 的分享参数:
+            // peer=sni.xx.xx&obfs=grpc&obfsParam=hjfjkdkdi&path=tekdjjd#yanue-trojan1
+            // ?peer=sni.xx.xx&plugin=obfs-local;obfs=websocket;obfs-host=%7B%22Host%22:%22hjfjkdkdi%22%7D;obfs-uri=tekdjjd#trojan3
+            case "plugin":
+                // 这里是 obfs-local 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
+                let value = item.value as! String
+                print("trojan plugin:", value)
+                // 按 ; 分割
+                let plugins = value.components(separatedBy: ";")
+                for plugin in plugins {
+                    let pluginParts = plugin.components(separatedBy: "=")
+                    if pluginParts.count < 2 {
+                        continue
+                    }
+                    switch pluginParts[0] {
+                    case "obfs":
+                        // 这里是 ws 的
+                        if pluginParts[1] == "websocket" || pluginParts[1] == "ws" {
+                            self.network = "ws"
+                        } else if pluginParts[1] == "h2" {
+                            self.network = "h2"
+                        } else if pluginParts[1] == "grpc" {
+                            self.network = "grpc"
+                        } else {
+                            self.network = "tcp"
+                        }
+                    case "obfs-host":
+                        // 这里是 ws,h2 的 host: {"Host":"hjfjkdkdi"}
+                        if let hostValue = pluginParts[1].removingPercentEncoding,let data = hostValue.data(using: .utf8) {
+                            if let json = try? JSON(data: data) {
+                                self.netHost = json["Host"].stringValue
+                            }
+                        }
+                    case "obfs-uri":
+                        // 这里是 ws,h2 的 path
+                        self.netPath = pluginParts[1]
+                    default:
+                        break
+                    }
+                }
+                break
+            case "obfs":
+                let value = item.value as! String
+                print("trojan obfs:", value)
+                // 这里是 ws 的
+                if value == "websocket" || value == "ws" {
+                    self.network = "ws"
+                } else if value == "h2" {
+                    self.network = "h2"
+                } else if value == "grpc" {
+                    self.network = "grpc"
+                } else {
+                    self.network = "tcp"
+                }
+                break
+            case "obfsParam":
+                // 这里是 ws,h2 的 host
+                self.netHost = item.value as! String
+                break
+            case "peer":
+                // 这里是 sni
+                self.sni = item.value as! String
                 break
             default:
                 break
