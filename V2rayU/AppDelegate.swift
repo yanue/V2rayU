@@ -163,7 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // auto clear log
         if UserDefaults.getBool(forKey: .autoClearLog) {
-            V2rayLaunch.clearLogFile()
+            V2rayLaunch.truncateLogFile()
         }
         // ping
         ping.pingAll()
