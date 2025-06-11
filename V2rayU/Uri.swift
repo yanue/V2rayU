@@ -630,7 +630,10 @@ class TrojanUri {
         if self.security == "" {
             self.security = "tls"
         }
-        self.remark = (url.fragment ?? "trojan").urlDecoded()
+        
+        if self.network.isEmpty {
+            self.remark = (url.fragment ?? "trojan").urlDecoded()
+        }
     }
 }
 
@@ -711,21 +714,54 @@ class VlessUri {
     }
 
     func Init(url: URL) {
-        guard let address = url.host else {
+        // vless://YXV0bzpwYXNzd29yZEB2bGVzcy5ob3N0OjQ0Mw==?remarks=vless_vision_reality&tls=1&peer=sni.vless.host&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+        // vless://id@address:port?query#remark
+        guard var address = url.host else {
             self.error = "error:missing host"
             return
         }
-        guard let port = url.port else {
-            self.error = "error:missing port"
-            return
-        }
-        guard let id = url.user else {
-            self.error = "error:missing id"
-            return
+        var id = url.user ?? ""
+        var port = url.port ?? 0
+        if id.count == 0 || port == 0 {
+            // 可能是 shadowrocket 的链接: vless://base64encode?query#remark
+            // base64encode 是 auto:id@address:port 的 base64 编码
+            guard let base64Str = url.absoluteString.components(separatedBy: "://").last?.components(separatedBy: "?").first else {
+                self.error = "error:missing port or id"
+                return
+            }
+            guard let decodedStr = base64Str.base64Decoded() else {
+                self.error = "error: decode base64"
+                return
+            }
+            print("VlessUri decode base64:", decodedStr)
+            let parts = decodedStr.split(separator: "@")
+            if parts.count != 2 {
+                self.error = "error: decode base64 parts"
+                return
+            }
+            // id:encryption
+            let idAndEncypt = parts[0].split(separator: ":")
+            if idAndEncypt.count > 1 {
+                self.encryption = String(idAndEncypt[0])
+                id = String(idAndEncypt[1])
+            } else {
+                id = String(idAndEncypt[0])
+            }
+            // address:port
+            let addressAndPort = parts[1].split(separator: ":")
+            if addressAndPort.count != 2 {
+                self.error = "error: decode base64 address and port"
+                return
+            }
+            // 替换原始的 id 和 address, port
+            address = String(addressAndPort[0])
+            port = Int(addressAndPort[1]) ?? 0
         }
         self.address = address
         self.port = Int(port)
         self.id = id
+        let paramsStr = url.query ?? ""
+        print("VlessUri parsed", self.encryption, address, port, id, url)
         let queryItems = url.queryParams()
         for item in queryItems {
             switch item.key {
@@ -777,6 +813,73 @@ class VlessUri {
             case "mode":
                 self.grpcMode = item.value as! String
                 break
+                // 以下是 shadowrocket 的分享参数:
+                // remarks=yanue-test11&tls=1&peer=sni.domain&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+            case "obfs":
+                let value = item.value as! String
+                // 这里是 ws 的
+                if value == "websocket" || value == "ws" {
+                    self.network = "ws"
+                } else if value == "h2" {
+                    self.network = "h2"
+                } else if value == "http" {
+                    self.network = "tcp" //
+                    self.headerType = "http" // headerType
+                } else if value == "grpc" {
+                    self.network = "grpc"
+                } else if value == "domainsocket" {
+                    self.network = "domainsocket"
+                } else if value == "quic" {
+                    self.network = "quic"
+                } else if value == "kcp" || value == "mkcp" {
+                    self.network = "kcp"
+                } else {
+                    self.network = "tcp"
+                    self.headerType = value
+                }
+                break
+            case "obfsParam":
+                let value = item.value as! String
+                // 这里是 ws,h2 的 host
+                self.host = value
+                // params的obfs=mkcp情况下, 获取 kcp seed: obfsParam=%7B%22seed%22:%22111%22,%22Host%22:%22xxx.xx%22%7D
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    // 先 urldecode, 解析 kcp seed: {"seed":"111","Host":""}
+                    if let decodedParam = value.removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSON(data: data) {
+                            self.kcpSeed = json["seed"].stringValue
+                            self.host = json["Host"].stringValue
+                        }
+                    }
+                }
+            case "tls":
+                let value = item.value as! String
+                if !paramsStr.contains("xtls=") && value == "1" {
+                    self.security = "tls"
+                }
+                break
+            case "xtls":
+                let value = item.value as! String
+                if value == "1" {
+                    self.security = "xtls"
+                    self.flow = "xtls-rprx-origin" // 默认 xtls
+                }
+                if value == "2" {
+                    self.security = "reality"
+                    self.flow = "xtls-rprx-vision" // 默认 reality
+                }
+                break
+            case "remarks":
+                // 这里是备注
+                let value = item.value as! String
+                self.remark = value.urlDecoded()
+                break
+            case "peer":
+                // 这里是 sni
+                let value = item.value as! String
+                self.sni = value
+                print("VlessUri peer sni:", self.sni)
+                break
             default:
                 break
             }
@@ -785,7 +888,9 @@ class VlessUri {
         if self.sni.count == 0 {
             self.sni = address
         }
-
-        self.remark = (url.fragment ?? "vless").urlDecoded()
+            
+        if self.remark.isEmpty {
+            self.remark = (url.fragment ?? "vless").urlDecoded()
+        }
     }
 }
