@@ -566,7 +566,6 @@ class TrojanUri {
             case "plugin":
                 // 这里是 obfs-local 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
                 let value = item.value as! String
-                print("trojan plugin:", value)
                 // 按 ; 分割
                 let plugins = value.components(separatedBy: ";")
                 for plugin in plugins {
@@ -603,7 +602,6 @@ class TrojanUri {
                 break
             case "obfs":
                 let value = item.value as! String
-                print("trojan obfs:", value)
                 // 这里是 ws 的
                 if value == "websocket" || value == "ws" {
                     self.network = "ws"
@@ -631,7 +629,7 @@ class TrojanUri {
             self.security = "tls"
         }
         
-        if self.network.isEmpty {
+        if self.remark.isEmpty {
             self.remark = (url.fragment ?? "trojan").urlDecoded()
         }
     }
