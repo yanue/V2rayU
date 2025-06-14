@@ -444,4 +444,44 @@ class V2rayLaunch: NSObject {
             NSLog("save json file fail: \(error)")
         }
     }
+    
+    // clear v2ray-core.log file
+    static func clearLogFile() {
+        let logFile = URL(fileURLWithPath: logFilePath)
+        do {
+            if FileManager.default.fileExists(atPath: logFilePath) {
+                try FileManager.default.removeItem(at: logFile)
+            }
+            // create new file
+            FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: nil)
+        } catch let error {
+            NSLog("clear log file fail: \(error)")
+            var title = "Clear log file failed"
+            var toast = "Error: \(error)"
+            if isMainland {
+                title = "清除日志文件失败"
+                toast = "错误: \(error)"
+            }
+            alertDialog(title: title, message: toast)
+        }
+    }
+    
+    static func truncateLogFile() {
+        let logFile = URL(fileURLWithPath: logFilePath)
+        do {
+            if FileManager.default.fileExists(atPath: logFilePath) {
+                // truncate log file,  write empty string
+                try "".write(to: logFile, atomically: true, encoding: String.Encoding.utf8)
+            }
+        } catch let error {
+            NSLog("truncate log file fail: \(error)")
+            var title = "Truncate log file failed"
+            var toast = "Error: \(error)"
+            if isMainland {
+                title = "清除日志文件失败"
+                toast = "错误: \(error)"
+            }
+            alertDialog(title: title, message: toast)
+        }
+    }
 }

@@ -152,8 +152,64 @@ class VmessUri {
                 break
             case "mode":
                 self.grpcMode = param[1]
+                break
             case "seed":
                 self.kcpSeed = param[1]
+                break
+                // 以下是 shadowrocket 的分享参数:
+                // remarks=vmess_ws&obfsParam=ws.host.domain&path=/vmwss&obfs=websocket&tls=1&peer=ws.sni.domain&alterId=64
+            case "obfs":
+                // 这里是 ws 的
+                if param[1] == "websocket" || param[1] == "ws" {
+                    self.network = "ws"
+                } else if param[1] == "h2" {
+                    self.network = "h2"
+                } else if param[1] == "http" {
+                    self.network = "tcp" //
+                    self.type = "http" // headerType
+                } else if param[1] == "grpc" {
+                    self.network = "grpc"
+                } else if param[1] == "domainsocket" {
+                    self.network = "domainsocket"
+                } else if param[1] == "quic" {
+                    self.network = "quic"
+                } else if param[1] == "kcp" || param[1] == "mkcp" {
+                    self.network = "kcp"
+                } else {
+                    self.network = "tcp"
+                    self.type = param[1]
+                }
+                break
+            case "alterId":
+                // 这里是 alterId
+                self.alterId = Int(param[1]) ?? 0
+                break
+            case "obfsParam":
+                // 这里是 ws,h2 的 host
+                self.netHost = param[1]
+                // params的obfs=mkcp情况下, 获取 kcp seed: obfsParam=%7B%22seed%22:%22111%22,%22Host%22:%22xxx.xx%22%7D
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    // 先 urldecode, 解析 kcp seed: {"seed":"111","Host":""}
+                    if let decodedParam = param[1].removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSON(data: data) {
+                            self.kcpSeed = json["seed"].stringValue
+                            self.netHost = json["Host"].stringValue
+                        }
+                    }
+                }
+                break
+            case "path":
+                // 这里是 ws,h2 的 path, tcp 的 header path
+                self.netPath = param[1]
+                break
+            case "remarks":
+                // 这里是备注
+                self.remark = param[1].urlDecoded()
+                break
+            case "peer":
+                // 这里是 sni
+                self.sni = param[1]
+                break
             default:
                 break
             }
@@ -418,6 +474,7 @@ class ShadowsockRUri: ShadowsockUri {
 // trojan
 class TrojanUri {
     var host: String = ""
+    var path: String = ""
     var port: Int = 443
     var password: String = ""
     var remark: String = ""
@@ -426,12 +483,16 @@ class TrojanUri {
     var security: String = "tls"
     var fp: String = ""
     var error: String = ""
-
+    var network: String = "tcp" // network type: tcp,ws,h2,grpc,domainsocket
+    var netHost: String = "" // host for ws,h2
+    var netPath: String = "" // path for ws,h2,grpc,ds,kcp
+    var headerType: String = "none" // header type: none,http,wireguard,srtp,utp,wechat-video,dtls
+    
     // trojan://pass@remote_host:443?flow=xtls-rprx-origin&security=xtls&sni=sni&host=remote_host#trojan
     func encode() -> String {
         var uri = URLComponents()
         uri.scheme = "trojan"
-        uri.password = self.password
+        uri.user = self.password // 因没有 user，所以这里用 password, 不然会多一个 :
         uri.host = self.host
         uri.port = self.port
         uri.queryItems = [
@@ -439,6 +500,11 @@ class TrojanUri {
             URLQueryItem(name: "security", value: self.security),
             URLQueryItem(name: "sni", value: self.sni),
             URLQueryItem(name: "fp", value: self.fp),
+            URLQueryItem(name: "type", value: self.network),
+            URLQueryItem(name: "host", value: self.netHost),
+            URLQueryItem(name: "path", value: self.netPath),
+            URLQueryItem(name: "headerType", value: self.headerType),
+            URLQueryItem(name: "serviceName", value: self.netPath)
         ]
         return (uri.url?.absoluteString ?? "") + "#" + self.remark
     }
@@ -452,9 +518,14 @@ class TrojanUri {
             self.error = "error:missing port"
             return
         }
-        guard let password = url.user else {
+        guard var password = url.user else {
             self.error = "error:missing password"
             return
+        }
+        // shadowrocket trojan url: trojan://%3Apassword@host:port?query#remark
+        if url.absoluteString.contains("trojan://%3A") {
+            // 去掉前面的 %3A,即:
+            password = password.replacingOccurrences(of: "%3A", with: "").replacingOccurrences(of: ":", with: "")
         }
         self.host = host
         self.port = Int(port)
@@ -474,6 +545,82 @@ class TrojanUri {
             case "fp":
                 self.fp = item.value as! String
                 break
+            case "type":
+                self.network = item.value as! String
+                break
+            case "path":
+                self.netPath = item.value as! String
+                break
+            case "host":
+                self.netHost = item.value as! String
+                break
+            case "serviceName":
+                self.netPath = item.value as! String
+                break
+            case "headerType":
+                self.headerType = item.value as! String
+                break
+            // 以下是 shadowrocket 的分享参数:
+            // peer=sni.xx.xx&obfs=grpc&obfsParam=hjfjkdkdi&path=tekdjjd#yanue-trojan1
+            // ?peer=sni.xx.xx&plugin=obfs-local;obfs=websocket;obfs-host=%7B%22Host%22:%22hjfjkdkdi%22%7D;obfs-uri=tekdjjd#trojan3
+            case "plugin":
+                // 这里是 obfs-local 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
+                let value = item.value as! String
+                // 按 ; 分割
+                let plugins = value.components(separatedBy: ";")
+                for plugin in plugins {
+                    let pluginParts = plugin.components(separatedBy: "=")
+                    if pluginParts.count < 2 {
+                        continue
+                    }
+                    switch pluginParts[0] {
+                    case "obfs":
+                        // 这里是 ws 的
+                        if pluginParts[1] == "websocket" || pluginParts[1] == "ws" {
+                            self.network = "ws"
+                        } else if pluginParts[1] == "h2" {
+                            self.network = "h2"
+                        } else if pluginParts[1] == "grpc" {
+                            self.network = "grpc"
+                        } else {
+                            self.network = "tcp"
+                        }
+                    case "obfs-host":
+                        // 这里是 ws,h2 的 host: {"Host":"hjfjkdkdi"}
+                        if let hostValue = pluginParts[1].removingPercentEncoding,let data = hostValue.data(using: .utf8) {
+                            if let json = try? JSON(data: data) {
+                                self.netHost = json["Host"].stringValue
+                            }
+                        }
+                    case "obfs-uri":
+                        // 这里是 ws,h2 的 path
+                        self.netPath = pluginParts[1]
+                    default:
+                        break
+                    }
+                }
+                break
+            case "obfs":
+                let value = item.value as! String
+                // 这里是 ws 的
+                if value == "websocket" || value == "ws" {
+                    self.network = "ws"
+                } else if value == "h2" {
+                    self.network = "h2"
+                } else if value == "grpc" {
+                    self.network = "grpc"
+                } else {
+                    self.network = "tcp"
+                }
+                break
+            case "obfsParam":
+                // 这里是 ws,h2 的 host
+                self.netHost = item.value as! String
+                break
+            case "peer":
+                // 这里是 sni
+                self.sni = item.value as! String
+                break
             default:
                 break
             }
@@ -481,7 +628,10 @@ class TrojanUri {
         if self.security == "" {
             self.security = "tls"
         }
-        self.remark = (url.fragment ?? "trojan").urlDecoded()
+        
+        if self.remark.isEmpty {
+            self.remark = (url.fragment ?? "trojan").urlDecoded()
+        }
     }
 }
 
@@ -562,21 +712,54 @@ class VlessUri {
     }
 
     func Init(url: URL) {
-        guard let address = url.host else {
+        // vless://YXV0bzpwYXNzd29yZEB2bGVzcy5ob3N0OjQ0Mw==?remarks=vless_vision_reality&tls=1&peer=sni.vless.host&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+        // vless://id@address:port?query#remark
+        guard var address = url.host else {
             self.error = "error:missing host"
             return
         }
-        guard let port = url.port else {
-            self.error = "error:missing port"
-            return
-        }
-        guard let id = url.user else {
-            self.error = "error:missing id"
-            return
+        var id = url.user ?? ""
+        var port = url.port ?? 0
+        if id.count == 0 || port == 0 {
+            // 可能是 shadowrocket 的链接: vless://base64encode?query#remark
+            // base64encode 是 auto:id@address:port 的 base64 编码
+            guard let base64Str = url.absoluteString.components(separatedBy: "://").last?.components(separatedBy: "?").first else {
+                self.error = "error:missing port or id"
+                return
+            }
+            guard let decodedStr = base64Str.base64Decoded() else {
+                self.error = "error: decode base64"
+                return
+            }
+            print("VlessUri decode base64:", decodedStr)
+            let parts = decodedStr.split(separator: "@")
+            if parts.count != 2 {
+                self.error = "error: decode base64 parts"
+                return
+            }
+            // id:encryption
+            let idAndEncypt = parts[0].split(separator: ":")
+            if idAndEncypt.count > 1 {
+                self.encryption = String(idAndEncypt[0])
+                id = String(idAndEncypt[1])
+            } else {
+                id = String(idAndEncypt[0])
+            }
+            // address:port
+            let addressAndPort = parts[1].split(separator: ":")
+            if addressAndPort.count != 2 {
+                self.error = "error: decode base64 address and port"
+                return
+            }
+            // 替换原始的 id 和 address, port
+            address = String(addressAndPort[0])
+            port = Int(addressAndPort[1]) ?? 0
         }
         self.address = address
         self.port = Int(port)
         self.id = id
+        let paramsStr = url.query ?? ""
+        print("VlessUri parsed", self.encryption, address, port, id, url)
         let queryItems = url.queryParams()
         for item in queryItems {
             switch item.key {
@@ -628,6 +811,73 @@ class VlessUri {
             case "mode":
                 self.grpcMode = item.value as! String
                 break
+                // 以下是 shadowrocket 的分享参数:
+                // remarks=yanue-test11&tls=1&peer=sni.domain&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+            case "obfs":
+                let value = item.value as! String
+                // 这里是 ws 的
+                if value == "websocket" || value == "ws" {
+                    self.network = "ws"
+                } else if value == "h2" {
+                    self.network = "h2"
+                } else if value == "http" {
+                    self.network = "tcp" //
+                    self.headerType = "http" // headerType
+                } else if value == "grpc" {
+                    self.network = "grpc"
+                } else if value == "domainsocket" {
+                    self.network = "domainsocket"
+                } else if value == "quic" {
+                    self.network = "quic"
+                } else if value == "kcp" || value == "mkcp" {
+                    self.network = "kcp"
+                } else {
+                    self.network = "tcp"
+                    self.headerType = value
+                }
+                break
+            case "obfsParam":
+                let value = item.value as! String
+                // 这里是 ws,h2 的 host
+                self.host = value
+                // params的obfs=mkcp情况下, 获取 kcp seed: obfsParam=%7B%22seed%22:%22111%22,%22Host%22:%22xxx.xx%22%7D
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    // 先 urldecode, 解析 kcp seed: {"seed":"111","Host":""}
+                    if let decodedParam = value.removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSON(data: data) {
+                            self.kcpSeed = json["seed"].stringValue
+                            self.host = json["Host"].stringValue
+                        }
+                    }
+                }
+            case "tls":
+                let value = item.value as! String
+                if !paramsStr.contains("xtls=") && value == "1" {
+                    self.security = "tls"
+                }
+                break
+            case "xtls":
+                let value = item.value as! String
+                if value == "1" {
+                    self.security = "xtls"
+                    self.flow = "xtls-rprx-origin" // 默认 xtls
+                }
+                if value == "2" {
+                    self.security = "reality"
+                    self.flow = "xtls-rprx-vision" // 默认 reality
+                }
+                break
+            case "remarks":
+                // 这里是备注
+                let value = item.value as! String
+                self.remark = value.urlDecoded()
+                break
+            case "peer":
+                // 这里是 sni
+                let value = item.value as! String
+                self.sni = value
+                print("VlessUri peer sni:", self.sni)
+                break
             default:
                 break
             }
@@ -636,7 +886,9 @@ class VlessUri {
         if self.sni.count == 0 {
             self.sni = address
         }
-
-        self.remark = (url.fragment ?? "vless").urlDecoded()
+            
+        if self.remark.isEmpty {
+            self.remark = (url.fragment ?? "vless").urlDecoded()
+        }
     }
 }

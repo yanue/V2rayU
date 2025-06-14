@@ -30,7 +30,6 @@ class ShareUri {
     var remark = ""
     var uri: String = ""
     var v2ray = V2rayConfig()
-    var share = VmessShare()
 
     func qrcode(item: V2rayItem) {
         v2ray.parseJson(jsonText: item.json)
@@ -91,70 +90,72 @@ class ShareUri {
     tls：底层传输安全（tls)
     */
     private func genVmessUri() {
-        self.share.add = self.v2ray.serverVmess.address
-        self.share.ps = self.remark
-        self.share.port = String(self.v2ray.serverVmess.port)
+        var share = VmessShare()
+
+        share.add = self.v2ray.serverVmess.address
+        share.ps = self.remark
+        share.port = String(self.v2ray.serverVmess.port)
         if self.v2ray.serverVmess.users.count > 0 {
-            self.share.id = self.v2ray.serverVmess.users[0].id
-            self.share.aid = String(self.v2ray.serverVmess.users[0].alterId)
-            self.share.security = self.v2ray.serverVmess.users[0].security // security type
+            share.id = self.v2ray.serverVmess.users[0].id
+            share.aid = String(self.v2ray.serverVmess.users[0].alterId)
+            share.security = self.v2ray.serverVmess.users[0].security // security type
         }
-        self.share.net = self.v2ray.streamNetwork
+        share.net = self.v2ray.streamNetwork
 
         if self.v2ray.streamNetwork == "tcp" {
-            self.share.type = self.v2ray.streamTcp.header.type
+            share.type = self.v2ray.streamTcp.header.type
             if self.v2ray.streamTcp.header.type == "http" {
                 if let req = self.v2ray.streamTcp.header.request {
                     if req.path.count > 0 {
-                        self.share.path = req.path[0]
+                        share.path = req.path[0]
                     }
                     if req.headers.host.count>0 {
-                        self.share.host = req.headers.host[0]
+                        share.host = req.headers.host[0]
                     }
                 }
             }
         }
         
         if self.v2ray.streamNetwork == "kcp" {
-            self.share.type = self.v2ray.streamKcp.header.type
-            self.share.path = self.v2ray.streamKcp.seed
+            share.type = self.v2ray.streamKcp.header.type
+            share.path = self.v2ray.streamKcp.seed
         }
         
         if self.v2ray.streamNetwork == "quic" {
-            self.share.type = self.v2ray.streamQuic.header.type
-            self.share.path = self.v2ray.streamQuic.key
+            share.type = self.v2ray.streamQuic.header.type
+            share.path = self.v2ray.streamQuic.key
         }
         
         if self.v2ray.streamNetwork == "domainsocket" {
-            self.share.path = self.v2ray.streamDs.path
+            share.path = self.v2ray.streamDs.path
         }
         
         if self.v2ray.streamNetwork == "h2" {
             if self.v2ray.streamH2.host.count > 0 {
-                self.share.host = self.v2ray.streamH2.host[0]
+                share.host = self.v2ray.streamH2.host[0]
             }
-            self.share.path = self.v2ray.streamH2.path
+            share.path = self.v2ray.streamH2.path
         }
 
         if self.v2ray.streamNetwork == "ws" {
-            self.share.host = self.v2ray.streamWs.headers.host
-            self.share.path = self.v2ray.streamWs.path
+            share.host = self.v2ray.streamWs.headers.host
+            share.path = self.v2ray.streamWs.path
         }
 
         if self.v2ray.streamNetwork == "grpc" {
-            self.share.path = self.v2ray.streamGrpc.serviceName
+            share.path = self.v2ray.streamGrpc.serviceName
             if self.v2ray.streamGrpc.multiMode {
-                self.share.type = "multi"
+                share.type = "multi"
             }
         }
 
-        self.share.tls = self.v2ray.streamSecurity
-        self.share.sni = self.v2ray.securityTls.serverName
-        self.share.fp = self.v2ray.securityTls.fingerprint
-        self.share.net = self.v2ray.streamNetwork
+        share.tls = self.v2ray.streamSecurity
+        share.sni = self.v2ray.securityTls.serverName
+        share.fp = self.v2ray.securityTls.fingerprint
+        share.net = self.v2ray.streamNetwork
         // todo headerType
         let encoder = JSONEncoder()
-        if let data = try? encoder.encode(self.share) {
+        if let data = try? encoder.encode(share) {
             let uri = String(data: data, encoding: .utf8)!
             self.uri = "vmess://" + uri.base64Encoded()!
         } else {
@@ -181,9 +182,42 @@ class ShareUri {
         ss.port = self.v2ray.serverTrojan.port
         ss.password = self.v2ray.serverTrojan.password
         ss.remark = self.remark
-        ss.security = "tls"
+        ss.security = self.v2ray.streamSecurity
+        ss.network = self.v2ray.streamNetwork
+        if self.v2ray.streamNetwork == "tcp" {
+            ss.headerType = self.v2ray.streamTcp.header.type
+            if self.v2ray.streamTcp.header.type == "http" {
+                if let req = self.v2ray.streamTcp.header.request {
+                    if req.path.count > 0 {
+                        ss.path = req.path[0]
+                    }
+                    if req.headers.host.count>0 {
+                        ss.host = req.headers.host[0]
+                    }
+                }
+            }
+        } else if self.v2ray.streamNetwork == "kcp" {
+            ss.headerType = self.v2ray.streamKcp.header.type
+            ss.netPath = self.v2ray.streamKcp.seed
+        } else if self.v2ray.streamNetwork == "quic" {
+            ss.headerType = self.v2ray.streamQuic.header.type
+            ss.netPath = self.v2ray.streamQuic.key
+        } else if self.v2ray.streamNetwork == "domainsocket" {
+            ss.netPath = self.v2ray.streamDs.path
+        } else if self.v2ray.streamNetwork == "h2" {
+            if self.v2ray.streamH2.host.count > 0 {
+                ss.netHost = self.v2ray.streamH2.host[0]
+            }
+            ss.netPath = self.v2ray.streamH2.path
+        } else if self.v2ray.streamNetwork == "ws" {
+            ss.netHost = self.v2ray.streamWs.headers.host
+            ss.netPath = self.v2ray.streamWs.path
+        } else if self.v2ray.streamNetwork == "grpc" {
+            ss.netPath = self.v2ray.streamGrpc.serviceName
+        }
         ss.fp = self.v2ray.securityTls.fingerprint
         ss.flow = self.v2ray.serverTrojan.flow
+        ss.sni = self.v2ray.securityTls.serverName
 
         self.uri = ss.encode()
         self.error = ss.error
@@ -256,9 +290,9 @@ class ShareUri {
         }
 
         if self.v2ray.streamNetwork == "grpc" {
-            self.share.path = self.v2ray.streamGrpc.serviceName
+            ss.path = self.v2ray.streamGrpc.serviceName
             if self.v2ray.streamGrpc.multiMode {
-                self.share.type = "multi"
+                ss.grpcMode = "multi"
             }
         }
 

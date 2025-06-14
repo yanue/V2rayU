@@ -206,23 +206,34 @@ class MenuController: NSObject, NSMenuDelegate {
         }
 
         // subscribe items
-        for (itemKey, menu) in groupMenus {
-            if itemKey == "default" {
-                continue
+        // 超过一个分组,才使用二级菜单
+        if groupMenus.count > 1 {
+            for (itemKey, menu) in groupMenus {
+                if itemKey == "default" {
+                    continue
+                }
+                let newGroup: NSMenuItem = NSMenuItem()
+                var groupTagName = "🌏 订阅"
+                if let sub = V2raySubItem.load(name: itemKey) {
+                    groupTagName = "🌏 " + sub.remark + " (\(menu.items.count))"
+                }
+                newGroup.submenu = menu
+                newGroup.title = groupTagName
+                newGroup.target = self
+                newGroup.isEnabled = true
+                if chooseGroup == itemKey {
+                    newGroup.state = NSControl.StateValue.on
+                }
+                _subMenus.addItem(newGroup)
             }
-            let newGroup: NSMenuItem = NSMenuItem()
-            var groupTagName = "🌏 订阅"
-            if let sub = V2raySubItem.load(name: itemKey) {
-                groupTagName = "🌏 " + sub.remark + " (\(menu.items.count))"
+        } else {
+            // only one group, add all items to the first menu
+            for (_, subMenus) in groupMenus {
+                for menu in subMenus.items {
+                    subMenus.removeItem(menu) // 必须要先移除
+                    _subMenus.addItem(menu)
+                }
             }
-            newGroup.submenu = menu
-            newGroup.title = groupTagName
-            newGroup.target = self
-            newGroup.isEnabled = true
-            if chooseGroup == itemKey {
-                newGroup.state = NSControl.StateValue.on
-            }
-            _subMenus.addItem(newGroup)
         }
 
         if validCount == 0 {

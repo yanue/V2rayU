@@ -121,6 +121,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.get(forKey: .runMode) == nil {
             UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
         }
+        if UserDefaults.get(forKey: .autoClearLog) == nil {
+            UserDefaults.setBool(forKey: .autoClearLog, value: true)
+        }
+        // 启动时清除日志
+        V2rayLaunch.clearLogFile()
+        
         V2rayServer.loadConfig()
         V2rayRoutings.loadConfig()
         V2raySubscription.loadConfig()
@@ -154,6 +160,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // auto update subscribe servers
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             V2raySubSync.shared.sync()
+        }
+        // auto clear log
+        if UserDefaults.getBool(forKey: .autoClearLog) {
+            V2rayLaunch.truncateLogFile()
         }
         // ping
         ping.pingAll()

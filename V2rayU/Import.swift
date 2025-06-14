@@ -427,14 +427,37 @@ class ImportUri {
 
         v2ray.serverTrojan = svr
         v2ray.enableMux = false
+        v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
         // tcp
         v2ray.streamNetwork = "tcp"
         v2ray.streamSecurity = trojan.security
         v2ray.securityTls.allowInsecure = true
         v2ray.securityTls.serverName = trojan.sni // default tls sni
         v2ray.securityTls.fingerprint = trojan.fp
-
-        v2ray.serverProtocol = V2rayProtocolOutbound.trojan.rawValue
+        switch trojan.network {
+        case "h2","http":
+            v2ray.streamNetwork = trojan.network
+            v2ray.streamH2.host = [trojan.netHost]
+            v2ray.streamH2.path = trojan.netPath
+        case "ws":
+            v2ray.streamNetwork = "ws"
+            v2ray.streamWs.path = trojan.netPath
+            v2ray.streamWs.headers.host = trojan.netHost
+        case "grpc":
+            v2ray.streamNetwork = "grpc"
+            v2ray.streamGrpc.serviceName = trojan.netPath
+            v2ray.streamGrpc.multiMode = true // v2rayN
+        default:
+            v2ray.streamNetwork = "tcp"
+            v2ray.streamTcp.header.type = trojan.headerType
+            if v2ray.streamTcp.header.type == "http" {
+                var tcpReq = TcpSettingHeaderRequest()
+                tcpReq.path = [trojan.netPath]
+                tcpReq.headers.host = [trojan.netHost]
+                v2ray.streamTcp.header.request = tcpReq
+            }
+        }
+      
         // check is valid
         v2ray.checkManualValid()
         if v2ray.isValid {
