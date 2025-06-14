@@ -140,8 +140,10 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
     @IBOutlet weak var streamTlsAllowInsecure: NSButton!
     @IBOutlet weak var streamTlsServerName: NSTextField!
     @IBOutlet weak var streamTlsAlpn: NSTextField!
+    @IBOutlet weak var streamTlsFingerprint: NSTextField!
     @IBOutlet weak var streamRealityServerName: NSTextField!
     @IBOutlet weak var streamRealityPublicKey: NSTextField!
+    @IBOutlet weak var streamRealityFingerprint: NSTextField!
     @IBOutlet weak var streamRealityShortId: NSTextField!
     @IBOutlet weak var streamRealitySpiderX: NSTextField!
     
@@ -367,15 +369,17 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         // tls
         v2rayConfig.securityTls.allowInsecure = self.streamTlsAllowInsecure.state.rawValue > 0
         v2rayConfig.securityTls.serverName = self.streamTlsServerName.stringValue
+        v2rayConfig.securityTls.fingerprint = self.streamTlsFingerprint.stringValue
         let streamTlsAlpn = self.streamTlsAlpn.stringValue
         if streamTlsAlpn.count != 0 {
-            v2rayConfig.securityTls.alpn = [streamTlsAlpn]
+            v2rayConfig.securityTls.alpn = streamTlsAlpn.components(separatedBy: ",").map { $0.trimmingCharacters(in: CharacterSet(charactersIn: " \"")) }
         } else {
-            v2rayConfig.securityTls.alpn = []
+            v2rayConfig.securityTls.alpn = ["h2", "http/1.1"]
         }
         // reality
         v2rayConfig.securityReality.serverName = self.streamRealityServerName.stringValue
         v2rayConfig.securityReality.publicKey = self.streamRealityPublicKey.stringValue
+        v2rayConfig.securityReality.fingerprint = self.streamRealityFingerprint.stringValue
         v2rayConfig.securityReality.shortId = self.streamRealityShortId.stringValue
         v2rayConfig.securityReality.spiderX = self.streamRealitySpiderX.stringValue
         
@@ -511,11 +515,13 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamSecurity.selectItem(withTitle: v2rayConfig.streamSecurity)
         self.streamTlsAllowInsecure.intValue = v2rayConfig.securityTls.allowInsecure ? 1 : 0
         self.streamTlsServerName.stringValue = v2rayConfig.securityTls.serverName
-        self.streamTlsAlpn.stringValue = v2rayConfig.securityTls.alpn.count > 0 ? v2rayConfig.securityTls.alpn[0] : ""
+        self.streamTlsFingerprint.stringValue = v2rayConfig.securityTls.fingerprint
+        self.streamTlsAlpn.stringValue = v2rayConfig.securityTls.alpn.map { "\"\($0)\"" }.joined(separator: ", ")
         
         // reality
         self.streamRealityServerName.stringValue = v2rayConfig.securityReality.serverName
         self.streamRealityPublicKey.stringValue = v2rayConfig.securityReality.publicKey
+        self.streamRealityFingerprint.stringValue = v2rayConfig.securityReality.fingerprint
         self.streamRealityShortId.stringValue = v2rayConfig.securityReality.shortId
         self.streamRealitySpiderX.stringValue = v2rayConfig.securityReality.spiderX
         
