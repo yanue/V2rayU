@@ -900,7 +900,12 @@ class V2rayConfig: NSObject {
 
             if transport.xtlsSettings != nil {
                 self.securityTls.serverName = transport.xtlsSettings!.serverName
+                self.securityTls.fingerprint = transport.xtlsSettings!.fingerprint
                 self.securityTls.allowInsecure = transport.xtlsSettings!.allowInsecure
+                self.securityTls.alpn = transport.xtlsSettings!.alpn
+                if self.securityTls.fingerprint == "" {
+                    self.securityTls.fingerprint = "chrome"
+                }
             }
             
             if transport.tlsSettings != nil {
@@ -908,6 +913,9 @@ class V2rayConfig: NSObject {
                 self.securityTls.fingerprint = transport.tlsSettings!.fingerprint
                 self.securityTls.allowInsecure = transport.tlsSettings!.allowInsecure
                 self.securityTls.alpn = transport.tlsSettings!.alpn
+                if self.securityTls.fingerprint == "" {
+                    self.securityTls.fingerprint = "chrome"
+                }
             }
             
             if transport.realitySettings != nil {
@@ -966,6 +974,7 @@ class V2rayConfig: NSObject {
             let settings = streamJson["tlsSettings"]
             var tlsSettings = TlsSettings()
             tlsSettings.serverName = settings["serverName"].stringValue
+            tlsSettings.fingerprint = settings["fingerprint"].stringValue
             tlsSettings.alpn = settings["alpn"].arrayValue.map {
                 $0.stringValue
             }
@@ -1148,6 +1157,9 @@ class V2rayConfig: NSObject {
             var xhttpSettings = XhttpSettings()
             xhttpSettings.mode = streamJson["xhttpSettings"]["mode"].stringValue
             xhttpSettings.path = streamJson["xhttpSettings"]["path"].stringValue
+            if xhttpSettings.mode == "" {
+                xhttpSettings.mode = "auto"
+            }
             stream.xhttpSettings = xhttpSettings
         }
 

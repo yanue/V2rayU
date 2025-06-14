@@ -263,13 +263,6 @@ func getPacUserRules() -> String {
     var userRuleTxt = """
     ! Put user rules line by line in this file.
     ! See https://adblockplus.org/en/filter-cheatsheet
-    ||api.github.com
-    ||githubusercontent.com
-    ||github.io
-    ||github.com
-    ||chat.openai.com
-    ||openai.com
-    ||chatgpt.com
     """
     do {
         let url = URL(fileURLWithPath: PACUserRuleFilePath)
@@ -281,25 +274,6 @@ func getPacUserRules() -> String {
         }
     } catch {
         NSLog("getPacUserRules err \(error)")
-    }
-    // auto include githubusercontent.com api.github.com
-    if !userRuleTxt.contains("githubusercontent.com") {
-        userRuleTxt.append("\n||githubusercontent.com")
-    }
-    if !userRuleTxt.contains("github.io") {
-        userRuleTxt.append("\n||github.io")
-    }
-    if !userRuleTxt.contains("api.github.com") {
-        userRuleTxt.append("\n||api.github.com")
-    }
-    if !userRuleTxt.contains("openai.com") {
-        userRuleTxt.append("\n||openai.com")
-    }
-    if !userRuleTxt.contains("chat.openai.com") {
-        userRuleTxt.append("\n||chat.openai.com")
-    }
-    if !userRuleTxt.contains("chatgpt.com") {
-        userRuleTxt.append("\n||chatgpt.com")
     }
     return userRuleTxt
 }

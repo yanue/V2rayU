@@ -65,7 +65,7 @@ struct TlsSettings: Codable {
     var allowInsecure: Bool = true
     var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
-    var alpn: [String] = [""]
+    var alpn: [String] = ["h2", "http/1.1"]
     var fingerprint: String = "chrome" // 必填，使用 tls 库模拟客户端 TLS 指纹
 }
 
@@ -171,7 +171,7 @@ struct WsSettingsHeader: Codable {
 }
 
 struct XhttpSettings: Codable {
-    var mode: String = ""
+    var mode: String = "auto"
     var path: String = ""
 }
 
