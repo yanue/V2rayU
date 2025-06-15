@@ -35,6 +35,7 @@
 		66ACB1A021757D5B005B5881 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB19F21757D5B005B5881 /* MainMenu.swift */; };
 		66AD5335241497000070529C /* Shortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AD5330241496FF0070529C /* Shortcut.m */; };
 		66BC2B89228C589E00FBB716 /* V2raySubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC2B88228C589E00FBB716 /* V2raySubscription.swift */; };
+		66E87E0F2DFECB2A0038ADA9 /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66E87E0E2DFECB2A0038ADA9 /* build.sh */; };
 		66F07CF9236D79540088A4AE /* Ping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F07CF8236D79540088A4AE /* Ping.swift */; };
 		66F411B121CA49EE007AAC10 /* pac in Copy Files */ = {isa = PBXBuildFile; fileRef = 6683B1EA21C2AD1A004A1C5F /* pac */; };
 		66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66FEAD4E217EE14C009DECF9 /* ConfigWindow.xib */; };
@@ -114,7 +115,6 @@
 		6618372D23E9BF73000F7410 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ToastWindow.xib; sourceTree = "<group>"; };
 		66193A8523EE45B200289B6A /* PreferenceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceRouting.swift; sourceTree = "<group>"; };
 		66193A8823EE46BC00289B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceRouting.xib; sourceTree = SOURCE_ROOT; };
-		6625848E2AB746D500DFDC1E /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
 		663F040525ED4B2C00687600 /* V2rayLaunch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		664666A021CBD6C60094F0B7 /* libPods-V2rayUTool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-V2rayUTool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		664B95DD217062A500DBC941 /* Alamofire */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Alamofire; path = Pods/Alamofire; sourceTree = "<group>"; };
@@ -149,13 +149,13 @@
 		66AD5330241496FF0070529C /* Shortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcut.m; sourceTree = "<group>"; };
 		66AD5333241496FF0070529C /* V2rayU-Bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "V2rayU-Bridging-header.h"; sourceTree = "<group>"; };
 		66BC2B88228C589E00FBB716 /* V2raySubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2raySubscription.swift; sourceTree = "<group>"; };
+		66E87E0E2DFECB2A0038ADA9 /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		66F07CF8236D79540088A4AE /* Ping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ping.swift; sourceTree = "<group>"; };
 		66F3029D22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConfigWindow.strings"; sourceTree = "<group>"; };
 		66F3029E22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/QrcodeWindow.strings"; sourceTree = "<group>"; };
 		66F3029F22AAA0A600FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceAbout.strings"; sourceTree = "<group>"; };
 		66F302A222AAA0A700FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferencePac.strings"; sourceTree = "<group>"; };
 		66F302A322AAA0A700FCA4E2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceSubscription.strings"; sourceTree = "<group>"; };
-		66FEAD45217D75FC009DECF9 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		66FEAD4F217EE14C009DECF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConfigWindow.xib; sourceTree = "<group>"; };
 		6D6DF085C3C411989C416D0D /* user-rule.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "user-rule.txt"; sourceTree = "<group>"; };
 		6D6DF11F0983AFCBEF1E347B /* Uri.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Uri.swift; sourceTree = "<group>"; };
@@ -296,8 +296,7 @@
 		66FEAD44217D75D7009DECF9 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				6625848E2AB746D500DFDC1E /* appdmg.sh */,
-				66FEAD45217D75FC009DECF9 /* release.sh */,
+				66E87E0E2DFECB2A0038ADA9 /* build.sh */,
 				6D6DFD93CE866018306A090E /* pac */,
 				6D6DF927AC79EEF7378C192A /* appdmg.json */,
 			);
@@ -458,6 +457,7 @@
 				6662C20B240EA782000AF6CD /* PreferenceDns.xib in Resources */,
 				6610ECB721742AFD008FC401 /* MainMenu.xib in Resources */,
 				66107B8622DEDBE4002FFB60 /* Localizable.strings in Resources */,
+				66E87E0F2DFECB2A0038ADA9 /* build.sh in Resources */,
 				664EB377216C9A5F00B6AE0D /* Assets.xcassets in Resources */,
 				66FEAD53217EE14C009DECF9 /* ConfigWindow.xib in Resources */,
 				6618372E23E9BF74000F7410 /* ToastWindow.xib in Resources */,
@@ -483,9 +483,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -500,9 +504,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
