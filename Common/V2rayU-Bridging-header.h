@@ -4,4 +4,3 @@
 
 #import <MASShortcut/Shortcut.h>
 #import "Shortcut.h"
-#import "SimplePing.h"

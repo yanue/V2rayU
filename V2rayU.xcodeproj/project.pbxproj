@@ -117,7 +117,6 @@
 		66193A8823EE46BC00289B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = V2rayU/Base.lproj/PreferenceRouting.xib; sourceTree = SOURCE_ROOT; };
 		663F040525ED4B2C00687600 /* V2rayLaunch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		664666A021CBD6C60094F0B7 /* libPods-V2rayUTool.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-V2rayUTool.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		664B95DD217062A500DBC941 /* Alamofire */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Alamofire; path = Pods/Alamofire; sourceTree = "<group>"; };
 		664BAC462C2DB0E100654FB7 /* V2rayRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayRouting.swift; sourceTree = "<group>"; };
 		664BAC482C314CD600654FB7 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		664BAC4F2C394AA000654FB7 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../zh-Hans.lproj/PreferenceRouting.strings"; sourceTree = "<group>"; };
@@ -341,7 +340,6 @@
 				664666A021CBD6C60094F0B7 /* libPods-V2rayUTool.a */,
 				66973EB621797719001FEA1E /* ServiceManagement.framework */,
 				66A5CE4521706B5A009B08B2 /* Pods_V2rayU.framework */,
-				664B95DD217062A500DBC941 /* Alamofire */,
 				230294B5D1C5B1E0D311F3E2 /* libPods-V2rayUTool.a */,
 			);
 			name = Frameworks;
@@ -483,9 +481,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -500,9 +502,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-V2rayU/Pods-V2rayU-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
