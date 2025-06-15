@@ -9,8 +9,8 @@
 import Cocoa
 import Preferences
 
-final class PreferenceAboutViewController: NSViewController, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.aboutTab
+final class PreferenceAboutViewController: NSViewController, SettingsPane {
+    let preferencePaneIdentifier: Settings.PaneIdentifier = .aboutTab
     let preferencePaneTitle = "About"
     let toolbarItemIcon = NSImage(named: NSImage.infoName)!
     

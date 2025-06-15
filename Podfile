@@ -13,7 +13,7 @@ target 'V2rayU' do
   pod 'FirebaseCrashlytics'
   pod 'SwiftyJSON'
   # master branch
-  pod 'Preferences', :git => 'https://github.com/sindresorhus/Preferences.git'
+  pod 'Preferences', :git => 'https://github.com/sindresorhus/Settings.git', :tag => 'v2.6.0'
   pod 'QRCoder'
   pod 'MASShortcut'
   pod 'Swifter'

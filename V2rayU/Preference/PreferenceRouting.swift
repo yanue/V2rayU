@@ -9,9 +9,8 @@
 import Cocoa
 import Preferences
 
-final class PreferenceRoutingViewController: NSViewController, PreferencePane, NSTabViewDelegate {
-
-    let preferencePaneIdentifier = PreferencePane.Identifier.routingTab
+final class PreferenceRoutingViewController: NSViewController, SettingsPane, NSTabViewDelegate {
+    let preferencePaneIdentifier: Settings.PaneIdentifier = .routingTab
     let preferencePaneTitle = "Routing"
     let toolbarItemIcon = NSImage(named: NSImage.networkName)!
     let tableViewDragType: String = "v2ray.routing"

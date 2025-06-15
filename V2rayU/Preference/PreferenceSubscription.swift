@@ -9,8 +9,8 @@
 import Cocoa
 import Preferences
 
-final class PreferenceSubscribeViewController: NSViewController, PreferencePane, NSTabViewDelegate {
-    let preferencePaneIdentifier = PreferencePane.Identifier.subscribeTab
+final class PreferenceSubscribeViewController: NSViewController, SettingsPane, NSTabViewDelegate {
+    let preferencePaneIdentifier: Settings.PaneIdentifier = .subscribeTab
     let preferencePaneTitle = "Subscription"
     let toolbarItemIcon = NSImage(named: NSImage.userAccountsName)!
     let tableViewDragType: String = "v2ray.subscribe"

@@ -21,14 +21,15 @@ let appVersion = getAppVersion()
 let NOTIFY_TOGGLE_RUNNING_SHORTCUT = Notification.Name(rawValue: "NOTIFY_TOGGLE_RUNNING_SHORTCUT")
 let NOTIFY_SWITCH_PROXY_MODE_SHORTCUT = Notification.Name(rawValue: "NOTIFY_SWITCH_PROXY_MODE_SHORTCUT")
 
-extension PreferencePane.Identifier {
-    static let generalTab = Identifier("generalTab")
-    static let advanceTab = Identifier("advanceTab")
-    static let subscribeTab = Identifier("subscribeTab")
-    static let pacTab = Identifier("pacTab")
-    static let routingTab = Identifier("routingTab")
-    static let dnsTab = Identifier("dnsTab")
-    static let aboutTab = Identifier("aboutTab")
+// Preferences
+extension Settings.PaneIdentifier {
+    static let generalTab = Self("generalTab")
+    static let advanceTab = Self("advanceTab")
+    static let subscribeTab = Self("subscribeTab")
+    static let pacTab = Self("pacTab")
+    static let routingTab = Self("routingTab")
+    static let dnsTab = Self("dnsTab")
+    static let aboutTab = Self("aboutTab")
 }
 
 let preferencesWindowController = PreferencesWindowController(

@@ -10,8 +10,8 @@ import Cocoa
 import Preferences
 import ServiceManagement
 
-final class PreferenceGeneralViewController: NSViewController, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.generalTab
+final class PreferenceGeneralViewController: NSViewController, SettingsPane {
+    let preferencePaneIdentifier: Settings.PaneIdentifier = .generalTab
     let preferencePaneTitle = "General"
     let toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
 

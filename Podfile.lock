@@ -115,7 +115,7 @@ PODS:
     - nanopb/encode (= 2.30910.0)
   - nanopb/decode (2.30910.0)
   - nanopb/encode (2.30910.0)
-  - Preferences (0.3.0)
+  - Preferences (2.5.0)
   - PromisesObjC (2.4.0)
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
@@ -129,7 +129,7 @@ DEPENDENCIES:
   - FirebaseAnalytics
   - FirebaseCrashlytics
   - MASShortcut
-  - Preferences (from `https://github.com/sindresorhus/Preferences.git`)
+  - Preferences (from `https://github.com/sindresorhus/Settings.git`, tag `v2.6.0`)
   - QRCoder
   - Swifter
   - SwiftyJSON
@@ -160,12 +160,13 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Preferences:
-    :git: https://github.com/sindresorhus/Preferences.git
+    :git: https://github.com/sindresorhus/Settings.git
+    :tag: v2.6.0
 
 CHECKOUT OPTIONS:
   Preferences:
-    :commit: e2e2aaba41b531a642934a17c9b37149dd1c294c
-    :git: https://github.com/sindresorhus/Preferences.git
+    :git: https://github.com/sindresorhus/Settings.git
+    :tag: v2.6.0
 
 SPEC CHECKSUMS:
   AppCenter: 994875ea7941b9e168babb98299f900a94bcef13
@@ -182,7 +183,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   MASShortcut: 9c215e8a8a78f3d01ce56da48e2730ab66b538fa
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
-  Preferences: cfd4b0cbc5adfb5781b819ad3a000324d0fc9f48
+  Preferences: 871194b976ccb59b79d8fe6395d354bd667fa01e
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
@@ -190,6 +191,6 @@ SPEC CHECKSUMS:
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   Yams: e10dae147f517ed57ecae37c5e8681bdf8fcab65
 
-PODFILE CHECKSUM: 4f5cf0038c0de017d838b1fc684805af99a6abae
+PODFILE CHECKSUM: 2a08e426e75fe2708e016334ef82fb84a3d0c738
 
 COCOAPODS: 1.15.2
