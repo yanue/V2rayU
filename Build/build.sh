@@ -54,7 +54,7 @@ function build() {
     fi
     
     echo "self Signing to the app..."
-    codesign --force --deep --sign "V2rayU" "${V2rayU_RELEASE}/${APP_NAME}.app"
+#    codesign --force --deep --sign "V2rayU" "${V2rayU_RELEASE}/${APP_NAME}.app"
     
     echo "Creating DMG file..."
     rm -f ${V2rayU_64_dmg}  ${V2rayU_arm64_dmg}
