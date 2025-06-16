@@ -1,57 +1,82 @@
 import SwiftUI
 
-struct AppMenuView: View {
-    @ObservedObject var appState = AppState.shared // 引用单例
-
-    // 保存选中的子项
-    @State private var selectedItem: String? = nil
-    @State private var listHeight: CGFloat = 0 // 保存列表高度
-    @State private var isExpanded: Bool = false // 保存列表高度
-    @State private var isEnabled = false
-
-    var openContentViewWindow: () -> Void
-    @State private var selectedOption = 1
+struct CustomPicker<T: Identifiable & Equatable>: View {
+    @Binding var selection: T
+    let items: [T]
+    let label: String
+    
+    @State private var isExpanded: Bool = false
     
     var body: some View {
         VStack {
+            Button(action: {
+                isExpanded.toggle()
+
+            }) {
+                HStack {
+                    Text(label)
+                        .font(.headline)
+                    Spacer()
+                    Text("\(selection.id)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+            }
+            
+            if isExpanded {
+                List(items) { item in
+                    Button(action: {
+                        selection = item
+                        isExpanded = false
+
+                    }) {
+                        Text("\(item.id)") // Customize this based on your data type
+                            .padding()
+                    }
+                }
+                .frame(maxHeight: 200)
+                .cornerRadius(8)
+                .shadow(radius: 5)
+//                .transition(.move(edge: .top))
+            }
+        }
+    }
+}
+struct MyItem: Identifiable, Equatable {
+    var id: String
+}
+struct AppMenuView: View {
+    @ObservedObject var appState = AppState.shared // 引用单例
+
+    var openContentViewWindow: () -> Void
+    @State var selected: RunMode = .global
+    @State private var selectedItem: MyItem = MyItem(id: "Item 1")
+
+    let items: [MyItem] = [
+          MyItem(id: "Item 1"),
+          MyItem(id: "Item 2"),
+          MyItem(id: "Item 3")
+      ]
+    var body: some View {
+        VStack {
             HeaderView()
-            if appState.v2rayTurnOn {
-                MenuSpeedView()
-            }
-
+            Spacer()
+            MenuSpeedView()
+            Spacer()
             MenuRoutingPanel()
-
+            Spacer()
             MenuProfilePanel()
+            Spacer()
+            MenuItemsView(openContentViewWindow: openContentViewWindow)
+            Spacer()
+        }
+        .padding(.horizontal,8)
+        .frame(maxHeight: .infinity)
+            .frame(width: 320)
 
-            VStack(alignment: .leading) {
-                MenuItemView(title: "打开设置", action: openContentViewWindow)
-                Divider()
-                MenuItemView(title: "Import Server From Pasteboard", action: {
-                    if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
-                        importUri(url: uri)
-                    } else {
-                        noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// from Pasteboard")
-                    }
-                })
-                Divider()
-                MenuItemView(title: "Scan QRCode From Screen", action: {
-                    let uri: String = Scanner.scanQRCodeFromScreen()
-                    if uri.count > 0 {
-                        importUri(url: uri)
-                    } else {
-                        noticeTip(title: "import server fail", informativeText: "no found qrcode")
-                    }
-                })
-                Divider()
-                MenuItemView(title: "Quit", action: { NSApplication.shared.terminate(nil) })
-            }
-            .cornerRadius(6)
-            .padding()
-        }.frame(maxHeight: .infinity)
-            .frame(width: 360)
-//            .background(.regularMaterial) // 毛玻璃效果
-//            .foregroundColor(.primary)
-//            .animation(nil, value: isExpanded) // 关闭展开/折叠动画
     }
 }
 

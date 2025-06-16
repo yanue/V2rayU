@@ -52,7 +52,7 @@ struct ContentView: View {
                 case .server:
                     ProfileListView()
                 case .subscription:
-                    SubListView()
+                    SubscriptionListView()
                 case .routing:
                     RoutingListView()
                 case .setting:
@@ -63,7 +63,7 @@ struct ContentView: View {
             .padding(16)
             .background()
             .padding(.all, 16)
-            .frame(width: 600)
+            .frame(width: 800)
         }
     }
   

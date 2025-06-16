@@ -22,7 +22,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
-
+        V2rayLaunch.checkInstall()
+        V2rayLaunch.runAtStart()
+        // 自动更新订阅服务器
+        Task{
+            await SubscriptionHandler.shared.sync()
+        }
         // 监听系统睡眠和唤醒通知
         DistributedNotificationCenter.default.addObserver(
             self,

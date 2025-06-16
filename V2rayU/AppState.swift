@@ -1,7 +1,7 @@
 import Combine
 import SwiftUI
 
-enum RunMode: String {
+enum RunMode: String, CaseIterable {
     case global
     case off
     case manual
@@ -19,6 +19,12 @@ enum RunMode: String {
             return "IconT"
         }
     }
+    var isEnabled: Bool {
+           switch self {
+           case .off, .tunnel: return false
+           default: return true
+           }
+       }
 }
 
 @MainActor
@@ -198,6 +204,12 @@ final class AppState: ObservableObject {
         self.runningProfile = profile
         UserDefaults.set(forKey: .runningProfile, value: profile)
         UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    }
+    
+    func runMode(mode: RunMode) {
+        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+        self.runMode = mode
+        V2rayLaunch.startV2rayCore()
     }
     
     func runRouting(uuid: String) {

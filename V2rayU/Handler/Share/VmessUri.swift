@@ -209,9 +209,15 @@ class VmessUri: BaseShareUri {
         case .kcp:
             profile.headerType = query.getEnum(forKey: "kcpHeader", type: V2rayHeaderType.self, defaultValue: .none)
             profile.path = query.getString(forKey: "seed", defaultValue: "") // seed
+            if profile.path.isEmpty {
+                profile.path = query.getString(forKey: "path", defaultValue: "")
+            }
             break
         case .grpc:
             profile.path = query.getString(forKey: "serviceName", defaultValue: "/")
+            if profile.path.isEmpty {
+                profile.path = query.getString(forKey: "path", defaultValue: "/")
+            }
             break
         case .quic:
             profile.path = query.getString(forKey: "path", defaultValue: "/")

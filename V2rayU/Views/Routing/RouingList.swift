@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-struct SubListView: View {
-    @StateObject private var viewModel = SubViewModel()
+struct RoutingListView: View {
+    @StateObject private var viewModel = RoutingViewModel()
 
-    @State private var list: [SubModel] = []
-    @State private var sortOrder: [KeyPathComparator<SubModel>] = []
-    @State private var selection: Set<SubModel.ID> = []
-    @State private var selectedRow: SubModel? = nil
-    @State private var draggedRow: SubModel?
+    @State private var list: [RoutingModel] = []
+    @State private var sortOrder: [KeyPathComparator<RoutingModel>] = []
+    @State private var selection: Set<RoutingModel.ID> = []
+    @State private var selectedRow: RoutingModel? = nil
+    @State private var draggedRow: RoutingModel?
 
-    var filteredAndSortedItems: [SubModel] {
+    var filteredAndSortedItems: [RoutingModel] {
         let filtered = viewModel.list.sorted(using: sortOrder)
         // 循环增加序号
         filtered.enumerated().forEach { index, item in
@@ -29,7 +29,7 @@ struct SubListView: View {
         VStack {
             HStack {
                 // Header Section
-                Text("Subscription")
+                Text("Routing")
                     .font(.title)
                     .fontWeight(.bold)
                 
@@ -53,12 +53,13 @@ struct SubListView: View {
                 .disabled(selection.isEmpty)
                 Button("新增") {
                     withAnimation {
-                        self.selectedRow = SubModel(remark: "", url: "")
+                        let newProxy = RoutingModel(name: "newRouting", remark: "newRouting")
+                        self.selectedRow = newProxy
                     }
                 }
             }
 
-            Table(of: SubModel.self, selection: $selection, sortOrder: $sortOrder) {
+            Table(of: RoutingModel.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { item in
                     Text("\(item.index + 1)") // 显示 1-based 索引
                 }
@@ -69,10 +70,11 @@ struct SubListView: View {
                         selectedRow = row
                     }
                 }
-                TableColumn("Url", value: \.url).width(300)
-                TableColumn("Port", value: \.enable.description)
-                TableColumn("Interval", value: \.updateInterval.description)
-                TableColumn("Updatetime", value: \.updateTime.description)
+                TableColumn("name", value: \.name).width(300)
+                TableColumn("domainStrategy", value: \.domainStrategy)
+                TableColumn("proxy", value: \.proxy)
+                TableColumn("block", value: \.block)
+                TableColumn("direct", value: \.direct)
             } rows: {
                 ForEach(filteredAndSortedItems) { row in
                     TableRow(row)
@@ -84,19 +86,31 @@ struct SubListView: View {
                         }
                 }
                 // 处理拖动逻辑
-                .dropDestination(for: SubModel.self, action: handleDrop)
+                .dropDestination(for: RoutingModel.self, action: handleDrop)
             }
         }
         .sheet(item: $selectedRow) { row in
             VStack {
-                Button("Close") {
-                    print("upsert, \(row)")
-                    viewModel.upsert(item: row)
-                    // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
-                    selectedRow = nil
+                RoutingFormView(item: row).padding()
+                HStack{
+                    Spacer()
+                    HStack{
+                        Button("Cancel") {
+                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
+                            selectedRow = nil
+                        }
+                        Button("Save") {
+                            print("upsert, \(row)")
+                            viewModel.upsert(item: row)
+                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
+                            selectedRow = nil
+                        }
+                        .buttonStyle(.borderedProminent) // 蓝色主按钮
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
                 }
-                SubFormView(item: row).padding()
-            }
+            }.padding(0)
         }
         .task {
             loadData()
@@ -105,7 +119,7 @@ struct SubListView: View {
 
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
-    func handleDrop(index: Int, rows: [SubModel]) {
+    func handleDrop(index: Int, rows: [RoutingModel]) {
         guard let firstRow = rows.first, let firstRemoveIndex = list.firstIndex(where: { $0.uuid == firstRow.uuid }) else { return }
 
         list.removeAll(where: { row in
@@ -115,7 +129,7 @@ struct SubListView: View {
         list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
     }
 
-    private func contextMenuProvider(item: SubModel) -> some View {
+    private func contextMenuProvider(item: RoutingModel) -> some View {
         Group {
             Button("Edit") {
                 self.selectedRow = item
@@ -136,17 +150,19 @@ struct SubListView: View {
     }
 }
 
-struct SubFormView: View {
-    @ObservedObject var item: SubModel
+struct RoutingFormView: View {
+    @ObservedObject var item: RoutingModel
 
     var body: some View {
         HStack {
             VStack {
-                Section(header: Text("Sub Settings")) {
+                Section(header: Text("Routing Settings")) {
+                    getTextFieldWithLabel(label: "Name", text: $item.name)
                     getTextFieldWithLabel(label: "Remark", text: $item.remark)
-                    getTextFieldWithLabel(label: "Url", text: $item.url)
-                    getNumFieldWithLabel(label: "sort", num: $item.sort)
-                    getNumFieldWithLabel(label: "updateInterval", num: $item.updateInterval)
+                    getTextFieldWithLabel(label: "domainStrategy", text: $item.domainStrategy)
+                    getTextFieldWithLabel(label: "block", text: $item.block)
+                    getTextFieldWithLabel(label: "proxy", text: $item.proxy)
+                    getTextFieldWithLabel(label: "direct", text: $item.direct)
                 }
             }
         }
@@ -154,5 +170,5 @@ struct SubFormView: View {
 }
 
 #Preview {
-    SubListView()
+    RoutingListView()
 }

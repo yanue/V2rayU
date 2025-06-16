@@ -11,8 +11,13 @@ struct ConfigServerView: View {
     @ObservedObject var item: ProfileModel
 
     var body: some View {
-        HStack {
+        VStack {
+            
+            getTextFieldWithLabel(label: "Remark", text: $item.remark)
+        }
+        VStack {
             VStack {
+
                 Section(header: Text("Server Settings")) {
                     getPickerWithLabel(label: "Protocol", selection: $item.protocol)
                     if item.protocol == .trojan {
@@ -68,7 +73,7 @@ struct ConfigServerView: View {
             }
         }
         .padding(20)
-        .border(Color.secondary, width: 1) // 黑色边框，宽度为 2
+        .border(Color.white, width: 1) // 黑色边框，宽度为 2
 
         Spacer()
     }

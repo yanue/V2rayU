@@ -15,6 +15,7 @@ struct MenuProfilePanel: View {
     @State var isExpanded: Bool = false
     @State var isEnabled: Bool = false
     @State var searchText: String = ""
+    @State private var isTransitioning: Bool = false
     
     var count: Int {
         return filteredAndSortedItems.count
@@ -36,16 +37,23 @@ struct MenuProfilePanel: View {
     var body: some View {
         VStack(spacing: 0) {
             GroupBox("Profiles") {
-                Button(action: { withAnimation(.spring()) { isExpanded.toggle() }}) {
+                // 标题和按钮始终固定
+                Button(action: {
+                    if isTransitioning { return }
+                    isTransitioning = true
+                    isExpanded.toggle()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        isTransitioning = false
+                    }
+                }) {
                     HStack {
                         HStack(spacing: 12) {
                             Image(systemName: "wifi")
                                 .foregroundColor(.white)
                                 .frame(width: 16, height: 16)
                                 .padding(8)
-                                .background(isEnabled ? Color.blue : Color.gray)
+                                .background(appState.v2rayTurnOn ? Color.blue : Color.gray)
                                 .clipShape(Circle())
-                            
                             VStack(alignment: .leading) {
                                 HStack {
                                     Text("Profiles")
@@ -64,16 +72,16 @@ struct MenuProfilePanel: View {
                             .foregroundColor(.blue)
                             .rotationEffect(.degrees(isExpanded ? 90 : 0))
                     }
-                    .padding(12)
+                    .padding(.horizontal,8)
+                    .padding(.vertical,4)
+                    .contentShape(Rectangle())
                 }
-                .contentShape(Rectangle()) // 扩展点击区域
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
                 .buttonStyle(.plain)
 
-                // Expanded WiFi Panel
                 if isExpanded {
-                    VStack() {
-                        // Network List
-                        // Bottom Options
+                    VStack {
                         HStack() {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.white)
@@ -97,16 +105,15 @@ struct MenuProfilePanel: View {
                                 }
                             }
                         }
-                        .frame(height:  160)
-                        
+                        .frame(height:  200)
                     }
-                    //                .background(Color(NSColor.controlBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(.top, 4)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.3), value: isExpanded)
                 }
             }
         }
-        .padding(.horizontal, 16)
+        .id("profile-panel")
         .onAppear{
             viewModel.getList()
         }
@@ -137,6 +144,7 @@ struct MenuProfileRow: View {
                     .foregroundColor(.blue)
             }
         }
+        .contentShape(Rectangle()) // Ensures full area is tappable
         .padding(.vertical, 6)
     }
 }

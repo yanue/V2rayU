@@ -19,8 +19,6 @@ struct V2rayUApp: App {
         }
         print("NSHomeDirectory()",NSHomeDirectory())
         print("userHomeDirectory",userHomeDirectory)
-        V2rayLaunch.checkInstall()
-        V2rayLaunch.runAtStart()
         // 加载
         appState.viewModel.getList()
 //        V2rayLaunch.runTun2Socks()
