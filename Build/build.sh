@@ -25,12 +25,18 @@ function build() {
     fi
 
     echo "Building archive... please wait a minute"
-    xcodebuild -workspace ${BASE_DIR}/V2rayU.xcworkspace -config Release -scheme V2rayU -archivePath ${V2rayU_ARCHIVE} archive
+    # build universal app
+    xcodebuild -workspace ${BASE_DIR}/V2rayU.xcworkspace -configuration Release -scheme V2rayU -archivePath ${V2rayU_ARCHIVE} archive ARCHS="arm64 x86_64" VALID_ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
     if [ $? -ne 0 ]; then
         echo "Error: Failed to build archive"
         exit 1
     fi
-
+    
+    sleep 3
+    
+    echo "verifying archive..."
+    lipo -info ${V2rayU_ARCHIVE}/Products/Applications/V2rayU.app/Contents/MacOS/V2rayU
+    
     echo "Copying .app to release directory..."
     mkdir -p ${V2rayU_RELEASE}
     cp -R "${V2rayU_ARCHIVE}/Products/Applications/${APP_NAME}.app" "${V2rayU_RELEASE}/${APP_NAME}.app"
