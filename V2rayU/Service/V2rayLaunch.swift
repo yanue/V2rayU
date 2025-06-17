@@ -16,8 +16,8 @@ func executeAppleScriptWithOsascript(script: String) {
         print("executeAppleScript-Output: \(output)")
     } catch {
         print("executeAppleScript-Error: \(error)")
-        var title = "Install V2rayUTool Failed";
-        var toast =  "Error: \(error),\nYou need execute scripts manually:\n \(script)";
+        var title = "Install V2rayUTool Failed"
+        var toast = "Error: \(error),\nYou need execute scripts manually:\n \(script)"
         if isMainland {
             title = "安装 V2rayUTool 失败"
             toast = "安装失败: \(error)\n, 你需要在命令行手动执行一下: \(script)"
@@ -109,7 +109,6 @@ class V2rayLaunch: NSObject {
     }
 
     static func install() {
-
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         // Create authorization reference for the user
         executeAppleScriptWithOsascript(script: doSh)
@@ -168,11 +167,11 @@ class V2rayLaunch: NSObject {
                 await AppState.shared.setRunMode(mode: .off)
             }
         }
-        
+
         // auto update subscribe servers
         Task {
             if await AppState.shared.autoUpdateServers {
-                    await SubscriptionHandler.shared.sync()
+                await SubscriptionHandler.shared.sync()
             }
         }
     }
@@ -241,7 +240,7 @@ class V2rayLaunch: NSObject {
             await AppState.shared.setRunMode(mode: .off)
         }
     }
-    
+
     static func createJsonFile(item: ProfileModel) {
         let vCfg = V2rayConfigHandler()
         let jsonText = vCfg.toJSON(item: item)
@@ -253,7 +252,7 @@ class V2rayLaunch: NSObject {
             noticeTip(title: "Failed to write JSON file: \(error)")
         }
     }
-    
+
     static func Start() -> Bool {
         Stop()
 
@@ -266,8 +265,8 @@ class V2rayLaunch: NSObject {
             var toast = "http port \(httpPort) has been used, please replace it from advance setting"
             var title = "Port is already in use"
             if isMainland {
-                 toast = "http端口 \(httpPort) 已被使用, 请更换"
-                 title = "端口已被占用"
+                toast = "http端口 \(httpPort) 已被使用, 请更换"
+                title = "端口已被占用"
             }
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
@@ -330,8 +329,8 @@ class V2rayLaunch: NSObject {
         var sockPort: String = ""
         // reload
         if mode == .global {
-            httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087")
-            sockPort = UserDefaults.get(forKey: .localSockPort,defaultValue: "1080")
+            httpPort = UserDefaults.get(forKey: .localHttpPort, defaultValue: "1087")
+            sockPort = UserDefaults.get(forKey: .localSockPort, defaultValue: "1080")
         }
         do {
             let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])
@@ -341,5 +340,4 @@ class V2rayLaunch: NSObject {
             showInstallAlert()
         }
     }
-
 }

@@ -12,16 +12,14 @@ struct MenuSpeedView: View {
     @ObservedObject var appState = AppState.shared // 引用单例
 
     var body: some View {
-        if appState.v2rayTurnOn {
-            HStack (spacing: 8) {
-                MenuSpeedItemView(name: "direct", icon: "swift", upSpeed: $appState.directUpSpeed, downSpeed: $appState.directDownSpeed)
-                    .frame(maxWidth: .infinity)  // 使其占用 50% 宽度
-                
-                MenuSpeedItemView(name: "proxy", icon: "swiftdata", upSpeed: $appState.proxyUpSpeed, downSpeed: $appState.proxyDownSpeed)
-                    .frame(maxWidth: .infinity)  // 使其占用 50% 宽度
-            }
-            .id("menu-speed-container")
+        HStack (spacing: 8) {
+            MenuSpeedItemView(name: "direct", icon: "swift", upSpeed: $appState.directUpSpeed, downSpeed: $appState.directDownSpeed)
+                .frame(maxWidth: .infinity)  // 使其占用 50% 宽度
+            
+            MenuSpeedItemView(name: "proxy", icon: "swiftdata", upSpeed: $appState.proxyUpSpeed, downSpeed: $appState.proxyDownSpeed)
+                .frame(maxWidth: .infinity)  // 使其占用 50% 宽度
         }
+        .id("menu-speed-container")
     }
 }
 
@@ -39,6 +37,7 @@ struct MenuSpeedItemView: View {
             }
             .font(.system(size: 11))
             .frame(maxWidth: .infinity)  // 确保在其父视图中占据 50% 宽度
+            .padding(.vertical, 3)
         }.id("menu-speed")
     }
 }

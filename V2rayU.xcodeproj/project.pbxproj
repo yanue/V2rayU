@@ -66,6 +66,8 @@
 		663745372D2EC8840093A101 /* MenuSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745362D2EC87F0093A101 /* MenuSpeed.swift */; };
 		663745392D2ECAE40093A101 /* MenuHead.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663745382D2ECAE00093A101 /* MenuHead.swift */; };
 		6637453B2D2ECF590093A101 /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6637453A2D2ECF530093A101 /* MenuItem.swift */; };
+		663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */; };
+		663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5322D2913000032DD09 /* ProfileStatModel.swift */; };
@@ -195,6 +197,8 @@
 		663745362D2EC87F0093A101 /* MenuSpeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSpeed.swift; sourceTree = "<group>"; };
 		663745382D2ECAE00093A101 /* MenuHead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuHead.swift; sourceTree = "<group>"; };
 		6637453A2D2ECF530093A101 /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItem.swift; sourceTree = "<group>"; };
+		663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionForm.swift; sourceTree = "<group>"; };
+		663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionSync.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B5322D2913000032DD09 /* ProfileStatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatModel.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -461,6 +465,8 @@
 			isa = PBXGroup;
 			children = (
 				662CC3FF2D1BED9B006E8450 /* SubscriptionListView.swift */,
+				663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */,
+				663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */,
 			);
 			path = Subscription;
 			sourceTree = "<group>";
@@ -708,6 +714,7 @@
 				662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */,
 				662CC4022D1BED9B006E8450 /* AppDelegate.swift in Sources */,
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
+				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
 				66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */,
 				66E94B322D26B95D003745B5 /* Language.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
@@ -771,6 +778,7 @@
 				662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
+				663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */,
 				66F66F972D1F8A7800E77C64 /* PingRunning.swift in Sources */,
 				66F66F982D1F8A7800E77C64 /* Ping.swift in Sources */,
 				66F66F992D1F8A7800E77C64 /* PingAll.swift in Sources */,

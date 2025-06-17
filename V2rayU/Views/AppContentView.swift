@@ -60,10 +60,12 @@ struct ContentView: View {
                 }
                 Spacer()
             }
-            .padding(16)
-            .background()
-            .padding(.all, 16)
-            .frame(width: 800)
+            .background() // 先添加背景
+            .padding(.all, 16) // 添加内边距
+            .background() // 添加背景颜色
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)) // 圆角矩形背景
+            .padding(.all, 16) // 外边距
+            .frame(width: 800) // 设置右侧内容区的宽度
         }
     }
   

@@ -31,6 +31,24 @@ actor SubscriptionHandler {
         syncTaskGroup(items: list)
     }
 
+    func syncOne(item: SubModel) {
+        if SubscriptionHandlering {
+            NSLog("SubscriptionHandler Syncing ...")
+            return
+        }
+        SubscriptionHandlering = true
+        NSLog("SubscriptionHandler start syncOne")
+        Task {
+            do {
+                try await self.dlFromUrl(url: item.url, sub: item)
+                NSLog("SubscriptionHandler syncOne success")
+            } catch {
+                NSLog("SubscriptionHandler syncOne error: \(error)")
+                logTip(title: "syncOne fail: ", uri: item.url, informativeText: error.localizedDescription)
+            }
+        }
+    }
+    
     private func syncTaskGroup(items: [SubModel]) {
         // 使用 Combine 处理多个异步任务
         items.publisher.flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
