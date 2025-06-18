@@ -29,12 +29,12 @@ let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
 ])
 
 class RoutingManager {
-    // todo 优化
+
     let defaultRules = Dictionary(uniqueKeysWithValues: [
-       (RoutingRuleGlobal, RoutingModel(name: RoutingRuleGlobal, remark: "")),
-       (RoutingRuleLAN, RoutingModel(name: RoutingRuleLAN, remark: "")),
-       (RoutingRuleCn, RoutingModel(name: RoutingRuleCn, remark: "")),
-       (RoutingRuleLANAndCn, RoutingModel(name: RoutingRuleLANAndCn, remark: "")),
+       (RoutingRuleGlobal, RoutingModel(name: RoutingRuleGlobal, remark: "🌏 Global")),
+       (RoutingRuleLAN, RoutingModel(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
+       (RoutingRuleCn, RoutingModel(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
+       (RoutingRuleLANAndCn, RoutingModel(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
     ])
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
@@ -45,7 +45,12 @@ class RoutingManager {
         var all = RoutingViewModel.all()
         // 如果没有规则，则创建默认规则
         if all.count == 0 {
-            for (_, item) in defaultRules {
+            for (rule, item) in defaultRules {
+                if isMainland {
+                    item.domainStrategy = "AsIs"
+                    item.domainMatcher = "hybrid"
+                    item.remark = defaultRuleCn[rule] ?? item.remark
+                }
                 RoutingViewModel.upsert(item: item)
                 // 添加到 all
                 all.append(item)

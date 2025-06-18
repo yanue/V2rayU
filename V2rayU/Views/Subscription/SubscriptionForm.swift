@@ -16,7 +16,7 @@ struct SubscriptionFormView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "link.circle.fill")
+                Image(systemName: "personalhotspot")
                     .resizable()
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)

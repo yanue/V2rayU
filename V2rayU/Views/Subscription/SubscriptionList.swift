@@ -30,7 +30,7 @@ struct SubscriptionListView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Image(systemName: "link.circle.fill")
+                Image(systemName: "personalhotspot")
                     .resizable()
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
@@ -49,13 +49,7 @@ struct SubscriptionListView: View {
                 }
                 .buttonStyle(.bordered)
                 Button(action: {
-                    let alert = NSAlert()
-                    alert.messageText = "Are you sure you want to delete the selected subscriptions?"
-                    alert.informativeText = "This action cannot be undone."
-                    alert.alertStyle = .warning
-                    alert.addButton(withTitle: "Delete")
-                    alert.addButton(withTitle: "Cancel")
-                    if alert.runModal() == .alertFirstButtonReturn {
+                    if showConfirmAlertSync(title: "Are you sure you want to delete the selected subscriptions?", message: "This action cannot be undone.") {
                         withAnimation {
                             for selectedID in self.selection {
                                 viewModel.delete(uuid: selectedID)
@@ -160,13 +154,7 @@ struct SubscriptionListView: View {
             }
             Divider()
             Button("Delete") {
-                let alert = NSAlert()
-                alert.messageText = "Are you sure you want to delete this subscription?"
-                alert.informativeText = "This action cannot be undone."
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "Delete")
-                alert.addButton(withTitle: "Cancel")
-                if alert.runModal() == .alertFirstButtonReturn {
+                if showConfirmAlertSync(title: "Are you sure you want to delete this subscription?", message: "This action cannot be undone.") {
                     viewModel.delete(uuid: item.uuid)
                 }
             }

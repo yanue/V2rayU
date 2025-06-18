@@ -18,27 +18,32 @@ class RoutingModel: ObservableObject, Identifiable, Codable {
     @Published var remark: String
     @Published var json: String
     @Published var domainStrategy: String
+    @Published var domainMatcher: String
     @Published var block: String
     @Published var proxy: String
     @Published var direct: String
+    @Published var sort: Int
+
     var id:  String  {
         return uuid
     }
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, name, remark, json, domainStrategy, block, proxy, direct
+        case uuid, name, remark, json, domainStrategy, domainMatcher, block, proxy, direct, sort
     }
 
     // Initializer
-    init(uuid:String = UUID().uuidString, name: String, remark: String, json: String = "", domainStrategy: String = "AsIs", block: String = "", proxy: String = "", direct: String = "") {
+    init(uuid:String = UUID().uuidString, name: String, remark: String, json: String = "", domainStrategy: String = "AsIs", domainMatcher: String = "hybrid", block: String = "", proxy: String = "", direct: String = "") {
         self.uuid = uuid
         self.name = name
         self.remark = remark
         self.json = json
         self.domainStrategy = domainStrategy
+        self.domainMatcher = domainMatcher
         self.block = block
         self.proxy = proxy
         self.direct = direct
+        self.sort = 0
     }
 
     // 需要手动实现 `init(from:)` 和 `encode(to:)`，如果你使用自定义类型时
@@ -49,9 +54,11 @@ class RoutingModel: ObservableObject, Identifiable, Codable {
         remark = try container.decode(String.self, forKey: .remark)
         json = try container.decode(String.self, forKey: .json)
         domainStrategy = try container.decode(String.self, forKey: .domainStrategy)
+        domainMatcher = try container.decodeIfPresent(String.self, forKey: .domainMatcher) ?? "AsIs"
         block = try container.decode(String.self, forKey: .block)
         proxy = try container.decode(String.self, forKey: .proxy)
         direct = try container.decode(String.self, forKey: .direct)
+        sort = try container.decodeIfPresent(Int.self, forKey: .sort) ?? 0
     }
 
     func encode(to encoder: Encoder) throws {
@@ -61,9 +68,11 @@ class RoutingModel: ObservableObject, Identifiable, Codable {
         try container.encode(remark, forKey: .remark)
         try container.encode(json, forKey: .json)
         try container.encode(domainStrategy, forKey: .domainStrategy)
+        try container.encode(domainMatcher, forKey: .domainMatcher)
         try container.encode(block, forKey: .block)
         try container.encode(proxy, forKey: .proxy)
         try container.encode(direct, forKey: .direct)
+        try container.encode(sort, forKey: .sort)
     }
 }
 
@@ -90,9 +99,11 @@ extension RoutingModel: TableRecord, FetchableRecord, PersistableRecord  {
         static let remark = Column(CodingKeys.remark)
         static let json = Column(CodingKeys.json)
         static let domainStrategy = Column(CodingKeys.domainStrategy)
+        static let domainMatcher = Column(CodingKeys.domainMatcher)
         static let block = Column(CodingKeys.block)
         static let proxy = Column(CodingKeys.proxy)
         static let direct = Column(CodingKeys.direct)
+        static let sort = Column(CodingKeys.sort)
     }
     
     // 定义迁移
@@ -108,7 +119,18 @@ extension RoutingModel: TableRecord, FetchableRecord, PersistableRecord  {
                 t.column(RoutingModel.Columns.block.name, .text).notNull()
                 t.column(RoutingModel.Columns.proxy.name, .text).notNull()
                 t.column(RoutingModel.Columns.direct.name, .text).notNull()
-
+            }
+        }
+        // 创建domainMatcher字段
+        migrator.registerMigration("addDomainMatcherToRouting") { db in
+            try db.alter(table: RoutingModel.databaseTableName) { t in
+                t.add(column: RoutingModel.Columns.domainMatcher.name, .text).notNull().defaults(to: "hybrid")
+            }
+        }
+        // 创建sort字段
+        migrator.registerMigration("addSortToRouting") { db in
+            try db.alter(table: RoutingModel.databaseTableName) { t in
+                t.add(column: "sort", .integer).notNull().defaults(to: 0)
             }
         }
     }

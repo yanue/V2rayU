@@ -66,3 +66,22 @@ func getBoolFieldWithLabel(label: String, isOn: Binding<Bool>, labelWidth: CGFlo
         Spacer()
     }
 }
+
+
+@MainActor
+func getTextEditorWithLabel(label: String, text: Binding<String>, labelWidth: CGFloat = 120) -> some View {
+    HStack {
+        Text(label).frame(width: labelWidth, alignment: .trailing)
+        Spacer()
+
+        TextEditor(text: text)
+            .frame(height: 60)
+            .background(Color(NSColor.textBackgroundColor))
+            .padding(.all, 4)
+            .border(Color(NSColor.separatorColor), width: 1)
+            .cornerRadius(4)
+            .padding(.leading, 7)
+            // 设置行间距
+            .lineSpacing(4)
+    }
+}

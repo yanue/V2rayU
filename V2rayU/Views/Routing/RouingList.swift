@@ -26,91 +26,120 @@ struct RoutingListView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
-                // Header Section
-                Text("Routing")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Button("刷新") {
-                    withAnimation {
-                        loadData()
-                    }
+                Image(systemName: "bonjour")
+                    .resizable()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Routing")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
                 Spacer()
-
-                Button("删除") {
-                    withAnimation {
-                        // 删数据
-                        for selectedID in self.selection {
-                            viewModel.delete(uuid: selectedID) // 使用找到的模型的 uuid 字段
+                Button(action: { withAnimation {
+                    let newProxy = RoutingModel(name: "newRouting", remark: "newRouting")
+                    self.selectedRow = newProxy
+                } }) {
+                    Label("新增", systemImage: "plus")
+                }
+                .buttonStyle(.bordered)
+                Button(action: {
+                    let alert = NSAlert()
+                    alert.messageText = "Are you sure you want to delete the selected routings?"
+                    alert.informativeText = "This action cannot be undone."
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "Delete")
+                    alert.addButton(withTitle: "Cancel")
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        withAnimation {
+                            for selectedID in self.selection {
+                                viewModel.delete(uuid: selectedID)
+                            }
+                            selection.removeAll()
                         }
-                        // 移除选择
-                        selection.removeAll()
                     }
+                }) {
+                    Label("删除", systemImage: "trash")
                 }
                 .disabled(selection.isEmpty)
-                Button("新增") {
-                    withAnimation {
-                        let newProxy = RoutingModel(name: "newRouting", remark: "newRouting")
-                        self.selectedRow = newProxy
-                    }
+                .buttonStyle(.bordered)
+                Button(action: { withAnimation { loadData() } }) {
+                    Label("刷新", systemImage: "arrow.clockwise")
                 }
+                .buttonStyle(.bordered)
             }
-
-            Table(of: RoutingModel.self, selection: $selection, sortOrder: $sortOrder) {
-                TableColumn("#") { item in
-                    Text("\(item.index + 1)") // 显示 1-based 索引
-                }
-                .width(30)
-                TableColumn("Remark") { row in
-                    // 双击事件
-                    Text(row.remark).onTapGesture(count: 2) {
-                        selectedRow = row
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+            Divider()
+            ZStack {
+                Table(of: RoutingModel.self, selection: $selection, sortOrder: $sortOrder) {
+                    TableColumn("#") { row in
+                        Text("\(row.index + 1)")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .onTapGesture(count: 2) { selectedRow = row }
                     }
+                    .width(30)
+                    TableColumn("Remark") { row in
+                        Text(row.remark)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }.width(180)
+                    TableColumn("domainStrategy") { row in
+                        Text(row.domainStrategy)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    TableColumn("direct") { row in
+                        Text(row.direct)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    TableColumn("block") { row in
+                        Text(row.block)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    TableColumn("proxy") { row in
+                        Text(row.proxy)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                } rows: {
+                    ForEach(filteredAndSortedItems) { row in
+                        TableRow(row)
+                            .draggable(row)
+                            .contextMenu {
+                                Button("Edit") { self.selectedRow = row }
+                                Divider()
+                                Button("Delete") {
+                                    let alert = NSAlert()
+                                    alert.messageText = "Are you sure you want to delete this routing?"
+                                    alert.informativeText = "This action cannot be undone."
+                                    alert.alertStyle = .warning
+                                    alert.addButton(withTitle: "Delete")
+                                    alert.addButton(withTitle: "Cancel")
+                                    if alert.runModal() == .alertFirstButtonReturn {
+                                        viewModel.delete(uuid: row.uuid)
+                                    }
+                                }
+                            }
+                    }
+                    .dropDestination(for: RoutingModel.self, action: handleDrop)
                 }
-                TableColumn("name", value: \.name).width(300)
-                TableColumn("domainStrategy", value: \.domainStrategy)
-                TableColumn("proxy", value: \.proxy)
-                TableColumn("block", value: \.block)
-                TableColumn("direct", value: \.direct)
-            } rows: {
-                ForEach(filteredAndSortedItems) { row in
-                    TableRow(row)
-                        // 启用拖拽功能
-                        .draggable(row)
-                        // 右键菜单
-                        .contextMenu {
-                            contextMenuProvider(item: row)
-                        }
-                }
-                // 处理拖动逻辑
-                .dropDestination(for: RoutingModel.self, action: handleDrop)
+                .padding(8)
             }
         }
         .sheet(item: $selectedRow) { row in
-            VStack {
-                RoutingFormView(item: row).padding()
-                HStack{
-                    Spacer()
-                    HStack{
-                        Button("Cancel") {
-                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
-                            selectedRow = nil
-                        }
-                        Button("Save") {
-                            print("upsert, \(row)")
-                            viewModel.upsert(item: row)
-                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
-                            selectedRow = nil
-                        }
-                        .buttonStyle(.borderedProminent) // 蓝色主按钮
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                }
-            }.padding(0)
+            RoutingFormView(item: row, onClose: {
+                selectedRow = nil
+                loadData()
+            })
         }
         .task {
             loadData()
@@ -146,25 +175,6 @@ struct RoutingListView: View {
     private func loadData() {
         withAnimation {
             viewModel.getList()
-        }
-    }
-}
-
-struct RoutingFormView: View {
-    @ObservedObject var item: RoutingModel
-
-    var body: some View {
-        HStack {
-            VStack {
-                Section(header: Text("Routing Settings")) {
-                    getTextFieldWithLabel(label: "Name", text: $item.name)
-                    getTextFieldWithLabel(label: "Remark", text: $item.remark)
-                    getTextFieldWithLabel(label: "domainStrategy", text: $item.domainStrategy)
-                    getTextFieldWithLabel(label: "block", text: $item.block)
-                    getTextFieldWithLabel(label: "proxy", text: $item.proxy)
-                    getTextFieldWithLabel(label: "direct", text: $item.direct)
-                }
-            }
         }
     }
 }

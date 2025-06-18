@@ -16,13 +16,27 @@ func alertDialog(title: String, message: String) {
         alert.informativeText = message
         alert.alertStyle = .warning
         let response = alert.runModal()
-        
+
         if response == .alertFirstButtonReturn {
             print("OK clicked")
         } else {
             print("Cancel clicked")
         }
     }
+}
+
+@MainActor
+func showConfirmAlertSync(title: String, message: String, confirmTitle: String = "OK", cancelTitle: String = "Cancel") -> Bool {
+    let alert = NSAlert()
+    if let icon = NSImage(named: "V2rayU") {
+        alert.icon = icon
+    }
+    alert.messageText = title
+    alert.informativeText = message
+    alert.alertStyle = .warning
+    alert.addButton(withTitle: confirmTitle)
+    alert.addButton(withTitle: cancelTitle)
+    return alert.runModal() == .alertFirstButtonReturn
 }
 
 func makeToast(message: String, displayDuration: Double? = 3) {
