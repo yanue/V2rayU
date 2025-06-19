@@ -33,7 +33,7 @@ struct ContentView: View {
                 .padding(.vertical,20)
 
                 SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters", selectedTab: $selectedTab)
-                SidebarButton(tab: .server, title: "proxies", icon: "network.badge.shield.half.filled", selectedTab: $selectedTab)
+                SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled", selectedTab: $selectedTab)
                 SidebarButton(tab: .subscription, title: "Subscription", icon: "personalhotspot", selectedTab: $selectedTab)
                 SidebarButton(tab: .routing, title: "Routing", icon: "bonjour", selectedTab: $selectedTab)
                 SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)

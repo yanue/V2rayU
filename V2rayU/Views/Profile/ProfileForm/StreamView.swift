@@ -49,10 +49,6 @@ struct ConfigStreamView: View {
                 }
             }
         }
-        .padding(20)
-        .border(Color.secondary, width: 1) // 黑色边框，宽度为 2
-
-        Spacer()
     }
 }
 

@@ -72,10 +72,6 @@ struct ConfigServerView: View {
                 }
             }
         }
-        .padding(20)
-        .border(Color.white, width: 1) // 黑色边框，宽度为 2
-
-        Spacer()
     }
 }
 

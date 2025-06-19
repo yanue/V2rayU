@@ -23,6 +23,7 @@ actor PingRunning {
             print("Ping task is already running.")
             return
         }
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始单节点 Ping: \(item.remark)")
         // 睡眠
         try await Task.sleep(nanoseconds: 2 * 1_000_000_000) // Wait for 2 seconds
         // 替换
@@ -39,16 +40,20 @@ actor PingRunning {
             do {
                 let pingTime = try await ping.doPing(bindPort: port)
                 print("Ping success, time: \(pingTime)ms")
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 成功: \(item.remark) - \(pingTime)ms")
                 resetFailureCount()
                 success = true
             } catch {
                 retries += 1
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 失败: \(item.remark) - 第\(retries)次: \(error.localizedDescription)")
                 print("Ping failed (\(retries)/\(maxRetries)): \(error)")
             }
         }
 
         if !success {
             await handleFailure()
+        } else {
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "完成单节点 Ping: \(item.remark)")
         }
     }
 

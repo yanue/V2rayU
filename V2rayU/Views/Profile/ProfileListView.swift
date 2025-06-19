@@ -13,9 +13,12 @@ struct ProfileListView: View {
     @State private var sortOrder: [KeyPathComparator<ProfileModel>] = []
     @State private var selection: Set<ProfileModel.ID> = []
     @State private var selectedRow: ProfileModel? = nil
+    @State private var pingRow: ProfileModel? = nil
     @State private var selectGroup: String = ""
     @State private var searchText = ""
     @State private var draggedRow: ProfileModel?
+    @State private var selectAll: Bool = false
+    @State private var showPingSheet: Bool = false
 
     var filteredAndSortedItems: [ProfileModel] {
         let filtered = viewModel.list.filter { item in
@@ -31,109 +34,151 @@ struct ProfileListView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
-                Text("Prixies")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
+                Image(systemName: "shield.lefthalf.filled")
+                    .resizable()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Proxies")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("Manage your proxy list")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
                 Picker("选择组", selection: $selectGroup) {
-//                    ForEach(viewModel.groups) { group in // 使用 groups 数组并遍历
-//                        Text(group).tag(group) // 使用 .tag 来绑定选中的项
-//                    }
-                }
-                .pickerStyle(MenuPickerStyle()) // 可根据需要选择不同的 Picker 样式
-                .padding()
-
-                Text("搜索")
-                TextField("Search by Address or Remark", text: $searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                Button("刷新") {
-                    loadData()
-                }
-                Button("Ping") {
-                    withAnimation {
+                    Text("全部分组").tag("")
+                    ForEach(viewModel.groups, id: \.self) { group in
+                        Text(group).tag(group)
                     }
                 }
-
-                Button("删除") {
-                    withAnimation {
-                        // 删数据
-                        for selectedID in self.selection {
-                            viewModel.delete(uuid: selectedID) // 使用找到的模型的 uuid 字段
-                        }
-                        // 移除选择
-                        selection.removeAll()
-                    }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 140)
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField("Search by Address or Remark", text: $searchText)
+                        .frame(width: 200)
                 }
-                .disabled(selection.isEmpty)
-
-                Button("新增") {
-                    withAnimation {
-                        let newProxy = ProfileModel(remark: "New Remark", protocol: .trojan, address: "newAddress", port: 443, password: UUID().uuidString, encryption: "auto")
+                Button(action: { loadData() }) {
+                    Label("刷新", systemImage: "arrow.clockwise")
+                }
+            }
+            .padding(.vertical, 6)
+            VStack {
+                Spacer()
+                HStack {
+                    // checkbox
+                    Toggle(isOn: $selectAll) {
+                        Text("全选")
+                    }
+                    Spacer()
+                    Button(action: { withAnimation {
+                        let newProxy = ProfileModel(remark: "", protocol: .trojan, address: "", port: 443, password: UUID().uuidString, encryption: "auto")
                         self.selectedRow = newProxy
+                    }}) {
+                        Label("新增", systemImage: "plus")
                     }
-                }
-            }
-
-            Table(of: ProfileModel.self, selection: $selection, sortOrder: $sortOrder) {
-                TableColumn("#") { item in
-                    Text("\(item.index + 1)") // 显示 1-based 索引
-                }
-                .width(30)
-                TableColumn("Type", value: \.protocol.rawValue)
-                TableColumn("Remark") { row in
-                    // 双击事件
-                    Text(row.remark).onTapGesture(count: 2) {
-                        selectedRow = row
-                    }
-                }
-                TableColumn("Address", value: \.address)
-                TableColumn("Port", value: \.port.description)
-                TableColumn("Network", value: \.network.rawValue)
-                TableColumn("TLS", value: \.security.rawValue)
-            } rows: {
-                ForEach(filteredAndSortedItems) { row in
-                    TableRow(row)
-                        // 启用拖拽功能
-                        .draggable(row)
-                        // 右键菜单
-                        .contextMenu {
-                            contextMenuProvider(item: row)
+                    .buttonStyle(.bordered)
+                    Button(action: {
+                        withAnimation {
+                            for selectedID in self.selection {
+                                viewModel.delete(uuid: selectedID)
+                            }
+                            selection.removeAll()
                         }
+                    }) {
+                        Label("删除", systemImage: "trash")
+                    }
+                    .disabled(selection.isEmpty)
+                    .buttonStyle(.bordered)
+
+                    Button(action: { showPingSheet = true }) {
+                        Label("PingAll", systemImage: "lasso.badge.sparkles")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }.padding(.horizontal, 10)
+                // 表格主体
+                Table(of: ProfileModel.self, selection: $selection, sortOrder: $sortOrder) {
+                    TableColumn("#") { item in
+                        Text("\(item.index + 1)")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .onTapGesture(count: 2) { selectedRow = item }
+                    }
+                    .width(30)
+                    TableColumn("Type") { row in
+                        Text(row.`protocol` == .shadowsocks ? "ss" : row.`protocol`.rawValue)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    .width(40)
+                    TableColumn("Remark") { row in
+                        Text(row.remark)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    .width(150)
+                    TableColumn("Address") { row in
+                        Text(row.address)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    .width(120)
+                    TableColumn("Port") { row in
+                        Text("\(row.port)")
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }
+                    .width(40)
+                    TableColumn("Network") { row in
+                        Text(row.network.rawValue)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }.width(50)
+                    TableColumn("TLS") { row in
+                        Text(row.security.rawValue)
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }.width(40)
+                    TableColumn("latency(KB/s)") { row in
+                        Text(String(format: "%d", row.speed))
+                            .font(.system(size: 13))
+                            .onTapGesture(count: 2) { selectedRow = row }
+                    }.width(76)
+                } rows: {
+                    ForEach(filteredAndSortedItems) { row in
+                        TableRow(row)
+                            .draggable(row)
+                            .contextMenu { contextMenuProvider(item: row) }
+                    }
+                    .dropDestination(for: ProfileModel.self, action: handleDrop)
                 }
-                // 处理拖动逻辑
-                .dropDestination(for: ProfileModel.self, action: handleDrop)
+                
             }
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
         }
         .sheet(item: $selectedRow) { row in
-            VStack {
-                ConfigView(item: row)
-                    .padding()
-                HStack{
-                    Spacer()
-                    HStack{
-                        Button("Cancel") {
-                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
-                            selectedRow = nil
-                        }
-                        Button("Save") {
-                            print("upsert, \(row)")
-                            viewModel.upsert(item: row)
-                            // 如果需要关闭 `sheet`，将 `selectedRow` 设置为 `nil`
-                            selectedRow = nil
-                        }
-                        .buttonStyle(.borderedProminent) // 蓝色主按钮
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                }
+            ConfigFormView(item: row) {
+                selectedRow = nil
+                loadData()
             }
         }
-        .task {
-            loadData()
+        .sheet(item: $pingRow) { row in
+            ProfilePingView(profile: pingRow, isAll: false) {
+                pingRow = nil
+            }
         }
+        .sheet(isPresented: $showPingSheet) {
+            ProfilePingView(profile: nil, isAll: true) {
+                showPingSheet = false
+            }
+        }.task { loadData() }
     }
 
     // 处理拖拽排序逻辑:
@@ -153,13 +198,10 @@ struct ProfileListView: View {
             Button("Edit") {
                 self.selectedRow = item
             }
-
             Divider()
-
             Button("Ping") {
-                // Handle ping action
+                self.pingRow = item
             }
-
             Button("Delete") {
                 // Handle another action
                 print("item.uuid", item.id, item.uuid)

@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+let NOTIFY_UPDATE_Ping = Notification.Name(rawValue: "NOTIFY_UPDATE_Ping")
+
 actor PingAll {
     static var shared = PingAll()
 
@@ -18,6 +20,7 @@ actor PingAll {
     func run()  {
         guard !inPing else {
             NSLog("Ping is already running.")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 已经在运行中")
             return
         }
         inPing = true
@@ -27,12 +30,20 @@ actor PingAll {
         let items = ProfileViewModel.all()
         guard !items.isEmpty else {
             NSLog("No items to ping.")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "没有可 Ping 的节点")
             return
         }
 
         NSLog("Ping started.")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 所有节点")
         // 开始执行异步任务
         self.pingTaskGroup(items: items)
+    }
+    
+    func pingOne(item: ProfileModel) {
+        // 开始执行异步任务
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 节点")
+        self.pingTaskGroup(items: [item])
     }
 
     private func pingTaskGroup(items: [ProfileModel]) {
@@ -41,9 +52,12 @@ actor PingAll {
             Future<Void, Error> { promise in
                 Task {
                     do {
+                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping: \(item.remark)")
                         try await self.pingEachServer(item: item)
+                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "完成 Ping: \(item.remark)")
                         promise(.success(()))
                     } catch {
+                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 失败: \(item.remark) - \(error.localizedDescription)")
                         promise(.failure(error))
                     }
                 }
@@ -53,8 +67,10 @@ actor PingAll {
         .sink(receiveCompletion: { completion in
             switch completion {
             case .finished:
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "所有节点 Ping 完成\n")
                 NSLog("Ping completed")
             case let .failure(error):
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 批量任务异常: \(error.localizedDescription)")
                 NSLog("Error: \(error)")
             }
             self.inPing = false
@@ -106,6 +122,7 @@ actor PingServer {
         let ping = Ping()
         let pingTime = try await ping.doPing(bindPort: self.bindPort)
         print("Ping success, time: \(pingTime)ms")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 成功: \(item.remark) - \(pingTime)ms")
         // 更新 speed
         ProfileViewModel.update_speed(uuid: self.item.uuid, speed: pingTime)
     }
@@ -120,6 +137,7 @@ actor PingServer {
             }
             try FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
         } catch {
+            // 捕获错误并打印
             NSLog("remove ping config error: \(error)")
         }
     }
@@ -155,4 +173,3 @@ actor PingServer {
         self.process.launch()
     }
 }
-
