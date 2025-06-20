@@ -90,7 +90,7 @@ struct SubscriptionListView: View {
                         Text(row.url)
                             .font(.system(size: 13))
                             .onTapGesture(count: 2) { selectedRow = row }
-                    }.width(300)
+                    }.width(200)
                     TableColumn("Port") { row in
                         Text("\(row.enable)")
                             .font(.system(size: 13))

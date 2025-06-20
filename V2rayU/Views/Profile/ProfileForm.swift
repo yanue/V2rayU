@@ -20,9 +20,9 @@ struct ConfigFormView: View {
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Subscription Settings")
+                    Text("Profile Settings")
                         .font(.headline)
-                    Text("Edit your Profile information")
+                    Text("Edit your proxy configuration")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -32,24 +32,32 @@ struct ConfigFormView: View {
             .padding(.leading, 24)
             Divider()
             HStack {
-                VStack{
-                    ConfigServerView(item: item)
-                    ConfigStreamView(item: item)
-                    ConfigTransportView(item: item)
+                VStack {
+                    VStack{
+                        ConfigServerView(item: item)
+                        Spacer(minLength: 12)
+                        ConfigStreamView(item: item)
+                        Spacer(minLength: 12)
+                        ConfigTransportView(item: item)
+                    }
+                    .padding(.all, 12)
+                    .padding(.leading, 8)
                 }
-                .frame(width: 400) // 左
-
-                Divider().frame(width: 0) // 分隔线，适当调整宽度
-
-                ConfigShowView(item: item) // 右
-            }.padding()
-            Spacer()
+                .frame(width: 400)
+                Divider()
+                VStack{
+                    ConfigShowView(item: item)
+                        .padding(.all, 12)
+                        .padding(.trailing, 8)
+                }
+            }
             Divider()
             HStack {
                 Spacer()
                 Button("Cancel") {
                     onClose()
                 }
+                .buttonStyle(.bordered)
                 Button("Save") {
                     viewModel.upsert(item: item)
                     onClose()
@@ -59,10 +67,14 @@ struct ConfigFormView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
-        .frame(width: 660)
+        .frame(width: 760)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(NSColor.windowBackgroundColor))
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 2)
+        )
         .onAppear {
-            print("ConfigView appeared with item: \(item.id)")
+            print("ProfileFormView appeared with item: \(item.id)")
         }
     }
 }
-

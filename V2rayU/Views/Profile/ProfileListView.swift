@@ -63,11 +63,9 @@ struct ProfileListView: View {
                     TextField("Search by Address or Remark", text: $searchText)
                         .frame(width: 200)
                 }
-                Button(action: { loadData() }) {
-                    Label("刷新", systemImage: "arrow.clockwise")
-                }
             }
             .padding(.vertical, 6)
+            Spacer()
             VStack {
                 Spacer()
                 HStack {
@@ -100,6 +98,13 @@ struct ProfileListView: View {
                         Label("PingAll", systemImage: "lasso.badge.sparkles")
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(viewModel.list.isEmpty)
+                    // 分享
+                    Button(action: {
+                        
+                    }) {
+                        Label("分享", systemImage: "square.and.arrow.up")
+                    }
                 }.padding(.horizontal, 10)
                 // 表格主体
                 Table(of: ProfileModel.self, selection: $selection, sortOrder: $sortOrder) {
@@ -195,12 +200,34 @@ struct ProfileListView: View {
 
     private func contextMenuProvider(item: ProfileModel) -> some View {
         Group {
-            Button("Edit") {
-                self.selectedRow = item
-            }
             Divider()
+            Button("Choose") {
+            }
+            Button("Duplicate") {
+            }
+            Button("Copy") {
+            }
             Button("Ping") {
                 self.pingRow = item
+            }
+            Button("Share") {
+                self.pingRow = item
+            }
+            Divider()
+            Button("🔝 Move to Top") {
+                self.pingRow = item
+            }
+            Button("Move to Bottom") {
+                self.pingRow = item
+            }
+            Button("↑ Move Up") {
+                self.pingRow = item
+            }
+            Button("↓ Move Down") {
+            }
+            Divider()
+            Button("Edit") {
+                self.selectedRow = item
             }
             Button("Delete") {
                 // Handle another action

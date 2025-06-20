@@ -15,12 +15,12 @@ func getTextField(name: String, text: Binding<String>) -> some View {
 }
 
 // 公共的 getTextField 函数，接受 name
-func getTextLabel(label: String, labelWidth: CGFloat = 120) -> some View {
+func getTextLabel(label: String, labelWidth: CGFloat = 100) -> some View {
     Text(label).frame(width: labelWidth, alignment: .trailing)
 }
 
 @MainActor
-func getTextFieldWithLabel(label: String, text: Binding<String>, labelWidth: CGFloat = 120) -> some View {
+func getTextFieldWithLabel(label: String, text: Binding<String>, labelWidth: CGFloat = 100) -> some View {
     HStack {
         Text(label).frame(width: labelWidth, alignment: .trailing)
         Spacer()
@@ -31,7 +31,7 @@ func getTextFieldWithLabel(label: String, text: Binding<String>, labelWidth: CGF
 }
 
 @MainActor
-func getNumFieldWithLabel(label: String, num: Binding<Int>, labelWidth: CGFloat = 120) -> some View {
+func getNumFieldWithLabel(label: String, num: Binding<Int>, labelWidth: CGFloat = 100) -> some View {
         HStack {
             Text(label).frame(width: labelWidth, alignment: .trailing)
             Spacer()
@@ -42,13 +42,13 @@ func getNumFieldWithLabel(label: String, num: Binding<Int>, labelWidth: CGFloat 
 }
 
 @MainActor
-func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: String, selection: Binding<T>, labelWidth: CGFloat = 120) -> some View where T.RawValue == String, T.AllCases: RandomAccessCollection {
+func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: String, selection: Binding<T>,ignore: [T] = [], labelWidth: CGFloat = 100) -> some View where T.RawValue == String, T.AllCases: RandomAccessCollection {
     HStack {
         Text(label)
             .frame(width: labelWidth, alignment: .trailing)
         Spacer()
         Picker("", selection: selection) {
-            ForEach(T.allCases, id: \.self) { pick in
+            ForEach(T.allCases.filter { !ignore.contains($0) }, id: \.self) { pick in
                 Text(pick.rawValue)
             }
         }
@@ -57,7 +57,7 @@ func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: St
 }
 
 @MainActor
-func getBoolFieldWithLabel(label: String, isOn: Binding<Bool>, labelWidth: CGFloat = 120) -> some View {
+func getBoolFieldWithLabel(label: String, isOn: Binding<Bool>, labelWidth: CGFloat = 100) -> some View {
     HStack {
         Text(label).frame(width: labelWidth, alignment: .trailing)
         Toggle("", isOn: isOn).frame(alignment: .leading)
@@ -69,7 +69,7 @@ func getBoolFieldWithLabel(label: String, isOn: Binding<Bool>, labelWidth: CGFlo
 
 
 @MainActor
-func getTextEditorWithLabel(label: String, text: Binding<String>, labelWidth: CGFloat = 120) -> some View {
+func getTextEditorWithLabel(label: String, text: Binding<String>, labelWidth: CGFloat = 100) -> some View {
     HStack {
         Text(label).frame(width: labelWidth, alignment: .trailing)
         Spacer()

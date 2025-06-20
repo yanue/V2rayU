@@ -9,45 +9,79 @@ import SwiftUI
 
 struct ConfigStreamView: View {
     @ObservedObject var item: ProfileModel
-    
+
     var body: some View {
-        HStack {
+        VStack {
+            HStack {
+                Image(systemName: "waveform.path")
+                Text("Stream Settings")
+                Spacer()
+            }
+            .foregroundColor(.primary)
+            .padding(.horizontal, 10)
+
             VStack {
-                Section(header: Text("Stream Settings")) {
-                    getPickerWithLabel(label: "Network", selection: $item.network)
-                    if item.network == .tcp || item.network == .ws || item.network == .h2  {
-                        if item.network == .tcp || item.network == .h2 {
-                            getPickerWithLabel(label: "header type", selection: $item.headerType)
-                        }
-                        getTextFieldWithLabel(label: "request host",text: $item.host)
-                        getTextFieldWithLabel(label: "request path",text: $item.path)
+                getPickerWithLabel(label: "Network", selection: $item.network)
+                if item.network == .tcp  {
+                    if item.network == .tcp {
+                        getPickerWithLabel(label: "Header Type", selection: $item.headerType)
                     }
-                    if item.network == .grpc {
-                        getTextFieldWithLabel(label: "serviceName",text: $item.path)
-                    }
-                    if item.network == .quic {
-                        getTextFieldWithLabel(label: "Key",text: $item.path)
-                        getPickerWithLabel(label: "header type", selection: $item.headerType)
-                        getPickerWithLabel(label: "security", selection: $item.headerType)
-                    }
-                    if item.network == .domainsocket {
-                        getTextFieldWithLabel(label: "path",text: $item.path)
-                    }
-                    if item.network == .kcp {
-                        getTextFieldWithLabel(label: "seed",text: $item.path)
-                        getPickerWithLabel(label: "header-type", selection: $item.headerType)
-                        getBoolFieldWithLabel(label: "congestion", isOn: $item.allowInsecure)
-                        getNumFieldWithLabel(label: "mtu", num: $item.port)
-                        getNumFieldWithLabel(label: "tti", num: $item.port)
-                        getNumFieldWithLabel(label: "uplinkCapacity", num: $item.port)
-                        getNumFieldWithLabel(label: "downlinkCapacity", num: $item.port)
-                    }
-                    if item.network == .xhttp {
-                        getTextFieldWithLabel(label: "path",text: $item.path)
-                        getTextFieldWithLabel(label: "host",text: $item.host)
+                    if item.headerType == .http {
+                        getTextFieldWithLabel(label: "Request Host", text: $item.host)
+                        getTextFieldWithLabel(label: "Request Path", text: $item.path)
                     }
                 }
+                
+                if item.network == .ws {
+                    getTextFieldWithLabel(label: "Request Host", text: $item.host)
+                    getTextFieldWithLabel(label: "Request Path", text: $item.path)
+                }
+                
+                if item.network == .h2 {
+                    getTextFieldWithLabel(label: "Request Host", text: $item.host)
+                    getTextFieldWithLabel(label: "Request Path", text: $item.path)
+                }
+                
+                if item.network == .grpc {
+                    getTextFieldWithLabel(label: "Service Name", text: $item.path)
+                }
+                
+                if item.network == .quic {
+                    getTextFieldWithLabel(label: "Key", text: $item.path)
+                    getPickerWithLabel(label: "Header Type", selection: $item.headerType)
+                    getPickerWithLabel(label: "Security", selection: $item.headerType)
+                }
+                
+                if item.network == .domainsocket {
+                    getTextFieldWithLabel(label: "Path", text: $item.path)
+                }
+                
+                if item.network == .kcp {
+                    getTextFieldWithLabel(label: "Seed", text: $item.path)
+                    getPickerWithLabel(label: "Header Type", selection: $item.headerType)
+                    getBoolFieldWithLabel(label: "Congestion", isOn: $item.allowInsecure)
+                    getNumFieldWithLabel(label: "MTU", num: $item.port)
+                    getNumFieldWithLabel(label: "TTI", num: $item.port)
+                    getNumFieldWithLabel(label: "Uplink Capacity", num: $item.port)
+                    getNumFieldWithLabel(label: "Downlink Capacity", num: $item.port)
+                }
+                
+                if item.network == .xhttp {
+                    getTextFieldWithLabel(label: "Path", text: $item.path)
+                    getTextFieldWithLabel(label: "Host", text: $item.host)
+                }
             }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(NSColor.alternateSelectedControlTextColor))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.black.opacity(0.2), lineWidth: 1)
+                            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+            )
         }
     }
 }

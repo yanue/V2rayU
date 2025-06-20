@@ -12,8 +12,17 @@ protocol V2rayOutboundSettings: Codable {}
 
 // MARK: - Protocol Definitions
 enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
-    case vmess, vless, trojan, shadowsocks, socks, dns, http, blackhole, freedom
+    case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom
     var id: Self { self }
+    
+    func showInEditor () -> Bool {
+        switch self {
+        case .socks, .dns, .http, .blackhole, .freedom:
+            return false
+        default:
+            return true
+        }
+    }
 }
 
 // MARK: - V2rayOutbound Definition
@@ -123,7 +132,7 @@ struct V2rayOutboundShadowsocks: V2rayOutboundSettings {
     var servers: [V2rayOutboundShadowsockServer] = [V2rayOutboundShadowsockServer()]
 }
 
-let V2rayOutboundShadowsockMethod = ["2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", "chacha20-ietf-poly1305", "chacha20-poly1305", "aes-128-gcm", "aes-256-gcm", "rc4-md5", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr",  "aes-192-gcm", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "bf-cfb", "salsa20", "chacha20", "chacha20-ietf"]
+let V2rayOutboundShadowsockMethod = ["2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", "aes-256-gcm", "aes-128-gcm", "chacha20-poly1305", "chacha20-ietf-poly1305", "xchacha20-poly1305", "xchacha20-ietf-poly1305", "none", "plain"]
 
 struct V2rayOutboundShadowsockServer: Codable {
     var address: String = ""

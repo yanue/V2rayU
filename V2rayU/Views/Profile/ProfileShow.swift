@@ -12,12 +12,27 @@ struct ConfigShowView: View {
     var body: some View {
         HStack {
             VStack {
-                Section(header: Text("Outbound Preview")) {
-                    JSONTextView(jsonString: V2rayOutboundHandler(from: item).toJSON())
+                HStack {
+                    Image(systemName: "waveform.path")
+                    Text("Outbound Preview")
+                    Spacer()
                 }
-                Spacer()
+                .foregroundColor(.primary)
+                .padding(.horizontal, 10)
+                
+                JSONTextView(jsonString: V2rayOutboundHandler(from: item).toJSON())
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(NSColor.alternateSelectedControlTextColor))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.black.opacity(0.2), lineWidth: 1)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            )
+                    )
             }
-            Spacer()
         }
     }
 }
