@@ -198,12 +198,11 @@ final class AppState: ObservableObject {
         self.icon = mode.icon // 更新图标
     }
     
-    func setRunning(profile: String, mode: RunMode) {
-        self.runMode = mode
-        self.icon = mode.icon
-        self.runningProfile = profile
-        UserDefaults.set(forKey: .runningProfile, value: profile)
-        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    func setRunning(uuid: String) {
+        self.runningProfile = uuid
+        self.runMode = .global
+        self.icon = RunMode.global.icon // 更新图标
+        UserDefaults.set(forKey: .runningProfile, value: uuid)
     }
     
     func runMode(mode: RunMode) {

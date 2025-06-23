@@ -17,7 +17,8 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbReader = AppDatabase.shared.reader
             try dbReader.read { db in
-                list = try ProfileModel.fetchAll(db)
+                // 按 sort 排序
+                list = try ProfileModel.fetchAll(db).sorted(by: { $0.sort < $1.sort })
             }
         } catch {
             print("getList error: \(error)")
@@ -84,7 +85,6 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-
     static func getFastOne() -> ProfileModel? {
         do {
             let dbReader = AppDatabase.shared.reader
@@ -143,10 +143,24 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: 0)])
+                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: speed)])
             }
         } catch {
             print("delete error: \(error)")
+        }
+    }
+
+    func updateSortOrderInDBAsync() {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                for (index, item) in list.enumerated() {
+                    item.sort = index // Update the sort order in memory
+                    try item.update(db, columns: [ProfileModel.Columns.sort]) // Update the database
+                }
+            }
+        } catch {
+            print("updateSortOrderInDBAsync error: \(error)")
         }
     }
 

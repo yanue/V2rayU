@@ -36,7 +36,7 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     @Published var publicKey: String = "" // publicKey(reality): reality
     @Published var shortId: String = "" // shortId(reality): reality
     @Published var spiderX: String = "" // spiderX(reality): reality
-    
+
     // Identifiable 协议的要求
     var id: String {
         return uuid
@@ -44,7 +44,7 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid,remark,speed,sort,`protocol`, subid, address, port, password, alterId, encryption, network,headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
     }
 
     // 需要手动实现 `init(from:)` 和 `encode(to:)`，如果你使用自定义类型时
@@ -167,8 +167,41 @@ extension ProfileModel: Transferable {
     }
 }
 
+// clone 方法
+extension ProfileModel {
+    func clone() -> ProfileModel {
+        let cloned = ProfileModel(
+            uuid: UUID().uuidString, // 生成新的 UUID
+            remark: remark + " (Copy)", // 添加 "(Copy)" 后缀
+            speed: speed,
+            sort: sort,
+            protocol: self.protocol,
+            address: address,
+            port: port,
+            password: password,
+            alterId: alterId,
+            encryption: encryption,
+            network: network,
+            headerType: headerType,
+            host: host,
+            path: path,
+            security: security,
+            allowInsecure: allowInsecure,
+            subid: subid,
+            flow: flow,
+            sni: sni,
+            alpn: alpn,
+            fingerprint: fingerprint,
+            publicKey: publicKey,
+            shortId: shortId,
+            spiderX: spiderX
+        )
+        return cloned
+    }
+}
+
 // 实现GRDB
-extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
+extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord {
     // 自定义表名
     static var databaseTableName: String {
         return "profile" // 设置你的表名
@@ -234,7 +267,7 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord  {
             }
         }
     }
-    
+
     func save() {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

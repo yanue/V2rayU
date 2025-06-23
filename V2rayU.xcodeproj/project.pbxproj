@@ -78,6 +78,7 @@
 		66B1B5842D297D030032DD09 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5832D297D030032DD09 /* v2ray-core */; };
 		66B1B5872D2980E40032DD09 /* Tun2SocksKit in Frameworks */ = {isa = PBXBuildFile; productRef = 66B1B5862D2980E40032DD09 /* Tun2SocksKit */; };
 		66B1B5892D2980E40032DD09 /* Tun2SocksKitC in Frameworks */ = {isa = PBXBuildFile; productRef = 66B1B5882D2980E40032DD09 /* Tun2SocksKitC */; };
+		66D27AE52E098E3A004C600D /* ProfileShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ProfileShare.swift */; };
 		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
 		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
@@ -222,6 +223,7 @@
 		66B1B5832D297D030032DD09 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		66D27AE42E098E3A004C600D /* ProfileShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileShare.swift; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		66E94B2E2D26B95D003745B5 /* JsonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonView.swift; sourceTree = "<group>"; };
 		66E94B2F2D26B95D003745B5 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
@@ -391,6 +393,7 @@
 				662CC3EF2D1BED9B006E8450 /* ProfileForm.swift */,
 				662CC3F02D1BED9B006E8450 /* ProfileShow.swift */,
 				663814B42E0448DB00F5FCF3 /* ProfilePing.swift */,
+				66D27AE42E098E3A004C600D /* ProfileShare.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -752,6 +755,7 @@
 				662CC40A2D1BED9B006E8450 /* V2rayLaunch.swift in Sources */,
 				662CC40B2D1BED9B006E8450 /* StreamView.swift in Sources */,
 				662CC40D2D1BED9B006E8450 /* AppVersion.swift in Sources */,
+				66D27AE52E098E3A004C600D /* ProfileShare.swift in Sources */,
 				662CC40E2D1BED9B006E8450 /* SubscriptionList.swift in Sources */,
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
 				662CC4102D1BED9B006E8450 /* Advance.swift in Sources */,

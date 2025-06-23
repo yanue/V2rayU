@@ -4,25 +4,23 @@ class ShareUri {
     var error = ""
     var uri: String = ""
 
-    func qrcode(item: ProfileModel) {
-
+    static func generateShareUri(item: ProfileModel) -> String {
+        let handler = ShareUri()
+        
         switch item.protocol {
         case .trojan:
-            self.uri = TrojanUri(from: item).encode()
-            break
+            handler.uri = TrojanUri(from: item).encode()
         case .vmess:
-            self.uri = VmessUri(from: item).encode()
-            break
+            handler.uri = VmessUri(from: item).encode()
         case .vless:
-            self.uri = VlessUri(from: item).encode()
-            break
+            handler.uri = VlessUri(from: item).encode()
         case .shadowsocks:
-            self.uri = ShadowsocksUri(from: item).encode()
-            break
+            handler.uri = ShadowsocksUri(from: item).encode()
         default:
-            break
+            handler.error = "Protocol not supported"
+            return ""
         }
-
-        self.error = "not support"
+        
+        return handler.uri
     }
 }
