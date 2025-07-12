@@ -274,7 +274,7 @@ func parseRoutingRuleJson(json: String) -> (V2rayRouting, err: Error?) {
     do {
         res = try jsonDecoder.decode(V2rayRouting.self, from: jsonData!)
     } catch let error {
-        print("parseJson err", error)
+        print("parseRoutingRuleJson err", json, error)
         err = error
     }
     return (res, err)

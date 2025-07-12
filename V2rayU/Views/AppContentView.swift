@@ -34,8 +34,8 @@ struct ContentView: View {
 
                 SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters", selectedTab: $selectedTab)
                 SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled", selectedTab: $selectedTab)
-                SidebarButton(tab: .subscription, title: "Subscription", icon: "personalhotspot", selectedTab: $selectedTab)
-                SidebarButton(tab: .routing, title: "Routing", icon: "bonjour", selectedTab: $selectedTab)
+                SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot", selectedTab: $selectedTab)
+                SidebarButton(tab: .routing, title: "Routings", icon: "bonjour", selectedTab: $selectedTab)
                 SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)
 
                 Spacer()

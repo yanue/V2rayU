@@ -17,7 +17,7 @@ struct MenuRoutingPanel: View {
         return routingModel.list.count
     }
     var name: String {
-        return routingModel.list.first(where: { $0.uuid == appState.runningRouting })?.name ?? ""
+        return routingModel.list.first(where: { $0.uuid == appState.runningRouting })?.remark ?? ""
     }
 
     var body: some View {
@@ -71,7 +71,7 @@ struct MenuRoutingPanel: View {
                         ScrollView {
                             VStack(spacing: 4) {
                                 ForEach(routingModel.list) { item in
-                                    MenuRoutingRow(name: item.name, isSelected: item.uuid == appState.runningRouting)
+                                    MenuRoutingRow(name: item.remark, isSelected: item.uuid == appState.runningRouting)
                                         .padding(.horizontal)
                                         .contentShape(Rectangle())
                                         .onTapGesture {

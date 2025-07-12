@@ -10,7 +10,7 @@ import SwiftUI
 struct MenuItemsView: View {
     var openContentViewWindow: () -> Void
     var body: some View {
-        GroupBox(""){
+        GroupBox("Settings"){
             VStack {
                 MenuItemView(title: "打开设置", action: openContentViewWindow)
                 Divider()
@@ -54,7 +54,7 @@ struct MenuItemView: View {
                 Spacer()
             }
             .padding(.horizontal)
-            .frame(maxWidth: .infinity, minHeight: 22, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: 20, alignment: .leading)
             .background(isHovered ? Color.accentColor.opacity(0.8) : Color.clear) // 鼠标悬停高亮
             .cornerRadius(4) // 可选的圆角
         }

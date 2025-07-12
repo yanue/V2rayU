@@ -6,26 +6,22 @@ struct AppMenuView: View {
     var openContentViewWindow: () -> Void
 
     var body: some View {
-        VStack {
+        VStack() {
             HeaderView()
-            Spacer()
             MenuSpeedView()
-            Spacer()
             MenuRoutingPanel()
-            Spacer()
             MenuProfilePanel()
-            Spacer()
             MenuItemsView(openContentViewWindow: openContentViewWindow)
-            Spacer()
         }
-        .padding(.horizontal, 8)
+        .padding(12)
         .frame(maxHeight: .infinity)
-        .frame(width: 320)
-
+        .frame(width: 340)
+        .background(Color(NSColor.windowBackgroundColor).opacity(0.8)) // 背景颜色透明度.7
     }
 }
 
-
+// 预览修正
+enum Dummy { static func open() {} }
 #Preview {
-    AppMenuView(openContentViewWindow: vold)
+    AppMenuView(openContentViewWindow: Dummy.open)
 }

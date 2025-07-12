@@ -226,7 +226,9 @@ class V2rayLaunch: NSObject {
                 await AppState.shared.setRunning(uuid: v2ray.uuid)
             }
             // ping current
-//            try await PingRunning.shared.startPing(item: v2ray)
+            Task {
+//                try await PingRunning.shared.startPing()
+            }
         }
     }
 

@@ -21,7 +21,7 @@ struct MenuProfilePanel: View {
         return filteredAndSortedItems.count
     }
     var name: String {
-        return viewModel.list.first(where: { $0.uuid == appState.runningProfile })?.remark ?? ""
+        return appState.runningServer?.remark ?? "No Profile Selected"
     }
     var filteredAndSortedItems: [ProfileModel] {
         let filtered = viewModel.list.filter { item in
@@ -100,7 +100,7 @@ struct MenuProfilePanel: View {
                                         .padding(.horizontal)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            appState.runProfile(uuid: item.uuid)
+                                            AppState.shared.runProfile(uuid: item.uuid)
                                         }
                                 }
                             }
@@ -135,6 +135,7 @@ struct MenuProfileRow: View {
             // Network Name
             Text(item.remark)
                 .font(.system(size: 13))
+                .foregroundColor(isSelected ? .blue : .primary)
             
             Spacer()
             

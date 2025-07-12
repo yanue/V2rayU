@@ -39,6 +39,7 @@ final class AppState: ObservableObject {
     @Published var runMode: RunMode = .off // 运行模式
     @Published var runningProfile: String = "" // 当前运行的配置
     @Published var runningRouting: String = "" // 当前运行的路由
+    @Published var runningServer: ProfileModel? // 当前运行的配置文件
 
     @Published var launchAtLogin: Bool = true
     @Published var checkForUpdates: Bool = true
@@ -72,7 +73,6 @@ final class AppState: ObservableObject {
         v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
         runningProfile = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
         runningRouting = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
-        
         enableMux = UserDefaults.getBool(forKey: .enableMux)
         enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -92,6 +92,8 @@ final class AppState: ObservableObject {
         selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
 
         setupBindings()
+        
+        self.runningServer = ProfileViewModel.getRunning()
     }
 
     private func setupBindings() {
@@ -100,7 +102,19 @@ final class AppState: ObservableObject {
                 UserDefaults.set(forKey: .runMode, value: mode.rawValue)
             }
             .store(in: &cancellables)
-
+        
+        $runningProfile
+            .sink { uuid in
+                UserDefaults.set(forKey: .runningProfile, value: uuid)
+            }
+            .store(in: &cancellables)
+        
+        $runningRouting
+            .sink { uuid in
+                UserDefaults.set(forKey: .runningRouting, value: uuid)
+            }
+            .store(in: &cancellables)
+        
         $launchAtLogin
             .sink { launch in
                 UserDefaults.setBool(forKey: .autoLaunch, value: launch)
@@ -199,6 +213,7 @@ final class AppState: ObservableObject {
     }
     
     func setRunning(uuid: String) {
+        print("setRunning: \(uuid)")
         self.runningProfile = uuid
         self.runMode = .global
         self.icon = RunMode.global.icon // 更新图标
@@ -220,6 +235,7 @@ final class AppState: ObservableObject {
     func runProfile(uuid: String) {
         UserDefaults.set(forKey: .runningProfile, value: uuid)
         self.runningProfile = uuid
+        self.runningServer = ProfileViewModel.getRunning()
         V2rayLaunch.startV2rayCore()
     }
     

@@ -91,8 +91,8 @@ extension UserDefaults {
 
     static func get(forKey key: KEY, defaultValue: String = "") -> String {
         let rawValue = UserDefaults.standard.string(forKey: key.rawValue)
-        if rawValue != nil && rawValue != "" {
-            return defaultValue
+        if let value = rawValue, !value.isEmpty {
+            return value
         }
         return defaultValue
     }

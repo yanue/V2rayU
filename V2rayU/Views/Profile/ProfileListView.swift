@@ -296,7 +296,7 @@ struct ProfileListView: View {
 
     private func chooseItem(item: ProfileModel) {
         // 选择当前配置
-        AppState.shared.setRunning(uuid: item.uuid)
+        AppState.shared.runProfile(uuid: item.uuid)
     }
 
     private func duplicateItem(item: ProfileModel) {
