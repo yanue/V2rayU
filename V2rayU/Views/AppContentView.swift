@@ -60,20 +60,16 @@ struct ContentView: View {
                 }
                 Spacer()
             }
-            .background() // 先添加背景
-            .padding(.all, 16) // 添加内边距
-            .background(
+            .padding() // 1. 内边距
+            .background() // 2. 然后背景
+            .clipShape(RoundedRectangle(cornerRadius: 10)) // 3. 内圆角
+            .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(NSColor.alternateSelectedControlTextColor))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.black.opacity(0.2), lineWidth: 1)
-                            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    )
-            )
-            .padding(.all, 16) // 外边距
-            .frame(width: 800) // 设置右侧内容区的宽度
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                    .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
+            ) // 4. 添加边框和阴影
+            .padding(.all, 16) // 5. 外边距
+            .frame(width: 640) // 设置右侧内容区的宽度
         }
     }
   

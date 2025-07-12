@@ -15,7 +15,7 @@ struct ConfigFormView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "personalhotspot")
+                Image(systemName: "shield.lefthalf.filled")
                     .resizable()
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
@@ -43,7 +43,7 @@ struct ConfigFormView: View {
                     .padding(.all, 12)
                     .padding(.leading, 8)
                 }
-                .frame(width: 400)
+                .frame(width: 360)
                 Divider()
                 VStack{
                     ConfigShowView(item: item)
@@ -67,7 +67,7 @@ struct ConfigFormView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
-        .frame(width: 760)
+        .frame(width: 700)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(NSColor.windowBackgroundColor))
