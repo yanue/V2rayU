@@ -12,7 +12,8 @@ let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
 let v2rayCorePath = AppHomePath + "/v2ray-core"
 let v2rayCoreFile = v2rayCorePath + "/v2ray"
-let logFilePath = AppHomePath + "/v2ray-core.log"
+let v2rayLogFilePath = AppHomePath + "/v2ray-core.log"
+let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 
@@ -24,6 +25,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("Application did finish launching.")
         V2rayLaunch.checkInstall()
         V2rayLaunch.runAtStart()
+        // 日志重定向
+        AppDelegate.redirectStdoutToFile()
         // 自动更新订阅服务器
         Task{
             await SubscriptionHandler.shared.sync()
@@ -43,7 +46,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
     }
-
+    
+    // 日志重定向，建议在 App 启动时调用
+     static func redirectStdoutToFile() {
+         freopen(appLogFilePath, "a+", stdout)
+         freopen(appLogFilePath, "a+", stderr)
+     }
+    
     @objc func onWakeNote(note: NSNotification) {
         NSLog("onWakeNote")
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {

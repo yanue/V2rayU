@@ -131,8 +131,8 @@ class V2rayLaunch: NSObject {
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_NAME,
             "WorkingDirectory": AppHomePath,
-            "StandardOutPath": logFilePath,
-            "StandardErrorPath": logFilePath,
+            "StandardOutPath": v2rayLogFilePath,
+            "StandardErrorPath": v2rayLogFilePath,
             "ProgramArguments": agentArguments,
             "RunAtLoad": false, // 不能开机自启(需要停止)
             "KeepAlive": false, // 不能自动重启(需要停止)

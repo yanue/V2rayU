@@ -69,7 +69,7 @@
 		663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */; };
 		663814B32E02E0FD00F5FCF3 /* RoutingForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B22E02E0F600F5FCF3 /* RoutingForm.swift */; };
 		663814B52E0448DB00F5FCF3 /* ProfilePing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B42E0448DB00F5FCF3 /* ProfilePing.swift */; };
-		6680D1032E23DC230013095C /* V2rayLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1022E23DC140013095C /* V2rayLogView.swift */; };
+		6680D1072E2407F80013095C /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogView.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5322D2913000032DD09 /* ProfileStatModel.swift */; };
@@ -203,7 +203,7 @@
 		663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionSync.swift; sourceTree = "<group>"; };
 		663814B22E02E0F600F5FCF3 /* RoutingForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingForm.swift; sourceTree = "<group>"; };
 		663814B42E0448DB00F5FCF3 /* ProfilePing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePing.swift; sourceTree = "<group>"; };
-		6680D1022E23DC140013095C /* V2rayLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLogView.swift; sourceTree = "<group>"; };
+		6680D1062E2407F80013095C /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B5322D2913000032DD09 /* ProfileStatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatModel.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -464,8 +464,8 @@
 		663814AC2E00659100F5FCF3 /* Overview */ = {
 			isa = PBXGroup;
 			children = (
+				6680D1062E2407F80013095C /* LogView.swift */,
 				662CC3FD2D1BED9B006E8450 /* Overview.swift */,
-				6680D1022E23DC140013095C /* V2rayLogView.swift */,
 			);
 			path = Overview;
 			sourceTree = "<group>";
@@ -779,7 +779,6 @@
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
-				6680D1032E23DC230013095C /* V2rayLogView.swift in Sources */,
 				662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */,
 				663745392D2ECAE40093A101 /* MenuHead.swift in Sources */,
 				662CC4292D1BED9B006E8450 /* ToastWindow.swift in Sources */,
@@ -792,6 +791,7 @@
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
 				663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */,
 				66F66F972D1F8A7800E77C64 /* PingRunning.swift in Sources */,
+				6680D1072E2407F80013095C /* LogView.swift in Sources */,
 				66F66F982D1F8A7800E77C64 /* Ping.swift in Sources */,
 				66F66F992D1F8A7800E77C64 /* PingAll.swift in Sources */,
 			);

@@ -101,7 +101,8 @@ struct ActivityView: View {
                 TabItem(name: "Interfaces", selected: false)
             }
             // Event Log
-            V2rayLogView()
+            LogView(logManager: .init(filePath: appLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "App Log")
+            LogView(logManager: .init(filePath: v2rayLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "V2ray Log")
         }
         .padding(8)
     }

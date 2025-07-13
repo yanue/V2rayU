@@ -89,8 +89,8 @@ class V2rayConfigHandler {
         // base
         self.v2ray.log.loglevel = V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info
         if !self.forPing {
-            self.v2ray.log.access = logFilePath
-            self.v2ray.log.error = logFilePath
+            self.v2ray.log.access = v2rayLogFilePath
+            self.v2ray.log.error = v2rayLogFilePath
         }
         // ------------------------------------- inbound start ---------------------------------------------
 
