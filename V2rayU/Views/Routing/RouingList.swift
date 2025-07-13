@@ -26,7 +26,7 @@ struct RoutingListView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack() {
             HStack {
                 Image(systemName: "bonjour")
                     .resizable()
@@ -132,9 +132,9 @@ struct RoutingListView: View {
                     }
                     .dropDestination(for: RoutingModel.self, action: handleDrop)
                 }
-                .padding(8)
             }
         }
+        .padding(8)
         .sheet(item: $selectedRow) { row in
             RoutingFormView(item: row, onClose: {
                 selectedRow = nil

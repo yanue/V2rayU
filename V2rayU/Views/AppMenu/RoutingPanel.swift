@@ -104,6 +104,7 @@ struct MenuRoutingRow: View {
         HStack {
             // Network Name
             Text(name)
+                .foregroundColor(isSelected ? .blue : .primary)
 
             Spacer()
 

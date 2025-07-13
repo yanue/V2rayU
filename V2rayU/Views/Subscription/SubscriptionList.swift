@@ -69,8 +69,8 @@ struct SubscriptionListView: View {
                 .disabled(viewModel.list.isEmpty)
                 .buttonStyle(.borderedProminent)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
+
+            
             Spacer()
             ZStack {
                 Table(of: SubModel.self, selection: $selection, sortOrder: $sortOrder) {
@@ -114,9 +114,9 @@ struct SubscriptionListView: View {
                     }
                     .dropDestination(for: SubModel.self, action: handleDrop)
                 }
-                .padding(8)
             }
         }
+        .padding(8)
         .sheet(item: $selectedRow) { row in
             SubscriptionFormView(item: row) {
                 selectedRow = nil

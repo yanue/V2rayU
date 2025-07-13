@@ -25,11 +25,23 @@ struct SettingView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Header Section
-            Text("Setting")
-                .font(.title)
-                .fontWeight(.bold)
+        VStack() {
+            HStack {
+                Image(systemName: "gear")
+                    .resizable()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Settings")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("aaaaas")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                
+            }
 
             // Segmented Picker (Tabs)
             Picker("", selection: $selectedTab) {
@@ -37,19 +49,19 @@ struct SettingView: View {
                 Text("Advance").tag(SettingTab.advance)
             }
             .pickerStyle(.segmented).padding(0)
-
             // Content based on Selected Tab
-            VStack {
-                switch selectedTab {
-                case .general:
-                    GeneralView()
-                case .advance:
-                    AdvanceView()
+            HStack{
+                VStack {
+                    switch selectedTab {
+                    case .general:
+                        GeneralView()
+                    case .advance:
+                        AdvanceView()
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding()
+        .padding(8)
     }
 }
 

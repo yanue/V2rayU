@@ -8,89 +8,102 @@
 import SwiftUI
 
 struct ActivityView: View {
+    @ObservedObject var appState = AppState.shared
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            
-            // Header Section
-            Text("Activity")
-                .font(.title)
-                .fontWeight(.bold)
-            
-            // Tabs
             HStack {
-                TabItem(name: "Latency", selected: true)
-                TabItem(name: "Traffic", selected: false)
-                TabItem(name: "Interfaces", selected: false)
+                Image(systemName: "camera.filters")
+                    .resizable()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Activity")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
-            
-            // Cards: Router, DNS, Internet, Proxy
-            HStack(spacing: 12) {
-                CardView(title: "ROUTER", value: "≤1", unit: "ms", color: .cyan)
-                CardView(title: "DNS", value: "3", unit: "ms", color: .purple)
-                CardView(title: "INTERNET", value: "60", unit: "ms", color: .blue)
-                CardView(title: "Proxy", value: "157", unit: "ms", color: .orange)
+
+            // Profile Info Section
+            if let profile = appState.runningServer {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Current Proxy: \(profile.remark)")
+                        .font(.headline)
+                    Text("Protocol: \(profile.protocol.rawValue)  |  \(profile.address):\(profile.port)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text("Speed: \(profile.speed >= 0 ? "\(profile.speed) ms" : "N/A")")
+                        .font(.subheadline)
+                        .foregroundColor(.orange)
+                }
+                .padding(8)
+                .background(Color.gray.opacity(0.08))
+                .cornerRadius(8)
+            } else {
+                Text("No active profile.")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
-            
+
             // Network Info
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("UPLOAD")
+                    Text("Proxy UPLOAD")
                         .font(.caption)
                         .foregroundColor(.pink)
-                    Text("2 KB/s")
+                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
                         .font(.headline)
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("DOWNLOAD")
+                    Text("Proxy DOWNLOAD")
                         .font(.caption)
                         .foregroundColor(.blue)
-                    Text("4 KB/s")
+                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
                         .font(.headline)
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("ACTIVE CONNECTIONS")
+                    Text("Proxy UPLOAD")
                         .font(.caption)
-                        .foregroundColor(.gray)
-                    Text("10")
+                        .foregroundColor(.pink)
+                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
                         .font(.headline)
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("TOTAL")
+                    Text("Proxy DOWNLOAD")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
+                        .font(.headline)
+                }
+                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("LATENCY")
                         .font(.caption)
                         .foregroundColor(.gray)
-                    Text("63.4 MB")
+                    Text(String(format: "%.2f ms", appState.latency))
                         .font(.headline)
                 }
             }
             .padding()
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10)
-            
-            // Network History Chart
-            VStack(alignment: .leading) {
-                Text("Network History")
-                    .font(.headline)
-                // Replace this placeholder with a chart view or graph.
-                Rectangle()
-                    .fill(Color.blue.opacity(0.2))
-                    .frame(height: 100)
-                    .cornerRadius(10)
+
+            // Tabs
+            HStack {
+                TabItem(name: "Latency", selected: true)
+                TabItem(name: "Traffic", selected: false)
+                TabItem(name: "Interfaces", selected: false)
             }
-            
             // Event Log
-            VStack(alignment: .leading) {
-                Text("Events")
-                    .font(.headline)
-                EventLogItem(timestamp: "2023/4/6, 3:03:49 PM", message: "SOCKS5 proxy listen on interface: 127.0.0.1, port: 6153")
-                EventLogItem(timestamp: "2023/4/6, 3:03:49 PM", message: "HTTP proxy listen on interface: 127.0.0.1, port: 6152")
-            }
-            
-            Spacer()
+            V2rayLogView()
         }
-        .padding()
+        .padding(8)
     }
 }
 
@@ -99,7 +112,7 @@ struct ActivityView: View {
 struct TabItem: View {
     var name: String
     var selected: Bool
-    
+
     var body: some View {
         Text(name)
             .font(.subheadline)
@@ -116,50 +129,30 @@ struct CardView: View {
     var value: String
     var unit: String
     var color: Color
-    
+
     var body: some View {
         VStack(alignment: .leading) {
-            Text(title)
-                .font(.caption)
-                .foregroundColor(color)
             HStack {
+                Spacer()
+
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(color)
+
+                Spacer()
+            }
+            HStack {
+                Spacer()
                 Text(value)
-                    .font(.largeTitle)
+                    .font(.title2)
                     .fontWeight(.bold)
                 Text(unit)
                     .font(.caption)
+                Spacer()
             }
         }
         .padding()
-        .frame(width: 80, height: 80)
         .background(color.opacity(0.1))
         .cornerRadius(10)
-    }
-}
-
-struct EventLogItem: View {
-    var timestamp: String
-    var message: String
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("INFO")
-                    .foregroundColor(.green)
-                    .font(.caption)
-                Text(timestamp)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            Text(message)
-                .font(.footnote)
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-struct ActivityView_Previews: PreviewProvider {
-    static var previews: some View {
-        ActivityView()
     }
 }

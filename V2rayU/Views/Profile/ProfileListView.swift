@@ -36,7 +36,7 @@ struct ProfileListView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack() {
             HStack {
                 Image(systemName: "shield.lefthalf.filled")
                     .resizable()
@@ -66,7 +66,7 @@ struct ProfileListView: View {
                         .frame(width: 200)
                 }
             }
-            .padding(.vertical, 6)
+
             Spacer()
             VStack {
                 Spacer()
@@ -171,6 +171,7 @@ struct ProfileListView: View {
             .border(Color.gray.opacity(0.1), width: 1)
             .cornerRadius(8)
         }
+        .padding(8)
         .sheet(item: $selectedRow) { row in
             ConfigFormView(item: row) {
                 selectedRow = nil
