@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActivityView: View {
     @ObservedObject var appState = AppState.shared
+    @State private var selectedLogTab: String = "App Log" // 新增状态
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -35,9 +36,6 @@ struct ActivityView: View {
                     Text("Protocol: \(profile.protocol.rawValue)  |  \(profile.address):\(profile.port)")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    Text("Speed: \(profile.speed >= 0 ? "\(profile.speed) ms" : "N/A")")
-                        .font(.subheadline)
-                        .foregroundColor(.orange)
                 }
                 .padding(8)
                 .background(Color.gray.opacity(0.08))
@@ -51,42 +49,42 @@ struct ActivityView: View {
             // Network Info
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Proxy UPLOAD")
-                        .font(.caption)
-                        .foregroundColor(.pink)
-                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
-                        .font(.headline)
-                }
-                Spacer()
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Proxy DOWNLOAD")
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
-                        .font(.headline)
-                }
-                Spacer()
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Proxy UPLOAD")
-                        .font(.caption)
-                        .foregroundColor(.pink)
-                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
-                        .font(.headline)
-                }
-                Spacer()
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Proxy DOWNLOAD")
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
-                        .font(.headline)
-                }
-                Spacer()
-                VStack(alignment: .leading, spacing: 8) {
                     Text("LATENCY")
                         .font(.caption)
-                        .foregroundColor(.gray)
-                    Text(String(format: "%.2f ms", appState.latency))
+                        .foregroundColor(.green)
+                    Text(String(format: "%.0f ms", appState.latency))
+                        .font(.headline)
+                }
+                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Proxy UPLOAD")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
+                        .font(.headline)
+                }
+                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Proxy DOWNLOAD")
+                        .font(.caption)
+                        .foregroundColor(.brown)
+                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
+                        .font(.headline)
+                }
+                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Proxy UPLOAD")
+                        .font(.caption)
+                        .foregroundColor(.pink)
+                    Text(String(format: "%.2f KB/s", appState.proxyUpSpeed))
+                        .font(.headline)
+                }
+                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Proxy DOWNLOAD")
+                        .font(.caption)
+                        .foregroundColor(.cyan)
+                    Text(String(format: "%.2f KB/s", appState.proxyDownSpeed))
                         .font(.headline)
                 }
             }
@@ -95,65 +93,44 @@ struct ActivityView: View {
             .cornerRadius(10)
 
             // Tabs
-            HStack {
-                TabItem(name: "Latency", selected: true)
-                TabItem(name: "Traffic", selected: false)
-                TabItem(name: "Interfaces", selected: false)
+            HStack(spacing: 0) {
+                LogTabItem(name: "App Log", selected: selectedLogTab == "App Log") {
+                    selectedLogTab = "App Log"
+                }
+                LogTabItem(name: "V2ray Log", selected: selectedLogTab == "V2ray Log") {
+                    selectedLogTab = "V2ray Log"
+                }
             }
-            // Event Log
-            LogView(logManager: .init(filePath: appLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "App Log")
-            LogView(logManager: .init(filePath: v2rayLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "V2ray Log")
+            .padding(.vertical, 4)
+            .padding(.horizontal, 4)
+            .background(Color.gray.opacity(0.08))
+            .cornerRadius(6)
+            // LogView 切换
+            if selectedLogTab == "App Log" {
+                LogView(logManager: .init(filePath: appLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "App Log")
+            } else {
+                LogView(logManager: .init(filePath: v2rayLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "V2ray Log")
+            }
         }
         .padding(8)
     }
 }
 
-// Subviews
-
-struct TabItem: View {
+// 新增美观的 TabItem
+struct LogTabItem: View {
     var name: String
     var selected: Bool
-
+    var action: () -> Void
     var body: some View {
-        Text(name)
-            .font(.subheadline)
-            .foregroundColor(selected ? .black : .gray)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(selected ? Color.gray.opacity(0.2) : Color.clear)
-            .cornerRadius(8)
-    }
-}
-
-struct CardView: View {
-    var title: String
-    var value: String
-    var unit: String
-    var color: Color
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Spacer()
-
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(color)
-
-                Spacer()
-            }
-            HStack {
-                Spacer()
-                Text(value)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Text(unit)
-                    .font(.caption)
-                Spacer()
-            }
+        Button(action: action) {
+            Text(name)
+                .font(.subheadline)
+                .foregroundColor(selected ? .accentColor : .gray)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(selected ? Color.accentColor.opacity(0.15) : Color.clear)
+                .cornerRadius(6)
         }
-        .padding()
-        .background(color.opacity(0.1))
-        .cornerRadius(10)
+        .buttonStyle(PlainButtonStyle())
     }
 }
