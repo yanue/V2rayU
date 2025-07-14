@@ -22,7 +22,7 @@ struct ActivityView: View {
                     Text("Activity")
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连")
+                    Text("Activity and Logs")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -104,12 +104,12 @@ struct ActivityView: View {
             .padding(.vertical, 4)
             .padding(.horizontal, 4)
             .background(Color.gray.opacity(0.08))
-            .cornerRadius(6)
+            .cornerRadius(4)
             // LogView 切换
             if selectedLogTab == "App Log" {
-                LogView(logManager: .init(filePath: appLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "App Log")
+                LogView(logManager: AppLogStream, title: "App Log")
             } else {
-                LogView(logManager: .init(filePath: v2rayLogFilePath, maxLines: 20, parse: { GenericLogLine(raw: $0) }), title: "V2ray Log")
+                LogView(logManager: V2rayLogStream, title: "V2ray Log")
             }
         }
         .padding(8)
@@ -129,7 +129,7 @@ struct LogTabItem: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(selected ? Color.accentColor.opacity(0.15) : Color.clear)
-                .cornerRadius(6)
+                .cornerRadius(4)
         }
         .buttonStyle(PlainButtonStyle())
     }

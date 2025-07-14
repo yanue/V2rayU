@@ -23,10 +23,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
+        
         V2rayLaunch.checkInstall()
         V2rayLaunch.runAtStart()
-        // 日志重定向
-        AppDelegate.redirectStdoutToFile()
+        // 日志流
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            Task { @MainActor in
+                AppLogStream.startLogging()
+                V2rayLogStream.startLogging()
+            }
+        }
         // 自动更新订阅服务器
         Task{
             await SubscriptionHandler.shared.sync()
@@ -101,5 +107,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
         print("Application will terminate.")
+        AppLogStream.stopLogging()
+        V2rayLogStream.stopLogging()
     }
 }
