@@ -7,22 +7,24 @@
 
 import SwiftUI
 
-struct LogView: View {
+struct LogStreamView: View {
     @ObservedObject var logManager: LogStreamHandler
     var title: String = "Log"
     @State private var scrollToBottom: Bool = false
     @State private var isAtBottom: Bool = true
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
-                Text(title)
-                    .font(.title)
-                    .bold()
-                Text("(\(logManager.logLines.count))")
-                    .font(.caption)
+                VStack {
+                    Text(title)
+                        .font(.title3)
+                        .bold()
+                    Text("(\(logManager.logLines.count)) messages")
+                        .font(.caption)
+                }
                 Spacer()
-                HStack() {
+                HStack {
                     LogActionButton(
                         systemName: logManager.isLogging ? "pause.fill" : "play.fill",
                         label: logManager.isLogging ? "Pause" : "Start",
@@ -62,55 +64,46 @@ struct LogView: View {
                     )
                 }
             }
-
-
-            ScrollViewReader { proxy in
-                GeometryReader { geometry in
-                    ScrollView(.vertical) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            TextEditor(text: .constant(
-                                    logManager.logLines.map { $0.raw }.joined(separator: "\n")
-                            ))
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(.primary)
-                            .frame(minHeight: 300, maxHeight: .infinity)
-                            .background(Color.clear)
-                            .id("logContent") // 用于标识内容
-                        }
-                        .onPreferenceChange(ViewOffsetKey.self) { value in
-                            let scrollViewHeight = geometry.size.height
-                            // value 是内容底部的 y 坐标
-                            // 如果内容底部 <= scrollView 高度 + 2，说明到底部
-                            if value <= scrollViewHeight + 2 {
-                                isAtBottom = true
-                            } else {
-                                isAtBottom = false
-                            }
-                        }
-                        .padding()
-                        .background(Color.clear)
-
+            .padding()
+        }
+        Spacer()
+        ScrollViewReader { proxy in
+            GeometryReader { geometry in
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        TextEditor(text: .constant(
+                            logManager.logLines.map { $0.raw }.joined(separator: "\n")
+                        ))
+                        .id("logContent")
+                        .font(.system(size: 12, design: .monospaced))
                     }
-                    .coordinateSpace(name: "scrollView")
-                    .onChange(of: logManager.logLines) { _,_ in
-                        if logManager.isLogging && isAtBottom, let last = logManager.logLines.last {
-                            proxy.scrollTo(last.id, anchor: .bottom)
-                        }
-                    }
-                    .onChange(of: scrollToBottom) { _, newValue in
-                        if newValue, let last = logManager.logLines.last {
-                            proxy.scrollTo(last.id, anchor: .bottom)
-                            scrollToBottom = false
+                    .onPreferenceChange(ViewOffsetKey.self) { value in
+                        let scrollViewHeight = geometry.size.height
+                        // value 是内容底部的 y 坐标
+                        // 如果内容底部 <= scrollView 高度 + 2，说明到底部
+                        if value <= scrollViewHeight + 2 {
+                            isAtBottom = true
+                        } else {
+                            isAtBottom = false
                         }
                     }
                 }
-                .background() // 2. 然后背景
-                .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-                ) // 4. 添加边框和阴影
+                .padding(8)
+                .foregroundColor(.primary)
+                .frame(minHeight: 300, maxHeight: .infinity)
+                .cornerRadius(8)
+                .coordinateSpace(name: "scrollView")
+                .onChange(of: logManager.logLines) { _, _ in
+                    if logManager.isLogging && isAtBottom, let last = logManager.logLines.last {
+                        proxy.scrollTo(last.id, anchor: .bottom)
+                    }
+                }
+                .onChange(of: scrollToBottom) { _, newValue in
+                    if newValue, let last = logManager.logLines.last {
+                        proxy.scrollTo(last.id, anchor: .bottom)
+                        scrollToBottom = false
+                    }
+                }
             }
         }
     }
@@ -139,7 +132,7 @@ struct LogActionButton: View {
                         .foregroundColor(color)
                 }
                 .padding(6)
-                .frame(width: 36,height: 36)
+                .frame(width: 32, height: 32)
                 .background(
                     Circle()
                         .fill(filled ? color.opacity(0.18) : Color.clear)
@@ -148,12 +141,14 @@ struct LogActionButton: View {
                     Circle()
                         .stroke(color.opacity(0.5), lineWidth: 1.2)
                 )
-                HStack{
+                HStack {
                     Text(label)
                         .font(.caption2)
                         .foregroundColor(color)
                 }
             }
+            .frame(width: 42, height: 42)
+            .contentShape(Rectangle()) // 让整个区域可点击
         }
         .buttonStyle(PlainButtonStyle())
     }

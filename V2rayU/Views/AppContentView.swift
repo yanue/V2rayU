@@ -11,6 +11,7 @@ struct ContentView: View {
     // 定义 Tab 枚举
     enum Tab: String {
         case activity
+        case log
         case server
         case subscription
         case routing
@@ -33,6 +34,7 @@ struct ContentView: View {
                 .padding(.vertical,20)
 
                 SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters", selectedTab: $selectedTab)
+                SidebarButton(tab: .log, title: "Logs", icon: "document", selectedTab: $selectedTab)
                 SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled", selectedTab: $selectedTab)
                 SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot", selectedTab: $selectedTab)
                 SidebarButton(tab: .routing, title: "Routings", icon: "bonjour", selectedTab: $selectedTab)
@@ -49,6 +51,8 @@ struct ContentView: View {
                 switch selectedTab {
                 case .activity:
                     ActivityView()
+                case .log:
+                    LogPageView()
                 case .server:
                     ProfileListView()
                 case .subscription:

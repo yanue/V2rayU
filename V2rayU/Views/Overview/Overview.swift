@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ActivityView: View {
     @ObservedObject var appState = AppState.shared
-    @State private var selectedLogTab: String = "App Log" // 新增状态
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -92,45 +91,7 @@ struct ActivityView: View {
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10)
 
-            // Tabs
-            HStack(spacing: 0) {
-                LogTabItem(name: "App Log", selected: selectedLogTab == "App Log") {
-                    selectedLogTab = "App Log"
-                }
-                LogTabItem(name: "V2ray Log", selected: selectedLogTab == "V2ray Log") {
-                    selectedLogTab = "V2ray Log"
-                }
-            }
-            .padding(.vertical, 4)
-            .padding(.horizontal, 4)
-            .background(Color.gray.opacity(0.08))
-            .cornerRadius(4)
-            // LogView 切换
-            if selectedLogTab == "App Log" {
-                LogView(logManager: AppLogStream, title: "App Log")
-            } else {
-                LogView(logManager: V2rayLogStream, title: "V2ray Log")
-            }
         }
         .padding(8)
-    }
-}
-
-// 新增美观的 TabItem
-struct LogTabItem: View {
-    var name: String
-    var selected: Bool
-    var action: () -> Void
-    var body: some View {
-        Button(action: action) {
-            Text(name)
-                .font(.subheadline)
-                .foregroundColor(selected ? .accentColor : .gray)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(selected ? Color.accentColor.opacity(0.15) : Color.clear)
-                .cornerRadius(4)
-        }
-        .buttonStyle(PlainButtonStyle())
     }
 }
