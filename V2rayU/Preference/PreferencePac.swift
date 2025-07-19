@@ -154,7 +154,7 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
     
     // get ip addr
     if socks5Address == "0.0.0.0" {
-        socks5Address = GetIPAddresses() ?? "127.0.0.1"
+        socks5Address = "127.0.0.1"
     }
     
     // permission
