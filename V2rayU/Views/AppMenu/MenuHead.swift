@@ -13,7 +13,6 @@ struct HeaderView: View {
 
     var body: some View {
         VStack {
-            Spacer()
             HStack {
                 Text("v2ray-core ● \(String(format: "%.0f", appState.latency)) ms").foregroundColor(.green)
                 Spacer()

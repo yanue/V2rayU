@@ -22,6 +22,9 @@ struct SettingView: View {
     enum SettingTab {
         case general
         case advance
+        case dns
+        case pac
+        case core
     }
 
     var body: some View {
@@ -47,8 +50,13 @@ struct SettingView: View {
             Picker("", selection: $selectedTab) {
                 Text("General").tag(SettingTab.general)
                 Text("Advance").tag(SettingTab.advance)
+                Text("DNS").tag(SettingTab.dns)
+                Text("PAC").tag(SettingTab.pac)
+                Text("Core").tag(SettingTab.core)
             }
-            .pickerStyle(.segmented).padding(0)
+            .pickerStyle(.segmented)
+            
+            Spacer(minLength: 20) 
             // Content based on Selected Tab
             HStack{
                 VStack {
@@ -57,8 +65,21 @@ struct SettingView: View {
                         GeneralView()
                     case .advance:
                         AdvanceView()
+                    case .dns:
+                        DnsView()
+                    case .pac:
+                        PacView()
+                    case .core:
+                        CoreView()
                     }
-                }
+                }.padding() // 1. 内边距
+                    .background() // 2. 然后背景
+                    .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                            .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
+                    ) // 4. 添加边框和阴影
             }
         }
         .padding(8)

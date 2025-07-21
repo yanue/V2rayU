@@ -7,6 +7,7 @@
 import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: Tab = .activity // 当前选中的按钮
+    @ObservedObject var appState = AppState.shared // 引用单例
 
     // 定义 Tab 枚举
     enum Tab: String {
@@ -39,7 +40,6 @@ struct ContentView: View {
                 SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot", selectedTab: $selectedTab)
                 SidebarButton(tab: .routing, title: "Routings", icon: "bonjour", selectedTab: $selectedTab)
                 SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)
-
                 Spacer()
             }
             .frame(width: 160)

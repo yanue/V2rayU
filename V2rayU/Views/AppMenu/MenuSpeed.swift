@@ -32,8 +32,8 @@ struct MenuSpeedItemView: View {
     var body: some View {
         GroupBox(name) {
             HStack{
-                Text("\(String(format: "%.2f", upSpeed)) KB/s ↑").foregroundStyle(.blue)
-                Text("\(String(format: "%.2f", downSpeed)) KB/s ↓").foregroundStyle(.red)
+                Text("\(String(format: "%.0f", upSpeed)) KB/s ↑").foregroundStyle(.blue)
+                Text("\(String(format: "%.0f", downSpeed)) KB/s ↓").foregroundStyle(.red)
             }
             .font(.system(size: 11))
             .frame(maxWidth: .infinity)  // 确保在其父视图中占据 50% 宽度

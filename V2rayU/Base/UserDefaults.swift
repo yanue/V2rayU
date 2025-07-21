@@ -54,6 +54,8 @@ extension UserDefaults {
         case muxConcurrent
         // pacPort
         case localPacPort
+        // gfwPacListUrl
+        case gfwPacListUrl
 
         // selected routing uuid
         case runningRouting

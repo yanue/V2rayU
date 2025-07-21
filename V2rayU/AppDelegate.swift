@@ -29,8 +29,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 日志流
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             Task { @MainActor in
-                AppLogStream.startLogging()
-                V2rayLogStream.startLogging()
+//                AppLogStream.startLogging()
+//                V2rayLogStream.startLogging()
             }
         }
         // 自动更新订阅服务器
