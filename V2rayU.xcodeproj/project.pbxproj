@@ -95,6 +95,7 @@
 		66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B3C2D27E74C003745B5 /* V2rayStats.swift */; };
 		66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A52E2E669400E72DE2 /* PacHandler.swift */; };
 		66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */; };
+		66EB76B02E31135200E72DE2 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76AF2E31135200E72DE2 /* Download.swift */; };
 		66F66F832D1E450000E77C64 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F822D1E450000E77C64 /* AppState.swift */; };
 		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
@@ -248,6 +249,7 @@
 		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
+		66EB76AF2E31135200E72DE2 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
@@ -295,6 +297,7 @@
 		662CC3C92D1BED9B006E8450 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				66EB76AF2E31135200E72DE2 /* Download.swift */,
 				66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */,
 				662CC44F2D1C4D46006E8450 /* Scanner.swift */,
 				662CC3C32D1BED9B006E8450 /* Port.swift */,
@@ -420,10 +423,10 @@
 		662CC3F82D1BED9B006E8450 /* Setting */ = {
 			isa = PBXGroup;
 			children = (
+				66E94B382D26B971003745B5 /* SettingView.swift */,
 				660A63AF2E2CF9B700D84D5D /* PacView.swift */,
 				660A63AD2E2CF9AD00D84D5D /* DnsView.swift */,
 				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
-				66E94B382D26B971003745B5 /* SettingView.swift */,
 				662CC3F32D1BED9B006E8450 /* Advance.swift */,
 				662CC3F42D1BED9B006E8450 /* General.swift */,
 			);
@@ -762,6 +765,7 @@
 				663745352D2EAF4F0093A101 /* RoutingPanel.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
+				66EB76B02E31135200E72DE2 /* Download.swift in Sources */,
 				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
 				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
 				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,

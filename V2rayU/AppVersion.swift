@@ -5,8 +5,8 @@
 //  Created by yanue on 2024/6/30.
 //  Copyright © 2024 yanue. All rights reserved.
 //
-import SwiftUI
 import ServiceManagement
+import SwiftUI
 
 let appVersion = getAppVersion()
 let langStr = Locale.current.identifier
@@ -14,10 +14,10 @@ let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" |
 
 // 手动实现检查版本下载更新 UI.
 // 基于 SwiftUI + NSWindowController 实现
-// 参考 UI: Sparkle(https://github.com/sparkle-project/Sparkle) 
+// 参考 UI: Sparkle(https://github.com/sparkle-project/Sparkle)
 // 基于 https://github.com/yanue/V2rayU/releases 进行版本检查
 
-struct GithubRelease: Codable {
+struct GithubRelease: Codable, Equatable, Hashable {
     let id: Int
     let tagName: String
     let name: String
@@ -37,28 +37,62 @@ struct GithubRelease: Codable {
         case assets
         case body
     }
+
+    static func == (lhs: GithubRelease, rhs: GithubRelease) -> Bool {
+        return lhs.tagName == rhs.tagName
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(tagName)
+    }
+
+    var formattedPublishedAt: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return dateFormatter.string(from: publishedAt)
+    }
+    
+    func getDownloadAsset() -> GithubAsset {
+        let arch = getArch()
+        // 根据 assets 和当前架构选择正确的
+        for asset in self.assets {
+            let lowerName = asset.name.lowercased()
+            if lowerName.hasSuffix(".zip") && lowerName.contains("macos") {
+                // GithubAsset: Xray-macos-arm64-v8a.zip -> xray-macos-arm64-v8a.zip
+                if arch == "arm64" && lowerName.contains("arm64") {
+                    return asset
+                }
+                // GithubAsset: Xray-macos-64.zip -> xray-macos-64.zip
+                if arch != "arm64" && !lowerName.contains("arm64") {
+                    return asset
+                }
+            }
+        }
+        return GithubAsset(name: "", browserDownloadUrl: "", size: 0)
+    }
 }
 
 struct GithubAsset: Codable {
     let name: String
     let browserDownloadUrl: String
+    let size: Int64
 
     enum CodingKeys: String, CodingKey {
         case name
         case browserDownloadUrl = "browser_download_url"
+        case size
     }
 }
 
 struct GithubError: Codable {
     let message: String
     let documentationUrl: String
-    
+
     enum CodingKeys: String, CodingKey {
         case message
         case documentationUrl = "documentation_url"
     }
 }
-
 
 @MainActor
 let V2rayUpdater = AppCheckController()
@@ -77,32 +111,32 @@ class AppCheckController: NSWindowController {
             bindData: bindData,
             closeWindow: {}
         ))
-        
+
         // Create the window with specified dimensions and styles
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
                               styleMask: [.titled, .closable, .resizable],
                               backing: .buffered, defer: false)
         window.title = "Check V2rayU"
         window.contentView = contentView
-        
+
         // Call the super init with the created window
         super.init(window: window)
-        
+
         // Update the contentView with the actual closure after super.init
         contentView.rootView = ContentView(
             bindData: bindData,
             closeWindow: closeWindow
         )
     }
-    
+
     required init?(coder: NSCoder) {
-       fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func windowDidLoad() {
-       super.windowDidLoad()
+        super.windowDidLoad()
     }
-   
+
     func checkForUpdates(showWindow: Bool = false) {
         if showWindow {
             DispatchQueue.main.async {
@@ -121,7 +155,7 @@ class AppCheckController: NSWindowController {
             return
         }
         print("checkForUpdates: \(url)")
-        let checkTask = URLSession.shared.dataTask(with: url) { data, response, error in
+        let checkTask = URLSession.shared.dataTask(with: url) { data, _, error in
             if let error = error {
                 print("Error fetching release: \(error)")
                 return
@@ -131,16 +165,16 @@ class AppCheckController: NSWindowController {
                 print("No data returned")
                 return
             }
-            
+
             print("checkForUpdates: \n \(data)")
-            
+
             do {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .iso8601 // 解析日期
 
                 // try decode data
                 let data: [GithubRelease] = try decoder.decode([GithubRelease].self, from: data)
-                
+
                 // 按日期倒序排序
                 let sortedData = data.sorted { $0.publishedAt > $1.publishedAt }
 
@@ -175,7 +209,7 @@ class AppCheckController: NSWindowController {
                             var toast = "V2rayU \(appVersion) is currently the newest version available."
                             if isMainland {
                                 title = "当前已经是最新版了"
-                                toast = "V2rayU \(appVersion) 已经是当前最新版了.";
+                                toast = "V2rayU \(appVersion) 已经是当前最新版了."
                             }
                             // open dialog
                             alertDialog(title: title, message: toast)
@@ -188,7 +222,7 @@ class AppCheckController: NSWindowController {
                 // 可能请求太频繁了
                 do {
                     let decoder = JSONDecoder()
-                    
+
                     // try decode data
                     let data: GithubError = try decoder.decode(GithubError.self, from: data)
                     DispatchQueue.main.async {
@@ -198,7 +232,7 @@ class AppCheckController: NSWindowController {
                         if isMainland {
                             title = "检查失败"
                         }
-                        var toast = "\(data.message)\n\(data.documentationUrl)";
+                        var toast = "\(data.message)\n\(data.documentationUrl)"
                         // open dialog
                         alertDialog(title: title, message: toast)
                         // sleep 2s
@@ -216,7 +250,7 @@ class AppCheckController: NSWindowController {
                         var toast = "\(error)"
                         if isMainland {
                             title = "检查失败"
-                            toast = "\(error)";
+                            toast = "\(error)"
                         }
                         // open dialog
                         alertDialog(title: title, message: toast)
@@ -231,14 +265,13 @@ class AppCheckController: NSWindowController {
         }
         checkTask.resume()
     }
-    
+
     func closeWindow() {
         DispatchQueue.main.async {
             self.window?.close()
         }
     }
-    
-    
+
     class BindData: ObservableObject {
         @Published var progressText = "check for updates..."
     }
@@ -260,7 +293,7 @@ class AppCheckController: NSWindowController {
 
                     VStack {
                         HStack {
-                            ProgressView(bindData.progressText) .progressViewStyle(LinearProgressViewStyle()).padding(.horizontal)
+                            ProgressView(bindData.progressText).progressViewStyle(LinearProgressViewStyle()).padding(.horizontal)
                         }
 
                         HStack {
@@ -277,10 +310,8 @@ class AppCheckController: NSWindowController {
                 .padding()
             }
         }
-
     }
 }
-
 
 // AppVersionController - 新版本详情页面
 
@@ -290,24 +321,24 @@ class AppVersionController: NSWindowController {
     private var release: GithubRelease!
 
     init() {
-       let contentView = NSHostingView(rootView: ContentView(
-           bindData: bindData,
-           skipAction: { print("Skip action") },
-           installAction: { print("Install action") }
-       ))
-       let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 300),
-                             styleMask: [.titled, .closable, .resizable],
-                             backing: .buffered, defer: false)
-       window.title = "V2rayU Update"
-       window.contentView = contentView
-        
-       super.init(window: window)
-        
+        let contentView = NSHostingView(rootView: ContentView(
+            bindData: bindData,
+            skipAction: { print("Skip action") },
+            installAction: { print("Install action") }
+        ))
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 300),
+                              styleMask: [.titled, .closable, .resizable],
+                              backing: .buffered, defer: false)
+        window.title = "V2rayU Update"
+        window.contentView = contentView
+
+        super.init(window: window)
+
         // Update the contentView with the actual closure after super.init
         contentView.rootView = ContentView(
             bindData: bindData,
-            skipAction: self.skipAction,
-            installAction: self.installAction
+            skipAction: skipAction,
+            installAction: installAction
         )
     }
 
@@ -316,7 +347,7 @@ class AppVersionController: NSWindowController {
             self.release = release
             if !isMainland {
                 self.bindData.title = "A new version of V2rayU is available!"
-                if release.prerelease{
+                if release.prerelease {
                     self.bindData.description = "V2rayU \(release.tagName) preview is now available, you have \(appVersion). Would you like to download it now?"
                 } else {
                     self.bindData.description = "V2rayU \(release.tagName) is now available, you have \(appVersion). Would you like to download it now?"
@@ -344,15 +375,15 @@ class AppVersionController: NSWindowController {
             NSApp.activate(ignoringOtherApps: true)
         }
     }
-    
+
     required init?(coder: NSCoder) {
-       fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func windowDidLoad() {
-       super.windowDidLoad()
+        super.windowDidLoad()
     }
-    
+
     // 安装新版本
     func installAction() {
         DispatchQueue.main.async {
@@ -364,7 +395,6 @@ class AppVersionController: NSWindowController {
         }
     }
 
-    
     func skipAction() {
         print("Skip action")
         DispatchQueue.main.async {
@@ -374,7 +404,7 @@ class AppVersionController: NSWindowController {
             self.window?.close()
         }
     }
-    
+
     class BindData: ObservableObject {
         @Published var title = "A new version of V2rayU App is available!"
         @Published var description = ""
@@ -388,7 +418,7 @@ class AppVersionController: NSWindowController {
         @ObservedObject var bindData: BindData
         var skipAction: () -> Void
         var installAction: () -> Void
-        
+
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top, spacing: 10) {
@@ -403,46 +433,43 @@ class AppVersionController: NSWindowController {
                         Text(bindData.title)
                             .font(.headline)
                             .padding(.top, 20)
-                        
+
                         Text(bindData.description)
                             .padding(.trailing, 20)
-                        
+
                         Text(bindData.releaseNodesTitle)
                             .font(.headline)
                             .bold()
                             .padding(.top, 20)
 
                         HStack {
-                        
                             // 文字可选中
                             TextEditor(text: $bindData.releaseNotes)
                                 .lineSpacing(6) // 行间距
                                 .frame(height: 120)
                                 .border(Color.gray, width: 1) // 黑色边框，宽度为 2
                                 .fixedSize(horizontal: false, vertical: true)
-                        
-                               
+
                             Spacer(minLength: 20) // 右边 margin 40
                         }
-                        
+
                         HStack {
                             Button(bindData.skipVersion) {
                                 skipAction()
                             }
-                            
+
                             Spacer()
-                            
+
                             Button(bindData.installUpdate) {
                                 installAction()
                             }
                             .padding(.trailing, 20)
                             .keyboardShortcut(.defaultAction)
                         }
-                        .padding(.top,20)
-                        .padding(.bottom,20)
+                        .padding(.top, 20)
+                        .padding(.bottom, 20)
                     }
                 }
-
             }
             .frame(width: 500, height: 300)
         }
@@ -479,15 +506,14 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         self.contentView = contentView
     }
 
-    
     required init?(coder: NSCoder) {
-       fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func windowDidLoad() {
-       super.windowDidLoad()
+        super.windowDidLoad()
     }
-    
+
     func show(release: GithubRelease) {
         DispatchQueue.main.async {
             self.window?.orderFrontRegardless()
@@ -497,7 +523,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         }
         download(release: release)
     }
-    
+
     func download(release: GithubRelease) {
         DispatchQueue.main.async {
             if let asset = release.assets.first {
@@ -527,7 +553,6 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
         downloadTask = urlSession.downloadTask(with: url)
         downloadTask?.resume()
-            
     }
 
     private func cancelDownload() {
@@ -555,19 +580,21 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                 }
             }
         }
-       
-        print("Installing V2rayU: \(String(describing: self.destinationURL))")
+
+        print("Installing V2rayU: \(String(describing: destinationURL))")
     }
-    
+
     // ---------------------- ui 相关 --------------------------------
+
     // MARK: - 下载进度数据
+
     class BindData: ObservableObject {
         @Published var progressText = "Downloading..."
         @Published var dmgUrl: String = ""
         @Published var progress: Float = 0.0
         @Published var isDownloading: Bool = false
     }
-    
+
     // MARK: - 下载进度视图
 
     struct ContentView: View {
@@ -589,7 +616,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                         VStack {
                             HStack {
                                 ProgressView(value: bindData.progress, total: 100) {
-                                   Text(bindData.progressText)
+                                    Text(bindData.progressText)
                                 }
                             }
 
@@ -619,8 +646,9 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
     }
 
     // ---------------------- 下载相关 --------------------------------
-    
+
     // MARK: - URLSessionDownloadDelegate
+
     nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
         let downloadsDirectory = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first!
@@ -638,7 +666,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                 }
                 return
             }
-            
+
             try fileManager.moveItem(at: location, to: destUrl)
 
             DispatchQueue.main.async {
@@ -683,7 +711,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
             var toast = "\(error)"
             if isMainland {
                 title = "下载文件失败"
-                toast = "\(error)";
+                toast = "\(error)"
             }
             // open dialog
             alertDialog(title: title, message: toast)

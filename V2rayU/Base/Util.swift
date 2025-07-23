@@ -8,6 +8,28 @@
 import Foundation
 import Cocoa
 
+func getArch() -> String {
+    #if arch(arm64)
+        return "arm64"
+    #else
+        return "amd64"
+    #endif
+}
+
+func getCoreVersion() -> String {
+    guard FileManager.default.fileExists(atPath: v2rayCoreFile) else {
+        return "Not Found"
+    }
+    if let output = shell(launchPath: v2rayCoreFile, arguments: ["version"]) {
+        let lines = output.split(separator: "\n")
+        if let firstLine = lines.first {
+            return String(firstLine)
+        }
+        return output
+    }
+    return "Unknown"
+}
+
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
 }
@@ -100,4 +122,16 @@ func vold() {
 
 func getRandomPort() -> UInt16 {
     return UInt16.random(in: 49152...65535)
+}
+
+
+func formatByte(_ bytesPerSecond: Double) -> String {
+    let formatter = ByteCountFormatter()
+    formatter.allowedUnits = .useAll
+    formatter.countStyle = .file
+
+    let speedInBytesPerSecond = max(0, Int64(bytesPerSecond))
+    let formatted = formatter.string(fromByteCount: speedInBytesPerSecond)
+
+    return formatted
 }
