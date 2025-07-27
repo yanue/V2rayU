@@ -19,8 +19,8 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
     private let timeoutSeconds: Double
     private var didTimeout = false
     private var downloadTask: URLSessionDownloadTask?
-    private let onProgress: (Double, String) -> Void
-    private let onSuccess: (URL) -> Void
+    private let onProgress: (Double, String, String) -> Void
+    private let onSuccess: (String) -> Void
     private let onError: (String) -> Void
     private var lastWritten: Int64 = 0
     private var lastTime: Date = Date()
@@ -32,8 +32,8 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
     ///   - onSuccess: 成功回调，参数为下载文件临时路径
     ///   - onError: 错误回调，参数为错误信息
     init(timeout: Double = 10,
-         onProgress: @escaping (Double, String) -> Void,
-         onSuccess: @escaping (URL) -> Void,
+         onProgress: @escaping (Double, String, String) -> Void,
+         onSuccess: @escaping (String) -> Void,
          onError: @escaping (String) -> Void) {
         timeoutSeconds = timeout
         self.onProgress = onProgress
@@ -77,7 +77,7 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
         let timeInterval = now.timeIntervalSince(lastTime)
         var speed = "0.0 KB/s"
         if timeInterval > 0 {
-            speed = formatByte(Double(totalBytesWritten - lastWritten) / timeInterval)+"/s"
+            speed = formatByte(Double(totalBytesWritten - lastWritten) / timeInterval) + "/s"
         }
         // 更新记录
         lastWritten = totalBytesWritten
@@ -85,16 +85,40 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
         let progress = totalBytesExpectedToWrite > 0 ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) : 0
 
         DispatchQueue.main.async {
-            self.onProgress(progress, speed)
+            self.onProgress(progress, speed, formatByte(Double(totalBytesWritten)))
         }
         resetTimeout()
     }
 
-
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         timer?.invalidate()
+        let locationPath = location.path
+        let fileName = downloadTask.response?.suggestedFilename ?? ""
+        guard locationPath != "", fileName != "" else {
+            print("urlSession: locationPath or fileName missing", )
+            return
+        }
+        let documentsPath = NSHomeDirectory() + "/Library/Caches/Download"
+        let filePath = documentsPath + "/" + fileName
+        do {
+            // 删除原有文件
+            if FileManager.default.fileExists(atPath: filePath) {
+                try FileManager.default.removeItem(atPath: filePath)
+            }
+        } catch let catchError {
+            alertDialog(title: "下载失败1", message: "保存出错 = \(catchError.localizedDescription)")
+        }
+        do {
+            if FileManager.default.fileExists(atPath: documentsPath) == false {
+                try FileManager.default.createDirectory(atPath: documentsPath, withIntermediateDirectories: true)
+            }
+            // 移动文件,不然随时被删除
+            try FileManager.default.moveItem(atPath: locationPath, toPath: filePath)
+        } catch let catchError {
+            alertDialog(title: "下载失败2", message: "保存出错 = \(catchError.localizedDescription)")
+        }
         DispatchQueue.main.async {
-            self.onSuccess(location)
+            self.onSuccess(filePath)
         }
     }
 
