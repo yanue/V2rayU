@@ -93,6 +93,9 @@
 		66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B362D26B971003745B5 /* AppContentView.swift */; };
 		66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B372D26B971003745B5 /* ProfileListView.swift */; };
 		66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B3C2D27E74C003745B5 /* V2rayStats.swift */; };
+		66EB6C132E37B87200A12DB3 /* FlyingFox in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C122E37B87200A12DB3 /* FlyingFox */; };
+		66EB6C152E37B87200A12DB3 /* FlyingSocks in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C142E37B87200A12DB3 /* FlyingSocks */; };
+		66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB6C162E37C83C00A12DB3 /* HttpServer.swift */; };
 		66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A52E2E669400E72DE2 /* PacHandler.swift */; };
 		66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */; };
 		66EB76B02E31135200E72DE2 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76AF2E31135200E72DE2 /* Download.swift */; };
@@ -247,6 +250,7 @@
 		66E94B372D26B971003745B5 /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
+		66EB6C162E37C83C00A12DB3 /* HttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpServer.swift; sourceTree = "<group>"; };
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
@@ -281,6 +285,8 @@
 				66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */,
 				66B1B5892D2980E40032DD09 /* Tun2SocksKitC in Frameworks */,
 				660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */,
+				66EB6C152E37B87200A12DB3 /* FlyingSocks in Frameworks */,
+				66EB6C132E37B87200A12DB3 /* FlyingFox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +383,7 @@
 		662CC3E22D1BED9B006E8450 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				66EB6C162E37C83C00A12DB3 /* HttpServer.swift */,
 				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
 				66F66F9A2D1FA34E00E77C64 /* Ping */,
 				662CC3E02D1BED9B006E8450 /* Tunnel.swift */,
@@ -713,6 +720,7 @@
 				662CC4332D1BEEDB006E8450 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */,
 				66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */,
+				66EB6C112E37B87200A12DB3 /* XCRemoteSwiftPackageReference "FlyingFox" */,
 			);
 			productRefGroup = 66CBCED82C63B16400313949 /* Products */;
 			projectDirPath = "";
@@ -757,6 +765,7 @@
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
 				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
 				66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */,
+				66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */,
 				66E94B322D26B95D003745B5 /* Language.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				66E94B342D26B95D003745B5 /* Theme.swift in Sources */,
@@ -1160,6 +1169,14 @@
 				minimumVersion = 4.7.6;
 			};
 		};
+		66EB6C112E37B87200A12DB3 /* XCRemoteSwiftPackageReference "FlyingFox" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swhitty/FlyingFox.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.24.1;
+			};
+		};
 		66F66F892D1E7DE300E77C64 /* XCRemoteSwiftPackageReference "Yams" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jpsim/Yams.git";
@@ -1200,6 +1217,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 66B1B5852D2980E40032DD09 /* XCRemoteSwiftPackageReference "Tun2SocksKit" */;
 			productName = Tun2SocksKitC;
+		};
+		66EB6C122E37B87200A12DB3 /* FlyingFox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66EB6C112E37B87200A12DB3 /* XCRemoteSwiftPackageReference "FlyingFox" */;
+			productName = FlyingFox;
+		};
+		66EB6C142E37B87200A12DB3 /* FlyingSocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66EB6C112E37B87200A12DB3 /* XCRemoteSwiftPackageReference "FlyingFox" */;
+			productName = FlyingSocks;
 		};
 		66F66F8A2D1E7DE300E77C64 /* Yams */ = {
 			isa = XCSwiftPackageProductDependency;

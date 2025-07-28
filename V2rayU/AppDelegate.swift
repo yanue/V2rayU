@@ -24,6 +24,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
         
+        truncateLogFile(v2rayLogFilePath)
+        truncateLogFile(appLogFilePath)
+        
         V2rayLaunch.checkInstall()
         V2rayLaunch.runAtStart()
         // 日志流

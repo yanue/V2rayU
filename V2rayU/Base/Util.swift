@@ -84,11 +84,15 @@ func GetIPAddresses() -> String? {
 }
 
 func getHttpProxyPort() -> UInt16 {
-    return UInt16(UserDefaults.get(forKey: .localHttpPort) ?? "1087") ?? 1087
+    return UInt16(UserDefaults.get(forKey: .localHttpPort)) ?? 1087
 }
 
 func getSocksProxyPort() -> UInt16 {
-    return UInt16(UserDefaults.get(forKey: .localSockPort) ?? "1080") ?? 1080
+    return UInt16(UserDefaults.get(forKey: .localSockPort)) ?? 1080
+}
+
+func getPacPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
 }
 
 func showDock(state: Bool) {
@@ -134,4 +138,45 @@ func formatByte(_ bytesPerSecond: Double) -> String {
     let formatted = formatter.string(fromByteCount: speedInBytesPerSecond)
 
     return formatted
+}
+
+
+// clear v2ray-core.log file
+func clearLogFile(logFilePath: String) {
+    let logFile = URL(fileURLWithPath: logFilePath)
+    do {
+        if FileManager.default.fileExists(atPath: logFilePath) {
+            try FileManager.default.removeItem(at: logFile)
+        }
+        // create new file
+        FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: nil)
+    } catch let error {
+        NSLog("clear log file fail: \(error)")
+        var title = "Clear log file failed"
+        var toast = "Error: \(error)"
+        if isMainland {
+            title = "清除日志文件失败"
+            toast = "错误: \(error)"
+        }
+        alertDialog(title: title, message: toast)
+    }
+}
+
+func truncateLogFile(_ logFilePath: String) {
+    let logFile = URL(fileURLWithPath: logFilePath)
+    do {
+        if FileManager.default.fileExists(atPath: logFilePath) {
+            // truncate log file,  write empty string
+            try "".write(to: logFile, atomically: true, encoding: String.Encoding.utf8)
+        }
+    } catch let error {
+        NSLog("truncate log file fail: \(error)")
+        var title = "Truncate log file failed"
+        var toast = "Error: \(error)"
+        if isMainland {
+            title = "清除日志文件失败"
+            toast = "错误: \(error)"
+        }
+        alertDialog(title: title, message: toast)
+    }
 }
