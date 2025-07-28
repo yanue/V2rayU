@@ -1,5 +1,6 @@
 import Combine
 import SwiftUI
+import ServiceManagement
 
 enum RunMode: String, CaseIterable {
     case global
@@ -41,7 +42,7 @@ final class AppState: ObservableObject {
     @Published var runningRouting: String = "" // 当前运行的路由
     @Published var runningServer: ProfileModel? // 当前运行的配置文件
 
-    @Published var launchAtLogin: Bool = true
+    @Published var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled // 开机自启动(macOS13以上)
     @Published var checkForUpdates: Bool = true
     @Published var autoUpdateServers: Bool = true
     @Published var selectFastestServer: Bool = true
@@ -118,6 +119,16 @@ final class AppState: ObservableObject {
         $launchAtLogin
             .sink { launch in
                 UserDefaults.setBool(forKey: .autoLaunch, value: launch)
+                debugPrint("设置开机自启", launch, SMAppService.mainApp.status == .enabled)
+                do {
+                    if SMAppService.mainApp.status == .enabled {
+                        try SMAppService.mainApp.unregister()
+                    } else {
+                        try SMAppService.mainApp.register()
+                    }
+                } catch {
+                    Swift.print(error.localizedDescription)
+                }
             }
             .store(in: &cancellables)
 

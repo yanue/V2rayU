@@ -21,7 +21,7 @@ struct V2rayUApp: App {
         print("userHomeDirectory",userHomeDirectory)
 //        AppDelegate.redirectStdoutToFile()
         // 加载
-        appState.viewModel.getList()
+//        appState.viewModel.getList()
 //        V2rayLaunch.runTun2Socks()
     }
 
