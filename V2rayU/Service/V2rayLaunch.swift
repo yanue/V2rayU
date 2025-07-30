@@ -333,8 +333,8 @@ class V2rayLaunch: NSObject {
         var sockPort: String = ""
         // reload
         if mode == .global {
-            httpPort = UserDefaults.get(forKey: .localHttpPort, defaultValue: "1087")
-            sockPort = UserDefaults.get(forKey: .localSockPort, defaultValue: "1080")
+            httpPort = String(getHttpProxyPort())
+            sockPort = String(getSocksProxyPort())
         }
         do {
             let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])

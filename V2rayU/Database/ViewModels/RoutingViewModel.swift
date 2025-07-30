@@ -63,7 +63,7 @@ class RoutingViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try RoutingModel.filter(RoutingModel.Columns.uuid == uuid).deleteAll(db)
+                try _ = RoutingModel.filter(RoutingModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
             print("delete error: \(error)")

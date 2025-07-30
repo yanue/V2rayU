@@ -47,10 +47,8 @@ class V2rayConfigHandler {
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
 
-        self.httpPort = UserDefaults.get(forKey: .localHttpPort,defaultValue: "1087")
-        self.httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
-        self.socksPort = UserDefaults.get(forKey: .localSockPort, defaultValue: "1080")
-        self.socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
+        self.httpPort = String(getHttpProxyPort())
+        self.socksPort = String(getSocksProxyPort())
 
         self.mux = UserDefaults.getInt(forKey: .muxConcurrent ,defaultValue: 8)
 

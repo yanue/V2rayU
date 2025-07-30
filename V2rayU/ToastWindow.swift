@@ -10,17 +10,29 @@ import Cocoa
 import SwiftUI
 
 func alertDialog(title: String, message: String) {
+    // 直接在主线程执行，避免并发问题
     DispatchQueue.main.async {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = message
-        alert.alertStyle = .warning
-        let response = alert.runModal()
-
-        if response == .alertFirstButtonReturn {
-            print("OK clicked")
+        // 检查是否有可用窗口
+        if (NSApp.mainWindow ?? NSApp.windows.first) != nil {
+            let alert = NSAlert()
+            alert.messageText = title
+            alert.informativeText = message
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "OK")
+            
+            let response = alert.runModal()
+            if response == .alertFirstButtonReturn {
+                print("OK clicked")
+            } else {
+                print("Cancel clicked")
+            }
         } else {
-            print("Cancel clicked")
+            // 如果没有窗口，使用替代方案
+            Task {
+                await MainActor.run {
+                    makeToast(message: title + "\n" + message, displayDuration: 5)
+                }
+            }
         }
     }
 }

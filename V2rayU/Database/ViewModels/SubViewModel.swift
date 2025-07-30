@@ -61,7 +61,7 @@ class SubViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try SubModel.filter(SubModel.Columns.uuid == uuid).deleteAll(db)
+                try _ = SubModel.filter(SubModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
             print("delete error: \(error)")

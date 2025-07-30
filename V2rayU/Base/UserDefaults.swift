@@ -34,14 +34,14 @@ extension UserDefaults {
         case enableStat
 
         // base settings
-        // http host
-        case localHttpHost
+        // allowLAN
+        case allowLAN
         // http port
         case localHttpPort
-        // sock host
-        case localSockHost
         // sock port
         case localSockPort
+        // pac Port
+        case localPacPort
         // dns servers
         case dnsServers
         // enable udp
@@ -52,8 +52,6 @@ extension UserDefaults {
         case enableSniffing
         // mux Concurrent
         case muxConcurrent
-        // pacPort
-        case localPacPort
         // gfwPacListUrl
         case gfwPacListUrl
 

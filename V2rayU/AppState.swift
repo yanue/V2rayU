@@ -36,29 +36,30 @@ final class AppState: ObservableObject {
     
     @Published var icon: String = "IconOff" // 默认图标
 
-    @Published var v2rayTurnOn = true // 是否开启v2ray
-    @Published var runMode: RunMode = .off // 运行模式
-    @Published var runningProfile: String = "" // 当前运行的配置
-    @Published var runningRouting: String = "" // 当前运行的路由
-    @Published var runningServer: ProfileModel? // 当前运行的配置文件
+    @Published var v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn) // 是否开启v2ray
+    @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) // 运行模式
+    @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "") // 当前运行的配置
+    @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "") // 当前运行的路由
+    @Published var runningServer: ProfileModel? = ProfileViewModel.getRunning() // 当前运行的配置文件
 
     @Published var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled // 开机自启动(macOS13以上)
-    @Published var checkForUpdates: Bool = true
-    @Published var autoUpdateServers: Bool = true
-    @Published var selectFastestServer: Bool = true
-    @Published var enableStat = true
+    @Published var checkForUpdates: Bool = UserDefaults.getBool(forKey: .autoCheckVersion) // 是否自动检查更新
+    @Published var autoUpdateServers: Bool = UserDefaults.getBool(forKey: .autoUpdateServers) // 是否自动更新服务器列表
+    @Published var selectFastestServer: Bool = UserDefaults.getBool(forKey: .autoSelectFastestServer) // 是否自动选择最快服务器
+    @Published var enableStat = UserDefaults.getBool(forKey: .enableStat) // 是否启用统计
 
-    @Published var logLevel = V2rayLogLevel.info
-    @Published var socksPort = 1080
-    @Published var socksHost = "127.0.0.1"
-    @Published var httpPort = 1087
-    @Published var httpHost = "127.0.0.1"
-    @Published var enableUdp = false
-    @Published var enableSniffing = true
-    @Published var enableMux = false
-    @Published var mux = 8
-    @Published var dnsJson = ""
-    
+    @Published var logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+    @Published var socksPort =  Int(getSocksProxyPort())
+    @Published var httpPort =  Int(getHttpProxyPort())
+    @Published var pacPort =  Int(getPacPort())
+    @Published var enableUdp = UserDefaults.getBool(forKey: .enableUdp) // 是否启用 UDP 转发
+    @Published var enableSniffing = UserDefaults.getBool(forKey: .enableSniffing) // 是否启用 sniffing
+    @Published var enableMux = UserDefaults.getBool(forKey: .enableMux) // 是否启用 Mux
+    @Published var gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: "https://raw.githubusercontent.com/yanue/V2rayU/master/gfwlist.txt") // GFW 列表 URL
+    @Published var mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
+    @Published var dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns) // DNS JSON
+    @Published var allowLAN = UserDefaults.getBool(forKey: .allowLAN)  // 允许局域网访问
+
     @Published var latency = 0.0 // 网络延迟(ping值ms)
     @Published var directUpSpeed = 0.0
     @Published var directDownSpeed = 0.0
@@ -70,31 +71,8 @@ final class AppState: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        runMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
-        v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
-        runningProfile = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
-        runningRouting = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
-        enableMux = UserDefaults.getBool(forKey: .enableMux)
-        enableUdp = UserDefaults.getBool(forKey: .enableUdp)
-        enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
-        enableStat = UserDefaults.getBool(forKey: .enableStat)
-
-        httpPort = UserDefaults.getInt(forKey: .localHttpPort, defaultValue: 1087)
-        httpHost = UserDefaults.get(forKey: .localHttpHost, defaultValue: "127.0.0.1")
-        socksPort = UserDefaults.getInt(forKey: .localSockPort, defaultValue: 1080)
-        socksHost = UserDefaults.get(forKey: .localSockHost, defaultValue: "127.0.0.1")
-        mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
-
-        logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
-
-        launchAtLogin = UserDefaults.getBool(forKey: .autoLaunch)
-        autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
-        checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)
-        selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
-
+        // 启用自动绑定更新
         setupBindings()
-        
-        self.runningServer = ProfileViewModel.getRunning()
     }
 
     private func setupBindings() {
@@ -158,28 +136,48 @@ final class AppState: ObservableObject {
 
         $socksPort
             .sink { port in
+                debugPrint("设置Socks端口", port)
                 UserDefaults.setInt(forKey: .localSockPort, value: port)
-            }
-            .store(in: &cancellables)
-
-        $socksHost
-            .sink { host in
-                UserDefaults.set(forKey: .localSockHost, value: host)
+                // 重启v2ray
+                V2rayLaunch.restartV2ray()
             }
             .store(in: &cancellables)
 
         $httpPort
             .sink { port in
+                debugPrint("设置HTTP端口", port)
                 UserDefaults.setInt(forKey: .localHttpPort, value: port)
+                // 重启v2ray
+                V2rayLaunch.restartV2ray()
             }
             .store(in: &cancellables)
 
-        $httpHost
-            .sink { host in
-                UserDefaults.set(forKey: .localHttpHost, value: host)
+        $pacPort
+            .sink { port in
+                debugPrint("设置PAC端口", port)
+                UserDefaults.setInt(forKey: .localPacPort, value: port)
+                // 重启 http
+                Task {
+                    await LocalHttpServer.shared.restart()
+                }
+               }
+            .store(in: &cancellables)
+        
+        $allowLAN
+            .sink { enabled in
+                debugPrint("设置允许局域网访问", enabled)
+                UserDefaults.setBool(forKey: .allowLAN, value: enabled)
+                // 重启 http
+                Task {
+                    await LocalHttpServer.shared.restart()
+                }
+                // 重启 v2ray
+                V2rayLaunch.restartV2ray()
+                // 重启 pac
+                _ = GeneratePACFile(rewrite: true)
             }
             .store(in: &cancellables)
-
+        
         $enableMux
             .sink { enabled in
                 UserDefaults.setBool(forKey: .enableMux, value: enabled)
@@ -197,7 +195,7 @@ final class AppState: ObservableObject {
                 UserDefaults.setBool(forKey: .enableSniffing, value: enabled)
             }
             .store(in: &cancellables)
-
+       
         $mux
             .sink { value in
                 UserDefaults.set(forKey: .muxConcurrent, value: "\(value)")

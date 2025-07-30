@@ -113,7 +113,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
+                try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
             print("delete error: \(error)")
@@ -143,7 +143,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: speed)])
+                try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: speed)])
             }
         } catch {
             print("delete error: \(error)")

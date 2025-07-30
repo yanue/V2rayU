@@ -19,10 +19,20 @@ actor LocalHttpServer {
 
     private var httpServer: HTTPServer?
 
+    func restart() {
+        debugPrint("Restarting LocalHttpServer")
+        Task {
+            await stop()
+            await start()
+        }
+    }
+    
     func start() async {
         // 停止已有服务
         await stop()
         let pacPort = getPacPort()
+        print("pacPort", pacPort)
+
         if isPortOpen(port: pacPort) {
             var toast = "pac port \(pacPort) has been used, please replace from advance setting"
             var title = "Port is already in use"
@@ -36,21 +46,38 @@ actor LocalHttpServer {
             }
             return
         }
-        // only listens on localhost 8080
-//        let server = HTTPServer(address: .loopback(port: 8080))
-        let server = HTTPServer(address: .inet(port: UInt16(pacPort)))
-        // 静态文件目录映射，subPath 用 URL 路径前缀，serverPath 用绝对路径
-        print("AppHomePath",AppHomePath)
-        await server.appendRoute("GET /*", to: .directory(subPath: "/", serverPath: AppHomePath))
-        await server.appendRoute("GET /pac/*", to: .directory(subPath: "/pac", serverPath: AppHomePath + "/pac"))
-        await server.appendRoute("GET /proxy.js", to: .file(named: AppHomePath + "/proxy.js"))
-        await server.appendRoute("GET /config.json", to: .file(named: AppHomePath + "/config.json"))
+        
+        // 创建 HTTP 服务器
+        let server: HTTPServer
+        do {
+            // 绑定到所有网络接口，支持局域网访问
+            server = try HTTPServer(address: .inet(ip4: getListenAddress(), port: UInt16(pacPort)))
+        } catch {
+            print("Failed to create HTTP server: \(error)")
+            return
+        }
+        
+        // 最简单的目录映射(其他方式不能正常使用)
+        await server.appendRoute("GET /*") { request in
+            let path = request.path
+            let filePath = AppHomePath + (path == "/" ? "/index.html" : path)
+
+            print("Requested: \(path) \(filePath)")
+
+            if FileManager.default.fileExists(atPath: filePath),
+               let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) {
+                return HTTPResponse(statusCode: .ok, body: data)
+            }
+            return HTTPResponse(statusCode: .notFound)
+        }
+        
         httpServer = server
         Task {
             do {
                 try await server.run()
                 print("FlyingFox HTTPServer started at port: \(pacPort)")
             } catch {
+                alertDialog(title: "启动 http 失败", message: "\(error)")
                 print("FlyingFox HTTPServer start error: \(error)")
             }
         }

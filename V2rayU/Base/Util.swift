@@ -95,6 +95,25 @@ func getPacPort() -> UInt16 {
     return UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
 }
 
+func getListenAddress() -> String {
+    let allowLAN = UserDefaults.getBool(forKey: .allowLAN)
+    if allowLAN{
+        return "0.0.0.0"
+    } else {
+        return "127.0.0.1"
+    }
+}
+
+
+func getPacAddress() -> String {
+    let allowLAN = UserDefaults.getBool(forKey: .allowLAN)
+    if allowLAN{
+        return GetIPAddresses() ?? "127.0.0.1"
+    } else {
+        return "127.0.0.1"
+    }
+}
+
 func showDock(state: Bool) {
     DispatchQueue.main.async {
         // Get transform state.

@@ -16,26 +16,19 @@ let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwli
 
 
 func getPacUrl() -> String {
-    let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
-    let pacUrl = "http://127.0.0.1:" + String(pacPort) + "/proxy.js"
+    let pacUrl = "http://127.0.0.1:" + String(getPacPort()) + "/proxy.js"
     return pacUrl
 }
 
 func getConfigUrl() -> String {
-    let pacPort = UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
-    let configUrl = "http://127.0.0.1:" + String(pacPort) + "/config.json"
+    let configUrl = "http://127.0.0.1:" + String(getPacPort()) + "/config.json"
     return configUrl
 }
 
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
-    let sockPort = UserDefaults.get(forKey: .localSockPort,defaultValue: "1080")
-    var socks5Address = UserDefaults.get(forKey: .localSockHost,defaultValue: "127.0.0.1")
-    
-    // get ip addr
-    if socks5Address == "0.0.0.0" {
-        socks5Address = GetIPAddresses() ?? "127.0.0.1"
-    }
+    let socksPort = String(getPacPort())
+    let pacAddress = getPacAddress()
     
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod -R 755 ./pac"])
@@ -45,8 +38,8 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
         return true
     }
 
-    print("GeneratePACFile rewrite", sockPort)
-    var userRules = getPacUserRules()
+    print("GeneratePACFile rewrite", pacAddress, socksPort)
+    let userRules = getPacUserRules()
     var gfwlist = getPacGFWList()
     do {
         if let data = Data(base64Encoded: gfwlist, options: .ignoreUnknownCharacters) {
@@ -93,13 +86,13 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 // Replace rules placeholder in pac js
                 jsStr = jsStr.replacingOccurrences(of: "__RULES__", with: rulesJsonStr)
                 // Replace __SOCKS5PORT__ palcholder in pac js
-                jsStr = jsStr.replacingOccurrences(of: "__SOCKS5PORT__", with: "\(sockPort)")
+                jsStr = jsStr.replacingOccurrences(of: "__SOCKS5PORT__", with: "\(socksPort)")
                 // Replace __SOCKS5ADDR__ palcholder in pac js
                 var sin6 = sockaddr_in6()
-                if socks5Address.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
-                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: "[\(socks5Address)]")
+                if pacAddress.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
+                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: "[\(pacAddress)]")
                 } else {
-                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: socks5Address)
+                    jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: pacAddress)
                 }
                 print("PACFilePath", PACFilePath)
 

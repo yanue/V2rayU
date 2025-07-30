@@ -16,7 +16,6 @@ struct AdvanceView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            getTextFieldWithLabel(label: "Local Socks Listen Host", text: $appState.socksHost, labelWidth: labelWidth)
             HStack {
                 getTextLabel(label: "Local Socks Listen Port", labelWidth: labelWidth)
                 TextField("Local Socks Listen Port", value: $appState.socksPort, formatter: NumberFormatter())
@@ -28,8 +27,9 @@ struct AdvanceView: View {
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
                     .frame(alignment: .leading)
             }
-            getTextFieldWithLabel(label: "Local Http Listen Host", text: $appState.httpHost, labelWidth: labelWidth)
             getNumFieldWithLabel(label: "Local Http Listen Port", num: $appState.httpPort, labelWidth: labelWidth)
+            getNumFieldWithLabel(label: "Local Pac Listen Port", num: $appState.pacPort, labelWidth: labelWidth)
+            getBoolFieldWithLabel(label: "Allow LAN", isOn: $appState.allowLAN, labelWidth: labelWidth)
             getBoolFieldWithLabel(label: "Enable Sniffing", isOn: $appState.enableSniffing, labelWidth: labelWidth)
             HStack {
                 getBoolFieldWithLabel(label: "Enable Mux", isOn: $appState.enableMux, labelWidth: labelWidth)
