@@ -112,5 +112,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("Application will terminate.")
         AppLogStream.stopLogging()
         V2rayLogStream.stopLogging()
+        Task {
+            await LocalHttpServer.shared.stop()
+        }
     }
 }

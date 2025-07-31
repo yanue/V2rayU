@@ -25,9 +25,9 @@
 		662CC40D2D1BED9B006E8450 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C12D1BED9B006E8450 /* AppVersion.swift */; };
 		662CC40E2D1BED9B006E8450 /* SubscriptionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FF2D1BED9B006E8450 /* SubscriptionList.swift */; };
 		662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D32D1BED9B006E8450 /* Migrate.swift */; };
-		662CC4102D1BED9B006E8450 /* Advance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F32D1BED9B006E8450 /* Advance.swift */; };
+		662CC4102D1BED9B006E8450 /* AdvanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F32D1BED9B006E8450 /* AdvanceView.swift */; };
 		662CC4112D1BED9B006E8450 /* Tunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E02D1BED9B006E8450 /* Tunnel.swift */; };
-		662CC4122D1BED9B006E8450 /* General.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F42D1BED9B006E8450 /* General.swift */; };
+		662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F42D1BED9B006E8450 /* GeneralView.swift */; };
 		662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E72D1BED9B006E8450 /* V2rayStruct.swift */; };
 		662CC4142D1BED9B006E8450 /* Overview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FD2D1BED9B006E8450 /* Overview.swift */; };
 		662CC4152D1BED9B006E8450 /* RoutingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */; };
@@ -96,6 +96,7 @@
 		66EB6C132E37B87200A12DB3 /* FlyingFox in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C122E37B87200A12DB3 /* FlyingFox */; };
 		66EB6C152E37B87200A12DB3 /* FlyingSocks in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C142E37B87200A12DB3 /* FlyingSocks */; };
 		66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB6C162E37C83C00A12DB3 /* HttpServer.swift */; };
+		66EB6C1B2E3B985300A12DB3 /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 66EB6C1A2E3B985300A12DB3 /* TODO */; };
 		66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A52E2E669400E72DE2 /* PacHandler.swift */; };
 		66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */; };
 		66EB76B02E31135200E72DE2 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76AF2E31135200E72DE2 /* Download.swift */; };
@@ -174,7 +175,6 @@
 		662CC3D92D1BED9B006E8450 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		662CC3DA2D1BED9B006E8450 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		662CC3DB2D1BED9B006E8450 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		662CC3DE2D1BED9B006E8450 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		662CC3E02D1BED9B006E8450 /* Tunnel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tunnel.swift; sourceTree = "<group>"; };
 		662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		662CC3E32D1BED9B006E8450 /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
@@ -188,8 +188,8 @@
 		662CC3EC2D1BED9B006E8450 /* StreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamView.swift; sourceTree = "<group>"; };
 		662CC3EF2D1BED9B006E8450 /* ProfileForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileForm.swift; sourceTree = "<group>"; };
 		662CC3F02D1BED9B006E8450 /* ProfileShow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileShow.swift; sourceTree = "<group>"; };
-		662CC3F32D1BED9B006E8450 /* Advance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Advance.swift; sourceTree = "<group>"; };
-		662CC3F42D1BED9B006E8450 /* General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = General.swift; sourceTree = "<group>"; };
+		662CC3F32D1BED9B006E8450 /* AdvanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvanceView.swift; sourceTree = "<group>"; };
+		662CC3F42D1BED9B006E8450 /* GeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralView.swift; sourceTree = "<group>"; };
 		662CC3FC2D1BED9B006E8450 /* AppMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenuView.swift; sourceTree = "<group>"; };
 		662CC3FD2D1BED9B006E8450 /* Overview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overview.swift; sourceTree = "<group>"; };
 		662CC3FE2D1BED9B006E8450 /* RouingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouingList.swift; sourceTree = "<group>"; };
@@ -251,6 +251,7 @@
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
 		66EB6C162E37C83C00A12DB3 /* HttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpServer.swift; sourceTree = "<group>"; };
+		66EB6C1A2E3B985300A12DB3 /* TODO */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
@@ -351,15 +352,19 @@
 		662CC3D72D1BED9B006E8450 /* Handler */ = {
 			isa = PBXGroup;
 			children = (
+				66F66F9A2D1FA34E00E77C64 /* Ping */,
+				662CC3E02D1BED9B006E8450 /* Tunnel.swift */,
+				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
+				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
 				66EB76A52E2E669400E72DE2 /* PacHandler.swift */,
 				6680D1082E2547280013095C /* LogStreamHandler.swift */,
 				662CC4342D1C4CE9006E8450 /* ImportHandler.swift */,
-				662CC43B2D1C4CE9006E8450 /* Share */,
 				66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */,
 				662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */,
 				662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */,
 				662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */,
 				662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */,
+				66EB6C162E37C83C00A12DB3 /* HttpServer.swift */,
 			);
 			path = Handler;
 			sourceTree = "<group>";
@@ -370,26 +375,6 @@
 				662CC3DC2D1BED9B006E8450 /* Localizable.strings */,
 			);
 			path = Locales;
-			sourceTree = "<group>";
-		};
-		662CC3DF2D1BED9B006E8450 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				662CC3DE2D1BED9B006E8450 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		662CC3E22D1BED9B006E8450 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				66EB6C162E37C83C00A12DB3 /* HttpServer.swift */,
-				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
-				66F66F9A2D1FA34E00E77C64 /* Ping */,
-				662CC3E02D1BED9B006E8450 /* Tunnel.swift */,
-				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
-			);
-			path = Service;
 			sourceTree = "<group>";
 		};
 		662CC3E82D1BED9B006E8450 /* V2ray */ = {
@@ -434,8 +419,8 @@
 				660A63AF2E2CF9B700D84D5D /* PacView.swift */,
 				660A63AD2E2CF9AD00D84D5D /* DnsView.swift */,
 				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
-				662CC3F32D1BED9B006E8450 /* Advance.swift */,
-				662CC3F42D1BED9B006E8450 /* General.swift */,
+				662CC3F32D1BED9B006E8450 /* AdvanceView.swift */,
+				662CC3F42D1BED9B006E8450 /* GeneralView.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -566,6 +551,7 @@
 		66CBCECE2C63B16400313949 = {
 			isa = PBXGroup;
 			children = (
+				66EB6C1A2E3B985300A12DB3 /* TODO */,
 				66B1B5832D297D030032DD09 /* v2ray-core */,
 				66B1B55C2D297B3F0032DD09 /* Build */,
 				66CBCED92C63B16400313949 /* V2rayU */,
@@ -587,6 +573,7 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				66EB6C1C2E3B99F300A12DB3 /* Protocol */,
 				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
 				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
@@ -596,13 +583,10 @@
 				662CC3E32D1BED9B006E8450 /* ToastWindow.swift */,
 				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
 				66B1B5582D297AE60032DD09 /* Scpipts */,
-				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D42D1BED9B006E8450 /* Database */,
+				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D72D1BED9B006E8450 /* Handler */,
 				662CC3DD2D1BED9B006E8450 /* Locales */,
-				662CC3DF2D1BED9B006E8450 /* Preview Content */,
-				662CC3E22D1BED9B006E8450 /* Service */,
-				662CC3E82D1BED9B006E8450 /* V2ray */,
 				662CC3E92D1BED9B006E8450 /* V2rayU.entitlements */,
 				662CC4002D1BED9B006E8450 /* Views */,
 				66CBCEE22C63B16500313949 /* Preview Content */,
@@ -627,6 +611,15 @@
 				66E94B302D26B95D003745B5 /* Theme.swift */,
 			);
 			path = Base;
+			sourceTree = "<group>";
+		};
+		66EB6C1C2E3B99F300A12DB3 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				662CC43B2D1C4CE9006E8450 /* Share */,
+				662CC3E82D1BED9B006E8450 /* V2ray */,
+			);
+			path = Protocol;
 			sourceTree = "<group>";
 		};
 		66F66F9A2D1FA34E00E77C64 /* Ping */ = {
@@ -741,6 +734,7 @@
 				66B1B55A2D297B140032DD09 /* install.sh in Resources */,
 				662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */,
 				662CC4302D1BED9B006E8450 /* Info.plist in Resources */,
+				66EB6C1B2E3B985300A12DB3 /* TODO in Resources */,
 				66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */,
 				662CC4312D1BED9B006E8450 /* Localizable.strings in Resources */,
 			);
@@ -806,9 +800,9 @@
 				662CC40E2D1BED9B006E8450 /* SubscriptionList.swift in Sources */,
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
 				660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */,
-				662CC4102D1BED9B006E8450 /* Advance.swift in Sources */,
+				662CC4102D1BED9B006E8450 /* AdvanceView.swift in Sources */,
 				662CC4112D1BED9B006E8450 /* Tunnel.swift in Sources */,
-				662CC4122D1BED9B006E8450 /* General.swift in Sources */,
+				662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */,
 				662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */,
 				66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */,
 				662CC4142D1BED9B006E8450 /* Overview.swift in Sources */,
