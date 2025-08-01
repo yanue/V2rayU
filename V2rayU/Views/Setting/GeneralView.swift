@@ -14,19 +14,18 @@ struct GeneralView: View {
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
 
-    @ObservedObject var appState = AppState.shared // 引用单例
     @ObservedObject var themeManager: ThemeManager = ThemeManager()
     @ObservedObject var languageManager: LanguageManager = LanguageManager()
-
+    @ObservedObject var settings = AppSettings.shared // 引用单例
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Form {
                 Section {
-                    Toggle("Launch V2rayU at login", isOn: $appState.launchAtLogin)
-                    Toggle("Check for updates automatically", isOn: $appState.checkForUpdates)
-                    Toggle("Automatically update servers from subscriptions", isOn: $appState.autoUpdateServers)
-                    Toggle("Automatically select fastest server", isOn: $appState.selectFastestServer)
+                    Toggle("Launch V2rayU at login", isOn: $settings.launchAtLogin)
+                    Toggle("Check for updates automatically", isOn: $settings.checkForUpdates)
+                    Toggle("Automatically update servers from subscriptions", isOn: $settings.autoUpdateServers)
+                    Toggle("Automatically select fastest server", isOn: $settings.selectFastestServer)
                 }
                 Spacer()
 
@@ -66,8 +65,8 @@ struct GeneralView: View {
             }
 
             HStack {
-                Button("Check for Updates...") {
-                    // Implement update check logic
+                Button("保存") {
+                    settings.saveSettings()
                 }
                 Spacer()
                 Button("Feedback...") {
@@ -77,6 +76,5 @@ struct GeneralView: View {
             .padding()
         }
         .frame(width: 500, height: 400)
-
     }
 }
