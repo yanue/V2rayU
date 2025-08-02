@@ -172,7 +172,7 @@ class V2rayLaunch: NSObject {
 
         // auto update subscribe servers
         Task {
-            if await AppState.shared.autoUpdateServers {
+            if await AppSettings.shared.autoUpdateServers {
                 await SubscriptionHandler.shared.sync()
             }
         }

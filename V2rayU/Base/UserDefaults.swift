@@ -15,8 +15,6 @@ extension UserDefaults {
         case v2rayTurnOn
         // v2ray-core log level
         case v2rayLogLevel
-        // v2ray dns json txt
-        case v2rayDnsJson
 
         // auth check version
         case autoCheckVersion

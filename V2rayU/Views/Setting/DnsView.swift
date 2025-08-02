@@ -12,6 +12,7 @@ struct DnsView: View {
     @State private var dnsJson: String = ""
     @State private var tips: String = ""
     @State private var showAlert: Bool = false
+    @ObservedObject var settings = AppSettings() // 引用单例
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -71,7 +72,7 @@ struct DnsView: View {
     }
 
     private func loadDnsServers() {
-        dnsJson = UserDefaults.get(forKey: .v2rayDnsJson, defaultValue: defaultDns)
+        dnsJson = AppSettings.shared.dnsJson
     }
 
     private func saveDnsServers() {
@@ -99,10 +100,9 @@ struct DnsView: View {
         do {
             let formattedData = try encoder.encode(JSONAny(jsonObj))
             if let formattedStr = String(data: formattedData, encoding: .utf8) {
-                str = formattedStr
-                UserDefaults.set(forKey: .v2rayDnsJson, value: formattedStr)
-                V2rayLaunch.restartV2ray()
-                dnsJson = str
+                // 触发更新
+                AppSettings.shared.dnsJson = formattedStr
+                AppSettings.shared.saveSettings()
                 tips = "DNS 配置保存成功"
             } else {
                 tips = "Error: 格式化后内容无法编码为字符串"

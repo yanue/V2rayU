@@ -12,7 +12,7 @@ actor Ping {
     func doPing(bindPort: UInt16) async throws -> Int {
         let session = URLSession(configuration: getProxyUrlSessionConfigure(httpProxyPort: bindPort))
 
-        let (_, response) = try await session.data(for: URLRequest(url: AppState.shared.pingURL))
+        let (_, response) = try await session.data(for: URLRequest(url: AppSettings.shared.pingURL))
         // 这里可以根据 data 或 response 做更多校验
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -20,7 +20,7 @@ actor Ping {
         }
 
         // 使用 metrics 提取 ping 时间
-        let metrics = try await session.metrics(for: URLRequest(url: AppState.shared.pingURL))
+        let metrics = try await session.metrics(for: URLRequest(url: AppSettings.shared.pingURL))
         guard let transactionMetrics = metrics.transactionMetrics.first,
               let fetchStartDate = transactionMetrics.fetchStartDate,
               let responseEndDate = transactionMetrics.responseEndDate else {

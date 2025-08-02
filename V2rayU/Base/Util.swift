@@ -169,3 +169,34 @@ func truncateLogFile(_ logFilePath: String) {
         alertDialog(title: title, message: toast)
     }
 }
+
+func getHttpProxyPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localHttpPort)) ?? 1087
+}
+
+func getSocksProxyPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localSockPort)) ?? 1080
+}
+
+func getPacPort() -> UInt16 {
+    return UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
+}
+
+func getListenAddress() -> String {
+    let allowLAN = UserDefaults.getBool(forKey: .allowLAN)
+    if allowLAN{
+        return "0.0.0.0"
+    } else {
+        return "127.0.0.1"
+    }
+}
+
+
+func getPacAddress() -> String {
+    let allowLAN = UserDefaults.getBool(forKey: .allowLAN)
+    if allowLAN{
+        return GetIPAddresses() ?? "127.0.0.1"
+    } else {
+        return "127.0.0.1"
+    }
+}

@@ -135,7 +135,7 @@ class V2rayConfigHandler {
             // 添加
             outbounds.append(outboundFreedom)
             outbounds.append(outboundBlackhole)
-//            outbounds.append(outboundDns)
+            outbounds.append(outboundDns)
         }
 
         self.v2ray.outbounds = outbounds
@@ -152,7 +152,7 @@ class V2rayConfigHandler {
     }
     
     func getDns() -> V2rayDns {
-        let dnsJson = UserDefaults.get(forKey: .v2rayDnsJson, defaultValue: defaultDns)
+        let dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
         if let jsonData = dnsJson.data(using: .utf8) {
             do {
                 let decoder = JSONDecoder()
