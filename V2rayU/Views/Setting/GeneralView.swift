@@ -56,25 +56,12 @@ struct GeneralView: View {
                     }
                 }
                 Spacer()
-                Section(header: Text("Related file locations")) {
-                    Text("~/.V2rayU/")
-                    Text("~/Library/Preferences/net.yanue.V2rayU.plist")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
+              
             }
-
-            HStack {
-                Button("保存") {
-                    settings.saveSettings()
-                }
-                Spacer()
-                Button("Feedback...") {
-                    // Implement feedback logic
-                }
-            }
-            .padding()
         }
         .frame(width: 500, height: 400)
+        .onDisappear {
+            AppSettings.shared.saveSettings()
+        }
     }
 }

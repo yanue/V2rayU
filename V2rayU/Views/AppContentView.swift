@@ -8,6 +8,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: Tab = .activity // 当前选中的按钮
     @ObservedObject var appState = AppState.shared // 引用单例
+    @State private var version = getAppVersion() // 控制设置页面的显示
 
     // 定义 Tab 枚举
     enum Tab: String {
@@ -17,6 +18,7 @@ struct ContentView: View {
         case subscription
         case routing
         case setting
+        case about
     }
 
     var body: some View {
@@ -30,7 +32,7 @@ struct ContentView: View {
                         .frame(width: 64, height: 64)
 
                     Text("V2rayU")
-                    Text("v5.0.0").font(.footnote).foregroundColor(.secondary)
+                    Text("v"+version).font(.footnote).foregroundColor(.secondary)
                 }
                 .padding(.vertical,20)
 
@@ -40,6 +42,7 @@ struct ContentView: View {
                 SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot", selectedTab: $selectedTab)
                 SidebarButton(tab: .routing, title: "Routings", icon: "bonjour", selectedTab: $selectedTab)
                 SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)
+                SidebarButton(tab: .about, title: "About", icon: "info.circle", selectedTab: $selectedTab)
                 Spacer()
             }
             .frame(width: 160)
@@ -61,6 +64,8 @@ struct ContentView: View {
                     RoutingListView()
                 case .setting:
                     SettingView()
+                case .about:
+                    AboutView()
                 }
                 Spacer()
             }

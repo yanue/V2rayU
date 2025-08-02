@@ -33,7 +33,9 @@ func getCoreVersion() -> String {
 func getAppVersion() -> String {
     return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
 }
-
+func getAppBuild() -> String {
+    return "\(Bundle.main.infoDictionary!["CFBundleVersion"] ?? "")"
+}
 func checkFileIsRootAdmin(file: String) -> Bool {
     do {
         let fileAttrs = try FileManager.default.attributesOfItem(atPath: file)

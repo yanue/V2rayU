@@ -95,7 +95,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
         // 停止 V2ray
-        V2rayLaunch.stopTun2Socks()
         V2rayLaunch.Stop()
 
         // 关闭系统代理
