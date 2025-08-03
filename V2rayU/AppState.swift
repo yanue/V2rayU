@@ -32,9 +32,6 @@ enum RunMode: String, CaseIterable {
 final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
 
-    // 设置相关属性
-    var settings = AppSettings()
-
     // 其它非设置相关属性
     @Published var icon: String = "IconOff"
     @Published var v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)

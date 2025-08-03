@@ -3,8 +3,8 @@ import SwiftUI
 
 @main
 struct V2rayUApp: App {
-    @State  var windowController: NSWindowController?
-    @State  var aboutWindowController: NSWindowController?
+    @State var windowController: NSWindowController?
+    @State var aboutWindowController: NSWindowController?
     @StateObject var languageManager = LanguageManager()
     @StateObject var themeManager = ThemeManager()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -17,8 +17,8 @@ struct V2rayUApp: App {
         if fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first != nil {
 //            print("Application Support Directory: \(appSupportURL)")
         }
-        print("NSHomeDirectory()",NSHomeDirectory())
-        print("userHomeDirectory",userHomeDirectory)
+        print("NSHomeDirectory()", NSHomeDirectory())
+        print("userHomeDirectory", userHomeDirectory)
 //        AppDelegate.redirectStdoutToFile()
         // 加载
 //        appState.viewModel.getList()
@@ -34,6 +34,30 @@ struct V2rayUApp: App {
         .menuBarExtraStyle(.window) // 重点,按窗口显示
         .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
     }
+
+    func MenuBarIcon() -> some View {
+        HStack(spacing: 8) {
+            Image(appState.icon)
+                .resizable()
+                .frame(width: 18, height: 18)
+            if AppSettings.shared.showSpeedOnTray {
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(String(format: "↑%.0fKB/s", AppState.shared.proxyUpSpeed))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color(red: 1, green: 0.2, blue: 0.2))
+                    Text(String(format: "↓%.0fKB/s", AppState.shared.proxyDownSpeed))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color(red: 0.2, green: 0.7, blue: 0.2))
+                }
+                .frame(height: 18)
+                .fixedSize()
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+        .frame(height: 32)
+        .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
+      }
 
     func openContentViewWindow() {
         if windowController == nil {
@@ -103,36 +127,6 @@ struct V2rayUApp: App {
     }
 }
 
-struct VisualEffectBackground: View {
-    @Environment(\.colorScheme) var colorScheme // 获取当前系统的颜色模式
-    
-    var body: some View {
-        VisualEffectView(effect: colorScheme == .dark ? .dark : .light)
-            .edgesIgnoringSafeArea(.all)
-    }
-}
-
-struct VisualEffectView: NSViewRepresentable {
-    var effect: NSVisualEffectView.Material
-    
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let visualEffectView = NSVisualEffectView()
-        visualEffectView.blendingMode = .withinWindow
-        visualEffectView.material = effect
-        visualEffectView.state = .active
-        return visualEffectView
-    }
-    
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
-        nsView.material = effect
-    }
-}
-
-struct CustomMenuItemView: View {
-    var body: some View {
-        Text("Hello world")
-    }
-}
 
 // 实现 NSWindowDelegate 来监听窗口关闭事件,所有窗口关闭时,隐藏 dock 图标
 class WindowDelegate: NSObject, NSWindowDelegate {

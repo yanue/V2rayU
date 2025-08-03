@@ -26,6 +26,8 @@ struct GeneralView: View {
                     Toggle("Check for updates automatically", isOn: $settings.checkForUpdates)
                     Toggle("Automatically update servers from subscriptions", isOn: $settings.autoUpdateServers)
                     Toggle("Automatically select fastest server", isOn: $settings.selectFastestServer)
+                    Toggle("Show Proxy Speed on Tray Icon", isOn: $settings.showSpeedOnTray)
+                    Toggle("Enable Proxy Statistics", isOn: $settings.enableStat)
                 }
                 Spacer()
 

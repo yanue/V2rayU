@@ -30,7 +30,8 @@ extension UserDefaults {
         case runMode
         // enable Traffic Statistics
         case enableStat
-
+        // show speed in menu bar
+        case showSpeedOnTray
         // base settings
         // allowLAN
         case allowLAN
