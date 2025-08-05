@@ -100,19 +100,14 @@ class VlessUri: BaseShareUri {
         // vless://YXV0bzpwYXNzd29yZEB2bGVzcy5ob3N0OjQ0Mw==?remarks=vless_vision_reality&tls=1&peer=sni.vless.host&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
         // vless://password@address:port?query#remark
         guard var address = url.host else {
-            self.error = "error:missing host"
-            return
+            return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey:  "error:missing host"])
         }
-        var password = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
+        var host = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
         var port = url.port ?? 0 // 可能没有 port
-        if password.count == 0 || port == 0 {
+        var password = url.password ?? "" // 可能没有 password
+        if host.count == 0 || port == 0 {
             // 可能是 shadowrocket 的链接: vless://base64encode?query#remark
             // base64encode 是 auto:password@address:port 的 base64 编码
-            //
-            let base64Str = components?.path.dropFirst() ?? ""
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-
-            let base64Str = url.password
             guard let base64Str = url.absoluteString.components(separatedBy: "://").last?.components(separatedBy: "?").first else {
                 return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error:missing port or id"])
             }
@@ -127,7 +122,7 @@ class VlessUri: BaseShareUri {
             // password:encryption
             let idAndEncypt = parts[0].split(separator: ":")
             if idAndEncypt.count > 1 {
-                self.encryption = String(idAndEncypt[0])
+                self.profile.encryption = String(idAndEncypt[0])
                 password = String(idAndEncypt[1])
             } else {
                 password = String(idAndEncypt[0])
@@ -141,7 +136,7 @@ class VlessUri: BaseShareUri {
             address = String(addressAndPort[0])
             port = Int(addressAndPort[1]) ?? 0
         }
-        self.profile.address = host
+        self.profile.address = address
         self.profile.port = Int(port)
         self.profile.password = password
         let query = url.queryParams()
@@ -178,8 +173,6 @@ class VlessUri: BaseShareUri {
             break
         case .quic:
             self.profile.path = query.getString(forKey: "path", defaultValue: "/")
-            break
-        default:
             break
         }
 

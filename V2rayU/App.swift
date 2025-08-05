@@ -3,16 +3,13 @@ import SwiftUI
 
 @main
 struct V2rayUApp: App {
-    @State var windowController: NSWindowController?
-    @State var aboutWindowController: NSWindowController?
+    @State  var windowController: NSWindowController?
+    @State  var aboutWindowController: NSWindowController?
     @StateObject var languageManager = LanguageManager()
     @StateObject var themeManager = ThemeManager()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var appState = AppState.shared
-    @Environment(\.colorScheme) var colorScheme
-
-    // 新增：状态栏菜单项
-    var statusItem: NSStatusItem?
+    @Environment(\.colorScheme) var colorScheme // 获取当前系统主题模式
 
     init() {
         // 初始化
@@ -20,92 +17,23 @@ struct V2rayUApp: App {
         if fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first != nil {
 //            print("Application Support Directory: \(appSupportURL)")
         }
-        print("NSHomeDirectory()", NSHomeDirectory())
-        print("userHomeDirectory", userHomeDirectory)
+        print("NSHomeDirectory()",NSHomeDirectory())
+        print("userHomeDirectory",userHomeDirectory)
 //        AppDelegate.redirectStdoutToFile()
         // 加载
 //        appState.viewModel.getList()
 //        V2rayLaunch.runTun2Socks()
-        // 初始化状态栏菜单
-        setupStatusItem()
     }
+
 
     var body: some Scene {
-        // 移除 MenuBarExtra，保留空 WindowGroup 以兼容 SwiftUI 生命周期
-        WindowGroup {
-            EmptyView()
+        // 显示 MenuBar
+        MenuBarExtra("V2rayU", image: appState.icon) {
+            AppMenuView(openContentViewWindow: openContentViewWindow)
         }
-        .environment(\.locale, languageManager.currentLocale)
+        .menuBarExtraStyle(.window) // 重点,按窗口显示
+        .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
     }
-
-    // 新增：状态栏菜单初始化
-    func setupStatusItem() {
-        // 只初始化一次
-        if statusItem != nil { return }
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = NSImage(named: appState.icon)
-        item.button?.action = #selector(statusBarButtonClicked)
-        item.button?.target = self
-        item.menu = buildStatusMenu()
-        statusItem = item
-    }
-
-    // 新增：构建菜单
-    func buildStatusMenu() -> NSMenu {
-        let menu = NSMenu()
-        // 参考 MainMenu.xib 和 MenuController，添加主要菜单项
-        menu.addItem(withTitle: "V2ray-Core: On", action: nil, keyEquivalent: "")
-        menu.items.last?.isEnabled = false
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: "打开主界面", action: #selector(openMainWindow), keyEquivalent: "o")
-        menu.addItem(withTitle: "关于", action: #selector(openAbout), keyEquivalent: "")
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: "退出", action: #selector(quitApp), keyEquivalent: "q")
-        return menu
-    }
-
-    // 新增：状态栏按钮点击事件（可选，弹出 SwiftUI 菜单/窗口）
-    @objc func statusBarButtonClicked() {
-        // 可选：弹出 SwiftUI 菜单窗口
-        openContentViewWindow()
-    }
-
-    // 新增：菜单事件
-    @objc func openMainWindow() {
-        openContentViewWindow()
-    }
-
-    @objc func openAbout() {
-        openAboutWindow()
-    }
-
-    @objc func quitApp() {
-        NSApplication.shared.terminate(nil)
-    }
-
-    func MenuBarIcon() -> some View {
-        HStack(spacing: 8) {
-            Image(appState.icon)
-                .resizable()
-                .frame(width: 18, height: 18)
-            if AppSettings.shared.showSpeedOnTray {
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(String(format: "↑%.0fKB/s", AppState.shared.proxyUpSpeed))
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color(red: 1, green: 0.2, blue: 0.2))
-                    Text(String(format: "↓%.0fKB/s", AppState.shared.proxyDownSpeed))
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color(red: 0.2, green: 0.7, blue: 0.2))
-                }
-                .frame(height: 18)
-                .fixedSize()
-            }
-            Spacer()
-        }
-        .padding(.horizontal, 4)
-        .frame(height: 32)
-        .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
-      }
 
     func openContentViewWindow() {
         if windowController == nil {
@@ -175,6 +103,36 @@ struct V2rayUApp: App {
     }
 }
 
+struct VisualEffectBackground: View {
+    @Environment(\.colorScheme) var colorScheme // 获取当前系统的颜色模式
+
+    var body: some View {
+        VisualEffectView(effect: colorScheme == .dark ? .dark : .light)
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+
+struct VisualEffectView: NSViewRepresentable {
+    var effect: NSVisualEffectView.Material
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let visualEffectView = NSVisualEffectView()
+        visualEffectView.blendingMode = .withinWindow
+        visualEffectView.material = effect
+        visualEffectView.state = .active
+        return visualEffectView
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = effect
+    }
+}
+
+struct CustomMenuItemView: View {
+    var body: some View {
+        Text("Hello world")
+    }
+}
 
 // 实现 NSWindowDelegate 来监听窗口关闭事件,所有窗口关闭时,隐藏 dock 图标
 class WindowDelegate: NSObject, NSWindowDelegate {
