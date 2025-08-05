@@ -24,7 +24,7 @@ class TrojanUri: BaseShareUri {
     func encode() -> String {
         var uri = URLComponents()
         uri.scheme = "trojan"
-        uri.password = profile.password
+        uri.user = self.password // 因没有 user，所以这里用 password, 不然会多一个 :
         uri.host = profile.address
         uri.port = profile.port
         var queryItems = [
@@ -100,7 +100,78 @@ class TrojanUri: BaseShareUri {
         default:
             break
         }
-        profile.remark = (url.fragment ?? "trojan").urlDecoded()
+        if self.remark.isEmpty {
+            self.remark = (url.fragment ?? "trojan").urlDecoded()
+        }
+        // shadowrocket trojan url: trojan://%3Apassword@host:port?query#remark
+        if url.absoluteString.contains("trojan://%3A") {
+            // 去掉前面的 %3A,即:
+            profile.password = password.replacingOccurrences(of: "%3A", with: "").replacingOccurrences(of: ":", with: "")
+             // 以下是 shadowrocket 的分享参数:
+            // 方式1: peer=sni.xx.xx&obfs=grpc&obfsParam=hjfjkdkdi&path=tekdjjd#yanue-trojan1
+            // 方式2: ?peer=sni.xx.xx&plugin=obfs-local;obfs=websocket;obfs-host=%7B%22Host%22:%22hjfjkdkdi%22%7D;obfs-uri=tekdjjd#trojan3
+            if let peer = query.getString(forKey: "peer", defaultValue: "") {
+                profile.sni = peer
+            }
+            // 方式1: 以obfs方式
+            if let obfs = query.getString(forKey: "obfs", defaultValue: "") {
+                // 这里是 obfs 的参数
+                if obfs == "grpc" {
+                    profile.network = .grpc
+                } else if obfs == "websocket" || obfs == "ws" {
+                    profile.network = .ws
+                } else if obfs == "h2" {
+                    profile.network = .h2
+                } else {
+                    profile.network = .tcp
+                }
+            }
+            if let obfsParam = query.getString(forKey: "obfs-uri", defaultValue: "") {
+                // 这里是 obfsParam 的参数,即 host
+                profile.host = obfsParam
+            }
+            if let path = query.getString(forKey: "path", defaultValue: "") {
+                // 这里是 obfsParam 的参数,即 path
+                profile.path = path
+            }
+            // 方式2: 以 plugin 方式
+            if let plugin = query.getString(forKey: "plugin", defaultValue: "") {
+                // 这里是 plugin 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
+                // 按 ; 分割
+                let plugins = plugin.components(separatedBy: ";")
+                for plugin in plugins {
+                    let pluginParts = plugin.components(separatedBy: "=")
+                    if pluginParts.count < 2 {
+                        continue
+                    }
+                    switch pluginParts[0] {
+                    case "obfs":
+                        // 这里是 ws 的
+                        if pluginParts[1] == "websocket" || pluginParts[1] == "ws" {
+                            profile.network = "ws"
+                        } else if pluginParts[1] == "h2" {
+                            profile.network = "h2"
+                        } else if pluginParts[1] == "grpc" {
+                            profile.network = "grpc"
+                        } else {
+                            profile.network = "tcp"
+                        }
+                    case "obfs-host":
+                        // 这里是 ws,h2 的 host: {"Host":"hjfjkdkdi"}
+                        if let hostValue = pluginParts[1].removingPercentEncoding,let data = hostValue.data(using: .utf8) {
+                            if let json = try? JSON(data: data) {
+                                profile.host = json["Host"].stringValue
+                            }
+                        }
+                    case "obfs-uri":
+                        // 这里是 ws,h2 的 path
+                        profile.path = pluginParts[1]
+                    default:
+                        break
+                    }
+                }
+            }
+        }
         return nil
     }
 }

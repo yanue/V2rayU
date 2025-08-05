@@ -228,6 +228,59 @@ class VmessUri: BaseShareUri {
         default:
             break
         }
+
+        // 以下是 shadowrocket 的分享参数:
+        // remarks=vmess_ws&obfsParam=ws.host.domain&path=/vmwss&obfs=websocket&tls=1&peer=ws.sni.domain&alterId=64
+        let obfs = query.getString(forKey: "obfs")
+        if !obfs.isEmpty {
+            let v = obfs.lowercased()
+            if v == "websocket" || v == "ws" {
+                self.profile.network = .ws
+            } else if v == "h2" {
+                self.profile.network = .h2
+            } else if v == "http" {
+                self.profile.network = .tcp
+                self.profile.headerType = .http
+            } else if v == "grpc" {
+                self.profile.network = .grpc
+            } else if v == "domainsocket" {
+                self.profile.network = .domainsocket
+            } else if v == "quic" {
+                self.profile.network = .quic
+            } else if v == "kcp" || v == "mkcp" {
+                self.profile.network = .kcp
+            } else {
+                self.profile.network = .tcp
+                self.profile.headerType = V2rayHeaderType(rawValue: obfs) ?? .none
+            }
+            let remarks = query.getString(forKey: "remarks")
+            if !remarks.isEmpty {
+                self.profile.remark = remarks.urlDecoded()
+            }
+
+            // 解析 shadowrocket 的 obfsParam 参数: ws/h2 host
+            let obfsParam = query.getString(forKey: "obfsParam")
+            if !obfsParam.isEmpty {
+                // 这里是 ws,h2 的 host
+                if self.profile.network == .ws || self.profile.network == .h2 {
+                    self.profile.host = obfsParam
+                }
+                // kcp seed 兼容
+                let paramsStr = url.query ?? ""
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    if let decodedParam = obfsParam.removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                            if let seed = json["seed"] as? String {
+                                self.profile.path = seed
+                            }
+                            if let host = json["Host"] as? String {
+                                self.profile.host = host
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

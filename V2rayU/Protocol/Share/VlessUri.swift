@@ -97,14 +97,49 @@ class VlessUri: BaseShareUri {
     }
 
     func parse(url: URL) -> Error? {
-        guard let host = url.host else {
-            return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Missing host"])
+        // vless://YXV0bzpwYXNzd29yZEB2bGVzcy5ob3N0OjQ0Mw==?remarks=vless_vision_reality&tls=1&peer=sni.vless.host&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+        // vless://password@address:port?query#remark
+        guard var address = url.host else {
+            self.error = "error:missing host"
+            return
         }
-        guard let port = url.port else {
-            return NSError(domain: "VlessUriError", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Missing port"])
-        }
-        guard let password = url.user else {
-            return NSError(domain: "VlessUriError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Missing id"])
+        var password = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
+        var port = url.port ?? 0 // 可能没有 port
+        if password.count == 0 || port == 0 {
+            // 可能是 shadowrocket 的链接: vless://base64encode?query#remark
+            // base64encode 是 auto:password@address:port 的 base64 编码
+            //
+            let base64Str = components?.path.dropFirst() ?? ""
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+
+            let base64Str = url.password
+            guard let base64Str = url.absoluteString.components(separatedBy: "://").last?.components(separatedBy: "?").first else {
+                return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error:missing port or id"])
+            }
+            guard let decodedStr = base64Str.base64Decoded() else {
+                return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error: decode base64"])
+            }
+            print("VlessUri decode base64:", decodedStr)
+            let parts = decodedStr.split(separator: "@")
+            if parts.count != 2 {
+                return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error: decode base64 parts"])
+            }
+            // password:encryption
+            let idAndEncypt = parts[0].split(separator: ":")
+            if idAndEncypt.count > 1 {
+                self.encryption = String(idAndEncypt[0])
+                password = String(idAndEncypt[1])
+            } else {
+                password = String(idAndEncypt[0])
+            }
+            // address:port
+            let addressAndPort = parts[1].split(separator: ":")
+            if addressAndPort.count != 2 {
+                return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error: decode base64 address and port"])
+            }
+            // 替换原始的 password 和 address, port
+            address = String(addressAndPort[0])
+            port = Int(addressAndPort[1]) ?? 0
         }
         self.profile.address = host
         self.profile.port = Int(port)
@@ -165,6 +200,59 @@ class VlessUri: BaseShareUri {
         }
 
         self.profile.remark = (url.fragment ?? "vless").urlDecoded()
+
+        // 以下是 shadowrocket 的分享参数:
+        // remarks=yanue-test11&tls=1&peer=sni.domain&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+        let obfs = query.getString(forKey: "obfs")
+        if !obfs.isEmpty {
+            let v = obfs.lowercased()
+            if v == "websocket" || v == "ws" {
+                self.profile.network = .ws
+            } else if v == "h2" {
+                self.profile.network = .h2
+            } else if v == "http" {
+                self.profile.network = .tcp
+                self.profile.headerType = .http
+            } else if v == "grpc" {
+                self.profile.network = .grpc
+            } else if v == "domainsocket" {
+                self.profile.network = .domainsocket
+            } else if v == "quic" {
+                self.profile.network = .quic
+            } else if v == "kcp" || v == "mkcp" {
+                self.profile.network = .kcp
+            } else {
+                self.profile.network = .tcp
+                self.profile.headerType = V2rayHeaderType(rawValue: obfs) ?? .none
+            }
+            let remarks = query.getString(forKey: "remarks")
+            if !remarks.isEmpty {
+                self.profile.remark = remarks.urlDecoded()
+            }
+
+            // 解析 shadowrocket 的 obfsParam 参数: ws/h2 host
+            let obfsParam = query.getString(forKey: "obfsParam")
+            if !obfsParam.isEmpty {
+                // 这里是 ws,h2 的 host
+                if self.profile.network == .ws || self.profile.network == .h2 {
+                    self.profile.host = obfsParam
+                }
+                // kcp seed 兼容
+                let paramsStr = url.query ?? ""
+                if paramsStr.contains("obfs=mkcp") || paramsStr.contains("obfs=kcp") || paramsStr.contains("obfs=grpc") {
+                    if let decodedParam = obfsParam.removingPercentEncoding, let data = decodedParam.data(using: .utf8) {
+                        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                            if let seed = json["seed"] as? String {
+                                self.profile.path = seed
+                            }
+                            if let host = json["Host"] as? String {
+                                self.profile.host = host
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return nil
     }
 }
