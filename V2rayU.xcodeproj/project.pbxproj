@@ -71,6 +71,7 @@
 		663814B32E02E0FD00F5FCF3 /* RoutingForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B22E02E0F600F5FCF3 /* RoutingForm.swift */; };
 		663814B52E0448DB00F5FCF3 /* ProfilePing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B42E0448DB00F5FCF3 /* ProfilePing.swift */; };
 		66389D092E425ACC0050CB27 /* AppMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66389D082E425AC80050CB27 /* AppMenu.swift */; };
+		66389D0B2E4342D70050CB27 /* HotKeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66389D0A2E4342CF0050CB27 /* HotKeyWindow.swift */; };
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
 		6680D10B2E26802D0013095C /* LogPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D10A2E2680250013095C /* LogPageView.swift */; };
@@ -217,6 +218,7 @@
 		663814B22E02E0F600F5FCF3 /* RoutingForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingForm.swift; sourceTree = "<group>"; };
 		663814B42E0448DB00F5FCF3 /* ProfilePing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePing.swift; sourceTree = "<group>"; };
 		66389D082E425AC80050CB27 /* AppMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenu.swift; sourceTree = "<group>"; };
+		66389D0A2E4342CF0050CB27 /* HotKeyWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyWindow.swift; sourceTree = "<group>"; };
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
 		6680D10A2E2680250013095C /* LogPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPageView.swift; sourceTree = "<group>"; };
@@ -306,6 +308,7 @@
 		662CC3C92D1BED9B006E8450 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				66389D0A2E4342CF0050CB27 /* HotKeyWindow.swift */,
 				669DCEA12E3D90760085278B /* Github.swift */,
 				669DCEA22E3D90760085278B /* ToastWindow.swift */,
 				66EB76AF2E31135200E72DE2 /* Download.swift */,
@@ -589,10 +592,10 @@
 				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
 				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
+				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
 				66389D082E425AC80050CB27 /* AppMenu.swift */,
 				669DCEA52E3D908C0085278B /* AppSettings.swift */,
 				66F66F822D1E450000E77C64 /* AppState.swift */,
-				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
 				662CC3C12D1BED9B006E8450 /* AppVersion.swift */,
 				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
 				66B1B5582D297AE60032DD09 /* Scpipts */,
@@ -804,6 +807,7 @@
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
 				663745372D2EC8840093A101 /* MenuSpeed.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* ServerView.swift in Sources */,
+				66389D0B2E4342D70050CB27 /* HotKeyWindow.swift in Sources */,
 				663814B52E0448DB00F5FCF3 /* ProfilePing.swift in Sources */,
 				662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */,
 				662CC40A2D1BED9B006E8450 /* V2rayLaunch.swift in Sources */,

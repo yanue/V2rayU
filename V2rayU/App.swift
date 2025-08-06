@@ -29,31 +29,4 @@ struct V2rayUApp: App {
     var body: some Scene {
         // 留空
     }
-    
-}
-
-// 实现 NSWindowDelegate 来监听窗口关闭事件,所有窗口关闭时,隐藏 dock 图标
-class WindowDelegate: NSObject, NSWindowDelegate {
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        // 允许窗口关闭
-        return true
-    }
-    
-    // 监听窗口关闭事件
-    func windowWillClose(_ notification: Notification) {
-        // 延迟检查剩余的窗口
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            // 当前已打开的窗口
-            let windows = NSApplication.shared.windows
-            // 过滤出用户可见的普通窗口
-            let visibleMainWindows = windows.filter { window in
-                window.isVisible && window.isKeyWindow && window.level == .normal
-            }
-            // 如果没有可见的主窗口
-            if visibleMainWindows.isEmpty {
-                // 隐藏 Dock 图标
-                NSApp.setActivationPolicy(.accessory)
-            }
-        }
-    }
 }

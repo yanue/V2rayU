@@ -17,8 +17,6 @@ let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 
-@MainActor let windowDelegate = WindowDelegate()
-
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -107,7 +105,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("applicationShouldTerminate end")
         return .terminateNow
     }
-
+    
     func applicationWillTerminate(_ aNotification: Notification) {
         print("Application will terminate.")
         AppLogStream.stopLogging()
