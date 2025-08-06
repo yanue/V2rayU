@@ -27,115 +27,18 @@ struct V2rayUApp: App {
 
 
     var body: some Scene {
-        // 显示 MenuBar
-        MenuBarExtra("V2rayU", image: appState.icon) {
-            AppMenuView(openContentViewWindow: openContentViewWindow)
-        }
-        .menuBarExtraStyle(.window) // 重点,按窗口显示
-        .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
+        // 留空
     }
-
-    func openContentViewWindow() {
-        if windowController == nil {
-//            let contentView = ContentView().modelContainer(sharedModelContainer)
-//            let item = ProfileModel(protocol: .trojan,  address: "aaa", port: 443, id: "xxxx-bbb-ccccc", security: "none", remark: "test02")
-//            let contentView = ConfigView(item: item)
-            let contentView = ContentView()
-                .environment(\.locale, languageManager.currentLocale) // 设置 Environment 的 locale
-                .environmentObject(AppState.shared)
-            let hostingController = NSHostingController(rootView: contentView)
-
-            let window = NSWindow(contentViewController: hostingController)
-            window.setContentSize(NSSize(width: 760, height: 600))
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-            window.isReleasedWhenClosed = false
-            window.delegate = windowDelegate
-
-            windowController = NSWindowController(window: window)
-        }
-
-        windowController?.showWindow(nil)
-
-        // 确保窗口在最前面
-        windowController?.window?.makeKeyAndOrderFront(nil)
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-
-        // 确保窗口始终在最前面
-        DispatchQueue.main.async {
-            self.windowController?.window?.orderFrontRegardless()
-        }
-    }
-
-    func openAboutWindow() {
-        if aboutWindowController == nil {
-            // 创建自定义 About 窗口
-            let aboutView = VStack {
-                Text("V2rayU")
-                    .font(.largeTitle)
-                Text("版本 1.0.0")
-                Text("版权所有 © 2024")
-                    .padding()
-            }.frame(width: 400, height: 200)
-                .padding()
-            let hostingController = NSHostingController(rootView: aboutView)
-            let window = NSWindow(contentViewController: hostingController)
-            window.title = "About V2rayU"
-            window.styleMask = [.titled, .closable]
-            window.setContentSize(NSSize(width: 600, height: 400))
-            window.isReleasedWhenClosed = false
-            window.delegate = windowDelegate
-
-            aboutWindowController = NSWindowController(window: window)
-        }
-        // 确保窗口在最前面
-        aboutWindowController?.window?.makeKeyAndOrderFront(nil)
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-
-        // 确保窗口始终在最前面
-        DispatchQueue.main.async {
-            self.aboutWindowController?.window?.orderFrontRegardless()
-        }
-    }
-
-    func showWindow() {
-    }
-}
-
-struct VisualEffectBackground: View {
-    @Environment(\.colorScheme) var colorScheme // 获取当前系统的颜色模式
-
-    var body: some View {
-        VisualEffectView(effect: colorScheme == .dark ? .dark : .light)
-            .edgesIgnoringSafeArea(.all)
-    }
-}
-
-struct VisualEffectView: NSViewRepresentable {
-    var effect: NSVisualEffectView.Material
-
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let visualEffectView = NSVisualEffectView()
-        visualEffectView.blendingMode = .withinWindow
-        visualEffectView.material = effect
-        visualEffectView.state = .active
-        return visualEffectView
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
-        nsView.material = effect
-    }
-}
-
-struct CustomMenuItemView: View {
-    var body: some View {
-        Text("Hello world")
-    }
+    
 }
 
 // 实现 NSWindowDelegate 来监听窗口关闭事件,所有窗口关闭时,隐藏 dock 图标
 class WindowDelegate: NSObject, NSWindowDelegate {
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        // 允许窗口关闭
+        return true
+    }
+    
     // 监听窗口关闭事件
     func windowWillClose(_ notification: Notification) {
         // 延迟检查剩余的窗口

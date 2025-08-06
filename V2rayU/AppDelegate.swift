@@ -23,7 +23,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
-        
+        // 初始化状态栏项目
+        StatusItemManager.shared.setupStatusItem()
         truncateLogFile(v2rayLogFilePath)
         truncateLogFile(appLogFilePath)
         

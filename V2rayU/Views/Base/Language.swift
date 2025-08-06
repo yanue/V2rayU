@@ -37,6 +37,7 @@ enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
 
 @MainActor
 class LanguageManager: ObservableObject {
+    static public let shared = LanguageManager()
     @Published var selectedLanguage: Language {
         didSet {
             UserDefaults.standard.set([selectedLanguage.localeIdentifier], forKey: "AppleLanguages")

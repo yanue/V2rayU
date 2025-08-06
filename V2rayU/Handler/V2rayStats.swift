@@ -52,7 +52,7 @@ actor V2rayTraffics {
             // 更新到 UI
             await AppState.shared.setSpeed(latency: latency, directUpSpeed: directUpSpeed, directDownSpeed: directDownSpeed, proxyUpSpeed: proxyUpSpeed, proxyDownSpeed: proxyDownSpeed)
             let uuid = await AppState.shared.runningProfile
-            // print("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
+             print("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
             // 更新到数据库
             try ProfileStatModel.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
         }
