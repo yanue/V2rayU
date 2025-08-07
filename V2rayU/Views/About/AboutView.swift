@@ -100,7 +100,6 @@ struct AboutView: View {
                         .font(.caption)
                     Spacer()
                 }
-                Spacer()
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(fileLocations, id: \ .self) { path in
                         Button(action: { openInFinder(path: path) }) {
@@ -128,7 +127,6 @@ struct AboutView: View {
                         .font(.caption)
                     Spacer()
                 }
-                Spacer()
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(openSources, id: \ .self) { url in
                         Button(action: { openLink(url: url) }) {

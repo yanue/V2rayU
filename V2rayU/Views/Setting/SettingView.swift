@@ -16,7 +16,7 @@ extension KeyboardShortcuts.Name {
 }
 
 struct SettingView: View {
-    @State private var selectedTab: SettingTab = .general
+    @ObservedObject var appState = AppState.shared // 引用单例
 
     // Enum for Tabs
     enum SettingTab {
@@ -47,7 +47,7 @@ struct SettingView: View {
             }
 
             // Segmented Picker (Tabs)
-            Picker("", selection: $selectedTab) {
+            Picker("", selection: $appState.settingTab) {
                 Text("General").tag(SettingTab.general)
                 Text("Advance").tag(SettingTab.advance)
                 Text("DNS").tag(SettingTab.dns)
@@ -60,7 +60,7 @@ struct SettingView: View {
             // Content based on Selected Tab
             HStack{
                 VStack {
-                    switch selectedTab {
+                    switch appState.settingTab {
                     case .general:
                         GeneralView()
                     case .advance:
@@ -74,6 +74,7 @@ struct SettingView: View {
                     }
                 }
             }
+            Spacer()
         }
         .padding(8)
     }

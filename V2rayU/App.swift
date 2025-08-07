@@ -28,5 +28,7 @@ struct V2rayUApp: App {
 
     var body: some Scene {
         // 留空
+        MenuBarExtra("V2rayU", systemImage: "v2ray") {
+        }
     }
 }

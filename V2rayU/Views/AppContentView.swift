@@ -6,12 +6,11 @@
 //
 import SwiftUI
 struct ContentView: View {
-    @State private var selectedTab: Tab = .activity // 当前选中的按钮
     @ObservedObject var appState = AppState.shared // 引用单例
     @State private var version = getAppVersion() // 控制设置页面的显示
 
     // 定义 Tab 枚举
-    enum Tab: String {
+    enum Tab: String, CaseIterable {
         case activity
         case log
         case server
@@ -36,13 +35,13 @@ struct ContentView: View {
                 }
                 .padding(.vertical,20)
 
-                SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters", selectedTab: $selectedTab)
-                SidebarButton(tab: .log, title: "Logs", icon: "document", selectedTab: $selectedTab)
-                SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled", selectedTab: $selectedTab)
-                SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot", selectedTab: $selectedTab)
-                SidebarButton(tab: .routing, title: "Routings", icon: "bonjour", selectedTab: $selectedTab)
-                SidebarButton(tab: .setting, title: "Settings", icon: "gear", selectedTab: $selectedTab)
-                SidebarButton(tab: .about, title: "About", icon: "info.circle", selectedTab: $selectedTab)
+                SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters")
+                SidebarButton(tab: .log, title: "Logs", icon: "document")
+                SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled")
+                SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot")
+                SidebarButton(tab: .routing, title: "Routings", icon: "bonjour")
+                SidebarButton(tab: .setting, title: "Settings", icon: "gear")
+                SidebarButton(tab: .about, title: "About", icon: "info.circle")
                 Spacer()
             }
             .frame(width: 160)
@@ -51,7 +50,7 @@ struct ContentView: View {
 
             // 右侧内容区，根据选中状态切换
             VStack {
-                switch selectedTab {
+                switch appState.mainTab {
                 case .activity:
                     ActivityView()
                 case .log:
@@ -82,10 +81,10 @@ struct ContentView: View {
         }
     }
   
-    func SidebarButton(tab: Tab, title: String, icon: String, selectedTab: Binding<Tab>) -> some View {
-        let isSelected = selectedTab.wrappedValue == tab
+    func SidebarButton(tab: Tab, title: String, icon: String) -> some View {
+        let isSelected = appState.mainTab == tab
         return Button(action: {
-            selectedTab.wrappedValue = tab
+            appState.mainTab = tab
         }) {
             HStack(spacing: 10) { // Adjust spacing between icon and text
                 Image(systemName: icon)

@@ -31,6 +31,9 @@ enum RunMode: String, CaseIterable {
 @MainActor
 final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
+    
+    @Published var mainTab: ContentView.Tab = .activity
+    @Published var settingTab: SettingView.SettingTab = .general
 
     // 其它非设置相关属性
     @Published var icon: String = "IconOff"
@@ -71,7 +74,7 @@ final class AppState: ObservableObject {
             }
             .store(in: &cancellables)
     }
-
+    
     func setRunMode(mode: RunMode) {
         NSLog("setRunMode: \(mode)")
         runMode = mode
