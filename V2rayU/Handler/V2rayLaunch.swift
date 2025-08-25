@@ -224,12 +224,10 @@ class V2rayLaunch: NSObject {
                 runMode = .global
             }
             setSystemProxy(mode: runMode)
-            Task {
-                await AppState.shared.setRunning(uuid: v2ray.uuid)
-            }
+
             // ping current
             Task {
-//                try await PingRunning.shared.startPing()
+              await AppState.shared.setRunning(uuid: v2ray.uuid)
             }
         }
     }

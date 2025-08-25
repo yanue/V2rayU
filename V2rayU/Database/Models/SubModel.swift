@@ -9,7 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import GRDB
 
-class SubModel: ObservableObject, Identifiable, Codable {
+class SubModel: ObservableObject, Identifiable, Codable, Hashable {
     var index: Int = 0
     @Published var uuid: String
     @Published var remark: String
@@ -25,6 +25,15 @@ class SubModel: ObservableObject, Identifiable, Codable {
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
         case uuid, remark, url, enable, sort, updateInterval, updateTime
+    }
+    
+    // 如果要作为字典的 key，需要实现 Hashable
+    static func == (lhs: SubModel, rhs: SubModel) -> Bool {
+        lhs.id == rhs.id
+    }
+   
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
     // 提供默认值的初始化器

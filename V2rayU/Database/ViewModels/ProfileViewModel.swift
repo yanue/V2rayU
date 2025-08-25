@@ -64,7 +64,42 @@ class ProfileViewModel: ObservableObject {
             return []
         }
     }
-
+    
+    static func getGroupedProfiles() -> [String: [ProfileModel]] {
+        let profiles = ProfileViewModel.all()
+        let groups = SubViewModel.all().reduce(into: [String: SubModel]()) { dict, sub in
+            dict[sub.uuid] = sub
+        }
+        var result: [String: [ProfileModel]] = [:]
+        
+        // 按 subid 分组
+        for profile in profiles {
+            if !profile.subid.isEmpty, groups[profile.subid] != nil {
+                // 有订阅的按订阅ID分组
+                result[groups[profile.subid]?.remark ?? "", default: []].append(profile)
+            } else {
+                // 没有订阅的放在空字符串组
+                result["", default: []].append(profile)
+            }
+        }
+        
+        // 重新排序，让空字符串的组（本地配置）放在最前面
+        let sortedResult = result.sorted { (first, second) -> Bool in
+            if first.key.isEmpty {
+                return true  // 空key放前面
+            } else if second.key.isEmpty {
+                return false
+            } else {
+                // 其他按订阅名称排序
+                let firstName = groups[first.key]?.remark ?? first.key
+                let secondName = groups[second.key]?.remark ?? second.key
+                return firstName < secondName
+            }
+        }
+        
+        return Dictionary(uniqueKeysWithValues: sortedResult)
+    }
+    
     // filter: ["id": 1,"conlmn":"value"]
     static func count(filter: [String: (any DatabaseValueConvertible)?]?) -> Int {
         guard let filter = filter else { return 0 }

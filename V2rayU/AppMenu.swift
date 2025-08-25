@@ -47,6 +47,10 @@ final class StatusItemManager: NSObject {
         }
     }
 
+    func refreshMenuItems() {
+        setupMenu()
+    }
+    
     private func setupMenu() {
         let menu = NSMenu()
 
@@ -64,23 +68,18 @@ final class StatusItemManager: NSObject {
         menu.addItem(NSMenuItem(title: "View v2ray log", action: #selector(openLogs), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         // 模式切换
-        menu.addItem(NSMenuItem(title: "Pac Mode", action: #selector(switchPacMode), keyEquivalent: ""))
-        let globalModeItem = NSMenuItem(title: "Global Mode", action: #selector(switchGlobalMode), keyEquivalent: "")
-        globalModeItem.state = .on // 当前选中模式
-        menu.addItem(globalModeItem)
-        menu.addItem(NSMenuItem(title: "Manual Mode", action: #selector(switchManualMode), keyEquivalent: ""))
-
+        menu.addItem(getRunModeItem(mode: .pac,title: "Pac Mode", keyEquivalent: ""))
+        menu.addItem(getRunModeItem(mode: .global,title: "Global Mode", keyEquivalent: ""))
+        menu.addItem(getRunModeItem(mode: .manual,title: "Manual Mode", keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
-
         // 路由与服务器
-        let routingItem = NSMenuItem(title: "Routing", action: #selector(goRouting), keyEquivalent: "")
+        let routingItem = getRoutingSubMenus()
         menu.addItem(routingItem)
-        menu.addItem(NSMenuItem(title: "Servers", action: #selector(switchServer), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "打开主窗口", action: #selector(openMainWindow), keyEquivalent: ""))
+        let serverItem = getServerSubMenus()
+        menu.addItem(serverItem)
         menu.addItem(NSMenuItem(title: "Subscription...", action: #selector(openPreferenceSubscribe), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Pac...", action: #selector(openPreferencePac), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Ping", action: #selector(pingSpeed), keyEquivalent: ""))
-
         menu.addItem(NSMenuItem.separator())
 
         // 导入与分享
@@ -106,7 +105,159 @@ final class StatusItemManager: NSObject {
 
         statusItem.menu = menu
     }
+    
+    func getRunModeItem(mode: RunMode,title: String, keyEquivalent: String = "") -> NSMenuItem {
+        let menu = NSMenuItem()
+        menu.title = title
+        menu.action = #selector(switchRunMode)
+        menu.representedObject = mode.rawValue  // 可选：存储模式名称
+        menu.isEnabled =  true
+        menu.target = self
+        menu.keyEquivalent = keyEquivalent // todo 快捷键设置
+        menu.state = (mode == AppState.shared.runMode) ? .on : .off
+        return menu
+    }
 
+    func getRoutingSubMenus() -> NSMenuItem {
+        let menu = NSMenuItem()
+        menu.title = "Routing"
+        menu.submenu = NSMenu()
+        
+        let routings = RoutingViewModel.all()
+        let currentRouting = AppState.shared.runningRouting
+        let item = NSMenuItem(title: "Routing Settings ...", action: #selector(openRoutingTab), keyEquivalent: "")
+        item.representedObject = ""  // 可选：存储路由名称
+        item.isEnabled =  true
+        item.target = self
+        menu.submenu?.addItem(item)
+        menu.submenu?.addItem(NSMenuItem.separator())
+
+        NSLog("currentRouting: \(currentRouting)")
+        for routing in routings {
+            NSLog("routing item: \(routing.name) \(currentRouting) \(item.state.rawValue) ")
+            let item = createRoutingMenuItem(routing: routing, current: currentRouting)
+            menu.submenu?.addItem(item)
+        }
+        return menu
+    }
+    
+    private func createRoutingMenuItem(routing: RoutingModel, current: String) -> NSMenuItem {
+        let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
+        item.representedObject = routing  // 可选：存储路由名称
+        item.isEnabled =  true
+        item.target = self
+        item.state = (routing.uuid == current) ? .on : .off
+        return item
+    }
+    
+    func getServerSubMenus() -> NSMenuItem {
+        let menu = NSMenuItem()
+        menu.title = "Servers"
+        menu.submenu = NSMenu()
+        
+        let currentProfile = AppState.shared.runningProfile
+        
+        // 添加服务器设置项
+        let settingsItem = NSMenuItem(title: "Servers Settings ...", action: #selector(openServerTab), keyEquivalent: "")
+        settingsItem.isEnabled = true
+        settingsItem.target = self
+        menu.submenu?.addItem(settingsItem)
+        menu.submenu?.addItem(NSMenuItem.separator())
+        
+        // 按订阅ID分组
+        let groupedServers = ProfileViewModel.getGroupedProfiles()
+        
+        // 决定是否使用分组显示
+        let useGrouping = groupedServers.count >= 2
+        
+        if useGrouping {
+            // 分组显示
+            for (name, profiles) in groupedServers {
+                let groupName = name.isEmpty ? "Default" : name
+                let subMenu = NSMenu()
+                let groupItem = NSMenuItem()
+                groupItem.title = groupName
+                groupItem.submenu = subMenu
+                groupItem.image = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
+                groupItem.toolTip = "\(profiles.count) servers"
+                // todo 优化
+                groupItem.state = profiles.contains { $0.uuid == currentProfile } ? .on : .off
+                for profile in profiles {
+                    let item = createServerMenuItem(profile: profile, current: currentProfile)
+                    subMenu.addItem(item)
+                }
+                menu.submenu?.addItem(groupItem)
+            }
+        } else {
+            // 直接显示所有服务器
+            for (_, profiles) in groupedServers {
+                for profile in profiles {
+                    let item = createServerMenuItem(profile: profile, current: currentProfile)
+                    menu.submenu?.addItem(item)
+                }
+            }
+        }
+        
+        return menu
+    }
+
+    // 辅助方法：创建对齐的服务器菜单项
+    private func createServerMenuItem(profile: ProfileModel, current: String) -> NSMenuItem {
+        let speedText: String
+        let speedColor: NSColor
+        
+        if profile.speed < 0 {
+            speedText = "[\(profile.speed)ms]"
+            speedColor = NSColor.systemGray
+        } else if profile.speed < 100 {
+            speedText = "[\(profile.speed)ms]"
+            speedColor = NSColor.systemGreen
+        } else if profile.speed < 300 {
+            speedText = "[\(profile.speed)ms]"
+            speedColor = NSColor.systemOrange
+        } else {
+            speedText = "[\(profile.speed)ms]"
+            speedColor = NSColor.systemRed
+        }
+        
+        // Ping值放前面
+        let title = "\(speedText) \(profile.remark)"
+        
+        let item = NSMenuItem()
+        item.attributedTitle = createColoredAttributedTitle(
+            title: title,
+            speedRange: NSRange(location: 0, length: speedText.count),
+            speedColor: speedColor
+        )
+        item.action = #selector(switchServer)
+        item.keyEquivalent = ""
+        item.representedObject = profile
+        item.isEnabled = true
+        item.target = self
+        item.state = profile.uuid == current ? .on : .off
+        item.toolTip = "\(profile.address):\(profile.port)"
+        
+        return item
+    }
+
+    private func createColoredAttributedTitle(title: String, speedRange: NSRange, speedColor: NSColor) -> NSAttributedString {
+        let attributedString = NSMutableAttributedString(string: title)
+        
+        // 设置整体字体
+        attributedString.addAttributes([
+            .font: NSFont.menuFont(ofSize: 0),
+            .foregroundColor: NSColor.labelColor
+        ], range: NSRange(location: 0, length: title.count))
+        
+        // 为速度文本设置颜色
+        attributedString.addAttributes([
+            .foregroundColor: speedColor,
+            .font: NSFont.boldSystemFont(ofSize: NSFont.labelFontSize)
+        ], range: speedRange)
+        
+        return attributedString
+    }
+    
     @objc private func openLogs(_ sender: NSMenuItem) {
 //        OpenLogs()
     }
@@ -138,28 +289,31 @@ final class StatusItemManager: NSObject {
         AppState.shared.settingTab = .pac
         openMainWindow()
     }
-
+    
+    @objc private func openRoutingTab(_ sender: NSMenuItem) {
+        AppState.shared.mainTab = .routing
+        openMainWindow()
+    }
+    
+    @objc private func openServerTab(_ sender: NSMenuItem) {
+        AppState.shared.mainTab = .server
+        openMainWindow()
+    }
+    
     @objc private func switchServer(_ sender: NSMenuItem) {
-//        guard let obj = sender.representedObject as? V2rayItem else {
-//            NSLog("switchServer err")
-//            return
-//        }
-//        UserDefaults.set(forKey: .v2rayCurrentServerName, value: obj.name)
-        V2rayLaunch.restartV2ray()
+        guard let uuid = sender.representedObject as? String else {
+            NSLog("switchServer err")
+            return
+        }
+        AppState.shared.runProfile(uuid: uuid)
     }
 
     @objc private func switchRouting(_ sender: NSMenuItem) {
-//        guard let obj = sender.representedObject as? RoutingItem else {
-//            NSLog("switchRouting err")
-//            return
-//        }
-//        UserDefaults.set(forKey: .routingSelectedRule, value: obj.name)
-//        showRouting()
-        V2rayLaunch.restartV2ray()
-    }
-
-    @objc private func openConfig(_ sender: NSMenuItem) {
-//        OpenConfigWindow()
+        guard let uuid = sender.representedObject as? String else {
+            NSLog("switchRouting err")
+            return
+        }
+        AppState.shared.runRouting(uuid: uuid)
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {
@@ -169,23 +323,13 @@ final class StatusItemManager: NSObject {
         NSWorkspace.shared.open(url)
     }
 
-    @objc private func switchManualMode(_ sender: NSMenuItem) {
-        V2rayLaunch.restartV2ray()
-    }
-
-    @objc private func switchPacMode(_ sender: NSMenuItem) {
-        V2rayLaunch.restartV2ray()
-    }
-
-    @objc private func goRouting(_ sender: NSMenuItem) {
-        DispatchQueue.main.async {
-//            showDock(state: true)
+    @objc private func switchRunMode(_ sender: NSMenuItem) {
+        guard let modeRaw = sender.representedObject as? String, let mode = RunMode(rawValue: modeRaw) else {
+            NSLog("switchRunMode err")
+            return
         }
-    }
-
-    @objc private func switchGlobalMode(_ sender: NSMenuItem) {
-        UserDefaults.set(forKey: .runMode, value: RunMode.global.rawValue)
-        V2rayLaunch.restartV2ray()
+        NSLog("switchRunMode: \(mode.rawValue)")
+        AppState.shared.runMode(mode: mode)
     }
 
     @objc private func checkForUpdate(_ sender: NSMenuItem) {

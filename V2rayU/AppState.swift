@@ -4,6 +4,7 @@ import SwiftUI
 enum RunMode: String, CaseIterable {
     case global
     case off
+    case pac
     case manual
     case tunnel
 
@@ -11,6 +12,8 @@ enum RunMode: String, CaseIterable {
         switch self {
         case .global:
             return "IconOn"
+        case .pac:
+            return "IconM"
         case .off:
             return "IconOff"
         case .manual:
@@ -84,21 +87,24 @@ final class AppState: ObservableObject {
     func setRunning(uuid: String) {
         print("setRunning: \(uuid)")
         runningProfile = uuid
-        runMode = .global
-        icon = RunMode.global.icon // 更新图标
         UserDefaults.set(forKey: .runningProfile, value: uuid)
+        StatusItemManager.shared.refreshMenuItems()
     }
-
+    
     func runMode(mode: RunMode) {
+        print("runMode: \(mode)")
         UserDefaults.set(forKey: .runMode, value: mode.rawValue)
         runMode = mode
         V2rayLaunch.startV2rayCore()
+        StatusItemManager.shared.refreshMenuItems()
     }
 
     func runRouting(uuid: String) {
+        print("setRouting: \(uuid)")
         UserDefaults.set(forKey: .runningRouting, value: uuid)
         runningRouting = uuid
         V2rayLaunch.startV2rayCore()
+        StatusItemManager.shared.refreshMenuItems()
     }
 
     func runProfile(uuid: String) {
@@ -106,6 +112,7 @@ final class AppState: ObservableObject {
         runningProfile = uuid
         runningServer = ProfileViewModel.getRunning()
         V2rayLaunch.startV2rayCore()
+        StatusItemManager.shared.refreshMenuItems()
     }
 
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
