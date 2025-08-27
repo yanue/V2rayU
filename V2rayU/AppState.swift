@@ -91,28 +91,24 @@ final class AppState: ObservableObject {
         StatusItemManager.shared.refreshMenuItems()
     }
     
-    func runMode(mode: RunMode) {
-        print("runMode: \(mode)")
-        UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    func setRunMode(mode: RunMode) {
+        NSLog("setRunMode: \(mode)")
         runMode = mode
-        V2rayLaunch.startV2rayCore()
-        StatusItemManager.shared.refreshMenuItems()
+        icon = mode.icon  // 更新图标
+        reloadCore(trigger: "setRunMode(\(mode))")
     }
 
     func runRouting(uuid: String) {
         print("setRouting: \(uuid)")
-        UserDefaults.set(forKey: .runningRouting, value: uuid)
         runningRouting = uuid
-        V2rayLaunch.startV2rayCore()
-        StatusItemManager.shared.refreshMenuItems()
+        reloadCore(trigger: "runRouting(\(uuid))")
     }
 
     func runProfile(uuid: String) {
-        UserDefaults.set(forKey: .runningProfile, value: uuid)
+        print("setProfile: \(uuid)")
         runningProfile = uuid
         runningServer = ProfileViewModel.getRunning()
-        V2rayLaunch.startV2rayCore()
-        StatusItemManager.shared.refreshMenuItems()
+        reloadCore(trigger: "runProfile(\(uuid))")
     }
 
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
@@ -121,5 +117,58 @@ final class AppState: ObservableObject {
         self.directDownSpeed = directDownSpeed
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
+    }
+}
+
+extension AppState {
+    /// 修改了配置后，统一调用该方法来刷新 v2ray-core
+    func reloadCore(trigger: String) {
+        Task {
+            let success = await V2rayLaunch.startV2rayCore()
+            if !success {
+                setRunMode(mode: .off)
+            }
+            NSLog("reloadCore triggered by: \(trigger)")
+            StatusItemManager.shared.refreshMenuItems()
+        }
+    }
+
+    func appDidLaunch() {
+        // 初始化依赖
+        V2rayLaunch.prepareEnvironment()
+
+        // 根据状态判断是否启动
+        if v2rayTurnOn {
+            reloadCore(trigger: "appDidLaunch with v2rayTurnOn")
+        }
+
+        // 自动更新订阅
+        Task {
+            if await AppSettings.shared.autoUpdateServers {
+                await SubscriptionHandler.shared.sync()
+            }
+        }
+    }
+
+    func toggleRunning() {
+        v2rayTurnOn.toggle()
+        if v2rayTurnOn {
+            reloadCore(trigger: "toggleRunning on")
+        } else {
+            V2rayLaunch.stopV2rayCore()
+            setRunMode(mode: .off)
+        }
+    }
+
+    func reloadCore(trigger: String) {
+        Task {
+            let success = await V2rayLaunch.startV2rayCore()
+            if success {
+                NSLog("Core Reloaded by \(trigger)")
+            } else {
+                setRunMode(mode: .off)
+            }
+            StatusItemManager.shared.refreshMenuItems()
+        }
     }
 }

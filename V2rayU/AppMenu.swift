@@ -257,7 +257,15 @@ final class StatusItemManager: NSObject {
         
         return attributedString
     }
-    
+
+    func openPreferenceAdvanceTab(_ sender: NSMenuItem) {
+        DispatchQueue.main.async {
+            AppState.shared.mainTab = .setting
+            AppState.shared.settingTab = .general
+            openMainWindow()
+        }
+    }
+
     @objc private func openLogs(_ sender: NSMenuItem) {
 //        OpenLogs()
     }
@@ -299,7 +307,7 @@ final class StatusItemManager: NSObject {
         AppState.shared.mainTab = .server
         openMainWindow()
     }
-    
+
     @objc private func switchServer(_ sender: NSMenuItem) {
         guard let uuid = sender.representedObject as? String else {
             NSLog("switchServer err")

@@ -5,7 +5,6 @@ import Foundation
 //import AppCenterAnalytics
 //import AppCenterCrashes
 
-let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
@@ -18,7 +17,6 @@ let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         print("Application did finish launching.")
         // 初始化状态栏项目
@@ -26,7 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         truncateLogFile(v2rayLogFilePath)
         truncateLogFile(appLogFilePath)
         
-        V2rayLaunch.checkInstall()
+        AppInstaller.shared.checkInstall()
         V2rayLaunch.runAtStart()
         // 日志流
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -35,24 +33,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //                V2rayLogStream.startLogging()
             }
         }
-        // 自动更新订阅服务器
-        Task{
-            await SubscriptionHandler.shared.sync()
-        }
         // 监听系统睡眠和唤醒通知
-        DistributedNotificationCenter.default.addObserver(
-            self,
-            selector: #selector(onWakeNote),
-            name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"),
-            object: nil
-        )
-
-        DistributedNotificationCenter.default.addObserver(
-            self,
-            selector: #selector(onSleepNote),
-            name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"),
-            object: nil
-        )
+        sleepObserver = NotificationCenter.default.addObserver(
+            forName: NSWorkspace.willSleepNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            self.onSleepNote()
+        }
+        // 监听系统唤醒
+        wakeObserver = NotificationCenter.default.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            self.onWakeNote()
+        }
     }
     
     // 日志重定向，建议在 App 启动时调用
