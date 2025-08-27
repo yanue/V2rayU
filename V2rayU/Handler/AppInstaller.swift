@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class AppInstaller: NSObject {
+actor AppInstaller: NSObject {
     static let shared = AppInstaller()
     // 检查是否需要安装
     func checkInstall() {
@@ -62,7 +62,9 @@ class AppInstaller: NSObject {
 
         showInstallAlert()
         // generate plist
-        LaunchAgent.shared.generateLaunchAgentPlist()
+        Task {
+          await LaunchAgent.shared.generateLaunchAgentPlist()
+        }
     }
 
     func showInstallAlert() {
@@ -82,7 +84,9 @@ class AppInstaller: NSObject {
             }
             switch alert.runModal() {
             case .alertFirstButtonReturn:
-                install()
+                Task {
+                    await self.showInstallAlertSynchronously()
+                }
             default:
                 NSApp.terminate(self)
             }

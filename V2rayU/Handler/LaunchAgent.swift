@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class LaunchAgent: NSObject {
+actor LaunchAgent: NSObject {
     static let shared = LaunchAgent()
     private let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
     let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/"
@@ -85,10 +85,8 @@ class LaunchAgent: NSObject {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
             print("Stop v2ray-core: ok \(output)")
-            return true
         } catch let error {
             alertDialog(title: "Stop v2ray-core failed.", message: error.localizedDescription)
-            return false
         }
     }
 }

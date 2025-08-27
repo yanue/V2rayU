@@ -87,6 +87,9 @@
 		66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */; };
 		66B1B5842D297D030032DD09 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5832D297D030032DD09 /* v2ray-core */; };
 		66D27AE52E098E3A004C600D /* ProfileShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ProfileShare.swift */; };
+		66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchAgent.swift */; };
+		66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F842E5F44850024E338 /* AppInstaller.swift */; };
+		66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */; };
 		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
 		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
@@ -248,6 +251,9 @@
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66CBCEE32C63B16500313949 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		66D27AE42E098E3A004C600D /* ProfileShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileShare.swift; sourceTree = "<group>"; };
+		66DF3F842E5F44850024E338 /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
+		66DF3F852E5F44850024E338 /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
+		66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		66E94B2E2D26B95D003745B5 /* JsonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonView.swift; sourceTree = "<group>"; };
 		66E94B2F2D26B95D003745B5 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
@@ -359,7 +365,10 @@
 		662CC3D72D1BED9B006E8450 /* Handler */ = {
 			isa = PBXGroup;
 			children = (
+				66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */,
 				66F66F9A2D1FA34E00E77C64 /* Ping */,
+				66DF3F842E5F44850024E338 /* AppInstaller.swift */,
+				66DF3F852E5F44850024E338 /* LaunchAgent.swift */,
 				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
 				66EB76A52E2E669400E72DE2 /* PacHandler.swift */,
@@ -779,6 +788,8 @@
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				66E94B342D26B95D003745B5 /* Theme.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
+				66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */,
+				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
 				66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */,
 				663745352D2EAF4F0093A101 /* RoutingPanel.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
@@ -816,6 +827,7 @@
 				6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */,
 				66D27AE52E098E3A004C600D /* ProfileShare.swift in Sources */,
 				662CC40E2D1BED9B006E8450 /* SubscriptionList.swift in Sources */,
+				66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */,
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
 				660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */,
 				662CC4102D1BED9B006E8450 /* AdvanceView.swift in Sources */,

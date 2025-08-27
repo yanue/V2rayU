@@ -18,11 +18,11 @@ struct HeaderView: View {
                 Spacer()
                 Toggle("", isOn: $appState.v2rayTurnOn)
                     .toggleStyle(SwitchToggleStyle())
-                    .onChange(of: appState.v2rayTurnOn) { newValue in
+                    .onChange(of: appState.v2rayTurnOn) { _, newValue in
                         if newValue {
-                            V2rayLaunch.startV2rayCore()
+                            AppState.shared.turnOnCore()
                         } else {
-                            V2rayLaunch.stopV2rayCore()
+                            AppState.shared.turnOffCore()
                         }
                     }
             }

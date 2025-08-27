@@ -21,33 +21,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("Application did finish launching.")
         // 初始化状态栏项目
         StatusItemManager.shared.setupStatusItem()
-        truncateLogFile(v2rayLogFilePath)
-        truncateLogFile(appLogFilePath)
-        
-        AppInstaller.shared.checkInstall()
-        V2rayLaunch.runAtStart()
-        // 日志流
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            Task { @MainActor in
-//                AppLogStream.startLogging()
-//                V2rayLogStream.startLogging()
-            }
-        }
-        // 监听系统睡眠和唤醒通知
-        sleepObserver = NotificationCenter.default.addObserver(
-            forName: NSWorkspace.willSleepNotification,
-            object: nil,
-            queue: .main
-        ) { _ in
-            self.onSleepNote()
-        }
-        // 监听系统唤醒
-        wakeObserver = NotificationCenter.default.addObserver(
-            forName: NSWorkspace.didWakeNotification,
-            object: nil,
-            queue: .main
-        ) { _ in
-            self.onWakeNote()
+        Task{
+            // 初始化helper
+            await AppInstaller.shared.checkInstall()
+            // 初始化睡眠管理器
+            await SystemSleepManager.shared.setup()
+            // 启动设置
+            AppState.shared.appDidLaunch()
         }
     }
     
@@ -57,32 +37,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
          freopen(appLogFilePath, "a+", stderr)
      }
     
-    @objc func onWakeNote(note: NSNotification) {
-        NSLog("onWakeNote")
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            NSLog("V2rayLaunch restart")
-            V2rayLaunch.restartV2ray()
-        }
-        if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            // 自动检查更新
-//            V2rayUpdater.checkForUpdates()
-        }
-        if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            // 自动更新订阅服务器
-            Task{
-                await SubscriptionHandler.shared.sync()
-            }
-        }
-        // ping
-        Task {
-            await PingAll.shared.run()
-        }
-    }
-
-    @objc func onSleepNote(note: NSNotification) {
-        NSLog("onSleepNote")
-    }
-
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         print("applicationShouldTerminate")
 
@@ -90,7 +44,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
         // 停止 V2ray
-        V2rayLaunch.Stop()
+        V2rayLaunch.StopAgent()
 
         // 关闭系统代理
         V2rayLaunch.setSystemProxy(mode: .off)

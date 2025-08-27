@@ -258,12 +258,10 @@ final class StatusItemManager: NSObject {
         return attributedString
     }
 
-    func openPreferenceAdvanceTab(_ sender: NSMenuItem) {
-        DispatchQueue.main.async {
-            AppState.shared.mainTab = .setting
-            AppState.shared.settingTab = .general
-            openMainWindow()
-        }
+    func openAdvanceSetting() {
+        AppState.shared.mainTab = .setting
+        AppState.shared.settingTab = .general
+        self.openMainWindow()
     }
 
     @objc private func openLogs(_ sender: NSMenuItem) {
@@ -271,10 +269,8 @@ final class StatusItemManager: NSObject {
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {
-        let isRunning = AppState.shared.v2rayTurnOn
-        V2rayLaunch.ToggleRunning()
+        AppState.shared.ToggleRunning()
         toggleCoreItem.title = AppState.shared.v2rayTurnOn ? "Turn xray-core On" : "Turn xray-core Off"
-        print("toggleRunning", isRunning, toggleCoreItem.title)
     }
 
     @objc private func quitClicked(_ sender: NSMenuItem) {
@@ -337,7 +333,7 @@ final class StatusItemManager: NSObject {
             return
         }
         NSLog("switchRunMode: \(mode.rawValue)")
-        AppState.shared.runMode(mode: mode)
+        AppState.shared.switchRunMode(mode: mode)
     }
 
     @objc private func checkForUpdate(_ sender: NSMenuItem) {
@@ -345,20 +341,20 @@ final class StatusItemManager: NSObject {
     }
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {
-//        guard let v2ray = V2rayServer.loadSelectedItem() else {
+//        guard let v2ray = ProfileViewModel.getRunning() else {
 //            NSLog("v2ray config not found")
 //            noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
 //            return
 //        }
 //
 //        let share = ShareUri()
-//        share.qrcode(item: v2ray)
+//        let uri = ShareUri.generateShareUri(item: v2ray)
 //        if share.error.count > 0 {
 //            noticeTip(title: "generate Qrcode fail", informativeText: share.error)
 //            return
 //        }
 //
-//        showQRCode(uri: share.uri)
+//        showQRCode(uri: uri)
     }
 
     @objc private func copyExportCommand(_ sender: NSMenuItem) {

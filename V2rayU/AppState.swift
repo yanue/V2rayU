@@ -77,12 +77,6 @@ final class AppState: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
-    func setRunMode(mode: RunMode) {
-        NSLog("setRunMode: \(mode)")
-        runMode = mode
-        icon = mode.icon // 更新图标
-    }
 
     func setRunning(uuid: String) {
         print("setRunning: \(uuid)")
@@ -91,11 +85,27 @@ final class AppState: ObservableObject {
         StatusItemManager.shared.refreshMenuItems()
     }
     
-    func setRunMode(mode: RunMode) {
+    func switchRunMode(mode: RunMode) {
         NSLog("setRunMode: \(mode)")
         runMode = mode
         icon = mode.icon  // 更新图标
         reloadCore(trigger: "setRunMode(\(mode))")
+    }
+    
+    func turnOnCore() {
+        if !v2rayTurnOn {
+            v2rayTurnOn = true
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
+        }
+        reloadCore(trigger: "turnOn")
+    }
+    
+    func turnOffCore() {
+        if v2rayTurnOn {
+            v2rayTurnOn = false
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
+        }
+        V2rayLaunch.stopV2rayCore()
     }
 
     func runRouting(uuid: String) {
@@ -123,10 +133,13 @@ final class AppState: ObservableObject {
 extension AppState {
     /// 修改了配置后，统一调用该方法来刷新 v2ray-core
     func reloadCore(trigger: String) {
+        if !v2rayTurnOn {
+            return
+        }
         Task {
             let success = await V2rayLaunch.startV2rayCore()
             if !success {
-                setRunMode(mode: .off)
+                switchRunMode(mode: .off)
             }
             NSLog("reloadCore triggered by: \(trigger)")
             StatusItemManager.shared.refreshMenuItems()
@@ -134,41 +147,34 @@ extension AppState {
     }
 
     func appDidLaunch() {
+        // 清理日志
+        truncateLogFile(v2rayLogFilePath)
+        truncateLogFile(appLogFilePath)
         // 初始化依赖
-        V2rayLaunch.prepareEnvironment()
-
+        // start http server
+        startHttpServer()
+        Task {
+            await V2rayTrafficStats.shared.initTask()
+        }
         // 根据状态判断是否启动
         if v2rayTurnOn {
             reloadCore(trigger: "appDidLaunch with v2rayTurnOn")
         }
-
         // 自动更新订阅
         Task {
-            if await AppSettings.shared.autoUpdateServers {
+            if AppSettings.shared.autoUpdateServers {
                 await SubscriptionHandler.shared.sync()
             }
         }
     }
 
-    func toggleRunning() {
+    func ToggleRunning() {
         v2rayTurnOn.toggle()
         if v2rayTurnOn {
             reloadCore(trigger: "toggleRunning on")
         } else {
             V2rayLaunch.stopV2rayCore()
-            setRunMode(mode: .off)
-        }
-    }
-
-    func reloadCore(trigger: String) {
-        Task {
-            let success = await V2rayLaunch.startV2rayCore()
-            if success {
-                NSLog("Core Reloaded by \(trigger)")
-            } else {
-                setRunMode(mode: .off)
-            }
-            StatusItemManager.shared.refreshMenuItems()
+            switchRunMode(mode: .off)
         }
     }
 }

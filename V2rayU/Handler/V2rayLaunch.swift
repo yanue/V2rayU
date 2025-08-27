@@ -11,38 +11,11 @@ import SystemConfiguration
 
 class V2rayLaunch: NSObject {
 
-    static func runAtStart() {
-        Task {
-            await V2rayTrafficStats.shared.initTask()
-        }
-        // start http server
-        startHttpServer()
-        // start or show servers
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            // start and show servers
-            startV2rayCore()
-        }
-        // auto update subscribe servers
-        Task {
-            if await AppSettings.shared.autoUpdateServers {
-                await SubscriptionHandler.shared.sync()
-            }
-        }
-    }
-
-    static func ToggleRunning() {
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            print("ToggleRunning stop")
-            Self.stopV2rayCore()
-        } else {
-            print("ToggleRunning start")
-            Self.startV2rayCore()
-        }
-    }
-
     static func restartV2ray() {
         // start
-        startV2rayCore()
+        Task {
+            await Self.startV2rayCore()
+        }
     }
 
     static func startV2rayCore() async -> Bool {
@@ -69,7 +42,7 @@ class V2rayLaunch: NSObject {
         Self.setSystemProxy(mode: .off)
         // set status
         Task {
-            await AppState.shared.setRunMode(mode: .off)
+            await AppState.shared.switchRunMode(mode: .off)
         }
     }
 
@@ -101,7 +74,9 @@ class V2rayLaunch: NSObject {
                 title = "端口已被占用"
             }
             alertDialog(title: title, message: toast)
-            StatusItemManager.shared.openAdvanceSetting()
+            DispatchQueue.main.async {
+                StatusItemManager.shared.openAdvanceSetting()
+            }
             return false
         }
 
@@ -114,15 +89,22 @@ class V2rayLaunch: NSObject {
                 title = "端口已被占用"
             }
             alertDialog(title: title, message: toast)
-            StatusItemManager.shared.openAdvanceSetting()
+            DispatchQueue.main.async {
+                StatusItemManager.shared.openAdvanceSetting()
+            }
             return false
         }
         // 启动
-        return LaunchAgent.shared.startAgent()
+        Task {
+            await LaunchAgent.shared.startAgent()
+        }
+        return true
     }
 
     static func StopAgent() {
-        LaunchAgent.shared.stopAgent()
+        Task {
+            await LaunchAgent.shared.stopAgent()
+        }
     }
 
     static func setSystemProxy(mode: RunMode) {
@@ -139,7 +121,9 @@ class V2rayLaunch: NSObject {
             print("setSystemProxy: ok \(output)")
         } catch let error {
             alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
-            showInstallAlert()
+            Task {
+               await AppInstaller.shared.showInstallAlert()
+            }
         }
     }
 }
