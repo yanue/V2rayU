@@ -29,7 +29,7 @@ actor Ping {
 
         let requestDuration = responseEndDate.timeIntervalSince(fetchStartDate)
         let pingTime = Int(requestDuration * 100) // 转换为毫秒
-        print("PingRunning: fetchStartDate=\(fetchStartDate), responseEndDate=\(responseEndDate), requestDuration=\(requestDuration), pingTs=\(pingTime)")
+        logger.info("PingRunning: fetchStartDate=\(fetchStartDate), responseEndDate=\(responseEndDate), requestDuration=\(requestDuration), pingTs=\(pingTime)")
 
         return pingTime
     }

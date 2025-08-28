@@ -114,7 +114,7 @@ class VlessUri: BaseShareUri {
             guard let decodedStr = base64Str.base64Decoded() else {
                 return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error: decode base64"])
             }
-            print("VlessUri decode base64:", decodedStr)
+            logger.info("VlessUri decode base64: \(decodedStr)" )
             let parts = decodedStr.split(separator: "@")
             if parts.count != 2 {
                 return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "error: decode base64 parts"])

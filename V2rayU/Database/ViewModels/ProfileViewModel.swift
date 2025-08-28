@@ -21,7 +21,7 @@ class ProfileViewModel: ObservableObject {
                 list = try ProfileModel.fetchAll(db).sorted(by: { $0.sort < $1.sort })
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
         }
     }
 
@@ -60,7 +60,7 @@ class ProfileViewModel: ObservableObject {
                 try ProfileModel.fetchAll(db)
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
             return []
         }
     }
@@ -115,7 +115,7 @@ class ProfileViewModel: ObservableObject {
                 return try query.fetchCount(db)
             }
         } catch {
-            print("count error: \(error)")
+            logger.info("count error: \(error)")
             return 0
         }
     }
@@ -127,7 +127,7 @@ class ProfileViewModel: ObservableObject {
                 try ProfileModel.order(ProfileModel.Columns.speed.desc).fetchOne(db)
             }
         } catch {
-            print("getFastOne error: \(error)")
+            logger.info("getFastOne error: \(error)")
             return nil
         }
     }
@@ -139,7 +139,7 @@ class ProfileViewModel: ObservableObject {
                 try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db)
             }
         } catch {
-            print("fetchOne error: \(error)")
+            logger.info("fetchOne error: \(error)")
             return nil
         }
     }
@@ -151,7 +151,7 @@ class ProfileViewModel: ObservableObject {
                 try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
-            print("delete error: \(error)")
+            logger.info("delete error: \(error)")
         }
     }
 
@@ -170,7 +170,7 @@ class ProfileViewModel: ObservableObject {
                 try query.deleteAll(db)
             }
         } catch {
-            print("delete error: \(error)")
+            logger.info("delete error: \(error)")
         }
     }
 
@@ -181,7 +181,7 @@ class ProfileViewModel: ObservableObject {
                 try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: speed)])
             }
         } catch {
-            print("delete error: \(error)")
+            logger.info("delete error: \(error)")
         }
     }
 
@@ -195,7 +195,7 @@ class ProfileViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("updateSortOrderInDBAsync error: \(error)")
+            logger.info("updateSortOrderInDBAsync error: \(error)")
         }
     }
 
@@ -206,7 +206,7 @@ class ProfileViewModel: ObservableObject {
                 try item.save(db)
             }
         } catch {
-            print("upsert error: \(error)")
+            logger.info("upsert error: \(error)")
         }
     }
 
@@ -219,7 +219,7 @@ class ProfileViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("insert_many error: \(error)")
+            logger.info("insert_many error: \(error)")
         }
     }
 }

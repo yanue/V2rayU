@@ -120,7 +120,7 @@ extension ProfileStatModel: TableRecord, FetchableRecord, PersistableRecord {
                 try db.execute(sql: sql, arguments: [uuid, up, down, up, down, lastUpdate])
             }
         } catch {
-            print("update_stat error: \(error)")
+            logger.info("update_stat error: \(error)")
         }
     }
 
@@ -156,12 +156,12 @@ extension ProfileStatModel: TableRecord, FetchableRecord, PersistableRecord {
                             )
                         }
                     } catch {
-                        print("getFastOne error: \(error)")
+                        logger.info("getFastOne error: \(error)")
                     }
                 }
             }
         } catch {
-            print("clearTodayData error: \(error)")
+            logger.info("clearTodayData error: \(error)")
             return
         }
     }
@@ -175,7 +175,7 @@ extension ProfileStatModel: TableRecord, FetchableRecord, PersistableRecord {
                 try db.execute(sql: sql, arguments: [Date(), uuid])
             }
         } catch {
-            print("clearAllData error: \(error)")
+            logger.info("clearAllData error: \(error)")
             return
         }
     }
@@ -187,7 +187,7 @@ extension ProfileStatModel: TableRecord, FetchableRecord, PersistableRecord {
                 try self.save(db)
             }
         } catch {
-            print("save error: \(error)")
+            logger.info("save error: \(error)")
         }
     }
 }

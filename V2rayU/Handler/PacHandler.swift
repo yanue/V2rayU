@@ -38,13 +38,13 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
         return true
     }
 
-    print("GeneratePACFile rewrite", pacAddress, socksPort)
+    logger.info("GeneratePACFile rewrite", pacAddress, socksPort)
     let userRules = getPacUserRules()
     var gfwlist = getPacGFWList()
     do {
         if let data = Data(base64Encoded: gfwlist, options: .ignoreUnknownCharacters) {
             if let str = String(data: data, encoding: .utf8) {
-                NSLog("base64Encoded")
+                logger.info("base64Encoded")
                 gfwlist = str
             }
             let userRuleLines = userRules.components(separatedBy: CharacterSet.newlines)
@@ -69,17 +69,17 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 // rule lines to json array
                 let rulesJsonData: Data = try JSONSerialization.data(withJSONObject: lines, options: .prettyPrinted)
                 guard let rulesJsonStr = String(data: rulesJsonData, encoding: String.Encoding.utf8) else {
-                    NSLog("Failed to Get rulesJsonData")
+                    logger.info("Failed to Get rulesJsonData")
                     return false
                 }
 
                 // Get raw pac js
                 guard let jsData = try? Data(contentsOf: URL(fileURLWithPath: PACAbpFile)) else {
-                    NSLog("Failed to Get raw pac js")
+                    logger.info("Failed to Get raw pac js")
                     return false
                 }
                 guard var jsStr = String(data: jsData, encoding: String.Encoding.utf8) else {
-                    NSLog("Failed to Get js str")
+                    logger.info("Failed to Get js str")
                     return false
                 }
 
@@ -94,16 +94,16 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 } else {
                     jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: pacAddress)
                 }
-                print("PACFilePath", PACFilePath)
+                logger.info("PACFilePath", PACFilePath)
 
                 // Write the pac js to file.
                 try jsStr.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)
                 return true
             } catch {
-                print("write pac fail \(error)")
+                logger.info("write pac fail \(error)")
             }
         } else {
-            NSLog("base64Encoded not decode")
+            logger.info("base64Encoded not decode")
         }
     }
 
@@ -125,13 +125,13 @@ func getPacUserRules() -> String {
     do {
         let url = URL(fileURLWithPath: PACUserRuleFilePath)
         if let str = try? String(contentsOf: url, encoding: .utf8) {
-            NSLog("getPacUserRules: \(PACUserRuleFilePath) \(str.count)")
+            logger.info("getPacUserRules: \(PACUserRuleFilePath) \(str.count)")
             if str.count > 0 {
                 userRuleTxt = str
             }
         }
     } catch {
-        NSLog("getPacUserRules err \(error)")
+        logger.info("getPacUserRules err \(error)")
     }
     // auto include githubusercontent.com api.github.com
     if !userRuleTxt.contains("githubusercontent.com") {
@@ -160,13 +160,13 @@ func getPacGFWList() -> String {
     do {
         let url = URL(fileURLWithPath: GFWListFilePath)
         if let str = try? String(contentsOf: url, encoding: String.Encoding.utf8) {
-            NSLog("getPacGFWList: \(GFWListFilePath) \(str.count)")
+            logger.info("getPacGFWList: \(GFWListFilePath) \(str.count)")
             if str.count > 0 {
                 gfwList = str
             }
         }
     } catch {
-        NSLog("getPacGFWList err \(error)")
+        logger.info("getPacGFWList err \(error)")
     }
     return gfwList
 }

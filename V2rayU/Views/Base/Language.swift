@@ -56,6 +56,6 @@ class LanguageManager: ObservableObject {
 
     private func updateLocale() {
         currentLocale = Locale(identifier: selectedLanguage.localeIdentifier)
-        print("Current Locale: \(currentLocale)") // 添加此行
+        logger.info("Current Locale: \(currentLocale)") // 添加此行
     }
 }

@@ -20,7 +20,7 @@ actor PingRunning {
     /// 开始 Ping 流程
     func startPing(item: ProfileModel) async throws {
         guard !isExecuting else {
-            print("Ping task is already running.")
+            logger.info("Ping task is already running.")
             return
         }
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始单节点 Ping: \(item.remark)")
@@ -39,14 +39,14 @@ actor PingRunning {
         while retries < maxRetries && !success {
             do {
                 let pingTime = try await ping.doPing(bindPort: port)
-                print("Ping success, time: \(pingTime)ms")
+                logger.info("Ping success, time: \(pingTime)ms")
                 NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 成功: \(item.remark) - \(pingTime)ms")
                 resetFailureCount()
                 success = true
             } catch {
                 retries += 1
                 NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 失败: \(item.remark) - 第\(retries)次: \(error.localizedDescription)")
-                print("Ping failed (\(retries)/\(maxRetries)): \(error)")
+                logger.info("Ping failed (\(retries)/\(maxRetries)): \(error)")
             }
         }
 
@@ -74,7 +74,7 @@ actor PingRunning {
         failureCount += 1
         if failureCount >= maxFailures {
             failureCount = 0
-            print("Ping failed \(maxFailures) times, switching to backup...")
+            logger.info("Ping failed \(maxFailures) times, switching to backup...")
             await switchServer()
         }
     }
@@ -88,7 +88,7 @@ actor PingRunning {
 
 func chooseNewServer(uuid: String) async {
     guard UserDefaults.getBool(forKey: .autoSelectFastestServer) else {
-        NSLog(" - choose new server: disabled")
+        logger.info(" - choose new server: disabled")
         return
     }
     
@@ -116,7 +116,7 @@ func chooseNewServer(uuid: String) async {
         return
     }
 
-    NSLog(" - choose new server: \(newSvrName)")
+    logger.info(" - choose new server: \(newSvrName)")
     UserDefaults.set(forKey: .runningProfile, value: newSvrName)
     V2rayLaunch.restartV2ray()
 }

@@ -19,7 +19,7 @@ class SubViewModel: ObservableObject {
                 list = try SubModel.fetchAll(db)
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
         }
     }
     
@@ -42,7 +42,7 @@ class SubViewModel: ObservableObject {
                 return try SubModel.fetchAll(db)
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
             return []
         }
     }
@@ -64,7 +64,7 @@ class SubViewModel: ObservableObject {
                 try _ = SubModel.filter(SubModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
-            print("delete error: \(error)")
+            logger.info("delete error: \(error)")
         }
     }
 
@@ -75,7 +75,7 @@ class SubViewModel: ObservableObject {
                 try item.save(db)
             }
         } catch {
-            print("upsert error: \(error)")
+            logger.info("upsert error: \(error)")
         }
     }
 }

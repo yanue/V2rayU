@@ -15,11 +15,11 @@ actor SubscriptionHandler {
     // sync from Subscription list
     public func sync() {
         if SubscriptionHandlering {
-            NSLog("SubscriptionHandler Syncing ...")
+            logger.info("SubscriptionHandler Syncing ...")
             return
         }
         SubscriptionHandlering = true
-        NSLog("SubscriptionHandler start")
+        logger.info("SubscriptionHandler start")
 
         let list = SubViewModel.all()
 
@@ -33,17 +33,17 @@ actor SubscriptionHandler {
 
     func syncOne(item: SubModel) {
         if SubscriptionHandlering {
-            NSLog("SubscriptionHandler Syncing ...")
+            logger.info("SubscriptionHandler Syncing ...")
             return
         }
         SubscriptionHandlering = true
-        NSLog("SubscriptionHandler start syncOne")
+        logger.info("SubscriptionHandler start syncOne")
         Task {
             do {
                 try await self.dlFromUrl(url: item.url, sub: item)
-                NSLog("SubscriptionHandler syncOne success")
+                logger.info("SubscriptionHandler syncOne success")
             } catch {
-                NSLog("SubscriptionHandler syncOne error: \(error)")
+                logger.info("SubscriptionHandler syncOne error: \(error)")
                 logTip(title: "syncOne fail: ", uri: item.url, informativeText: error.localizedDescription)
             }
         }
@@ -67,9 +67,9 @@ actor SubscriptionHandler {
         .sink(receiveCompletion: { completion in
             switch completion {
             case .finished:
-                NSLog("All tasks completed")
+                logger.info("All tasks completed")
             case let .failure(error):
-                NSLog("Error: \(error)")
+                logger.info("Error: \(error)")
             }
             self.SubscriptionHandlering = false
             self.refreshMenu()
@@ -78,7 +78,7 @@ actor SubscriptionHandler {
     }
 
     func refreshMenu() {
-        NSLog("SubscriptionHandler refreshMenu")
+        logger.info("SubscriptionHandler refreshMenu")
         self.SubscriptionHandlering = false
         do {
             // refresh server
@@ -111,7 +111,7 @@ actor SubscriptionHandler {
             }
         } catch let error {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-            NSLog("save json file fail: \(error)")
+            logger.info("save json file fail: \(error)")
         }
     }
 
@@ -163,7 +163,7 @@ actor SubscriptionHandler {
 
             return true
         } catch {
-            NSLog("parseYaml \(error)")
+            logger.info("parseYaml \(error)")
         }
 
         return false
@@ -201,7 +201,7 @@ actor SubscriptionHandler {
 
     func logTip(title: String = "", uri: String = "", informativeText: String = "") {
         NotificationCenter.default.post(name: NOTIFY_UPDATE_SubSync, object: title + informativeText + "\n")
-        print("SubSync", title + informativeText)
+        logger.info("SubSync: \(title + informativeText)")
         if uri != "" {
             NotificationCenter.default.post(name: NOTIFY_UPDATE_SubSync, object: "url: " + uri + "\n\n\n")
         }

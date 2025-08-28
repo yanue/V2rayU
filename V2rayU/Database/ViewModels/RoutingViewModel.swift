@@ -21,7 +21,7 @@ class RoutingViewModel: ObservableObject {
                 list = try RoutingModel.fetchAll(db)
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
         }
     }
     
@@ -44,7 +44,7 @@ class RoutingViewModel: ObservableObject {
                 return try RoutingModel.fetchAll(db)
             }
         } catch {
-            print("getList error: \(error)")
+            logger.info("getList error: \(error)")
             return []
         }
     }
@@ -66,7 +66,7 @@ class RoutingViewModel: ObservableObject {
                 try _ = RoutingModel.filter(RoutingModel.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
-            print("delete error: \(error)")
+            logger.info("delete error: \(error)")
         }
     }
     
@@ -77,7 +77,7 @@ class RoutingViewModel: ObservableObject {
                 try item.save(db)
             }
         } catch {
-            print("upsert error: \(error)")
+            logger.info("upsert error: \(error)")
         }
     }
 }

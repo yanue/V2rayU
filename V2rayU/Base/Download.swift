@@ -95,7 +95,7 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
         let locationPath = location.path
         let fileName = downloadTask.response?.suggestedFilename ?? ""
         guard locationPath != "", fileName != "" else {
-            print("urlSession: locationPath or fileName missing", )
+            logger.info("urlSession: locationPath or fileName missing", )
             return
         }
         let documentsPath = NSHomeDirectory() + "/Library/Caches/Download"

@@ -163,7 +163,7 @@ class VmessUri: BaseShareUri {
             error = "error decode Str"
             return
         }
-        print("decodeStr", decodeStr)
+        logger.info("decodeStr: \(decodeStr)")
         // main
         var uuid_ = ""
         var host_ = ""
@@ -184,7 +184,6 @@ class VmessUri: BaseShareUri {
             profile.address = host_port[0]
             profile.port = Int(host_port[1]) ?? 0
         }
-        print("VmessUri self", self)
 
         // params
         let query = url.queryParams()

@@ -132,9 +132,9 @@ final class StatusItemManager: NSObject {
         menu.submenu?.addItem(item)
         menu.submenu?.addItem(NSMenuItem.separator())
 
-        NSLog("currentRouting: \(currentRouting)")
+        logger.info("currentRouting: \(currentRouting)")
         for routing in routings {
-            NSLog("routing item: \(routing.name) \(currentRouting) \(item.state.rawValue) ")
+            logger.info("routing item: \(routing.name) \(currentRouting) \(item.state.rawValue) ")
             let item = createRoutingMenuItem(routing: routing, current: currentRouting)
             menu.submenu?.addItem(item)
         }
@@ -306,7 +306,7 @@ final class StatusItemManager: NSObject {
 
     @objc private func switchServer(_ sender: NSMenuItem) {
         guard let uuid = sender.representedObject as? String else {
-            NSLog("switchServer err")
+            logger.info("switchServer err")
             return
         }
         AppState.shared.runProfile(uuid: uuid)
@@ -314,7 +314,7 @@ final class StatusItemManager: NSObject {
 
     @objc private func switchRouting(_ sender: NSMenuItem) {
         guard let uuid = sender.representedObject as? String else {
-            NSLog("switchRouting err")
+            logger.info("switchRouting err")
             return
         }
         AppState.shared.runRouting(uuid: uuid)
@@ -329,10 +329,10 @@ final class StatusItemManager: NSObject {
 
     @objc private func switchRunMode(_ sender: NSMenuItem) {
         guard let modeRaw = sender.representedObject as? String, let mode = RunMode(rawValue: modeRaw) else {
-            NSLog("switchRunMode err")
+            logger.info("switchRunMode err")
             return
         }
-        NSLog("switchRunMode: \(mode.rawValue)")
+        logger.info("switchRunMode: \(mode.rawValue)")
         AppState.shared.switchRunMode(mode: mode)
     }
 
@@ -342,7 +342,7 @@ final class StatusItemManager: NSObject {
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {
 //        guard let v2ray = ProfileViewModel.getRunning() else {
-//            NSLog("v2ray config not found")
+//            logger.info("v2ray config not found")
 //            noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
 //            return
 //        }

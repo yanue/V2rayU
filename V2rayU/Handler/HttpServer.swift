@@ -20,7 +20,7 @@ actor LocalHttpServer {
     private var httpServer: HTTPServer?
 
     func restart() {
-        debugPrint("Restarting LocalHttpServer")
+        logger.info("Restarting LocalHttpServer")
         Task {
             await stop()
             await start()
@@ -31,7 +31,7 @@ actor LocalHttpServer {
         // 停止已有服务
         await stop()
         let pacPort = getPacPort()
-        print("pacPort", pacPort)
+        logger.info("pacPort", pacPort)
 
         if isPortOpen(port: pacPort) {
             var toast = "pac port \(pacPort) has been used, please replace from advance setting"
@@ -53,7 +53,7 @@ actor LocalHttpServer {
             // 绑定到所有网络接口，支持局域网访问
             server = try HTTPServer(address: .inet(ip4: getListenAddress(), port: UInt16(pacPort)))
         } catch {
-            print("Failed to create HTTP server: \(error)")
+            logger.info("Failed to create HTTP server: \(error)")
             return
         }
         
@@ -62,7 +62,7 @@ actor LocalHttpServer {
             let path = request.path
             let filePath = AppHomePath + (path == "/" ? "/index.html" : path)
 
-            print("Requested: \(path) \(filePath)")
+            logger.info("Requested: \(path) \(filePath)")
 
             if FileManager.default.fileExists(atPath: filePath),
                let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) {
@@ -75,10 +75,10 @@ actor LocalHttpServer {
         Task {
             do {
                 try await server.run()
-                print("FlyingFox HTTPServer started at port: \(pacPort)")
+                logger.info("FlyingFox HTTPServer started at port: \(pacPort)")
             } catch {
                 alertDialog(title: "启动 http 失败", message: "\(error)")
-                print("FlyingFox HTTPServer start error: \(error)")
+                logger.info("FlyingFox HTTPServer start error: \(error)")
             }
         }
     }

@@ -166,7 +166,7 @@ struct AboutView: View {
         if let url = URL(string: url) {
             NSWorkspace.shared.open(url)
         } else {
-            print("Invalid URL: \(url)")
+            logger.info("Invalid URL: \(url)")
         }
     }
 }

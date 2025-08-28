@@ -211,7 +211,7 @@ struct ProfileListView: View {
         })
 
         viewModel.list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
-        print("handleDrop: \(index) \(rows.count)")
+        logger.info("handleDrop: \(index) \(rows.count)")
         // 更新排序
         viewModel.updateSortOrderInDBAsync()
     }
@@ -314,10 +314,10 @@ struct ProfileListView: View {
         pasteboard.clearContents()
         let profileString = ShareUri.generateShareUri(item: item)
         if pasteboard.setString(profileString, forType: .string) {
-            print("Copied to clipboard: \(profileString)")
+            logger.info("Copied to clipboard: \(profileString)")
             alertDialog(title: "Copied", message: "")
         } else {
-            print("Failed to copy to clipboard")
+            logger.info("Failed to copy to clipboard")
             alertDialog(title: "Failed to copy to clipboard", message: "")
         }
     }

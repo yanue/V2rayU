@@ -52,7 +52,7 @@ actor V2rayTraffics {
             // 更新到 UI
             await AppState.shared.setSpeed(latency: latency, directUpSpeed: directUpSpeed, directDownSpeed: directDownSpeed, proxyUpSpeed: proxyUpSpeed, proxyDownSpeed: proxyDownSpeed)
             let uuid = await AppState.shared.runningProfile
-//             print("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
+//             logger.info("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
             // 更新到数据库
             try ProfileStatModel.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
         }
@@ -66,7 +66,7 @@ actor V2rayTrafficStats {
     private init() {}
 
     func initTask() {
-        NSLog("TrafficStats initialize")
+        logger.info("TrafficStats initialize")
         // 确保在主线程调用
         // 确保在主线程创建和调度 Timer
         DispatchQueue.main.async {
@@ -84,7 +84,7 @@ actor V2rayTrafficStats {
     // 将 fetchV2RayStats 改为异步函数
     func fetchV2RayStats() async {
         guard let url = URL(string: "http://127.0.0.1:11111/debug/vars") else {
-            NSLog("Invalid URL")
+            logger.info("Invalid URL")
             return
         }
         
@@ -92,17 +92,17 @@ actor V2rayTrafficStats {
             let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                NSLog("Invalid response")
+                logger.info("Invalid response")
                 return
             }
             
             if httpResponse.statusCode == 200 {
                 await parseV2RayStats(jsonData: data)
             } else {
-                NSLog("Failed with status code: \(httpResponse.statusCode)")
+                logger.info("Failed with status code: \(httpResponse.statusCode)")
             }
         } catch {
-            NSLog("Request failed: \(error.localizedDescription)")
+            logger.info("Request failed: \(error.localizedDescription)")
         }
     }
     
@@ -118,7 +118,7 @@ actor V2rayTrafficStats {
             var proxyUpLink = 0
             var proxyDownLink = 0
             guard let stats = vars.stats else {
-                NSLog("Invalid V2Ray Stats")
+                logger.info("Invalid V2Ray Stats")
                 return
             }
             if let latencyValue = vars.observatory?["proxy"] {
@@ -133,9 +133,9 @@ actor V2rayTrafficStats {
                 proxyDownLink = proxyUpLinkValue.downlink
             }
             await V2rayTraffics.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
-//            NSLog("Parsed V2Ray Stats: \(stats)")
+//            logger.info("Parsed V2Ray Stats: \(stats)")
         } catch {
-            NSLog("Failed to parse JSON: \(error.localizedDescription)")
+            logger.info("Failed to parse JSON: \(error.localizedDescription)")
         }
     }
 }

@@ -84,14 +84,14 @@ class RoutingHandler {
         // 根据json配置生成
         let (res, err) = parseRoutingRuleJson(json: self.routing.json)
         if err != nil {
-            print("parseRule err: \(err)")
+            logger.info("parseRule err: \(err)")
         } else {
             return res
         }
         
         // dns-rule:  { "type": "field", "outboundTag": "dns-out", "network": "udp", "port": 53 }
         let dnsRule = getRoutingRule(outTag: "dns_out", port: "53", network: "udp")
-        print("dnsRule: \(dnsRule)")
+        logger.info("dnsRule: \(dnsRule)")
         // api-rule:  {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
         let apiRule = getRoutingRule(outTag: "metrics_out", inboundTag: ["metrics_in"])
 
@@ -239,7 +239,7 @@ class RoutingHandler {
             }
         }
 
-//        print("ips", ips, "domains", domains)
+//        logger.info("ips", ips, "domains", domains)
 
         return (domains, ips)
     }
@@ -274,7 +274,7 @@ func parseRoutingRuleJson(json: String) -> (V2rayRouting, err: Error?) {
     do {
         res = try jsonDecoder.decode(V2rayRouting.self, from: jsonData!)
     } catch let error {
-        print("parseRoutingRuleJson err", json, error)
+        logger.info("parseRoutingRuleJson err: \(json), \(error)")
         err = error
     }
     return (res, err)

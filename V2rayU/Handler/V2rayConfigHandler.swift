@@ -159,7 +159,7 @@ class V2rayConfigHandler {
                 let dns = try decoder.decode(V2rayDns.self, from: jsonData)
                 return dns
             } catch {
-                print("解析 JSON 失败: \(error)")
+                logger.info("解析 JSON 失败: \(error)")
             }
         }
         return V2rayDns()

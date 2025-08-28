@@ -77,19 +77,19 @@ class AppCheckController: NSWindowController {
         guard let url = URL(string: "https://api.github.com/repos/yanue/V2rayU/releases") else {
             return
         }
-        print("checkForUpdates: \(url)")
+        logger.info("checkForUpdates: \(url)")
         let checkTask = URLSession.shared.dataTask(with: url) { data, _, error in
             if let error = error {
-                print("Error fetching release: \(error)")
+                logger.info("Error fetching release: \(error)")
                 return
             }
 
             guard let data = data else {
-                print("No data returned")
+                logger.info("No data returned")
                 return
             }
 
-            print("checkForUpdates: \n \(data)")
+            logger.info("checkForUpdates: \n \(data)")
 
             do {
                 let decoder = JSONDecoder()
@@ -103,7 +103,7 @@ class AppCheckController: NSWindowController {
 
                 // 取第一个
                 if let release = sortedData.first {
-                    print("release: \(release.tagName)")
+                    logger.info("release: \(release.tagName)")
                     DispatchQueue.main.async {
                         let releaseVersion = release.tagName.replacingOccurrences(of: "v", with: "").replacingOccurrences(of: "V", with: "").trimmingCharacters(in: .whitespaces) // v4.1.0 => 4.1.0
                         // get old version
@@ -117,7 +117,7 @@ class AppCheckController: NSWindowController {
                                 // 如果用户选择跳过版本更新, 则不显示新版本详情页面
                                 if let skipVersion = UserDefaults.standard.string(forKey: "skipAppVersion") {
                                     if skipVersion == release.tagName {
-                                        print("Skip version: \(skipVersion)")
+                                        logger.info("Skip version: \(skipVersion)")
                                         return
                                     }
                                 }
@@ -165,7 +165,7 @@ class AppCheckController: NSWindowController {
                         }
                     }
                 } catch {
-                    print("Error decoding JSON: \(error)")
+                    logger.info("Error decoding JSON: \(error)")
                     DispatchQueue.main.async {
                         // update progress text
                         self.bindData.progressText = "Check failed: \(error)"
@@ -246,8 +246,8 @@ class AppVersionController: NSWindowController {
     init() {
         let contentView = NSHostingView(rootView: ContentView(
             bindData: bindData,
-            skipAction: { print("Skip action") },
-            installAction: { print("Install action") }
+            skipAction: { logger.info("Skip action") },
+            installAction: { logger.info("Install action") }
         ))
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 300),
                               styleMask: [.titled, .closable, .resizable],
@@ -319,7 +319,7 @@ class AppVersionController: NSWindowController {
     }
 
     func skipAction() {
-        print("Skip action")
+        logger.info("Skip action")
         DispatchQueue.main.async {
             // UserDefaults 记录是否跳过版本更新
             UserDefaults.standard.set(self.release.tagName, forKey: "skipAppVersion")
@@ -451,7 +451,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         DispatchQueue.main.async {
             if let asset = release.assets.first {
                 self.bindData.dmgUrl = asset.browserDownloadUrl
-                print("download: \(self.bindData.dmgUrl)")
+                logger.info("download: \(self.bindData.dmgUrl)")
                 self.startDownload()
             } else {
                 self.bindData.progressText = "No dmg asset found"
@@ -484,7 +484,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
             self.bindData.progress = 0.0
             self.bindData.progressText = "Download canceled"
             self.downloadTask?.cancel()
-            print("Download canceled")
+            logger.info("Download canceled")
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.window?.close()
@@ -504,7 +504,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
             }
         }
 
-        print("Installing V2rayU: \(String(describing: destinationURL))")
+        logger.info("Installing V2rayU: \(String(describing: destinationURL))")
     }
 
     // ---------------------- ui 相关 --------------------------------
@@ -578,9 +578,9 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
         let destUrl = downloadsDirectory.appendingPathComponent(downloadTask.response?.suggestedFilename ?? "V2rayU-macOS.dmg")
 
         do {
-            print("destinationURL: \(destUrl)")
+            logger.info("destinationURL: \(destUrl)")
             if fileManager.fileExists(atPath: destUrl.path) {
-                print("Download file already exists: \(destUrl.path) \(location)")
+                logger.info("Download file already exists: \(destUrl.path) \(location)")
                 DispatchQueue.main.async {
                     self.bindData.isDownloading = false
                     self.bindData.progress = 100.0
@@ -599,7 +599,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                 self.destinationURL = destUrl
             }
 
-            print("Download finished: \(destUrl)")
+            logger.info("Download finished: \(destUrl)")
         } catch {
             DispatchQueue.main.async {
                 self.bindData.isDownloading = false
@@ -614,7 +614,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                 // Ensure alertDialog function displays an alert to the user
                 alertDialog(title: title, message: toast)
             }
-            print("File move error: \(error.localizedDescription)")
+            logger.info("File move error: \(error.localizedDescription)")
         }
     }
 
@@ -638,7 +638,7 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
             }
             // open dialog
             alertDialog(title: title, message: toast)
-            print("Download error: \(error.localizedDescription)")
+            logger.info("Download error: \(error.localizedDescription)")
         }
     }
 }

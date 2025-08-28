@@ -74,7 +74,7 @@ struct ConfigFormView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 2)
         )
         .onAppear {
-            print("ProfileFormView appeared with item: \(item.id)")
+            logger.info("ProfileFormView appeared with item: \(item.id)")
         }
     }
 }

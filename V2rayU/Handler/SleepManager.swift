@@ -17,7 +17,7 @@ actor SystemSleepManager {
             object: nil,
             queue: .main
         ) { _ in
-            print("系统即将进入睡眠状态")
+            logger.info("系统即将进入睡眠状态")
             // 在这里处理睡眠前的逻辑
             Task {
                 await self.handleSystemWillSleep()
@@ -30,7 +30,7 @@ actor SystemSleepManager {
             object: nil,
             queue: .main
         ) { _ in
-            print("系统已唤醒")
+            logger.info("系统已唤醒")
             // 在这里处理唤醒后的逻辑
             Task {
                 await self.handleSystemDidWake()
@@ -46,9 +46,9 @@ actor SystemSleepManager {
     private func handleSystemDidWake() {
         // 系统唤醒后的处理逻辑
         // 例如：重新建立连接、恢复任务、刷新数据等
-        NSLog("onWakeNote")
+        logger.info("onWakeNote")
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            NSLog("V2rayLaunch restart")
+            logger.info("V2rayLaunch restart")
             V2rayLaunch.restartV2ray()
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {

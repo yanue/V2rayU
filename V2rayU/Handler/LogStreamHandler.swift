@@ -57,7 +57,7 @@ class LogStreamHandler : ObservableObject {
 
     func startLogging() {
         guard let url = logFileURL else {
-            print("Log file URL is not set.\(String(describing: logFileURL))")
+            logger.info("Log file URL is not set.\(String(describing: logFileURL))")
             return
         }
         do {
@@ -66,9 +66,9 @@ class LogStreamHandler : ObservableObject {
             logLines = []
             startFileMonitor()
             isLogging = true
-            print("Started logging to \(url.path)")
+            logger.info("Started logging to \(url.path)")
         } catch {
-            print("Error starting logging: \(error)")
+            logger.info("Error starting logging: \(error)")
             isLogging = false
         }
     }
@@ -101,7 +101,7 @@ class LogStreamHandler : ObservableObject {
             source = src
             src.resume()
         } catch {
-            print("Error monitoring log file: \(error)")
+            logger.info("Error monitoring log file: \(error)")
         }
     }
 
@@ -138,7 +138,7 @@ class LogStreamHandler : ObservableObject {
             }
             lastOffset = fileSize
         } catch {
-            print("Error reading new log lines: \(error)")
+            logger.info("Error reading new log lines: \(error)")
         }
     }
 }

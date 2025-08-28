@@ -44,7 +44,7 @@ final class AppSettings: ObservableObject {
                     try SMAppService.mainApp.register()
                 }
             } catch {
-                Swift.print(error.localizedDescription)
+                uiLogger.info(error.localizedDescription)
             }
 
             // 先保存旧值

@@ -49,10 +49,10 @@ func checkFileIsRootAdmin(file: String) -> Bool {
                 groupUser = attr.value as! String
             }
         }
-        print("checkFileIsRootAdmin: file=\(file),owner=\(ownerUser),group=\(groupUser)")
+        logger.info("checkFileIsRootAdmin: file=\(file),owner=\(ownerUser),group=\(groupUser)")
         return ownerUser == "root" && groupUser == "admin"
     } catch {
-        print("\(error)")
+        logger.info("\(error)")
     }
     return false
 }
@@ -142,7 +142,7 @@ func clearLogFile(logFilePath: String) {
         // create new file
         FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: nil)
     } catch let error {
-        NSLog("clear log file fail: \(error)")
+        logger.info("clear log file fail: \(error)")
         var title = "Clear log file failed"
         var toast = "Error: \(error)"
         if isMainland {
@@ -161,7 +161,7 @@ func truncateLogFile(_ logFilePath: String) {
             try "".write(to: logFile, atomically: true, encoding: String.Encoding.utf8)
         }
     } catch let error {
-        NSLog("truncate log file fail: \(error)")
+        logger.info("truncate log file fail: \(error)")
         var title = "Truncate log file failed"
         var toast = "Error: \(error)"
         if isMainland {

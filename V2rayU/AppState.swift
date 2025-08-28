@@ -79,14 +79,14 @@ final class AppState: ObservableObject {
     }
 
     func setRunning(uuid: String) {
-        print("setRunning: \(uuid)")
+        logger.info("setRunning: \(uuid)")
         runningProfile = uuid
         UserDefaults.set(forKey: .runningProfile, value: uuid)
         StatusItemManager.shared.refreshMenuItems()
     }
     
     func switchRunMode(mode: RunMode) {
-        NSLog("setRunMode: \(mode)")
+        logger.info("setRunMode: \(mode)")
         runMode = mode
         icon = mode.icon  // 更新图标
         reloadCore(trigger: "setRunMode(\(mode))")
@@ -109,13 +109,13 @@ final class AppState: ObservableObject {
     }
 
     func runRouting(uuid: String) {
-        print("setRouting: \(uuid)")
+        logger.info("setRouting: \(uuid)")
         runningRouting = uuid
         reloadCore(trigger: "runRouting(\(uuid))")
     }
 
     func runProfile(uuid: String) {
-        print("setProfile: \(uuid)")
+        logger.info("setProfile: \(uuid)")
         runningProfile = uuid
         runningServer = ProfileViewModel.getRunning()
         reloadCore(trigger: "runProfile(\(uuid))")
@@ -141,7 +141,7 @@ extension AppState {
             if !success {
                 switchRunMode(mode: .off)
             }
-            NSLog("reloadCore triggered by: \(trigger)")
+            logger.info("reloadCore triggered by: \(trigger)")
             StatusItemManager.shared.refreshMenuItems()
         }
     }

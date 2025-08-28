@@ -16,7 +16,7 @@ func shell(launchPath: String, arguments: [String]) -> String? {
         let output = try runCommand(at: launchPath, with: arguments)
         return output
     } catch let error {
-        print("shell error: \(error)")
+        logger.info("shell error: \(error)")
         return ""
     }
 }
@@ -66,9 +66,9 @@ func killProcess(processIdentifier: pid_t) {
     do {
         let result = kill(processIdentifier, SIGKILL)
         if result == -1 {
-            NSLog("killProcess: Failed to kill process with identifier \(processIdentifier)")
+            logger.info("killProcess: Failed to kill process with identifier \(processIdentifier)")
         } else {
-            NSLog("killProcess: Successfully killed process with identifier \(processIdentifier)")
+            logger.info("killProcess: Successfully killed process with identifier \(processIdentifier)")
         }
     }
 }
@@ -76,14 +76,14 @@ func killProcess(processIdentifier: pid_t) {
 func killAllPing() {
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
-    NSLog("killAllPing: \(String(describing: msg))")
+    logger.info("killAllPing: \(String(describing: msg))")
     let rmPingJsonCmd = "rm -f ~/.V2rayU/.config.*.json"
     let msg1 = shell(launchPath: "/bin/bash", arguments: ["-c", rmPingJsonCmd])
-    NSLog("rmPingJson: \(String(describing: msg1))")
+    logger.info("rmPingJson: \(String(describing: msg1))")
 }
 
 func killSelfV2ray() {
     let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/config.json' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
-    NSLog("killSelfV2ray: \(String(describing: msg))")
+    logger.info("killSelfV2ray: \(String(describing: msg))")
 }

@@ -19,7 +19,7 @@ actor PingAll {
 
     func run()  {
         guard !inPing else {
-            NSLog("Ping is already running.")
+            logger.info("Ping is already running.")
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 已经在运行中")
             return
         }
@@ -29,12 +29,12 @@ actor PingAll {
 
         let items = ProfileViewModel.all()
         guard !items.isEmpty else {
-            NSLog("No items to ping.")
+            logger.info("No items to ping.")
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "没有可 Ping 的节点")
             return
         }
 
-        NSLog("Ping started.")
+        logger.info("Ping started.")
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 所有节点")
         // 开始执行异步任务
         self.pingTaskGroup(items: items)
@@ -68,10 +68,10 @@ actor PingAll {
             switch completion {
             case .finished:
                 NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "所有节点 Ping 完成\n")
-                NSLog("Ping completed")
+                logger.info("Ping completed")
             case let .failure(error):
                 NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 批量任务异常: \(error.localizedDescription)")
-                NSLog("Error: \(error)")
+                logger.info("Error: \(error)")
             }
             self.inPing = false
             killAllPing()
@@ -121,14 +121,14 @@ actor PingServer {
     private func ping() async throws {
         let ping = Ping()
         let pingTime = try await ping.doPing(bindPort: self.bindPort)
-        print("Ping success, time: \(pingTime)ms")
+        logger.info("Ping success, time: \(pingTime)ms")
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 成功: \(item.remark) - \(pingTime)ms")
         // 更新 speed
         ProfileViewModel.update_speed(uuid: self.item.uuid, speed: pingTime)
     }
     
     private func terminate() {
-        NSLog("ping end: \(item.remark) - \(item.speed)")
+        logger.info("ping end: \(item.remark) - \(item.speed)")
         do {
             if self.process.isRunning {
                 self.process.interrupt()
@@ -138,7 +138,7 @@ actor PingServer {
             try FileManager.default.removeItem(at: URL(fileURLWithPath: jsonFile))
         } catch {
             // 捕获错误并打印
-            NSLog("remove ping config error: \(error)")
+            logger.info("remove ping config error: \(error)")
         }
     }
     
@@ -148,7 +148,7 @@ actor PingServer {
         do {
             try jsonText.write(to: URL(fileURLWithPath: jsonFile), atomically: true, encoding: .utf8)
         } catch {
-            NSLog("Failed to write JSON file: \(error)")
+            logger.info("Failed to write JSON file: \(error)")
         }
     }
 

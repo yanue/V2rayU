@@ -15,10 +15,8 @@ struct V2rayUApp: App {
         // 初始化
         let fileManager = FileManager.default
         if fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first != nil {
-//            print("Application Support Directory: \(appSupportURL)")
+//            logger.info("Application Support Directory: \(appSupportURL)")
         }
-        print("NSHomeDirectory()",NSHomeDirectory())
-        print("userHomeDirectory",userHomeDirectory)
 //        AppDelegate.redirectStdoutToFile()
         // 加载
 //        appState.viewModel.getList()

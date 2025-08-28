@@ -52,9 +52,9 @@ actor LaunchAgent: NSObject {
     func loadAgent() {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["load", "-wF", launchAgentPlistFile])
-            NSLog("launchctl load \(launchAgentPlistFile) succeeded. \(output)")
+            logger.info("launchctl load \(launchAgentPlistFile) succeeded. \(output)")
         } catch let error {
-            NSLog("launchctl load \(launchAgentPlistFile) failed. \(error)")
+            logger.info("launchctl load \(launchAgentPlistFile) failed. \(error)")
         }
     }
 
@@ -62,9 +62,9 @@ actor LaunchAgent: NSObject {
     func unloadAgent() {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["unload", "-F", launchAgentPlistFile])
-            NSLog("launchctl unload \(launchAgentPlistFile) succeeded. \(output)")
+            logger.info("launchctl unload \(launchAgentPlistFile) succeeded. \(output)")
         } catch let error {
-            NSLog("launchctl unload \(launchAgentPlistFile) failed. \(error)")
+            logger.info("launchctl unload \(launchAgentPlistFile) failed. \(error)")
         }
     }
 
@@ -72,7 +72,7 @@ actor LaunchAgent: NSObject {
     func startAgent() -> Bool {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["start", LAUNCH_AGENT_NAME])
-            print("Start v2ray-core: ok \(output)")
+            logger.info("Start v2ray-core: ok \(output)")
             return true
         } catch let error {
             alertDialog(title: "Start v2ray-core failed.", message: error.localizedDescription)
@@ -84,7 +84,7 @@ actor LaunchAgent: NSObject {
     func stopAgent() {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
-            print("Stop v2ray-core: ok \(output)")
+            logger.info("Stop v2ray-core: ok \(output)")
         } catch let error {
             alertDialog(title: "Stop v2ray-core failed.", message: error.localizedDescription)
         }

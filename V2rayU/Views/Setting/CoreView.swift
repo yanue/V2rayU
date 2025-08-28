@@ -199,22 +199,22 @@ struct CoreView: View {
         }
         isLoading = true
 
-        print("checkForUpdates: \(url)")
+        logger.info("checkForUpdates: \(url)")
         let checkTask = URLSession.shared.dataTask(with: url) { data, _, error in
             DispatchQueue.main.async {
                 self.isLoading = false
             }
             if let error = error {
-                print("Error fetching release: \(error)")
+                logger.info("Error fetching release: \(error)")
                 return
             }
 
             guard let data = data else {
-                print("No data returned")
+                logger.info("No data returned")
                 return
             }
 
-            print("checkForUpdates: \n \(data)")
+            logger.info("checkForUpdates: \n \(data)")
 
             do {
                 let decoder = JSONDecoder()
@@ -239,7 +239,7 @@ struct CoreView: View {
                         self.errorMsg = "Check failed: \(data.message)\n\(data.documentationUrl)"
                     }
                 } catch {
-                    print("Error decoding JSON: \(error)")
+                    logger.info("Error decoding JSON: \(error)")
                     DispatchQueue.main.async {
                         self.errorMsg = "Check failed: \(error)"
                     }
@@ -261,7 +261,7 @@ struct CoreView: View {
         downloadTargetSize = ""
 
         let asset = version.getDownloadAsset()
-        print("downloadAndReplace: \(asset)")
+        logger.info("downloadAndReplace: \(asset)")
         guard let url = URL(string: asset.browserDownloadUrl) else {
             errorMsg = "下载地址错误: \(asset.browserDownloadUrl)"
             isLoading = false
@@ -344,7 +344,7 @@ struct CoreView: View {
     }
     
     private func downloadDone(zipFile: String) {
-        print("downloadDone", zipFile)
+        logger.info("downloadDone", zipFile)
         let destPath = AppHomePath + "/xray-core"
         let backupPath = destPath + ".bak"
 

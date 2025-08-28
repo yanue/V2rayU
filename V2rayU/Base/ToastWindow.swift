@@ -22,9 +22,9 @@ func alertDialog(title: String, message: String) {
             
             let response = alert.runModal()
             if response == .alertFirstButtonReturn {
-                print("OK clicked")
+                logger.info("OK clicked")
             } else {
-                print("Cancel clicked")
+                logger.info("Cancel clicked")
             }
         } else {
             // 如果没有窗口，使用替代方案
@@ -52,7 +52,7 @@ func showConfirmAlertSync(title: String, message: String, confirmTitle: String =
 }
 
 func makeToast(message: String, displayDuration: Double? = 3) {
-    print("makeToast: message=\(message),displayDuration=\(String(describing: displayDuration))")
+    logger.info("makeToast: message=\(message),displayDuration=\(String(describing: displayDuration))")
     // 确保调用 makeToast 时在主线程上
     DispatchQueue.main.async {
         ToastManager.shared.makeToast(message: message,displayDuration: displayDuration ?? 3)
@@ -152,7 +152,7 @@ class ToastManager: ObservableObject {
                     isDisplaying = false
                 }
             } catch {
-                print("Hide task cancelled")
+                logger.info("Hide task cancelled")
             }
         }
     }

@@ -1,5 +1,7 @@
 import SwiftUI
 import Foundation
+import OSLog
+
 //import FirebaseCore
 //import AppCenter
 //import AppCenterAnalytics
@@ -15,10 +17,12 @@ let v2rayLogFilePath = AppHomePath + "/v2ray-core.log"
 let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+let logger = Logger(subsystem: "net.yanue.V2rayU", category: "app")
+let uiLogger = Logger(subsystem: "net.yanue.V2rayU", category: "ui")
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        print("Application did finish launching.")
+        logger.info("Application did finish launching.")
         // 初始化状态栏项目
         StatusItemManager.shared.setupStatusItem()
         Task{
@@ -38,7 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
      }
     
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        print("applicationShouldTerminate")
+        logger.info("applicationShouldTerminate")
 
         // 停止所有快捷键监听
 
@@ -52,12 +56,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 终止 V2ray 进程
         killSelfV2ray()
 
-        print("applicationShouldTerminate end")
+        logger.info("applicationShouldTerminate end")
         return .terminateNow
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
-        print("Application will terminate.")
+        logger.info("Application will terminate.")
         AppLogStream.stopLogging()
         V2rayLogStream.stopLogging()
         Task {

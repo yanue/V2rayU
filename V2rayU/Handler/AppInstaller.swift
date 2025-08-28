@@ -15,15 +15,15 @@ actor AppInstaller: NSObject {
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: AppHomePath) {
-            print("app home dir \(AppHomePath) not exists,need install")
+            logger.info("app home dir \(AppHomePath) not exists,need install")
             try! fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
         }
 
         // make sure new version
-        NSLog("install", AppResourcesPath)
+        logger.info("install", AppResourcesPath)
         var needRunInstall = false
         if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
-            NSLog("\(v2rayCoreFile) not accessable")
+            logger.info("\(v2rayCoreFile) not accessable")
             needRunInstall = true
         }
         // Ensure permission with root admin
@@ -31,32 +31,32 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
         if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayCorePath + "/geoip.dat") {
-            NSLog("\(v2rayCorePath)/geoip.dat not exists,need install")
+            logger.info("\(v2rayCorePath)/geoip.dat not exists,need install")
             needRunInstall = true
         }
         if !needRunInstall {
             // use /bin/bash to fix crash when V2rayUTool is not exist
             let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
-            NSLog("toolVersion - \(v2rayUTool): \(String(describing: toolVersion))")
+            logger.info("toolVersion - \(v2rayUTool): \(String(describing: toolVersion))")
             if toolVersion != nil {
                 let _version = toolVersion ?? "" // old version
                 if _version.contains("Usage:") {
-                    NSLog("\(v2rayUTool) old version,need install")
+                    logger.info("\(v2rayUTool) old version,need install")
                     needRunInstall = true
                 } else {
                     if !(_version >= "4.0.0") {
-                        NSLog("\(v2rayUTool) old version,need install")
+                        logger.info("\(v2rayUTool) old version,need install")
                         needRunInstall = true
                     }
                 }
             } else {
-                NSLog("\(v2rayUTool) not exists,need install")
+                logger.info("\(v2rayUTool) not exists,need install")
                 needRunInstall = true
             }
         }
-        print("launchedBefore", needRunInstall)
+        logger.info("launchedBefore, \(needRunInstall)")
         if !needRunInstall {
-            print("no need install")
+            logger.info("no need install")
             return
         }
 
@@ -126,9 +126,9 @@ actor AppInstaller: NSObject {
     func executeAppleScriptWithOsascript(script: String) {
         do {
             let output = try runCommand(at: "/usr/bin/osascript", with: ["-e", "do shell script \"" + script + "\" with administrator privileges"])
-            print("executeAppleScript-Output: \(output)")
+            logger.info("executeAppleScript-Output: \(output)")
         } catch {
-            print("executeAppleScript-Error: \(error)")
+            logger.info("executeAppleScript-Error: \(error)")
             var title = "Install V2rayUTool Failed"
             var toast = "Error: \(error),\nYou need execute scripts manually:\n \(script)"
             if isMainland {

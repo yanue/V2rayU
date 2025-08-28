@@ -90,7 +90,7 @@ struct PacView: View {
 
     func viewPacFile(_ sender: Any) {
         let pacUrl = getPacUrl()
-        print("viewPacFile PACUrl", pacUrl)
+        logger.info("viewPacFile PACUrl", pacUrl)
         guard let url = URL(string: pacUrl) else {
             return
         }
@@ -101,7 +101,7 @@ struct PacView: View {
         tips = "Updating Pac Rules ..."
         do {
             // save user rules into file
-            print("user-rules", pacUserRules)
+            logger.info("user-rules", pacUserRules)
             try pacUserRules.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
 
             UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl)
@@ -115,7 +115,7 @@ struct PacView: View {
                 showAlert = true
             }
         } catch {
-            NSLog("updatePac error \(error)")
+            logger.info("updatePac error \(error)")
             tips = "updatePac error \(error)"
             showAlert = true
         }
@@ -200,7 +200,7 @@ struct PacView: View {
     func tryDownloadByShell(gfwPacListUrl: String) {
         let sockPort = getSocksProxyPort()
         let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
-        NSLog("curlCmd: \(curlCmd)")
+        logger.info("curlCmd: \(curlCmd)")
         let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
         if GeneratePACFile(rewrite: true) {
             // Popup a user notification

@@ -13,7 +13,7 @@ func findFreePort() -> UInt16 {
 
     let socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
     if socketFD == -1 {
-        // print("Error creating socket: \(errno)")
+        // logger.info("Error creating socket: \(errno)")
         return port
     }
 
@@ -31,21 +31,21 @@ func findFreePort() -> UInt16 {
     var addressInfo: UnsafeMutablePointer<addrinfo>?
     var result = getaddrinfo(nil, "0", &hints, &addressInfo)
     if result != 0 {
-        // print("Error getting address info: \(errno)")
+        // logger.info("Error getting address info: \(errno)")
         close(socketFD)
         return port
     }
 
     result = Darwin.bind(socketFD, addressInfo!.pointee.ai_addr, socklen_t(addressInfo!.pointee.ai_addrlen))
     if result == -1 {
-        // print("Error binding socket to an address: \(errno)")
+        // logger.info("Error binding socket to an address: \(errno)")
         close(socketFD)
         return port
     }
 
     result = Darwin.listen(socketFD, 1)
     if result == -1 {
-        // print("Error setting socket to listen: \(errno)")
+        // logger.info("Error setting socket to listen: \(errno)")
         close(socketFD)
         return port
     }
@@ -76,7 +76,7 @@ func isPortOpen(port: UInt16) -> Bool {
         let output = try runCommand(at: "/usr/sbin/lsof", with: ["-i", ":\(port)"])
         return output.contains("LISTEN")
     } catch let error {
-        NSLog("isPortOpen: \(error)")
+        logger.info("isPortOpen: \(error)")
     }
     return false
 }
@@ -87,7 +87,7 @@ func getUsablePort(port: UInt16) -> (Bool, UInt16) {
     var _port = port
     while i < 100 {
         let opened = isPortOpen(port: _port)
-        NSLog("getUsablePort: try=\(i) port=\(_port) opened=\(opened)")
+        logger.info("getUsablePort: try=\(i) port=\(_port) opened=\(opened)")
         if !opened {
             return (isNew, _port)
         }

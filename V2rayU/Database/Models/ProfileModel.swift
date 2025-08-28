@@ -275,7 +275,7 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord {
                 try self.save(db)
             }
         } catch {
-            print("save error: \(error)")
+            logger.info("save error: \(error)")
         }
     }
 }

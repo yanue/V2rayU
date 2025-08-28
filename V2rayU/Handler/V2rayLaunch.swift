@@ -19,7 +19,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func startV2rayCore() async -> Bool {
-        NSLog("start v2ray-core begin")
+        logger.info("start v2ray-core begin")
         guard let v2ray = ProfileViewModel.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return false
@@ -50,10 +50,10 @@ class V2rayLaunch: NSObject {
         let vCfg = V2rayConfigHandler()
         let jsonText = vCfg.toJSON(item: item)
         do {
-            NSLog("createJsonFile: \(JsonConfigFilePath)")
+            logger.info("createJsonFile: \(JsonConfigFilePath)")
             try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
         } catch {
-            NSLog("Failed to write JSON file: \(error)")
+            logger.info("Failed to write JSON file: \(error)")
             noticeTip(title: "Failed to write JSON file: \(error)")
         }
     }
@@ -108,7 +108,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode) {
-        print("setSystemProxy", v2rayUTool, mode)
+        logger.info("setSystemProxy", v2rayUTool, mode)
         var httpPort: String = ""
         var sockPort: String = ""
         // reload
@@ -118,7 +118,7 @@ class V2rayLaunch: NSObject {
         }
         do {
             let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])
-            print("setSystemProxy: ok \(output)")
+            logger.info("setSystemProxy: ok \(output)")
         } catch let error {
             alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
             Task {
