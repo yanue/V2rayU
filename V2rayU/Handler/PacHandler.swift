@@ -38,7 +38,7 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
         return true
     }
 
-    logger.info("GeneratePACFile rewrite", pacAddress, socksPort)
+    logger.info("GeneratePACFile rewrite: \(pacAddress), \(socksPort)" )
     let userRules = getPacUserRules()
     var gfwlist = getPacGFWList()
     do {
@@ -94,7 +94,7 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
                 } else {
                     jsStr = jsStr.replacingOccurrences(of: "__SOCKS5ADDR__", with: pacAddress)
                 }
-                logger.info("PACFilePath", PACFilePath)
+                logger.info("PACFilePath: \(PACFilePath)")
 
                 // Write the pac js to file.
                 try jsStr.data(using: String.Encoding.utf8)?.write(to: URL(fileURLWithPath: PACFilePath), options: .atomic)

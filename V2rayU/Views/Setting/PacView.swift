@@ -90,7 +90,7 @@ struct PacView: View {
 
     func viewPacFile(_ sender: Any) {
         let pacUrl = getPacUrl()
-        logger.info("viewPacFile PACUrl", pacUrl)
+        logger.info("viewPacFile PACUrl: \(pacUrl)")
         guard let url = URL(string: pacUrl) else {
             return
         }
@@ -101,7 +101,7 @@ struct PacView: View {
         tips = "Updating Pac Rules ..."
         do {
             // save user rules into file
-            logger.info("user-rules", pacUserRules)
+            logger.info("user-rules: \(pacUserRules)")
             try pacUserRules.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
 
             UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl)

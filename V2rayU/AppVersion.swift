@@ -503,8 +503,6 @@ class AppDownloadController: NSWindowController, URLSessionDownloadDelegate {
                 }
             }
         }
-
-        logger.info("Installing V2rayU: \(String(describing: destinationURL))")
     }
 
     // ---------------------- ui 相关 --------------------------------

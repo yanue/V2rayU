@@ -261,7 +261,7 @@ struct CoreView: View {
         downloadTargetSize = ""
 
         let asset = version.getDownloadAsset()
-        logger.info("downloadAndReplace: \(asset)")
+        logger.info("downloadAndReplace: \(asset.browserDownloadUrl)")
         guard let url = URL(string: asset.browserDownloadUrl) else {
             errorMsg = "下载地址错误: \(asset.browserDownloadUrl)"
             isLoading = false
@@ -344,7 +344,7 @@ struct CoreView: View {
     }
     
     private func downloadDone(zipFile: String) {
-        logger.info("downloadDone", zipFile)
+        logger.info("downloadDone: \(zipFile)")
         let destPath = AppHomePath + "/xray-core"
         let backupPath = destPath + ".bak"
 

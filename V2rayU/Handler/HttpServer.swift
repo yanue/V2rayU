@@ -31,7 +31,7 @@ actor LocalHttpServer {
         // 停止已有服务
         await stop()
         let pacPort = getPacPort()
-        logger.info("pacPort", pacPort)
+        logger.info("pacPort: \(pacPort)")
 
         if isPortOpen(port: pacPort) {
             var toast = "pac port \(pacPort) has been used, please replace from advance setting"

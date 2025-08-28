@@ -52,9 +52,9 @@ actor LaunchAgent: NSObject {
     func loadAgent() {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["load", "-wF", launchAgentPlistFile])
-            logger.info("launchctl load \(launchAgentPlistFile) succeeded. \(output)")
+            logger.info("launchctl load \(self.launchAgentPlistFile) succeeded. \(output)")
         } catch let error {
-            logger.info("launchctl load \(launchAgentPlistFile) failed. \(error)")
+            logger.info("launchctl load \(self.launchAgentPlistFile) failed. \(error)")
         }
     }
 
@@ -62,9 +62,9 @@ actor LaunchAgent: NSObject {
     func unloadAgent() {
         do {
             let output = try runCommand(at: "/bin/launchctl", with: ["unload", "-F", launchAgentPlistFile])
-            logger.info("launchctl unload \(launchAgentPlistFile) succeeded. \(output)")
+            logger.info("launchctl unload \(self.launchAgentPlistFile) succeeded. \(output)")
         } catch let error {
-            logger.info("launchctl unload \(launchAgentPlistFile) failed. \(error)")
+            logger.info("launchctl unload \(self.launchAgentPlistFile) failed. \(error)")
         }
     }
 

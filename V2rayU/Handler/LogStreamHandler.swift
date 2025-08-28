@@ -57,7 +57,7 @@ class LogStreamHandler : ObservableObject {
 
     func startLogging() {
         guard let url = logFileURL else {
-            logger.info("Log file URL is not set.\(String(describing: logFileURL))")
+            logger.info("Log file URL is not set.")
             return
         }
         do {

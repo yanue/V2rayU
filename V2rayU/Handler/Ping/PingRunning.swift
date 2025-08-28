@@ -46,7 +46,7 @@ actor PingRunning {
             } catch {
                 retries += 1
                 NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 失败: \(item.remark) - 第\(retries)次: \(error.localizedDescription)")
-                logger.info("Ping failed (\(retries)/\(maxRetries)): \(error)")
+                logger.info("Ping failed (\(retries)/\(self.maxRetries)): \(error)")
             }
         }
 
@@ -74,7 +74,7 @@ actor PingRunning {
         failureCount += 1
         if failureCount >= maxFailures {
             failureCount = 0
-            logger.info("Ping failed \(maxFailures) times, switching to backup...")
+            logger.info("Ping failed \(self.maxFailures) times, switching to backup...")
             await switchServer()
         }
     }

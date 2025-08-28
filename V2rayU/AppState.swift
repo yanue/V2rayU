@@ -86,7 +86,6 @@ final class AppState: ObservableObject {
     }
     
     func switchRunMode(mode: RunMode) {
-        logger.info("setRunMode: \(mode)")
         runMode = mode
         icon = mode.icon  // 更新图标
         reloadCore(trigger: "setRunMode(\(mode))")

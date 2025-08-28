@@ -128,7 +128,7 @@ actor PingServer {
     }
     
     private func terminate() {
-        logger.info("ping end: \(item.remark) - \(item.speed)")
+        logger.info("ping end: \(self.item.remark) - \(self.item.speed)")
         do {
             if self.process.isRunning {
                 self.process.interrupt()

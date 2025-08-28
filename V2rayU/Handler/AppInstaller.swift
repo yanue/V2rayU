@@ -20,7 +20,7 @@ actor AppInstaller: NSObject {
         }
 
         // make sure new version
-        logger.info("install", AppResourcesPath)
+        logger.info("install: \(AppResourcesPath)")
         var needRunInstall = false
         if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
             logger.info("\(v2rayCoreFile) not accessable")

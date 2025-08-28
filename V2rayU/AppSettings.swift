@@ -44,7 +44,7 @@ final class AppSettings: ObservableObject {
                     try SMAppService.mainApp.register()
                 }
             } catch {
-                uiLogger.info(error.localizedDescription)
+                uiLogger.info("Failed to update launch at login setting: \(error.localizedDescription)")
             }
 
             // 先保存旧值

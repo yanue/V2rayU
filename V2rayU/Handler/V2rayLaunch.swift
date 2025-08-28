@@ -108,7 +108,7 @@ class V2rayLaunch: NSObject {
     }
 
     static func setSystemProxy(mode: RunMode) {
-        logger.info("setSystemProxy", v2rayUTool, mode)
+        logger.info("setSystemProxy: \(v2rayUTool), \(mode.rawValue)")
         var httpPort: String = ""
         var sockPort: String = ""
         // reload
