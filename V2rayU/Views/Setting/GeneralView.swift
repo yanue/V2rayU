@@ -15,34 +15,36 @@ struct GeneralView: View {
     @State private var proxyModeShortcut: String = ""
 
     @ObservedObject var themeManager: ThemeManager = ThemeManager()
-    @ObservedObject var languageManager: LanguageManager = LanguageManager()
+    @StateObject private var languageManager = LanguageManager.shared
     @ObservedObject var settings = AppSettings.shared // 引用单例
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Form {
                 Section {
-                    Toggle("Launch V2rayU at login", isOn: $settings.launchAtLogin)
-                    Toggle("Check for updates automatically", isOn: $settings.checkForUpdates)
-                    Toggle("Automatically update servers from subscriptions", isOn: $settings.autoUpdateServers)
-                    Toggle("Automatically select fastest server", isOn: $settings.selectFastestServer)
-                    Toggle("Show Proxy Speed on Tray Icon", isOn: $settings.showSpeedOnTray)
-                    Toggle("Enable Proxy Statistics", isOn: $settings.enableStat)
+                    Toggle(String(localized: .LaunchAtLogin), isOn: $settings.launchAtLogin)
+                    Toggle(String(localized: .CheckForUpdateAutomatically), isOn: $settings.checkForUpdates)
+                    Toggle(String(localized: .AutoUpdateServersFromSubscriptions), isOn: $settings.autoUpdateServers)
+                    Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
+                    Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
+                    Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
                 }
                 Spacer()
 
                 // 语言选择器
-                Picker("Language", selection: $languageManager.selectedLanguage) {
+                Picker(String(localized: .Language), selection: $languageManager.selectedLanguage) {
                     ForEach(Language.allCases, id: \.self) { item in
-                       Text(item.localized).tag(item.rawValue)
+                        localized(item.rawValue).tag(item.rawValue)
                     }
                 }
                .padding()
 
-
-                Picker("Theme", selection: $themeManager.selectedTheme) {
+                localized(.Language)
+                localized(.Theme)
+                    
+                Picker(String(localized: .Theme), selection: $themeManager.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
-                        Text(item.localized).tag(item.rawValue)
+                        localized(item.rawValue).tag(item.rawValue)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle()) // 分段选择样式

@@ -3,4 +3,12 @@
 "Follow System" = "跟随系统";
 "English" = "English";
 "Simplified Chinese" = "简体中文";
-"Traditional Chinese" = "繁体中文";
+"Traditional Chinese" = "繁體中文";
+"Language" = "语言";
+"Theme" = "主题";
+"LaunchAtLogin" = "开启时自动启动";
+"CheckForUpdateAutomatically" = "自动检查更新";
+"AutoUpdateServersFromSubscriptions" = "自动从订阅更新服务器";
+"AutomaticallySelectFastestServer" = "自动选择最快服务器";
+"ShowProxySpeedOnTrayIcon" = "在菜单栏图标显示代理速度";
+"EnableProxyStatistics" = "启用代理流量统计";

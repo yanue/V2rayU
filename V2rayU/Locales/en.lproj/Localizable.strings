@@ -4,3 +4,11 @@
 "English" = "English";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
+"Language" = "Language";
+"Theme" = "Theme";
+"LaunchAtLogin" = "Launch at login";
+"CheckForUpdateAutomatically" = "Check for update automatically";
+"AutoUpdateServersFromSubscriptions" = "Auto-update servers from subscriptions";
+"AutomaticallySelectFastestServer" = "Automatically select fastest server";
+"ShowProxySpeedOnTrayIcon" = "Show proxy speed on tray icon";
+"EnableProxyStatistics" = "Enable proxy statistics";

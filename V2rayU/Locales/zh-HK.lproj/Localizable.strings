@@ -4,3 +4,11 @@
 "English" = "English";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
+"Language" = "語言";
+"Theme" = "主題";
+"LaunchAtLogin" = "開啟時自動啟動";
+"CheckForUpdateAutomatically" = "自動檢查更新";
+"AutoUpdateServersFromSubscriptions" = "自動從訂閱更新伺服器";
+"AutomaticallySelectFastestServer" = "自動選擇最快伺服器";
+"ShowProxySpeedOnTrayIcon" = "在選單欄圖標顯示代理速度";
+"EnableProxyStatistics" = "啟用代理流量統計";

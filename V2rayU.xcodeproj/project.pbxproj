@@ -606,6 +606,8 @@
 				669DCEA52E3D908C0085278B /* AppSettings.swift */,
 				66F66F822D1E450000E77C64 /* AppState.swift */,
 				662CC3C12D1BED9B006E8450 /* AppVersion.swift */,
+				66E94B2F2D26B95D003745B5 /* Language.swift */,
+				66E94B302D26B95D003745B5 /* Theme.swift */,
 				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
 				66B1B5582D297AE60032DD09 /* Scpipts */,
 				662CC3D42D1BED9B006E8450 /* Database */,
@@ -632,8 +634,6 @@
 			children = (
 				66E94B2D2D26B95D003745B5 /* Common.swift */,
 				66E94B2E2D26B95D003745B5 /* JsonView.swift */,
-				66E94B2F2D26B95D003745B5 /* Language.swift */,
-				66E94B302D26B95D003745B5 /* Theme.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
