@@ -160,5 +160,27 @@ enum LanguageLabel: String, CaseIterable {
     case TransportSettings
     case ServerSettings
     case StreamSettings
-    
+    // menu
+    case TurnCoreOff
+    case TurnCoreOn
+    case ViewLog
+    case ViewConfigJson
+    case ViewPacFile
+    case PacMode
+    case GlobalMode
+    case ManualMode
+    case RoutingList
+    case ServerList
+    case goRoutingSettings
+    case goServerSettings
+    case Ping
+    case ImportServersFromClipboard
+    case ScanQRCodeFromScreen
+    case ShareQrCode
+    case CopyHttpProxyShellExportLine
+    case Preferences
+    case CheckForUpdates
+    case Quit
+    case On
+    case Off
 }

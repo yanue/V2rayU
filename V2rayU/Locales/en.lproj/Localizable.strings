@@ -162,3 +162,27 @@
 "TransportSettings" = "Transport settings";
 "ServerSettings" = "Server settings";
 "StreamSettings" = "Stream settings";
+
+// app menu
+"TurnCoreOn" = "Turn Core On";
+"TurnCoreOff" = "Turn Core Off";
+"ViewLog" = "View Log";
+"ViewConfigJson" = "View Config JSON";
+"ViewPacFile" = "View PAC File";
+"PacMode" = "PAC Mode";
+"GlobalMode" = "Global Mode";
+"ManualMode" = "Manual Mode";
+"RoutingList" = "Routing ...";
+"ServerList" = "Server ...";
+"goServerSettings" = "Server Settings...";
+"goRoutingSettings" = "Routing Settings...";
+"Ping" = "Ping";
+"ImportServersFromClipboard" = "Import Servers from Clipboard";
+"ScanQRCodeFromScreen" = "Scan QR Code from Screen";
+"ShareQrCode" = "Share QR Code";
+"CopyHttpProxyShellExportLine" = "Copy HTTP Proxy Shell Export Line";
+"Preferences" = "Preferences";
+"CheckForUpdates" = "Check for Updates";
+"Quit" = "Quit";
+"On" = "On";
+"Off" = "Off";

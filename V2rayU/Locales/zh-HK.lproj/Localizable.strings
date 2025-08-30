@@ -162,3 +162,27 @@
 "TransportSettings" = "傳輸設定";
 "ServerSettings" = "伺服器設定";
 "StreamSettings" = "串流設定";
+
+// app menu
+"TurnCoreOn" = "啟動核心";
+"TurnCoreOff" = "關閉核心";
+"ViewLog" = "檢視日誌";
+"ViewConfigJson" = "檢視配置 JSON";
+"ViewPacFile" = "檢視 PAC 檔案";
+"PacMode" = "PAC 模式";
+"GlobalMode" = "全域模式";
+"ManualMode" = "手動模式";
+"RoutingList" = "路由 ...";
+"ServerList" = "服务器 ...";
+"goServerSettings" = "服务器配置 ...";
+"goRoutingSettings" = "路由设置 ...";
+"Ping" = "Ping 測試";
+"ImportServersFromClipboard" = "從剪貼簿匯入伺服器";
+"ScanQRCodeFromScreen" = "掃描螢幕上的二維碼";
+"ShareQrCode" = "分享二維碼";
+"CopyHttpProxyShellExportLine" = "複製 HTTP 代理 Shell 匯出命令";
+"Preferences" = "偏好設定";
+"CheckForUpdates" = "檢查更新";
+"Quit" = "退出";
+"On" = "開啟";
+"Off" = "關閉";

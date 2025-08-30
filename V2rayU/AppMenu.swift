@@ -13,9 +13,34 @@ final class StatusItemManager: NSObject {
     static let shared = StatusItemManager()
     var windowController: NSWindowController?
     var aboutWindowController: NSWindowController?
+    private var inited = false
     private var statusItem: NSStatusItem!
     private var hostingView: NSHostingView<StatusItemView>!
+    // menu items
     private var toggleCoreItem: NSMenuItem!
+    private var viewConfigItem: NSMenuItem!
+    private var viewPacItem: NSMenuItem!
+    private var viewLogItem: NSMenuItem!
+    private var pacModeItem: NSMenuItem!
+    private var globalModeItem: NSMenuItem!
+    private var manualModeItem: NSMenuItem!
+    private var routingItem: NSMenuItem!
+    private var routingSubMenu: NSMenu!
+    private var goRoutingSettingItem: NSMenuItem!
+    private var serverItem: NSMenuItem!
+    private var serverSubMenu: NSMenu!
+    private var goServerSettingItem: NSMenuItem!
+    private var subscriptionsItem: NSMenuItem!
+    private var pacSettingsItem: NSMenuItem!
+    private var pingItem: NSMenuItem!
+    private var importServersItem: NSMenuItem!
+    private var scanQRCodeItem: NSMenuItem!
+    private var shareQRCodeItem: NSMenuItem!
+    private var copyHttpProxyItem: NSMenuItem!
+    private var preferencesItem: NSMenuItem!
+    private var checkForUpdatesItem: NSMenuItem!
+    private var helpItem: NSMenuItem!
+    private var quitItem: NSMenuItem!
 
     override private init() {
         super.init()
@@ -48,9 +73,41 @@ final class StatusItemManager: NSObject {
     }
 
     func refreshMenuItems() {
-        setupMenu()
+        serverSubMenu = getServerSubMenus()
     }
     
+    func refreshRoutingItems() {
+        routingSubMenu = getRoutingSubMenus()
+    }
+    
+    func updateMenuTitles() {
+        if !inited {
+            return
+        }
+        toggleCoreItem.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+        viewConfigItem.title = String(localized: .ViewConfigJson)
+        viewPacItem.title = String(localized: .ViewPacFile)
+        viewLogItem.title = String(localized: .ViewLog)
+        pacModeItem.title = String(localized: .PacMode)
+        globalModeItem.title = String(localized: .GlobalMode)
+        manualModeItem.title = String(localized: .ManualMode)
+        subscriptionsItem.title = String(localized: .Subscriptions)
+        pacSettingsItem.title = String(localized: .PAC)
+        pingItem.title = String(localized: .Ping)
+        importServersItem.title = String(localized: .ImportServersFromClipboard)
+        scanQRCodeItem.title = String(localized: .ScanQRCodeFromScreen)
+        shareQRCodeItem.title = String(localized: .ShareQrCode)
+        copyHttpProxyItem.title = String(localized: .CopyHttpProxyShellExportLine)
+        preferencesItem.title = String(localized: .Preferences)
+        checkForUpdatesItem.title = String(localized: .CheckForUpdates)
+        helpItem.title = String(localized: .Help)
+        quitItem.title = String(localized: .Quit)
+        goRoutingSettingItem.title = String(localized: .goRoutingSettings)
+        goServerSettingItem.title = String(localized: .goServerSettings)
+        routingItem.title = String(localized: .RoutingList)
+        serverItem.title = String(localized: .ServerList)
+    }
+
     private func setupMenu() {
         let menu = NSMenu()
 
@@ -60,43 +117,59 @@ final class StatusItemManager: NSObject {
         coreStatusItem.isEnabled = false
         menu.addItem(coreStatusItem)
 
-        toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? "Turn Core Off" : "Turn Core On", action: #selector(toggleRunning), keyEquivalent: "t")
-        menu.addItem(toggleCoreItem)
+        toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn), action: #selector(toggleRunning), keyEquivalent: "t")
+        viewConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewConfig), keyEquivalent: "")
+        viewPacItem = NSMenuItem(title: String(localized: .ViewPacFile), action: #selector(viewPacFile), keyEquivalent: "")
+        viewLogItem = NSMenuItem(title: String(localized: .ViewLog), action: #selector(openLogs), keyEquivalent: "")
         // 配置查看
-        menu.addItem(NSMenuItem(title: "View config.json", action: #selector(viewConfig), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "View pac file", action: #selector(viewPacFile), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "View v2ray log", action: #selector(openLogs), keyEquivalent: ""))
+        menu.addItem(toggleCoreItem)
+        menu.addItem(viewConfigItem)
+        menu.addItem(viewPacItem)
+        menu.addItem(viewLogItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
-        menu.addItem(getRunModeItem(mode: .pac,title: "Pac Mode", keyEquivalent: ""))
-        menu.addItem(getRunModeItem(mode: .global,title: "Global Mode", keyEquivalent: ""))
-        menu.addItem(getRunModeItem(mode: .manual,title: "Manual Mode", keyEquivalent: ""))
+        pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
+        globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
+        manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
+        menu.addItem(pacModeItem)
+        menu.addItem(globalModeItem)
+        menu.addItem(manualModeItem)
         menu.addItem(NSMenuItem.separator())
         // 路由与服务器
-        let routingItem = getRoutingSubMenus()
+        routingItem = getRoutingItem()
+        serverItem = getServerItem()
+        subscriptionsItem = NSMenuItem(title: String(localized: .Subscriptions), action: #selector(openPreferenceSubscribe), keyEquivalent: "")
+        pacSettingsItem = NSMenuItem(title: String(localized: .PAC), action: #selector(openPreferencePac), keyEquivalent: "")
+        pingItem = NSMenuItem(title: String(localized: .Ping), action: #selector(pingSpeed), keyEquivalent: "")
         menu.addItem(routingItem)
-        let serverItem = getServerSubMenus()
         menu.addItem(serverItem)
-        menu.addItem(NSMenuItem(title: "Subscription...", action: #selector(openPreferenceSubscribe), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Pac...", action: #selector(openPreferencePac), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Ping", action: #selector(pingSpeed), keyEquivalent: ""))
+        menu.addItem(subscriptionsItem)
+        menu.addItem(pacSettingsItem)
+        menu.addItem(pingItem)
         menu.addItem(NSMenuItem.separator())
 
         // 导入与分享
-        menu.addItem(NSMenuItem(title: "Import Server From Pasteboard", action: #selector(ImportFromPasteboard), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Scan QR Code From Screen", action: #selector(scanQrcode), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Share QR Code", action: #selector(generateQrcode), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Copy HTTP Proxy Shell Export Line", action: #selector(copyExportCommand), keyEquivalent: ""))
-
+        importServersItem = NSMenuItem(title: String(localized: .ImportServersFromClipboard), action: #selector(ImportFromPasteboard), keyEquivalent: "")
+        scanQRCodeItem = NSMenuItem(title: String(localized: .ScanQRCodeFromScreen), action: #selector(scanQrcode), keyEquivalent: "")
+        shareQRCodeItem = NSMenuItem(title: String(localized: .ShareQrCode), action: #selector(generateQrcode), keyEquivalent: "")
+        copyHttpProxyItem = NSMenuItem(title: String(localized: .CopyHttpProxyShellExportLine), action: #selector(copyExportCommand), keyEquivalent: "")
+        menu.addItem(importServersItem)
+        menu.addItem(scanQRCodeItem)
+        menu.addItem(shareQRCodeItem)
+        menu.addItem(copyHttpProxyItem)
         menu.addItem(NSMenuItem.separator())
 
         // 设置与帮助
-        menu.addItem(NSMenuItem(title: "Preferences...", action: #selector(openPreferenceGeneral), keyEquivalent: ","))
-        menu.addItem(NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdate), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Help", action: #selector(goHelp), keyEquivalent: ""))
-
+        preferencesItem = NSMenuItem(title: String(localized: .Preferences), action: #selector(openPreferenceGeneral), keyEquivalent: ",")
+        checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates), action: #selector(checkForUpdate), keyEquivalent: "")
+        helpItem = NSMenuItem(title: String(localized: .Help), action: #selector(goHelp), keyEquivalent: "")
+        menu.addItem(preferencesItem)
+        menu.addItem(checkForUpdatesItem)
+        menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "退出", action: #selector(terminateApp), keyEquivalent: "q"))
+        
+        quitItem = NSMenuItem(title: String(localized: .Quit), action: #selector(terminateApp), keyEquivalent: "q")
+        menu.addItem(quitItem)
 
         // 为所有菜单项设置 target
         for item in menu.items {
@@ -104,6 +177,17 @@ final class StatusItemManager: NSObject {
         }
 
         statusItem.menu = menu
+        self.inited = true
+    }
+    
+    func getRoutingItem() -> NSMenuItem {
+
+        // 获取子菜单
+        routingSubMenu = getRoutingSubMenus()
+        // 返回菜单项
+        let item = NSMenuItem(title: String(localized: .RoutingList), action: nil, keyEquivalent: "")
+        item.submenu = routingSubMenu
+        return item
     }
     
     func getRunModeItem(mode: RunMode,title: String, keyEquivalent: String = "") -> NSMenuItem {
@@ -118,25 +202,23 @@ final class StatusItemManager: NSObject {
         return menu
     }
 
-    func getRoutingSubMenus() -> NSMenuItem {
-        let menu = NSMenuItem()
-        menu.title = "Routing"
-        menu.submenu = NSMenu()
+    func getRoutingSubMenus() -> NSMenu {
+        // 预先初始化一次
+        goRoutingSettingItem = NSMenuItem(title: String(localized: .goRoutingSettings), action: #selector(openRoutingTab), keyEquivalent: "")
+        goRoutingSettingItem.isEnabled = true
+        goRoutingSettingItem.target = self
+        
+        let menu = NSMenu()
+               
+        menu.addItem(goRoutingSettingItem)
+        menu.addItem(NSMenuItem.separator())
         
         let routings = RoutingViewModel.all()
         let currentRouting = AppState.shared.runningRouting
-        let item = NSMenuItem(title: "Routing Settings ...", action: #selector(openRoutingTab), keyEquivalent: "")
-        item.representedObject = ""  // 可选：存储路由名称
-        item.isEnabled =  true
-        item.target = self
-        menu.submenu?.addItem(item)
-        menu.submenu?.addItem(NSMenuItem.separator())
-
         logger.info("currentRouting: \(currentRouting)")
         for routing in routings {
-            logger.info("routing item: \(routing.name) \(currentRouting) \(item.state.rawValue) ")
             let item = createRoutingMenuItem(routing: routing, current: currentRouting)
-            menu.submenu?.addItem(item)
+            menu.addItem(item)
         }
         return menu
     }
@@ -150,20 +232,28 @@ final class StatusItemManager: NSObject {
         return item
     }
     
-    func getServerSubMenus() -> NSMenuItem {
-        let menu = NSMenuItem()
-        menu.title = "Servers"
-        menu.submenu = NSMenu()
+    func getServerItem() -> NSMenuItem {
+        // 获取子菜单
+        serverSubMenu = getServerSubMenus()
+        // 返回菜单项
+        let item = NSMenuItem(title: String(localized: .ServerList), action: nil, keyEquivalent: "")
+        item.submenu = serverSubMenu
+        return item
+    }
+    
+    func getServerSubMenus() -> NSMenu {
+        // 预先初始化一次
+        goServerSettingItem = NSMenuItem(title: String(localized: .goServerSettings), action: #selector(openServerTab), keyEquivalent: "")
+        goServerSettingItem.isEnabled = true
+        goServerSettingItem.target = self
+        
+        let menu = NSMenu()
+        // 添加服务器设置项
+        menu.addItem(goServerSettingItem)
+        menu.addItem(NSMenuItem.separator())
         
         let currentProfile = AppState.shared.runningProfile
-        
-        // 添加服务器设置项
-        let settingsItem = NSMenuItem(title: "Servers Settings ...", action: #selector(openServerTab), keyEquivalent: "")
-        settingsItem.isEnabled = true
-        settingsItem.target = self
-        menu.submenu?.addItem(settingsItem)
-        menu.submenu?.addItem(NSMenuItem.separator())
-        
+
         // 按订阅ID分组
         let groupedServers = ProfileViewModel.getGroupedProfiles()
         
@@ -179,25 +269,24 @@ final class StatusItemManager: NSObject {
                 groupItem.title = groupName
                 groupItem.submenu = subMenu
                 groupItem.image = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
-                groupItem.toolTip = "\(profiles.count) servers"
+                groupItem.toolTip = "\(profiles.count)"
                 // todo 优化
                 groupItem.state = profiles.contains { $0.uuid == currentProfile } ? .on : .off
                 for profile in profiles {
                     let item = createServerMenuItem(profile: profile, current: currentProfile)
                     subMenu.addItem(item)
                 }
-                menu.submenu?.addItem(groupItem)
+                menu.addItem(groupItem)
             }
         } else {
             // 直接显示所有服务器
             for (_, profiles) in groupedServers {
                 for profile in profiles {
                     let item = createServerMenuItem(profile: profile, current: currentProfile)
-                    menu.submenu?.addItem(item)
+                    menu.addItem(item)
                 }
             }
         }
-        
         return menu
     }
 

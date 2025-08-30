@@ -31,6 +31,11 @@ enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
     }
 }
 
+// 在 LanguageManager 中添加
+extension Notification.Name {
+    static let languageDidChange = Notification.Name("LanguageDidChange")
+}
+
 // MARK: - Language Manager
 @MainActor
 class LanguageManager: ObservableObject {
@@ -62,6 +67,8 @@ class LanguageManager: ObservableObject {
             languageBundle = Bundle.main
         }
         currentLocale = Locale(identifier: selectedLanguage.localeIdentifier)
+        // 更新菜单
+        StatusItemManager.shared.updateMenuTitles()
     }
 
     func localizedString(_ key: String) -> String {
