@@ -21,9 +21,9 @@ struct SubscriptionFormView: View {
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Subscription Settings")
+                    localized(.SubscriptionSettings)
                         .font(.headline)
-                    Text("Edit your subscription information")
+                    localized(.SubscriptionSettingsSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -34,10 +34,10 @@ struct SubscriptionFormView: View {
             Divider()
             Spacer()
             VStack() {
-                getTextFieldWithLabel(label: "Remark", text: $item.remark)
-                getTextFieldWithLabel(label: "Url", text: $item.url)
-                getNumFieldWithLabel(label: "sort", num: $item.sort)
-                getNumFieldWithLabel(label: "updateInterval", num: $item.updateInterval)
+                getTextFieldWithLabel(label: .Remark, text: $item.remark)
+                getTextFieldWithLabel(label: .SubscriptionUrl, text: $item.url)
+                getNumFieldWithLabel(label: .sort, num: $item.sort)
+                getNumFieldWithLabel(label: .updateInterval, num: $item.updateInterval)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
@@ -45,10 +45,10 @@ struct SubscriptionFormView: View {
             Divider()
             HStack {
                 Spacer()
-                Button("Cancel") {
+                Button(String(localized: .Cancel)) {
                     onClose()
                 }
-                Button("Save") {
+                Button(String(localized: .Save)) {
                     viewModel.upsert(item: item)
                     onClose()
                 }

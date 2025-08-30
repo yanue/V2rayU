@@ -1,14 +1,164 @@
-"Light" = "Light";
-"Dark" = "Dark";
-"Follow System" = "Follow System";
 "English" = "English";
-"Simplified Chinese" = "简体中文";
-"Traditional Chinese" = "繁體中文";
+"Simplified Chinese" = "Simplified Chinese";
+"Traditional Chinese" = "Traditional Chinese";
 "Language" = "Language";
 "Theme" = "Theme";
+"Light" = "Light";
+"Dark" = "Dark";
+"FollowSystem" = "Follow System";
+
+// base
+"Save" = "Save";
+"Confirm" = "Confirm";
+"Cancel" = "Cancel";
+"Close" = "Close";
+"Reset" = "Reset";
+"Remark" = "Remark";
+"Edit" = "Edit";
+"Preview" = "Preview";
+
+// app content
+"Activity" = "Activity";
+"ActivitySubHead" = "View recent activities and logs";
+"Servers" = "Servers";
+"ServerSubHead" = "Manage and configure your servers";
+"Subscriptions" = "Subscriptions";
+"SubscriptionSubHead" = "Manage your subscription sources";
+"Routings" = "Routings";
+"RoutingSubHead" = "Match priority: Domain Block -> Domain Proxy -> Domain Direct -> IP Block -> IP Proxy -> IP Direct";
+"Settings" = "Settings";
+"SettingsSubHead" = "General application settings";
+"About" = "About";
+"AboutSubHead" = "About this application";
+
+// settings tab
+"General" = "General";
+"Advanced" = "Advanced";
+"PAC" = "PAC";
+"DNS" = "DNS";
+"Core" = "Core";
+
+// general settings
 "LaunchAtLogin" = "Launch at login";
 "CheckForUpdateAutomatically" = "Check for update automatically";
 "AutoUpdateServersFromSubscriptions" = "Auto-update servers from subscriptions";
 "AutomaticallySelectFastestServer" = "Automatically select fastest server";
 "ShowProxySpeedOnTrayIcon" = "Show proxy speed on tray icon";
 "EnableProxyStatistics" = "Enable proxy statistics";
+"KeyboardShortcuts" = "Shortcuts";
+"ToggleV2rayOnOff" = "Toggle V2ray On/Off";
+"SwitchProxyMode" = "Switch Proxy Mode";
+
+// advanced settings
+"LocalSocksListenPort" = "Local SOCKS listen port";
+"EnableUDP" = "Enable UDP";
+"LocalHttpListenPort" = "Local HTTP listen port";
+"LocalPacListenPort" = "Local PAC listen port";
+"AllowLAN" = "Allow LAN connections";
+"EnableSniffing" = "Enable sniffing";
+"EnableMux" = "Enable Mux";
+"Mux" = "Mux";
+"EnableTrafficStatistics" = "Enable traffic statistics";
+"V2rayCoreLogLevel" = "V2Ray core log level";
+
+// pac settings
+"PacSettings" = "PAC Settings";
+"ConfigureProxyRules" = "Configure proxy rules";
+"GFWListDownloadURL" = "GFWList download URL";
+"EnterGFWListURL" = "Enter GFWList URL";
+"CustomRules" = "Custom rules";
+"AddCustomRules" = "Add custom rules";
+"ViewPACFile" = "View PAC file";
+"UpdatePAC" = "Update PAC";
+"PACUpdatedByUserRules" = "PAC updated by user rules";
+"PACUpdateFailed" = "PAC update failed";
+"PACUpdatedByGFWList" = "PAC updated by GFWList";
+"FailedToDownloadGFWList" = "Failed to download GFWList";
+"FailedToWriteGFWList" = "Failed to write GFWList";
+"FailedToUpdatePAC" = "Failed to update PAC";
+"UpdatingPACRules" = "Updating PAC rules";
+"PACUpdateError" = "PAC update error";
+"PACUpdateSuccess" = "PAC update success";
+"PACUpdateNotification" = "PAC update notification";
+
+// dns settings
+"DnsConfiguration" = "DNS Configuration";
+"DnsJsonFormatTip" = "Tip: Use JSON format for DNS configuration";
+"ViewConfiguration" = "View configuration";
+"Help" = "Help";
+"Notification" = "Notification";
+
+// subscription form
+"SubscriptionSettings" = "Subscription settings";
+"SubscriptionSettingsSubHead" = "Manage subscription details";
+"SubscriptionUrl" = "Subscription URL";
+"sort" = "Sort";
+"updateInterval" = "Update interval";
+"AddSubscription" = "Add subscription";
+"EditSubscription" = "Edit subscription";
+"SyncAllSubscriptionTitle" = "Sync all subscriptions";
+"SyncSubscriptionTitle" = "Sync subscription";
+"SyncAllSubscriptionTip" = "Synchronize all subscriptions now";
+"SyncSubscriptionNow" = "Sync subscription now";
+"SyncSubscriptionIng" = "Synchronizing subscription...";
+
+// routing settings
+"RoutingSettings" = "Routing settings";
+"RoutingSettingsSubHead" = "Manage routing rules";
+"AddRoutingRule" = "Add routing rule";
+"EditRoutingRule" = "Edit routing rule";
+"domainStrategy" = "Domain strategy";
+"domainMatcher" = "Domain matcher";
+"Direct" = "Direct";
+"Proxy" = "Proxy";
+"Block" = "Block";
+
+// profile settings
+"ProfileSettings" = "Profile settings";
+"ProfileSettingsSubHead" = "Manage profile details";
+"Protocol" = "Protocol";
+"Address" = "Address";
+"Password" = "Password";
+"Method" = "Method";
+"Port" = "Port";
+"ID" = "ID";
+"UserID" = "User ID";
+"AlterID" = "Alter ID";
+"Security" = "Security";
+"Encryption" = "Encryption";
+"Network" = "Network";
+"HeaderType" = "Header type";
+"HttpHost" = "HTTP host";
+"HttpPath" = "HTTP path";
+"WsHost" = "WebSocket host";
+"WsPath" = "WebSocket path";
+"DsPath" = "DS path";
+"WsHeaders" = "WebSocket headers";
+"Flow" = "Flow";
+"TcpFastOpen" = "TCP Fast Open";
+"EnableTls" = "Enable TLS";
+"SkipCertVerify" = "Skip certificate verification";
+"TlsSettings" = "TLS settings";
+"XtlsSettings" = "XTLS settings";
+"RealitySettings" = "REALITY settings";
+"ServerName" = "Server name";
+"Key" = "Key";
+"Seed" = "Seed";
+"Congestion" = "Congestion";
+"MTU" = "MTU";
+"TTI" = "TTI";
+"UplinkCapacity" = "Uplink capacity";
+"DownloadCapacity" = "Download capacity";
+"xhttpPath" = "XHTTP path";
+"xhttpHost" = "XHTTP host";
+"AllowInsecure" = "Allow insecure";
+"ProfileRemark" = "Profile remark";
+"Sni" = "SNI";
+"Fingerprint" = "Fingerprint";
+"PublicKey" = "Public key";
+"ShortID" = "Short ID";
+"SpiderX" = "SpiderX";
+"Alpn" = "ALPN";
+"TransportSettings" = "Transport settings";
+"ServerSettings" = "Server settings";
+"StreamSettings" = "Stream settings";

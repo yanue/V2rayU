@@ -18,15 +18,15 @@ struct PacView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("PAC 设置")
+                    localized(.PacSettings)
                         .font(.title2)
-                    Text("配置代理规则，管理 GFWList 与自定义规则。")
+                    localized(.ConfigureProxyRules)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
                 Button(action: { viewPacFile(self) }) {
-                    Label("查看 PAC 文件", systemImage: "doc.text.magnifyingglass")
+                    Label(String(localized: .ViewPACFile), systemImage: "doc.text.magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -34,18 +34,18 @@ struct PacView: View {
             Spacer()
 
             VStack(alignment: .leading) {
-                Text("GFW List 下载地址：")
+                localized(.GFWListDownloadURL)
                     .font(.headline)
-                TextField("输入 GFW List URL", text: $gfwPacListUrl)
+                TextField(String(localized: .EnterGFWListURL), text: $gfwPacListUrl)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
             }
 
             Spacer()
 
             VStack(alignment: .leading) {
-                Text("自定义规则：")
+                localized(.CustomRules)
                     .font(.headline)
-                Text("可在此添加自定义规则，每行一条。")
+                localized(.AddCustomRules)
                     .font(.caption)
                     .foregroundColor(.secondary)
                 TextEditor(text: $pacUserRules)
@@ -54,7 +54,7 @@ struct PacView: View {
 
             HStack {
                 Button(action: { viewPacFile(self) }) {
-                    Label("查看 PAC 文件", systemImage: "doc.text")
+                    Label(String(localized: .ViewPACFile), systemImage: "doc.text")
                 }
                 .buttonStyle(.bordered)
 
@@ -72,7 +72,7 @@ struct PacView: View {
                 Spacer()
 
                 Button(action: { updatePac(self) }) {
-                    Label("更新 PAC", systemImage: "arrow.triangle.2.circlepath")
+                    Label(String(localized: .UpdatePAC), systemImage: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -84,7 +84,7 @@ struct PacView: View {
             pacUserRules = getPacUserRules()
         }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("提示"), message: Text(tips), dismissButton: .default(Text("确定")))
+            Alert(title: Text(String(localized: .PACUpdateNotification)), message: Text(tips), dismissButton: .default(Text("确定")))
         }
     }
 

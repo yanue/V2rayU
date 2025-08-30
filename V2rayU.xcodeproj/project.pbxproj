@@ -90,9 +90,8 @@
 		66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchAgent.swift */; };
 		66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F842E5F44850024E338 /* AppInstaller.swift */; };
 		66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */; };
-		66E94B322D26B95D003745B5 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* Language.swift */; };
+		66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* LanguageLabel.swift */; };
 		66E94B332D26B95D003745B5 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2D2D26B95D003745B5 /* Common.swift */; };
-		66E94B342D26B95D003745B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B302D26B95D003745B5 /* Theme.swift */; };
 		66E94B352D26B95D003745B5 /* JsonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2E2D26B95D003745B5 /* JsonView.swift */; };
 		66E94B392D26B971003745B5 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B382D26B971003745B5 /* SettingView.swift */; };
 		66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B362D26B971003745B5 /* AppContentView.swift */; };
@@ -105,6 +104,7 @@
 		66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A52E2E669400E72DE2 /* PacHandler.swift */; };
 		66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */; };
 		66EB76B02E31135200E72DE2 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76AF2E31135200E72DE2 /* Download.swift */; };
+		66F1C5CA2E62E6B2009D0024 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F1C5C92E62E6B1009D0024 /* LanguageManager.swift */; };
 		66F66F832D1E450000E77C64 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F822D1E450000E77C64 /* AppState.swift */; };
 		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
@@ -256,8 +256,7 @@
 		66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		66E94B2E2D26B95D003745B5 /* JsonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonView.swift; sourceTree = "<group>"; };
-		66E94B2F2D26B95D003745B5 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
-		66E94B302D26B95D003745B5 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		66E94B2F2D26B95D003745B5 /* LanguageLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageLabel.swift; sourceTree = "<group>"; };
 		66E94B362D26B971003745B5 /* AppContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentView.swift; sourceTree = "<group>"; };
 		66E94B372D26B971003745B5 /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
@@ -267,6 +266,7 @@
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
+		66F1C5C92E62E6B1009D0024 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
@@ -597,24 +597,24 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
-				66EB6C1C2E3B99F300A12DB3 /* Protocol */,
+				662CC3E92D1BED9B006E8450 /* V2rayU.entitlements */,
+				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
 				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
 				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
 				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
 				66389D082E425AC80050CB27 /* AppMenu.swift */,
 				669DCEA52E3D908C0085278B /* AppSettings.swift */,
-				66F66F822D1E450000E77C64 /* AppState.swift */,
 				662CC3C12D1BED9B006E8450 /* AppVersion.swift */,
-				66E94B2F2D26B95D003745B5 /* Language.swift */,
-				66E94B302D26B95D003745B5 /* Theme.swift */,
-				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
+				66F66F822D1E450000E77C64 /* AppState.swift */,
+				66F1C5C92E62E6B1009D0024 /* LanguageManager.swift */,
+				66E94B2F2D26B95D003745B5 /* LanguageLabel.swift */,
+				66EB6C1C2E3B99F300A12DB3 /* Protocol */,
 				66B1B5582D297AE60032DD09 /* Scpipts */,
 				662CC3D42D1BED9B006E8450 /* Database */,
 				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D72D1BED9B006E8450 /* Handler */,
 				662CC3DD2D1BED9B006E8450 /* Locales */,
-				662CC3E92D1BED9B006E8450 /* V2rayU.entitlements */,
 				662CC4002D1BED9B006E8450 /* Views */,
 				66CBCEE22C63B16500313949 /* Preview Content */,
 			);
@@ -784,9 +784,8 @@
 				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
 				66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */,
 				66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */,
-				66E94B322D26B95D003745B5 /* Language.swift in Sources */,
+				66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
-				66E94B342D26B95D003745B5 /* Theme.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
 				66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */,
 				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
@@ -848,6 +847,7 @@
 				662CC4212D1BED9B006E8450 /* AppMenuView.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
+				66F1C5CA2E62E6B2009D0024 /* LanguageManager.swift in Sources */,
 				669DCEA32E3D90760085278B /* ToastWindow.swift in Sources */,
 				669DCEA42E3D90760085278B /* Github.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,

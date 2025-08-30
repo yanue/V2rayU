@@ -13,7 +13,7 @@ struct ConfigTransportView: View {
         VStack {
             HStack {
                 Image(systemName: "lock.shield")
-                Text("Transport Settings")
+                localized(.TransportSettings)
                 Spacer()
             }
             .foregroundColor(.primary)
@@ -21,16 +21,16 @@ struct ConfigTransportView: View {
             .font(.title3)
             
             VStack {
-                getPickerWithLabel(label: "Security", selection: $item.security)
-                getBoolFieldWithLabel(label: "Allow Insecure", isOn: $item.allowInsecure)
-                getTextFieldWithLabel(label: "serverName(SNI)", text: $item.sni)
-                getPickerWithLabel(label: "Fingerprint", selection: $item.fingerprint)
+                getPickerWithLabel(label: .Security, selection: $item.security)
+                getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.allowInsecure)
+                getTextFieldWithLabel(label: .Sni, text: $item.sni)
+                getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
                 if item.security == .reality {
-                    getTextFieldWithLabel(label: "Public Key", text: $item.publicKey)
-                    getTextFieldWithLabel(label: "Short ID", text: $item.shortId)
-                    getTextFieldWithLabel(label: "SpiderX", text: $item.spiderX)
+                    getTextFieldWithLabel(label: .PublicKey, text: $item.publicKey)
+                    getTextFieldWithLabel(label: .ShortID, text: $item.shortId)
+                    getTextFieldWithLabel(label: .SpiderX, text: $item.spiderX)
                 } else {
-                    getPickerWithLabel(label: "ALPN", selection: $item.alpn)
+                    getPickerWithLabel(label: .Alpn, selection: $item.alpn)
                 }
             }
             .padding() // 1. 内边距
@@ -43,8 +43,4 @@ struct ConfigTransportView: View {
             ) // 4. 添加边框和阴影
         }
     }
-}
-
-#Preview {
-    ConfigTransportView(item: ProfileModel(remark: "test01", protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto"))
 }

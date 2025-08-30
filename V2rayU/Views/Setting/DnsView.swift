@@ -18,15 +18,15 @@ struct DnsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("DNS 配置")
+                    localized(.DnsConfiguration)
                         .font(.title2)
-                    Text("仅支持 JSON 格式, 请输入 DNS 节点内的json配置(`dns`: {内容部分})")
+                    localized(.DnsJsonFormatTip)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
                 Button(action: { goViewConfig(self) }) {
-                    Label("查看配置", systemImage: "doc.text.magnifyingglass")
+                    Label(String(localized: .ViewConfiguration), systemImage: "doc.text.magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -45,7 +45,7 @@ struct DnsView: View {
 
             HStack {
                 Button(action: { goHelp(self) }) {
-                    Label("帮助", systemImage: "questionmark.circle")
+                    Label(String(localized: .Help), systemImage: "questionmark.circle")
                 }
                 .buttonStyle(.bordered)
                 Spacer()
@@ -60,14 +60,14 @@ struct DnsView: View {
 
                 Spacer()
                 Button(action: { saveDnsServers() }) {
-                    Label("保存", systemImage: "tray.and.arrow.down")
+                    Label(String(localized: .Save), systemImage: "tray.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
             }
         }
         .onAppear { loadDnsServers() }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("提示"), message: Text(tips), dismissButton: .default(Text("确定")))
+            Alert(title: Text(String(localized: .Notification)), message: Text(tips), dismissButton: .default(Text(String(localized: .Confirm))) )
         }
     }
 

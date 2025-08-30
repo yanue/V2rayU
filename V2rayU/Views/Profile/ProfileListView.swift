@@ -43,10 +43,10 @@ struct ProfileListView: View {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Proxies")
+                    localized(.Servers)
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("Manage your proxy list")
+                    localized(.ServerSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

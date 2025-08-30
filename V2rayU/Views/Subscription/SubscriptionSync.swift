@@ -18,10 +18,10 @@ struct SubscriptionSyncView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text(isAll ? "Sync All Subscriptions" : "Sync Subscription")
+                Text(isAll ? String(localized: .SyncAllSubscriptionTitle) : String(localized: .SyncSubscriptionTitle))
                     .font(.title2).bold()
                 Spacer()
-                Button(isSyncing ? "Syncing..." : "Sync Now") {
+                Button(isSyncing ? String(localized: .SyncSubscriptionIng) : String(localized: .SyncSubscriptionNow)) {
                     isSyncing = true
                     logs.removeAll()
                     if isAll {
@@ -33,7 +33,7 @@ struct SubscriptionSyncView: View {
                 .disabled(isSyncing)
                 .buttonStyle(.borderedProminent)
                 Button(action: onClose) {
-                    Text("Close")
+                    localized(.Close)
                 }
             }
             .padding([.top, .horizontal], 20)
@@ -43,10 +43,10 @@ struct SubscriptionSyncView: View {
 
             if let sub = subscription, !isAll {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Remark: \(sub.remark)")
+                    Text(String(localized: .Remark) + ": \(sub.remark)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    Text("Url: \(sub.url)")
+                    Text(String(localized: .SubscriptionUrl) + ": \(sub.url)")
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
@@ -54,7 +54,7 @@ struct SubscriptionSyncView: View {
                 .padding(.top, 8)
                 Divider().padding(.top, 8)
             } else if isAll {
-                Text("This will sync all subscriptions.")
+                localized(.SyncAllSubscriptionTip)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 20)
@@ -92,7 +92,7 @@ struct SubscriptionSyncView: View {
                         .padding(.horizontal, 20)
                     }
                     .onAppear { scrollProxy = proxy }
-                    .onChange(of: logs) { _ in
+                    .onChange(of: logs) { _,_ in
                         if let last = logs.indices.last {
                             DispatchQueue.main.async {
                                 withAnimation { proxy.scrollTo(last, anchor: .bottom) }

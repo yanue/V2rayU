@@ -42,7 +42,7 @@ struct AboutView: View {
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("About")
+                    localized(.About)
                         .font(.title)
                         .fontWeight(.bold)
                     HStack {

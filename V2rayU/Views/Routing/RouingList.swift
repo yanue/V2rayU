@@ -33,10 +33,10 @@ struct RoutingListView: View {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Routing")
+                    localized(.Routings)
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连")
+                    localized(.RoutingSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

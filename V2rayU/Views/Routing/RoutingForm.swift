@@ -23,9 +23,9 @@ struct RoutingFormView: View {
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Routing Settings")
+                    localized(.RoutingSettings)
                         .font(.headline)
-                    Text("Edit your routing information")
+                    localized(.RoutingSettingsSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -36,9 +36,9 @@ struct RoutingFormView: View {
             Divider()
             Spacer()
             VStack() {
-                getTextFieldWithLabel(label: "Remark", text: $item.remark)
+                getTextFieldWithLabel(label: .Remark, text: $item.remark)
                 HStack {
-                    getTextLabel(label: "domainStrategy")
+                    getTextLabel(label: .domainStrategy)
                     Spacer()
                     Picker("", selection: $item.domainStrategy) {
                         ForEach(domainStrategys, id: \.self) { pick in
@@ -47,7 +47,7 @@ struct RoutingFormView: View {
                     }
                 }
                 HStack {
-                    getTextLabel(label: "domainMatcher")
+                    getTextLabel(label: .domainMatcher)
                     Spacer()
                     Picker("", selection: $item.domainMatcher) {
                         ForEach(domainMatchers, id: \.self) { pick in
@@ -100,9 +100,9 @@ struct RoutingFormView: View {
                     }
                 }
                 Divider()
-                getTextEditorWithLabel(label: "direct", text: $item.direct)
-                getTextEditorWithLabel(label: "block", text: $item.block)
-                getTextEditorWithLabel(label: "proxy", text: $item.proxy)
+                getTextEditorWithLabel(label: .Direct, text: $item.direct)
+                getTextEditorWithLabel(label: .Block, text: $item.block)
+                getTextEditorWithLabel(label: .Proxy, text: $item.proxy)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
@@ -110,10 +110,10 @@ struct RoutingFormView: View {
             Divider()
             HStack {
                 Spacer()
-                Button("Cancel") {
+                Button(String(localized: .Cancel)) {
                     onClose()
                 }
-                Button("Save") {
+                Button(String(localized: .Save)) {
                     viewModel.upsert(item: item)
                     onClose()
                 }

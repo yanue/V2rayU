@@ -14,7 +14,7 @@ struct ConfigStreamView: View {
         VStack {
             HStack {
                 Image(systemName: "waveform.path")
-                Text("Stream Settings")
+                localized(.StreamSettings)
                 Spacer()
             }
             .foregroundColor(.primary)
@@ -22,54 +22,54 @@ struct ConfigStreamView: View {
             .font(.title3)
             
             VStack {
-                getPickerWithLabel(label: "Network", selection: $item.network)
+                getPickerWithLabel(label: .Network, selection: $item.network)
                 if item.network == .tcp  {
                     if item.network == .tcp {
-                        getPickerWithLabel(label: "Header Type", selection: $item.headerType)
+                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
                     }
                     if item.headerType == .http {
-                        getTextFieldWithLabel(label: "Request Host", text: $item.host)
-                        getTextFieldWithLabel(label: "Request Path", text: $item.path)
+                        getTextFieldWithLabel(label: .HttpHost, text: $item.host)
+                        getTextFieldWithLabel(label: .HttpPath, text: $item.path)
                     }
                 }
                 
                 if item.network == .ws {
-                    getTextFieldWithLabel(label: "Request Host", text: $item.host)
-                    getTextFieldWithLabel(label: "Request Path", text: $item.path)
+                    getTextFieldWithLabel(label: .WsHost, text: $item.host)
+                    getTextFieldWithLabel(label: .WsPath, text: $item.path)
                 }
                 
                 if item.network == .h2 {
-                    getTextFieldWithLabel(label: "Request Host", text: $item.host)
-                    getTextFieldWithLabel(label: "Request Path", text: $item.path)
+                    getTextFieldWithLabel(label: .HttpHost, text: $item.host)
+                    getTextFieldWithLabel(label: .HttpPath, text: $item.path)
                 }
                 
                 if item.network == .grpc {
-                    getTextFieldWithLabel(label: "Service Name", text: $item.path)
+                    getTextFieldWithLabel(label: .ServerName, text: $item.path)
                 }
                 
                 if item.network == .quic {
-                    getTextFieldWithLabel(label: "Key", text: $item.path)
-                    getPickerWithLabel(label: "Header Type", selection: $item.headerType)
-                    getPickerWithLabel(label: "Security", selection: $item.headerType)
+                    getTextFieldWithLabel(label: .Key, text: $item.path)
+                    getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                    getPickerWithLabel(label: .Security, selection: $item.security)
                 }
                 
                 if item.network == .domainsocket {
-                    getTextFieldWithLabel(label: "Path", text: $item.path)
+                    getTextFieldWithLabel(label: .DsPath, text: $item.path)
                 }
                 
                 if item.network == .kcp {
-                    getTextFieldWithLabel(label: "Seed", text: $item.path)
-                    getPickerWithLabel(label: "Header Type", selection: $item.headerType)
-                    getBoolFieldWithLabel(label: "Congestion", isOn: $item.allowInsecure)
-                    getNumFieldWithLabel(label: "MTU", num: $item.port)
-                    getNumFieldWithLabel(label: "TTI", num: $item.port)
-                    getNumFieldWithLabel(label: "Uplink Capacity", num: $item.port)
-                    getNumFieldWithLabel(label: "Downlink Capacity", num: $item.port)
+                    getTextFieldWithLabel(label: .Seed, text: $item.path)
+                    getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                    getBoolFieldWithLabel(label: .Congestion, isOn: $item.allowInsecure)
+                    getNumFieldWithLabel(label: .MTU, num: $item.port)
+                    getNumFieldWithLabel(label: .TTI, num: $item.port)
+                    getNumFieldWithLabel(label: .UplinkCapacity, num: $item.port)
+                    getNumFieldWithLabel(label: .DownloadCapacity, num: $item.port)
                 }
                 
                 if item.network == .xhttp {
-                    getTextFieldWithLabel(label: "Path", text: $item.path)
-                    getTextFieldWithLabel(label: "Host", text: $item.host)
+                    getTextFieldWithLabel(label: .xhttpHost, text: $item.host)
+                    getTextFieldWithLabel(label: .xhttpPath, text: $item.path)
                 }
             }
             .padding() // 1. 内边距
@@ -82,8 +82,4 @@ struct ConfigStreamView: View {
             ) // 4. 添加边框和阴影
         }
     }
-}
-
-#Preview {
-    ConfigStreamView(item: ProfileModel(remark: "test01", protocol: .trojan, address: "dss", port: 443, password: "aaa", encryption: "auto"))
 }

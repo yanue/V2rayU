@@ -31,6 +31,15 @@ enum RunMode: String, CaseIterable {
     }
 }
 
+enum Theme: String, CaseIterable {
+    case System = "FollowSystem"
+    case Light
+    case Dark
+    var localized: String {
+        return NSLocalizedString(rawValue, comment: "")
+    }
+}
+
 @MainActor
 final class AppState: ObservableObject {
     static let shared = AppState() // 单例实例
@@ -53,31 +62,48 @@ final class AppState: ObservableObject {
     @Published var proxyUpSpeed = 0.0
     @Published var proxyDownSpeed = 0.0
 
-    @StateObject var viewModel = ProfileViewModel()
+    @Published var selectedTheme: Theme {
+        didSet {
+            setAppearance(selectedTheme)
+        }
+    }
+
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        setupBindings()
+        if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
+           let theme = Theme(rawValue: savedTheme) {
+            selectedTheme = theme
+        } else {
+            selectedTheme = .System
+        }
+        // 初始化应用外观,等待主线程完成后再执行
+        DispatchQueue.main.async {
+            self.setAppearance(self.selectedTheme)
+        }
     }
 
-    private func setupBindings() {
-        $runMode
-            .sink { mode in
-                UserDefaults.set(forKey: .runMode, value: mode.rawValue)
+    // 更新应用外观的方法
+    private func setAppearance(_ theme: Theme) {
+        logger.info("setAppearance: \(theme.rawValue)-\(theme.localized)")
+        // 保存主题设置
+        UserDefaults.standard.set(theme.rawValue, forKey: "AppleThemes")
+        // 刷新应用外观
+        if #available(macOS 10.14, *) {
+            switch theme {
+            case .Light:
+                // 浅色模式
+                NSApp.appearance = NSAppearance(named: .aqua)
+            case .Dark:
+                // 深色模式
+                NSApp.appearance = NSAppearance(named: .darkAqua)
+            default:
+                // 系统默认模式
+                NSApp.appearance = nil
             }
-            .store(in: &cancellables)
-        $runningProfile
-            .sink { uuid in
-                UserDefaults.set(forKey: .runningProfile, value: uuid)
-            }
-            .store(in: &cancellables)
-        $runningRouting
-            .sink { uuid in
-                UserDefaults.set(forKey: .runningRouting, value: uuid)
-            }
-            .store(in: &cancellables)
+        }
     }
-
+    
     func setRunning(uuid: String) {
         logger.info("setRunning: \(uuid)")
         runningProfile = uuid

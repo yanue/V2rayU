@@ -18,10 +18,10 @@ struct ActivityView: View {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Activity")
+                    localized(.Activity)
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("Activity and Logs")
+                    localized(.ActivitySubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

@@ -20,9 +20,9 @@ struct ConfigFormView: View {
                     .frame(width: 32, height: 32)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Profile Settings")
+                    localized(.ProfileSettings)
                         .font(.headline)
-                    Text("Edit your proxy configuration")
+                    localized(.ProfileSettingsSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -54,11 +54,11 @@ struct ConfigFormView: View {
             Divider()
             HStack {
                 Spacer()
-                Button("Cancel") {
+                Button(String(localized: .Cancel)) {
                     onClose()
                 }
                 .buttonStyle(.bordered)
-                Button("Save") {
+                Button(String(localized: .Save)) {
                     viewModel.upsert(item: item)
                     onClose()
                 }

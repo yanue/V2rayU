@@ -1,14 +1,164 @@
-"Light" = "淺色模式";
-"Dark" = "深色模式";
-"Follow System" = "跟隨系統";
 "English" = "English";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
 "Language" = "語言";
-"Theme" = "主題";
-"LaunchAtLogin" = "開啟時自動啟動";
+"Theme" = "Theme";
+"Light" = "淺色";
+"Dark" = "深色";
+"FollowSystem" = "跟隨系統";
+
+// base
+"Save" = "儲存";
+"Confirm" = "確認";
+"Cancel" = "取消";
+"Close" = "關閉";
+"Reset" = "重置";
+"Remark" = "備註";
+"Edit" = "編輯";
+"Preview" = "預覽";
+
+// app content
+"Activity" = "活動";
+"ActivitySubHead" = "檢視最近活動與日誌";
+"Servers" = "伺服器";
+"ServerSubHead" = "管理與設定伺服器";
+"Subscriptions" = "訂閱";
+"SubscriptionSubHead" = "管理訂閱來源";
+"Routings" = "路由";
+"RoutingSubHead" = "匹配優先級: 網域阻斷 -> 網域代理 -> 網域直連 -> IP 阻斷 -> IP 代理 -> IP 直連";
+"Settings" = "設定";
+"SettingsSubHead" = "一般應用程式設定";
+"About" = "關於";
+"AboutSubHead" = "關於此應用程式";
+
+// settings tab
+"General" = "通用設定";
+"Advanced" = "高級設定";
+"PAC" = "PAC設定";
+"DNS" = "DNS設定";
+"Core" = "Core設定";
+
+// general settings
+"LaunchAtLogin" = "開機啟動";
 "CheckForUpdateAutomatically" = "自動檢查更新";
 "AutoUpdateServersFromSubscriptions" = "自動從訂閱更新伺服器";
 "AutomaticallySelectFastestServer" = "自動選擇最快伺服器";
-"ShowProxySpeedOnTrayIcon" = "在選單欄圖標顯示代理速度";
-"EnableProxyStatistics" = "啟用代理流量統計";
+"ShowProxySpeedOnTrayIcon" = "系統匣圖示顯示代理速度";
+"EnableProxyStatistics" = "啟用代理統計";
+"KeyboardShortcuts" = "快捷鍵";
+"ToggleV2rayOnOff" = "切換 V2ray 開關";
+"SwitchProxyMode" = "切換代理模式";
+
+// advanced settings
+"LocalSocksListenPort" = "本地 SOCKS 監聽埠";
+"EnableUDP" = "啟用 UDP";
+"LocalHttpListenPort" = "本地 HTTP 監聽埠";
+"LocalPacListenPort" = "本地 PAC 監聽埠";
+"AllowLAN" = "允許區域網路連線";
+"EnableSniffing" = "啟用嗅探";
+"EnableMux" = "啟用 Mux";
+"Mux" = "Mux";
+"EnableTrafficStatistics" = "啟用流量統計";
+"V2rayCoreLogLevel" = "V2Ray 核心日誌等級";
+
+// pac settings
+"PacSettings" = "PAC 設定";
+"ConfigureProxyRules" = "設定代理規則";
+"GFWListDownloadURL" = "GFWList 下載網址";
+"EnterGFWListURL" = "輸入 GFWList 網址";
+"CustomRules" = "自訂規則";
+"AddCustomRules" = "新增自訂規則";
+"ViewPACFile" = "檢視 PAC 檔案";
+"UpdatePAC" = "更新 PAC";
+"PACUpdatedByUserRules" = "PAC 已由使用者規則更新";
+"PACUpdateFailed" = "PAC 更新失敗";
+"PACUpdatedByGFWList" = "PAC 已由 GFWList 更新";
+"FailedToDownloadGFWList" = "下載 GFWList 失敗";
+"FailedToWriteGFWList" = "寫入 GFWList 失敗";
+"FailedToUpdatePAC" = "更新 PAC 失敗";
+"UpdatingPACRules" = "正在更新 PAC 規則";
+"PACUpdateError" = "PAC 更新錯誤";
+"PACUpdateSuccess" = "PAC 更新成功";
+"PACUpdateNotification" = "PAC 更新通知";
+
+// dns settings
+"DnsConfiguration" = "DNS 設定";
+"DnsJsonFormatTip" = "提示: 使用 JSON 格式進行 DNS 設定";
+"ViewConfiguration" = "檢視設定";
+"Help" = "幫助";
+"Notification" = "通知";
+
+// subscription form
+"SubscriptionSettings" = "訂閱設定";
+"SubscriptionSettingsSubHead" = "管理訂閱詳細資訊";
+"SubscriptionUrl" = "訂閱網址";
+"sort" = "排序";
+"updateInterval" = "更新間隔";
+"AddSubscription" = "新增訂閱";
+"EditSubscription" = "編輯訂閱";
+"SyncAllSubscriptionTitle" = "同步所有訂閱";
+"SyncSubscriptionTitle" = "同步訂閱";
+"SyncAllSubscriptionTip" = "立即同步所有訂閱";
+"SyncSubscriptionNow" = "立即同步訂閱";
+"SyncSubscriptionIng" = "正在同步訂閱...";
+
+// routing settings
+"RoutingSettings" = "路由設定";
+"RoutingSettingsSubHead" = "管理路由規則";
+"AddRoutingRule" = "新增路由規則";
+"EditRoutingRule" = "編輯路由規則";
+"domainStrategy" = "網域策略";
+"domainMatcher" = "網域匹配方式";
+"Direct" = "直連";
+"Proxy" = "代理";
+"Block" = "阻斷";
+
+// profile settings
+"ProfileSettings" = "設定檔設定";
+"ProfileSettingsSubHead" = "管理設定檔詳細資訊";
+"Protocol" = "協議";
+"Address" = "地址";
+"Password" = "密碼";
+"Method" = "加密方式";
+"Port" = "埠";
+"ID" = "ID";
+"UserID" = "使用者 ID";
+"AlterID" = "額外 ID";
+"Security" = "安全";
+"Encryption" = "加密";
+"Network" = "網路";
+"HeaderType" = "標頭類型";
+"HttpHost" = "HTTP 主機";
+"HttpPath" = "HTTP 路徑";
+"WsHost" = "WebSocket 主機";
+"WsPath" = "WebSocket 路徑";
+"DsPath" = "DS 路徑";
+"WsHeaders" = "WebSocket 標頭";
+"Flow" = "流控";
+"TcpFastOpen" = "TCP 快速開啟";
+"EnableTls" = "啟用 TLS";
+"SkipCertVerify" = "略過憑證驗證";
+"TlsSettings" = "TLS 設定";
+"XtlsSettings" = "XTLS 設定";
+"RealitySettings" = "REALITY 設定";
+"ServerName" = "伺服器名稱";
+"Key" = "金鑰";
+"Seed" = "種子";
+"Congestion" = "壅塞控制";
+"MTU" = "MTU";
+"TTI" = "TTI";
+"UplinkCapacity" = "上行頻寬";
+"DownloadCapacity" = "下行頻寬";
+"xhttpPath" = "XHTTP 路徑";
+"xhttpHost" = "XHTTP 主機";
+"AllowInsecure" = "允許不安全連線";
+"ProfileRemark" = "設定檔備註";
+"Sni" = "SNI";
+"Fingerprint" = "指紋";
+"PublicKey" = "公鑰";
+"ShortID" = "短 ID";
+"SpiderX" = "SpiderX";
+"Alpn" = "ALPN";
+"TransportSettings" = "傳輸設定";
+"ServerSettings" = "伺服器設定";
+"StreamSettings" = "串流設定";

@@ -14,7 +14,7 @@ struct ConfigShowView: View {
             VStack {
                 HStack {
                     Image(systemName: "waveform.path")
-                    Text("Preview")
+                    localized(.Preview)
                     Spacer()
                 }
                 .foregroundColor(.primary)

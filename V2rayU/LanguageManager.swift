@@ -1,26 +1,11 @@
 //
-//  Language.swift
+//  LanguageManager.swift
 //  V2rayU
 //
-//  Created by yanue on 2024/12/19.
+//  Created by yanue on 2025/8/30.
 //
 
 import SwiftUI
-
-// MARK: - Language Label Enum
-enum LanguageLabel: String, CaseIterable {
-    case Language
-    case Theme
-    // general settings
-    case LaunchAtLogin
-    case CheckForUpdateAutomatically
-    case AutoUpdateServersFromSubscriptions
-    case AutomaticallySelectFastestServer
-    case ShowProxySpeedOnTrayIcon
-    case EnableProxyStatistics
-    
-    
-}
 
 enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
     var id: Self { self } // 使枚举可用于 ForEach
@@ -43,10 +28,6 @@ enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
         case "zh-Hant": self = .zhHant
         default: self = .en
         }
-    }
-
-    var localized: String {
-        return NSLocalizedString(self.rawValue, comment: "")
     }
 }
 
@@ -133,10 +114,19 @@ struct LocalizedTextView: View {
     
     var body: some View {
         let localizedString = languageManager.localizedString(key)
-        let finalString = arguments.isEmpty ?
-            localizedString :
-            String(format: localizedString, arguments: arguments)
-        
+        let finalString = arguments.isEmpty ? localizedString : String(format: localizedString, arguments: arguments)
         Text(finalString)
+    }
+}
+
+// MARK: - 响应式本地化 Text View - 使用枚举(View外部调用更方便)
+struct LocalizedTextLabelView: View {
+    let label: LanguageLabel
+    
+    @ObservedObject var languageManager = LanguageManager.shared
+    
+    var body: some View {
+        let localizedString = languageManager.localizedString(label.rawValue)
+        Text(localizedString)
     }
 }

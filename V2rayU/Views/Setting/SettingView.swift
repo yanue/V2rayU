@@ -5,15 +5,7 @@
 //  Created by yanue on 2024/12/18.
 //
 
-import KeyboardShortcuts
 import SwiftUI
-
-
-// Placeholder Views for Content
-extension KeyboardShortcuts.Name {
-    static let toggleV2rayOnOff = Self("toggleV2rayOnOff")
-    static let swiftProxyMode = Self("swiftProxyMode")
-}
 
 struct SettingView: View {
     @ObservedObject var appState = AppState.shared // 引用单例
@@ -35,10 +27,10 @@ struct SettingView: View {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Settings")
+                    localized(.Settings)
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("aaaaas")
+                    localized(.SettingsSubHead)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -48,11 +40,11 @@ struct SettingView: View {
 
             // Segmented Picker (Tabs)
             Picker("", selection: $appState.settingTab) {
-                Text("General").tag(SettingTab.general)
-                Text("Advance").tag(SettingTab.advance)
-                Text("DNS").tag(SettingTab.dns)
-                Text("PAC").tag(SettingTab.pac)
-                Text("Core").tag(SettingTab.core)
+                localized(.General).tag(SettingTab.general)
+                localized(.Advanced).tag(SettingTab.advance)
+                localized(.DNS).tag(SettingTab.dns)
+                localized(.PAC).tag(SettingTab.pac)
+                localized(.Core).tag(SettingTab.core)
             }
             .pickerStyle(.segmented)
             
@@ -77,29 +69,5 @@ struct SettingView: View {
             Spacer()
         }
         .padding(8)
-    }
-}
-
-struct TrafficView: View {
-    var body: some View {
-        Text("Traffic Data")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.green.opacity(0.1))
-            .cornerRadius(8)
-    }
-}
-
-struct InterfacesView: View {
-    var body: some View {
-        Text("Interfaces Data")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.orange.opacity(0.1))
-            .cornerRadius(8)
-    }
-}
-
-struct SettingView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingView()
     }
 }

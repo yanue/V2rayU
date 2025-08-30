@@ -17,37 +17,37 @@ struct AdvanceView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
-                getTextLabel(label: "Local Socks Listen Port", labelWidth: labelWidth)
-                TextField("Local Socks Listen Port", value: $settings.socksPort, formatter: NumberFormatter())
+                getTextLabel(label: .LocalSocksListenPort, labelWidth: labelWidth)
+                TextField(String(localized: .LocalSocksListenPort), value: $settings.socksPort, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.leading, 7)
                 Spacer()
-                getTextLabel(label: "Enable UDP", labelWidth: 100)
+                getTextLabel(label: .EnableUDP, labelWidth: 100)
                 Toggle("", isOn: $settings.enableUdp).frame(alignment: .leading)
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
                     .frame(alignment: .leading)
             }
-            getNumFieldWithLabel(label: "Local Http Listen Port", num: $settings.httpPort, labelWidth: labelWidth)
-            getNumFieldWithLabel(label: "Local Pac Listen Port", num: $settings.pacPort, labelWidth: labelWidth)
-            getBoolFieldWithLabel(label: "Allow LAN", isOn: $settings.allowLAN, labelWidth: labelWidth)
-            getBoolFieldWithLabel(label: "Enable Sniffing", isOn: $settings.enableSniffing, labelWidth: labelWidth)
+            getNumFieldWithLabel(label: .LocalHttpListenPort, num: $settings.httpPort, labelWidth: labelWidth)
+            getNumFieldWithLabel(label: .LocalPacListenPort, num: $settings.pacPort, labelWidth: labelWidth)
+            getBoolFieldWithLabel(label: .AllowLAN, isOn: $settings.allowLAN, labelWidth: labelWidth)
+            getBoolFieldWithLabel(label: .EnableSniffing, isOn: $settings.enableSniffing, labelWidth: labelWidth)
             HStack {
-                getBoolFieldWithLabel(label: "Enable Mux", isOn: $settings.enableMux, labelWidth: labelWidth)
+                getBoolFieldWithLabel(label: .EnableMux, isOn: $settings.enableMux, labelWidth: labelWidth)
                 Spacer()
-                getNumFieldWithLabel(label: "mux", num: $settings.mux)
+                getNumFieldWithLabel(label: .Mux, num: $settings.mux)
             }
-            getBoolFieldWithLabel(label: "Enable Traffic Statistics", isOn: $settings.enableStat, labelWidth: labelWidth)
+            getBoolFieldWithLabel(label: .EnableTrafficStatistics, isOn: $settings.enableStat, labelWidth: labelWidth)
             HStack {
-                getTextLabel(label: "V2ray Core Log Level", labelWidth: labelWidth)
+                getTextLabel(label: .V2rayCoreLogLevel, labelWidth: labelWidth)
                 Spacer()
                 Picker("", selection: $settings.logLevel) {
-                    ForEach(V2rayLogLevel.allCases, id: \.self) { pick in
+                    ForEach(V2rayLogLevel.allCases, id: \ .self) { pick in
                         Text(pick.rawValue)
                     }
                 }
             }
             HStack {
-                Button("保存") {
+                Button(String(localized: .Save)) {
                     settings.saveSettings()
                 }
                 Spacer()

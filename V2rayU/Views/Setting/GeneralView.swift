@@ -9,14 +9,20 @@ import Foundation
 import SwiftUI
 import KeyboardShortcuts
 
+// Placeholder Views for Content
+extension KeyboardShortcuts.Name {
+    static let toggleV2rayOnOff = Self("toggleV2rayOnOff")
+    static let swiftProxyMode = Self("swiftProxyMode")
+}
+
 struct GeneralView: View {
 
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
 
-    @ObservedObject var themeManager: ThemeManager = ThemeManager()
     @StateObject private var languageManager = LanguageManager.shared
     @ObservedObject var settings = AppSettings.shared // 引用单例
+    @ObservedObject var state = AppState.shared // 引用单例
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -38,11 +44,8 @@ struct GeneralView: View {
                     }
                 }
                .padding()
-
-                localized(.Language)
-                localized(.Theme)
                     
-                Picker(String(localized: .Theme), selection: $themeManager.selectedTheme) {
+                Picker(String(localized: .Theme), selection: $state.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
                         localized(item.rawValue).tag(item.rawValue)
                     }
@@ -51,12 +54,12 @@ struct GeneralView: View {
                 .padding()
 
                 Spacer()
-                Section(header: Text("Shortcuts")) {
+                Section(header: localized(.KeyboardShortcuts)) {
                     HStack {
-                        KeyboardShortcuts.Recorder("Toggle V2ray On/Off:", name: .toggleV2rayOnOff)
+                        KeyboardShortcuts.Recorder(String(localized: .ToggleV2rayOnOff), name: .toggleV2rayOnOff)
                     }
                     HStack {
-                        KeyboardShortcuts.Recorder("Switch Proxy Mode:", name: .swiftProxyMode)
+                        KeyboardShortcuts.Recorder(String(localized: .SwitchProxyMode), name: .swiftProxyMode)
                     }
                 }
                 Spacer()

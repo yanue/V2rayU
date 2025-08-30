@@ -35,13 +35,12 @@ struct ContentView: View {
                 }
                 .padding(.vertical,20)
 
-                SidebarButton(tab: .activity, title: "Activity", icon: "camera.filters")
-                SidebarButton(tab: .log, title: "Logs", icon: "document")
-                SidebarButton(tab: .server, title: "Proxies", icon: "shield.lefthalf.filled")
-                SidebarButton(tab: .subscription, title: "Subscriptions", icon: "personalhotspot")
-                SidebarButton(tab: .routing, title: "Routings", icon: "bonjour")
-                SidebarButton(tab: .setting, title: "Settings", icon: "gear")
-                SidebarButton(tab: .about, title: "About", icon: "info.circle")
+                SidebarButton(tab: .activity, title: .Activity, icon: "camera.filters")
+                SidebarButton(tab: .server, title: .Servers, icon: "shield.lefthalf.filled")
+                SidebarButton(tab: .subscription, title: .Subscriptions, icon: "personalhotspot")
+                SidebarButton(tab: .routing, title: .Routings, icon: "bonjour")
+                SidebarButton(tab: .setting, title: .Settings, icon: "gear")
+                SidebarButton(tab: .about, title: .About, icon: "info.circle")
                 Spacer()
             }
             .frame(width: 160)
@@ -81,7 +80,7 @@ struct ContentView: View {
         }
     }
   
-    func SidebarButton(tab: Tab, title: String, icon: String) -> some View {
+    func SidebarButton(tab: Tab, title: LanguageLabel, icon: String) -> some View {
         let isSelected = appState.mainTab == tab
         return Button(action: {
             appState.mainTab = tab
@@ -89,7 +88,7 @@ struct ContentView: View {
             HStack(spacing: 10) { // Adjust spacing between icon and text
                 Image(systemName: icon)
                     .frame(width: 20, height: 20) // Consistent icon size
-                Text(title)
+                LocalizedTextLabelView(label:title)
                     .font(.body) // Adjust font size for better readability
             }
             .frame(maxWidth: .infinity, alignment: .leading) // Align content to the left
