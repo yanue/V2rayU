@@ -183,4 +183,32 @@ enum LanguageLabel: String, CaseIterable {
     case Quit
     case On
     case Off
+    // help page
+    case HelpDiagnosticsTitle
+    case HelpDiagnosticsSubHead
+    case Refresh
+    case V2rayCoreSwitchStatus
+    case V2rayCoreRunningStatus
+    case BackgroundActivity
+    case BackgroundActivitySubtitleRunning
+    case BackgroundActivitySubtitleNotRunning
+    case OpenSettings
+    case Restart
+    case RunPingNow
+    case V2rayCoreInstallAndVersion
+    case V2rayUToolPermission
+    case GeoipFile
+    case Installed
+    case Missing
+    case PermissionException
+    case V2rayCoreNotInstalled
+    case UnableToOpenSystemSettings
+    case PleaseManuallyOpenBackgroundActivity
+    case Fix
+    case PingProblem
+    // problem descriptions
+    case V2rayUToolProblem
+    case BackgroundProblem
+    case GeoipProblem
+    case V2rayCoreProblem
 }

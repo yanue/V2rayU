@@ -186,3 +186,31 @@
 "Quit" = "Quit";
 "On" = "On";
 "Off" = "Off";
+
+// help view
+"HelpDiagnosticsTitle" = "System Diagnostics";
+"HelpDiagnosticsSubHead" = "Check key components and provide common fixes";
+"Refresh" = "Refresh";
+"V2rayCoreSwitchStatus" = "V2Ray core switch status";
+"V2rayCoreRunningStatus" = "V2Ray core running status (launchd)";
+"BackgroundActivity" = "Background Activity (App Background Activity)";
+"BackgroundActivitySubtitleRunning" = "Core process running";
+"BackgroundActivitySubtitleNotRunning" = "Core process not running";
+"OpenSettings" = "Open Settings";
+"Restart" = "Restart";
+"RunPingNow" = "Ping Now";
+"V2rayCoreInstallAndVersion" = "V2Ray core install & version";
+"V2rayUToolPermission" = "V2rayUTool Permission";
+"GeoipFile" = "geoip.dat file";
+"Installed" = "Installed";
+"Missing" = "Missing";
+"PermissionException" = "root:admin";
+"V2rayCoreNotInstalled" = "v2ray-core is not installed or not executable.";
+"UnableToOpenSystemSettings" = "Unable to open System Settings";
+"PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity and allow V2rayU to run in background.";
+"Fix" = "Fix";
+"PingProblem" = "Current node unreachable or network error.";
+"V2rayUToolProblem" = "V2rayUTool permission issue, some features may not work.";
+"BackgroundProblem" = "App is not running in background; it may be restricted by system or core process stopped.";
+"GeoipProblem" = "geoip.dat is missing; some routing or IP classification rules may fail.";
+"V2rayCoreProblem" = "v2ray-core is not installed or not executable.";

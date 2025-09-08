@@ -18,7 +18,7 @@ actor AppInstaller: NSObject {
             logger.info("app home dir \(AppHomePath) not exists,need install")
             try! fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
         }
-
+        // 检查 V2rayU 自身是否允许 App Background Activity
         // make sure new version
         logger.info("install: \(AppResourcesPath)")
         var needRunInstall = false
@@ -26,6 +26,7 @@ actor AppInstaller: NSObject {
             logger.info("\(v2rayCoreFile) not accessable")
             needRunInstall = true
         }
+        // 检查 v2rayCoreFile 是否允许 App Background Activity
         // Ensure permission with root admin
         if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
             needRunInstall = true

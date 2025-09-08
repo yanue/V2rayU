@@ -186,3 +186,31 @@
 "Quit" = "退出";
 "On" = "开启";
 "Off" = "关闭";
+
+// help view
+"HelpDiagnosticsTitle" = "系统诊断";
+"HelpDiagnosticsSubHead" = "检测关键组件状态并提供常见问题修复操作";
+"Refresh" = "刷新";
+"V2rayCoreSwitchStatus" = "v2ray-core 开关状态";
+"V2rayCoreRunningStatus" = "v2ray-core 运行状态 (launchd)";
+"BackgroundActivity" = "后台活动 (App Background Activity)";
+"BackgroundActivitySubtitleRunning" = "核心进程在运行";
+"BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
+"OpenSettings" = "打开设置";
+"Restart" = "重启";
+"RunPingNow" = "立即检测";
+"V2rayCoreInstallAndVersion" = "v2ray-core 安装与版本";
+"V2rayUToolPermission" = "V2rayUTool 权限";
+"GeoipFile" = "geoip.dat 文件";
+"Installed" = "已安装";
+"Missing" = "缺失";
+"PermissionException" = "root:admin";
+"V2rayCoreNotInstalled" = "v2ray-core 未安装或不可执行。";
+"UnableToOpenSystemSettings" = "无法打开系统设置";
+"PleaseManuallyOpenBackgroundActivity" = "请手动前往 系统设置 → 通用 → 后台活动，允许 V2rayU 后台运行。";
+"Fix" = "修复";
+"PingProblem" = "当前节点不可用或网络异常。";
+"V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法正常启动核心。";
+"BackgroundProblem" = "应用未在后台运行；可能被系统限制或核心进程已停止。";
+"GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常。";
+"V2rayCoreProblem" = "v2ray-core 未安装或不可执行。";

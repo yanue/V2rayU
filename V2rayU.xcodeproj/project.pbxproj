@@ -75,6 +75,7 @@
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
 		6680D10B2E26802D0013095C /* LogPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D10A2E2680250013095C /* LogPageView.swift */; };
+		668C4AC82E6F0CEC00DB2FFC /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668C4AC72E6F0CE900DB2FFC /* HelpView.swift */; };
 		669DCEA32E3D90760085278B /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA22E3D90760085278B /* ToastWindow.swift */; };
 		669DCEA42E3D90760085278B /* Github.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA12E3D90760085278B /* Github.swift */; };
 		669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA52E3D908C0085278B /* AppSettings.swift */; };
@@ -225,6 +226,7 @@
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
 		6680D10A2E2680250013095C /* LogPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPageView.swift; sourceTree = "<group>"; };
+		668C4AC72E6F0CE900DB2FFC /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		669DCEA12E3D90760085278B /* Github.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Github.swift; sourceTree = "<group>"; };
 		669DCEA22E3D90760085278B /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
 		669DCEA52E3D908C0085278B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -443,6 +445,7 @@
 		662CC4002D1BED9B006E8450 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				668C4AC92E6F0CFA00DB2FFC /* Help */,
 				669DCEAB2E3D9C120085278B /* About */,
 				6680D10C2E2683160013095C /* Log */,
 				663814AD2E0065A700F5FCF3 /* Subscription */,
@@ -518,6 +521,14 @@
 				6680D1062E2407F80013095C /* LogStreamView.swift */,
 			);
 			path = Log;
+			sourceTree = "<group>";
+		};
+		668C4AC92E6F0CFA00DB2FFC /* Help */ = {
+			isa = PBXGroup;
+			children = (
+				668C4AC72E6F0CE900DB2FFC /* HelpView.swift */,
+			);
+			path = Help;
 			sourceTree = "<group>";
 		};
 		669DCEAB2E3D9C120085278B /* About */ = {
@@ -801,6 +812,7 @@
 				6637453B2D2ECF590093A101 /* MenuItem.swift in Sources */,
 				66389D092E425ACC0050CB27 /* AppMenu.swift in Sources */,
 				66E94B392D26B971003745B5 /* SettingView.swift in Sources */,
+				668C4AC82E6F0CEC00DB2FFC /* HelpView.swift in Sources */,
 				66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */,
 				66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,

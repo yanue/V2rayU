@@ -17,6 +17,7 @@ struct ContentView: View {
         case subscription
         case routing
         case setting
+        case help
         case about
     }
 
@@ -40,6 +41,7 @@ struct ContentView: View {
                 SidebarButton(tab: .subscription, title: .Subscriptions, icon: "personalhotspot")
                 SidebarButton(tab: .routing, title: .Routings, icon: "bonjour")
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
+                SidebarButton(tab: .help, title: .Help, icon: "questionmark.circle")
                 SidebarButton(tab: .about, title: .About, icon: "info.circle")
                 Spacer()
             }
@@ -62,6 +64,8 @@ struct ContentView: View {
                     RoutingListView()
                 case .setting:
                     SettingView()
+                case .help:
+                    HelpView()
                 case .about:
                     AboutView()
                 }
@@ -102,9 +106,4 @@ struct ContentView: View {
         }
         .buttonStyle(.plain) // Remove default button styling
     }
-}
-
-
-#Preview {
-    ContentView()
 }
