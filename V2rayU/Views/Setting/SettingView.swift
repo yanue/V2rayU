@@ -36,8 +36,8 @@ struct SettingView: View {
                 }
                 Spacer()
                 
-            }
-
+            }.padding(.bottom, 10)
+            
             // Segmented Picker (Tabs)
             Picker("", selection: $appState.settingTab) {
                 localized(.General).tag(SettingTab.general)
@@ -66,8 +66,6 @@ struct SettingView: View {
                     }
                 }
             }
-            Spacer()
         }
-        .padding(8)
     }
 }

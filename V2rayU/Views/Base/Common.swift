@@ -86,3 +86,29 @@ func getTextEditorWithLabel(label: LanguageLabel, text: Binding<String>, labelWi
             .lineSpacing(4)
     }
 }
+
+struct RefreshButton: View {
+    @Binding var checking: Bool
+    var action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                ZStack {
+                    // 固定占位，避免布局跳动
+                    if checking {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(0.5) // 缩小到 60%
+                            .frame(width: 16, height: 16)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+                .frame(width: 16, height: 16)
+                
+                Text(String(localized: .Refresh))
+            }
+        }
+    }
+}

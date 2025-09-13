@@ -188,8 +188,8 @@
 "Off" = "Off";
 
 // help view
-"HelpDiagnosticsTitle" = "System Diagnostics";
-"HelpDiagnosticsSubHead" = "Check key components and provide common fixes";
+"HelpPageTitle" = "Help & Troubleshooting";
+"HelpPageSubHead" = "Common issues and solutions, diagnostics";
 "Refresh" = "Refresh";
 "V2rayCoreSwitchStatus" = "V2Ray core switch status";
 "V2rayCoreRunningStatus" = "V2Ray core running status (launchd)";
@@ -198,6 +198,7 @@
 "BackgroundActivitySubtitleNotRunning" = "Core process not running";
 "OpenSettings" = "Open Settings";
 "Restart" = "Restart";
+"PingState" = "ping state";
 "RunPingNow" = "Ping Now";
 "V2rayCoreInstallAndVersion" = "V2Ray core install & version";
 "V2rayUToolPermission" = "V2rayUTool Permission";
@@ -214,3 +215,5 @@
 "BackgroundProblem" = "App is not running in background; it may be restricted by system or core process stopped.";
 "GeoipProblem" = "geoip.dat is missing; some routing or IP classification rules may fail.";
 "V2rayCoreProblem" = "v2ray-core is not installed or not executable.";
+"Diagnostics" = "Diagnostics";
+"QA" = "FAQ";

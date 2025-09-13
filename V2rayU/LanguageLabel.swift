@@ -184,8 +184,8 @@ enum LanguageLabel: String, CaseIterable {
     case On
     case Off
     // help page
-    case HelpDiagnosticsTitle
-    case HelpDiagnosticsSubHead
+    case HelpPageTitle
+    case HelpPageSubHead
     case Refresh
     case V2rayCoreSwitchStatus
     case V2rayCoreRunningStatus
@@ -194,6 +194,7 @@ enum LanguageLabel: String, CaseIterable {
     case BackgroundActivitySubtitleNotRunning
     case OpenSettings
     case Restart
+    case PingState
     case RunPingNow
     case V2rayCoreInstallAndVersion
     case V2rayUToolPermission
@@ -211,4 +212,7 @@ enum LanguageLabel: String, CaseIterable {
     case BackgroundProblem
     case GeoipProblem
     case V2rayCoreProblem
+    case Diagnostics
+    case QA
+    case Abount
 }

@@ -46,6 +46,7 @@ final class AppState: ObservableObject {
     
     @Published var mainTab: ContentView.Tab = .activity
     @Published var settingTab: SettingView.SettingTab = .general
+    @Published var helpTab: HelpPageView.HelpTab = .diagnostic
 
     // 其它非设置相关属性
     @Published var icon: String = "IconOff"

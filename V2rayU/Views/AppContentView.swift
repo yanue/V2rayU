@@ -65,7 +65,7 @@ struct ContentView: View {
                 case .setting:
                     SettingView()
                 case .help:
-                    HelpView()
+                    HelpPageView()
                 case .about:
                     AboutView()
                 }

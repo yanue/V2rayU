@@ -8,7 +8,7 @@
 import SwiftUI
 import AppKit
 
-struct HelpView: View {
+struct DiagnosticsView: View {
     @ObservedObject var appState = AppState.shared // 引用单例
 
     @State private var v2rayCoreInstalled: Bool = false
@@ -183,59 +183,98 @@ struct HelpView: View {
 
     var body: some View {
         VStack {
-            VStack(spacing: 14) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(LanguageManager.shared.localizedString(LanguageLabel.HelpDiagnosticsTitle.rawValue)).font(.largeTitle).bold()
-                        Text(LanguageManager.shared.localizedString(LanguageLabel.HelpDiagnosticsSubHead.rawValue)).foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Button(action: runAllChecks) {
-                        HStack {
-                            if checking { ProgressView().scaleEffect(0.8) }
-                            Text(LanguageManager.shared.localizedString(LanguageLabel.Refresh.rawValue))
-                        }
-                    }
-                    .buttonStyle(BorderlessButtonStyle())
+            HStack {
+                Text(String(localized: .Diagnostics))
+                Spacer()
+                RefreshButton(checking: $checking) {
+                    runAllChecks()
                 }
-                ScrollView{
-                    VStack(spacing: 10) {
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.V2rayCoreSwitchStatus.rawValue), subtitle: appState.v2rayTurnOn ? LanguageManager.shared.localizedString(LanguageLabel.Installed.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.Missing.rawValue), ok: appState.v2rayTurnOn, problem: appState.v2rayTurnOn ? nil : LanguageManager.shared.localizedString(LanguageLabel.V2rayCoreNotInstalled.rawValue), actionTitle: appState.v2rayTurnOn ? LanguageManager.shared.localizedString(LanguageLabel.TurnCoreOff.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.TurnCoreOn.rawValue)) {
-                             toggleCoreOnOff()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.V2rayCoreRunningStatus.rawValue), subtitle: v2rayCoreRunning ? LanguageManager.shared.localizedString(LanguageLabel.BackgroundActivitySubtitleRunning.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.BackgroundActivitySubtitleNotRunning.rawValue), ok: v2rayCoreRunning, problem: backgroundProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.Restart.rawValue)) {
-                             restartCore()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.BackgroundActivity.rawValue), subtitle: v2rayCoreRunning ? LanguageManager.shared.localizedString(LanguageLabel.BackgroundActivitySubtitleRunning.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.BackgroundActivitySubtitleNotRunning.rawValue), ok: v2rayCoreRunning, problem: backgroundProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.OpenSettings.rawValue)) {
-                             fixBackgroundActivity()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.RunPingNow.rawValue), subtitle: pingStatus ? String(format: "%.0f ms", appState.latency) : LanguageManager.shared.localizedString(LanguageLabel.Missing.rawValue), ok: pingStatus, problem: pingProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.RunPingNow.rawValue)) {
-                             doPingNow()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.V2rayCoreInstallAndVersion.rawValue), subtitle: v2rayCoreVersion, ok: v2rayCoreInstalled, problem: v2rayCoreProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.Fix.rawValue)) {
-                             fixInstallAll()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.V2rayUToolPermission.rawValue), subtitle: v2rayUToolPermission ? LanguageManager.shared.localizedString(LanguageLabel.PermissionException.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.Missing.rawValue), ok: v2rayUToolPermission, problem: v2rayUToolProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.Fix.rawValue)) {
-                             fixV2rayUTool()
-                         }
-                         
-                        statusRow(title: LanguageManager.shared.localizedString(LanguageLabel.GeoipFile.rawValue), subtitle: geoipExists ? LanguageManager.shared.localizedString(LanguageLabel.Installed.rawValue) : LanguageManager.shared.localizedString(LanguageLabel.Missing.rawValue), ok: geoipExists, problem: geoipProblem, actionTitle: LanguageManager.shared.localizedString(LanguageLabel.Fix.rawValue)) {
-                             fixGeoip()
-                         }
-                     }
-                     .padding(.top, 6)
-                 }
-             }
-             .padding()
-         }
-         .onAppear { runAllChecks() }
-         .alert(isPresented: $showOpenSettingsAlert) {
-            Alert(title: Text(LanguageManager.shared.localizedString(LanguageLabel.UnableToOpenSystemSettings.rawValue)), message: Text(LanguageManager.shared.localizedString(LanguageLabel.PleaseManuallyOpenBackgroundActivity.rawValue)), dismissButton: .default(Text(LanguageManager.shared.localizedString(LanguageLabel.Confirm.rawValue))))
+            }
+            .padding(.horizontal, 10)
+
+            ScrollView {
+                VStack(spacing: 10) {
+                    statusRow(
+                        title: String(localized: .V2rayCoreSwitchStatus),
+                        subtitle: appState.v2rayTurnOn ? String(localized: .Installed) : String(localized: .Missing),
+                        ok: appState.v2rayTurnOn,
+                        problem: appState.v2rayTurnOn ? nil : String(localized: .V2rayCoreNotInstalled),
+                        actionTitle: appState.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+                    ) {
+                        toggleCoreOnOff()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .V2rayCoreRunningStatus),
+                        subtitle: v2rayCoreRunning ? String(localized: .BackgroundActivitySubtitleRunning) : String(localized: .BackgroundActivitySubtitleNotRunning),
+                        ok: v2rayCoreRunning,
+                        problem: backgroundProblem,
+                        actionTitle: String(localized: .Restart)
+                    ) {
+                        restartCore()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .BackgroundActivity),
+                        subtitle: v2rayCoreRunning ? String(localized: .BackgroundActivitySubtitleRunning) : String(localized: .BackgroundActivitySubtitleNotRunning),
+                        ok: v2rayCoreRunning,
+                        problem: backgroundProblem,
+                        actionTitle: String(localized: .OpenSettings)
+                    ) {
+                        fixBackgroundActivity()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .PingState),
+                        subtitle: pingStatus ? String(format: "%.0f ms", appState.latency) : String(localized: .Missing),
+                        ok: pingStatus,
+                        problem: pingProblem,
+                        actionTitle: String(localized: .RunPingNow)
+                    ) {
+                        doPingNow()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .V2rayCoreInstallAndVersion),
+                        subtitle: v2rayCoreVersion,
+                        ok: v2rayCoreInstalled,
+                        problem: v2rayCoreProblem,
+                        actionTitle: String(localized: .Fix)
+                    ) {
+                        fixInstallAll()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .V2rayUToolPermission),
+                        subtitle: v2rayUToolPermission ? String(localized: .PermissionException) : String(localized: .Missing),
+                        ok: v2rayUToolPermission,
+                        problem: v2rayUToolProblem,
+                        actionTitle: String(localized: .Fix)
+                    ) {
+                        fixV2rayUTool()
+                    }
+                    
+                    statusRow(
+                        title: String(localized: .GeoipFile),
+                        subtitle: geoipExists ? String(localized: .Installed) : String(localized: .Missing),
+                        ok: geoipExists,
+                        problem: geoipProblem,
+                        actionTitle: String(localized: .Fix)
+                    ) {
+                        fixGeoip()
+                    }
+                }
+                .padding(.top, 6)
+            }
+            .padding(.horizontal, 10)
+            .onAppear { runAllChecks() }
+            .alert(isPresented: $showOpenSettingsAlert) {
+                Alert(
+                    title: Text(String(localized: .UnableToOpenSystemSettings)),
+                    message: Text(String(localized: .PleaseManuallyOpenBackgroundActivity)),
+                    dismissButton: .default(Text(String(localized: .Confirm)))
+                )
+            }
         }
      }
  }

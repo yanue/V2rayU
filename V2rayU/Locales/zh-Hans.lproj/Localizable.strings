@@ -188,8 +188,8 @@
 "Off" = "关闭";
 
 // help view
-"HelpDiagnosticsTitle" = "系统诊断";
-"HelpDiagnosticsSubHead" = "检测关键组件状态并提供常见问题修复操作";
+"HelpPageTitle" = "诊断与帮助";
+"HelpPageSubHead" = "检测关键组件状态并提供常见问题修复操作";
 "Refresh" = "刷新";
 "V2rayCoreSwitchStatus" = "v2ray-core 开关状态";
 "V2rayCoreRunningStatus" = "v2ray-core 运行状态 (launchd)";
@@ -198,7 +198,8 @@
 "BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
 "OpenSettings" = "打开设置";
 "Restart" = "重启";
-"RunPingNow" = "立即检测";
+"PingState" = "ping 测试状态";
+"RunPingNow" = "ping 测试";
 "V2rayCoreInstallAndVersion" = "v2ray-core 安装与版本";
 "V2rayUToolPermission" = "V2rayUTool 权限";
 "GeoipFile" = "geoip.dat 文件";
@@ -214,3 +215,5 @@
 "BackgroundProblem" = "应用未在后台运行；可能被系统限制或核心进程已停止。";
 "GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常。";
 "V2rayCoreProblem" = "v2ray-core 未安装或不可执行。";
+"Diagnostics" = "异常诊断";
+"QA" = "常见问题";
