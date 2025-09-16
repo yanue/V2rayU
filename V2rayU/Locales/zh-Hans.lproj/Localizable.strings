@@ -165,24 +165,28 @@
 "StreamSettings" = "流设置";
 
 // app menu
-"TurnCoreOn" = "启动核心";
-"TurnCoreOff" = "关闭核心";
-"ViewLog" = "查看日志";
-"ViewConfigJson" = "查看配置 JSON";
-"ViewPacFile" = "查看 PAC 文件";
-"PacMode" = "PAC 模式";
+"TurnCoreOn" = "启动 core";
+"TurnCoreOff" = "关闭 core";
+"ViewLog" = "查看 core 日志";
+"ViewConfigJson" = "查看 config.json";
+"ViewPacFile" = "查看 pac 文件";
+"PacMode" = "pac模式";
 "GlobalMode" = "全局模式";
 "ManualMode" = "手动模式";
-"RoutingList" = "路由 ...";
-"ServerList" = "服务器 ...";
+"Global.tip" = "系统代理 (系统偏好设置->网络->WIFI->详情->代理->HTTP,HTTPS,SOCKS 代理)";
+"Pac.tip" = "自动代理 (系统偏好设置->网络->WIFI->详情->代理->自动代理配置)";
+"Manual.tip" = "不设置系统代理 (清除系统代理)";
+"RoutingList" = "选择路由";
+"ServerList" = "选择服务器";
 "goServerSettings" = "服务器配置 ...";
+"goSubscriptionSettings" = "订阅配置 ...";
 "goRoutingSettings" = "路由设置 ...";
+"goPreferences" = "偏好设置 ...";
 "Ping" = "Ping 测试";
 "ImportServersFromClipboard" = "从剪贴板导入服务器";
 "ScanQRCodeFromScreen" = "扫描屏幕上的二维码";
 "ShareQrCode" = "分享二维码";
 "CopyHttpProxyShellExportLine" = "复制 HTTP 代理 Shell 导出命令";
-"Preferences" = "偏好设置";
 "CheckForUpdates" = "检查更新";
 "Quit" = "退出";
 "On" = "开启";

@@ -172,14 +172,15 @@ enum LanguageLabel: String, CaseIterable {
     case ManualMode
     case RoutingList
     case ServerList
+    case goSubscriptionSettings
     case goRoutingSettings
     case goServerSettings
+    case goPreferences
     case Ping
     case ImportServersFromClipboard
     case ScanQRCodeFromScreen
     case ShareQrCode
     case CopyHttpProxyShellExportLine
-    case Preferences
     case CheckForUpdates
     case Quit
     case On

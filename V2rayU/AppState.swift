@@ -29,6 +29,21 @@ enum RunMode: String, CaseIterable {
         default: return true
         }
     }
+    
+    var tip: String {
+        switch self {
+        case .global:
+            return "Global.tip"
+        case .pac:
+            return "Pac.tip"
+        case .off:
+            return "Off.tip"
+        case .manual:
+            return "Manual.tip"
+        case .tunnel:
+            return "Tunnel.tip"
+        }
+    }
 }
 
 enum Theme: String, CaseIterable {

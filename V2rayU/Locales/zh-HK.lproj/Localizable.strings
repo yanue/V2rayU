@@ -167,16 +167,21 @@
 // app menu
 "TurnCoreOn" = "啟動核心";
 "TurnCoreOff" = "關閉核心";
-"ViewLog" = "檢視日誌";
-"ViewConfigJson" = "檢視配置 JSON";
-"ViewPacFile" = "檢視 PAC 檔案";
+"ViewLog" = "檢視 core 日誌";
+"ViewConfigJson" = "檢視 config.json ";
+"ViewPacFile" = "檢視 pac 檔案";
 "PacMode" = "PAC 模式";
 "GlobalMode" = "全域模式";
 "ManualMode" = "手動模式";
-"RoutingList" = "路由 ...";
-"ServerList" = "服务器 ...";
+"Global.tip" = "全域代理 (系統偏好設定->網路->WIFI->詳細資訊->代理->HTTP 代理)";
+"Pac.tip" = "自動代理 (系統偏好設定->網路->WIFI->詳細資訊->代理->自動代理配置)";
+"Manual.tip" = "不設定系統代理 (清除系統代理)";
+"RoutingList" = "選擇路由";
+"ServerList" = "選擇伺服器";
 "goServerSettings" = "服务器配置 ...";
+"goSubscriptionSettings" = "訂閱配置 ...";
 "goRoutingSettings" = "路由设置 ...";
+"goPreferences" = "偏好設定 ...";
 "Ping" = "Ping 測試";
 "ImportServersFromClipboard" = "從剪貼簿匯入伺服器";
 "ScanQRCodeFromScreen" = "掃描螢幕上的二維碼";

@@ -37,10 +37,10 @@ struct QAView: View {
                 """),
                 QAItem(question: "运行模式说明", answer: """
                 主要是怎么设置系统代理:
-                
-                Pac 模式：根据 PAC 文件自动选择代理或直连（系统代理设置为自动代理配置）
-                Global 模式：全局代理，所有流量都通过代理服务器（系统代理设置为 HTTP/SOCKS）
-                Manual 模式：手动模式，不设置系统代理，会清理系统代理
+                Pac 模式：系统设置pac代理(设置->网络->WIFI->详情->代理->自动代理配置)
+                Global 模式：系统设置http/socks代理(设置->网络->WIFI->详情->代理->HTTP,HTTPS和SOCKS代理)
+                Manual 模式：手动模式,不设置系统代理(会清理系统代理,包括pac,HTTP,HTTPS,SOCKS代理)
+                说明: 以上主要是以浏览器等系统级应用会走系统代理，其他应用通常需要手动设置代理。
                 """),
                 QAItem(question: "运行模式与路由的关系", answer: """
                 运行模式决定了系统代理的设置方式，而路由规则则决定了哪些流量通过代理服务器，哪些流量直连。两者结合使用，可以实现灵活的网络访问策略。
@@ -73,10 +73,10 @@ struct QAView: View {
                 """),
                 QAItem(question: "運行模式說明", answer: """
                 主要是如何設定系統代理:
-                
-                Pac 模式：依據 PAC 檔自動選擇代理或直連（系統代理設定為自動代理設定）
-                Global 模式：全域代理，所有流量都透過代理伺服器（系統代理設定為 HTTP/SOCKS）
-                Manual 模式：手動模式，不設定系統代理，會清除系統代理
+                Pac 模式：系統設定 pac 代理 (設定->網路->WIFI->詳細資訊->代理->自動代理設定)
+                Global 模式：系統設定 http/socks 代理 (設定->網路->WIFI->詳細資訊->代理->HTTP,HTTPS 和 SOCKS 代理)
+                Manual 模式：手動模式，不設定系統代理 (會清理系統代理，包括 pac,HTTP,HTTPS,SOCKS 代理)
+                說明: 以上主要是以瀏覽器等系統級應用會走系統代理，其他應用通常需要手動設定代理。
                 """),
                 QAItem(question: "運行模式與路由的關係", answer: """
                 運行模式決定了系統代理的設定方式，而路由規則則決定哪些流量透過代理伺服器，哪些流量直連。兩者結合使用，可以實現靈活的網路存取策略。
@@ -109,10 +109,10 @@ struct QAView: View {
                 """),
                 QAItem(question: "Operation modes explained", answer: """
                 Mainly about how the system proxy is set:
-                
-                Pac mode: Automatically chooses proxy or direct connection based on PAC file (system proxy set to auto proxy configuration)
-                Global mode: All traffic goes through the proxy server (system proxy set to HTTP/SOCKS)
-                Manual mode: No system proxy is set, and existing system proxy settings are cleared
+                Pac mode: Auto proxy configuration (settings->Network->WIFI->Details->Proxy->Auto Proxy Configuration)
+                Global mode: Global proxy, sets system HTTP/HTTPS/SOCKS proxy (settings->Network->WIFI->Proxy->HTTP,HTTPS,SOCKS Proxy)
+                Manual mode: Clear system proxy settings, including auto proxy configuration URL, HTTP, HTTPS and SOCKS proxy
+                Note: The above mainly affects browsers and other system-level applications that use the system proxy;
                 """),
                 QAItem(question: "Relationship between operation mode and routing", answer: """
                 The operation mode determines how the system proxy is configured, while routing rules decide which traffic goes through the proxy server and which goes directly. Together, they enable flexible network access strategies.
