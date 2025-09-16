@@ -44,6 +44,7 @@
 "AutoUpdateServersFromSubscriptions" = "Auto-update servers from subscriptions";
 "AutomaticallySelectFastestServer" = "Automatically select fastest server";
 "ShowProxySpeedOnTrayIcon" = "Show proxy speed on tray icon";
+"ShowLatencyOnTrayIcon" = "Show ping latency on tray icon";
 "EnableProxyStatistics" = "Enable proxy statistics";
 "KeyboardShortcuts" = "Shortcuts";
 "ToggleV2rayOnOff" = "Toggle V2ray On/Off";

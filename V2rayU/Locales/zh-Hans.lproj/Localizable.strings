@@ -44,6 +44,7 @@
 "AutoUpdateServersFromSubscriptions" = "自动从订阅更新服务器";
 "AutomaticallySelectFastestServer" = "自动选择最快服务器";
 "ShowProxySpeedOnTrayIcon" = "托盘图标显示代理速度";
+"ShowLatencyOnTrayIcon" = "托盘图标显示ping值";
 "EnableProxyStatistics" = "启用代理统计";
 "KeyboardShortcuts" = "快捷键";
 "ToggleV2rayOnOff" = "切换 V2ray 开关";

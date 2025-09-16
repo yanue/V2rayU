@@ -10,7 +10,7 @@ import Foundation
 // URL 扩展：用于从 URL 获取查询参数
 extension URL {
     func queryParams() -> QueryParameters {
-        var dict = QueryParameters()
+        let dict = QueryParameters()
         if let components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             if let queryItems = components.queryItems {
                 for item in queryItems {

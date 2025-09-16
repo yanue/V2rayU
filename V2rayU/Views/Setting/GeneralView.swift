@@ -33,6 +33,7 @@ struct GeneralView: View {
                     Toggle(String(localized: .AutoUpdateServersFromSubscriptions), isOn: $settings.autoUpdateServers)
                     Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
                     Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
+                    Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
                     Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
                 }
                 Spacer()

@@ -13,6 +13,12 @@ struct StatusItemView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 20, height: 20)
+            if settings.showLatencyOnTray {
+                // 延迟信息
+                Text("● \(String(format: "%.0f", appState.latency)) ms")
+                    .font(.system(size: 10))
+                    .foregroundColor(.green) // 绿色
+            }
             if settings.showSpeedOnTray {
                 // 速度信息（两行显示）
                 VStack(alignment: .leading) {

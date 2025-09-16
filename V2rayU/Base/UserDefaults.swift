@@ -32,6 +32,8 @@ extension UserDefaults {
         case enableStat
         // show speed in menu bar
         case showSpeedOnTray
+        // show latency in menu bar
+        case showLatencyOnTray
         // base settings
         // allowLAN
         case allowLAN

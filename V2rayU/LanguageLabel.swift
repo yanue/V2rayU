@@ -48,6 +48,7 @@ enum LanguageLabel: String, CaseIterable {
     case AutoUpdateServersFromSubscriptions
     case AutomaticallySelectFastestServer
     case ShowProxySpeedOnTrayIcon
+    case ShowLatencyOnTrayIcon
     case EnableProxyStatistics
     case KeyboardShortcuts
     case ToggleV2rayOnOff
