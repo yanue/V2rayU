@@ -118,5 +118,7 @@ func chooseNewServer(uuid: String) async {
 
     logger.info(" - choose new server: \(newSvrName)")
     UserDefaults.set(forKey: .runningProfile, value: newSvrName)
-    V2rayLaunch.restartV2ray()
+    Task {
+        await V2rayLaunch.shared.restart()
+    }
 }

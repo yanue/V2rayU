@@ -165,6 +165,8 @@
 "StreamSettings" = "流设置";
 
 // app menu
+"CoreOn" = "core 已启动";
+"CoreOff" = "core 已停止";
 "TurnCoreOn" = "启动 core";
 "TurnCoreOff" = "关闭 core";
 "ViewLog" = "查看 core 日志";

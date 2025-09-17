@@ -162,6 +162,8 @@ enum LanguageLabel: String, CaseIterable {
     case ServerSettings
     case StreamSettings
     // menu
+    case CoreOn
+    case CoreOff
     case TurnCoreOff
     case TurnCoreOn
     case ViewLog

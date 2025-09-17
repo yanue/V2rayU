@@ -14,7 +14,6 @@
 		660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AD2E2CF9AD00D84D5D /* DnsView.swift */; };
 		660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AF2E2CF9B700D84D5D /* PacView.swift */; };
 		662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3FE2D1BED9B006E8450 /* RouingList.swift */; };
-		662CC4022D1BED9B006E8450 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C02D1BED9B006E8450 /* AppDelegate.swift */; };
 		662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C52D1BED9B006E8450 /* String+Extension.swift */; };
 		662CC4052D1BED9B006E8450 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C42D1BED9B006E8450 /* Shell.swift */; };
 		662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C72D1BED9B006E8450 /* UserDefaults.swift */; };
@@ -44,7 +43,6 @@
 		662CC42A2D1BED9B006E8450 /* V2rayOutbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E52D1BED9B006E8450 /* V2rayOutbound.swift */; };
 		662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3EF2D1BED9B006E8450 /* ProfileForm.swift */; };
 		662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F02D1BED9B006E8450 /* ProfileShow.swift */; };
-		662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3C22D1BED9B006E8450 /* Assets.xcassets */; };
 		662CC4302D1BED9B006E8450 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3D82D1BED9B006E8450 /* Info.plist */; };
 		662CC4312D1BED9B006E8450 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 662CC3DC2D1BED9B006E8450 /* Localizable.strings */; };
 		662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4342D1C4CE9006E8450 /* ImportHandler.swift */; };
@@ -72,6 +70,7 @@
 		663814B52E0448DB00F5FCF3 /* ProfilePing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B42E0448DB00F5FCF3 /* ProfilePing.swift */; };
 		66389D092E425ACC0050CB27 /* AppMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66389D082E425AC80050CB27 /* AppMenu.swift */; };
 		66389D0B2E4342D70050CB27 /* HotKeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66389D0A2E4342CF0050CB27 /* HotKeyWindow.swift */; };
+		6651ACCE2E7ADAE40026128F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6651ACCD2E7ADAE40026128F /* Assets.xcassets */; };
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
@@ -164,9 +163,7 @@
 		660A63AD2E2CF9AD00D84D5D /* DnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsView.swift; sourceTree = "<group>"; };
 		660A63AF2E2CF9B700D84D5D /* PacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacView.swift; sourceTree = "<group>"; };
 		662CC3BF2D1BED9B006E8450 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		662CC3C02D1BED9B006E8450 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		662CC3C12D1BED9B006E8450 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
-		662CC3C22D1BED9B006E8450 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		662CC3C32D1BED9B006E8450 /* Port.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Port.swift; sourceTree = "<group>"; };
 		662CC3C42D1BED9B006E8450 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		662CC3C52D1BED9B006E8450 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
@@ -225,6 +222,7 @@
 		663814B42E0448DB00F5FCF3 /* ProfilePing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePing.swift; sourceTree = "<group>"; };
 		66389D082E425AC80050CB27 /* AppMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMenu.swift; sourceTree = "<group>"; };
 		66389D0A2E4342CF0050CB27 /* HotKeyWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyWindow.swift; sourceTree = "<group>"; };
+		6651ACCD2E7ADAE40026128F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
@@ -614,12 +612,11 @@
 		66CBCED92C63B16400313949 /* V2rayU */ = {
 			isa = PBXGroup;
 			children = (
+				6651ACCD2E7ADAE40026128F /* Assets.xcassets */,
 				662CC3E92D1BED9B006E8450 /* V2rayU.entitlements */,
-				662CC3C22D1BED9B006E8450 /* Assets.xcassets */,
 				66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */,
 				662CC3D82D1BED9B006E8450 /* Info.plist */,
 				662CC3BF2D1BED9B006E8450 /* App.swift */,
-				662CC3C02D1BED9B006E8450 /* AppDelegate.swift */,
 				66F66F822D1E450000E77C64 /* AppState.swift */,
 				66389D082E425AC80050CB27 /* AppMenu.swift */,
 				669DCEA52E3D908C0085278B /* AppSettings.swift */,
@@ -773,7 +770,7 @@
 			files = (
 				66B1B5842D297D030032DD09 /* v2ray-core in Resources */,
 				66B1B55A2D297B140032DD09 /* install.sh in Resources */,
-				662CC42E2D1BED9B006E8450 /* Assets.xcassets in Resources */,
+				6651ACCE2E7ADAE40026128F /* Assets.xcassets in Resources */,
 				662CC4302D1BED9B006E8450 /* Info.plist in Resources */,
 				66EB6C1B2E3B985300A12DB3 /* TODO in Resources */,
 				66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */,
@@ -796,7 +793,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */,
-				662CC4022D1BED9B006E8450 /* AppDelegate.swift in Sources */,
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
 				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
 				66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */,

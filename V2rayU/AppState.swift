@@ -1,167 +1,40 @@
 import Combine
 import SwiftUI
 
-enum RunMode: String, CaseIterable {
-    case global
-    case off
-    case pac
-    case manual
-    case tunnel
-
-    var icon: String {
-        switch self {
-        case .global:
-            return "IconOn"
-        case .pac:
-            return "IconM"
-        case .off:
-            return "IconOff"
-        case .manual:
-            return "IconM"
-        case .tunnel:
-            return "IconT"
-        }
-    }
-
-    var isEnabled: Bool {
-        switch self {
-        case .off, .tunnel: return false
-        default: return true
-        }
-    }
-    
-    var tip: String {
-        switch self {
-        case .global:
-            return "Global.tip"
-        case .pac:
-            return "Pac.tip"
-        case .off:
-            return "Off.tip"
-        case .manual:
-            return "Manual.tip"
-        case .tunnel:
-            return "Tunnel.tip"
-        }
-    }
-}
-
-enum Theme: String, CaseIterable {
-    case System = "FollowSystem"
-    case Light
-    case Dark
-    var localized: String {
-        return NSLocalizedString(rawValue, comment: "")
-    }
-}
 
 @MainActor
 final class AppState: ObservableObject {
-    static let shared = AppState() // 单例实例
-    
+    static let shared = AppState()
+
+    // UI 绑定状态
     @Published var mainTab: ContentView.Tab = .activity
     @Published var settingTab: SettingView.SettingTab = .general
     @Published var helpTab: HelpPageView.HelpTab = .diagnostic
 
-    // 其它非设置相关属性
-    @Published var icon: String = "IconOff"
-    @Published var v2rayTurnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
-    @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off)
+    @Published var v2rayTurnOn: Bool = UserDefaults.getBool(forKey: .v2rayTurnOn) {
+        didSet { UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn) }
+    }
+    @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) {
+        didSet { UserDefaults.set(forKey: .runMode, value: runMode.rawValue) }
+    }
+    @Published var icon: String = RunMode.off.icon
     @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
     @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
     @Published var runningServer: ProfileModel? = ProfileViewModel.getRunning()
 
-    // 其它统计属性
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
     @Published var directDownSpeed = 0.0
     @Published var proxyUpSpeed = 0.0
     @Published var proxyDownSpeed = 0.0
-
-    @Published var selectedTheme: Theme {
-        didSet {
-            setAppearance(selectedTheme)
-        }
-    }
-
-    private var cancellables = Set<AnyCancellable>()
-
+    
     init() {
-        if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
-           let theme = Theme(rawValue: savedTheme) {
-            selectedTheme = theme
-        } else {
-            selectedTheme = .System
-        }
-        // 初始化应用外观,等待主线程完成后再执行
-        DispatchQueue.main.async {
-            self.setAppearance(self.selectedTheme)
-        }
-    }
-
-    // 更新应用外观的方法
-    private func setAppearance(_ theme: Theme) {
-        logger.info("setAppearance: \(theme.rawValue)-\(theme.localized)")
-        // 保存主题设置
-        UserDefaults.standard.set(theme.rawValue, forKey: "AppleThemes")
-        // 刷新应用外观
-        if #available(macOS 10.14, *) {
-            switch theme {
-            case .Light:
-                // 浅色模式
-                NSApp.appearance = NSAppearance(named: .aqua)
-            case .Dark:
-                // 深色模式
-                NSApp.appearance = NSAppearance(named: .darkAqua)
-            default:
-                // 系统默认模式
-                NSApp.appearance = nil
-            }
-        }
+        self.icon = runMode.icon
     }
     
-    func setRunning(uuid: String) {
-        logger.info("setRunning: \(uuid)")
-        runningProfile = uuid
-        UserDefaults.set(forKey: .runningProfile, value: uuid)
-        StatusItemManager.shared.refreshMenuItems()
-    }
-    
-    func switchRunMode(mode: RunMode) {
-        runMode = mode
-        icon = mode.icon  // 更新图标
-        reloadCore(trigger: "setRunMode(\(mode))")
-    }
-    
-    func turnOnCore() {
-        if !v2rayTurnOn {
-            v2rayTurnOn = true
-            UserDefaults.setBool(forKey: .v2rayTurnOn, value: true)
-        }
-        reloadCore(trigger: "turnOn")
-    }
-    
-    func turnOffCore() {
-        if v2rayTurnOn {
-            v2rayTurnOn = false
-            UserDefaults.setBool(forKey: .v2rayTurnOn, value: false)
-        }
-        V2rayLaunch.stopV2rayCore()
-    }
+    private var isCoreOperationInProgress = false
 
-    func runRouting(uuid: String) {
-        logger.info("setRouting: \(uuid)")
-        runningRouting = uuid
-        reloadCore(trigger: "runRouting(\(uuid))")
-    }
-
-    func runProfile(uuid: String) {
-        logger.info("setProfile: \(uuid)")
-        runningProfile = uuid
-        runningServer = ProfileViewModel.getRunning()
-        reloadCore(trigger: "runProfile(\(uuid))")
-    }
-
+    // MARK: - 更新速度
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
         self.latency = latency
         self.directUpSpeed = directUpSpeed
@@ -169,39 +42,69 @@ final class AppState: ObservableObject {
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
     }
-}
 
-extension AppState {
-    /// 修改了配置后，统一调用该方法来刷新 v2ray-core
-    func reloadCore(trigger: String) {
-        if !v2rayTurnOn {
-            return
-        }
+    // MARK: - 启动/停止核心
+    
+    func setCoreRunning(_ running: Bool) {
+        guard !isCoreOperationInProgress else { return }
+        isCoreOperationInProgress = true
+
         Task {
-            let success = await V2rayLaunch.startV2rayCore()
-            if !success {
-                switchRunMode(mode: .off)
+            defer { isCoreOperationInProgress = false }
+
+            if running {
+                let success = await V2rayLaunch.shared.start()
+                if success {
+                    v2rayTurnOn = true
+                    icon = runMode.icon
+                } else {
+                    v2rayTurnOn = false
+                    icon = RunMode.off.icon
+                }
+            } else {
+                await V2rayLaunch.shared.stop()
+                v2rayTurnOn = false
+                icon = RunMode.off.icon
             }
-            logger.info("reloadCore triggered by: \(trigger)")
-            StatusItemManager.shared.refreshMenuItems()
         }
     }
 
+    // MARK: - 切换运行模式
+    func switchRunMode(mode: RunMode) {
+        runMode = mode
+        logger.info("appState-switchRunMode: \(mode.rawValue), \(self.runMode.rawValue)")
+        setCoreRunning(true)
+        StatusItemManager.shared.refreshBasicMenus()
+    }
+
+    // MARK: - 切换路由
+    func runRouting(uuid: String) {
+        runningRouting = uuid
+        setCoreRunning(true)
+        StatusItemManager.shared.refreshRoutingItems()
+    }
+
+    // MARK: - 切换配置
+    func runProfile(uuid: String) {
+        runningProfile = uuid
+        runningServer = ProfileViewModel.getRunning()
+        setCoreRunning(true)
+        StatusItemManager.shared.refreshServerItems()
+    }
+
+    // MARK: - App 启动时调用
     func appDidLaunch() {
-        // 清理日志
         truncateLogFile(v2rayLogFilePath)
         truncateLogFile(appLogFilePath)
-        // 初始化依赖
-        // start http server
         startHttpServer()
-        Task {
-            await V2rayTrafficStats.shared.initTask()
-        }
-        // 根据状态判断是否启动
+        Task { await V2rayTrafficStats.shared.initTask() }
+        
+        logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description)")
+
         if v2rayTurnOn {
-            reloadCore(trigger: "appDidLaunch with v2rayTurnOn")
+            setCoreRunning(true)
         }
-        // 自动更新订阅
+        StatusItemManager.shared.refreshBasicMenus()
         Task {
             if AppSettings.shared.autoUpdateServers {
                 await SubscriptionHandler.shared.sync()
@@ -209,13 +112,23 @@ extension AppState {
         }
     }
 
-    func ToggleRunning() {
-        v2rayTurnOn.toggle()
-        if v2rayTurnOn {
-            reloadCore(trigger: "toggleRunning on")
-        } else {
-            V2rayLaunch.stopV2rayCore()
-            switchRunMode(mode: .off)
-        }
+    // MARK: - 菜单栏 Toggle
+    func toggleCore() {
+        v2rayTurnOn = !v2rayTurnOn
+        setCoreRunning(v2rayTurnOn)
+        StatusItemManager.shared.refreshBasicMenus()
+    }
+    
+    func turnOnCore() {
+        v2rayTurnOn = true
+        v2rayTurnOn = true
+        setCoreRunning(v2rayTurnOn)
+        StatusItemManager.shared.refreshBasicMenus()
+    }
+    
+    func turnOffCore() {
+        v2rayTurnOn = false
+        setCoreRunning(v2rayTurnOn)
+        StatusItemManager.shared.refreshBasicMenus()
     }
 }

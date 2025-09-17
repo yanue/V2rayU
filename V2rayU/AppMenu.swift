@@ -17,6 +17,7 @@ final class StatusItemManager: NSObject {
     private var statusItem: NSStatusItem!
     private var hostingView: NSHostingView<StatusItemView>!
     // menu items
+    private var coreStatusItem: NSMenuItem!
     private var toggleCoreItem: NSMenuItem!
     private var viewConfigItem: NSMenuItem!
     private var viewPacItem: NSMenuItem!
@@ -72,7 +73,7 @@ final class StatusItemManager: NSObject {
         }
     }
 
-    func refreshMenuItems() {
+    func refreshServerItems() {
         serverSubMenu = getServerSubMenus()
     }
     
@@ -80,15 +81,21 @@ final class StatusItemManager: NSObject {
         routingSubMenu = getRoutingSubMenus()
     }
     
+    func refreshBasicMenus() {
+        coreStatusItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff)
+        toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+        pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
+        globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
+        manualModeItem.state = (.manual == AppState.shared.runMode) ? .on : .off
+    }
+    
     func updateMenuTitles() {
         if !inited {
             return
         }
-
+        coreStatusItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff)
         pingItem?.title = String(localized: .Ping)
-        toggleCoreItem?.title = AppState.shared.v2rayTurnOn
-            ? String(localized: .TurnCoreOff)
-            : String(localized: .TurnCoreOn)
+        toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         viewConfigItem?.title = String(localized: .ViewConfigJson)
         viewPacItem?.title = String(localized: .ViewPacFile)
         viewLogItem?.title = String(localized: .ViewLog)
@@ -116,8 +123,7 @@ final class StatusItemManager: NSObject {
         let menu = NSMenu()
 
         // 基本菜单项
-        // 状态显示
-        let coreStatusItem = NSMenuItem(title: "v2ray-core: On (v4.2.6)", action: nil, keyEquivalent: "")
+        coreStatusItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff), action: nil, keyEquivalent: "")
         coreStatusItem.isEnabled = false
         menu.addItem(coreStatusItem)
 
@@ -357,8 +363,7 @@ final class StatusItemManager: NSObject {
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {
-        AppState.shared.ToggleRunning()
-        toggleCoreItem.title = AppState.shared.v2rayTurnOn ? "Turn xray-core On" : "Turn xray-core Off"
+        AppState.shared.toggleCore()
     }
 
     @objc private func quitClicked(_ sender: NSMenuItem) {

@@ -49,7 +49,9 @@ actor SystemSleepManager {
         logger.info("onWakeNote")
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
             logger.info("V2rayLaunch restart")
-            V2rayLaunch.restartV2ray()
+            Task {
+               await V2rayLaunch.shared.restart()
+            }
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // 自动检查更新

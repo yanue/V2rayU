@@ -165,6 +165,8 @@
 "StreamSettings" = "串流設定";
 
 // app menu
+"CoreOn" = "core 已啟動";
+"CoreOff" = "core 已關閉";
 "TurnCoreOn" = "啟動核心";
 "TurnCoreOff" = "關閉核心";
 "ViewLog" = "檢視 core 日誌";

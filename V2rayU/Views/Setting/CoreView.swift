@@ -359,7 +359,9 @@ struct CoreView: View {
             try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: destPath)
             
             // 重启v2ray
-            V2rayLaunch.restartV2ray()
+            Task {
+                await V2rayLaunch.shared.restart()
+            }
             
             self.errorMsg = "替换成功！\n\(msg)"
         } catch {

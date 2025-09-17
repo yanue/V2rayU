@@ -46,7 +46,7 @@ struct GeneralView: View {
                 }
                .padding()
                     
-                Picker(String(localized: .Theme), selection: $state.selectedTheme) {
+                Picker(String(localized: .Theme), selection: $settings.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
                         localized(item.rawValue).tag(item.rawValue)
                     }

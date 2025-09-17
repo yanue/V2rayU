@@ -165,6 +165,8 @@
 "StreamSettings" = "Stream settings";
 
 // app menu
+"CoreOn" = "Core is On";
+"CoreOff" = "Core is off";
 "TurnCoreOn" = "Turn Core On";
 "TurnCoreOff" = "Turn Core Off";
 "ViewLog" = "View Log";

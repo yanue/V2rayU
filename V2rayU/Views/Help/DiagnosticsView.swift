@@ -74,7 +74,7 @@ struct DiagnosticsView: View {
 
     func restartCore() {
         Task {
-            V2rayLaunch.stopV2rayCore()
+            await V2rayLaunch.shared.stop()
             // small delay to allow stop
             try? await Task.sleep(nanoseconds: 300_000_000)
             AppState.shared.turnOnCore()

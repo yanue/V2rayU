@@ -2,11 +2,26 @@ import ServiceManagement
 import SwiftUI
 
 // app 设置项
+enum Theme: String, CaseIterable {
+    case System = "FollowSystem"
+    case Light
+    case Dark
+    var localized: String {
+        return NSLocalizedString(rawValue, comment: "")
+    }
+}
 
 @MainActor
 final class AppSettings: ObservableObject {
     static var shared = AppSettings()
     var lock = NSLock()
+    
+    @Published var selectedTheme: Theme {
+        didSet {
+            setAppearance(selectedTheme)
+        }
+    }
+    
     @Published var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
     @Published var checkForUpdates: Bool = UserDefaults.getBool(forKey: .autoCheckVersion)
     @Published var autoUpdateServers: Bool = UserDefaults.getBool(forKey: .autoUpdateServers)
@@ -26,7 +41,41 @@ final class AppSettings: ObservableObject {
     @Published var dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
     @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204")!
+    
+    init() {
+        if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
+           let theme = Theme(rawValue: savedTheme) {
+            selectedTheme = theme
+        } else {
+            selectedTheme = .System
+        }
+        // 初始化应用外观,等待主线程完成后再执行
+        DispatchQueue.main.async {
+            self.setAppearance(self.selectedTheme)
+        }
+    }
 
+    // 更新应用外观的方法
+    private func setAppearance(_ theme: Theme) {
+        logger.info("setAppearance: \(theme.rawValue)-\(theme.localized)")
+        // 保存主题设置
+        UserDefaults.standard.set(theme.rawValue, forKey: "AppleThemes")
+        // 刷新应用外观
+        if #available(macOS 10.14, *) {
+            switch theme {
+            case .Light:
+                // 浅色模式
+                NSApp.appearance = NSAppearance(named: .aqua)
+            case .Dark:
+                // 深色模式
+                NSApp.appearance = NSAppearance(named: .darkAqua)
+            default:
+                // 系统默认模式
+                NSApp.appearance = nil
+            }
+        }
+    }
+    
     func reload() {
         lock.lock()
         defer { lock.unlock() }
@@ -104,7 +153,9 @@ final class AppSettings: ObservableObject {
             _ = GeneratePACFile(rewrite: true)
         }
         if needRestartV2ray {
-            V2rayLaunch.restartV2ray()
+            Task {
+              await V2rayLaunch.shared.restart()
+            }
         }
         if needRestartHttpServer {
             Task {

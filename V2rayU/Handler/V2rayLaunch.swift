@@ -9,48 +9,82 @@
 import Cocoa
 import SystemConfiguration
 
-class V2rayLaunch: NSObject {
+enum RunMode: String, CaseIterable {
+    case global
+    case off
+    case pac
+    case manual
+    case tunnel
 
-    static func restartV2ray() {
-        // start
-        Task {
-            await Self.startV2rayCore()
+    var icon: String {
+        switch self {
+        case .global:
+            return "IconOnG"
+        case .pac:
+            return "IconOnP"
+        case .off:
+            return "IconOff"
+        case .manual:
+            return "IconOnM"
+        case .tunnel:
+            return "IconOnT"
         }
     }
 
-    static func startV2rayCore() async -> Bool {
+    var tip: String {
+        switch self {
+        case .global:
+            return "Global.tip"
+        case .pac:
+            return "Pac.tip"
+        case .off:
+            return "Off.tip"
+        case .manual:
+            return "Manual.tip"
+        case .tunnel:
+            return "Tunnel.tip"
+        }
+    }
+}
+
+// MARK: - 核心启动器
+actor V2rayLaunch {
+    static let shared = V2rayLaunch()
+    
+    func restart() async {
+       let _ = await start()
+    }
+    
+    func start() async -> Bool {
         logger.info("start v2ray-core begin")
         guard let v2ray = ProfileViewModel.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return false
         }
-        // 重置流量统计
         await V2rayTraffics.shared.resetData()
-        // 创建配置文件
         createJsonFile(item: v2ray)
-        // 启动失败就返回 false
-        guard Self.StartAgent() else { return false }
-        // 设置系统代理（只动作，不更新状态）
-        setSystemProxy(mode: .global)
+        // 停止之前的
+        await LaunchAgent.shared.stopAgent()
+        // 启动
+        let started = await LaunchAgent.shared.startAgent()
+        if !started {
+            return false
+        }
+        let mode = await AppState.shared.runMode
+        setSystemProxy(mode: mode)
+        logger.info("start v2ray-core ok: \(mode.rawValue)")
         return true
     }
 
-    static func stopV2rayCore() {
-        // stop launch
-        Self.StopAgent()
-        // off system proxy
-        Self.setSystemProxy(mode: .off)
-        // set status
-        Task {
-            await AppState.shared.switchRunMode(mode: .off)
-        }
+    func stop() async {
+        await LaunchAgent.shared.stopAgent()
+        setSystemProxy(mode: .off)
     }
 
-    static func createJsonFile(item: ProfileModel) {
+    private func createJsonFile(item: ProfileModel) {
         let vCfg = V2rayConfigHandler()
         let jsonText = vCfg.toJSON(item: item)
         do {
-            logger.info("createJsonFile: \(JsonConfigFilePath)")
             try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
         } catch {
             logger.info("Failed to write JSON file: \(error)")
@@ -58,72 +92,29 @@ class V2rayLaunch: NSObject {
         }
     }
 
-    static func StartAgent() -> Bool {
-        StopAgent()
-
-        // close port
-        let httpPort = getHttpProxyPort()
-        let sockPort = getSocksProxyPort()
-
-        // port has been used
-        if isPortOpen(port: httpPort) {
-            var toast = "http port \(httpPort) has been used, please replace it from advance setting"
-            var title = "Port is already in use"
-            if isMainland {
-                toast = "http端口 \(httpPort) 已被使用, 请更换"
-                title = "端口已被占用"
-            }
-            alertDialog(title: title, message: toast)
-            DispatchQueue.main.async {
-                StatusItemManager.shared.openAdvanceSetting()
-            }
-            return false
-        }
-
-        // port has been used
-        if isPortOpen(port: sockPort) {
-            var toast = "socks port \(sockPort) has been used, please replace it from advance setting"
-            var title = "Port is already in use"
-            if isMainland {
-                toast = "socks端口 \(sockPort) 已被使用, 请更换"
-                title = "端口已被占用"
-            }
-            alertDialog(title: title, message: toast)
-            DispatchQueue.main.async {
-                StatusItemManager.shared.openAdvanceSetting()
-            }
-            return false
-        }
-        // 启动
-        Task {
-            await LaunchAgent.shared.startAgent()
-        }
-        return true
-    }
-
-    static func StopAgent() {
-        Task {
-            await LaunchAgent.shared.stopAgent()
-        }
-    }
-
-    static func setSystemProxy(mode: RunMode) {
+    func setSystemProxy(mode: RunMode) {
         logger.info("setSystemProxy: \(v2rayUTool), \(mode.rawValue)")
-        var httpPort: String = ""
-        var sockPort: String = ""
-        // reload
+        var httpPort = ""
+        var sockPort = ""
+        var pacUrl = ""
         if mode == .global {
             httpPort = String(getHttpProxyPort())
             sockPort = String(getSocksProxyPort())
         }
+        if mode == .pac {
+            pacUrl = getPacUrl()
+        }
         do {
-            let output = try runCommand(at: v2rayUTool, with: ["-mode", mode.rawValue, "-pac-url", "", "-http-port", httpPort, "-sock-port", sockPort])
+            let output = try runCommand(at: v2rayUTool, with: [
+                "-mode", mode.rawValue,
+                "-pac-url", pacUrl,
+                "-http-port", httpPort,
+                "-sock-port", sockPort
+            ])
             logger.info("setSystemProxy: ok \(output)")
-        } catch let error {
+        } catch {
             alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
-            Task {
-               await AppInstaller.shared.showInstallAlert()
-            }
+            Task { await AppInstaller.shared.showInstallAlert() }
         }
     }
 }
