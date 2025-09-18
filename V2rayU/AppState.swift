@@ -19,7 +19,13 @@ final class AppState: ObservableObject {
     }
     @Published var icon: String = RunMode.off.icon
     @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
+    {
+        didSet { UserDefaults.set(forKey: .runningProfile, value: runningProfile) }
+    }
     @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
+    {
+        didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
+    }
     @Published var runningServer: ProfileModel? = ProfileViewModel.getRunning()
 
     @Published var latency = 0.0
@@ -72,24 +78,28 @@ final class AppState: ObservableObject {
     // MARK: - 切换运行模式
     func switchRunMode(mode: RunMode) {
         runMode = mode
+        v2rayTurnOn = true // 先更改状态
         logger.info("appState-switchRunMode: \(mode.rawValue), \(self.runMode.rawValue)")
-        setCoreRunning(true)
-        StatusItemManager.shared.refreshBasicMenus()
+        setCoreRunning(v2rayTurnOn)
+        AppMenuManager.shared.refreshBasicMenus()
     }
 
     // MARK: - 切换路由
-    func runRouting(uuid: String) {
+    func switchRouting(uuid: String) {
         runningRouting = uuid
-        setCoreRunning(true)
-        StatusItemManager.shared.refreshRoutingItems()
+        v2rayTurnOn = true // 先更改状态
+        setCoreRunning(v2rayTurnOn)
+        logger.info("switchRouting: \(self.runningRouting)")
+        AppMenuManager.shared.refreshRoutingItems()
     }
 
     // MARK: - 切换配置
-    func runProfile(uuid: String) {
-        runningProfile = uuid
+    func switchServer(uuid: String) {
+        v2rayTurnOn = true // 先更改状态
+        setCoreRunning(v2rayTurnOn)
         runningServer = ProfileViewModel.getRunning()
-        setCoreRunning(true)
-        StatusItemManager.shared.refreshServerItems()
+        logger.info("switchServer: \(self.runningProfile)")
+        AppMenuManager.shared.refreshServerItems()
     }
 
     // MARK: - App 启动时调用
@@ -102,9 +112,10 @@ final class AppState: ObservableObject {
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description)")
 
         if v2rayTurnOn {
-            setCoreRunning(true)
+            setCoreRunning(v2rayTurnOn)
         }
-        StatusItemManager.shared.refreshBasicMenus()
+        // 刷新图标等
+        AppMenuManager.shared.refreshBasicMenus()
         Task {
             if AppSettings.shared.autoUpdateServers {
                 await SubscriptionHandler.shared.sync()
@@ -114,21 +125,20 @@ final class AppState: ObservableObject {
 
     // MARK: - 菜单栏 Toggle
     func toggleCore() {
-        v2rayTurnOn = !v2rayTurnOn
+        v2rayTurnOn = !v2rayTurnOn  // 先更改状态
         setCoreRunning(v2rayTurnOn)
-        StatusItemManager.shared.refreshBasicMenus()
+        AppMenuManager.shared.refreshBasicMenus()
     }
     
     func turnOnCore() {
-        v2rayTurnOn = true
-        v2rayTurnOn = true
+        v2rayTurnOn = true // 先更改状态
         setCoreRunning(v2rayTurnOn)
-        StatusItemManager.shared.refreshBasicMenus()
+        AppMenuManager.shared.refreshBasicMenus()
     }
     
     func turnOffCore() {
-        v2rayTurnOn = false
+        v2rayTurnOn = false // 先更改状态
         setCoreRunning(v2rayTurnOn)
-        StatusItemManager.shared.refreshBasicMenus()
+        AppMenuManager.shared.refreshBasicMenus()
     }
 }

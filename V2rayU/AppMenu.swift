@@ -9,8 +9,8 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class StatusItemManager: NSObject {
-    static let shared = StatusItemManager()
+final class AppMenuManager: NSObject {
+    static let shared = AppMenuManager()
     var windowController: NSWindowController?
     var aboutWindowController: NSWindowController?
     private var inited = false
@@ -75,10 +75,12 @@ final class StatusItemManager: NSObject {
 
     func refreshServerItems() {
         serverSubMenu = getServerSubMenus()
+        serverItem.submenu = serverSubMenu
     }
     
     func refreshRoutingItems() {
         routingSubMenu = getRoutingSubMenus()
+        routingItem.submenu = routingSubMenu
     }
     
     func refreshBasicMenus() {
@@ -220,21 +222,20 @@ final class StatusItemManager: NSObject {
         let menu = NSMenu()
 
         let routings = RoutingViewModel.all()
-        let currentRouting = AppState.shared.runningRouting
-        logger.info("currentRouting: \(currentRouting)")
         for routing in routings {
-            let item = createRoutingMenuItem(routing: routing, current: currentRouting)
+            let item = createRoutingMenuItem(routing: routing)
             menu.addItem(item)
         }
         return menu
     }
     
-    private func createRoutingMenuItem(routing: RoutingModel, current: String) -> NSMenuItem {
+    private func createRoutingMenuItem(routing: RoutingModel) -> NSMenuItem {
         let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
-        item.representedObject = routing  // 可选：存储路由名称
+        item.representedObject = routing.uuid  // 可选：存储路由名称
         item.isEnabled =  true
         item.target = self
-        item.state = (routing.uuid == current) ? .on : .off
+        item.state = (routing.uuid == AppState.shared.runningRouting) ? .on : .off
+        logger.info("currentRouting: \(AppState.shared.runningRouting)")
         return item
     }
     
@@ -254,20 +255,14 @@ final class StatusItemManager: NSObject {
         pingItem.target = self
 
         let menu = NSMenu()
-        // 添加服务器设置项
         menu.addItem(pingItem)
         menu.addItem(NSMenuItem.separator())
         
-        let currentProfile = AppState.shared.runningProfile
-
-        // 按订阅ID分组
+        // 直接拿有序数组
         let groupedServers = ProfileViewModel.getGroupedProfiles()
-        
-        // 决定是否使用分组显示
         let useGrouping = groupedServers.count >= 2
         
         if useGrouping {
-            // 分组显示
             for (name, profiles) in groupedServers {
                 let groupName = name.isEmpty ? "Default" : name
                 let subMenu = NSMenu()
@@ -275,19 +270,18 @@ final class StatusItemManager: NSObject {
                 groupItem.title = groupName
                 groupItem.submenu = subMenu
                 groupItem.image = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
-                // todo 优化
-                groupItem.state = profiles.contains { $0.uuid == currentProfile } ? .on : .off
+                groupItem.state = profiles.contains { $0.uuid == AppState.shared.runningProfile } ? .on : .off
+                
                 for profile in profiles {
-                    let item = createServerMenuItem(profile: profile, current: currentProfile)
+                    let item = createServerMenuItem(profile: profile)
                     subMenu.addItem(item)
                 }
                 menu.addItem(groupItem)
             }
         } else {
-            // 直接显示所有服务器
             for (_, profiles) in groupedServers {
                 for profile in profiles {
-                    let item = createServerMenuItem(profile: profile, current: currentProfile)
+                    let item = createServerMenuItem(profile: profile)
                     menu.addItem(item)
                 }
             }
@@ -296,7 +290,7 @@ final class StatusItemManager: NSObject {
     }
 
     // 辅助方法：创建对齐的服务器菜单项
-    private func createServerMenuItem(profile: ProfileModel, current: String) -> NSMenuItem {
+    private func createServerMenuItem(profile: ProfileModel) -> NSMenuItem {
         let speedText: String
         let speedColor: NSColor
         
@@ -325,10 +319,10 @@ final class StatusItemManager: NSObject {
         )
         item.action = #selector(switchServer)
         item.keyEquivalent = ""
-        item.representedObject = profile
+        item.representedObject = profile.uuid
         item.isEnabled = true
         item.target = self
-        item.state = profile.uuid == current ? .on : .off
+        item.state = profile.uuid == AppState.shared.runningProfile ? .on : .off
         item.toolTip = "\(profile.`protocol`)-\(profile.address):\(profile.port)-\(profile.uuid)"
         
         return item
@@ -402,7 +396,8 @@ final class StatusItemManager: NSObject {
             logger.info("switchServer err")
             return
         }
-        AppState.shared.runProfile(uuid: uuid)
+        logger.info("switchServer: \(uuid)")
+        AppState.shared.switchServer(uuid: uuid)
     }
 
     @objc private func switchRouting(_ sender: NSMenuItem) {
@@ -410,7 +405,8 @@ final class StatusItemManager: NSObject {
             logger.info("switchRouting err")
             return
         }
-        AppState.shared.runRouting(uuid: uuid)
+        logger.info("switchRouting: \(uuid)")
+        AppState.shared.switchRouting(uuid: uuid)
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {

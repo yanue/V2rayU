@@ -35,7 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         logger.info("Application did finish launching.")
         // 初始化状态栏项目
-        StatusItemManager.shared.setupStatusItem()
+        AppMenuManager.shared.setupStatusItem()
         Task{
             // 初始化helper
             await AppInstaller.shared.checkInstall()

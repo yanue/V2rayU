@@ -75,7 +75,7 @@ struct MenuRoutingPanel: View {
                                         .padding(.horizontal)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            appState.runRouting(uuid: item.uuid)
+                                            appState.switchRouting(uuid: item.uuid)
                                         }
                                 }
                             }

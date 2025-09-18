@@ -68,7 +68,7 @@ class LanguageManager: ObservableObject {
         }
         currentLocale = Locale(identifier: selectedLanguage.localeIdentifier)
         // 更新菜单
-        StatusItemManager.shared.updateMenuTitles()
+        AppMenuManager.shared.updateMenuTitles()
     }
 
     func localizedString(_ key: String) -> String {

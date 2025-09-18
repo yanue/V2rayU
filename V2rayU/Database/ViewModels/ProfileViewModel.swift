@@ -65,7 +65,8 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
-    static func getGroupedProfiles() -> [String: [ProfileModel]] {
+    // 改成返回有序数组
+    static func getGroupedProfiles() -> [(String, [ProfileModel])] {
         let profiles = ProfileViewModel.all()
         let groups = SubViewModel.all().reduce(into: [String: SubModel]()) { dict, sub in
             dict[sub.uuid] = sub
@@ -74,30 +75,23 @@ class ProfileViewModel: ObservableObject {
         
         // 按 subid 分组
         for profile in profiles {
-            if !profile.subid.isEmpty, groups[profile.subid] != nil {
+            if !profile.subid.isEmpty, let sub = groups[profile.subid] {
                 // 有订阅的按订阅ID分组
-                result[groups[profile.subid]?.remark ?? "", default: []].append(profile)
+                result[sub.remark, default: []].append(profile)
             } else {
                 // 没有订阅的放在空字符串组
                 result["", default: []].append(profile)
             }
         }
         
-        // 重新排序，让空字符串的组（本地配置）放在最前面
+        // 排序：空字符串组（本地配置）放最前，其余按订阅名称排序
         let sortedResult = result.sorted { (first, second) -> Bool in
-            if first.key.isEmpty {
-                return true  // 空key放前面
-            } else if second.key.isEmpty {
-                return false
-            } else {
-                // 其他按订阅名称排序
-                let firstName = groups[first.key]?.remark ?? first.key
-                let secondName = groups[second.key]?.remark ?? second.key
-                return firstName < secondName
-            }
+            if first.key.isEmpty { return true }
+            if second.key.isEmpty { return false }
+            return first.key < second.key
         }
         
-        return Dictionary(uniqueKeysWithValues: sortedResult)
+        return sortedResult
     }
     
     // filter: ["id": 1,"conlmn":"value"]

@@ -100,7 +100,7 @@ struct MenuProfilePanel: View {
                                         .padding(.horizontal)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            AppState.shared.runProfile(uuid: item.uuid)
+                                            AppState.shared.switchServer(uuid: item.uuid)
                                         }
                                 }
                             }
