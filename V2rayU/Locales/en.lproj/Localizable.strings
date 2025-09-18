@@ -197,6 +197,7 @@
 // help view
 "HelpPageTitle" = "Help & Troubleshooting";
 "HelpPageSubHead" = "Common issues and solutions, diagnostics";
+"GithubIssues" = "Github Issues";
 "Refresh" = "Refresh";
 "V2rayCoreSwitchStatus" = "V2Ray core switch status";
 "V2rayCoreRunningStatus" = "V2Ray core running status (launchd)";

@@ -7,6 +7,7 @@
 
 import Foundation
 import Cocoa
+import Network
 
 func getArch() -> String {
     #if arch(arm64)
@@ -200,5 +201,20 @@ func getPacAddress() -> String {
         return GetIPAddresses() ?? "127.0.0.1"
     } else {
         return "127.0.0.1"
+    }
+}
+
+func OpenLogs(logFilePath: String) {
+    if !FileManager.default.fileExists(atPath: logFilePath) {
+        let txt = ""
+        try! txt.write(to: URL(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+    }
+
+    let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])
+    task.waitUntilExit()
+    if task.terminationStatus == 0 {
+        NSLog("open logs succeeded.")
+    } else {
+        NSLog("open logs failed.")
     }
 }

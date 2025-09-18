@@ -190,6 +190,7 @@ enum LanguageLabel: String, CaseIterable {
     // help page
     case HelpPageTitle
     case HelpPageSubHead
+    case GithubIssues
     case Refresh
     case V2rayCoreSwitchStatus
     case V2rayCoreRunningStatus

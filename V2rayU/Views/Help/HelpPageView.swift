@@ -34,6 +34,12 @@ struct HelpPageView: View {
                             .foregroundColor(.secondary)
                     }
                     Spacer()
+                    // 如果不想用自定义图片，可以用 SF Symbols 代替
+                    Link(destination: URL(string: "https://github.com/yanue/V2rayU/issues")!) {
+                        Label(String(localized: .GithubIssues), systemImage: "link") // 用 link 图标代替
+                           .padding()
+                           .cornerRadius(8)
+                    }
                 }.padding(.bottom, 10)
 
                 // Segmented Picker (Tabs)

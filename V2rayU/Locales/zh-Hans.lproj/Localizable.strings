@@ -197,6 +197,7 @@
 // help view
 "HelpPageTitle" = "诊断与帮助";
 "HelpPageSubHead" = "检测关键组件状态并提供常见问题修复操作";
+"GithubIssues" = "问题反馈";
 "Refresh" = "刷新";
 "V2rayCoreSwitchStatus" = "v2ray-core 开关状态";
 "V2rayCoreRunningStatus" = "v2ray-core 运行状态 (launchd)";

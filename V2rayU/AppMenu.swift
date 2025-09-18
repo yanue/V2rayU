@@ -353,7 +353,7 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func openLogs(_ sender: NSMenuItem) {
-//        OpenLogs()
+        OpenLogs(logFilePath: v2rayLogFilePath)
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {
@@ -410,10 +410,8 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {
-        guard let url = URL(string: "https://github.com/yanue/v2rayu/issues") else {
-            return
-        }
-        NSWorkspace.shared.open(url)
+        AppState.shared.mainTab = .help
+        openMainWindow()
     }
 
     @objc private func switchRunMode(_ sender: NSMenuItem) {
@@ -561,3 +559,40 @@ final class AppMenuManager: NSObject {
         NSApp.terminate(self)
     }
 }
+
+// MARK: - 状态栏视图
+
+struct StatusItemView: View {
+    @ObservedObject var appState = AppState.shared // 显式使用 ObservedObject
+    @ObservedObject var settings = AppSettings.shared // 显式使用 ObservedObject
+
+    var body: some View {
+        HStack() {
+            // 应用图标
+            Image(appState.icon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+            if settings.showLatencyOnTray {
+                // 延迟信息
+                Text("● \(String(format: "%.0f", appState.latency)) ms")
+                    .font(.system(size: 10))
+                    .foregroundColor(.green) // 绿色
+            }
+            if settings.showSpeedOnTray {
+                // 速度信息（两行显示）
+                VStack(alignment: .leading) {
+                    Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
+                    Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
+                }
+                .font(.system(size: 9))
+                .foregroundColor(.primary)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 2)
+        .fixedSize()   // StatusBar自适应关键点: 需要 StatusItemView 设置 fixedSize 配合 statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    }
+}
+
