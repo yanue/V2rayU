@@ -189,14 +189,10 @@ struct ProfileListView: View {
             }
         }
         .sheet(item: $shareRow) { _ in
-            ProfileShareView(profile: shareRow, isAll: false) {
-                shareRow = nil
-            }
+            
         }
         .sheet(isPresented: $showShareSheet) {
-            ProfileShareView(profile: nil, isAll: true) {
-                showShareSheet = false
-            }
+            
         }
         .task { loadData() }
     }
@@ -351,8 +347,4 @@ struct ProfileListView: View {
     private func loadData() {
         viewModel.getList() // Load data when the view appears
     }
-}
-
-#Preview {
-    ProfileListView()
 }

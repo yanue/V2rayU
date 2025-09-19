@@ -9,7 +9,7 @@ import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
 
-class ProfileModel: ObservableObject, Identifiable, Codable {
+class ProfileModel: ObservableObject, Identifiable, Codable, Equatable {
     var index: Int = 0
     // 公共属性
     @Published var uuid: String // 唯一标识
@@ -40,6 +40,10 @@ class ProfileModel: ObservableObject, Identifiable, Codable {
     // Identifiable 协议的要求
     var id: String {
         return uuid
+    }
+    
+    static func == (lhs: ProfileModel, rhs: ProfileModel) -> Bool {
+        return lhs.uuid == rhs.uuid
     }
 
     // 对应编码的 `CodingKeys` 枚举

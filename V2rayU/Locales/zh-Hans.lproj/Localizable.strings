@@ -16,7 +16,12 @@
 "Remark" = "备注";
 "Edit" = "编辑";
 "Preview" = "预览";
-
+"Copy" = "复制";
+"Copied" = "已复制";
+"Regenerated" = "已重新生成";
+"Regenerate" = "重新生成";
+"Generate" = "生成";
+"Generated" = "已生成";
 // app content
 "Activity" = "活动";
 "ActivitySubHead" = "查看最近活动与日志";

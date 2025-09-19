@@ -23,6 +23,11 @@ enum LanguageLabel: String, CaseIterable {
     case Remark
     case Edit
     case Preview
+    // profile share
+    case Regenerate
+    case Regenerated
+    case Copy
+    case Copied
     // app content
     case Activity
     case ActivitySubHead

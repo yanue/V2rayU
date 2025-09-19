@@ -11,8 +11,6 @@ import SwiftUI
 @MainActor
 final class AppMenuManager: NSObject {
     static let shared = AppMenuManager()
-    var windowController: NSWindowController?
-    var aboutWindowController: NSWindowController?
     private var inited = false
     private var statusItem: NSStatusItem!
     private var hostingView: NSHostingView<StatusItemView>!
@@ -349,7 +347,7 @@ final class AppMenuManager: NSObject {
     func openAdvanceSetting() {
         AppState.shared.mainTab = .setting
         AppState.shared.settingTab = .general
-        self.openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openLogs(_ sender: NSMenuItem) {
@@ -367,28 +365,28 @@ final class AppMenuManager: NSObject {
     @objc private func openPreferenceGeneral(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .setting
         AppState.shared.settingTab = .general
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openPreferenceSubscribe(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .subscription
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openPreferencePac(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .setting
         AppState.shared.settingTab = .pac
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
     
     @objc private func openRoutingTab(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .routing
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
     
     @objc private func openServerTab(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .server
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func switchServer(_ sender: NSMenuItem) {
@@ -411,7 +409,7 @@ final class AppMenuManager: NSObject {
 
     @objc private func goHelp(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .help
-        openMainWindow()
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func switchRunMode(_ sender: NSMenuItem) {
@@ -428,20 +426,12 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {
-//        guard let v2ray = ProfileViewModel.getRunning() else {
-//            logger.info("v2ray config not found")
-//            noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
-//            return
-//        }
-//
-//        let share = ShareUri()
-//        let uri = ShareUri.generateShareUri(item: v2ray)
-//        if share.error.count > 0 {
-//            noticeTip(title: "generate Qrcode fail", informativeText: share.error)
-//            return
-//        }
-//
-//        showQRCode(uri: uri)
+        guard let v2ray = AppState.shared.runningServer else {
+            logger.info("v2ray config not found")
+            noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
+            return
+        }
+        ShareWindowManager.shared.openShareWindow(item: v2ray)
     }
 
     @objc private func copyExportCommand(_ sender: NSMenuItem) {
@@ -504,55 +494,6 @@ final class AppMenuManager: NSObject {
             return
         }
         NSWorkspace.shared.open(url)
-    }
-
-    @objc private func openMainWindow() {
-        // 1. 切回常规模式（显示 Dock 图标、主菜单）
-        NSApp.setActivationPolicy(.regular)
-        // 2. 激活应用，确保接收键盘事件
-        NSApp.activate(ignoringOtherApps: true)
-
-        // 3. 如果还没创建 windowController，就初始化
-        if windowController == nil {
-            // 3.1 构建 SwiftUI 内容视图
-            let contentView = ContentView()
-                .environment(\.locale, LanguageManager.shared.currentLocale)
-                .environmentObject(AppState.shared)
-            let hostingVC = NSHostingController(rootView: contentView)
-
-            // 3.2 初始化自定义窗口
-            let window = HotKeyWindow(
-                contentRect: .zero,
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered,
-                defer: false
-            )
-
-            // 3.3 关键：设置代理，触发 windowWillClose 等
-            window.delegate = window
-
-            // 3.4 配置窗口内容和大小
-            window.contentView = hostingVC.view
-            window.setContentSize(NSSize(width: 760, height: 600))
-            window.title = "V2rayU"
-            window.center()
-            window.isReleasedWhenClosed = false
-
-            // 3.5 关键：把焦点给 SwiftUI 视图，让 performKeyEquivalent 生效
-            window.makeFirstResponder(hostingVC.view)
-
-            // 3.6 包装成 NSWindowController
-            windowController = NSWindowController(window: window)
-        }
-
-        // 4. 显示并确保成为 key window
-        windowController?.showWindow(nil)
-        if let win = windowController?.window {
-            win.makeKeyAndOrderFront(nil)
-            DispatchQueue.main.async {
-                win.orderFrontRegardless()
-            }
-        }
     }
 
     @objc private func terminateApp() {

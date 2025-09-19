@@ -16,6 +16,12 @@
 "Remark" = "Remark";
 "Edit" = "Edit";
 "Preview" = "Preview";
+"Copy" = "Copy";
+"Copied" = "Copied";
+"Regenerated" = "Regenerated";
+"Regenerate" = "Regenerated";
+"Generate" = "Generate";
+"Generated" = "Generated";
 
 // app content
 "Activity" = "Activity";

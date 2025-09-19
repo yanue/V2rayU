@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 
 // 自定义窗口: 监听快捷键及窗口关闭事件
-class HotKeyWindow: NSWindow, NSWindowDelegate {
+class BaseWindow: NSWindow, NSWindowDelegate {
     // 因使用 NSStatusItem 自定义显示tray, 导致打开窗口无法自动监听相关快捷键, 这种手动监听对应的快捷键
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         guard event.type == .keyDown,
