@@ -175,8 +175,8 @@ final class AppMenuManager: NSObject {
         menu.addItem(NSMenuItem.separator())
 
         // 设置与帮助
-        checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates), action: #selector(checkForUpdate), keyEquivalent: "")
-        helpItem = NSMenuItem(title: String(localized: .Help), action: #selector(goHelp), keyEquivalent: "")
+        checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
+        helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))", action: #selector(checkForUpdate), keyEquivalent: "")
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
@@ -302,22 +302,8 @@ final class AppMenuManager: NSObject {
 
     // 辅助方法：创建对齐的服务器菜单项
     private func createServerMenuItem(profile: ProfileModel) -> NSMenuItem {
-        let speedText: String
-        let speedColor: NSColor
-        
-        if profile.speed < 0 {
-            speedText = "[\(profile.speed)ms]"
-            speedColor = NSColor.systemGray
-        } else if profile.speed < 100 {
-            speedText = "[\(profile.speed)ms]"
-            speedColor = NSColor.systemGreen
-        } else if profile.speed < 300 {
-            speedText = "[\(profile.speed)ms]"
-            speedColor = NSColor.systemOrange
-        } else {
-            speedText = "[\(profile.speed)ms]"
-            speedColor = NSColor.systemRed
-        }
+        let speedText: String = "[\(profile.speed)ms]"
+        let speedColor: NSColor = getSpeedColor(latency: Double(profile.speed))
         
         // Ping值放前面
         let title = "\(speedText) \(profile.remark)"
@@ -531,7 +517,7 @@ struct StatusItemView: View {
                 // 延迟信息
                 Text("● \(String(format: "%.0f", appState.latency)) ms")
                     .font(.system(size: 10))
-                    .foregroundColor(.green) // 绿色
+                    .foregroundColor(Color(getSpeedColor(latency: appState.latency))) // 绿色
             }
             if settings.showSpeedOnTray {
                 // 速度信息（两行显示）
@@ -551,23 +537,28 @@ struct StatusItemView: View {
 }
 
 struct CoreStatusItemView: View {
-    @ObservedObject var appState = AppState.shared // 显式使用 ObservedObject
+    @ObservedObject var appState = AppState.shared
 
     var body: some View {
         HStack(spacing: 8) {
-            Text(appState.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff))
-                .foregroundColor(Color.primary)
-            // 延迟信息（使用系统动态色）
+            // 用 SF Symbols 图标替代 On/Off 文本
+            Image(systemName: appState.v2rayTurnOn ? "wifi" : "wifi.slash")
+                .foregroundColor(Color(appState.v2rayTurnOn ? .systemGreen : .systemGray))
+            Spacer()
+            // 延迟信息
             Text("● \(String(format: "%.0f", appState.latency)) ms")
                 .font(.system(size: 11))
-                .foregroundColor(Color(.systemGreen))
+                .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
+            
             Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
                 .font(.system(size: 11))
-                .foregroundColor(Color(.systemBlue))
+                .foregroundColor(Color(appState.v2rayTurnOn ? .systemBlue : .systemGray))
+
             Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
                 .font(.system(size: 11))
-                .foregroundColor(Color(.systemRed))
+                .foregroundColor(Color(appState.v2rayTurnOn ? .systemRed : .systemGray))
         }
         .padding(.vertical, 6)
+        .padding(.horizontal, 24)
     }
 }

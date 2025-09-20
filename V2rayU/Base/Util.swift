@@ -17,6 +17,27 @@ func getArch() -> String {
     #endif
 }
 
+func getCoreShortVersion() -> String {
+    let version = getCoreVersion()
+    logger.debug("getCoreShortVersion: \(version)")
+    // Xray 1.8.20 (Xray, Penetrates Everything.) 8deb953 (go1.22.5 darwin/arm64)
+    // 正则提取类似 1.8.20 ,1.8 等
+    let pattern = #"(\d+\.\d+(\.\d+)?)"#
+    let regex = try! NSRegularExpression(pattern: pattern, options: [])
+    let nsString = version as NSString
+    let results = regex.matches(in: version, options: [], range: NSRange(location: 0, length: nsString.length))
+    if let match = results.first {
+        let shortVersion = nsString.substring(with: match.range(at: 1))
+        return shortVersion
+    }
+    // 按照空格分割，取第2个
+    let components = version.split(separator: " ")
+    if components.count >= 2 {
+        return String(components[1])
+    }
+    return version
+}
+
 func getCoreVersion() -> String {
     guard FileManager.default.fileExists(atPath: v2rayCoreFile) else {
         return "Not Found"
@@ -216,5 +237,18 @@ func OpenLogs(logFilePath: String) {
         NSLog("open logs succeeded.")
     } else {
         NSLog("open logs failed.")
+    }
+}
+
+// 根据延迟返回颜色
+func getSpeedColor(latency: Double) -> NSColor {
+    if latency <= 0 {
+        return NSColor.systemGray
+    } else if latency < 100 {
+        return NSColor.systemGreen
+    } else if latency < 300 {
+        return NSColor.systemOrange
+    } else {
+        return NSColor.systemRed
     }
 }

@@ -48,10 +48,10 @@ struct GeneralView: View {
                     
                 Picker(String(localized: .Theme), selection: $settings.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
-                        localized(item.rawValue).tag(item.rawValue)
+                        Text(String(localized: item.rawValue)).tag(item) // 保持 tag 类型为 Theme
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle()) // 分段选择样式
+                .pickerStyle(SegmentedPickerStyle())
                 .padding()
 
                 Spacer()

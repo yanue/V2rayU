@@ -9,6 +9,7 @@ import ServiceManagement
 import SwiftUI
 
 let appVersion = getAppVersion()
+let coreVersion = getCoreShortVersion()
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 

@@ -171,11 +171,11 @@
 "StreamSettings" = "Stream settings";
 
 // app menu
-"CoreOn" = "Core is On";
-"CoreOff" = "Core is off";
-"TurnCoreOn" = "Turn Core On";
-"TurnCoreOff" = "Turn Core Off";
-"ViewLog" = "View Log";
+"CoreOn" = "xray-core: On";
+"CoreOff" = "xray-core: off";
+"TurnCoreOn" = "Turn xray-core On";
+"TurnCoreOff" = "Turn xray-core Off";
+"ViewLog" = "View xray-core Log";
 "ViewConfigJson" = "View Config JSON";
 "ViewPacFile" = "View PAC File";
 "PacMode" = "PAC Mode";

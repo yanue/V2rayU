@@ -170,11 +170,11 @@
 "StreamSettings" = "流设置";
 
 // app menu
-"CoreOn" = "core 已启动";
-"CoreOff" = "core 已停止";
-"TurnCoreOn" = "启动 core";
-"TurnCoreOff" = "关闭 core";
-"ViewLog" = "查看 core 日志";
+"CoreOn" = "xray-core: 已启动";
+"CoreOff" = "xray-core: 已停止";
+"TurnCoreOn" = "启动 xray-core";
+"TurnCoreOff" = "关闭 xray-core";
+"ViewLog" = "查看 xray-core 日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 pac 文件";
 "PacMode" = "pac模式";
