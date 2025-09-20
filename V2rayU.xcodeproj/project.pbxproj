@@ -177,9 +177,6 @@
 		662CC3D32D1BED9B006E8450 /* Migrate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrate.swift; sourceTree = "<group>"; };
 		662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingHandler.swift; sourceTree = "<group>"; };
 		662CC3D82D1BED9B006E8450 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		662CC3D92D1BED9B006E8450 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		662CC3DA2D1BED9B006E8450 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		662CC3DB2D1BED9B006E8450 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayInbound.swift; sourceTree = "<group>"; };
 		662CC3E52D1BED9B006E8450 /* V2rayOutbound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayOutbound.swift; sourceTree = "<group>"; };
@@ -389,14 +386,6 @@
 			path = Handler;
 			sourceTree = "<group>";
 		};
-		662CC3DD2D1BED9B006E8450 /* Locales */ = {
-			isa = PBXGroup;
-			children = (
-				662CC3DC2D1BED9B006E8450 /* Localizable.strings */,
-			);
-			path = Locales;
-			sourceTree = "<group>";
-		};
 		662CC3E82D1BED9B006E8450 /* V2ray */ = {
 			isa = PBXGroup;
 			children = (
@@ -459,7 +448,6 @@
 				662CC3F22D1BED9B006E8450 /* Profile */,
 				662CC3F82D1BED9B006E8450 /* Setting */,
 				66E94B362D26B971003745B5 /* AppContentView.swift */,
-				662CC3DD2D1BED9B006E8450 /* Locales */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -910,16 +898,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		662CC3DC2D1BED9B006E8450 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				662CC3D92D1BED9B006E8450 /* en */,
-				662CC3DA2D1BED9B006E8450 /* zh-Hans */,
-				662CC3DB2D1BED9B006E8450 /* zh-HK */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
 		66E0AF432E7DAE6F004E44FF /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1102,7 +1080,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 yanue. All rights reserved.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 yanue. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1136,7 +1114,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = V2rayU;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 yanue. All rights reserved.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 yanue. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

@@ -82,7 +82,7 @@ final class AppMenuManager: NSObject {
     }
     
     func refreshBasicMenus() {
-        coreStatusItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff)
+        // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
@@ -93,7 +93,7 @@ final class AppMenuManager: NSObject {
         if !inited {
             return
         }
-        coreStatusItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff)
+        // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
         pingItem?.title = String(localized: .Ping)
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         viewConfigItem?.title = String(localized: .ViewConfigJson)
@@ -123,9 +123,9 @@ final class AppMenuManager: NSObject {
         let menu = NSMenu()
 
         // 基本菜单项
-        coreStatusItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff), action: nil, keyEquivalent: "")
-        coreStatusItem.isEnabled = false
+        coreStatusItem = getCoreStatusItem()
         menu.addItem(coreStatusItem)
+        menu.addItem(NSMenuItem.separator())
 
         toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn), action: #selector(toggleRunning), keyEquivalent: "t")
         viewConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewConfig), keyEquivalent: "")
@@ -191,6 +191,19 @@ final class AppMenuManager: NSObject {
 
         statusItem.menu = menu
         self.inited = true
+    }
+    
+    func getCoreStatusItem() -> NSMenuItem {
+        // 使用 SwiftUI 视图替换原始的 title-only 菜单项，CoreStatusItemView 会观察 AppState 自动刷新
+        let item = NSMenuItem()
+        // 创建一个 HostingView 并赋给 menu item 的 view
+        let coreHosting = NSHostingView(rootView: CoreStatusItemView())
+        // 给 hosting view 一个合理的固有大小（根据视图内容微调）
+        coreHosting.translatesAutoresizingMaskIntoConstraints = false
+        coreHosting.frame = NSRect(x: 0, y: 0, width: 220, height: 40)
+        item.view = coreHosting
+        item.isEnabled = false
+        return item
     }
     
     func getRoutingItem() -> NSMenuItem {
@@ -537,3 +550,24 @@ struct StatusItemView: View {
     }
 }
 
+struct CoreStatusItemView: View {
+    @ObservedObject var appState = AppState.shared // 显式使用 ObservedObject
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(appState.v2rayTurnOn ? String(localized: .CoreOn) : String(localized: .CoreOff))
+                .foregroundColor(Color.primary)
+            // 延迟信息（使用系统动态色）
+            Text("● \(String(format: "%.0f", appState.latency)) ms")
+                .font(.system(size: 11))
+                .foregroundColor(Color(.systemGreen))
+            Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
+                .font(.system(size: 11))
+                .foregroundColor(Color(.systemBlue))
+            Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
+                .font(.system(size: 11))
+                .foregroundColor(Color(.systemRed))
+        }
+        .padding(.vertical, 6)
+    }
+}
