@@ -50,6 +50,8 @@ final class AppState: ObservableObject {
         self.directDownSpeed = directDownSpeed
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
+        // 更新数据库
+        ProfileViewModel.update_speed(uuid: self.runningProfile, speed: Int(latency))
     }
 
     func resetSpeed(){

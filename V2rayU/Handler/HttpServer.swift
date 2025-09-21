@@ -33,7 +33,7 @@ actor LocalHttpServer {
         let pacPort = getPacPort()
         logger.info("pacPort: \(pacPort)")
 
-        if isPortOpen(port: pacPort) {
+        if isPortOpen(pacPort) {
             var toast = "pac port \(pacPort) has been used, please replace from advance setting"
             var title = "Port is already in use"
             if isMainland {

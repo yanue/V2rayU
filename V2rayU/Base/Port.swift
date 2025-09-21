@@ -71,14 +71,22 @@ func findFreePort() -> UInt16 {
     return port
 }
 
-func isPortOpen(port: UInt16) -> Bool {
-    do {
-        let output = try runCommand(at: "/usr/sbin/lsof", with: ["-i", ":\(port)"])
-        return output.contains("LISTEN")
-    } catch let error {
-        logger.info("isPortOpen: \(error)")
+func isPortOpen(_ port: UInt16) -> Bool {
+    let socketFD = socket(AF_INET, SOCK_STREAM, 0)
+    guard socketFD >= 0 else { return false }
+    defer { close(socketFD) }
+
+    var addr = sockaddr_in()
+    addr.sin_family = sa_family_t(AF_INET)
+    addr.sin_port = port.bigEndian
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1")
+
+    let result = withUnsafePointer(to: &addr) {
+        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+            connect(socketFD, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
+        }
     }
-    return false
+    return result == 0
 }
 
 func getUsablePort(port: UInt16) -> (Bool, UInt16) {
@@ -86,7 +94,7 @@ func getUsablePort(port: UInt16) -> (Bool, UInt16) {
     var isNew = false
     var _port = port
     while i < 100 {
-        let opened = isPortOpen(port: _port)
+        let opened = isPortOpen(_port)
         logger.info("getUsablePort: try=\(i) port=\(_port) opened=\(opened)")
         if !opened {
             return (isNew, _port)

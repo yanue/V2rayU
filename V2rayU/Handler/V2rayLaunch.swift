@@ -50,19 +50,19 @@ enum RunMode: String, CaseIterable {
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
-    
+
     func restart() async {
        let _ = await start()
     }
     
     func start() async -> Bool {
         logger.info("start v2ray-core begin")
-        guard let v2ray = ProfileViewModel.getRunning() else {
+        guard let item = ProfileViewModel.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return false
         }
         await V2rayTraffics.shared.resetData()
-        createJsonFile(item: v2ray)
+        createJsonFile(item: item)
         // 停止之前的
         await LaunchAgent.shared.stopAgent()
         // 启动
@@ -73,6 +73,9 @@ actor V2rayLaunch {
         let mode = await AppState.shared.runMode
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
+        Task {
+            try await PingRunning.shared.startPing()
+        }
         return true
     }
 

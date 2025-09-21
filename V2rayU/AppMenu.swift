@@ -7,6 +7,7 @@
 
 import AppKit
 import SwiftUI
+import Combine
 
 @MainActor
 final class AppMenuManager: NSObject {
@@ -41,7 +42,8 @@ final class AppMenuManager: NSObject {
     private var checkForUpdatesItem: NSMenuItem!
     private var helpItem: NSMenuItem!
     private var quitItem: NSMenuItem!
-
+    private var cancellables = Set<AnyCancellable>()
+    
     override private init() {
         super.init()
     }
@@ -151,7 +153,7 @@ final class AppMenuManager: NSObject {
         routingItem = getRoutingItem()
         serverItem = getServerItem()
         // 预先初始化一次
-        pingItem = NSMenuItem(title: String(localized: .Ping), action: #selector(pingSpeed), keyEquivalent: "")
+        pingItem = NSMenuItem(title: String(localized: .Ping) + "(pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
