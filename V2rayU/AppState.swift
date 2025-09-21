@@ -95,10 +95,11 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换配置
     func switchServer(uuid: String) {
+        runningProfile = uuid
         v2rayTurnOn = true // 先更改状态
         setCoreRunning(v2rayTurnOn)
         runningServer = ProfileViewModel.getRunning()
-        logger.info("switchServer: \(self.runningProfile)")
+        logger.info("switchServer-end: \(self.runningProfile)")
         AppMenuManager.shared.refreshServerItems()
     }
 

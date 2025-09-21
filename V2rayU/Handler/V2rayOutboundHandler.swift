@@ -88,6 +88,10 @@ class V2rayOutboundHandler {
             user.id = self.profile.password
             user.flow = self.profile.flow
             user.encryption = self.profile.encryption
+            if user.encryption == "" {
+                user.encryption = "none" // vless 不支持空字符串
+            }
+            
             // vless
             serverVless = V2rayOutboundVLessItem()
             serverVless.address = self.profile.address

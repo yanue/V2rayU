@@ -32,6 +32,7 @@ final class AppMenuManager: NSObject {
     private var goSubscriptionsItem: NSMenuItem!
     private var pacSettingsItem: NSMenuItem!
     private var pingItem: NSMenuItem!
+    private var diagnosticsItem: NSMenuItem!
     private var importServersItem: NSMenuItem!
     private var scanQRCodeItem: NSMenuItem!
     private var shareQRCodeItem: NSMenuItem!
@@ -95,6 +96,7 @@ final class AppMenuManager: NSObject {
         }
         // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
         pingItem?.title = String(localized: .Ping)
+        diagnosticsItem?.title = String(localized: .Diagnostics)
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         viewConfigItem?.title = String(localized: .ViewConfigJson)
         viewPacItem?.title = String(localized: .ViewPacFile)
@@ -148,9 +150,14 @@ final class AppMenuManager: NSObject {
         // 路由与服务器
         routingItem = getRoutingItem()
         serverItem = getServerItem()
+        // 预先初始化一次
+        pingItem = NSMenuItem(title: String(localized: .Ping), action: #selector(pingSpeed), keyEquivalent: "")
+        diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
         menu.addItem(serverItem)
+        menu.addItem(pingItem)
+        menu.addItem(diagnosticsItem)
         // 预先初始化一次
         goRoutingSettingItem = NSMenuItem(title: String(localized: .goRoutingSettings), action: #selector(openRoutingTab), keyEquivalent: "")
         goSubscriptionsItem = NSMenuItem(title: String(localized: .goSubscriptionSettings), action: #selector(openPreferenceSubscribe), keyEquivalent: "")
@@ -246,7 +253,6 @@ final class AppMenuManager: NSObject {
         item.isEnabled =  true
         item.target = self
         item.state = (routing.uuid == AppState.shared.runningRouting) ? .on : .off
-        logger.info("currentRouting: \(AppState.shared.runningRouting)")
         return item
     }
     
@@ -260,14 +266,8 @@ final class AppMenuManager: NSObject {
     }
     
     func getServerSubMenus() -> NSMenu {
-        // 预先初始化一次
-        pingItem = NSMenuItem(title: String(localized: .Ping), action: #selector(pingSpeed), keyEquivalent: "")
-        pingItem.isEnabled = true
-        pingItem.target = self
 
         let menu = NSMenu()
-        menu.addItem(pingItem)
-        menu.addItem(NSMenuItem.separator())
         
         // 直接拿有序数组
         let groupedServers = ProfileViewModel.getGroupedProfiles()
@@ -385,6 +385,12 @@ final class AppMenuManager: NSObject {
     
     @objc private func openServerTab(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .server
+        MainWindowManager.shared.openMainWindow()
+    }
+    
+    @objc private func openDiagnostics(_ sender: NSMenuItem) {
+        AppState.shared.mainTab = .help
+        AppState.shared.helpTab = .diagnostic
         MainWindowManager.shared.openMainWindow()
     }
 
