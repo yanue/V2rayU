@@ -42,10 +42,18 @@ final class AppMenuManager: NSObject {
     private var checkForUpdatesItem: NSMenuItem!
     private var helpItem: NSMenuItem!
     private var quitItem: NSMenuItem!
+    private var pingTip: String = ""
+    private let pingTipSubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
-    
+
     override private init() {
         super.init()
+        pingTipSubject // 500毫秒刷新一下,避免很多时一直刷新UI
+            .throttle(for: .milliseconds(500), scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] tip in
+                self?.pingItem?.title = String(localized: .Ping) + " \(tip)"
+            }
+            .store(in: &cancellables)
     }
 
     func setupStatusItem() {
@@ -73,7 +81,11 @@ final class AppMenuManager: NSObject {
             ])
         }
     }
-
+    
+    func refreshPingTip(pingTip: String) {
+        pingTipSubject.send(pingTip)
+    }
+    
     func refreshServerItems() {
         serverSubMenu = getServerSubMenus()
         serverItem.submenu = serverSubMenu
@@ -97,7 +109,7 @@ final class AppMenuManager: NSObject {
             return
         }
         // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
-        pingItem?.title = String(localized: .Ping)
+        pingItem?.title = String(localized: .Ping) + " \(self.pingTip)"
         diagnosticsItem?.title = String(localized: .Diagnostics)
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         viewConfigItem?.title = String(localized: .ViewConfigJson)
@@ -153,7 +165,7 @@ final class AppMenuManager: NSObject {
         routingItem = getRoutingItem()
         serverItem = getServerItem()
         // 预先初始化一次
-        pingItem = NSMenuItem(title: String(localized: .Ping) + "(pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
+        pingItem = NSMenuItem(title: String(localized: .Ping) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)

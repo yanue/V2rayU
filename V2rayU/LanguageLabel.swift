@@ -184,6 +184,7 @@ enum LanguageLabel: String, CaseIterable {
     case goServerSettings
     case goPreferences
     case Ping
+    case Testing
     case ImportServersFromClipboard
     case ScanQRCodeFromScreen
     case ShareQrCode

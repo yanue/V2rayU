@@ -190,6 +190,7 @@
 "goRoutingSettings" = "路由设置 ...";
 "goPreferences" = "偏好設定 ...";
 "Ping" = "Ping 測試";
+"Testing" = "測試中";
 "ImportServersFromClipboard" = "從剪貼簿匯入伺服器";
 "ScanQRCodeFromScreen" = "掃描螢幕上的二維碼";
 "ShareQrCode" = "分享二維碼";

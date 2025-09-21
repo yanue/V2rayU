@@ -16,10 +16,9 @@ actor PingAll {
     
     private let maxConcurrentTasks = 30
     private var cancellables = Set<AnyCancellable>()
-
     private var totalCount = 0
     private var finishedCount = 0
-
+    
     func run() {
         guard !inPing else {
             logger.info("Ping is already running.")
@@ -28,6 +27,7 @@ actor PingAll {
         }
         inPing = true
         killAllPing()
+        self.finishedCount = 0
 
         let items = ProfileViewModel.all()
         guard !items.isEmpty else {
@@ -37,8 +37,10 @@ actor PingAll {
         }
 
         totalCount = items.count
-        finishedCount = 0
-        pingTip = "0/\(totalCount)"   // 初始化进度
+        
+        Task {
+            await AppMenuManager.shared.refreshPingTip(pingTip: " - " + String(localized: .Testing) + "(\(finishedCount)/\(totalCount))")
+        }
 
         logger.info("Ping started.")
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 所有节点")
@@ -69,26 +71,44 @@ actor PingAll {
                     logger.info("Ping completed")
                 case let .failure(error):
                     NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-some-failed: \(error.localizedDescription)")
-                    logger.info("Error: \(error)")
+                    logger.info("Ping Error: \(error)")
                 }
-                self.inPing = false
                 killAllPing()
+                
+                // 在actor中,可以内部用 Task.sleep 2秒后设置为空
+                Task { [weak self] in
+                    try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                    await AppMenuManager.shared.refreshPingTip(pingTip: "")
+                    // 不能直接设置,只能调用函数
+                    await self?.setInPingFalse()
+                }
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
-
+    
+    private func setInPingFalse() {
+        inPing = false
+    }
+    
     private func pingEachServer(item: ProfileModel) async throws {
         let ping = PingServer(uuid: item.uuid)
         try await ping.doPing()
         let speed = await ping.getSpeed()
 
         // 更新进度
-        await MainActor.run {
-            finishedCount += 1
-            pingTip = "\(finishedCount)/\(totalCount)"
+        finishedCount += 1
+        
+        Task {
+            await AppMenuManager.shared.refreshPingTip(pingTip: " - " + String(localized: .Testing) + "(\(finishedCount)/\(totalCount))")
         }
 
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-done: \(item.remark) - \(speed) ms")
+    }
+    
+    func pingOne(item: ProfileModel) {
+        // 开始执行异步任务
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 节点")
+        self.pingTaskGroup(items: [item])
     }
 }
 

@@ -190,6 +190,7 @@
 "goSubscriptionSettings" = "Subscription Settings ...";
 "goRoutingSettings" = "Routing Settings ...";
 "Ping" = "Ping";
+"Testing" = "Testing";
 "ImportServersFromClipboard" = "Import Servers from Clipboard";
 "ScanQRCodeFromScreen" = "Scan QR Code from Screen";
 "ShareQrCode" = "Share QR Code";
