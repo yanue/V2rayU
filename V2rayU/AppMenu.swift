@@ -546,25 +546,29 @@ struct CoreStatusItemView: View {
     @ObservedObject var appState = AppState.shared
 
     var body: some View {
-        HStack(spacing: 8) {
-            // 用 SF Symbols 图标替代 On/Off 文本
-            Image(systemName: appState.v2rayTurnOn ? "wifi" : "wifi.slash")
-                .foregroundColor(Color(appState.v2rayTurnOn ? .systemGreen : .systemGray))
-            Spacer()
-            // 延迟信息
-            Text("● \(String(format: "%.0f", appState.latency)) ms")
-                .font(.system(size: 11))
-                .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
-            
-            Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
-                .font(.system(size: 11))
-                .foregroundColor(Color(appState.v2rayTurnOn ? .systemBlue : .systemGray))
+        HStack() {
+            HStack(spacing: 0) {
+                Image(systemName: appState.v2rayTurnOn ? "wifi" : "wifi.slash")
+                // 延迟信息
+                Text(" \(String(format: "%.0f", appState.latency)) ms")
+                    .font(.system(size: 11))
+            }
+            .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
 
-            Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
-                .font(.system(size: 11))
-                .foregroundColor(Color(appState.v2rayTurnOn ? .systemRed : .systemGray))
+            
+            Spacer()
+            
+            HStack{
+                Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color(appState.v2rayTurnOn ? .systemBlue : .systemGray))
+
+                Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color(appState.v2rayTurnOn ? .systemRed : .systemGray))
+            }
         }
         .padding(.vertical, 6)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 22)
     }
 }

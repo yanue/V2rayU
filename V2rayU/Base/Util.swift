@@ -244,9 +244,9 @@ func OpenLogs(logFilePath: String) {
 func getSpeedColor(latency: Double) -> NSColor {
     if latency <= 0 {
         return NSColor.systemGray
-    } else if latency < 100 {
+    } else if latency < 200 {
         return NSColor.systemGreen
-    } else if latency < 300 {
+    } else if latency < 500 {
         return NSColor.systemOrange
     } else {
         return NSColor.systemRed

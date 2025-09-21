@@ -42,6 +42,9 @@ final class AppState: ObservableObject {
 
     // MARK: - 更新速度
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
+        if !self.v2rayTurnOn {
+            return
+        }
         self.latency = latency
         self.directUpSpeed = directUpSpeed
         self.directDownSpeed = directDownSpeed
@@ -49,6 +52,14 @@ final class AppState: ObservableObject {
         self.proxyDownSpeed = proxyDownSpeed
     }
 
+    func resetSpeed(){
+        self.latency = 0
+        self.directUpSpeed = 0
+        self.directDownSpeed = 0
+        self.proxyUpSpeed = 0
+        self.proxyDownSpeed = 0
+    }
+    
     // MARK: - 启动/停止核心
     
     func setCoreRunning(_ running: Bool) {
@@ -57,6 +68,8 @@ final class AppState: ObservableObject {
 
         Task {
             defer { isCoreOperationInProgress = false }
+
+            self.resetSpeed()
 
             if running {
                 let success = await V2rayLaunch.shared.start()
