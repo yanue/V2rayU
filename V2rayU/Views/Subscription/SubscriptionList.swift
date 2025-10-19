@@ -10,21 +10,18 @@ import SwiftUI
 struct SubscriptionListView: View {
     @StateObject private var viewModel = SubViewModel()
 
-    @State private var list: [SubModel] = []
-    @State private var sortOrder: [KeyPathComparator<SubModel>] = []
+    @State private var list: [SubDTO] = []
+    @State private var sortOrder: [KeyPathComparator<SubDTO>] = []
     @State private var selection: Set<SubModel.ID> = []
     @State private var selectedRow: SubModel? = nil
     @State private var draggedRow: SubModel?
     @State private var syncingRow: SubModel? = nil
     @State private var syncingAll: Bool = false
-
-    var filteredAndSortedItems: [SubModel] {
-        let filtered = viewModel.list.sorted(using: sortOrder)
-        // 循环增加序号
-        filtered.enumerated().forEach { index, item in
-            item.index = index
-        }
-        return filtered
+    @State private var isDragging: Bool = false
+    @State private var hoveringHandleID: SubDTO.ID?
+    
+    var filteredAndSortedItems: [SubDTO] {
+        viewModel.list
     }
 
     var body: some View {
@@ -44,7 +41,7 @@ struct SubscriptionListView: View {
                 }
                 Spacer()
 
-                Button(action: { withAnimation { self.selectedRow = SubModel(remark: "", url: "") } }) {
+                Button(action: { withAnimation { self.selectedRow = SubModel(from: SubDTO()) } }) {
                     Label("新增", systemImage: "plus")
                 }
                 .buttonStyle(.bordered)
@@ -72,49 +69,10 @@ struct SubscriptionListView: View {
 
             
             Spacer()
-            ZStack {
-                Table(of: SubModel.self, selection: $selection, sortOrder: $sortOrder) {
-                    TableColumn("#") { row in
-                        Text("\(row.index + 1)")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.secondary)
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    .width(30)
-                    TableColumn("Remark") { row in
-                        Text(row.remark)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    TableColumn("Url") { row in
-                        Text(row.url)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }.width(200)
-                    TableColumn("Port") { row in
-                        Text("\(row.enable)")
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    TableColumn("Interval") { row in
-                        Text("\(row.updateInterval)")
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    TableColumn("Updatetime") { row in
-                        Text("\(row.updateTime)")
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                } rows: {
-                    ForEach(filteredAndSortedItems) { row in
-                        TableRow(row)
-                            .draggable(row)
-                            .contextMenu { contextMenuProvider(item: row) }
-                    }
-                    .dropDestination(for: SubModel.self, action: handleDrop)
-                }
-            }
+
+            // 将复杂的 Table 表达式提取到单独的计算属性以降低类型检查复杂度
+            subscriptionTable
+
         }
         .padding(8)
         .sheet(item: $selectedRow) { row in
@@ -134,23 +92,33 @@ struct SubscriptionListView: View {
 
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
-    func handleDrop(index: Int, rows: [SubModel]) {
-        guard let firstRow = rows.first, let firstRemoveIndex = list.firstIndex(where: { $0.uuid == firstRow.uuid }) else { return }
+    // 去掉这个没用的状态
+    // @State private var list: [SubDTO] = []
 
-        list.removeAll(where: { row in
-            rows.contains(where: { insertRow in insertRow.uuid == row.uuid })
-        })
+    func handleDrop(index: Int, rows: [SubDTO]) {
+        let uuids = rows.map(\.uuid)
 
-        list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
+        // 先移除拖拽的元素
+        viewModel.list.removeAll { uuids.contains($0.uuid) }
+
+        // 计算安全的插入位置
+        let safeIndex = min(max(index, 0), viewModel.list.count)
+
+        // 插入拖拽的元素
+        viewModel.list.insert(contentsOf: rows, at: safeIndex)
+
+        logger.info("handleDrop: \(index) \(rows.count)")
+        viewModel.updateSortOrderInDBAsync()
     }
 
-    private func contextMenuProvider(item: SubModel) -> some View {
+
+    private func contextMenuProvider(item: SubDTO) -> some View {
         Group {
             Button("Edit") {
-                self.selectedRow = item
+                self.selectedRow = SubModel(from: item)
             }
             Button("Sync") {
-                self.syncingRow = item
+                self.syncingRow = SubModel(from: item)
             }
             Divider()
             Button("Delete") {
@@ -166,8 +134,69 @@ struct SubscriptionListView: View {
             viewModel.getList()
         }
     }
-}
 
-#Preview {
-    SubscriptionListView()
+    // 提取的 Table 子视图，减少主视图表达式复杂度
+    private var subscriptionTable: some View {
+        ZStack {
+            Table(of: SubDTO.self, selection: $selection, sortOrder: $sortOrder) {
+                TableColumn("#") { (row: SubDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal")
+
+                        if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                            Text("\(idx + 1)")
+                                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .contentShape(Rectangle())   // 扩大点击/拖拽区域
+                    .draggable(row)              // 整个区域作为拖拽手柄
+                    .onTapGesture { }            // 吃掉点击事件，避免触发行选择
+                    .onHover { inside in
+                        if inside {
+                            NSCursor.openHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
+                }
+                .width(40)
+                
+                TableColumn("Remark") { (row: SubDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "square.and.pencil")
+                        Text(row.remark)
+                    }
+                    .contentShape(Rectangle())   // 扩大点击/拖拽区域
+                    .onTapGesture() { selectedRow = SubModel(from: row) }
+                    .onHover { inside in
+                        if inside {
+                            NSCursor.pointingHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
+                }
+                TableColumn("Url") { (row: SubDTO) in
+                    Text(row.url)
+                }.width(200)
+                TableColumn("Interval") { (row: SubDTO) in
+                    Text("\(row.updateInterval)")
+                }
+                TableColumn("Updatetime") { (row: SubDTO) in
+                    Text("\(row.updateTime)")
+                }
+            } rows: {
+                ForEach(viewModel.list) { row in
+                    TableRow(row)
+                        .contextMenu { contextMenuProvider(item: row) }
+                }
+                .dropDestination(for: SubDTO.self) { index, items in
+                    print("dropDestination", index, items)
+                    handleDrop(index: index, rows: items)
+                }
+
+            }
+        }
+    }
 }

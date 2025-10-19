@@ -21,7 +21,7 @@ actor SubscriptionHandler {
         SubscriptionHandlering = true
         logger.info("SubscriptionHandler start")
 
-        let list = SubViewModel.all()
+        let list = SubViewModel().all()
 
         if list.count == 0 {
             logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
@@ -31,7 +31,7 @@ actor SubscriptionHandler {
         syncTaskGroup(items: list)
     }
 
-    func syncOne(item: SubModel) {
+    func syncOne(item: SubDTO) {
         if SubscriptionHandlering {
             logger.info("SubscriptionHandler Syncing ...")
             return
@@ -49,7 +49,7 @@ actor SubscriptionHandler {
         }
     }
     
-    private func syncTaskGroup(items: [SubModel]) {
+    private func syncTaskGroup(items: [SubDTO]) {
         // 使用 Combine 处理多个异步任务
         items.publisher.flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
             Future<Void, Error> { promise in
@@ -92,7 +92,7 @@ actor SubscriptionHandler {
         }
     }
 
-    public func dlFromUrl(url: String, sub: SubModel) async throws {
+    public func dlFromUrl(url: String, sub: SubDTO) async throws {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         guard let reqUrl = URL(string: url) else {
@@ -115,7 +115,7 @@ actor SubscriptionHandler {
         }
     }
 
-    func handle(base64Str: String, sub: SubModel, url: String) {
+    func handle(base64Str: String, sub: SubDTO, url: String) {
         guard let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded() else {
             logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
             return
@@ -129,11 +129,11 @@ actor SubscriptionHandler {
         importByNormal(strTmp: strTmp, sub: sub)
     }
 
-    func getOldCount(sub: SubModel) -> Int {
+    func getOldCount(sub: SubDTO) -> Int {
         return ProfileViewModel.count(filter: [ProfileModel.Columns.subid.name: sub.uuid])
     }
 
-    func importByYaml(strTmp: String, sub: SubModel) -> Bool {
+    func importByYaml(strTmp: String, sub: SubDTO) -> Bool {
         var list: [ProfileModel] = []
         let oldCount = getOldCount(sub: sub)
 
@@ -169,7 +169,7 @@ actor SubscriptionHandler {
         return false
     }
 
-    func importByNormal(strTmp: String, sub: SubModel) {
+    func importByNormal(strTmp: String, sub: SubDTO) {
         var list: [ProfileModel] = []
         let oldCount = getOldCount(sub: sub)
 

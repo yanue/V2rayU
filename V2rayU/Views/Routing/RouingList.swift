@@ -156,6 +156,10 @@ struct RoutingListView: View {
         })
 
         list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
+        
+        logger.info("handleDrop: \(index) \(rows.count)")
+        // 更新排序
+        viewModel.updateSortOrderInDBAsync()
     }
 
     private func contextMenuProvider(item: RoutingModel) -> some View {

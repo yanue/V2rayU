@@ -10,13 +10,18 @@ import GRDB
 import Foundation
 
 class SubViewModel: ObservableObject {
-    @Published var list: [SubModel] = []
+    @Published var list: [SubDTO] = []
 
     func getList() {
         do {
             let dbReader = AppDatabase.shared.reader
             try dbReader.read { db in
-                list = try SubModel.fetchAll(db)
+                let items = try SubDTO.fetchAll(db)
+//                var list: [SubModel] = []
+//                for item in items{
+//                    list.append(SubModel(from: item))
+//                }
+                self.list = items
             }
         } catch {
             logger.info("getList error: \(error)")
@@ -35,25 +40,25 @@ class SubViewModel: ObservableObject {
     
     /// Mark: - Static
 
-    static func all() -> [SubModel] {
+    func all() -> [SubDTO] {
         do {
             let dbReader = AppDatabase.shared.reader
-            return try dbReader.read { db in
-                return try SubModel.fetchAll(db)
+            try dbReader.read { db in
+                return try SubDTO.fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")
-            return []
         }
+        return []
     }
     
     static func fetchOne(uuid: String) throws -> SubModel {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
-            guard let model = try SubModel.filter(SubModel.Columns.uuid == uuid).fetchOne(db) else {
+            guard let model = try SubDTO.filter(SubDTO.Columns.uuid == uuid).fetchOne(db) else {
                 throw NSError(domain: "SubModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
             }
-            return model
+            return SubModel.init(from: model)
         }
     }
 
@@ -61,7 +66,7 @@ class SubViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try _ = SubModel.filter(SubModel.Columns.uuid == uuid).deleteAll(db)
+                try _ = SubDTO.filter(SubDTO.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
             logger.info("delete error: \(error)")
@@ -72,10 +77,24 @@ class SubViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try item.save(db)
+                try item.toDTO().save(db)
             }
         } catch {
             logger.info("upsert error: \(error)")
+        }
+    }
+    
+    func updateSortOrderInDBAsync() {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                for var (index, item) in list.enumerated() {
+                    item.sort = index // Update the sort order in memory
+                    try item.update(db, columns: [SubDTO.Columns.sort]) // Update the database
+                }
+            }
+        } catch {
+            logger.info("updateSortOrderInDBAsync error: \(error)")
         }
     }
 }

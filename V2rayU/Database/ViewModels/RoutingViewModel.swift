@@ -80,4 +80,18 @@ class RoutingViewModel: ObservableObject {
             logger.info("upsert error: \(error)")
         }
     }
+    
+    func updateSortOrderInDBAsync() {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                for (index, item) in list.enumerated() {
+                    item.sort = index // Update the sort order in memory
+                    try item.update(db, columns: [RoutingModel.Columns.sort]) // Update the database
+                }
+            }
+        } catch {
+            logger.info("updateSortOrderInDBAsync error: \(error)")
+        }
+    }
 }

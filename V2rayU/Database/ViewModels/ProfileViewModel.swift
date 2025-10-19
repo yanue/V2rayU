@@ -68,7 +68,7 @@ class ProfileViewModel: ObservableObject {
     // 改成返回有序数组
     static func getGroupedProfiles() -> [(String, [ProfileModel])] {
         let profiles = ProfileViewModel.all()
-        let groups = SubViewModel.all().reduce(into: [String: SubModel]()) { dict, sub in
+        let groups = SubViewModel().all().reduce(into: [String: SubDTO]()) { dict, sub in
             dict[sub.uuid] = sub
         }
         var result: [String: [ProfileModel]] = [:]

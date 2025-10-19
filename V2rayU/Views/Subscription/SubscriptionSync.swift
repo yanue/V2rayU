@@ -147,7 +147,7 @@ struct SubscriptionSyncView: View {
 
     func doSyncItem(item: SubModel) {
         Task {
-            await SubscriptionHandler.shared.syncOne(item: item)
+            await SubscriptionHandler.shared.syncOne(item: item.toDTO())
         }
     }
 
