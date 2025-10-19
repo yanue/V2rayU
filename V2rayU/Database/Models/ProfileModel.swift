@@ -9,7 +9,7 @@ import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
 
-class ProfileModel: ObservableObject, Identifiable, Codable, Equatable {
+class ProfileModel: @unchecked Sendable, ObservableObject, Identifiable, Codable, Equatable  {
     var index: Int = 0
     // 公共属性
     @Published var uuid: String // 唯一标识

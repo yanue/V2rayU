@@ -10,7 +10,7 @@ import Combine
 let NOTIFY_UPDATE_Ping = Notification.Name(rawValue: "NOTIFY_UPDATE_Ping")
 
 actor PingAll {
-    static var shared = PingAll()
+    static let shared = PingAll()
 
     private(set) var inPing: Bool = false
     

@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 import GRDB
 
 // ----- routing routing item -----
-class RoutingModel: ObservableObject, Identifiable, Codable {
+final class RoutingModel: @unchecked Sendable, ObservableObject, Identifiable, Codable {
     var index: Int = 0
     @Published var uuid: String
     @Published var name: String

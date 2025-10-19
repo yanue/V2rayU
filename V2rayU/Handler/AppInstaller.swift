@@ -97,10 +97,10 @@ actor AppInstaller: NSObject {
     func showInstallAlertSynchronously() -> Bool {
         // 定义返回值
         var shouldInstall = false
-        // 创建信号量，初始值 = 0
+        
         let semaphore = DispatchSemaphore(value: 0)
         // 将 UI 操作放到主线程
-        DispatchQueue.main.async {
+        DispatchQueue.main.sync {
             let alert = NSAlert()
             alert.messageText = "Install V2rayUTool"
             alert.addButton(withTitle: "Install")
@@ -116,6 +116,7 @@ actor AppInstaller: NSObject {
         semaphore.wait()
         return shouldInstall
     }
+
 
     func install() {
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"

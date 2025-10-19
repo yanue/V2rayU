@@ -6,7 +6,7 @@ import Yams
 let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
 actor SubscriptionHandler {
-    static var shared = SubscriptionHandler()
+    static let shared = SubscriptionHandler()
     
     private var SubscriptionHandlering = false
     private let maxConcurrentTasks = 1 // work pool

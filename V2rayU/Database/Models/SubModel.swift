@@ -9,7 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import GRDB
 
-class SubModel: ObservableObject, Identifiable, Codable, Hashable {
+class SubModel: @unchecked Sendable, ObservableObject, Identifiable, Codable, Hashable {
     var index: Int = 0
     @Published var uuid: String
     @Published var remark: String
