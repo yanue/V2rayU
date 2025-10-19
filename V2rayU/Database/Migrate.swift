@@ -22,7 +22,7 @@ extension AppDatabase {
         ProfileModel.registerMigrations(in: &migrator)
         ProfileStatModel.registerMigrations(in: &migrator)
         SubDTO.registerMigrations(in: &migrator)
-        RoutingModel.registerMigrations(in: &migrator)
+        RoutingDTO.registerMigrations(in: &migrator)
         
         return migrator
     }

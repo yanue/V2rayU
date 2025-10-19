@@ -17,10 +17,6 @@ class SubViewModel: ObservableObject {
             let dbReader = AppDatabase.shared.reader
             try dbReader.read { db in
                 let items = try SubDTO.fetchAll(db)
-//                var list: [SubModel] = []
-//                for item in items{
-//                    list.append(SubModel(from: item))
-//                }
                 self.list = items
             }
         } catch {

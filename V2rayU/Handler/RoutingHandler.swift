@@ -31,10 +31,10 @@ let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
 class RoutingManager {
 
     let defaultRules = Dictionary(uniqueKeysWithValues: [
-       (RoutingRuleGlobal, RoutingModel(name: RoutingRuleGlobal, remark: "🌏 Global")),
-       (RoutingRuleLAN, RoutingModel(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
-       (RoutingRuleCn, RoutingModel(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
-       (RoutingRuleLANAndCn, RoutingModel(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
+       (RoutingRuleGlobal, RoutingDTO(name: RoutingRuleGlobal, remark: "🌏 Global")),
+       (RoutingRuleLAN, RoutingDTO(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
+       (RoutingRuleCn, RoutingDTO(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
+       (RoutingRuleLANAndCn, RoutingDTO(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
     ])
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
@@ -45,13 +45,13 @@ class RoutingManager {
         var all = RoutingViewModel.all()
         // 如果没有规则，则创建默认规则
         if all.count == 0 {
-            for (rule, item) in defaultRules {
+            for var (rule, item) in defaultRules {
                 if isMainland {
                     item.domainStrategy = "AsIs"
                     item.domainMatcher = "hybrid"
                     item.remark = defaultRuleCn[rule] ?? item.remark
                 }
-                RoutingViewModel.upsert(item: item)
+                RoutingViewModel.upsert(item: RoutingModel(from: item))
                 // 添加到 all
                 all.append(item)
             }
@@ -73,22 +73,14 @@ class RoutingManager {
 }
 
 class RoutingHandler {
-    private(set) var routing: RoutingModel
+    private(set) var routing: RoutingDTO
 
-    init(from model: RoutingModel) {
+    init(from model: RoutingDTO) {
         self.routing = model
     }
 
     // parse default settings
     func getRouting() -> V2rayRouting {
-        // 根据json配置生成
-        let (res, err) = parseRoutingRuleJson(json: self.routing.json)
-        if err != nil {
-            logger.info("parseRule err: \(err)")
-        } else {
-            return res
-        }
-        
         // dns-rule:  { "type": "field", "outboundTag": "dns-out", "network": "udp", "port": 53 }
         let dnsRule = getRoutingRule(outTag: "dns_out", port: "53", network: "udp")
         // api-rule:  {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}

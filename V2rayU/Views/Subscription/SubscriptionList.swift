@@ -17,13 +17,7 @@ struct SubscriptionListView: View {
     @State private var draggedRow: SubModel?
     @State private var syncingRow: SubModel? = nil
     @State private var syncingAll: Bool = false
-    @State private var isDragging: Bool = false
-    @State private var hoveringHandleID: SubDTO.ID?
     
-    var filteredAndSortedItems: [SubDTO] {
-        viewModel.list
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -177,22 +171,29 @@ struct SubscriptionListView: View {
                         }
                     }
                 }
+                .width(min: 100,max: 200)
+
                 TableColumn("Url") { (row: SubDTO) in
                     Text(row.url)
-                }.width(200)
+                }
+                .width(min: 200,max: 400)
+
                 TableColumn("Interval") { (row: SubDTO) in
                     Text("\(row.updateInterval)")
                 }
+                .width(100)
+
                 TableColumn("Updatetime") { (row: SubDTO) in
                     Text("\(row.updateTime)")
                 }
+                .width(160)
+
             } rows: {
                 ForEach(viewModel.list) { row in
                     TableRow(row)
                         .contextMenu { contextMenuProvider(item: row) }
                 }
                 .dropDestination(for: SubDTO.self) { index, items in
-                    print("dropDestination", index, items)
                     handleDrop(index: index, rows: items)
                 }
 

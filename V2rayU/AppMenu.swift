@@ -261,7 +261,7 @@ final class AppMenuManager: NSObject {
         return menu
     }
     
-    private func createRoutingMenuItem(routing: RoutingModel) -> NSMenuItem {
+    private func createRoutingMenuItem(routing: RoutingDTO) -> NSMenuItem {
         let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
         item.representedObject = routing.uuid  // 可选：存储路由名称
         item.isEnabled =  true
