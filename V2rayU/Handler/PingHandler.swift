@@ -47,7 +47,7 @@ actor PingAll {
         pingTaskGroup(items: items)
     }
 
-    private func pingTaskGroup(items: [ProfileModel]) {
+    private func pingTaskGroup(items: [ProfileDTO]) {
         items.publisher
             .flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
                 Future<Void, Error> { promise in
@@ -90,7 +90,7 @@ actor PingAll {
         inPing = false
     }
     
-    private func pingEachServer(item: ProfileModel) async throws {
+    private func pingEachServer(item: ProfileDTO) async throws {
         let ping = PingServer(uuid: item.uuid)
         try await ping.doPing()
         let speed = await ping.getSpeed()
@@ -105,7 +105,7 @@ actor PingAll {
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-done: \(item.remark) - \(speed) ms")
     }
     
-    func pingOne(item: ProfileModel) {
+    func pingOne(item: ProfileDTO) {
         // 开始执行异步任务
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 节点")
         self.pingTaskGroup(items: [item])
@@ -115,7 +115,7 @@ actor PingAll {
 
 actor PingServer {
     private var uuid: String = ""
-    private var item: ProfileModel = ProfileModel()
+    private var item: ProfileDTO = ProfileDTO()
     private var process: Process = Process()
     private var jsonFile: String = ""
     private var bindPort: UInt16 = 0
@@ -262,7 +262,7 @@ actor PingRunning {
     
     private var failureCount = 0
     private var isExecuting = false
-    private var item: ProfileModel = ProfileModel()
+    private var item: ProfileDTO = ProfileDTO()
 
     /// 开始 Ping 流程
     func startPing() async throws {

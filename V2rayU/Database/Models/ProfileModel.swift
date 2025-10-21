@@ -9,7 +9,109 @@ import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
 
-class ProfileModel: @unchecked Sendable, ObservableObject, Identifiable, Codable, Equatable  {
+
+struct ProfileDTO: Codable, Identifiable,  Equatable, Hashable {
+    // 公共属性
+    var uuid: String // 唯一标识
+    var remark: String // 备注
+    var speed: Int = -1 // 速度
+    var sort: Int = 0 // 排序
+    var `protocol`: V2rayProtocolOutbound // 协议
+    var network: V2rayStreamNetwork = .tcp // 网络: tcp, kcp, ws, domainsocket, xhttp, h2, grpc, quic
+    var security: V2rayStreamSecurity = .none // 底层传输安全加密方式: none, tls, reality
+    var subid: String // 订阅ID
+    var address: String // 代理服务器地址
+    var port: Int // 代理服务器端口
+    var password: String // 密码: password(trojan,vmess,shadowsocks) | id(vmess,vless)
+    var alterId: Int // vmess
+    var encryption: String // 加密方式: security(trojan,vmess) | encryption(vless) | method(shadowsocks)
+    var headerType: V2rayHeaderType = .none // 伪装类型: none, http, srtp, utp, wechat-video, dtls, wireguard
+    var host: String // 请求域名: headers.Host(ws, h2) | host(xhttp)
+    var path: String // 请求路径: path(ws, h2, xhttp) | serviceName(grpc) | key(quic) | seed(kcp)
+    var allowInsecure: Bool = true // 允许不安全连接,默认true
+    var flow: String = "" // 流控(xtls-rprx-vision | xtls-rprx-vision-udp443): 支持vless|trojan
+    var sni: String = "" // sni即serverName(tls): tls|reality
+    var alpn: V2rayStreamAlpn = .h2h1 // alpn(tls): tls|reality
+    var fingerprint: V2rayStreamFingerprint = .chrome // 浏览器指纹: chrome, firefox, safari, edge, windows, android, ios
+    var publicKey: String = "" // publicKey(reality): reality
+    var shortId: String = "" // shortId(reality): reality
+    var spiderX: String = "" // spiderX(reality): reality
+
+    // Identifiable 协议的要求
+    var id: String {
+        return uuid
+    }
+    
+    // 对应编码的 `CodingKeys` 枚举
+    enum CodingKeys: String, CodingKey {
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX
+    }
+
+    // 提供默认值的初始化器
+    init(
+        uuid: String = UUID().uuidString,
+        remark: String = "",
+        speed: Int = -1,
+        sort: Int = 0,
+        protocol: V2rayProtocolOutbound = .freedom,
+        address: String = "",
+        port: Int = 0,
+        password: String = "",
+        alterId: Int = 0,
+        encryption: String = "",
+        network: V2rayStreamNetwork = .tcp,
+        headerType: V2rayHeaderType = .none,
+        host: String = "",
+        path: String = "",
+        security: V2rayStreamSecurity = .none,
+        allowInsecure: Bool = true,
+        subid: String = "",
+        flow: String = "",
+        sni: String = "",
+        alpn: V2rayStreamAlpn = .h2h1,
+        fingerprint: V2rayStreamFingerprint = .chrome,
+        publicKey: String = "",
+        shortId: String = "",
+        spiderX: String = ""
+    ) {
+        self.uuid = uuid
+        self.speed = speed
+        self.sort = sort
+        self.remark = remark
+        self.protocol = `protocol`
+        self.address = address
+        self.port = port
+        self.password = password
+        self.alterId = alterId
+        self.encryption = encryption
+        self.network = network
+        self.headerType = headerType
+        self.host = host
+        self.path = path
+        self.security = security
+        self.allowInsecure = allowInsecure
+        self.subid = subid
+        self.flow = flow
+        self.sni = sni
+        self.alpn = alpn
+        self.fingerprint = fingerprint
+        self.publicKey = publicKey
+        self.shortId = shortId
+        self.spiderX = spiderX
+    }
+    
+}
+
+// 拖动排序
+extension ProfileDTO: Transferable {
+    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: draggableType)
+    }
+}
+
+final class ProfileModel: ObservableObject, Identifiable, Codable, Equatable  {
     var index: Int = 0
     // 公共属性
     @Published var uuid: String // 唯一标识
@@ -109,103 +211,69 @@ class ProfileModel: @unchecked Sendable, ObservableObject, Identifiable, Codable
     }
 
     // 提供默认值的初始化器
-    init(
-        uuid: String = UUID().uuidString,
-        remark: String = "",
-        speed: Int = -1,
-        sort: Int = 0,
-        protocol: V2rayProtocolOutbound = .freedom,
-        address: String = "",
-        port: Int = 0,
-        password: String = "",
-        alterId: Int = 0,
-        encryption: String = "",
-        network: V2rayStreamNetwork = .tcp,
-        headerType: V2rayHeaderType = .none,
-        host: String = "",
-        path: String = "",
-        security: V2rayStreamSecurity = .none,
-        allowInsecure: Bool = true,
-        subid: String = "",
-        flow: String = "",
-        sni: String = "",
-        alpn: V2rayStreamAlpn = .h2h1,
-        fingerprint: V2rayStreamFingerprint = .chrome,
-        publicKey: String = "",
-        shortId: String = "",
-        spiderX: String = ""
-    ) {
-        self.uuid = uuid
-        self.speed = speed
-        self.sort = sort
-        self.remark = remark
-        self.protocol = `protocol`
-        self.address = address
-        self.port = port
-        self.password = password
-        self.alterId = alterId
-        self.encryption = encryption
-        self.network = network
-        self.headerType = headerType
-        self.host = host
-        self.path = path
-        self.security = security
-        self.allowInsecure = allowInsecure
-        self.subid = subid
-        self.flow = flow
-        self.sni = sni
-        self.alpn = alpn
-        self.fingerprint = fingerprint
-        self.publicKey = publicKey
-        self.shortId = shortId
-        self.spiderX = spiderX
+    init(from dto: ProfileDTO) {
+        self.uuid = dto.uuid
+        self.speed = dto.speed
+        self.sort = dto.sort
+        self.remark = dto.remark
+        self.protocol = dto.`protocol`
+        self.address = dto.address
+        self.port = dto.port
+        self.password = dto.password
+        self.alterId = dto.alterId
+        self.encryption = dto.encryption
+        self.network = dto.network
+        self.headerType = dto.headerType
+        self.host = dto.host
+        self.path = dto.path
+        self.security = dto.security
+        self.allowInsecure = dto.allowInsecure
+        self.subid = dto.subid
+        self.flow = dto.flow
+        self.sni = dto.sni
+        self.alpn = dto.alpn
+        self.fingerprint = dto.fingerprint
+        self.publicKey = dto.publicKey
+        self.shortId = dto.shortId
+        self.spiderX = dto.spiderX
     }
-}
-
-// 拖动排序
-extension ProfileModel: Transferable {
-    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
-
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: ProfileModel.draggableType)
-    }
-}
-
-// clone 方法
-extension ProfileModel {
-    func clone() -> ProfileModel {
-        let cloned = ProfileModel(
-            uuid: UUID().uuidString, // 生成新的 UUID
-            remark: remark + " (Copy)", // 添加 "(Copy)" 后缀
-            speed: speed,
-            sort: sort,
+    
+    func toDTO() -> ProfileDTO {
+        return ProfileDTO(
+            uuid: self.uuid,
+            remark: self.remark,
+            speed: self.speed,
+            sort: self.sort,
             protocol: self.protocol,
-            address: address,
-            port: port,
-            password: password,
-            alterId: alterId,
-            encryption: encryption,
-            network: network,
-            headerType: headerType,
-            host: host,
-            path: path,
-            security: security,
-            allowInsecure: allowInsecure,
-            subid: subid,
-            flow: flow,
-            sni: sni,
-            alpn: alpn,
-            fingerprint: fingerprint,
-            publicKey: publicKey,
-            shortId: shortId,
-            spiderX: spiderX
+            address: self.address,
+            port: self.port,
+            password: self.password,
+            alterId: self.alterId,
+            encryption: self.encryption,
+            network: self.network,
+            headerType: self.headerType,
+            host: self.host,
+            path: self.path,
+            security: self.security,
+            allowInsecure: self.allowInsecure,
+            subid: self.subid,
+            flow: self.flow,
+            sni: self.sni,
+            alpn: self.alpn,
+            fingerprint: self.fingerprint,
+            publicKey: self.publicKey,
+            shortId: self.shortId,
+            spiderX: self.spiderX
         )
-        return cloned
+    }
+    
+    func clone() -> ProfileModel {
+        return ProfileModel(from: self.toDTO())
     }
 }
 
 // 实现GRDB
-extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord {
+extension ProfileDTO: TableRecord, FetchableRecord, PersistableRecord {
     // 自定义表名
     static var databaseTableName: String {
         return "profile" // 设置你的表名
@@ -243,35 +311,35 @@ extension ProfileModel: TableRecord, FetchableRecord, PersistableRecord {
     static func registerMigrations(in migrator: inout DatabaseMigrator) {
         // 创建表
         migrator.registerMigration("createProfileTable") { db in
-            try db.create(table: ProfileModel.databaseTableName) { t in
-                t.column(ProfileModel.Columns.uuid.name, .text).notNull().primaryKey()
-                t.column(ProfileModel.Columns.remark.name, .text).notNull()
-                t.column(ProfileModel.Columns.speed.name, .integer).notNull()
-                t.column(ProfileModel.Columns.sort.name, .integer).notNull()
-                t.column(ProfileModel.Columns.protocol.name, .text).notNull()
-                t.column(ProfileModel.Columns.subid.name, .text)
-                t.column(ProfileModel.Columns.address.name, .text).notNull()
-                t.column(ProfileModel.Columns.port.name, .integer).notNull()
-                t.column(ProfileModel.Columns.password.name, .text)
-                t.column(ProfileModel.Columns.alterId.name, .integer)
-                t.column(ProfileModel.Columns.encryption.name, .text)
-                t.column(ProfileModel.Columns.network.name, .text)
-                t.column(ProfileModel.Columns.headerType.name, .text)
-                t.column(ProfileModel.Columns.host.name, .text)
-                t.column(ProfileModel.Columns.path.name, .text)
-                t.column(ProfileModel.Columns.security.name, .text)
-                t.column(ProfileModel.Columns.allowInsecure.name, .boolean)
-                t.column(ProfileModel.Columns.flow.name, .text)
-                t.column(ProfileModel.Columns.sni.name, .text)
-                t.column(ProfileModel.Columns.alpn.name, .text)
-                t.column(ProfileModel.Columns.fingerprint.name, .text)
-                t.column(ProfileModel.Columns.publicKey.name, .text)
-                t.column(ProfileModel.Columns.shortId.name, .text)
-                t.column(ProfileModel.Columns.spiderX.name, .text)
+            try db.create(table: databaseTableName) { t in
+                t.column(Columns.uuid.name, .text).notNull().primaryKey()
+                t.column(Columns.remark.name, .text).notNull()
+                t.column(Columns.speed.name, .integer).notNull()
+                t.column(Columns.sort.name, .integer).notNull()
+                t.column(Columns.protocol.name, .text).notNull()
+                t.column(Columns.subid.name, .text)
+                t.column(Columns.address.name, .text).notNull()
+                t.column(Columns.port.name, .integer).notNull()
+                t.column(Columns.password.name, .text)
+                t.column(Columns.alterId.name, .integer)
+                t.column(Columns.encryption.name, .text)
+                t.column(Columns.network.name, .text)
+                t.column(Columns.headerType.name, .text)
+                t.column(Columns.host.name, .text)
+                t.column(Columns.path.name, .text)
+                t.column(Columns.security.name, .text)
+                t.column(Columns.allowInsecure.name, .boolean)
+                t.column(Columns.flow.name, .text)
+                t.column(Columns.sni.name, .text)
+                t.column(Columns.alpn.name, .text)
+                t.column(Columns.fingerprint.name, .text)
+                t.column(Columns.publicKey.name, .text)
+                t.column(Columns.shortId.name, .text)
+                t.column(Columns.spiderX.name, .text)
             }
         }
     }
-
+    
     func save() {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

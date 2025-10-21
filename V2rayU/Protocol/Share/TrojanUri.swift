@@ -2,21 +2,21 @@ import Foundation
 
 // trojan
 class TrojanUri: BaseShareUri {
-    private var profile: ProfileModel
+    private var profile: ProfileDTO
     private var error: String?
 
     // 初始化
     init() {
-        profile = ProfileModel(remark: "trojan", protocol: .trojan)
+        profile = ProfileDTO(remark: "trojan", protocol: .trojan)
     }
 
     // 从 ProfileModel 初始化
-    required init(from model: ProfileModel) {
+    required init(from model: ProfileDTO) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         profile = model
     }
 
-    func getProfile() -> ProfileModel {
+    func getProfile() -> ProfileDTO {
         return profile
     }
 

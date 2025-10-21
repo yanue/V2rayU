@@ -11,11 +11,11 @@ class ShadowsocksRUri: ShadowsocksUri {
     }
     
     // 从 ProfileModel 初始化
-    required init(from model: ProfileModel) {
+    required init(from model: ProfileDTO) {
         super.init(from: model)
     }
 
-    override func getProfile() -> ProfileModel {
+    override func getProfile() -> ProfileDTO {
         return self.profile
     }
 

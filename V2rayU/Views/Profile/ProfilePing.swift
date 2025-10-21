@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfilePingView: View {
-    var profile: ProfileModel?
+    var profile: ProfileDTO?
     var isAll: Bool
     var onClose: () -> Void
     @State private var logs: [String] = []
@@ -144,7 +144,7 @@ struct ProfilePingView: View {
         }
     }
 
-    func doPingItem(item: ProfileModel) {
+    func doPingItem(item: ProfileDTO) {
         Task {
             await PingAll.shared.pingOne(item: item)
         }

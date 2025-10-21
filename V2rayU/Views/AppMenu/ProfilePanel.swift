@@ -23,13 +23,9 @@ struct MenuProfilePanel: View {
     var name: String {
         return appState.runningServer?.remark ?? "No Profile Selected"
     }
-    var filteredAndSortedItems: [ProfileModel] {
+    var filteredAndSortedItems: [ProfileDTO] {
         let filtered = viewModel.list.filter { item in
             (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
-        }
-        // 循环增加序号
-        filtered.enumerated().forEach { index, item in
-            item.index = index
         }
         return filtered
     }
@@ -96,7 +92,7 @@ struct MenuProfilePanel: View {
                         ScrollView {
                             VStack(spacing: 4) {
                                 ForEach(filteredAndSortedItems) { item in
-                                    MenuProfileRow(item: item, isSelected: item.uuid == appState.runningProfile)
+                                    MenuProfileRow(item: ProfileModel(from: item), isSelected: item.uuid == appState.runningProfile)
                                         .padding(.horizontal)
                                         .contentShape(Rectangle())
                                         .onTapGesture {

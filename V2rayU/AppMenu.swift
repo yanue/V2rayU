@@ -315,7 +315,7 @@ final class AppMenuManager: NSObject {
     }
 
     // 辅助方法：创建对齐的服务器菜单项
-    private func createServerMenuItem(profile: ProfileModel) -> NSMenuItem {
+    private func createServerMenuItem(profile: ProfileDTO) -> NSMenuItem {
         let speedText: String = "[\(profile.speed)ms]"
         let speedColor: NSColor = getSpeedColor(latency: Double(profile.speed))
         
@@ -450,7 +450,7 @@ final class AppMenuManager: NSObject {
             noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
             return
         }
-        ShareWindowManager.shared.openShareWindow(item: v2ray)
+        ShareWindowManager.shared.openShareWindow(item: ProfileModel(from: v2ray))
     }
 
     @objc private func copyExportCommand(_ sender: NSMenuItem) {

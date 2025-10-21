@@ -30,7 +30,7 @@ struct VmessShare: Codable {
         case v, ps, add, port, id, aid, net, type, host, path, tls, alpn, sni, security, scy, fp, serviceName, seed
     }
     
-    init(from model: ProfileModel) {
+    init(from model: ProfileDTO) {
         self.ps = model.remark
         self.add = model.address
         self.port = String(model.port) // 转为字符串形式
@@ -89,21 +89,21 @@ struct VmessShare: Codable {
 
 // see: https://github.com/v2ray/v2ray-core/issues/1139
 class VmessUri: BaseShareUri {
-    private var profile: ProfileModel
+    private var profile: ProfileDTO
     private var error: String = ""
 
     // 初始化
     init() {
-        profile = ProfileModel(remark: "vless", protocol: .vless)
+        profile = ProfileDTO(remark: "vless", protocol: .vless)
     }
 
     // 从 ProfileModel 初始化
-    required init(from model: ProfileModel) {
+    required init(from model: ProfileDTO) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         profile = model
     }
 
-    func getProfile() -> ProfileModel {
+    func getProfile() -> ProfileDTO {
         return profile
     }
 

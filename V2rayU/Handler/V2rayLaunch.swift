@@ -84,7 +84,7 @@ actor V2rayLaunch {
         setSystemProxy(mode: .off)
     }
 
-    private func createJsonFile(item: ProfileModel) {
+    private func createJsonFile(item: ProfileDTO) {
         let vCfg = V2rayConfigHandler()
         let jsonText = vCfg.toJSON(item: item)
         do {

@@ -130,11 +130,11 @@ actor SubscriptionHandler {
     }
 
     func getOldCount(sub: SubDTO) -> Int {
-        return ProfileViewModel.count(filter: [ProfileModel.Columns.subid.name: sub.uuid])
+        return ProfileViewModel.count(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
     }
 
     func importByYaml(strTmp: String, sub: SubDTO) -> Bool {
-        var list: [ProfileModel] = []
+        var list: [ProfileDTO] = []
         let oldCount = getOldCount(sub: sub)
 
         // parse clash yaml
@@ -156,7 +156,7 @@ actor SubscriptionHandler {
                 return false
             }
             // 删除旧的
-            ProfileViewModel.delete(filter: [ProfileModel.Columns.subid.name: sub.uuid])
+            ProfileViewModel.delete(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
 
             // 插入新的
             ProfileViewModel.insert_many(items: list)
@@ -170,7 +170,7 @@ actor SubscriptionHandler {
     }
 
     func importByNormal(strTmp: String, sub: SubDTO) {
-        var list: [ProfileModel] = []
+        var list: [ProfileDTO] = []
         let oldCount = getOldCount(sub: sub)
 
         let lines = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
@@ -182,7 +182,7 @@ actor SubscriptionHandler {
                 continue
             }
             let importTask = ImportUri(share_uri: filterUri)
-            if let profile = importTask.doImport() {
+            if var profile = importTask.doImport() {
                 profile.subid = sub.uuid
                 list.append(profile)
             } else {
@@ -193,7 +193,7 @@ actor SubscriptionHandler {
         logTip(title: "importByNormal: ", informativeText: "old=\(oldCount) - new=\(list.count)")
 
         // 删除旧的
-        ProfileViewModel.delete(filter: [ProfileModel.Columns.subid.name: sub.uuid])
+        ProfileViewModel.delete(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
 
         // 插入新的
         ProfileViewModel.insert_many(items: list)

@@ -39,8 +39,9 @@ class SubViewModel: ObservableObject {
     func all() -> [SubDTO] {
         do {
             let dbReader = AppDatabase.shared.reader
-            try dbReader.read { db in
-                return try SubDTO.fetchAll(db)
+            return try dbReader.read { db in
+                // 先取出结果（fetch）成数组，才能在 for-in 里使用。
+                return try SubDTO.all().fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")

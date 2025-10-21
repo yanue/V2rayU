@@ -44,7 +44,7 @@ class V2rayOutboundHandler {
     // outbound
     private(set) var outbound = V2rayOutbound()
 
-    // 从 ProfileModel 初始化
+    // 从 ProfileDTO 初始化
     init(from model: ProfileModel) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         self.profile = model

@@ -26,7 +26,7 @@ final class AppState: ObservableObject {
     {
         didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
     }
-    @Published var runningServer: ProfileModel? = ProfileViewModel.getRunning()
+    @Published var runningServer: ProfileDTO? = ProfileViewModel.getRunning()
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0

@@ -56,27 +56,27 @@ class V2rayConfigHandler {
     }
 
     // ping配置
-    func toJSON(item: ProfileModel, httpPort: String) -> String {
+    func toJSON(item: ProfileDTO, httpPort: String) -> String {
         self.forPing = true
         self.enableSocks = false
         self.httpPort = String(httpPort)
-        let outbound = V2rayOutboundHandler(from: item).getOutbound()
+        let outbound = V2rayOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         self.combine(_outbounds: [outbound])
         return self.v2ray.toJSON()
     }
 
     // 单个配置
-    func toJSON(item: ProfileModel) -> String {
-        let outbound = V2rayOutboundHandler(from: item).getOutbound()
+    func toJSON(item: ProfileDTO) -> String {
+        let outbound = V2rayOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         self.combine(_outbounds: [outbound])
         return self.v2ray.toJSON()
     }
 
     // 组合配置
-    func toJSON(items: [ProfileModel]) -> String {
+    func toJSON(items: [ProfileDTO]) -> String {
         var _outbounds: [V2rayOutbound] = []
         for (_, item) in items.enumerated() {
-            let outbound = V2rayOutboundHandler(from: item).getOutbound()
+            let outbound = V2rayOutboundHandler(from: ProfileModel(from: item)).getOutbound()
             _outbounds.append(outbound)
         }
         self.combine(_outbounds: _outbounds)

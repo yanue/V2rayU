@@ -47,7 +47,7 @@ class ImportUri {
         self.share_uri = share_uri
     }
 
-    func doImport() -> ProfileModel? {
+    func doImport() -> ProfileDTO? {
         var url = URL(string: share_uri)
         if url == nil {
             // 标准url不支持非url-encoded
@@ -86,7 +86,7 @@ class ImportUri {
                 return nil
             }
             // 解析成功返回 ProfileModel
-            let profile = handler.getProfile()
+            var profile = handler.getProfile()
             if self.remark.count > 0 {
                 profile.remark = self.remark
             }

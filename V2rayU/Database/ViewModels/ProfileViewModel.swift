@@ -10,7 +10,7 @@ import Foundation
 import GRDB
 
 class ProfileViewModel: ObservableObject {
-    @Published var list: [ProfileModel] = []
+    @Published var list: [ProfileDTO] = []
     @Published var groups: [String] = []
 
     func getList() {
@@ -18,7 +18,7 @@ class ProfileViewModel: ObservableObject {
             let dbReader = AppDatabase.shared.reader
             try dbReader.read { db in
                 // 按 sort 排序
-                list = try ProfileModel.fetchAll(db).sorted(by: { $0.sort < $1.sort })
+                list = try ProfileDTO.fetchAll(db).sorted(by: { $0.sort < $1.sort })
             }
         } catch {
             logger.info("getList error: \(error)")
@@ -38,8 +38,8 @@ class ProfileViewModel: ObservableObject {
     // MARK: - Static
 
     // 获取当前正在运行配置
-    static func getRunning() -> ProfileModel? {
-        var item: ProfileModel?
+    static func getRunning() -> ProfileDTO? {
+        var item: ProfileDTO?
         // 获取当前运行配置
         let runningProfile = UserDefaults.get(forKey: .runningProfile)
         if !runningProfile.isEmpty {
@@ -53,11 +53,12 @@ class ProfileViewModel: ObservableObject {
         return item
     }
 
-    static func all() -> [ProfileModel] {
+    static func all() -> [ProfileDTO] {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                try ProfileModel.fetchAll(db)
+                // 先取出结果（fetch）成数组，才能在 for-in 里使用。
+                return try ProfileDTO.all().fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")
@@ -66,20 +67,19 @@ class ProfileViewModel: ObservableObject {
     }
     
     // 改成返回有序数组
-    static func getGroupedProfiles() -> [(String, [ProfileModel])] {
-        let profiles = ProfileViewModel.all()
-        let groups = SubViewModel().all().reduce(into: [String: SubDTO]()) { dict, sub in
-            dict[sub.uuid] = sub
+    static func getGroupedProfiles() -> [(String, [ProfileDTO])] {
+        let profiles = self.all()
+        
+        let groups = SubViewModel().all().reduce(into: [String: SubDTO]()) {
+            dict, sub in dict[sub.uuid] = sub
         }
-        var result: [String: [ProfileModel]] = [:]
+        var result: [String: [ProfileDTO]] = [:]
         
         // 按 subid 分组
         for profile in profiles {
             if !profile.subid.isEmpty, let sub = groups[profile.subid] {
-                // 有订阅的按订阅ID分组
                 result[sub.remark, default: []].append(profile)
             } else {
-                // 没有订阅的放在空字符串组
                 result["", default: []].append(profile)
             }
         }
@@ -93,14 +93,14 @@ class ProfileViewModel: ObservableObject {
         
         return sortedResult
     }
-    
+
     // filter: ["id": 1,"conlmn":"value"]
     static func count(filter: [String: (any DatabaseValueConvertible)?]?) -> Int {
         guard let filter = filter else { return 0 }
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                var query = ProfileModel.all()
+                var query = ProfileDTO.all()
                 for (column, value) in filter {
                     if let value = value {
                         query = query.filter(Column(column) == value)
@@ -114,11 +114,11 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    static func getFastOne() -> ProfileModel? {
+    static func getFastOne() -> ProfileDTO? {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                try ProfileModel.order(ProfileModel.Columns.speed.desc).fetchOne(db)
+                try ProfileDTO.order(ProfileDTO.Columns.speed.desc).fetchOne(db)
             }
         } catch {
             logger.info("getFastOne error: \(error)")
@@ -126,11 +126,11 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    static func fetchOne(uuid: String) -> ProfileModel? {
+    static func fetchOne(uuid: String) -> ProfileDTO? {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                try ProfileModel.filter(ProfileModel.Columns.uuid == uuid).fetchOne(db)
+                try ProfileDTO.filter(ProfileDTO.Columns.uuid == uuid).fetchOne(db)
             }
         } catch {
             logger.info("fetchOne error: \(error)")
@@ -142,7 +142,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).deleteAll(db)
+                try _ = ProfileDTO.filter(ProfileDTO.Columns.uuid == uuid).deleteAll(db)
             }
         } catch {
             logger.info("delete error: \(error)")
@@ -155,7 +155,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                var query = ProfileModel.all()
+                var query = ProfileDTO.all()
                 for (column, value) in filter {
                     if let value = value {
                         query = query.filter(Column(column) == value)
@@ -172,7 +172,7 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try _ = ProfileModel.filter(ProfileModel.Columns.uuid == uuid).updateAll(db, [ProfileModel.Columns.speed.set(to: speed)])
+                try _ = ProfileDTO.filter(ProfileDTO.Columns.uuid == uuid).updateAll(db, [ProfileDTO.Columns.speed.set(to: speed)])
             }
         } catch {
             logger.info("delete error: \(error)")
@@ -183,9 +183,9 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                for (index, item) in list.enumerated() {
+                for var (index, item) in list.enumerated() {
                     item.sort = index // Update the sort order in memory
-                    try item.update(db, columns: [ProfileModel.Columns.sort]) // Update the database
+                    try item.update(db, columns: [ProfileDTO.Columns.sort]) // Update the database
                 }
             }
         } catch {
@@ -197,14 +197,14 @@ class ProfileViewModel: ObservableObject {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try item.save(db)
+                try item.toDTO().save(db)
             }
         } catch {
             logger.info("upsert error: \(error)")
         }
     }
 
-    static func insert_many(items: [ProfileModel]) {
+    static func insert_many(items: [ProfileDTO]) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in

@@ -55,8 +55,8 @@ struct clashProxy: Codable {
 }
 
 extension clashProxy {
-    func toProfile() -> ProfileModel? {
-        let profile = ProfileModel()
+    func toProfile() -> ProfileDTO? {
+        var profile = ProfileDTO()
         
         profile.remark = self.name
         profile.address = self.server

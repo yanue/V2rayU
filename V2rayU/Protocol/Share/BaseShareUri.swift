@@ -2,7 +2,7 @@ import Foundation
 
 protocol BaseShareUri {
     // 从ProfileModel初始化
-    init(from model: ProfileModel)
+    init(from model: ProfileDTO)
 
     // 转换为 String, 用于分享
     func encode() -> String
@@ -11,5 +11,5 @@ protocol BaseShareUri {
     func parse(url: URL) -> Error?
 
     // 返回ProfileModel
-    func getProfile() -> ProfileModel
+    func getProfile() -> ProfileDTO
 }

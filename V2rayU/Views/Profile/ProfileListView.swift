@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ProfileListView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    @State private var list: [ProfileModel] = []
-    @State private var sortOrder: [KeyPathComparator<ProfileModel>] = []
+    @State private var list: [ProfileDTO] = []
+    @State private var sortOrder: [KeyPathComparator<ProfileDTO>] = []
     @State private var selection: Set<ProfileModel.ID> = []
     @State private var selectedRow: ProfileModel? = nil
     @State private var pingRow: ProfileModel? = nil
@@ -22,15 +22,10 @@ struct ProfileListView: View {
     @State private var showPingSheet: Bool = false
     @State private var showShareSheet: Bool = false
 
-    var filteredAndSortedItems: [ProfileModel] {
+    var filteredAndSortedItems: [ProfileDTO] {
         let filtered = viewModel.list.filter { item in
             (selectGroup == "" || selectGroup == item.subid) &&
                 (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
-        }
-        .sorted(using: sortOrder)
-        // 循环增加序号
-        filtered.enumerated().forEach { index, item in
-            item.index = index
         }
         return filtered
     }
@@ -77,7 +72,7 @@ struct ProfileListView: View {
                     }
                     Spacer()
                     Button(action: { withAnimation {
-                        let newProxy = ProfileModel(remark: "", protocol: .trojan, address: "", port: 443, password: UUID().uuidString, encryption: "auto")
+                        let newProxy = ProfileModel(from: ProfileDTO())
                         self.selectedRow = newProxy
                     }}) {
                         Label("新增", systemImage: "plus")
@@ -110,62 +105,7 @@ struct ProfileListView: View {
                     }.disabled(selection.isEmpty)
                         .buttonStyle(.bordered)
                 }.padding(.horizontal, 10)
-                // 表格主体
-                Table(of: ProfileModel.self, selection: $selection, sortOrder: $sortOrder) {
-                    TableColumn("#") { item in
-                        Text("\(item.index + 1)")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.secondary)
-                            .onTapGesture(count: 2) { selectedRow = item }
-                    }
-                    .width(30)
-                    TableColumn("Type") { row in
-                        Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    .width(40)
-                    TableColumn("Remark") { row in
-                        Text(row.remark)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    .width(150)
-                    TableColumn("Address") { row in
-                        Text(row.address)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    .width(120)
-                    TableColumn("Port") { row in
-                        Text("\(row.port)")
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }
-                    .width(40)
-                    TableColumn("Network") { row in
-                        Text(row.network.rawValue)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }.width(50)
-                    TableColumn("TLS") { row in
-                        Text(row.security.rawValue)
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }.width(40)
-                    TableColumn("latency(KB/s)") { row in
-                        Text(String(format: "%d", row.speed))
-                            .font(.system(size: 13))
-                            .onTapGesture(count: 2) { selectedRow = row }
-                    }.width(76)
-                } rows: {
-                    ForEach(filteredAndSortedItems) { row in
-                        TableRow(row)
-                            .draggable(row)
-                            .contextMenu { contextMenuProvider(item: row) }
-                    }
-                    .dropDestination(for: ProfileModel.self, action: handleDrop)
-                }
+                tableView
             }
             .background(.ultraThinMaterial)
             .border(Color.gray.opacity(0.1), width: 1)
@@ -179,7 +119,7 @@ struct ProfileListView: View {
             }
         }
         .sheet(item: $pingRow) { _ in
-            ProfilePingView(profile: pingRow, isAll: false) {
+            ProfilePingView(profile: pingRow?.toDTO(), isAll: false) {
                 pingRow = nil
             }
         }
@@ -199,7 +139,7 @@ struct ProfileListView: View {
 
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
-    func handleDrop(index: Int, rows: [ProfileModel]) {
+    func handleDrop(index: Int, rows: [ProfileDTO]) {
         guard let firstRow = rows.first, let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid }) else { return }
 
         viewModel.list.removeAll(where: { row in
@@ -212,16 +152,16 @@ struct ProfileListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func contextMenuProvider(item: ProfileModel) -> some View {
+    private func contextMenuProvider(item: ProfileDTO) -> some View {
         Group {
             Button {
-                chooseItem(item: item)
+                chooseItem(item: ProfileModel(from: item))
             } label: {
                 Label("Choose", systemImage: "checkmark.circle")
             }
 
             Button {
-                self.pingRow = item
+                self.pingRow = ProfileModel(from: item)
             } label: {
                 Label("Test Latency", systemImage: "speedometer")
             }
@@ -235,7 +175,7 @@ struct ProfileListView: View {
             }
 
             Button {
-                self.shareRow = item
+                self.shareRow = ProfileModel(from: item)
             } label: {
                 Label("QRCode", systemImage: "qrcode")
             }
@@ -269,13 +209,13 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                duplicateItem(item: item)
+                duplicateItem(item: ProfileModel(from: item))
             } label: {
                 Label("Duplicate", systemImage: "plus.square.on.square")
             }
 
             Button {
-                self.selectedRow = item
+                self.selectedRow = ProfileModel(from: item)
             } label: {
                 Label("Edit", systemImage: "pencil")
             }
@@ -291,6 +231,94 @@ struct ProfileListView: View {
         }
     }
 
+    // 提取的 Table 子视图，减少主视图表达式复杂度
+    private var tableView: some View {
+        // 表格主体
+        Table(of: ProfileDTO.self, selection: $selection, sortOrder: $sortOrder) {
+            TableColumn("#") { (row: ProfileDTO) in
+                HStack(spacing: 4) {
+                    Image(systemName: "line.3.horizontal")
+
+                    if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                        Text("\(idx + 1)")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .contentShape(Rectangle())   // 扩大点击/拖拽区域
+                .draggable(row)              // 整个区域作为拖拽手柄
+                .onTapGesture { }            // 吃掉点击事件，避免触发行选择
+                .onHover { inside in
+                    if inside {
+                        NSCursor.openHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
+            }
+            .width(40)
+
+            TableColumn("Remark") { (row: ProfileDTO) in
+                HStack(spacing: 4) {
+                    Image(systemName: "square.and.pencil")
+                    Text(row.remark)
+                }
+                .contentShape(Rectangle())   // 扩大点击/拖拽区域
+                .onTapGesture() { selectedRow = ProfileModel(from: row) }
+                .onHover { inside in
+                    if inside {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
+            }
+            .width(min: 100,max: 200)
+            
+            TableColumn("Type") { row in
+                Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }
+            .width(40)
+            
+            TableColumn("Address") { row in
+                Text(row.address)
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }
+            .width(120)
+            TableColumn("Port") { row in
+                Text("\(row.port)")
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }
+            .width(40)
+            TableColumn("Network") { row in
+                Text(row.network.rawValue)
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }.width(50)
+            TableColumn("TLS") { row in
+                Text(row.security.rawValue)
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }.width(40)
+            TableColumn("latency(KB/s)") { row in
+                Text(String(format: "%d", row.speed))
+                    .font(.system(size: 13))
+                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            }.width(76)
+        } rows: {
+            ForEach(filteredAndSortedItems) { row in
+                TableRow(row)
+                    .draggable(row)
+                    .contextMenu { contextMenuProvider(item: row) }
+            }
+            .dropDestination(for: ProfileDTO.self, action: handleDrop)
+        }
+    }
+    
     private func chooseItem(item: ProfileModel) {
         // 选择当前配置
         AppState.shared.switchServer(uuid: item.uuid)
@@ -304,7 +332,7 @@ struct ProfileListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func copyItem(item: ProfileModel) {
+    private func copyItem(item: ProfileDTO) {
         // 复制到剪贴板
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -318,27 +346,27 @@ struct ProfileListView: View {
         }
     }
 
-    private func moveToTop(item: ProfileModel) {
+    private func moveToTop(item: ProfileDTO) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         viewModel.list.remove(at: index)
         viewModel.list.insert(item, at: 0)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveToBottom(item: ProfileModel) {
+    private func moveToBottom(item: ProfileDTO) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         viewModel.list.remove(at: index)
         viewModel.list.append(item)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveUp(item: ProfileModel) {
+    private func moveUp(item: ProfileDTO) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index > 0 else { return }
         viewModel.list.swapAt(index, index - 1)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveDown(item: ProfileModel) {
+    private func moveDown(item: ProfileDTO) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index < viewModel.list.count - 1 else { return }
         viewModel.list.swapAt(index, index + 1)
         viewModel.updateSortOrderInDBAsync()

@@ -4,7 +4,7 @@ class ShareUri {
     var error = ""
     var uri: String = ""
 
-    static func generateShareUri(item: ProfileModel) -> String {
+    static func generateShareUri(item: ProfileDTO) -> String {
         let handler = ShareUri()
         
         switch item.protocol {
