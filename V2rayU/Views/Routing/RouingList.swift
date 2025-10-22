@@ -170,25 +170,21 @@ struct RoutingListView: View {
                 
                 TableColumn("domainStrategy") { row in
                     Text(row.domainStrategy)
-                        .font(.system(size: 13))
                 }
                 .width(min: 90,max: 200)
 
                 TableColumn("direct") { row in
                     Text(row.direct)
-                        .font(.system(size: 13))
                 }
                 .width(min: 100,max: 200)
 
                 TableColumn("block") { row in
                     Text(row.block)
-                        .font(.system(size: 13))
                 }
                 .width(min: 100,max: 200)
 
                 TableColumn("proxy") { row in
                     Text(row.proxy)
-                        .font(.system(size: 13))
                 }
                 .width(min: 100,max: 200)
             } rows: {

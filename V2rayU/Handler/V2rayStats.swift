@@ -54,7 +54,7 @@ actor V2rayTraffics {
             let uuid = await AppState.shared.runningProfile
 //             logger.info("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
             // 更新到数据库
-            try ProfileStatModel.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
+            try ProfileDTO.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
         }
     }
 }

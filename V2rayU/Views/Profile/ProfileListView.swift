@@ -31,7 +31,7 @@ struct ProfileListView: View {
     }
 
     var body: some View {
-        VStack() {
+        VStack {
             HStack {
                 Image(systemName: "shield.lefthalf.filled")
                     .resizable()
@@ -129,10 +129,8 @@ struct ProfileListView: View {
             }
         }
         .sheet(item: $shareRow) { _ in
-            
         }
         .sheet(isPresented: $showShareSheet) {
-            
         }
         .task { loadData() }
     }
@@ -235,80 +233,95 @@ struct ProfileListView: View {
     private var tableView: some View {
         // 表格主体
         Table(of: ProfileDTO.self, selection: $selection, sortOrder: $sortOrder) {
-            TableColumn("#") { (row: ProfileDTO) in
-                HStack(spacing: 4) {
-                    Image(systemName: "line.3.horizontal")
+            Group {
+                TableColumn("#") { (row: ProfileDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal")
 
-                    if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
-                        Text("\(idx + 1)")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.secondary)
+                        if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                            Text("\(idx + 1)")
+                                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .contentShape(Rectangle()) // 扩大点击/拖拽区域
+                    .draggable(row) // 整个区域作为拖拽手柄
+                    .onTapGesture { } // 吃掉点击事件，避免触发行选择
+                    .onHover { inside in
+                        if inside {
+                            NSCursor.openHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
                     }
                 }
-                .contentShape(Rectangle())   // 扩大点击/拖拽区域
-                .draggable(row)              // 整个区域作为拖拽手柄
-                .onTapGesture { }            // 吃掉点击事件，避免触发行选择
-                .onHover { inside in
-                    if inside {
-                        NSCursor.openHand.push()
-                    } else {
-                        NSCursor.pop()
-                    }
-                }
-            }
-            .width(40)
+                .width(40)
 
-            TableColumn("Remark") { (row: ProfileDTO) in
-                HStack(spacing: 4) {
-                    Image(systemName: "square.and.pencil")
-                    Text(row.remark)
-                }
-                .contentShape(Rectangle())   // 扩大点击/拖拽区域
-                .onTapGesture() { selectedRow = ProfileModel(from: row) }
-                .onHover { inside in
-                    if inside {
-                        NSCursor.pointingHand.push()
-                    } else {
-                        NSCursor.pop()
+                TableColumn("Remark") { (row: ProfileDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "square.and.pencil")
+                        Text(row.remark)
+                    }
+                    .contentShape(Rectangle()) // 扩大点击/拖拽区域
+                    .onTapGesture { selectedRow = ProfileModel(from: row) }
+                    .onHover { inside in
+                        if inside {
+                            NSCursor.pointingHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
                     }
                 }
+                .width(min: 120, max: 300)
+
+                TableColumn("Type") { row in
+                    Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
+                }
+                .width(40)
+
+                TableColumn("Address") { row in
+                    Text(row.address)
+                }
+                .width(min: 120, max: 300)
+
+                TableColumn("latency(ms)") { (row: ProfileDTO) in
+                    Text("\(row.speed)") // 或者 row.latency
+                        .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
+                }
+                .width(76)
+
+                TableColumn("Port") { row in
+                    Text("\(row.port)")
+                }
+                .width(40)
+                TableColumn("Network") { row in
+                    Text(row.network.rawValue)
+                }.width(50)
+                TableColumn("TLS") { row in
+                    Text(row.security.rawValue)
+                }.width(40)
             }
-            .width(min: 100,max: 200)
-            
-            TableColumn("Type") { row in
-                Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
+            Group {
+                TableColumn("TodayDown") { (row: ProfileDTO) in
+                    Text(row.todayDown.humanSize)
+                }
+                .width(min: 40, max: 100)
+
+                TableColumn("TodayUp") { (row: ProfileDTO) in
+                    Text(row.todayUp.humanSize)
+                }
+                .width(min: 40, max: 100)
+
+                TableColumn("TotalDown") { (row: ProfileDTO) in
+                    Text(row.totalDown.humanSize)
+                }
+                .width(min: 40, max: 100)
+
+                TableColumn("TotalUp") { (row: ProfileDTO) in
+                    Text(row.totalUp.humanSize)
+                }
+                .width(min: 40, max: 100)
             }
-            .width(40)
-            
-            TableColumn("Address") { row in
-                Text(row.address)
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
-            }
-            .width(120)
-            TableColumn("Port") { row in
-                Text("\(row.port)")
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
-            }
-            .width(40)
-            TableColumn("Network") { row in
-                Text(row.network.rawValue)
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
-            }.width(50)
-            TableColumn("TLS") { row in
-                Text(row.security.rawValue)
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
-            }.width(40)
-            TableColumn("latency(KB/s)") { row in
-                Text(String(format: "%d", row.speed))
-                    .font(.system(size: 13))
-                    .onTapGesture(count: 2) { selectedRow = ProfileModel(from: row) }
-            }.width(76)
         } rows: {
             ForEach(filteredAndSortedItems) { row in
                 TableRow(row)
@@ -318,14 +331,13 @@ struct ProfileListView: View {
             .dropDestination(for: ProfileDTO.self, action: handleDrop)
         }
     }
-    
+
     private func chooseItem(item: ProfileModel) {
         // 选择当前配置
         AppState.shared.switchServer(uuid: item.uuid)
     }
 
     private func duplicateItem(item: ProfileModel) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         let newItem = item.clone()
         viewModel.upsert(item: newItem.dto)
         viewModel.updateSortOrderInDBAsync()

@@ -252,3 +252,19 @@ func getSpeedColor(latency: Double) -> NSColor {
         return NSColor.systemRed
     }
 }
+
+extension Int64 {
+    var humanSize: String {
+        let units = ["B", "KB", "MB", "GB", "TB"]
+        var value = Double(self)
+        var index = 0
+        if value < 1024 {
+            return ""
+        }
+        while value >= 1024 && index < units.count - 1 {
+            value /= 1024
+            index += 1
+        }
+        return String(format: "%.2f %@", value, units[index])
+    }
+}

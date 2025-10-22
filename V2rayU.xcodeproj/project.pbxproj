@@ -82,7 +82,6 @@
 		669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEAC2E3D9C400085278B /* AboutView.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
-		66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5322D2913000032DD09 /* ProfileStatModel.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66B1B55A2D297B140032DD09 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5592D297B140032DD09 /* install.sh */; };
 		66B1B5742D297BF70032DD09 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5732D297BF70032DD09 /* GoogleService-Info.plist */; };
@@ -229,7 +228,6 @@
 		669DCEA52E3D908C0085278B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		669DCEAC2E3D9C400085278B /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
-		66B1B5322D2913000032DD09 /* ProfileStatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatModel.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		66B1B5592D297B140032DD09 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
@@ -331,7 +329,6 @@
 		662CC3CD2D1BED9B006E8450 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				66B1B5322D2913000032DD09 /* ProfileStatModel.swift */,
 				662CC3CA2D1BED9B006E8450 /* ProfileModel.swift */,
 				662CC3CB2D1BED9B006E8450 /* RoutingModel.swift */,
 				662CC3CC2D1BED9B006E8450 /* SubModel.swift */,
@@ -780,7 +777,6 @@
 				662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */,
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
 				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
-				66B1B5332D2913000032DD09 /* ProfileStatModel.swift in Sources */,
 				66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */,
 				66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,

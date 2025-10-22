@@ -20,7 +20,6 @@ extension AppDatabase {
       
         // 注册所有模型的迁移逻辑
         ProfileDTO.registerMigrations(in: &migrator)
-        ProfileStatModel.registerMigrations(in: &migrator)
         SubDTO.registerMigrations(in: &migrator)
         RoutingDTO.registerMigrations(in: &migrator)
         
