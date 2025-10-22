@@ -59,7 +59,7 @@ struct ConfigFormView: View {
                 }
                 .buttonStyle(.bordered)
                 Button(String(localized: .Save)) {
-                    viewModel.upsert(item: item)
+                    viewModel.upsert(item: item.dto)
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

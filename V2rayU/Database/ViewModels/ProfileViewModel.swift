@@ -30,7 +30,7 @@ class ProfileViewModel: ObservableObject {
         getList()
     }
 
-    func upsert(item: ProfileModel) {
+    func upsert(item: ProfileDTO) {
         Self.upsert(item: item)
         getList()
     }
@@ -58,23 +58,23 @@ class ProfileViewModel: ObservableObject {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
                 // 先取出结果（fetch）成数组，才能在 for-in 里使用。
-                return try ProfileDTO.all().fetchAll(db)
+                try ProfileDTO.all().fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")
             return []
         }
     }
-    
+
     // 改成返回有序数组
     static func getGroupedProfiles() -> [(String, [ProfileDTO])] {
-        let profiles = self.all()
-        
+        let profiles = all()
+
         let groups = SubViewModel().all().reduce(into: [String: SubDTO]()) {
             dict, sub in dict[sub.uuid] = sub
         }
         var result: [String: [ProfileDTO]] = [:]
-        
+
         // 按 subid 分组
         for profile in profiles {
             if !profile.subid.isEmpty, let sub = groups[profile.subid] {
@@ -83,14 +83,14 @@ class ProfileViewModel: ObservableObject {
                 result["", default: []].append(profile)
             }
         }
-        
+
         // 排序：空字符串组（本地配置）放最前，其余按订阅名称排序
-        let sortedResult = result.sorted { (first, second) -> Bool in
+        let sortedResult = result.sorted { first, second -> Bool in
             if first.key.isEmpty { return true }
             if second.key.isEmpty { return false }
             return first.key < second.key
         }
-        
+
         return sortedResult
     }
 
@@ -193,11 +193,11 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    static func upsert(item: ProfileModel) {
+    static func upsert(item: ProfileDTO) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try item.toDTO().save(db)
+                try item.save(db)
             }
         } catch {
             logger.info("upsert error: \(error)")

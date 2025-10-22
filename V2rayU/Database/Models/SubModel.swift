@@ -5,12 +5,13 @@
 //  Created by yanue on 2024/12/2.
 //
 
+import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
-import GRDB
 
 // MARK: - DTO (数据库层)
-struct SubDTO: Codable, TableRecord, FetchableRecord, PersistableRecord, Identifiable,  Equatable, Hashable {
+
+struct SubDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord {
     var uuid: String
     var remark: String
     var url: String
@@ -19,8 +20,14 @@ struct SubDTO: Codable, TableRecord, FetchableRecord, PersistableRecord, Identif
     var updateInterval: Int
     var updateTime: Int
 
-    var id:String {
-        return uuid;
+    var id: String {
+        return uuid
+    }
+
+    // 拖动排序
+    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: draggableType)
     }
 
     init(
@@ -40,7 +47,7 @@ struct SubDTO: Codable, TableRecord, FetchableRecord, PersistableRecord, Identif
         self.updateInterval = updateInterval
         self.updateTime = updateTime
     }
-    
+
     // 自定义表名
     static var databaseTableName: String { "sub" }
 
@@ -71,48 +78,26 @@ struct SubDTO: Codable, TableRecord, FetchableRecord, PersistableRecord, Identif
     }
 }
 
-// 拖动排序
-extension SubDTO: Transferable {
-    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
-
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: draggableType)
-    }
-}
-
 // MARK: - UI Model (SwiftUI 绑定)
+
+@dynamicMemberLookup
 final class SubModel: ObservableObject, Identifiable {
-    @Published var uuid: String
-    @Published var remark: String
-    @Published var url: String
-    @Published var enable: Bool
-    @Published var sort: Int
-    @Published var updateInterval: Int
-    @Published var updateTime: Int
+    @Published var dto: SubDTO
 
-    var id:String {
-        return uuid;
-    }
-    
-    init(from dto: SubDTO) {
-        self.uuid = dto.uuid
-        self.remark = dto.remark
-        self.url = dto.url
-        self.enable = dto.enable
-        self.sort = dto.sort
-        self.updateInterval = dto.updateInterval
-        self.updateTime = dto.updateTime
+    var id: String { dto.uuid }
+
+    init(from dto: SubDTO) { self.dto = dto }
+
+    // 动态代理属性访问
+    subscript<T>(dynamicMember keyPath: KeyPath<SubDTO, T>) -> T {
+        dto[keyPath: keyPath]
     }
 
-    func toDTO() -> SubDTO {
-        SubDTO (
-            uuid: uuid,
-            remark: remark,
-            url: url,
-            enable: enable,
-            sort: sort,
-            updateInterval: updateInterval,
-            updateTime: updateTime
-        )
+    subscript<T>(dynamicMember keyPath: WritableKeyPath<SubDTO, T>) -> T {
+        get { dto[keyPath: keyPath] }
+        set { dto[keyPath: keyPath] = newValue }
     }
+
+    // 转换回 DTO
+    func toDTO() -> SubDTO { dto }
 }

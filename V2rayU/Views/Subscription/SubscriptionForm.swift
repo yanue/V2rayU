@@ -49,7 +49,7 @@ struct SubscriptionFormView: View {
                     onClose()
                 }
                 Button(String(localized: .Save)) {
-                    viewModel.upsert(item: item)
+                    viewModel.upsert(item: item.dto)
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

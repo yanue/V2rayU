@@ -76,7 +76,7 @@ struct SubscriptionListView: View {
             }
         }
         .sheet(item: $syncingRow) { row in
-            SubscriptionSyncView(subscription: row, isAll: false) { syncingRow = nil }
+            SubscriptionSyncView(subscription: row.dto, isAll: false) { syncingRow = nil }
         }
         .sheet(isPresented: $syncingAll) {
             SubscriptionSyncView(subscription: nil, isAll: true) { syncingAll = false }

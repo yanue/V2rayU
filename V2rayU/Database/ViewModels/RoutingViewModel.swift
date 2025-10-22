@@ -5,15 +5,13 @@
 //  Created by yanue on 2024/12/14.
 //
 
-
 import Combine
-import GRDB
 import Foundation
+import GRDB
 
 class RoutingViewModel: ObservableObject {
-    
     @Published var list: [RoutingDTO] = []
-    
+
     func getList() {
         do {
             let dbReader = AppDatabase.shared.reader
@@ -24,31 +22,31 @@ class RoutingViewModel: ObservableObject {
             logger.info("getList error: \(error)")
         }
     }
-    
+
     func delete(uuid: String) {
         Self.delete(uuid: uuid)
-        self.getList()
+        getList()
     }
-    
+
     func upsert(item: RoutingModel) {
         Self.upsert(item: item)
-        self.getList()
+        getList()
     }
-    
-    /// Mark: - Static
-    
+
+    // MARK: - Static
+
     static func all() -> [RoutingDTO] {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
-                return try RoutingDTO.fetchAll(db)
+                try RoutingDTO.fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")
             return []
         }
     }
-    
+
     static func fetchOne(uuid: String) throws -> RoutingDTO {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
@@ -58,7 +56,7 @@ class RoutingViewModel: ObservableObject {
             return model
         }
     }
- 
+
     static func delete(uuid: String) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
@@ -69,7 +67,7 @@ class RoutingViewModel: ObservableObject {
             logger.info("delete error: \(error)")
         }
     }
-    
+
     static func upsert(item: RoutingModel) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
@@ -80,7 +78,7 @@ class RoutingViewModel: ObservableObject {
             logger.info("upsert error: \(error)")
         }
     }
-    
+
     func updateSortOrderInDBAsync() {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

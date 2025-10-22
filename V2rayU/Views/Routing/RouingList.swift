@@ -33,7 +33,7 @@ struct RoutingListView: View {
                 }
                 Spacer()
                 Button(action: { withAnimation {
-                    let newProxy = RoutingModel(name: "newRouting", remark: "newRouting")
+                    let newProxy = RoutingModel(from: RoutingDTO(name: "newRouting", remark: "newRouting"))
                     self.selectedRow = newProxy
                 } }) {
                     Label("新增", systemImage: "plus")

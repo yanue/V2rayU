@@ -6,8 +6,8 @@
 //
 
 import Combine
-import GRDB
 import Foundation
+import GRDB
 
 class SubViewModel: ObservableObject {
     @Published var list: [SubDTO] = []
@@ -23,39 +23,39 @@ class SubViewModel: ObservableObject {
             logger.info("getList error: \(error)")
         }
     }
-    
+
     func delete(uuid: String) {
         Self.delete(uuid: uuid)
-        self.getList()
+        getList()
     }
-    
-    func upsert(item: SubModel) {
+
+    func upsert(item: SubDTO) {
         Self.upsert(item: item)
-        self.getList()
+        getList()
     }
-    
-    /// Mark: - Static
+
+    // MARK: - Static
 
     func all() -> [SubDTO] {
         do {
             let dbReader = AppDatabase.shared.reader
             return try dbReader.read { db in
                 // 先取出结果（fetch）成数组，才能在 for-in 里使用。
-                return try SubDTO.all().fetchAll(db)
+                try SubDTO.all().fetchAll(db)
             }
         } catch {
             logger.info("getList error: \(error)")
         }
         return []
     }
-    
+
     static func fetchOne(uuid: String) throws -> SubModel {
         let dbReader = AppDatabase.shared.reader
         return try dbReader.read { db in
             guard let model = try SubDTO.filter(SubDTO.Columns.uuid == uuid).fetchOne(db) else {
                 throw NSError(domain: "SubModel", code: 404, userInfo: [NSLocalizedDescriptionKey: "ProfileModel not found for uuid: \(uuid)"])
             }
-            return SubModel.init(from: model)
+            return SubModel(from: model)
         }
     }
 
@@ -70,17 +70,17 @@ class SubViewModel: ObservableObject {
         }
     }
 
-    static func upsert(item: SubModel) {
+    static func upsert(item: SubDTO) {
         do {
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
-                try item.toDTO().save(db)
+                try item.save(db)
             }
         } catch {
             logger.info("upsert error: \(error)")
         }
     }
-    
+
     func updateSortOrderInDBAsync() {
         do {
             let dbWriter = AppDatabase.shared.dbWriter

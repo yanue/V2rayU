@@ -327,8 +327,7 @@ struct ProfileListView: View {
     private func duplicateItem(item: ProfileModel) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         let newItem = item.clone()
-        newItem.index = index + 1 // 设置新的索引
-        viewModel.upsert(item: newItem)
+        viewModel.upsert(item: newItem.dto)
         viewModel.updateSortOrderInDBAsync()
     }
 
