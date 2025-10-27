@@ -203,6 +203,12 @@ struct ProfileDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
             logger.info("save error: \(error)")
         }
     }
+    
+    /// profile 唯一标识符, 用于检测重复配置
+    /// 不需要 subid, 因为比较时已筛选
+    func uniqueKey() -> String {
+        return "\(`protocol`.rawValue)-\(address)-\(port)-\(password)-\(alterId)-\(network.rawValue)-\(host)-\(path)-\(security.rawValue)"
+    }
 
     /// 更新 `profile_stat` 表中指定 `uuid` 的统计数据
     static func update_stat(uuid: String, up: Int, down: Int, lastUpdate: Date) throws {

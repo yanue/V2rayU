@@ -7,11 +7,11 @@ let NOTIFY_UPDATE_SubSync = Notification.Name(rawValue: "NOTIFY_UPDATE_SubSync")
 
 actor SubscriptionHandler {
     static let shared = SubscriptionHandler()
-    
+
     private var SubscriptionHandlering = false
     private let maxConcurrentTasks = 1 // work pool
     private var cancellables = Set<AnyCancellable>()
-    
+
     // sync from Subscription list
     public func sync() {
         if SubscriptionHandlering {
@@ -26,7 +26,7 @@ actor SubscriptionHandler {
         if list.count == 0 {
             logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
         }
-        
+
         // 开始执行异步任务
         syncTaskGroup(items: list)
     }
@@ -48,10 +48,10 @@ actor SubscriptionHandler {
             }
         }
     }
-    
+
     private func syncTaskGroup(items: [SubDTO]) {
         // 使用 Combine 处理多个异步任务
-        items.publisher.flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
+        items.publisher.flatMap(maxPublishers: .max(maxConcurrentTasks)) { item in
             Future<Void, Error> { promise in
                 Task {
                     do {
@@ -79,7 +79,7 @@ actor SubscriptionHandler {
 
     func refreshMenu() {
         logger.info("SubscriptionHandler refreshMenu")
-        self.SubscriptionHandlering = false
+        SubscriptionHandlering = false
         do {
             // refresh server
 //            menuController.showServers()
@@ -171,10 +171,9 @@ actor SubscriptionHandler {
 
     func importByNormal(strTmp: String, sub: SubDTO) {
         var list: [ProfileDTO] = []
-        let oldCount = getOldCount(sub: sub)
-
+        
+        // 文本按行拆分
         let lines = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
-        var count = 0
         for uri in lines {
             let filterUri = uri.trimmingCharacters(in: .whitespacesAndNewlines)
             // import every server
@@ -190,13 +189,54 @@ actor SubscriptionHandler {
             }
         }
 
-        logTip(title: "importByNormal: ", informativeText: "old=\(oldCount) - new=\(list.count)")
+        // 查询旧的
+        let olds = ProfileViewModel.getGroupProfiles(subid: sub.uuid)
 
-        // 删除旧的
-        ProfileViewModel.delete(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
+        // 组合旧的 unique key 集合
+        var oldMap = [String: ProfileDTO]()
+        for item in olds {
+            let key = item.uniqueKey()
+            oldMap[key] = item
+        }
+
+        var adds = [ProfileDTO]()
+        var dels = [ProfileDTO]()
+        var exists = Set<String>()
+
+        // 遍历新的列表
+        for item in list {
+            let key = item.uniqueKey()
+            if let old = oldMap[key] {
+                exists.insert(key)
+                // 更新旧的
+                ProfileViewModel.update_profile(oldDto:  old, newDto: item)
+                logTip(title: "update existing profile: ", informativeText: "\(sub.remark), \(item.remark), \(item.address):\(item.port)")
+            } else {
+                // 新增
+                logTip(title: "add new profile: ", informativeText: "\(sub.remark), \(item.remark), \(item.address):\(item.port)")
+                adds.append(item)
+            }
+        }
+
+        // 找出需要删除的（旧的但不在新的里）
+        for (key, item) in oldMap {
+            if !exists.contains(key) {
+                logTip(title: "delete old profile: ", informativeText: "\(sub.remark), \(sub.url) - \(item.remark), \(item.address):\(item.port)")
+                dels.append(item)
+            }
+        }
 
         // 插入新的
-        ProfileViewModel.insert_many(items: list)
+        if !adds.isEmpty {
+            ProfileViewModel.insert_many(items: adds)
+        }
+        
+        // 删除旧的
+        for del in dels {
+            ProfileViewModel.delete(uuid: del.uuid)
+        }
+        
+        logTip(title: "importByNormal: ", informativeText: "\(sub.remark), \(sub.url) added=\(adds.count), deleted=\(dels.count), exists=\(exists.count)")
     }
 
     func logTip(title: String = "", uri: String = "", informativeText: String = "") {

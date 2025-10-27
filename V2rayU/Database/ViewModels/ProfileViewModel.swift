@@ -93,7 +93,44 @@ class ProfileViewModel: ObservableObject {
 
         return sortedResult
     }
-
+    
+    // MARK: - 根据 subid 获取配置列表
+    static func getGroupProfiles(subid: String) -> [ProfileDTO] {
+        do {
+            let dbReader = AppDatabase.shared.reader
+            return try dbReader.read { db in
+                // 先取出结果（fetch）成数组，才能在 for-in 里使用。
+                var query = ProfileDTO.all()
+                query = query.filter(ProfileDTO.Columns.subid == subid)
+                return try query.fetchAll(db)
+            }
+        } catch {
+            logger.info("getList error: \(error)")
+            return []
+        }
+    }
+    
+    // 更新除 uuid 和 统计字段外的所有字段
+    static func update_profile(oldDto: ProfileDTO, newDto: ProfileDTO) {
+        do {
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                // 除了 uuid,speed 和 统计字段外，全部更新
+                var updatedDto = newDto
+                updatedDto.uuid = oldDto.uuid
+                updatedDto.speed = oldDto.speed
+                updatedDto.totalUp = oldDto.totalUp
+                updatedDto.totalDown = oldDto.totalDown
+                updatedDto.todayUp = oldDto.todayUp
+                updatedDto.todayDown = oldDto.todayDown
+                updatedDto.lastUpdate = oldDto.lastUpdate
+                try updatedDto.update(db)
+            }
+        } catch {
+            logger.info("save error: \(error)")
+        }
+    }
+    
     // filter: ["id": 1,"conlmn":"value"]
     static func count(filter: [String: (any DatabaseValueConvertible)?]?) -> Int {
         guard let filter = filter else { return 0 }
