@@ -25,8 +25,12 @@ let uiLogger = Logger(subsystem: "net.yanue.V2rayU", category: "ui")
 @main
 struct V2rayUApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
-        // 留空
+        // 必须设置 settings, 不然无法输入框复制粘贴
+        Settings {
+            EmptyView()
+        }
     }
 }
 
