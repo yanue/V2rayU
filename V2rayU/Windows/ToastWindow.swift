@@ -38,7 +38,7 @@ func alertDialog(title: String, message: String) {
 }
 
 @MainActor
-func showConfirmAlertSync(title: String, message: String, confirmTitle: String = "OK", cancelTitle: String = "Cancel") -> Bool {
+func showConfirmAlertSync(title: String, message: String, confirmTitle: String = String(localized: .OK), cancelTitle: String = String(localized: .Cancel)) -> Bool {
     let alert = NSAlert()
     if let icon = NSImage(named: "V2rayU") {
         alert.icon = icon

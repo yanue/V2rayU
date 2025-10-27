@@ -231,3 +231,21 @@
 "V2rayCoreProblem" = "v2ray-core 未安装或不可执行。";
 "Diagnostics" = "异常诊断";
 "QA" = "常见问题";
+
+"Delete" = "删除";
+"DeleteSelected" = "删除所选";
+"DeleteConfirm" = "确定要删除此项吗？";
+"DeleteConfirmSelected" = "确定要删除所选项目吗？";
+"DeleteTip" = "此操作无法撤销。";
+"OK" = "确定";
+"Add" = "添加";
+
+// table fields
+"TableFieldSort" = "排序";
+"TableFieldRemark" = "备注";
+"TableFieldUrl" = "订阅地址";
+"TableFieldInterval" = "更新间隔(秒)";
+"TableFieldUpdateTime" = "更新时间";
+
+"SyncAl" = "同步全部";
+

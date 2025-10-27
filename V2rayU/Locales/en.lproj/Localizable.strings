@@ -232,3 +232,22 @@
 "V2rayCoreProblem" = "v2ray-core is not installed or not executable.";
 "Diagnostics" = "Diagnostics";
 "QA" = "FAQ";
+"About" = "About";
+
+"Delete" = "Delete";
+"DeleteSelected" = "Delete Selected";
+"DeleteConfirm" = "Are you sure you want to delete this item?";
+"DeleteConfirmSelected" = "Are you sure you want to delete selected items?";
+"DeleteTip" = "This action cannot be undone.";
+"OK" = "OK";
+"Add" = "Add";
+
+// table fields
+"TableFieldSort" = "Sort";
+"TableFieldRemark" = "Remark";
+"TableFieldUrl" = "URL";
+"TableFieldInterval" = "Interval(s)";
+"TableFieldUpdateTime" = "Update Time";
+
+"SyncAl" = "Sync All";
+

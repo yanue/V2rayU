@@ -232,3 +232,21 @@
 "V2rayCoreProblem" = "v2ray-core 未安裝或不可執行。";
 "Diagnostics" = "異常診斷";
 "QA" = "常見問題";
+
+"Delete" = "刪除";
+"DeleteSelected" = "刪除所選";
+"DeleteConfirm" = "確定要刪除此項嗎？";
+"DeleteConfirmSelected" = "確定要刪除所選項目嗎？";
+"DeleteTip" = "此操作無法撤銷。";
+"OK" = "確定";
+"Add" = "添加";
+
+// table fields
+"TableFieldSort" = "排序";
+"TableFieldRemark" = "備註";
+"TableFieldUrl" = "訂閱網址";
+"TableFieldInterval" = "更新間隔(秒)";
+"TableFieldUpdateTime" = "更新時間";
+
+"SyncAl" = "同步全部";
+

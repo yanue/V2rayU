@@ -23,6 +23,13 @@ enum LanguageLabel: String, CaseIterable {
     case Remark
     case Edit
     case Preview
+    case Delete
+    case DeleteSelected
+    case DeleteConfirm
+    case DeleteConfirmSelected
+    case DeleteTip
+    case OK
+    case Add
     // profile share
     case Regenerate
     case Regenerated
@@ -225,5 +232,11 @@ enum LanguageLabel: String, CaseIterable {
     case V2rayCoreProblem
     case Diagnostics
     case QA
-    case Abount
+    // table fields
+    case TableFieldSort
+    case TableFieldRemark
+    case TableFieldUrl
+    case TableFieldInterval
+    case TableFieldUpdateTime
+    case SyncAll
 }

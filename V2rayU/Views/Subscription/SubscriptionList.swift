@@ -26,21 +26,21 @@ struct SubscriptionListView: View {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Subscriptions")
+                    Text(localizedString(.Subscriptions))
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("Manage your subscription list")
+                    Text(localizedString(.SubscriptionSubHead))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
 
                 Button(action: { withAnimation { self.selectedRow = SubModel(from: SubDTO()) } }) {
-                    Label("新增", systemImage: "plus")
+                    Label(localizedString(.Add), systemImage: "plus")
                 }
                 .buttonStyle(.bordered)
                 Button(action: {
-                    if showConfirmAlertSync(title: "Are you sure you want to delete the selected subscriptions?", message: "This action cannot be undone.") {
+                    if showConfirmAlertSync(title: localizedString(.DeleteConfirmSelected), message: localizedString(.DeleteTip)) {
                         withAnimation {
                             for selectedID in self.selection {
                                 viewModel.delete(uuid: selectedID)
@@ -49,13 +49,13 @@ struct SubscriptionListView: View {
                         }
                     }
                 }) {
-                    Label("删除", systemImage: "trash")
+                    Label(localizedString(.DeleteSelected), systemImage: "trash")
                 }
                 .disabled(selection.isEmpty)
                 .buttonStyle(.bordered)
 
                 Button(action: { syncingAll = true }) {
-                    Label("SyncAll", systemImage: "arrow.triangle.2.circlepath")
+                    Label(localizedString(.SyncAll), systemImage: "arrow.triangle.2.circlepath")
                 }
                 .disabled(viewModel.list.isEmpty)
                 .buttonStyle(.borderedProminent)
@@ -105,20 +105,25 @@ struct SubscriptionListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
-
     private func contextMenuProvider(item: SubDTO) -> some View {
         Group {
-            Button("Edit") {
+            Button {
                 self.selectedRow = SubModel(from: item)
+            } label: {
+                Text(localizedString(.Edit))
             }
-            Button("Sync") {
+            Button {
                 self.syncingRow = SubModel(from: item)
+            } label: {
+                Text(localizedString(.SyncSubscriptionNow))
             }
             Divider()
-            Button("Delete") {
-                if showConfirmAlertSync(title: "Are you sure you want to delete this subscription?", message: "This action cannot be undone.") {
+            Button {
+                if showConfirmAlertSync(title: localizedString(.DeleteConfirm), message: localizedString(.DeleteTip)) {
                     viewModel.delete(uuid: item.uuid)
                 }
+            } label: {
+                Text(localizedString(.Delete))
             }
         }
     }
@@ -135,13 +140,18 @@ struct SubscriptionListView: View {
             Table(of: SubDTO.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { (row: SubDTO) in
                     HStack(spacing: 4) {
-                        Image(systemName: "line.3.horizontal")
-
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
+                    }
+                }
+                .width(10)
+                
+                TableColumn(String(localized: .TableFieldSort)) { (row: SubDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal")
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
                     .draggable(row)              // 整个区域作为拖拽手柄
@@ -154,9 +164,9 @@ struct SubscriptionListView: View {
                         }
                     }
                 }
-                .width(40)
+                .width(20)
                 
-                TableColumn("Remark") { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldSort)) { (row: SubDTO) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -173,17 +183,17 @@ struct SubscriptionListView: View {
                 }
                 .width(min: 100,max: 200)
 
-                TableColumn("Url") { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldUrl)) { (row: SubDTO) in
                     Text(row.url)
                 }
                 .width(min: 200,max: 400)
 
-                TableColumn("Interval") { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldInterval)) { (row: SubDTO) in
                     Text("\(row.updateInterval)")
                 }
                 .width(100)
 
-                TableColumn("Updatetime") { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldUpdateTime)) { (row: SubDTO) in
                     Text("\(row.updateTime)")
                 }
                 .width(160)
