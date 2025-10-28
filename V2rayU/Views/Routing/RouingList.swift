@@ -33,20 +33,15 @@ struct RoutingListView: View {
                 }
                 Spacer()
                 Button(action: { withAnimation {
-                    let newProxy = RoutingModel(from: RoutingDTO(name: "newRouting", remark: "newRouting"))
+                    let newProxy = RoutingModel(from: RoutingDTO())
                     self.selectedRow = newProxy
                 } }) {
-                    Label("新增", systemImage: "plus")
+                    Label(String(localized: .Add), systemImage: "plus")
                 }
                 .buttonStyle(.bordered)
+
                 Button(action: {
-                    let alert = NSAlert()
-                    alert.messageText = "Are you sure you want to delete the selected routings?"
-                    alert.informativeText = "This action cannot be undone."
-                    alert.alertStyle = .warning
-                    alert.addButton(withTitle: "Delete")
-                    alert.addButton(withTitle: "Cancel")
-                    if alert.runModal() == .alertFirstButtonReturn {
+                    if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
                         withAnimation {
                             for selectedID in self.selection {
                                 viewModel.delete(uuid: selectedID)
@@ -55,12 +50,13 @@ struct RoutingListView: View {
                         }
                     }
                 }) {
-                    Label("删除", systemImage: "trash")
+                    Label(String(localized: .Delete), systemImage: "trash")
                 }
                 .disabled(selection.isEmpty)
                 .buttonStyle(.bordered)
+
                 Button(action: { withAnimation { loadData() } }) {
-                    Label("刷新", systemImage: "arrow.clockwise")
+                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
             }
@@ -104,13 +100,13 @@ struct RoutingListView: View {
     
     private func contextMenuProvider(item: RoutingDTO) -> some View {
         Group {
-            Button("Edit") {
+            Button(String(localized: .Edit)) {
                 self.selectedRow = RoutingModel(from: item)
             }
 
             Divider()
-            Button("Delete") {
-                if showConfirmAlertSync(title: "Are you sure you want to delete this subscription?", message: "This action cannot be undone.") {
+            Button(String(localized: .Delete)) {
+                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
                     viewModel.delete(uuid: item.uuid)
                 }
             }
@@ -129,13 +125,18 @@ struct RoutingListView: View {
             Table(of: RoutingDTO.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { (row: RoutingDTO) in
                     HStack(spacing: 4) {
-                        Image(systemName: "line.3.horizontal")
-
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
+                    }
+                }
+                .width(20)
+
+                TableColumn("#") { (row: RoutingDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal")
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
                     .draggable(row)              // 整个区域作为拖拽手柄
@@ -148,9 +149,9 @@ struct RoutingListView: View {
                         }
                     }
                 }
-                .width(40)
-                
-                TableColumn("Remark") { (row: RoutingDTO) in
+                .width(20)
+
+                TableColumn(String(localized: .TableFieldRemark)) { (row: RoutingDTO) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -168,22 +169,22 @@ struct RoutingListView: View {
                 .width(min: 200,max: 400)
 
                 
-                TableColumn("domainStrategy") { row in
+                TableColumn(String(localized: .TableFieldDomainStrategy)) { row in
                     Text(row.domainStrategy)
                 }
                 .width(min: 90,max: 200)
 
-                TableColumn("direct") { row in
+                TableColumn(String(localized: .TableFieldDirect)) { row in
                     Text(row.direct)
                 }
                 .width(min: 100,max: 200)
 
-                TableColumn("block") { row in
+                TableColumn(String(localized: .TableFieldBlock)) { row in
                     Text(row.block)
                 }
                 .width(min: 100,max: 200)
 
-                TableColumn("proxy") { row in
+                TableColumn(String(localized: .TableFieldProxy)) { row in
                     Text(row.proxy)
                 }
                 .width(min: 100,max: 200)

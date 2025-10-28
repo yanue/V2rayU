@@ -34,12 +34,8 @@ actor LocalHttpServer {
         logger.info("pacPort: \(pacPort)")
 
         if isPortOpen(pacPort) {
-            var toast = "pac port \(pacPort) has been used, please replace from advance setting"
-            var title = "Port is already in use"
-            if isMainland {
-                toast = "pac端口 \(pacPort) 已被使用, 请更换"
-                title = "端口已被占用"
-            }
+            var title = String(localized: .PortInUse)
+            var toast = + "\(pacPort) " + String(localized: .PortInUseTip)
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 showDock(state: true)

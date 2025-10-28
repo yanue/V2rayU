@@ -11,6 +11,7 @@ struct AboutView: View {
     @State private var appVersion = getAppVersion()
     @State private var appBuild = getAppBuild()
     @State private var coreVersion = getCoreVersion()
+    @State private var year = Calendar.current.component(.year, from: Date())
 
     // 相关文件路径列表
     private var fileLocations: [String] {
@@ -46,7 +47,7 @@ struct AboutView: View {
                         .font(.title)
                         .fontWeight(.bold)
                     HStack {
-                        Text("Version \(appVersion) (Build \(appBuild))")
+                        Text("\(String(localized: .Version)) \(appVersion) (\(String(localized: .Build)) \(appBuild))")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Text("\(coreVersion)")
@@ -58,7 +59,7 @@ struct AboutView: View {
             Divider()
 
             HStack(spacing: 20) {
-                Text("V2rayU is a macOS GUI client for Xray-Core. Supports Vmess, Vless, Trojan, Shadowsocks, and more protocols.")
+                Text(String(localized: .AboutSubHead))
                     .font(.body)
                     .foregroundColor(.primary)
             }
@@ -66,9 +67,9 @@ struct AboutView: View {
             // 开源地址
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("开源地址")
+                    Text(String(localized: .OpenSourceProject))
                         .font(.headline)
-                    Text("(遵循 GNU GPL v3.0 许可协议)")
+                    Text("(\(String(localized: .OpenSourceLicense))")
                         .font(.caption)
                     Spacer()
                 }
@@ -80,13 +81,13 @@ struct AboutView: View {
                             .foregroundColor(.blue)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .help("在浏览器中打开")
+                    .help(String(localized: .OpenInBrowser))
                     .font(.callout)
                     .underline()
 
                     Spacer()
 
-                    Link("问题反馈", destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
+                    Link(String(localized: .GithubIssues), destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
                         .foregroundColor(.blue)
                 }
             }
@@ -94,9 +95,9 @@ struct AboutView: View {
             // 相关文件位置
             VStack(alignment: .leading) {
                 HStack {
-                    Text("相关文件位置")
+                    Text(String(localized: .RelatedFileLocations))
                         .font(.headline)
-                    Text("(点击路径可在 Finder 打开)")
+                    Text("(\(String(localized: .ClickAndOpenInFinder)))")
                         .font(.caption)
                     Spacer()
                 }
@@ -111,7 +112,7 @@ struct AboutView: View {
                             }
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .help("在 Finder 中打开")
+                        .help(String(localized: .OpenInFinder))
                         .font(.callout)
                         .underline()
                     }
@@ -121,9 +122,9 @@ struct AboutView: View {
             // 开源库引用
             VStack(alignment: .leading) {
                 HStack {
-                    Text("引用开源库")
+                    Text(String(localized: .OpenSourceLibraries))
                         .font(.headline)
-                    Text("(有用到且不限于以下)")
+                    Text("(\(String(localized: .UsedButNotLimitedTo)))")
                         .font(.caption)
                     Spacer()
                 }
@@ -136,7 +137,7 @@ struct AboutView: View {
                                 .foregroundColor(.blue)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .help("在浏览器中打开")
+                        .help(String(localized: .OpenInBrowser))
                         .font(.callout)
                         .underline()
                     }
@@ -145,7 +146,7 @@ struct AboutView: View {
 
             // 版权信息
             HStack {
-                Text("Copyright © 2018-2025 yanue")
+                Text("Copyright © 2018-\(year) yanue")
                     .font(.subheadline)
                 Text("All rights reserved.")
                     .font(.subheadline)

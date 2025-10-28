@@ -1,3 +1,6 @@
+/* Multi-language localization LanguageLabel.strings (English) */
+
+// MARK: - Language & Theme
 "English" = "English";
 "Simplified Chinese" = "Simplified Chinese";
 "Traditional Chinese" = "Traditional Chinese";
@@ -7,7 +10,7 @@
 "Dark" = "Dark";
 "FollowSystem" = "Follow System";
 
-// base
+// MARK: - Base operations
 "Save" = "Save";
 "Confirm" = "Confirm";
 "Cancel" = "Cancel";
@@ -16,20 +19,32 @@
 "Remark" = "Remark";
 "Edit" = "Edit";
 "Preview" = "Preview";
+"Delete" = "Delete";
+"DeleteSelected" = "Delete Selected";
+"DeleteConfirm" = "Are you sure you want to delete this item?";
+"DeleteSelectedConfirm" = "Are you sure you want to delete the selected items?";
+"DeleteTip" = "This action cannot be undone.";
+"OK" = "OK";
+"Add" = "Add";
+"Export" = "Export";
+"Select" = "Select";
+"Duplicate" = "Duplicate";
 "Copy" = "Copy";
 "Copied" = "Copied";
+"CopyFailed" = "Copy Failed";
+"Regenerate" = "Regenerate";
 "Regenerated" = "Regenerated";
-"Regenerate" = "Regenerated";
 "Generate" = "Generate";
 "Generated" = "Generated";
+"ShareProfile" = "Share Profile";
 
-// app content
+// MARK: - App Content
 "Activity" = "Activity";
-"ActivitySubHead" = "View recent activities and logs";
+"ActivitySubHead" = "View recent activity and logs";
 "Servers" = "Servers";
-"ServerSubHead" = "Manage and configure your servers";
+"ServerSubHead" = "Manage and configure servers";
 "Subscriptions" = "Subscriptions";
-"SubscriptionSubHead" = "Manage your subscription sources";
+"SubscriptionSubHead" = "Manage subscription sources";
 "Routings" = "Routings";
 "RoutingSubHead" = "Match priority: Domain Block -> Domain Proxy -> Domain Direct -> IP Block -> IP Proxy -> IP Direct";
 "Settings" = "Settings";
@@ -37,26 +52,26 @@
 "About" = "About";
 "AboutSubHead" = "About this application";
 
-// settings tab
+// MARK: - Settings Tabs
 "General" = "General";
 "Advanced" = "Advanced";
 "PAC" = "PAC";
 "DNS" = "DNS";
 "Core" = "Core";
 
-// general settings
+// MARK: - General Settings
 "LaunchAtLogin" = "Launch at login";
-"CheckForUpdateAutomatically" = "Check for update automatically";
-"AutoUpdateServersFromSubscriptions" = "Auto-update servers from subscriptions";
-"AutomaticallySelectFastestServer" = "Automatically select fastest server";
+"CheckForUpdateAutomatically" = "Check for updates automatically";
+"AutoUpdateServersFromSubscriptions" = "Auto update servers from subscriptions";
+"AutomaticallySelectFastestServer" = "Auto-select the fastest server";
 "ShowProxySpeedOnTrayIcon" = "Show proxy speed on tray icon";
-"ShowLatencyOnTrayIcon" = "Show ping latency on tray icon";
+"ShowLatencyOnTrayIcon" = "Show latency on tray icon";
 "EnableProxyStatistics" = "Enable proxy statistics";
-"KeyboardShortcuts" = "Shortcuts";
-"ToggleV2rayOnOff" = "Toggle V2ray On/Off";
+"KeyboardShortcuts" = "Keyboard Shortcuts";
+"ToggleV2rayOnOff" = "Toggle V2Ray On/Off";
 "SwitchProxyMode" = "Switch Proxy Mode";
 
-// advanced settings
+// MARK: - Advanced Settings
 "LocalSocksListenPort" = "Local SOCKS listen port";
 "EnableUDP" = "Enable UDP";
 "LocalHttpListenPort" = "Local HTTP listen port";
@@ -68,14 +83,14 @@
 "EnableTrafficStatistics" = "Enable traffic statistics";
 "V2rayCoreLogLevel" = "V2Ray core log level";
 
-// pac settings
+// MARK: - PAC Settings
 "PacSettings" = "PAC Settings";
 "ConfigureProxyRules" = "Configure proxy rules";
 "GFWListDownloadURL" = "GFWList download URL";
 "EnterGFWListURL" = "Enter GFWList URL";
-"CustomRules" = "Custom rules";
-"AddCustomRules" = "Add custom rules";
-"ViewPACFile" = "View PAC file";
+"CustomRules" = "Custom Rules";
+"AddCustomRules" = "Add Custom Rules";
+"ViewPACFile" = "View PAC File";
 "UpdatePAC" = "Update PAC";
 "PACUpdatedByUserRules" = "PAC updated by user rules";
 "PACUpdateFailed" = "PAC update failed";
@@ -83,45 +98,74 @@
 "FailedToDownloadGFWList" = "Failed to download GFWList";
 "FailedToWriteGFWList" = "Failed to write GFWList";
 "FailedToUpdatePAC" = "Failed to update PAC";
-"UpdatingPACRules" = "Updating PAC rules";
+"UpdatingPACRules" = "Updating PAC rules...";
 "PACUpdateError" = "PAC update error";
 "PACUpdateSuccess" = "PAC update success";
 "PACUpdateNotification" = "PAC update notification";
 
-// dns settings
+// MARK: - PAC Notifications & Errors
+"UpdatingPacRules" = "Updating PAC rules...";
+"PacUpdatedByUserRules" = "PAC has been updated by User Rules.";
+"PacUpdateFailedByUserRules" = "Failed to update PAC via User Rules.";
+"UpdatePacError" = "updatePac error: %@";
+"InvalidGfwUrl" = "Failed to download GFW List: URL is invalid.";
+"GfwListDownloadFailed" = "Failed to download the latest GFW List.";
+"GfwListDownloadError" = "Failed to download GFW List: %@";
+"GfwListWriteFailed" = "Failed to write the GFW List.";
+"GfwListUpdated" = "GFW List has been updated.";
+"PacUpdatedByGfwList" = "PAC has been updated by the latest GFW List.";
+"PacUpdateFailedByCurl" = "Failed to update PAC via curl method.";
+
+// MARK: - DNS Settings
 "DnsConfiguration" = "DNS Configuration";
-"DnsJsonFormatTip" = "Tip: Use JSON format for DNS configuration";
-"ViewConfiguration" = "View configuration";
+"DnsJsonFormatTip" = "Tip: Use JSON format for DNS configuration.";
+"ViewConfiguration" = "View Configuration";
 "Help" = "Help";
 "Notification" = "Notification";
+"DnsInvalidUTF8" = "Error: Input cannot be encoded as UTF-8.";
+"DnsJSONFormatError" = "Error: Invalid JSON format - %@";
+"DnsFormatEncodingFail" = "Error: Formatted content cannot be encoded to string.";
+"DnsSaveSuccess" = "DNS configuration saved successfully.";
+"DnsSaveFail" = "Error: Failed to save DNS configuration - %@";
 
-// subscription form
-"SubscriptionSettings" = "Subscription settings";
+// MARK: - Subscription Settings
+"SubscriptionSettings" = "Subscription Settings";
 "SubscriptionSettingsSubHead" = "Manage subscription details";
 "SubscriptionUrl" = "Subscription URL";
 "sort" = "Sort";
-"updateInterval" = "Update interval";
-"AddSubscription" = "Add subscription";
-"EditSubscription" = "Edit subscription";
-"SyncAllSubscriptionTitle" = "Sync all subscriptions";
-"SyncSubscriptionTitle" = "Sync subscription";
-"SyncAllSubscriptionTip" = "Synchronize all subscriptions now";
+"updateInterval" = "Update Interval";
+"AddSubscription" = "Add Subscription";
+"EditSubscription" = "Edit Subscription";
+"SyncAllSubscriptionTitle" = "Sync All Subscriptions";
+"SyncSubscriptionTitle" = "Sync Subscription";
+"SyncAllSubscriptionTip" = "Sync all subscriptions now";
 "SyncSubscriptionNow" = "Sync subscription now";
-"SyncSubscriptionIng" = "Synchronizing subscription...";
+"SyncSubscriptionIng" = "Syncing subscriptions...";
 
-// routing settings
-"RoutingSettings" = "Routing settings";
+// MARK: - Routing Settings
+"RoutingSettings" = "Routing Settings";
 "RoutingSettingsSubHead" = "Manage routing rules";
-"AddRoutingRule" = "Add routing rule";
-"EditRoutingRule" = "Edit routing rule";
-"domainStrategy" = "Domain strategy";
-"domainMatcher" = "Domain matcher";
+"AddRoutingRule" = "Add Routing Rule";
+"EditRoutingRule" = "Edit Routing Rule";
+"domainStrategy" = "Domain Strategy";
+"domainMatcher" = "Domain Matcher";
 "Direct" = "Direct";
 "Proxy" = "Proxy";
 "Block" = "Block";
 
-// profile settings
-"ProfileSettings" = "Profile settings";
+// MARK: - Custom Rules Guide
+"CustomRuleGuideTitle" = "Guide for Custom Rules";
+"CustomRuleGuideDescription" = "Each line is a rule: domain, IP, or predefined list.";
+"CustomRulePriorityDescription" = "Priority: Domain Block -> Domain Proxy -> Domain Direct -> IP Block -> IP Proxy -> IP Direct.";
+"CustomRuleDomainIntro" = "• Domain:";
+"CustomRuleDomainExample" = "e.g., example.com, *.google.com";
+"CustomRuleIPIntro" = "• IP:";
+"CustomRuleIPExample" = "e.g., 8.8.8.8, 192.168.0.0/16";
+"CustomRulePredefinedIntro" = "• Predefined:";
+"CustomRulePredefinedExample" = "e.g., geoip:private, geosite:cn, localhost";
+
+// MARK: - Profile Settings
+"ProfileSettings" = "Profile Settings";
 "ProfileSettingsSubHead" = "Manage profile details";
 "Protocol" = "Protocol";
 "Address" = "Address";
@@ -134,120 +178,160 @@
 "Security" = "Security";
 "Encryption" = "Encryption";
 "Network" = "Network";
-"HeaderType" = "Header type";
-"HttpHost" = "HTTP host";
-"HttpPath" = "HTTP path";
-"WsHost" = "WebSocket host";
-"WsPath" = "WebSocket path";
-"DsPath" = "DS path";
-"WsHeaders" = "WebSocket headers";
+"HeaderType" = "Header Type";
+"HttpHost" = "HTTP Host";
+"HttpPath" = "HTTP Path";
+"WsHost" = "WebSocket Host";
+"WsPath" = "WebSocket Path";
+"DsPath" = "DS Path";
+"WsHeaders" = "WebSocket Headers";
 "Flow" = "Flow";
 "TcpFastOpen" = "TCP Fast Open";
 "EnableTls" = "Enable TLS";
-"SkipCertVerify" = "Skip certificate verification";
-"TlsSettings" = "TLS settings";
-"XtlsSettings" = "XTLS settings";
-"RealitySettings" = "REALITY settings";
-"ServerName" = "Server name";
+"SkipCertVerify" = "Skip Certificate Verification";
+"TlsSettings" = "TLS Settings";
+"XtlsSettings" = "XTLS Settings";
+"RealitySettings" = "REALITY Settings";
+"ServerName" = "Server Name";
 "Key" = "Key";
 "Seed" = "Seed";
-"Congestion" = "Congestion";
+"Congestion" = "Congestion Control";
 "MTU" = "MTU";
 "TTI" = "TTI";
-"UplinkCapacity" = "Uplink capacity";
-"DownloadCapacity" = "Download capacity";
-"xhttpPath" = "XHTTP path";
-"xhttpHost" = "XHTTP host";
-"AllowInsecure" = "Allow insecure";
-"ProfileRemark" = "Profile remark";
+"UplinkCapacity" = "Uplink Capacity";
+"DownloadCapacity" = "Download Capacity";
+"xhttpPath" = "XHTTP Path";
+"xhttpHost" = "XHTTP Host";
+"AllowInsecure" = "Allow Insecure Connections";
+"ProfileRemark" = "Profile Remark";
 "Sni" = "SNI";
 "Fingerprint" = "Fingerprint";
-"PublicKey" = "Public key";
+"PublicKey" = "Public Key";
 "ShortID" = "Short ID";
 "SpiderX" = "SpiderX";
 "Alpn" = "ALPN";
-"TransportSettings" = "Transport settings";
-"ServerSettings" = "Server settings";
-"StreamSettings" = "Stream settings";
+"TransportSettings" = "Transport Settings";
+"ServerSettings" = "Server Settings";
+"StreamSettings" = "Stream Settings";
 
-// app menu
-"CoreOn" = "xray-core: On";
-"CoreOff" = "xray-core: off";
-"TurnCoreOn" = "Turn xray-core On";
-"TurnCoreOff" = "Turn xray-core Off";
-"ViewLog" = "View xray-core Log";
-"ViewConfigJson" = "View Config JSON";
-"ViewPacFile" = "View PAC File";
+// MARK: - Menu Operations
+"CoreOn" = "xray-core: Running";
+"CoreOff" = "xray-core: Stopped";
+"TurnCoreOn" = "Start xray-core";
+"TurnCoreOff" = "Stop xray-core";
+"ViewLog" = "View xray-core log";
+"ViewConfigJson" = "View config.json";
+"ViewPacFile" = "View PAC file";
 "PacMode" = "PAC Mode";
 "GlobalMode" = "Global Mode";
 "ManualMode" = "Manual Mode";
-"Global.tip" = "system proxies (settings->Network->WIFI->Detail->Proxies->HTTP,HTTPS,SOCKS Proxy)";
-"Pac.tip" = "auto proxy config (settings->Network->WIFI->Detail->Proxies->Automatic Proxy Configuration)";
-"Manual.tip" = "do not set system proxy, you need to set proxy manually in application";
-"RoutingList" = "choose routing";
-"ServerList" = "choose server";
-"goServerSettings" = "Server Settings ...";
-"goSubscriptionSettings" = "Subscription Settings ...";
-"goRoutingSettings" = "Routing Settings ...";
-"Ping" = "Ping";
+"RoutingList" = "Select Routing";
+"ServerList" = "Select Server";
+"goSubscriptionSettings" = "Subscription Settings...";
+"goRoutingSettings" = "Routing Settings...";
+"goServerSettings" = "Server Settings...";
+"goPreferences" = "Preferences...";
+"Ping" = "Ping Test";
 "Testing" = "Testing";
-"ImportServersFromClipboard" = "Import Servers from Clipboard";
-"ScanQRCodeFromScreen" = "Scan QR Code from Screen";
+"ImportServersFromClipboard" = "Import servers from clipboard";
+"ScanQRCodeFromScreen" = "Scan QR code from screen";
 "ShareQrCode" = "Share QR Code";
-"CopyHttpProxyShellExportLine" = "Copy HTTP Proxy Shell Export Line";
-"goPreferences" = "Preferences ...";
+"CopyHttpProxyShellExportLine" = "Copy HTTP proxy shell export line";
 "CheckForUpdates" = "Check for Updates";
 "Quit" = "Quit";
 "On" = "On";
 "Off" = "Off";
 
-// help view
-"HelpPageTitle" = "Help & Troubleshooting";
-"HelpPageSubHead" = "Common issues and solutions, diagnostics";
-"GithubIssues" = "Github Issues";
+// MARK: - Help View
+"HelpPageTitle" = "Diagnostics & Help";
+"HelpPageSubHead" = "Check core components and fix common problems";
+"GithubIssues" = "Feedback / Issues";
 "Refresh" = "Refresh";
-"V2rayCoreSwitchStatus" = "V2Ray core switch status";
-"V2rayCoreRunningStatus" = "V2Ray core running status (launchd)";
-"BackgroundActivity" = "Background Activity (App Background Activity)";
-"BackgroundActivitySubtitleRunning" = "Core process running";
-"BackgroundActivitySubtitleNotRunning" = "Core process not running";
+"V2rayCoreSwitchStatus" = "v2ray-core Switch Status";
+"V2rayCoreRunningStatus" = "v2ray-core Running State (launchd)";
+"BackgroundActivity" = "Background Activity";
+"BackgroundActivitySubtitleRunning" = "Core process is running";
+"BackgroundActivitySubtitleNotRunning" = "Core process is not running";
 "OpenSettings" = "Open Settings";
 "Restart" = "Restart";
-"PingState" = "ping state";
-"RunPingNow" = "Ping Now";
-"V2rayCoreInstallAndVersion" = "V2Ray core install & version";
+"PingState" = "Ping State";
+"RunPingNow" = "Run Ping";
+"V2rayCoreInstallAndVersion" = "v2ray-core Installation & Version";
 "V2rayUToolPermission" = "V2rayUTool Permission";
-"GeoipFile" = "geoip.dat file";
+"GeoipFile" = "geoip.dat File";
 "Installed" = "Installed";
 "Missing" = "Missing";
-"PermissionException" = "root:admin";
+"PermissionException" = "Permission Exception";
 "V2rayCoreNotInstalled" = "v2ray-core is not installed or not executable.";
-"UnableToOpenSystemSettings" = "Unable to open System Settings";
-"PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity and allow V2rayU to run in background.";
+"UnableToOpenSystemSettings" = "Unable to open system settings.";
+"PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity, and allow V2rayU to run in background.";
 "Fix" = "Fix";
-"PingProblem" = "Current node unreachable or network error.";
-"V2rayUToolProblem" = "V2rayUTool permission issue, some features may not work.";
-"BackgroundProblem" = "App is not running in background; it may be restricted by system or core process stopped.";
-"GeoipProblem" = "geoip.dat is missing; some routing or IP classification rules may fail.";
+"PingProblem" = "Current node unavailable or network issue.";
+"V2rayUToolProblem" = "V2rayUTool permission issue. The core may fail to start.";
+"BackgroundProblem" = "App is not running in background; might be limited by system or core process stopped.";
+"GeoipProblem" = "geoip.dat is missing, which may cause some functions to fail.";
 "V2rayCoreProblem" = "v2ray-core is not installed or not executable.";
 "Diagnostics" = "Diagnostics";
 "QA" = "FAQ";
-"About" = "About";
 
-"Delete" = "Delete";
-"DeleteSelected" = "Delete Selected";
-"DeleteConfirm" = "Are you sure you want to delete this item?";
-"DeleteConfirmSelected" = "Are you sure you want to delete selected items?";
-"DeleteTip" = "This action cannot be undone.";
-"OK" = "OK";
-"Add" = "Add";
-
-// table fields
+// MARK: - Table Fields
 "TableFieldSort" = "Sort";
 "TableFieldRemark" = "Remark";
-"TableFieldUrl" = "URL";
-"TableFieldInterval" = "Interval(s)";
+"TableFieldUrl" = "Subscription URL";
+"TableFieldInterval" = "Update Interval (s)";
 "TableFieldUpdateTime" = "Update Time";
+"TableFieldType" = "Type";
+"TableFieldAddress" = "Address";
+"TableFieldPort" = "Port";
+"TableFieldLatency" = "Latency";
+"TableFieldNetwork" = "Network";
+"TableFieldSecurity" = "Security";
+"TableFieldTodayDown" = "Today's Download";
+"TableFieldTodayUp" = "Today's Upload";
+"TableFieldTotalDown" = "Total Download";
+"TableFieldTotalUp" = "Total Upload";
+"TableFieldDomainStrategy" = "Domain Strategy";
+"TableFieldDirect" = "Direct";
+"TableFieldBlock" = "Block";
+"TableFieldProxy" = "Proxy";
+"SyncAll" = "Sync All";
+"SearchTip" = "Search";
+"AllGroup" = "All Groups";
+"SelectGroup" = "Select Group";
+"SelectAll" = "Select All";
+"CopyURI" = "Copy URI";
+"MoveToTop" = "Move to Top";
+"MoveToBottom" = "Move to Bottom";
+"MoveUp" = "Move Up";
+"MoveDown" = "Move Down";
 
-"SyncAl" = "Sync All";
+// MARK: - About Page
+"Version" = "Version";
+"Build" = "Build";
+"CoreVersion" = "Core Version";
+"RelatedFileLocations" = "Related File Locations";
+"ClickAndOpenInFinder" = "Click path to open in Finder";
+"OpenInFinder" = "Open in Finder";
+"OpenSourceProject" = "Open Source Project";
+"OpenSourceLicense" = "Under GNU GPL v3.0 License";
+"OpenSourceLibraries" = "Open Source Libraries";
+"UsedButNotLimitedTo" = "Used but not limited to:";
+"OpenInBrowser" = "Open in Browser";
 
+// MARK: - Core Update Management
+"CoreSettingsTitle" = "Core Settings";
+"CoreSettingsSubtitle" = "Manage your core versions";
+"CheckLatestVersion" = "Check Latest Version";
+"LocalCoreDirectory" = "Local Xray Core Directory";
+"FileDirectory" = "File Directory:";
+"LocalCoreVersionDetail" = "Local Xray Core Version Detail";
+"GithubLatestVersion" = "GitHub Latest Version";
+"DownloadAndReplace" = "Download and Replace";
+"Downloading" = "Downloading:";
+"DownloadedStatus" = "Downloaded: %@ / Total: %@";
+"CancelDownload" = "Cancel Download";
+"DownloadHint" = "Download Hint";
+"DownloadCanceled" = "Download Canceled";
+"DownloadURLInvalid" = "Invalid download URL: %@";
+"ReplaceSuccess" = "Replace Successful!";
+"OperationFailed" = "Operation Failed: %@";

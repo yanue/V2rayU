@@ -1,28 +1,44 @@
+/* 多語系本地化 LanguageLabel.strings (繁體中文) */
+
+// MARK: - 語言與主題
 "English" = "English";
-"Simplified Chinese" = "简体中文";
+"Simplified Chinese" = "簡體中文";
 "Traditional Chinese" = "繁體中文";
 "Language" = "語言";
-"Theme" = "Theme";
+"Theme" = "主題";
 "Light" = "淺色";
 "Dark" = "深色";
 "FollowSystem" = "跟隨系統";
 
-// base
+// MARK: - 基本操作
 "Save" = "儲存";
 "Confirm" = "確認";
 "Cancel" = "取消";
 "Close" = "關閉";
-"Reset" = "重置";
+"Reset" = "重設";
 "Remark" = "備註";
 "Edit" = "編輯";
 "Preview" = "預覽";
-"Copy" = "复制";
-"Copied" = "已复制";
-"Regenerated" = "已重新生成";
+"Delete" = "刪除";
+"DeleteSelected" = "刪除所選";
+"DeleteConfirm" = "確定要刪除此項嗎？";
+"DeleteSelectedConfirm" = "確定要刪除所選項目嗎？";
+"DeleteTip" = "此操作無法復原。";
+"OK" = "確定";
+"Add" = "新增";
+"Export" = "匯出";
+"Select" = "選擇";
+"Duplicate" = "建立副本";
+"Copy" = "複製";
+"Copied" = "已複製";
+"CopyFailed" = "複製失敗";
 "Regenerate" = "重新生成";
+"Regenerated" = "已重新生成";
 "Generate" = "生成";
 "Generated" = "已生成";
-// app content
+"ShareProfile" = "分享設定檔";
+
+// MARK: - App 內容
 "Activity" = "活動";
 "ActivitySubHead" = "檢視最近活動與日誌";
 "Servers" = "伺服器";
@@ -30,32 +46,32 @@
 "Subscriptions" = "訂閱";
 "SubscriptionSubHead" = "管理訂閱來源";
 "Routings" = "路由";
-"RoutingSubHead" = "匹配優先級: 網域阻斷 -> 網域代理 -> 網域直連 -> IP 阻斷 -> IP 代理 -> IP 直連";
+"RoutingSubHead" = "比對優先順序: 網域封鎖 -> 網域代理 -> 網域直連 -> IP封鎖 -> IP代理 -> IP直連";
 "Settings" = "設定";
-"SettingsSubHead" = "一般應用程式設定";
+"SettingsSubHead" = "一般應用設定";
 "About" = "關於";
 "AboutSubHead" = "關於此應用程式";
 
-// settings tab
-"General" = "通用設定";
-"Advanced" = "高級設定";
-"PAC" = "PAC設定";
-"DNS" = "DNS設定";
-"Core" = "Core設定";
+// MARK: - 設定分頁
+"General" = "一般設定";
+"Advanced" = "進階設定";
+"PAC" = "PAC 設定";
+"DNS" = "DNS 設定";
+"Core" = "核心管理";
 
-// general settings
-"LaunchAtLogin" = "開機啟動";
+// MARK: - 一般設定
+"LaunchAtLogin" = "自動開機啟動";
 "CheckForUpdateAutomatically" = "自動檢查更新";
 "AutoUpdateServersFromSubscriptions" = "自動從訂閱更新伺服器";
 "AutomaticallySelectFastestServer" = "自動選擇最快伺服器";
-"ShowProxySpeedOnTrayIcon" = "系統匣圖示顯示代理速度";
-"ShowLatencyOnTrayIcon" = "系統匣圖示顯示 Ping 值";
+"ShowProxySpeedOnTrayIcon" = "托盤圖示顯示代理速度";
+"ShowLatencyOnTrayIcon" = "托盤圖示顯示延遲值";
 "EnableProxyStatistics" = "啟用代理統計";
 "KeyboardShortcuts" = "快捷鍵";
-"ToggleV2rayOnOff" = "切換 V2ray 開關";
+"ToggleV2rayOnOff" = "切換 V2Ray 開關";
 "SwitchProxyMode" = "切換代理模式";
 
-// advanced settings
+// MARK: - 進階設定
 "LocalSocksListenPort" = "本地 SOCKS 監聽埠";
 "EnableUDP" = "啟用 UDP";
 "LocalHttpListenPort" = "本地 HTTP 監聽埠";
@@ -67,14 +83,14 @@
 "EnableTrafficStatistics" = "啟用流量統計";
 "V2rayCoreLogLevel" = "V2Ray 核心日誌等級";
 
-// pac settings
+// MARK: - PAC 設定
 "PacSettings" = "PAC 設定";
 "ConfigureProxyRules" = "設定代理規則";
 "GFWListDownloadURL" = "GFWList 下載網址";
 "EnterGFWListURL" = "輸入 GFWList 網址";
 "CustomRules" = "自訂規則";
 "AddCustomRules" = "新增自訂規則";
-"ViewPACFile" = "檢視 PAC 檔案";
+"ViewPACFile" = "查看 PAC 檔案";
 "UpdatePAC" = "更新 PAC";
 "PACUpdatedByUserRules" = "PAC 已由使用者規則更新";
 "PACUpdateFailed" = "PAC 更新失敗";
@@ -87,14 +103,32 @@
 "PACUpdateSuccess" = "PAC 更新成功";
 "PACUpdateNotification" = "PAC 更新通知";
 
-// dns settings
+// MARK: - PAC 提示與錯誤
+"UpdatingPacRules" = "正在更新 PAC 規則...";
+"PacUpdatedByUserRules" = "PAC 已由使用者規則更新。";
+"PacUpdateFailedByUserRules" = "由使用者規則更新 PAC 失敗。";
+"UpdatePacError" = "更新 PAC 錯誤: %@";
+"InvalidGfwUrl" = "下載 GFWList 失敗：網址無效。";
+"GfwListDownloadFailed" = "下載最新 GFWList 失敗。";
+"GfwListDownloadError" = "下載 GFWList 發生錯誤: %@";
+"GfwListWriteFailed" = "寫入 GFWList 失敗。";
+"GfwListUpdated" = "GFWList 已更新。";
+"PacUpdatedByGfwList" = "PAC 已由最新 GFWList 更新。";
+"PacUpdateFailedByCurl" = "使用 curl 方法更新 PAC 失敗。";
+
+// MARK: - DNS 設定
 "DnsConfiguration" = "DNS 設定";
-"DnsJsonFormatTip" = "提示: 使用 JSON 格式進行 DNS 設定";
-"ViewConfiguration" = "檢視設定";
+"DnsJsonFormatTip" = "提示：使用 JSON 格式進行 DNS 設定。";
+"ViewConfiguration" = "查看設定";
 "Help" = "幫助";
 "Notification" = "通知";
+"DnsInvalidUTF8" = "錯誤：輸入內容無法編碼為 UTF-8";
+"DnsJSONFormatError" = "錯誤：JSON 格式錯誤 - %@";
+"DnsFormatEncodingFail" = "錯誤：格式化後內容無法編碼為字串";
+"DnsSaveSuccess" = "DNS 設定已成功儲存";
+"DnsSaveFail" = "錯誤：儲存 DNS 設定失敗 - %@";
 
-// subscription form
+// MARK: - 訂閱設定
 "SubscriptionSettings" = "訂閱設定";
 "SubscriptionSettingsSubHead" = "管理訂閱詳細資訊";
 "SubscriptionUrl" = "訂閱網址";
@@ -108,29 +142,40 @@
 "SyncSubscriptionNow" = "立即同步訂閱";
 "SyncSubscriptionIng" = "正在同步訂閱...";
 
-// routing settings
+// MARK: - 路由設定
 "RoutingSettings" = "路由設定";
 "RoutingSettingsSubHead" = "管理路由規則";
 "AddRoutingRule" = "新增路由規則";
 "EditRoutingRule" = "編輯路由規則";
 "domainStrategy" = "網域策略";
-"domainMatcher" = "網域匹配方式";
+"domainMatcher" = "網域比對方式";
 "Direct" = "直連";
 "Proxy" = "代理";
-"Block" = "阻斷";
+"Block" = "封鎖";
 
-// profile settings
+// MARK: - 自訂規則說明
+"CustomRuleGuideTitle" = "自訂規則填寫說明";
+"CustomRuleGuideDescription" = "每行填寫一條規則，可為網域、IP 或預定義清單。";
+"CustomRulePriorityDescription" = "優先順序：網域封鎖 -> 網域代理 -> 網域直連 -> IP 封鎖 -> IP 代理 -> IP 直連";
+"CustomRuleDomainIntro" = "• 網域：";
+"CustomRuleDomainExample" = "如 example.com、*.google.com";
+"CustomRuleIPIntro" = "• IP：";
+"CustomRuleIPExample" = "如 8.8.8.8、192.168.0.0/16";
+"CustomRulePredefinedIntro" = "• 預定義：";
+"CustomRulePredefinedExample" = "如 geoip:private、geosite:cn、localhost";
+
+// MARK: - Profile 設定
 "ProfileSettings" = "設定檔設定";
 "ProfileSettingsSubHead" = "管理設定檔詳細資訊";
 "Protocol" = "協議";
-"Address" = "地址";
+"Address" = "位址";
 "Password" = "密碼";
 "Method" = "加密方式";
-"Port" = "埠";
+"Port" = "連接埠";
 "ID" = "ID";
 "UserID" = "使用者 ID";
 "AlterID" = "額外 ID";
-"Security" = "安全";
+"Security" = "安全性";
 "Encryption" = "加密";
 "Network" = "網路";
 "HeaderType" = "標頭類型";
@@ -139,8 +184,8 @@
 "WsHost" = "WebSocket 主機";
 "WsPath" = "WebSocket 路徑";
 "DsPath" = "DS 路徑";
-"WsHeaders" = "WebSocket 標頭";
-"Flow" = "流控";
+"WsHeaders" = "WebSocket 請求標頭";
+"Flow" = "流量控制";
 "TcpFastOpen" = "TCP 快速開啟";
 "EnableTls" = "啟用 TLS";
 "SkipCertVerify" = "略過憑證驗證";
@@ -169,84 +214,124 @@
 "ServerSettings" = "伺服器設定";
 "StreamSettings" = "串流設定";
 
-// app menu
-"CoreOn" = "xray-core 已啟動";
-"CoreOff" = "xray-core 已關閉";
+// MARK: - 功能選單
+"CoreOn" = "xray-core: 已啟動";
+"CoreOff" = "xray-core: 已停止";
 "TurnCoreOn" = "啟動 xray-core";
-"TurnCoreOff" = "關閉 xray-core";
-"ViewLog" = "檢視 xray-core 日誌";
-"ViewConfigJson" = "檢視 config.json ";
-"ViewPacFile" = "檢視 pac 檔案";
+"TurnCoreOff" = "停止 xray-core";
+"ViewLog" = "查看 xray-core 日誌";
+"ViewConfigJson" = "查看 config.json";
+"ViewPacFile" = "查看 PAC 檔案";
 "PacMode" = "PAC 模式";
 "GlobalMode" = "全域模式";
 "ManualMode" = "手動模式";
-"Global.tip" = "全域代理 (系統偏好設定->網路->WIFI->詳細資訊->代理->HTTP 代理)";
-"Pac.tip" = "自動代理 (系統偏好設定->網路->WIFI->詳細資訊->代理->自動代理配置)";
-"Manual.tip" = "不設定系統代理 (清除系統代理)";
 "RoutingList" = "選擇路由";
 "ServerList" = "選擇伺服器";
-"goServerSettings" = "服务器配置 ...";
-"goSubscriptionSettings" = "訂閱配置 ...";
-"goRoutingSettings" = "路由设置 ...";
-"goPreferences" = "偏好設定 ...";
+"goSubscriptionSettings" = "訂閱設定...";
+"goRoutingSettings" = "路由設定...";
+"goServerSettings" = "伺服器設定...";
+"goPreferences" = "偏好設定...";
 "Ping" = "Ping 測試";
 "Testing" = "測試中";
 "ImportServersFromClipboard" = "從剪貼簿匯入伺服器";
-"ScanQRCodeFromScreen" = "掃描螢幕上的二維碼";
-"ShareQrCode" = "分享二維碼";
+"ScanQRCodeFromScreen" = "掃描螢幕上的 QRCode";
+"ShareQrCode" = "分享 QRCode";
 "CopyHttpProxyShellExportLine" = "複製 HTTP 代理 Shell 匯出命令";
-"Preferences" = "偏好設定";
 "CheckForUpdates" = "檢查更新";
 "Quit" = "退出";
 "On" = "開啟";
 "Off" = "關閉";
 
-// HelpView
+// MARK: - 幫助頁面
 "HelpPageTitle" = "診斷與幫助";
-"HelpPageSubHead" = "檢測關鍵組件狀態並提供常見問題修復操作";
-"GithubIssues" = "问题反馈";
-"Refresh" = "刷新";
+"HelpPageSubHead" = "檢測關鍵元件狀態並提供常見問題修復操作";
+"GithubIssues" = "問題回報";
+"Refresh" = "重新整理";
 "V2rayCoreSwitchStatus" = "v2ray-core 開關狀態";
-"V2rayCoreRunningStatus" = "v2ray-core 運行狀態 (launchd)";
-"BackgroundActivity" = "背景活動 (App Background Activity)";
-"BackgroundActivitySubtitleRunning" = "核心進程在運行";
-"BackgroundActivitySubtitleNotRunning" = "核心進程未運行";
-"OpenSettings" = "打開設定";
-"Restart" = "重啟";
-"PingState" = "ping 测试状态";
-"RunPingNow" = "Ping 測試";
+"V2rayCoreRunningStatus" = "v2ray-core 執行狀態 (launchd)";
+"BackgroundActivity" = "背景活動";
+"BackgroundActivitySubtitleRunning" = "核心程序正在運行";
+"BackgroundActivitySubtitleNotRunning" = "核心程序未運行";
+"OpenSettings" = "開啟設定";
+"Restart" = "重新啟動";
+"PingState" = "Ping 測試狀態";
+"RunPingNow" = "執行 Ping 測試";
 "V2rayCoreInstallAndVersion" = "v2ray-core 安裝與版本";
 "V2rayUToolPermission" = "V2rayUTool 權限";
 "GeoipFile" = "geoip.dat 檔案";
 "Installed" = "已安裝";
 "Missing" = "缺失";
-"PermissionException" = "root:admin";
+"PermissionException" = "權限異常";
 "V2rayCoreNotInstalled" = "v2ray-core 未安裝或不可執行。";
-"UnableToOpenSystemSettings" = "無法打開系統設定";
-"PleaseManuallyOpenBackgroundActivity" = "請手動前往 系統設定 → 通用 → 背景活動，允許 V2rayU 在背景執行。";
+"UnableToOpenSystemSettings" = "無法開啟系統設定";
+"PleaseManuallyOpenBackgroundActivity" = "請手動前往 系統設定 → 一般 → 背景活動，允許 V2rayU 在背景運行。";
 "Fix" = "修復";
-"PingProblem" = "當前節點不可用或網路異常。";
+"PingProblem" = "目前節點不可用或網路異常。";
 "V2rayUToolProblem" = "V2rayUTool 權限異常，可能無法正常啟動核心。";
-"BackgroundProblem" = "應用未在背景運行；可能被系統限制或核心進程已停止。";
+"BackgroundProblem" = "應用程式未在背景運行，可能被系統限制或核心程序已停止。";
 "GeoipProblem" = "geoip.dat 檔案缺失，可能導致部分功能異常。";
 "V2rayCoreProblem" = "v2ray-core 未安裝或不可執行。";
 "Diagnostics" = "異常診斷";
 "QA" = "常見問題";
 
-"Delete" = "刪除";
-"DeleteSelected" = "刪除所選";
-"DeleteConfirm" = "確定要刪除此項嗎？";
-"DeleteConfirmSelected" = "確定要刪除所選項目嗎？";
-"DeleteTip" = "此操作無法撤銷。";
-"OK" = "確定";
-"Add" = "添加";
-
-// table fields
+// MARK: - 表格欄位
 "TableFieldSort" = "排序";
 "TableFieldRemark" = "備註";
 "TableFieldUrl" = "訂閱網址";
 "TableFieldInterval" = "更新間隔(秒)";
 "TableFieldUpdateTime" = "更新時間";
+"TableFieldType" = "類型";
+"TableFieldAddress" = "位址";
+"TableFieldPort" = "連接埠";
+"TableFieldLatency" = "延遲";
+"TableFieldNetwork" = "網路";
+"TableFieldSecurity" = "安全";
+"TableFieldTodayDown" = "今日下載";
+"TableFieldTodayUp" = "今日上傳";
+"TableFieldTotalDown" = "總下載";
+"TableFieldTotalUp" = "總上傳";
+"TableFieldDomainStrategy" = "網域策略";
+"TableFieldDirect" = "直連";
+"TableFieldBlock" = "封鎖";
+"TableFieldProxy" = "代理";
+"SyncAll" = "同步全部";
+"SearchTip" = "搜尋";
+"AllGroup" = "全部群組";
+"SelectGroup" = "選擇群組";
+"SelectAll" = "全選";
+"CopyURI" = "複製 URI 連結";
+"MoveToTop" = "移至頂部";
+"MoveToBottom" = "移至底部";
+"MoveUp" = "上移";
+"MoveDown" = "下移";
 
-"SyncAl" = "同步全部";
+// MARK: - 關於頁
+"Version" = "版本";
+"Build" = "組建";
+"CoreVersion" = "核心版本";
+"RelatedFileLocations" = "相關檔案位置";
+"ClickAndOpenInFinder" = "點擊路徑可在 Finder 開啟";
+"OpenInFinder" = "在 Finder 開啟";
+"OpenSourceProject" = "開源專案";
+"OpenSourceLicense" = "遵循 GNU GPL v3.0 授權協議";
+"OpenSourceLibraries" = "引用開源函式庫";
+"UsedButNotLimitedTo" = "有使用且不限於以下";
+"OpenInBrowser" = "在瀏覽器開啟";
 
+// MARK: - Core 更新管理
+"CoreSettingsTitle" = "核心設定";
+"CoreSettingsSubtitle" = "管理您的核心版本";
+"CheckLatestVersion" = "檢查最新版本";
+"LocalCoreDirectory" = "本地 Xray Core 目錄";
+"FileDirectory" = "檔案目錄:";
+"LocalCoreVersionDetail" = "本地 Xray Core 版本明細";
+"GithubLatestVersion" = "GitHub 最新版本";
+"DownloadAndReplace" = "下載並替換";
+"Downloading" = "正在下載:";
+"DownloadedStatus" = "已下載: %@ / 總大小: %@";
+"CancelDownload" = "取消下載";
+"DownloadHint" = "下載提示";
+"DownloadCanceled" = "下載已取消";
+"DownloadURLInvalid" = "下載網址錯誤: %@";
+"ReplaceSuccess" = "替換成功！";
+"OperationFailed" = "操作失敗: %@";

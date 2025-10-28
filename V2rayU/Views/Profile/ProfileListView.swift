@@ -46,8 +46,8 @@ struct ProfileListView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Picker("选择组", selection: $selectGroup) {
-                    Text("全部分组").tag("")
+                Picker(String(localized: .SelectGroup), selection: $selectGroup) {
+                    Text(String(localized: .AllGroup)).tag("")
                     ForEach(viewModel.groups, id: \.self) { group in
                         Text(group).tag(group)
                     }
@@ -57,7 +57,7 @@ struct ProfileListView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                    TextField("Search by Address or Remark", text: $searchText)
+                    TextField(String(localized: .SearchTip), text: $searchText)
                         .frame(width: 200)
                 }
             }
@@ -68,18 +68,22 @@ struct ProfileListView: View {
                 HStack {
                     // checkbox
                     Toggle(isOn: $selectAll) {
-                        Text("全选")
+                        Text(String(localized: .SelectAll))
                     }
+                    Button(action: { withAnimation { loadData() } }) {
+                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered)
                     Spacer()
                     Button(action: { withAnimation {
                         let newProxy = ProfileModel(from: ProfileDTO())
                         self.selectedRow = newProxy
                     }}) {
-                        Label("新增", systemImage: "plus")
+                        Label(String(localized: .Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
                     Button(action: {
-                        if showConfirmAlertSync(title: "Are you sure you want to delete the selected Proxy Profiles?", message: "This action cannot be undone.") {
+                        if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
                             withAnimation {
                                 for selectedID in self.selection {
                                     viewModel.delete(uuid: selectedID)
@@ -88,20 +92,20 @@ struct ProfileListView: View {
                             }
                         }
                     }) {
-                        Label("删除", systemImage: "trash")
+                        Label(String(localized: .Delete), systemImage: "trash")
                     }
                     .disabled(selection.isEmpty)
                     .buttonStyle(.bordered)
 
                     Button(action: { showPingSheet = true }) {
-                        Label("PingAll", systemImage: "lasso.badge.sparkles")
+                        Label(String(localized: .Ping), systemImage: "lasso.badge.sparkles")
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(viewModel.list.isEmpty)
                     // 分享
                     Button(action: {
                     }) {
-                        Label("分享", systemImage: "square.and.arrow.up")
+                        Label(String(localized: .Export), systemImage: "square.and.arrow.up")
                     }.disabled(selection.isEmpty)
                         .buttonStyle(.bordered)
                 }.padding(.horizontal, 10)
@@ -155,13 +159,13 @@ struct ProfileListView: View {
             Button {
                 chooseItem(item: ProfileModel(from: item))
             } label: {
-                Label("Choose", systemImage: "checkmark.circle")
+                Label(String(localized: .Select), systemImage: "checkmark.circle")
             }
 
             Button {
                 self.pingRow = ProfileModel(from: item)
             } label: {
-                Label("Test Latency", systemImage: "speedometer")
+                Label(String(localized.Ping), systemImage: "speedometer")
             }
 
             Divider()
@@ -169,13 +173,13 @@ struct ProfileListView: View {
             Button {
                 copyItem(item: item)
             } label: {
-                Label("Copy URI", systemImage: "doc.on.doc")
+                Label(String(localized: .CopyURI), systemImage: "doc.on.doc")
             }
 
             Button {
                 self.shareRow = ProfileModel(from: item)
             } label: {
-                Label("QRCode", systemImage: "qrcode")
+                Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
 
             Divider()
@@ -183,25 +187,25 @@ struct ProfileListView: View {
             Button(action: {
                 moveToTop(item: item)
             }) {
-                Label("Move to Top", systemImage: "arrow.up.to.line")
+                Label(String(localized: .MoveToTop), systemImage: "arrow.up.to.line")
             }
 
             Button(action: {
                 moveToBottom(item: item)
             }) {
-                Label("Move to Bottom", systemImage: "arrow.down.to.line")
+                Label(String(localized: .MoveToBottom), systemImage: "arrow.down.to.line")
             }
 
             Button(action: {
                 moveUp(item: item)
             }) {
-                Label("Move Up", systemImage: "chevron.up")
+                Label(String(localized: .MoveUp), systemImage: "chevron.up")
             }
 
             Button(action: {
                 moveDown(item: item)
             }) {
-                Label("Move Down", systemImage: "chevron.down")
+                Label(String(localized: .MoveDown), systemImage: "chevron.down")
             }
 
             Divider()
@@ -209,21 +213,21 @@ struct ProfileListView: View {
             Button {
                 duplicateItem(item: ProfileModel(from: item))
             } label: {
-                Label("Duplicate", systemImage: "plus.square.on.square")
+                Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
             }
 
             Button {
                 self.selectedRow = ProfileModel(from: item)
             } label: {
-                Label("Edit", systemImage: "pencil")
+                Label(String(localized: .Edit), systemImage: "pencil")
             }
 
             Button {
-                if showConfirmAlertSync(title: "Are you sure you want to delete this Proxy Profile?", message: "This action cannot be undone.") {
+                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
                     viewModel.delete(uuid: item.uuid)
                 }
             } label: {
-                Label("Delete", systemImage: "trash")
+                Label(String(localized: .Delete), systemImage: "trash")
                     .foregroundColor(.red)
             }
         }
@@ -236,13 +240,18 @@ struct ProfileListView: View {
             Group {
                 TableColumn("#") { (row: ProfileDTO) in
                     HStack(spacing: 4) {
-                        Image(systemName: "line.3.horizontal")
-
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
+                    }
+                }
+                .width(20)
+
+                TableColumn(String(localized: .TableFieldSort)) { (row: ProfileDTO) in
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal")
                     }
                     .contentShape(Rectangle()) // 扩大点击/拖拽区域
                     .draggable(row) // 整个区域作为拖拽手柄
@@ -255,9 +264,9 @@ struct ProfileListView: View {
                         }
                     }
                 }
-                .width(40)
+                .width(20)
 
-                TableColumn("Remark") { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldRemark)) { (row: ProfileDTO) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -274,50 +283,50 @@ struct ProfileListView: View {
                 }
                 .width(min: 120, max: 300)
 
-                TableColumn("Type") { row in
+                TableColumn(String(localized: .TableFieldType)) { row in
                     Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
                 }
                 .width(40)
 
-                TableColumn("Address") { row in
+                TableColumn(String(localized: .TableFieldAddress)) { row in
                     Text(row.address)
                 }
                 .width(min: 120, max: 300)
 
-                TableColumn("latency(ms)") { (row: ProfileDTO) in
-                    Text("\(row.speed)") // 或者 row.latency
+                TableColumn(String(localized: .TableFieldLatency)) { (row: ProfileDTO) in
+                    Text("\(row.speed)")
                         .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
                 }
                 .width(76)
 
-                TableColumn("Port") { row in
+                TableColumn(String(localized: .TableFieldPort)) { row in
                     Text("\(row.port)")
                 }
                 .width(40)
-                TableColumn("Network") { row in
+                TableColumn(String(localized: .TableFieldNetwork)) { row in
                     Text(row.network.rawValue)
                 }.width(50)
-                TableColumn("TLS") { row in
+                TableColumn(String(localized: .TableFieldSecurity)) { row in
                     Text(row.security.rawValue)
                 }.width(40)
             }
             Group {
-                TableColumn("TodayDown") { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileDTO) in
                     Text(row.todayDown.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn("TodayUp") { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileDTO) in
                     Text(row.todayUp.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn("TotalDown") { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileDTO) in
                     Text(row.totalDown.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn("TotalUp") { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileDTO) in
                     Text(row.totalUp.humanSize)
                 }
                 .width(min: 40, max: 100)
@@ -350,10 +359,10 @@ struct ProfileListView: View {
         let profileString = ShareUri.generateShareUri(item: item)
         if pasteboard.setString(profileString, forType: .string) {
             logger.info("Copied to clipboard: \(profileString)")
-            alertDialog(title: "Copied", message: "")
+            alertDialog(title: String(localized: .Copied), message: "")
         } else {
             logger.info("Failed to copy to clipboard")
-            alertDialog(title: "Failed to copy to clipboard", message: "")
+            alertDialog(title: String(localized: .CopyFailed), message: "")
         }
     }
 

@@ -36,9 +36,8 @@ struct ContentView: View {
                 }
                 .padding(.vertical,20)
 
-                SidebarButton(tab: .activity, title: .Activity, icon: "camera.filters")
-                SidebarButton(tab: .server, title: .Servers, icon: "shield.lefthalf.filled")
                 SidebarButton(tab: .subscription, title: .Subscriptions, icon: "personalhotspot")
+                SidebarButton(tab: .server, title: .Servers, icon: "shield.lefthalf.filled")
                 SidebarButton(tab: .routing, title: .Routings, icon: "bonjour")
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
                 SidebarButton(tab: .help, title: .Help, icon: "questionmark.circle")
@@ -52,10 +51,6 @@ struct ContentView: View {
             // 右侧内容区，根据选中状态切换
             VStack {
                 switch appState.mainTab {
-                case .activity:
-                    ActivityView()
-                case .log:
-                    LogPageView()
                 case .server:
                     ProfileListView()
                 case .subscription:

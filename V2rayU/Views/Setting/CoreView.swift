@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct CoreView: View {
     @State private var xrayCoreVersion: String = "Unknown"
@@ -14,60 +15,58 @@ struct CoreView: View {
     @State private var versions: [GithubRelease] = []
     @State private var errorMsg: String? = nil
     @State private var showDownloadDialog = false
-    @State private var downloadingVersion: String = ""
-    @State private var downloadingUrl: String = ""
-    @State private var downloadProgress: Double = 0.0
-    @State private var downloadSpeed: String = "0.0 KB/s"
-    @State private var downloadSize: String = "0.0 MB"
-    @State private var downloadTargetSize: String = "0.0 MB"
     @State private var is_end: Bool = false
-    @State private var downloadDelegate: DownloadDelegate? = nil
     @State private var showAlert = false
+    @ObservedObject var downloader: DownloadManager = DownloadManager(timeout: 15,onSuccess: onDownloadSuccess,onError: self.onDownloadFail)
 
     var body: some View {
         VStack(spacing: 8) {
+            // 顶部标题行
             HStack {
                 Image(systemName: "crown")
                     .resizable()
                     .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Core Settings")
+                    // 标题
+                    Text(String(localized: .CoreSettingsTitle))
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("Manage your core versions")
+                    Text(String(localized: .CoreSettingsSubtitle))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
                 Button(action: { checkVersions() }) {
-                    Label("检查最新版本", systemImage: "arrow.triangle.2.circlepath")
+                    Label(String(localized: .CheckLatestVersion), systemImage: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(isLoading)
             }
-            
+
             Spacer(minLength: 6)
 
+            // 本地路径部分
             Section {
                 HStack {
-                    Text("本地 Xray Core 目录")
+                    Text(String(localized: .LocalCoreDirectory))
                         .font(.headline)
                     Spacer()
                 }
                 Divider()
                 HStack {
-                    Text("文件目录: ")
+                    Text(String(localized: .FileDirectory))
                     Text("\(xrayCorePath)")
                     Spacer()
                 }
             }
-            
+
             Spacer(minLength: 6)
 
+            // 本地版本信息
             Section {
                 HStack {
-                    Text("本地 Xray Core 版本明细")
+                    Text(String(localized: .LocalCoreVersionDetail))
                         .font(.headline)
                     Spacer()
                 }
@@ -78,13 +77,14 @@ struct CoreView: View {
                     Spacer()
                 }
             }
-            
+
             Spacer(minLength: 6)
 
+            // GitHub 最新版本列表
             List {
                 if !versions.isEmpty {
-                    Section(header: Text("GitHub 最新版本")) {
-                        ForEach(versions, id: \ .self) { version in
+                    Section(header: Text(String(localized: .GithubLatestVersion))) {
+                        ForEach(versions, id: \.self) { version in
                             HStack {
                                 Text(version.tagName)
                                     .font(.title3)
@@ -94,7 +94,7 @@ struct CoreView: View {
                                 Button(action: {
                                     downloadAndReplace(version: version)
                                 }) {
-                                    Text("下载并替换")
+                                    Text(String(localized: .DownloadAndReplace))
                                 }
                                 .disabled(isLoading)
                             }
@@ -103,7 +103,8 @@ struct CoreView: View {
                 }
             }
             .listStyle(PlainListStyle())
-            
+
+            // 下载弹窗
             if showDownloadDialog {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
@@ -111,9 +112,9 @@ struct CoreView: View {
                             .foregroundColor(.accentColor)
                             .font(.title2)
                         VStack(alignment: .leading) {
-                            Text("正在下载: \(downloadingVersion)")
+                            Text("\(String(localized: .Downloading))\(downloader.state.downloadingVersion)")
                                 .font(.headline)
-                            Text(downloadingUrl)
+                            Text(downloader.state.downloadingUrl)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
@@ -121,29 +122,30 @@ struct CoreView: View {
                         }
                         Spacer()
                         Button(action: {
-                            openInBrowser(downloadingUrl)
+                            openInBrowser(downloader.state.downloadingUrl)
                         }) {
-                            Label("浏览器打开", systemImage: "safari")
+                            Label(String(localized: .OpenInBrowser), systemImage: "safari")
                         }
                         .buttonStyle(.bordered)
                     }
                     VStack(alignment: .leading) {
                         HStack {
-                            Text(String(format: "%.1f%%", downloadProgress * 100))
+                            Text(String(format: "%.1f%%", downloader.state.downloadProgress * 100))
                                 .font(.headline)
                                 .frame(width: 60, alignment: .leading)
-                            Text("已下载: \(downloadSize) / 总大小: \(downloadTargetSize)")
+                            Text(String(localized: .DownloadedStatus, arguments: downloader.state.downloadSize, downloader.state.downloadTargetSize))
                                 .font(.callout)
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text(downloadSpeed)
+                            Text(downloader.state.downloadSpeed)
                                 .font(.subheadline)
                                 .foregroundColor(.blue)
                         }
-                        ProgressView(value: downloadProgress)
+                        ProgressView(value: downloader.state.downloadProgress)
                             .progressViewStyle(LinearProgressViewStyle())
                             .frame(height: 10)
                             .accentColor(.accentColor)
+
                         HStack {
                             if self.errorMsg != nil {
                                 Text(self.errorMsg!)
@@ -151,18 +153,14 @@ struct CoreView: View {
                             }
                             Spacer()
                             if is_end {
-                                Button(action: {
-                                    closeDownloadDialog()
-                                }) {
-                                    Label("关闭", systemImage: "xmark.circle")
+                                Button(action: { closeDownloadDialog() }) {
+                                    Label(String(localized: .Close), systemImage: "xmark.circle")
                                         .font(.body)
                                 }
                                 .buttonStyle(.borderedProminent)
                             } else {
-                                Button(action: {
-                                    cancelDownload()
-                                }) {
-                                    Label("取消下载", systemImage: "xmark.circle")
+                                Button(action: { cancelDownload() }) {
+                                    Label(String(localized: .CancelDownload), systemImage: "xmark.circle")
                                         .font(.body)
                                 }
                                 .buttonStyle(.borderedProminent)
@@ -170,36 +168,43 @@ struct CoreView: View {
                         }
                     }
                 }
-                .padding() // 1. 内边距
-                .background() // 2. 然后背景
-                .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角
+                .padding()
+                .background()
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                         .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-                ) // 4. 添加边框和阴影
+                )
             }
 
-        }.onAppear {
+        }
+        .onAppear {
             loadCoreVersions()
             checkVersions()
         }
+        // 弹窗提示
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("下载提示"), message: Text(errorMsg ?? ""), dismissButton: .default(Text("确定")))
+            Alert(
+                title: Text(String(localized: .DownloadHint)),
+                message: Text(errorMsg ?? ""),
+                dismissButton: .default(Text(String(localized: .Confirm)))
+            )
         }
     }
 
+    // MARK: - 加载本地 core 版本
     private func loadCoreVersions() {
         xrayCoreVersion = getCoreVersion()
     }
 
+    // MARK: - 检查 GitHub 最新版本
     func checkVersions() {
         guard let url = URL(string: "https://api.github.com/repos/XTLS/Xray-core/releases?per_page=20") else {
             return
         }
         isLoading = true
 
-        logger.info("checkForUpdates: \(url)")
         let checkTask = URLSession.shared.dataTask(with: url) { data, _, error in
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -214,16 +219,10 @@ struct CoreView: View {
                 return
             }
 
-            logger.info("checkForUpdates: \n \(data)")
-
             do {
                 let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601 // 解析日期
-
-                // try decode data
+                decoder.dateDecodingStrategy = .iso8601
                 let data: [GithubRelease] = try decoder.decode([GithubRelease].self, from: data)
-
-                // 按日期倒序排序
                 let sortedData = data.sorted { $0.publishedAt > $1.publishedAt }
                 DispatchQueue.main.async {
                     self.versions = sortedData
@@ -232,10 +231,8 @@ struct CoreView: View {
                 // 可能请求太频繁了
                 do {
                     let decoder = JSONDecoder()
-                    // try decode data
                     let data: GithubError = try decoder.decode(GithubError.self, from: data)
                     DispatchQueue.main.async {
-                        // update progress text
                         self.errorMsg = "Check failed: \(data.message)\n\(data.documentationUrl)"
                     }
                 } catch {
@@ -249,127 +246,95 @@ struct CoreView: View {
         checkTask.resume()
     }
 
+    private func onDownloadSuccess(filePath: String) {
+        self.downloadDone(zipFile: filePath)
+        self.showAlert = true
+        self.isLoading = false
+        self.is_end = true
+    }
+
+    private func onDownloadFail(err: String) {
+        self.isLoading = false
+        self.is_end = true
+        self.errorMsg = msg
+    }
+
+    // MARK: - 下载并替换
     private func downloadAndReplace(version: GithubRelease) {
         isLoading = true
         showDownloadDialog = true
         is_end = false
         errorMsg = nil
-        downloadingVersion = version.tagName
-        downloadProgress = 0.0
-        downloadSpeed = "0.0 KB/s"
-        downloadSize = ""
-        downloadTargetSize = ""
+        let downloadingVersion = version.tagName
 
         let asset = version.getDownloadAsset()
-        logger.info("downloadAndReplace: \(asset.browserDownloadUrl)")
         guard let url = URL(string: asset.browserDownloadUrl) else {
-            errorMsg = "下载地址错误: \(asset.browserDownloadUrl)"
+            errorMsg = String(localized: .DownloadURLInvalid) + ": \(asset.browserDownloadUrl)"
             isLoading = false
             downloadingVersion = ""
             return
         }
-        downloadingUrl = asset.browserDownloadUrl
-        downloadTargetSize = formatByte(Double(asset.size))
-        
-        let config = getProxyUrlSessionConfigure()
 
-        let delegate = DownloadDelegate(
-            timeout: 10,
-            onProgress: { progress, speed, _downloadSize in
-                DispatchQueue.main.async {
-                    self.downloadSpeed = speed
-                    self.downloadProgress = progress
-                    self.downloadSize = _downloadSize
-                }
-            },
-            onSuccess: { filePath in
-                self.downloadDone(zipFile: filePath)
-                self.showAlert = true
-                self.isLoading = false
-                self.is_end = true
-                self.downloadingVersion = ""
-                self.downloadDelegate = nil
-            },
-            onError: { msg in
-                self.isLoading = false
-                self.is_end = true
-                self.downloadingVersion = ""
-                self.errorMsg = msg
-                self.downloadDelegate = nil
-            }
-        )
-        downloadDelegate = delegate
-        let session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
-        let task = session.downloadTask(with: url)
-        delegate.startTimeout(downloadTask: task)
-        task.resume()
+        // 启动下载
+        self.manager.startDownload(from: asset.browserDownloadUrl, version: downloadingVersion, totalSize: Int64(asset.size), useProxy: true)
     }
 
+    // MARK: - 在浏览器打开
     func openInBrowser(_ urlStr: String) {
-        guard let url = URL(string: urlStr) else {
-            return
-        }
+        guard let url = URL(string: urlStr) else { return }
         NSWorkspace.shared.open(url)
     }
 
+    // MARK: - 取消下载
     private func cancelDownload() {
-        is_end =  true
-        downloadDelegate?.cancelTask()
+        is_end = true
+        self.downloader?.cancelTask()
         isLoading = false
-        downloadingVersion = ""
-        errorMsg = "下载已取消"
+        errorMsg = String(localized: .DownloadCanceled)
     }
-    
+
+    // MARK: - 关闭下载面板
     private func closeDownloadDialog() {
         self.showDownloadDialog = false
     }
-    
+
+    // MARK: - 备份核心文件
     private func backupCore() {
         let backupPath = v2rayCorePath + ".bak"
-        // 备份当前文件
         if FileManager.default.fileExists(atPath: v2rayCorePath) {
             try? FileManager.default.removeItem(atPath: backupPath)
             try? FileManager.default.copyItem(atPath: v2rayCorePath, toPath: backupPath)
         }
     }
-    
+
+    // MARK: - 还原备份
     private func recoverCore(_ msg: String){
         let backupPath = v2rayCorePath + ".bak"
-        // 恢复备份
         if FileManager.default.fileExists(atPath: backupPath) {
             try? FileManager.default.removeItem(atPath: v2rayCorePath)
             try? FileManager.default.copyItem(atPath: backupPath, toPath: v2rayCorePath)
         }
         self.errorMsg = msg
     }
-    
+
+    // MARK: - 下载完成后进行替换
     private func downloadDone(zipFile: String) {
-        logger.info("downloadDone: \(zipFile)")
         let destPath = AppHomePath + "/xray-core"
         let backupPath = destPath + ".bak"
 
-        // 备份 core
         self.backupCore()
-        
+
         do {
-            // 确保解压目录存在
-            let msg = try runCommand(at: "/usr/bin/unzip", with: ["-o", zipFile, "-d", destPath] )
-            
-            // 设置权限
+            // 解压文件
+            let msg = try runCommand(at: "/usr/bin/unzip", with: ["-o", zipFile, "-d", destPath])
+            // 设置执行权限
             try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: destPath)
-            
-            // 重启v2ray
-            Task {
-                await V2rayLaunch.shared.restart()
-            }
-            
-            self.errorMsg = "替换成功！\n\(msg)"
+            // 重启
+            Task { await V2rayLaunch.shared.restart() }
+            self.errorMsg = String(localized: .ReplaceSuccess) + "\n" + msg
         } catch {
-            // 恢复备份
-            self.recoverCore("操作失败: \(error.localizedDescription)")
+            self.recoverCore(String(localized: .OperationFailed) + ": \(error.localizedDescription)")
         }
-        
-        // 清理临时文件和备份
         try? FileManager.default.removeItem(atPath: backupPath)
         try? FileManager.default.removeItem(atPath: zipFile)
     }

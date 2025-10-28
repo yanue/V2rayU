@@ -1,3 +1,6 @@
+/* 多语言本地化 LanguageLabel.strings (Simplified Chinese) */
+
+// MARK: - 语言与主题
 "English" = "English";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
@@ -7,7 +10,7 @@
 "Dark" = "深色";
 "FollowSystem" = "跟随系统";
 
-// base
+// MARK: - 基础操作
 "Save" = "保存";
 "Confirm" = "确认";
 "Cancel" = "取消";
@@ -16,13 +19,26 @@
 "Remark" = "备注";
 "Edit" = "编辑";
 "Preview" = "预览";
+"Delete" = "删除";
+"DeleteSelected" = "删除所选";
+"DeleteConfirm" = "确定要删除此项吗？";
+"DeleteSelectedConfirm" = "确定要删除所选项目吗？";
+"DeleteTip" = "此操作无法撤销。";
+"OK" = "确定";
+"Add" = "添加";
+"Export" = "导出";
+"Select" = "选择";
+"Duplicate" = "复制一份";
 "Copy" = "复制";
 "Copied" = "已复制";
-"Regenerated" = "已重新生成";
+"CopyFailed" = "复制失败";
 "Regenerate" = "重新生成";
+"Regenerated" = "已重新生成";
 "Generate" = "生成";
 "Generated" = "已生成";
-// app content
+"ShareProfile" = "分享配置文件";
+
+// MARK: - App 内容
 "Activity" = "活动";
 "ActivitySubHead" = "查看最近活动与日志";
 "Servers" = "服务器";
@@ -36,38 +52,38 @@
 "About" = "关于";
 "AboutSubHead" = "关于此应用";
 
-// settings tab
+// MARK: - 设置标签
 "General" = "通用设置";
 "Advanced" = "高级设置";
-"PAC" = "PAC设置";
-"DNS" = "DNS设置";
-"Core" = "Core管理";
+"PAC" = "PAC 设置";
+"DNS" = "DNS 设置";
+"Core" = "Core 管理";
 
-// general settings
+// MARK: - 通用设置
 "LaunchAtLogin" = "开机启动";
 "CheckForUpdateAutomatically" = "自动检查更新";
 "AutoUpdateServersFromSubscriptions" = "自动从订阅更新服务器";
 "AutomaticallySelectFastestServer" = "自动选择最快服务器";
 "ShowProxySpeedOnTrayIcon" = "托盘图标显示代理速度";
-"ShowLatencyOnTrayIcon" = "托盘图标显示ping值";
+"ShowLatencyOnTrayIcon" = "托盘图标显示 Ping 值";
 "EnableProxyStatistics" = "启用代理统计";
 "KeyboardShortcuts" = "快捷键";
-"ToggleV2rayOnOff" = "切换 V2ray 开关";
+"ToggleV2rayOnOff" = "切换 V2Ray 开关";
 "SwitchProxyMode" = "切换代理模式";
 
-// advanced settings
+// MARK: - 高级设置
 "LocalSocksListenPort" = "本地 SOCKS 监听端口";
 "EnableUDP" = "启用 UDP";
 "LocalHttpListenPort" = "本地 HTTP 监听端口";
 "LocalPacListenPort" = "本地 PAC 监听端口";
-"AllowLAN" = "允许局域网连接";
+"AllowLAN" = "允许局域网访问";
 "EnableSniffing" = "启用嗅探";
 "EnableMux" = "启用 Mux";
 "Mux" = "Mux";
 "EnableTrafficStatistics" = "启用流量统计";
 "V2rayCoreLogLevel" = "V2Ray 核心日志级别";
 
-// pac settings
+// MARK: - PAC 设置
 "PacSettings" = "PAC 设置";
 "ConfigureProxyRules" = "配置代理规则";
 "GFWListDownloadURL" = "GFWList 下载地址";
@@ -87,14 +103,32 @@
 "PACUpdateSuccess" = "PAC 更新成功";
 "PACUpdateNotification" = "PAC 更新通知";
 
-// dns settings
+// MARK: - PAC 提示与错误
+"UpdatingPacRules" = "正在更新 PAC 规则...";
+"PacUpdatedByUserRules" = "PAC 已由用户规则更新";
+"PacUpdateFailedByUserRules" = "更新 PAC (用户规则) 失败";
+"UpdatePacError" = "更新 PAC 错误: %@";
+"InvalidGfwUrl" = "下载 GFWList 失败: URL 无效";
+"GfwListDownloadFailed" = "下载 GFWList 失败";
+"GfwListDownloadError" = "下载 GFWList 出错: %@";
+"GfwListWriteFailed" = "写入 GFWList 失败";
+"GfwListUpdated" = "GFWList 已更新";
+"PacUpdatedByGfwList" = "PAC 已由最新 GFWList 更新";
+"PacUpdateFailedByCurl" = "通过 curl 更新 PAC 失败";
+
+// MARK: - DNS 设置
 "DnsConfiguration" = "DNS 配置";
 "DnsJsonFormatTip" = "提示: 使用 JSON 格式进行 DNS 配置";
 "ViewConfiguration" = "查看配置";
 "Help" = "帮助";
 "Notification" = "通知";
+"DnsInvalidUTF8" = "错误: 输入内容无法编码为 UTF-8";
+"DnsJSONFormatError" = "错误: JSON 格式错误 - %@";
+"DnsFormatEncodingFail" = "错误: 格式化后内容无法编码为字符串";
+"DnsSaveSuccess" = "DNS 配置保存成功";
+"DnsSaveFail" = "保存 DNS 配置失败 - %@";
 
-// subscription form
+// MARK: - 订阅设置
 "SubscriptionSettings" = "订阅设置";
 "SubscriptionSettingsSubHead" = "管理订阅详情";
 "SubscriptionUrl" = "订阅地址";
@@ -108,7 +142,7 @@
 "SyncSubscriptionNow" = "立即同步订阅";
 "SyncSubscriptionIng" = "正在同步订阅...";
 
-// routing settings
+// MARK: - 路由设置
 "RoutingSettings" = "路由设置";
 "RoutingSettingsSubHead" = "管理路由规则";
 "AddRoutingRule" = "添加路由规则";
@@ -119,7 +153,18 @@
 "Proxy" = "代理";
 "Block" = "阻断";
 
-// profile settings
+// MARK: - 自定义规则说明
+"CustomRuleGuideTitle" = "自定义规则填写说明";
+"CustomRuleGuideDescription" = "每行填写一个规则，可为域名、IP 或 预定义列表。";
+"CustomRulePriorityDescription" = "优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP 阻断 -> IP 代理 -> IP 直连";
+"CustomRuleDomainIntro" = "• 域名：";
+"CustomRuleDomainExample" = "如 example.com、*.google.com";
+"CustomRuleIPIntro" = "• IP：";
+"CustomRuleIPExample" = "如 8.8.8.8、192.168.0.0/16";
+"CustomRulePredefinedIntro" = "• 预定义：";
+"CustomRulePredefinedExample" = "如 geoip:private、geosite:cn、localhost";
+
+// MARK: - Profile 设置
 "ProfileSettings" = "配置文件设置";
 "ProfileSettingsSubHead" = "管理配置文件详情";
 "Protocol" = "协议";
@@ -169,7 +214,7 @@
 "ServerSettings" = "服务器设置";
 "StreamSettings" = "流设置";
 
-// app menu
+// MARK: - 菜单操作
 "CoreOn" = "xray-core: 已启动";
 "CoreOff" = "xray-core: 已停止";
 "TurnCoreOn" = "启动 xray-core";
@@ -177,22 +222,19 @@
 "ViewLog" = "查看 xray-core 日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 pac 文件";
-"PacMode" = "pac模式";
+"PacMode" = "PAC 模式";
 "GlobalMode" = "全局模式";
 "ManualMode" = "手动模式";
-"Global.tip" = "系统代理 (系统偏好设置->网络->WIFI->详情->代理->HTTP,HTTPS,SOCKS 代理)";
-"Pac.tip" = "自动代理 (系统偏好设置->网络->WIFI->详情->代理->自动代理配置)";
-"Manual.tip" = "不设置系统代理 (清除系统代理)";
 "RoutingList" = "选择路由";
 "ServerList" = "选择服务器";
-"goServerSettings" = "服务器配置 ...";
 "goSubscriptionSettings" = "订阅配置 ...";
 "goRoutingSettings" = "路由设置 ...";
+"goServerSettings" = "服务器配置 ...";
 "goPreferences" = "偏好设置 ...";
 "Ping" = "Ping 测试";
 "Testing" = "测试中";
 "ImportServersFromClipboard" = "从剪贴板导入服务器";
-"ScanQRCodeFromScreen" = "扫描屏幕上的二维码";
+"ScanQRCodeFromScreen" = "扫描屏幕二维码";
 "ShareQrCode" = "分享二维码";
 "CopyHttpProxyShellExportLine" = "复制 HTTP 代理 Shell 导出命令";
 "CheckForUpdates" = "检查更新";
@@ -200,52 +242,96 @@
 "On" = "开启";
 "Off" = "关闭";
 
-// help view
+// MARK: - 帮助视图
 "HelpPageTitle" = "诊断与帮助";
 "HelpPageSubHead" = "检测关键组件状态并提供常见问题修复操作";
 "GithubIssues" = "问题反馈";
 "Refresh" = "刷新";
 "V2rayCoreSwitchStatus" = "v2ray-core 开关状态";
 "V2rayCoreRunningStatus" = "v2ray-core 运行状态 (launchd)";
-"BackgroundActivity" = "后台活动 (App Background Activity)";
+"BackgroundActivity" = "后台活动";
 "BackgroundActivitySubtitleRunning" = "核心进程在运行";
 "BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
 "OpenSettings" = "打开设置";
 "Restart" = "重启";
-"PingState" = "ping 测试状态";
-"RunPingNow" = "ping 测试";
+"PingState" = "Ping 测试状态";
+"RunPingNow" = "运行 Ping 测试";
 "V2rayCoreInstallAndVersion" = "v2ray-core 安装与版本";
 "V2rayUToolPermission" = "V2rayUTool 权限";
 "GeoipFile" = "geoip.dat 文件";
 "Installed" = "已安装";
 "Missing" = "缺失";
-"PermissionException" = "root:admin";
-"V2rayCoreNotInstalled" = "v2ray-core 未安装或不可执行。";
+"PermissionException" = "权限异常";
+"V2rayCoreNotInstalled" = "v2ray-core 未安装或不可执行";
 "UnableToOpenSystemSettings" = "无法打开系统设置";
 "PleaseManuallyOpenBackgroundActivity" = "请手动前往 系统设置 → 通用 → 后台活动，允许 V2rayU 后台运行。";
 "Fix" = "修复";
-"PingProblem" = "当前节点不可用或网络异常。";
-"V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法正常启动核心。";
-"BackgroundProblem" = "应用未在后台运行；可能被系统限制或核心进程已停止。";
-"GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常。";
-"V2rayCoreProblem" = "v2ray-core 未安装或不可执行。";
+"PingProblem" = "节点不可用或网络异常";
+"V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法启动核心";
+"BackgroundProblem" = "应用未在后台运行，可能被系统限制或核心进程已停止";
+"GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常";
+"V2rayCoreProblem" = "v2ray-core 未安装或不可执行";
 "Diagnostics" = "异常诊断";
 "QA" = "常见问题";
 
-"Delete" = "删除";
-"DeleteSelected" = "删除所选";
-"DeleteConfirm" = "确定要删除此项吗？";
-"DeleteConfirmSelected" = "确定要删除所选项目吗？";
-"DeleteTip" = "此操作无法撤销。";
-"OK" = "确定";
-"Add" = "添加";
-
-// table fields
+// MARK: - 表格字段
 "TableFieldSort" = "排序";
 "TableFieldRemark" = "备注";
 "TableFieldUrl" = "订阅地址";
 "TableFieldInterval" = "更新间隔(秒)";
 "TableFieldUpdateTime" = "更新时间";
+"TableFieldType" = "类型";
+"TableFieldAddress" = "地址";
+"TableFieldPort" = "端口";
+"TableFieldLatency" = "延迟";
+"TableFieldNetwork" = "网络";
+"TableFieldSecurity" = "安全";
+"TableFieldTodayDown" = "今日下行";
+"TableFieldTodayUp" = "今日上行";
+"TableFieldTotalDown" = "总下行";
+"TableFieldTotalUp" = "总上行";
+"TableFieldDomainStrategy" = "域名策略";
+"TableFieldDirect" = "直连";
+"TableFieldBlock" = "阻断";
+"TableFieldProxy" = "代理";
+"SyncAll" = "同步全部";
+"SearchTip" = "搜索";
+"AllGroup" = "全部分组";
+"SelectGroup" = "选择分组";
+"SelectAll" = "全选";
+"CopyURI" = "复制 URI 链接";
+"MoveToTop" = "移至顶部";
+"MoveToBottom" = "移至底部";
+"MoveUp" = "上移";
+"MoveDown" = "下移";
 
-"SyncAl" = "同步全部";
+// MARK: - 关于页
+"Version" = "版本";
+"Build" = "构建";
+"CoreVersion" = "Core 版本";
+"RelatedFileLocations" = "相关文件位置";
+"ClickAndOpenInFinder" = "点击路径在 Finder 打开";
+"OpenInFinder" = "在 Finder 打开";
+"OpenSourceProject" = "开源项目";
+"OpenSourceLicense" = "遵循 GNU GPL v3.0 许可协议";
+"OpenSourceLibraries" = "引用开源库";
+"UsedButNotLimitedTo" = "有用到且不限于以下";
+"OpenInBrowser" = "在浏览器打开";
 
+// MARK: - Core 更新管理
+"CoreSettingsTitle" = "Core 设置";
+"CoreSettingsSubtitle" = "管理核心版本";
+"CheckLatestVersion" = "检查最新版本";
+"LocalCoreDirectory" = "本地 Xray Core 目录";
+"FileDirectory" = "文件目录:";
+"LocalCoreVersionDetail" = "本地 Xray Core 版本明细";
+"GithubLatestVersion" = "GitHub 最新版本";
+"DownloadAndReplace" = "下载并替换";
+"Downloading" = "正在下载:";
+"DownloadedStatus" = "已下载: %@ / 总大小: %@";
+"CancelDownload" = "取消下载";
+"DownloadHint" = "下载提示";
+"DownloadCanceled" = "下载已取消";
+"DownloadURLInvalid" = "下载地址错误: %@";
+"ReplaceSuccess" = "替换成功";
+"OperationFailed" = "操作失败: %@";

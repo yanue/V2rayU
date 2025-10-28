@@ -133,10 +133,6 @@ func noticeTip(title: String = "", informativeText: String = "") {
 }
 
 
-func vold() {
-    
-}
-
 func getRandomPort() -> UInt16 {
     return UInt16.random(in: 49152...65535)
 }
@@ -165,13 +161,8 @@ func clearLogFile(logFilePath: String) {
         FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: nil)
     } catch let error {
         logger.info("clear log file fail: \(error)")
-        var title = "Clear log file failed"
-        var toast = "Error: \(error)"
-        if isMainland {
-            title = "清除日志文件失败"
-            toast = "错误: \(error)"
-        }
-        alertDialog(title: title, message: toast)
+        var title = String(localized: .ClearLogFileFailed)
+        alertDialog(title: title, message: error)
     }
 }
 
@@ -184,12 +175,7 @@ func truncateLogFile(_ logFilePath: String) {
         }
     } catch let error {
         logger.info("truncate log file fail: \(error)")
-        var title = "Truncate log file failed"
-        var toast = "Error: \(error)"
-        if isMainland {
-            title = "清除日志文件失败"
-            toast = "错误: \(error)"
-        }
+        var title = String(localized: .ClearLogFileFailed)
         alertDialog(title: title, message: toast)
     }
 }

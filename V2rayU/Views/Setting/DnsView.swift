@@ -75,43 +75,62 @@ struct DnsView: View {
         dnsJson = AppSettings.shared.dnsJson
     }
 
+    // MARK: - 保存 DNS 配置（本地化 + 结构化）
     private func saveDnsServers() {
+        // 去除首尾空白和换行
         var str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // 检查输入能否编码为 UTF-8
         guard let data = str.data(using: .utf8) else {
-            tips = "Error: 输入内容无法编码为 UTF-8"
+            tips = String(localized: .DnsInvalidUTF8) // 错误：输入内容无法编码为 UTF-8
             showAlert = true
             return
         }
+
         var jsonObj: Any
+
+        // 尝试解析 JSON 内容
         do {
             jsonObj = try JSONSerialization.jsonObject(with: data, options: [])
         } catch {
-            tips = "Error: JSON 格式错误 - \(error.localizedDescription)"
+            tips = "\(String(localized: .DnsJSONFormatError)): \(error.localizedDescription)")
             showAlert = true
             return
         }
-        // 判断是否包含 `dns` 节点,如果包含,则取 `dns` 节点内的内容
+
+        // 如果 JSON 顶层包含 dns 节点，提取其内部内容
         if let dict = jsonObj as? [String: Any], let dnsConfig = dict["dns"] {
             jsonObj = dnsConfig
         }
-        // 重新编码为 JSON 字符串
+
+        // 重新编码 JSON（格式化输出，key 按字母排序）
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+
         do {
             let formattedData = try encoder.encode(JSONAny(jsonObj))
+
             if let formattedStr = String(data: formattedData, encoding: .utf8) {
-                // 触发更新
+                // 触发配置更新
                 AppSettings.shared.dnsJson = formattedStr
                 AppSettings.shared.saveSettings()
-                tips = "DNS 配置保存成功"
+
+                // 提示成功
+                tips = String(localized: .DnsSaveSuccess) // DNS 配置保存成功
             } else {
-                tips = "Error: 格式化后内容无法编码为字符串"
+                // 再次编码为字符串失败
+                tips = String(localized: .DnsFormatEncodingFail) // Error: 格式化后内容无法编码为字符串
             }
+
             showAlert = true
+
         } catch {
-            tips = "Error: 保存 DNS 配置失败 - \(error.localizedDescription)"
+            // 保存失败
+            tips = "\(String(localized: .DnsSaveFail)):\(error.localizedDescription)")
             showAlert = true
         }
+
+        // 5 秒后自动清空提示信息
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.tips = ""
         }

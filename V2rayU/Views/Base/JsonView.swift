@@ -77,15 +77,3 @@ struct JSONTextView: NSViewRepresentable {
     }
 
 }
-
-#Preview {
-    JSONTextView(jsonString: """
-    {
-        "name": "Alice",
-        "age": 25,
-        "isAdmin": true,
-        "roles": null,
-        "scores": [95, 88, 76]
-    }
-""")
-}

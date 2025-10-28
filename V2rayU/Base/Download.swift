@@ -6,9 +6,27 @@
 //
 
 import Foundation
+import SwiftUI
+
+/// 下载状态模型（纯数据结构）
+struct DownloadState {
+    var downloadingVersion: String = ""
+    var downloadingUrl: String = ""
+    var progress: Double = 0.0
+    var speed: String = "0.0 KB/s"
+    var downloadedSize: String = "0.0 MB"
+    var totalSize: String = "0.0 MB"
+    var isFinished: Bool = false
+    var errorMessage: String? = nil
+    var downloadedFilePath: String? = nil
+}
 
 /// 通用下载代理，支持进度、超时、错误、完成回调
-class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate, @unchecked Sendable {
+@MainActor
+class DownloadManager: NSObject, ObservableObject, URLSessionDelegate, URLSessionDownloadDelegate {
+    /// 一个整体的下载状态
+    @Published var state = DownloadState()
+
     private let timerLock = NSLock()
     private var _timer: Timer?
     private var timer: Timer? {
@@ -19,7 +37,6 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
     private let timeoutSeconds: Double
     private var didTimeout = false
     private var downloadTask: URLSessionDownloadTask?
-    private let onProgress: (Double, String, String) -> Void
     private let onSuccess: (String) -> Void
     private let onError: (String) -> Void
     private var lastWritten: Int64 = 0
@@ -28,17 +45,40 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
     /// 初始化
     /// - Parameters:
     ///   - timeout: 超时时间（秒）
-    ///   - onProgress: 进度回调 0~1
     ///   - onSuccess: 成功回调，参数为下载文件临时路径
     ///   - onError: 错误回调，参数为错误信息
     init(timeout: Double = 10,
-         onProgress: @escaping (Double, String, String) -> Void,
          onSuccess: @escaping (String) -> Void,
          onError: @escaping (String) -> Void) {
         timeoutSeconds = timeout
-        self.onProgress = onProgress
         self.onSuccess = onSuccess
         self.onError = onError
+    }
+
+    // MARK: - 对外启动下载接口
+    func startDownload(from urlString: String, version: String, totalSize: Int64, useProxy: Bool = true) {
+        guard let url = URL(string: urlString) else {
+            self.state.isFinished = true
+            self.state.errorMessage = String(localized: .DownloadURLInvalid)
+            self.onError(self.state.errorMessage)
+            return
+        }
+        state.downloadingVersion = version
+        state.downloadingUrl = urlString
+        state.totalSize = formatByte(Double(totalSize))
+        state.isFinished = false
+        state.progress = 0.0
+        state.errorMessage = nil
+        var config = URLSessionConfiguration.default
+        if useProxy {
+            config = getProxyUrlSessionConfigure()
+        }
+        session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+        let task = session!.downloadTask(with: url)
+        // 启动超时检测计时器
+        startTimeout(downloadTask: task)
+        // 启动下载任务
+        task.resume()
     }
 
     func startTimeout(downloadTask: URLSessionDownloadTask) {
@@ -48,7 +88,9 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
             self.didTimeout = true
             downloadTask.cancel()
             DispatchQueue.main.async {
-                self.onError("下载超时，请检查网络或代理设置")
+                self.state.isFinished = true
+                self.state.errorMessage = String(localized: .DownloadErrorOccurred)
+                self.onError(self.state.errorMessage)
             }
         }
     }
@@ -61,7 +103,9 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
             self.didTimeout = true
             task.cancel()
             DispatchQueue.main.async {
-                self.onError("下载超时，请检查网络或代理设置")
+                self.state.isFinished = true
+                self.state.errorMessage = String(localized: .DownloadTimeoutError)
+                self.onError(self.state.errorMessage)
             }
         }
     }
@@ -83,10 +127,11 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
         lastWritten = totalBytesWritten
         lastTime = now
         let progress = totalBytesExpectedToWrite > 0 ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) : 0
-
-        DispatchQueue.main.async {
-            self.onProgress(progress, speed, formatByte(Double(totalBytesWritten)))
-        }
+        let downloaded = formatByte(Double(totalBytesWritten))
+        // 更新结构体中的状态
+        self.state.progress = progress
+        self.state.speed = speed
+        self.state.downloadedSize = downloaded
         resetTimeout()
     }
 
@@ -96,6 +141,9 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
         let fileName = downloadTask.response?.suggestedFilename ?? ""
         guard locationPath != "", fileName != "" else {
             logger.info("urlSession: locationPath or fileName missing", )
+            self.state.isFinished = true
+            self.state.errorMessage = String(localized: .DownloadSaveFailed) + ": urlSession: locationPath or fileName missing"
+            self.onError(self.state.errorMessage)
             return
         }
         let documentsPath = NSHomeDirectory() + "/Library/Caches/Download"
@@ -106,18 +154,28 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
                 try FileManager.default.removeItem(atPath: filePath)
             }
         } catch let catchError {
-            alertDialog(title: "下载失败1", message: "保存出错 = \(catchError.localizedDescription)")
+            self.state.isFinished = true
+            self.state.errorMessage = String(localized: .DownloadSaveFailed) + ": \(catchError.localizedDescription)"
+            self.onError(self.state.errorMessage)
+            return
         }
         do {
             if FileManager.default.fileExists(atPath: documentsPath) == false {
                 try FileManager.default.createDirectory(atPath: documentsPath, withIntermediateDirectories: true)
             }
+            // 记录下载文件路径
+            self.state.downloadedFilePath = filePath
             // 移动文件,不然随时被删除
             try FileManager.default.moveItem(atPath: locationPath, toPath: filePath)
         } catch let catchError {
-            alertDialog(title: "下载失败2", message: "保存出错 = \(catchError.localizedDescription)")
+            self.state.isFinished = true
+            self.state.errorMessage = String(localized: .DownloadSaveFailed) + ": \(catchError.localizedDescription)"
+            self.onError(self.state.errorMessage)
+            return
         }
         DispatchQueue.main.async {
+            // 更新状态为完成
+            self.state.isFinished = true
             self.onSuccess(filePath)
         }
     }
@@ -130,7 +188,9 @@ class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDelegate
                 return
             }
             DispatchQueue.main.async {
-                self.onError("下载失败: \(error.localizedDescription)")
+                self.state.isFinished = true
+                self.state.errorMessage = String(localized: .DownloadErrorOccurred) + ": \(error.localizedDescription)"
+                self.onError(self.state.errorMessage)
             }
         }
     }

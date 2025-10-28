@@ -69,20 +69,16 @@ actor AppInstaller: NSObject {
     }
 
     func showInstallAlert() {
-        DispatchQueue.main.async {
+        // 将 UI 操作放到主线程, 同步执行, 确保在调用后才能继续
+        DispatchQueue.main.sync {
+
             let alert = NSAlert()
             alert.alertStyle = .warning
-            if isMainland {
-                alert.messageText = "安装V2rayUTool"
-                alert.informativeText = "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
-                alert.addButton(withTitle: "安装")
-                alert.addButton(withTitle: "退出")
-            } else {
-                alert.messageText = " Install V2rayUTool"
-                alert.informativeText = "V2rayU needs to install V2rayUTool into ~/.V2rayU/V2rayUTool with administrator privileges"
-                alert.addButton(withTitle: "Install")
-                alert.addButton(withTitle: "Quit")
-            }
+            alert.messageText = String(localized: .InstallV2rayUTool)
+            alert.informativeText = String(localized: .InstallPermissionTip)
+            alert.addButton(withTitle: String(localized: .Install))
+            alert.addButton(withTitle: String(localized: .Quit))
+
             switch alert.runModal() {
             case .alertFirstButtonReturn:
                 Task {
@@ -131,12 +127,8 @@ actor AppInstaller: NSObject {
             logger.info("executeAppleScript-Output: \(output)")
         } catch {
             logger.info("executeAppleScript-Error: \(error)")
-            var title = "Install V2rayUTool Failed"
-            var toast = "Error: \(error),\nYou need execute scripts manually:\n \(script)"
-            if isMainland {
-                title = "安装 V2rayUTool 失败"
-                toast = "安装失败: \(error)\n, 你需要在命令行手动执行一下: \(script)"
-            }
+            var title = String(localized: .InstallFailed)
+            var toast = "\(String(localized: .InstallFailedManual))\n \(script)"
             alertDialog(title: title, message: toast)
         }
     }

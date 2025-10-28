@@ -26,15 +26,20 @@ enum LanguageLabel: String, CaseIterable {
     case Delete
     case DeleteSelected
     case DeleteConfirm
-    case DeleteConfirmSelected
+    case DeleteSelectedConfirm
     case DeleteTip
     case OK
     case Add
+    case Export
+    case Select
+    case Duplicate
     // profile share
     case Regenerate
     case Regenerated
     case Copy
     case Copied
+    case CopyFailed
+    case ShareProfile
     // app content
     case Activity
     case ActivitySubHead
@@ -95,12 +100,31 @@ enum LanguageLabel: String, CaseIterable {
     case PACUpdateError
     case PACUpdateSuccess
     case PACUpdateNotification
+    // updatePac 主流程提示
+    case UpdatingPacRules = "UpdatingPacRules" // Updating Pac Rules ...
+    case PacUpdatedByUserRules = "PacUpdatedByUserRules" // PAC has been updated by User Rules.
+    case PacUpdateFailedByUserRules = "PacUpdateFailedByUserRules" // It's failed to update PAC by User Rules.
+    case UpdatePacError = "UpdatePacError" // updatePac error: \(error)
+    // GFWList 相关提示
+    case InvalidGfwUrl = "InvalidGfwUrl" // Failed to download latest GFW List: url is not valid
+    case GfwListDownloadFailed = "GfwListDownloadFailed" // Failed to download latest GFW List.
+    case GfwListDownloadError = "GfwListDownloadError" // Failed to download latest GFW List: \(error)
+    case GfwListWriteFailed = "GfwListWriteFailed" // Failed to write latest GFW List.
+    case GfwListUpdated = "GfwListUpdated" // gfwList has been updated
+    // PAC 更新提示
+    case PacUpdatedByGfwList = "PacUpdatedByGfwList" // PAC has been updated by latest GFW List.
+    case PacUpdateFailedByCurl = "PacUpdateFailedByCurl" // Failed to update PAC by curl method.
     // dns settings
     case DnsConfiguration
     case DnsJsonFormatTip
     case ViewConfiguration
     case Help
     case Notification
+    case DnsInvalidUTF8 = "DnsInvalidUTF8" // Error: 输入内容无法编码为 UTF-8
+    case DnsJSONFormatError = "DnsJSONFormatError" // Error: JSON 格式错误 - \(error.localizedDescription)
+    case DnsFormatEncodingFail = "DnsFormatEncodingFail" // Error: 格式化后内容无法编码为字符串
+    case DnsSaveSuccess = "DnsSaveSuccess" // DNS 配置保存成功
+    case DnsSaveFail = "DnsSaveFail" // Error: 保存 DNS 配置失败 - \(error.localizedDescription)
     // subscription form
     case SubscriptionSettings
     case SubscriptionSettingsSubHead
@@ -124,6 +148,17 @@ enum LanguageLabel: String, CaseIterable {
     case Direct
     case Proxy
     case Block
+    // 自定义规则填写说明
+    case CustomRuleGuideTitle          // 标题: “自定义规则填写说明”
+    case CustomRuleGuideDescription    // 说明: “每行填写一个规则，可为域名、IP 或 预定义列表。”
+    case CustomRulePriorityDescription // 说明: “优先级: 域名阻断 -> 域名代理 -> ...”
+    // 规则格式说明部分
+    case CustomRuleDomainIntro         // “• 域名：”
+    case CustomRuleDomainExample       // “如 example.com、*.google.com”
+    case CustomRuleIPIntro             // “• IP：”
+    case CustomRuleIPExample           // “如 8.8.8.8、192.168.0.0/16”
+    case CustomRulePredefinedIntro     // “• 预定义：”
+    case CustomRulePredefinedExample   // “如 geoip:private、geosite:cn、localhost”
     // Profile Settings
     case ProfileSettings
     case ProfileSettingsSubHead
@@ -238,5 +273,75 @@ enum LanguageLabel: String, CaseIterable {
     case TableFieldUrl
     case TableFieldInterval
     case TableFieldUpdateTime
+    case TableFieldType
+    case TableFieldAddress
+    case TableFieldPort
+    case TableFieldLatency
+    case TableFieldNetwork
+    case TableFieldSecurity
+    case TableFieldTodayDown
+    case TableFieldTodayUp
+    case TableFieldTotalDown
+    case TableFieldTotalUp
+    case TableFieldDomainStrategy
+    case TableFieldDirect
+    case TableFieldBlock
+    case TableFieldProxy
+    case Security
     case SyncAll
+    case SearchTip
+    case AllGroup
+    case SelectGroup
+    case SelectAll
+    case CopyURI
+    case MoveToTop
+    case MoveToBottom
+    case MoveUp
+    case MoveDown
+    // about
+    case Version
+    case Build
+    case CoreVersion
+    case RelatedFileLocations
+    case ClickAndOpenInFinder // 点击路径可在 Finder 打开
+    case OpenInFinder // 在 Finder 打开
+    case OpenSourceProject
+    case OpenSourceLicense // 遵循 GNU GPL v3.0 许可协议
+    case OpenSourceLibraries     // 引用开源库
+    case UsedButNotLimitedTo     // 有用到且不限于以下
+    case OpenInBrowser
+    // core update
+    case CoreSettingsTitle = "CoreSettingsTitle"               // Core Settings
+    case CoreSettingsSubtitle = "CoreSettingsSubtitle"         // Manage your core versions
+    // 基本操作
+    case CheckLatestVersion = "CheckLatestVersion"             // 检查最新版本
+    case LocalCoreDirectory = "LocalCoreDirectory"             // 本地 Xray Core 目录
+    case FileDirectory = "FileDirectory"                       // 文件目录:
+    case LocalCoreVersionDetail = "LocalCoreVersionDetail"     // 本地 Xray Core 版本明细
+    case GithubLatestVersion = "GithubLatestVersion"           // GitHub 最新版本
+    case DownloadAndReplace = "DownloadAndReplace"             // 下载并替换
+    // 下载弹窗
+    case Downloading = "Downloading"                           // 正在下载:
+    case OpenInBrowser = "OpenInBrowser"                       // 浏览器打开
+    case DownloadedStatus = "DownloadedStatus"                 // 已下载: %@ / 总大小: %@
+    case Close = "Close"                                       // 关闭
+    case CancelDownload = "CancelDownload"                     // 取消下载
+    case DownloadHint = "DownloadHint"                         // 下载提示
+    case Confirm = "Confirm"                                   // 确定
+    case DownloadCanceled = "DownloadCanceled"                 // 下载已取消
+    case DownloadURLInvalid = "DownloadURLInvalid"             // 下载地址错误: %@
+    case ReplaceSuccess = "ReplaceSuccess"                     // 替换成功！
+    case OperationFailed = "OperationFailed"                   // 操作失败: %@
+    case DownloadTimeoutError = "DownloadTimeoutError"
+    case DownloadSaveFailed = "SaveError"
+    case DownloadErrorOccurred = "DownloadErrorOccurred"
+    case ClearLogFileFailed = "ClearLogFileFailed"           // 清除日志文件失败
+    case PortInUse = "PortInUse"                       // 端口已被占用
+    case PortInUseTip = "PortInUseTip"                       // 端口已被占用, 请更换其他端口号。
+    case Install = "Install" // 安装
+    case InstallTitle = "InstallTitle"               // 安装V2rayUTool工具
+    case InstallPermissionTip = "InstallPermissionTip" // "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
+    case InstallFailed = "InstallFailed"               // 安装失败
+    case InstallFailedTip = "InstallFailedTip" // 安装 V2rayUTool 失败: %@
+    case InstallFailedManual = "InstallFailedManual" // 请手动运行安装脚本进行安装。
 }

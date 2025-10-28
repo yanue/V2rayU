@@ -62,28 +62,28 @@ struct RoutingFormView: View {
                         .font(.title2)
                         .padding(.top, 2)
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("自定义规则填写说明")
+                        Text(String(localized: .CustomRuleGuideTitle)) // 自定义规则填写说明
                             .font(.headline)
-                        Text("每行填写一个规则，可为域名、IP 或 预定义列表。")
+                        Text(String(localized: .CustomRuleGuideDescription)) // 每行填写一个规则，可为域名、IP 或 预定义列表。
                             .font(.subheadline)
-                        Text("优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连")
+                        Text(String(localized: .CustomRulePriorityDescription)) // 优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连
                             .font(.footnote)
                             .foregroundColor(.secondary)
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(alignment: .top, spacing: 4) {
-                                Text("• 域名：")
+                                Text(String(localized: .CustomRuleDomainIntro)) // • 域名：
                                     .bold()
-                                Text("如 example.com、*.google.com")
+                                Text(String(localized: .CustomRuleDomainExample)) // 如 example.com、*.google.com
                             }
                             HStack(alignment: .top, spacing: 4) {
-                                Text("• IP：")
+                                Text(String(localized: .CustomRuleIPIntro)) // • IP：
                                     .bold()
-                                Text("如 8.8.8.8、192.168.0.0/16")
+                                Text(String(localized: .CustomRuleIPExample)) // 如 8.8.8.8、192.168.0.0/16
                             }
                             HStack(alignment: .top, spacing: 4) {
-                                Text("• 预定义：")
+                                Text(String(localized: .CustomRulePredefinedIntro)) // • 预定义：
                                     .bold()
-                                Text("如 geoip:private、geosite:cn、localhost")
+                                Text(String(localized: .CustomRulePredefinedExample)) // 如 geoip:private、geosite:cn、localhost
                             }
                         }
                         .font(.footnote)

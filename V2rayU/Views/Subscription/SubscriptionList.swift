@@ -40,7 +40,7 @@ struct SubscriptionListView: View {
                 }
                 .buttonStyle(.bordered)
                 Button(action: {
-                    if showConfirmAlertSync(title: localizedString(.DeleteConfirmSelected), message: localizedString(.DeleteTip)) {
+                    if showConfirmAlertSync(title: localizedString(.DeleteSelectedConfirm), message: localizedString(.DeleteTip)) {
                         withAnimation {
                             for selectedID in self.selection {
                                 viewModel.delete(uuid: selectedID)
@@ -59,9 +59,13 @@ struct SubscriptionListView: View {
                 }
                 .disabled(viewModel.list.isEmpty)
                 .buttonStyle(.borderedProminent)
+
+                Button(action: { withAnimation { loadData() } }) {
+                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
             }
 
-            
             Spacer()
 
             // 将复杂的 Table 表达式提取到单独的计算属性以降低类型检查复杂度

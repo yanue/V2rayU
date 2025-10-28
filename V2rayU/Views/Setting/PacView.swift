@@ -97,116 +97,111 @@ struct PacView: View {
         NSWorkspace.shared.open(url)
     }
 
+    /// 更新 PAC 文件（由用户规则触发）
     func updatePac(_ sender: Any) {
-        tips = "Updating Pac Rules ..."
+        tips = String(localized: .UpdatingPacRules) // Updating Pac Rules ...
+
         do {
-            // save user rules into file
+            // 保存用户规则
             logger.info("user-rules: \(pacUserRules)")
             try pacUserRules.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
 
+            // 从 GFWList 更新
             UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl)
 
             if GeneratePACFile(rewrite: true) {
-                // Popup a user notification
-                tips = "PAC has been updated by User Rules."
-                showAlert = true
+                tips = String(localized: .PacUpdatedByUserRules) // PAC has been updated by User Rules.
             } else {
-                tips = "It's failed to update PAC by User Rules."
-                showAlert = true
+                tips = String(localized: .PacUpdateFailedByUserRules) // It's failed to update PAC by User Rules.
             }
+            showAlert = true
+
         } catch {
             logger.info("updatePac error \(error)")
-            tips = "updatePac error \(error)"
+            // 使用本地化模板字符串
+            tips = String(localized: .UpdatePacError, defaultValue: "updatePac error \(error)")
             showAlert = true
         }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.tips = ""
         }
     }
 
+    /// 从 GFWList 在线地址更新
     func UpdatePACFromGFWList(gfwPacListUrl: String) {
-        // Make the dir if rulesDirPath is not exesited.
         if !FileManager.default.fileExists(atPath: PACRulesDirPath) {
-            do {
-                try FileManager.default.createDirectory(atPath: PACRulesDirPath, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-            }
+            try? FileManager.default.createDirectory(atPath: PACRulesDirPath, withIntermediateDirectories: true)
         }
 
         guard let reqUrl = URL(string: gfwPacListUrl) else {
             DispatchQueue.main.async {
-                self.tips = "Failed to download latest GFW List: url is not valid"
+                self.tips = String(localized: .InvalidGfwUrl)
                 self.showAlert = true
             }
             return
         }
 
-        // url request with proxy
         let session = URLSession(configuration: getProxyUrlSessionConfigure())
-        let task = session.dataTask(with: URLRequest(url: reqUrl)) { (data: Data?, _: URLResponse?, error: Error?) in
-            if error != nil {
+        let task = session.dataTask(with: URLRequest(url: reqUrl)) { (data, _, error) in
+            if let error {
                 DispatchQueue.main.async {
-                    self.tips = "Failed to download latest GFW List: \(String(describing: error))"
+                    self.tips = "\(String(localized: .GfwListDownloadError)): \(error.localizedDescription)")
                     self.showAlert = true
                 }
-            } else {
-                if data != nil {
-                    if let outputStr = String(data: data!, encoding: String.Encoding.utf8) {
-                        do {
-                            try outputStr.write(toFile: GFWListFilePath, atomically: true, encoding: String.Encoding.utf8)
-                            DispatchQueue.main.async {
-                                self.tips = "gfwList has been updated"
-                                self.showAlert = true
-                            }
+                return
+            }
 
-                            // save to UserDefaults
-                            UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
+            guard let data, let outputStr = String(data: data, encoding: .utf8) else {
+                DispatchQueue.main.async {
+                    self.tips = String(localized: .GfwListDownloadFailed)
+                    self.showAlert = true
+                }
+                Task {
+                    await tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
+                }
+                return
+            }
 
-                            if GeneratePACFile(rewrite: true) {
-                                // Popup a user notification
-                                DispatchQueue.main.async {
-                                    self.tips = "PAC has been updated by latest GFW List."
-                                    self.showAlert = true
-                                }
-                            }
-                        } catch {
-                            // Popup a user notification
-                            DispatchQueue.main.async {
-                                self.tips = "Failed to Write latest GFW List."
-                                self.showAlert = true
-                            }
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.tips = "Failed to download latest GFW List."
-                            self.showAlert = true
-                        }
-                    }
-                } else {
-                    // Popup a user notification
+            do {
+                try outputStr.write(toFile: GFWListFilePath, atomically: true, encoding: .utf8)
+                DispatchQueue.main.async {
+                    self.tips = String(localized: .GfwListUpdated) // gfwList has been updated
+                    self.showAlert = true
+                }
+
+                UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
+
+                if GeneratePACFile(rewrite: true) {
                     DispatchQueue.main.async {
-                        self.tips = "Failed to download latest GFW List."
+                        self.tips = String(localized: .PacUpdatedByGfwList)
                         self.showAlert = true
                     }
-                    Task {
-                        await tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
-                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.tips = String(localized: .GfwListWriteFailed)
+                    self.showAlert = true
                 }
             }
         }
+
         task.resume()
     }
 
     func tryDownloadByShell(gfwPacListUrl: String) {
         let sockPort = getSocksProxyPort()
-        let curlCmd = "cd " + PACRulesDirPath + " && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
+        let curlCmd = "cd \(PACRulesDirPath) && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
         logger.info("curlCmd: \(curlCmd)")
+
         let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
+        logger.info("curl result: \(msg)")
+
         if GeneratePACFile(rewrite: true) {
-            // Popup a user notification
-            DispatchQueue.main.async {
-                self.tips = "PAC has been updated by latest GFW List."
-            }
+            self.tips = String(localized: .PacUpdatedByGfwList)
+        } else {
+            self.tips = String(localized: .PacUpdateFailedByCurl)
         }
+        self.showAlert = true
     }
 }
