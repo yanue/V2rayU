@@ -35,8 +35,34 @@ function build() {
     sleep 3
     
     echo "verifying archive..."
-    lipo -info ${V2rayU_ARCHIVE}/Products/Applications/V2rayU.app/Contents/MacOS/V2rayU
     
+    # 判断 V2rayU.app 的架构是否为 "x86_64 arm64"
+    v2rayUInfo="$(lipo -info ${V2rayU_ARCHIVE}/Products/Applications/V2rayU.app/Contents/MacOS/V2rayU)"
+    if [[ "$v2rayUInfo" != *"x86_64 arm64"* ]]; then
+        echo "Error: V2rayU.app is not x86_64: $v2rayUInfo"
+        exit 1
+    else
+        echo "V2rayU.app architecture verified: $v2rayUInfo"
+    fi
+
+    # 判断 v2ray-core/v2ray 的架构是否为 "x86_64"
+    v2rayInfo="$(lipo -info ${V2rayU_ARCHIVE}/Products/Applications/V2rayU.app/Contents/Resources/v2ray-core/v2ray)"
+    if [[ "$v2rayInfo" != *"x86_64"* ]]; then
+        echo "Error: v2ray file is not x86_64: $v2rayInfo"
+        exit 1
+    else
+        echo "v2ray file architecture verified: $v2rayInfo"
+    fi
+
+    # 判断 v2ray-core/v2ray-arm64 的架构是否为 "arm64"
+    v2rayArm64Info="$(lipo -info ${V2rayU_ARCHIVE}/Products/Applications/V2rayU.app/Contents/Resources/v2ray-core/v2ray-arm64)"
+    if [[ "$v2rayArm64Info" != *"arm64"* ]]; then
+        echo "Error: v2ray-arm64 file is not arm64: $v2rayArm64Info"
+        exit 1
+    else
+        echo "v2ray-arm64 file verified: $v2rayArm64Info"
+    fi
+
     echo "Copying .app to release directory..."
     mkdir -p ${V2rayU_RELEASE}
     cp -R "${V2rayU_ARCHIVE}/Products/Applications/${APP_NAME}.app" "${V2rayU_RELEASE}/${APP_NAME}.app"
