@@ -161,8 +161,10 @@ func clearLogFile(logFilePath: String) {
         FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: nil)
     } catch let error {
         logger.info("clear log file fail: \(error)")
-        var title = String(localized: .ClearLogFileFailed)
-        alertDialog(title: title, message: error)
+        DispatchQueue.main.async {
+            let title = String(localized: .ClearLogFileFailed)
+            alertDialog(title: title, message: error.localizedDescription)
+        }
     }
 }
 
@@ -175,8 +177,10 @@ func truncateLogFile(_ logFilePath: String) {
         }
     } catch let error {
         logger.info("truncate log file fail: \(error)")
-        var title = String(localized: .ClearLogFileFailed)
-        alertDialog(title: title, message: toast)
+        DispatchQueue.main.async {
+            let title = String(localized: .ClearLogFileFailed)
+            alertDialog(title: title, message: error.localizedDescription)
+        }
     }
 }
 

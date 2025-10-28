@@ -37,7 +37,7 @@ struct RoutingDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
         case uuid, name, remark, domainStrategy, domainMatcher, block, proxy, direct, sort
     }
 
-    init(uuid: String = UUID().uuidString, name: String, remark: String, domainStrategy: String = "AsIs", domainMatcher: String = "hybrid", block: String = "", proxy: String = "", direct: String = "", sort: Int = 0) {
+    init(uuid: String = UUID().uuidString, name: String="", remark: String="", domainStrategy: String = "AsIs", domainMatcher: String = "hybrid", block: String = "", proxy: String = "", direct: String = "", sort: Int = 0) {
         self.uuid = uuid
         self.name = name
         self.remark = remark

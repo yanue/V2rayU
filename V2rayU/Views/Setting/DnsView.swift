@@ -93,7 +93,7 @@ struct DnsView: View {
         do {
             jsonObj = try JSONSerialization.jsonObject(with: data, options: [])
         } catch {
-            tips = "\(String(localized: .DnsJSONFormatError)): \(error.localizedDescription)")
+            tips = "\(String(localized: .DnsJSONFormatError)): \(error.localizedDescription)"
             showAlert = true
             return
         }
@@ -126,7 +126,7 @@ struct DnsView: View {
 
         } catch {
             // 保存失败
-            tips = "\(String(localized: .DnsSaveFail)):\(error.localizedDescription)")
+            tips = "\(String(localized: .DnsSaveFail)):\(error.localizedDescription)"
             showAlert = true
         }
 

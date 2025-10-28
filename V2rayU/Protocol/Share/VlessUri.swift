@@ -102,7 +102,7 @@ class VlessUri: BaseShareUri {
         guard var address = url.host else {
             return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey:  "error:missing host"])
         }
-        var host = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
+        let host = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
         var port = url.port ?? 0 // 可能没有 port
         var password = url.password ?? "" // 可能没有 password
         if host.count == 0 || port == 0 {

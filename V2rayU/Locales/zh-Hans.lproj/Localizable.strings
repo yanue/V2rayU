@@ -335,3 +335,15 @@
 "DownloadURLInvalid" = "下载地址错误: %@";
 "ReplaceSuccess" = "替换成功";
 "OperationFailed" = "操作失败: %@";
+"DownloadTimeoutError" = "下载超时";
+"SaveError" = "保存文件失败";
+"DownloadErrorOccurred" = "下载过程中发生错误";
+"ClearLogFileFailed" = "清除日志文件失败";
+"PortInUse" = "端口已被占用";
+"PortInUseTip" = "端口已被占用, 请更换其他端口号。";
+"Install" = "安装";
+"InstallTitle" = "安装 V2rayUTool 工具";
+"InstallPermissionTip" = "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool";
+"InstallFailed" = "安装失败";
+"InstallFailedTip" = "安装 V2rayUTool 失败: %@";
+"InstallFailedManual" = "请手动运行安装脚本进行安装。";

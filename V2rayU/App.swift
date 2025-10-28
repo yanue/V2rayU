@@ -20,6 +20,10 @@ let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 let logger = Logger(subsystem: "net.yanue.V2rayU", category: "app")
 let uiLogger = Logger(subsystem: "net.yanue.V2rayU", category: "ui")
+let appVersion = getAppVersion()
+let coreVersion = getCoreShortVersion()
+let langStr = Locale.current.identifier
+let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 
 /// Mark - 入口
 @main

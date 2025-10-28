@@ -165,7 +165,7 @@ struct ProfileListView: View {
             Button {
                 self.pingRow = ProfileModel(from: item)
             } label: {
-                Label(String(localized.Ping), systemImage: "speedometer")
+                Label(String(localized: .Ping), systemImage: "speedometer")
             }
 
             Divider()

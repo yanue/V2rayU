@@ -335,3 +335,15 @@
 "DownloadURLInvalid" = "Invalid download URL: %@";
 "ReplaceSuccess" = "Replace Successful!";
 "OperationFailed" = "Operation Failed: %@";
+"DownloadTimeoutError" = "Download timed out";
+"SaveError" = "Failed to save file";
+"DownloadErrorOccurred" = "An error occurred during download";
+"ClearLogFileFailed" = "Failed to clear log file";
+"PortInUse" = "Port is already in use";
+"PortInUseTip" = "The port is already in use, please choose another port number.";
+"Install" = "Install";
+"InstallTitle" = "Install V2rayUTool";
+"InstallPermissionTip" = "V2rayU requires administrator privileges to install V2rayUTool to ~/.V2rayU/V2rayUTool";
+"InstallFailed" = "Installation failed";
+"InstallFailedTip" = "Failed to install V2rayUTool: %@";
+"InstallFailedManual" = "Please run the installation script manually.";

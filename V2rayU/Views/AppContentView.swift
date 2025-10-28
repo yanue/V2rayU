@@ -11,8 +11,6 @@ struct ContentView: View {
 
     // 定义 Tab 枚举
     enum Tab: String, CaseIterable {
-        case activity
-        case log
         case server
         case subscription
         case routing
@@ -63,6 +61,7 @@ struct ContentView: View {
                     HelpPageView()
                 case .about:
                     AboutView()
+
                 }
                 Spacer()
             }

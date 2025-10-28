@@ -287,7 +287,6 @@ enum LanguageLabel: String, CaseIterable {
     case TableFieldDirect
     case TableFieldBlock
     case TableFieldProxy
-    case Security
     case SyncAll
     case SearchTip
     case AllGroup
@@ -322,12 +321,9 @@ enum LanguageLabel: String, CaseIterable {
     case DownloadAndReplace = "DownloadAndReplace"             // 下载并替换
     // 下载弹窗
     case Downloading = "Downloading"                           // 正在下载:
-    case OpenInBrowser = "OpenInBrowser"                       // 浏览器打开
     case DownloadedStatus = "DownloadedStatus"                 // 已下载: %@ / 总大小: %@
-    case Close = "Close"                                       // 关闭
     case CancelDownload = "CancelDownload"                     // 取消下载
     case DownloadHint = "DownloadHint"                         // 下载提示
-    case Confirm = "Confirm"                                   // 确定
     case DownloadCanceled = "DownloadCanceled"                 // 下载已取消
     case DownloadURLInvalid = "DownloadURLInvalid"             // 下载地址错误: %@
     case ReplaceSuccess = "ReplaceSuccess"                     // 替换成功！

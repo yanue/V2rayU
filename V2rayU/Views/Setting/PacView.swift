@@ -119,7 +119,7 @@ struct PacView: View {
         } catch {
             logger.info("updatePac error \(error)")
             // 使用本地化模板字符串
-            tips = String(localized: .UpdatePacError, defaultValue: "updatePac error \(error)")
+            tips = String(localized: .UpdatePacError) + "\(error.localizedDescription)"
             showAlert = true
         }
 
@@ -146,7 +146,7 @@ struct PacView: View {
         let task = session.dataTask(with: URLRequest(url: reqUrl)) { (data, _, error) in
             if let error {
                 DispatchQueue.main.async {
-                    self.tips = "\(String(localized: .GfwListDownloadError)): \(error.localizedDescription)")
+                    self.tips = "\(String(localized: .GfwListDownloadError)): \(error.localizedDescription)"
                     self.showAlert = true
                 }
                 return
@@ -195,8 +195,7 @@ struct PacView: View {
         logger.info("curlCmd: \(curlCmd)")
 
         let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
-        logger.info("curl result: \(msg)")
-
+        logger.info("curl msg: \(String(describing: msg))")
         if GeneratePACFile(rewrite: true) {
             self.tips = String(localized: .PacUpdatedByGfwList)
         } else {

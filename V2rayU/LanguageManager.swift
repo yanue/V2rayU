@@ -86,6 +86,12 @@ extension String {
     init(localized label: LanguageLabel) {
         self = LanguageManager.shared.localizedString(label.rawValue)
     }
+    @MainActor
+    init(localized label: LanguageLabel, arguments: CVarArg...) {
+        let localizedString = LanguageManager.shared.localizedString(label.rawValue)
+        let finalString = arguments.isEmpty ? localizedString : String(format: localizedString, arguments: arguments)
+        self = finalString
+    }
 }
 
 

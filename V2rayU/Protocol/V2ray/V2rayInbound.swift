@@ -70,8 +70,6 @@ extension V2rayInbound {
         case .dokodemoDoor:
             settingDokodemoDoor = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
             break
-        default:
-            break
         }
     }
 
@@ -106,8 +104,6 @@ extension V2rayInbound {
             break
         case .dokodemoDoor:
             try container.encode(self.settingDokodemoDoor, forKey: .settings)
-            break
-        default:
             break
         }
     }

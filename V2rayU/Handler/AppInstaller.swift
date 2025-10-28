@@ -74,7 +74,7 @@ actor AppInstaller: NSObject {
 
             let alert = NSAlert()
             alert.alertStyle = .warning
-            alert.messageText = String(localized: .InstallV2rayUTool)
+            alert.messageText = String(localized: .InstallTitle)
             alert.informativeText = String(localized: .InstallPermissionTip)
             alert.addButton(withTitle: String(localized: .Install))
             alert.addButton(withTitle: String(localized: .Quit))
@@ -127,9 +127,11 @@ actor AppInstaller: NSObject {
             logger.info("executeAppleScript-Output: \(output)")
         } catch {
             logger.info("executeAppleScript-Error: \(error)")
-            var title = String(localized: .InstallFailed)
-            var toast = "\(String(localized: .InstallFailedManual))\n \(script)"
-            alertDialog(title: title, message: toast)
+            DispatchQueue.main.sync {
+                let title =  String(localized: .InstallFailed)
+                let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
+                alertDialog(title: title, message: toast)
+            }
         }
     }
 

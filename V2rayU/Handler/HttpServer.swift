@@ -34,8 +34,8 @@ actor LocalHttpServer {
         logger.info("pacPort: \(pacPort)")
 
         if isPortOpen(pacPort) {
-            var title = String(localized: .PortInUse)
-            var toast = + "\(pacPort) " + String(localized: .PortInUseTip)
+            var title = await String(localized: .PortInUse)
+            var toast = await "\(pacPort) " + String(localized: .PortInUseTip)
             alertDialog(title: title, message: toast)
             DispatchQueue.main.async {
                 showDock(state: true)
