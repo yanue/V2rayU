@@ -64,6 +64,7 @@
 		6651ACCE2E7ADAE40026128F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6651ACCD2E7ADAE40026128F /* Assets.xcassets */; };
 		6653B5182E7FBE3F003D0A6F /* PingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6653B5172E7FBE39003D0A6F /* PingHandler.swift */; };
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
+		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
 		6680D10B2E26802D0013095C /* LogPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D10A2E2680250013095C /* LogPageView.swift */; };
@@ -204,6 +205,7 @@
 		6651ACCD2E7ADAE40026128F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6653B5172E7FBE39003D0A6F /* PingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingHandler.swift; sourceTree = "<group>"; };
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
+		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
 		6680D10A2E2680250013095C /* LogPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPageView.swift; sourceTree = "<group>"; };
@@ -604,6 +606,7 @@
 			children = (
 				66E94B2D2D26B95D003745B5 /* Common.swift */,
 				66E94B2E2D26B95D003745B5 /* JsonView.swift */,
+				66764BCA2EB3BA48002F330B /* DownloadView.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -797,6 +800,7 @@
 				662CC41C2D1BED9B006E8450 /* ProfileModel.swift in Sources */,
 				662CC41D2D1BED9B006E8450 /* Port.swift in Sources */,
 				662CC4202D1BED9B006E8450 /* Util.swift in Sources */,
+				66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */,
 				66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
 				665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */,
@@ -1008,7 +1012,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"V2rayU/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1042,7 +1046,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"V2rayU/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

@@ -18,7 +18,6 @@ struct CoreView: View {
     @State private var showDownloadDialog = false
     @State private var is_end: Bool = false
     @State private var showAlert = false
-    @ObservedObject private var downloader = DownloadManager()
     
     var body: some View {
         VStack(spacing: 8) {
@@ -107,7 +106,16 @@ struct CoreView: View {
 
             // 下载弹窗
             if showDownloadDialog {
-                DownloadView(version: version!)
+                DownloadView(
+                    version: version!,
+                    onDownloadSuccess: { filePath in
+                        self.onDownloadSuccess(filePath: filePath)
+                    },
+                    onDownloadFail: { err in
+                        self.onDownloadFail(err: err)
+                    },
+                    closeDownloadDialog: closeDownloadDialog
+                )
             }
 
         }
@@ -196,22 +204,8 @@ struct CoreView: View {
         self.version = version
         isLoading = true
         showDownloadDialog = true
-        is_end = false
-        errorMsg = ""
-    }
-
-    // MARK: - 在浏览器打开
-    func openInBrowser(_ urlStr: String) {
-        guard let url = URL(string: urlStr) else { return }
-        NSWorkspace.shared.open(url)
-    }
-
-    // MARK: - 取消下载
-    private func cancelDownload() {
         is_end = true
-        self.downloader.cancelTask()
-        isLoading = false
-        errorMsg = String(localized: .DownloadCanceled)
+        errorMsg = ""
     }
 
     // MARK: - 关闭下载面板
@@ -258,145 +252,5 @@ struct CoreView: View {
         }
         try? FileManager.default.removeItem(atPath: backupPath)
         try? FileManager.default.removeItem(atPath: zipFile)
-    }
-}
-
-
-
-//
-//  CoreView.swift
-//  V2rayU
-//
-//  Created by yanue on 2025/7/20.
-//
-struct DownloadView: View {
-    @State private var showDownloadDialog = false
-    @StateObject private var downloader = DownloadManager()   // ✅ 改成 StateObject
-    @State private var showAlert = false
-    @State private var is_end: Bool = false
-    @State private var isLoading: Bool = false
-    
-    var version: GithubRelease
-    var onDownloadDone: ((String) -> Void) =  { _ in }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: "arrow.down.circle.fill")
-                    .foregroundColor(.accentColor)
-                    .font(.title2)
-                VStack(alignment: .leading) {
-                    Text("\(String(localized: .Downloading))\(downloader.state.downloadingVersion)")
-                        .font(.headline)
-                    Text(downloader.state.downloadingUrl)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-                Spacer()
-                Button(action: {
-                    openInBrowser(downloader.state.downloadingUrl)
-                }) {
-                    Label(String(localized: .OpenInBrowser), systemImage: "safari")
-                }
-                .buttonStyle(.bordered)
-            }
-
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(String(format: "%.1f%%", downloader.state.progress * 100))
-                        .font(.headline)
-                        .frame(width: 60, alignment: .leading)
-                    Text(String(localized: .DownloadedStatus,
-                                arguments: downloader.state.downloadedSize,
-                                downloader.state.totalSize))
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(downloader.state.speed)
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
-                }
-
-                ProgressView(value: downloader.state.progress)
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .frame(height: 10)
-                    .tint(.accentColor)
-
-                HStack {
-                    if downloader.state.errorMessage != "" {
-                        Text(downloader.state.errorMessage)
-                            .foregroundColor(.red)
-                    }
-                    Spacer()
-                    if is_end {
-                        Button(action: { closeDownloadDialog() }) {
-                            Label(String(localized: .Close), systemImage: "xmark.circle")
-                        }
-                        .buttonStyle(.borderedProminent)
-                    } else {
-                        Button(action: { cancelDownload() }) {
-                            Label(String(localized: .CancelDownload), systemImage: "xmark.circle")
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                }
-            }
-        }
-        .padding()
-        .background()
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-        )
-        .onAppear(){
-            startDownload()
-        }
-    }
-
-    // MARK: - 下载并替换
-    private func startDownload() {
-        isLoading = true
-        showDownloadDialog = true
-        is_end = false
-        downloader.state.errorMessage = ""   // ✅ 直接清空 state.errorMessage
-        let downloadingVersion = version.tagName
-        let asset = version.getDownloadAsset()
-        downloader.onSuccess = self.onDownloadSuccess
-        downloader.onError = self.onDownloadFail
-        downloader.startDownload(from: asset.browserDownloadUrl,version: downloadingVersion,totalSize: Int64(asset.size),useProxy: true)
-    }
-
-    private func onDownloadSuccess(filePath: String) {
-        self.onDownloadDone(filePath)
-        self.showAlert = true
-        self.isLoading = false
-        self.is_end = true
-    }
-
-    private func onDownloadFail(err: String) {
-        self.isLoading = false
-        self.is_end = true
-        downloader.state.errorMessage = err   // ✅ 统一写入 state
-    }
-
-    private func cancelDownload() {
-        is_end = true
-        downloader.cancelTask()
-        isLoading = false
-        downloader.state.errorMessage = String(localized: .DownloadCanceled)  // ✅
-    }
-
-    private func closeDownloadDialog() {
-        self.showDownloadDialog = false
-    }
-    
-    // MARK: - 在浏览器打开
-    func openInBrowser(_ urlStr: String) {
-        guard let url = URL(string: urlStr) else { return }
-        NSWorkspace.shared.open(url)
     }
 }
