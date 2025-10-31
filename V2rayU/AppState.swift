@@ -137,6 +137,10 @@ final class AppState: ObservableObject {
                 await SubscriptionHandler.shared.sync()
             }
         }
+        // 检查是否需要更新
+        if AppSettings.shared.checkForUpdates {
+            V2rayUpdater.checkForUpdates(showWindow: false)
+        }
     }
 
     // MARK: - 菜单栏 Toggle

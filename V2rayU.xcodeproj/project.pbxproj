@@ -65,13 +65,19 @@
 		6653B5182E7FBE3F003D0A6F /* PingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6653B5172E7FBE39003D0A6F /* PingHandler.swift */; };
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
 		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
+		66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BD92EB4EF8A002F330B /* CoreViewModel.swift */; };
+		66764BDF2EB4F031002F330B /* GithubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BDE2EB4F030002F330B /* GithubService.swift */; };
+		66764BE12EB4F049002F330B /* CoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE02EB4F045002F330B /* CoreManager.swift */; };
+		66764BE62EB4F461002F330B /* AppVersionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE52EB4F460002F330B /* AppVersionController.swift */; };
+		66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */; };
+		66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE92EB4F735002F330B /* AppVersionView.swift */; };
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
 		6680D10B2E26802D0013095C /* LogPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D10A2E2680250013095C /* LogPageView.swift */; };
 		668C4AC82E6F0CEC00DB2FFC /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668C4AC72E6F0CE900DB2FFC /* DiagnosticsView.swift */; };
 		669209DE2E755C0E00A7E52D /* QAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669209DD2E755C0900A7E52D /* QAView.swift */; };
 		669DCEA32E3D90760085278B /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA22E3D90760085278B /* ToastWindow.swift */; };
-		669DCEA42E3D90760085278B /* Github.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA12E3D90760085278B /* Github.swift */; };
+		669DCEA42E3D90760085278B /* GithubModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA12E3D90760085278B /* GithubModel.swift */; };
 		669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA52E3D908C0085278B /* AppSettings.swift */; };
 		669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEAC2E3D9C400085278B /* AboutView.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
@@ -206,12 +212,18 @@
 		6653B5172E7FBE39003D0A6F /* PingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingHandler.swift; sourceTree = "<group>"; };
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
 		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
+		66764BD92EB4EF8A002F330B /* CoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreViewModel.swift; sourceTree = "<group>"; };
+		66764BDE2EB4F030002F330B /* GithubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubService.swift; sourceTree = "<group>"; };
+		66764BE02EB4F045002F330B /* CoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreManager.swift; sourceTree = "<group>"; };
+		66764BE52EB4F460002F330B /* AppVersionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionController.swift; sourceTree = "<group>"; };
+		66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
+		66764BE92EB4F735002F330B /* AppVersionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionView.swift; sourceTree = "<group>"; };
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
 		6680D10A2E2680250013095C /* LogPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPageView.swift; sourceTree = "<group>"; };
 		668C4AC72E6F0CE900DB2FFC /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
 		669209DD2E755C0900A7E52D /* QAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QAView.swift; sourceTree = "<group>"; };
-		669DCEA12E3D90760085278B /* Github.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Github.swift; sourceTree = "<group>"; };
+		669DCEA12E3D90760085278B /* GithubModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubModel.swift; sourceTree = "<group>"; };
 		669DCEA22E3D90760085278B /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
 		669DCEA52E3D908C0085278B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		669DCEAC2E3D9C400085278B /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -300,8 +312,6 @@
 		662CC3C92D1BED9B006E8450 /* Base */ = {
 			isa = PBXGroup;
 			children = (
-				669DCEA12E3D90760085278B /* Github.swift */,
-				66EB76AF2E31135200E72DE2 /* Download.swift */,
 				66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */,
 				662CC44F2D1C4D46006E8450 /* Scanner.swift */,
 				662CC3C32D1BED9B006E8450 /* Port.swift */,
@@ -418,6 +428,7 @@
 		662CC4002D1BED9B006E8450 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				66764BCF2EB4E8E7002F330B /* AppVersion */,
 				668C4AC92E6F0CFA00DB2FFC /* Help */,
 				669DCEAB2E3D9C120085278B /* About */,
 				6680D10C2E2683160013095C /* Log */,
@@ -462,6 +473,43 @@
 				663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */,
 			);
 			path = Subscription;
+			sourceTree = "<group>";
+		};
+		66764BCF2EB4E8E7002F330B /* AppVersion */ = {
+			isa = PBXGroup;
+			children = (
+				66764BCA2EB3BA48002F330B /* DownloadView.swift */,
+				66764BE92EB4F735002F330B /* AppVersionView.swift */,
+			);
+			path = AppVersion;
+			sourceTree = "<group>";
+		};
+		66764BD82EB4EF64002F330B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				669DCEA12E3D90760085278B /* GithubModel.swift */,
+				66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */,
+				66764BD92EB4EF8A002F330B /* CoreViewModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		66764BDD2EB4F00C002F330B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				66EB76AF2E31135200E72DE2 /* Download.swift */,
+				66764BE02EB4F045002F330B /* CoreManager.swift */,
+				66764BDE2EB4F030002F330B /* GithubService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		66764BE22EB4F365002F330B /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				66764BE52EB4F460002F330B /* AppVersionController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 		6680D10C2E2683160013095C /* Log */ = {
@@ -577,6 +625,9 @@
 				662CC3C92D1BED9B006E8450 /* Base */,
 				662CC3D72D1BED9B006E8450 /* Handler */,
 				66E0AF3B2E7DAB79004E44FF /* Windows */,
+				66764BDD2EB4F00C002F330B /* Services */,
+				66764BE22EB4F365002F330B /* Controllers */,
+				66764BD82EB4EF64002F330B /* Models */,
 				662CC4002D1BED9B006E8450 /* Views */,
 			);
 			path = V2rayU;
@@ -606,7 +657,6 @@
 			children = (
 				66E94B2D2D26B95D003745B5 /* Common.swift */,
 				66E94B2E2D26B95D003745B5 /* JsonView.swift */,
-				66764BCA2EB3BA48002F330B /* DownloadView.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -756,6 +806,7 @@
 				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
 				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
 				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,
+				66764BE62EB4F461002F330B /* AppVersionController.swift in Sources */,
 				663814B32E02E0FD00F5FCF3 /* RoutingForm.swift in Sources */,
 				66E0AF3F2E7DABC2004E44FF /* ShareWindow.swift in Sources */,
 				66389D092E425ACC0050CB27 /* AppMenu.swift in Sources */,
@@ -764,6 +815,8 @@
 				66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */,
 				66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
+				66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */,
+				66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */,
 				662CC4452D1C4CE9006E8450 /* V2rayOutboundHandler.swift in Sources */,
 				662CC4462D1C4CE9006E8450 /* VlessUri.swift in Sources */,
 				662CC4472D1C4CE9006E8450 /* ShadowsocksUri.swift in Sources */,
@@ -773,6 +826,8 @@
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
 				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,
 				669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */,
+				66764BE12EB4F049002F330B /* CoreManager.swift in Sources */,
+				66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* ServerView.swift in Sources */,
 				66389D0B2E4342D70050CB27 /* BaseWindow.swift in Sources */,
@@ -800,6 +855,7 @@
 				662CC41C2D1BED9B006E8450 /* ProfileModel.swift in Sources */,
 				662CC41D2D1BED9B006E8450 /* Port.swift in Sources */,
 				662CC4202D1BED9B006E8450 /* Util.swift in Sources */,
+				66764BDF2EB4F031002F330B /* GithubService.swift in Sources */,
 				66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */,
 				66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
@@ -807,7 +863,7 @@
 				662CC4232D1BED9B006E8450 /* App.swift in Sources */,
 				66F1C5CA2E62E6B2009D0024 /* LanguageManager.swift in Sources */,
 				669DCEA32E3D90760085278B /* ToastWindow.swift in Sources */,
-				669DCEA42E3D90760085278B /* Github.swift in Sources */,
+				669DCEA42E3D90760085278B /* GithubModel.swift in Sources */,
 				6653B5182E7FBE3F003D0A6F /* PingHandler.swift in Sources */,
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
 				662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */,

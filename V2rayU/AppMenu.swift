@@ -441,7 +441,7 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func checkForUpdate(_ sender: NSMenuItem) {
-//        V2rayUpdater.checkForUpdates(showWindow: true)
+        V2rayUpdater.checkForUpdates(showWindow: true)
     }
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {

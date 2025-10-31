@@ -1,65 +1,120 @@
+//
+//  UpdateView.swift
+//  V2rayU
+//
+//  Created by yanue on 2025/10/31.
+//
+
 import SwiftUI
 
-/// 🎯 ViewModel for AppVersionController
-/// 负责展示新版本信息与用户选择（跳过 / 安装）
-class AppVersionViewModel: ObservableObject {
-    @Published var title = "A new version of V2rayU is available!"
-    @Published var description = ""
-    @Published var releaseNotes = ""
-    @Published var releaseNotesTitle = "Release Notes:"
-    @Published var skipVersionText = "Skip This Version"
-    @Published var installText = "Install Update"
-
-    /// 点击“跳过”回调
-    var onSkip: (() -> Void)?
-    /// 点击“安装”回调
-    var onInstall: (() -> Void)?
-}
-
-/// 🖼️ 新版本详情页面视图
 struct AppVersionView: View {
-    @ObservedObject var viewModel: AppVersionViewModel
+    @ObservedObject var vm: AppVersionViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 10) {
-                Image("V2rayU")
-                    .resizable()
-                    .frame(width: 64, height: 64)
-                    .padding(.top, 20)
-                    .padding(.leading, 20)
+        switch vm.stage {
+        case .checking:
+            VStack(spacing: 20) {
+                HStack {
+                    Image("V2rayU")
+                        .resizable()
+                        .frame(width: 64, height: 64)
+                        .cornerRadius(8)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(viewModel.title)
-                        .font(.headline)
+                    Spacer()
+
+                    VStack {
+                        HStack {
+                            ProgressView(vm.progressText)
+                                .progressViewStyle(LinearProgressViewStyle())
+                                .padding(.horizontal)
+                        }
+
+                        HStack {
+                            Spacer()
+                            Button("Cancel") {
+                                vm.onClose?()
+                            }
+                            .padding(.trailing, 20)
+                        }
+                    }
+                }
+                .padding()
+            }
+
+        case .versionAvailable:
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top, spacing: 10) {
+                    Image("V2rayU")
+                        .resizable()
+                        .frame(width: 64, height: 64)
                         .padding(.top, 20)
+                        .padding(.leading, 20)
 
-                    Text(viewModel.description)
-                        .padding(.trailing, 20)
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(vm.title)
+                            .font(.headline)
+                            .padding(.top, 20)
 
-                    Text(viewModel.releaseNotesTitle)
-                        .font(.headline)
-                        .bold()
-                        .padding(.top, 20)
+                        Text(vm.description)
+                            .padding(.trailing, 20)
 
-                    TextEditor(text: $viewModel.releaseNotes)
-                        .lineSpacing(6)
-                        .frame(height: 120)
-                        .border(Color.gray, width: 1)
-                        .fixedSize(horizontal: false, vertical: true)
+                        Text(vm.releaseNodesTitle)
+                            .font(.headline)
+                            .bold()
+                            .padding(.top, 20)
 
-                    HStack {
-                        Button(viewModel.skipVersionText) { viewModel.onSkip?() }
-                        Spacer()
-                        Button(viewModel.installText) { viewModel.onInstall?() }
+                        HStack {
+                            TextEditor(text: $vm.releaseNotes)
+                                .lineSpacing(6)
+                                .frame(height: 120)
+                                .border(Color.gray, width: 1)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 20)
+                        }
+
+                        HStack {
+                            Button(vm.skipVersion) {
+                                vm.onSkip?()
+                            }
+
+                            Spacer()
+
+                            Button(vm.installUpdate) {
+                                vm.onDownload?()
+                            }
                             .padding(.trailing, 20)
                             .keyboardShortcut(.defaultAction)
+                        }
+                        .padding(.top, 20)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.top, 20)
-                    .padding(.bottom, 20)
                 }
             }
+            .frame(width: 500, height: 300)
+
+        case .downloading:
+            if let release = vm.selectedRelease {
+                DownloadView(
+                    version: release,
+                    onDownloadSuccess: { filePath in
+                        vm.onInstall?(filePath)
+                    },
+                    onDownloadFail: { err in
+                        vm.progressText = "Download failed: \(err)"
+                    },
+                    closeDownloadDialog: {
+                        vm.onClose?()
+                    }
+                )
+                .padding(.all, 20)
+                .background()
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
+                )
+            }
         }
-        .frame(width: 500, height: 300)
     }
 }

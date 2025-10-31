@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DownloadView: View {
-    @StateObject private var manager = DownloadManager ()
+    @StateObject private var manager = DownloadManager()
     
     var version: GithubRelease
     var onDownloadSuccess: (String) -> Void
@@ -83,14 +83,6 @@ struct DownloadView: View {
                 }
             }
         }
-        .padding()
-        .background()
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-        )
         .onAppear {
             onAppear()
         }
@@ -114,6 +106,7 @@ struct DownloadView: View {
 
     private func startDownload() {
         let asset = version.getDownloadAsset()
+        logger.info("startDownload-asset: name=\(asset.name),url=\(asset.browserDownloadUrl)")
         manager.startDownload(
             from: asset.browserDownloadUrl,
             version: version.tagName,
