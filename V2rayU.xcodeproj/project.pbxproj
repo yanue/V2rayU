@@ -71,6 +71,7 @@
 		66764BE62EB4F461002F330B /* AppVersionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE52EB4F460002F330B /* AppVersionController.swift */; };
 		66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */; };
 		66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE92EB4F735002F330B /* AppVersionView.swift */; };
+		66764BEC2EB50FD5002F330B /* DownloadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BEB2EB50FC5002F330B /* DownloadModel.swift */; };
 		6680D1072E2407F80013095C /* LogStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1062E2407F80013095C /* LogStreamView.swift */; };
 		6680D1092E2547310013095C /* LogStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D1082E2547280013095C /* LogStreamHandler.swift */; };
 		6680D10B2E26802D0013095C /* LogPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6680D10A2E2680250013095C /* LogPageView.swift */; };
@@ -218,6 +219,7 @@
 		66764BE52EB4F460002F330B /* AppVersionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionController.swift; sourceTree = "<group>"; };
 		66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
 		66764BE92EB4F735002F330B /* AppVersionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionView.swift; sourceTree = "<group>"; };
+		66764BEB2EB50FC5002F330B /* DownloadModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadModel.swift; sourceTree = "<group>"; };
 		6680D1062E2407F80013095C /* LogStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamView.swift; sourceTree = "<group>"; };
 		6680D1082E2547280013095C /* LogStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamHandler.swift; sourceTree = "<group>"; };
 		6680D10A2E2680250013095C /* LogPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPageView.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 		66764BD82EB4EF64002F330B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				66764BEB2EB50FC5002F330B /* DownloadModel.swift */,
 				669DCEA12E3D90760085278B /* GithubModel.swift */,
 				66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */,
 				66764BD92EB4EF8A002F330B /* CoreViewModel.swift */,
@@ -812,6 +815,7 @@
 				66389D092E425ACC0050CB27 /* AppMenu.swift in Sources */,
 				66E94B392D26B971003745B5 /* SettingView.swift in Sources */,
 				668C4AC82E6F0CEC00DB2FFC /* DiagnosticsView.swift in Sources */,
+				66764BEC2EB50FD5002F330B /* DownloadModel.swift in Sources */,
 				66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */,
 				66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
