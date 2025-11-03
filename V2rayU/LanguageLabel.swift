@@ -340,4 +340,14 @@ enum LanguageLabel: String, CaseIterable {
     case InstallFailed = "InstallFailed"               // 安装失败
     case InstallFailedTip = "InstallFailedTip" // 安装 V2rayUTool 失败: %@
     case InstallFailedManual = "InstallFailedManual" // 请手动运行安装脚本进行安装。
+    case ReplaceCore = "ReplaceCore"                           // 替换Core
+    case releaseNodesTitle = "releaseNodesTitle" // release Nodes
+    case SkipVersion = "skipVersion" //  skip Version
+    case InstallUpdate = "installUpdate" // install Update
+    case CheckingForUpdates = "CheckingForUpdates" // Checking For Updates ...
+    case InstallV2rayU = "InstallV2rayU" // Install V2rayU
+    case NewVersionTip = "NewVersionTip" // "A new version (\(release.tagName)) is available!"
+    case AlreadyLastestVersion = "AlreadyLastestVersion" // Already Lastest Version
+    case AlreadyLastestToast = "AlreadyLastestToast" // 当前 %@ 已经是最新版了
+    case V2rayUUpdateTitle = "V2rayUUpdateTitle" // V2rayU Update
 }

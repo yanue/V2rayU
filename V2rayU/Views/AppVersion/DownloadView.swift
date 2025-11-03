@@ -11,9 +11,9 @@ struct DownloadView: View {
     @StateObject private var manager = DownloadManager()
     
     var version: GithubRelease
+    var downloadedBtn: String = String(localized: .Downloading)
     var onDownloadSuccess: (String) -> Void
     var onDownloadFail: (String) -> Void
-    var closeDownloadDialog: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -44,9 +44,7 @@ struct DownloadView: View {
                     Text(String(format: "%.1f%%", manager.progress * 100))
                         .font(.headline)
                         .frame(width: 60, alignment: .leading)
-                    Text(String(localized: .DownloadedStatus,
-                                arguments: manager.downloadedSize,
-                                manager.totalSize))
+                    Text(String(localized: .DownloadedStatus, arguments: manager.downloadedSize, manager.totalSize))
                         .font(.callout)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -70,10 +68,21 @@ struct DownloadView: View {
                     }
                     Spacer()
                     if manager.isFinished {
-                        Button(action: { closeDownloadDialog() }) {
-                            Label(String(localized: .Close), systemImage: "xmark.circle")
+                        if manager.downloadedPath != "" {
+                            Button(action: {
+                                onDownloadSuccess(manager.downloadedPath)
+                            }) {
+                                Label(downloadedBtn, systemImage: "tray.and.arrow.down.fill")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else {
+                            Button(action: {
+                                onDownloadFail(manager.errorMessage)
+                            }) {
+                                Label(String(localized: .Close), systemImage: "xmark.circle")
+                            }
+                            .buttonStyle(.borderedProminent)
                         }
-                        .buttonStyle(.borderedProminent)
                     } else {
                         Button(action: { manager.cancelTask() }) {
                             Label(String(localized: .CancelDownload), systemImage: "xmark.circle")
@@ -92,12 +101,11 @@ struct DownloadView: View {
         // 在这里把父级的回调传给 manager
         manager.setCallback(
             onSuccess: { path in
-                // 先更新自己 UI
-                self.onDownloadSuccess(path) // 再传给父级
+                // 更新下载路径
+                self.manager.downloadedPath = path
             },
             onError: { message in
-                // 先更新自己 UI
-                self.onDownloadFail(message) // 再传给父级
+                self.manager.errorMessage = message
             }
         )
         // 开始下载

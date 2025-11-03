@@ -327,7 +327,7 @@
 "LocalCoreVersionDetail" = "Local Xray Core Version Detail";
 "GithubLatestVersion" = "GitHub Latest Version";
 "DownloadAndReplace" = "Download and Replace";
-"Downloading" = "Downloading:";
+"Downloading" = "Downloading";
 "DownloadedStatus" = "Downloaded: %@ / Total: %@";
 "CancelDownload" = "Cancel Download";
 "DownloadHint" = "Download Hint";
@@ -347,3 +347,13 @@
 "InstallFailed" = "Installation failed";
 "InstallFailedTip" = "Failed to install V2rayUTool: %@";
 "InstallFailedManual" = "Please run the installation script manually.";
+"ReplaceCore" = "Replace Core";
+"releaseNodesTitle" = "Release Nodes";
+"skipVersion" = "Skip Version";
+"installUpdate" = "Install Update";
+"CheckingForUpdates" = "Checking For Updates ...";
+"InstallV2rayU" = "Install V2rayU";
+"NewVersionTip" = "A new version (%@) is available!";
+"AlreadyLastestVersion" = "Already Latest Version";
+"AlreadyLastestToast" = "Current %@ is already the latest version";
+"V2rayUUpdateTitle" = "V2rayU Update";

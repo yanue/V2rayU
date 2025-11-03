@@ -139,7 +139,10 @@ final class AppState: ObservableObject {
         }
         // 检查是否需要更新
         if AppSettings.shared.checkForUpdates {
-            V2rayUpdater.checkForUpdates(showWindow: false)
+            // 10秒后检查
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                AppMenuManager.shared.versionController.checkForUpdates(showWindow: false)
+            }
         }
     }
 

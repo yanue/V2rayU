@@ -52,13 +52,24 @@ class LanguageManager: ObservableObject {
     private var languageBundle: Bundle?
     @Published private(set) var currentLocale: Locale
 
-    init() {
+    private init() {
+        // 初始化时从 UserDefaults 读取语言
         let storedLocaleIdentifier = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?.first ?? "en"
-        selectedLanguage = Language(localeIdentifier: storedLocaleIdentifier)
-        currentLocale = Locale(identifier: storedLocaleIdentifier)
-        applyLanguage()
+        let lang = Language(localeIdentifier: storedLocaleIdentifier)
+
+        self.selectedLanguage = lang
+        self.currentLocale = Locale(identifier: storedLocaleIdentifier)
+
+        // 初始化时只加载 bundle，不触发 UI 更新，避免循环依赖
+        if let path = Bundle.main.path(forResource: lang.localeIdentifier, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            self.languageBundle = bundle
+        } else {
+            self.languageBundle = Bundle.main
+        }
     }
 
+    /// 切换语言时调用
     private func applyLanguage() {
         if let path = Bundle.main.path(forResource: selectedLanguage.localeIdentifier, ofType: "lproj"),
            let bundle = Bundle(path: path) {
@@ -67,8 +78,11 @@ class LanguageManager: ObservableObject {
             languageBundle = Bundle.main
         }
         currentLocale = Locale(identifier: selectedLanguage.localeIdentifier)
-        // 更新菜单
-        AppMenuManager.shared.updateMenuTitles()
+
+        // ⚠️ 注意：这里不要直接调用 AppMenuManager.shared
+        // 否则可能导致初始化循环
+        // 建议在 AppDelegate 或 SceneDelegate 中监听语言变化后再更新菜单
+        NotificationCenter.default.post(name: .languageDidChange, object: nil)
     }
 
     func localizedString(_ key: String) -> String {

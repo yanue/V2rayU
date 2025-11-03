@@ -100,13 +100,13 @@ struct CoreView: View {
             if vm.showDownloadDialog, let version = vm.selectedVersion {
                 DownloadView(
                     version: version,
+                    downloadedBtn : String(localized: .ReplaceCore),
                     onDownloadSuccess: { filePath in
                         vm.onDownloadSuccess(filePath: filePath)
                     },
                     onDownloadFail: { err in
                         vm.onDownloadFail(err: err)
-                    },
-                    closeDownloadDialog: vm.closeDownloadDialog
+                    }
                 )
                 .padding()
                 .background()

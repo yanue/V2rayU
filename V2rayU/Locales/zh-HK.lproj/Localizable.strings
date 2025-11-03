@@ -327,7 +327,7 @@
 "LocalCoreVersionDetail" = "本地 Xray Core 版本明細";
 "GithubLatestVersion" = "GitHub 最新版本";
 "DownloadAndReplace" = "下載並替換";
-"Downloading" = "正在下載:";
+"Downloading" = "正在下載";
 "DownloadedStatus" = "已下載: %@ / 總大小: %@";
 "CancelDownload" = "取消下載";
 "DownloadHint" = "下載提示";
@@ -347,3 +347,13 @@
 "InstallFailed" = "安裝失敗";
 "InstallFailedTip" = "安裝 V2rayUTool 失敗: %@";
 "InstallFailedManual" = "請手動執行安裝腳本進行安裝。";
+"ReplaceCore" = "替換 Core";
+"releaseNodesTitle" = "發布節點";
+"skipVersion" = "跳過此版本";
+"installUpdate" = "安裝更新";
+"CheckingForUpdates" = "正在檢查更新...";
+"InstallV2rayU" = "安裝 V2rayU";
+"NewVersionTip" = "發現新版本 (%@) 可用！";
+"AlreadyLastestVersion" = "已經是最新版本";
+"AlreadyLastestToast" = "目前 %@ 已經是最新版了";
+"V2rayUUpdateTitle" = "V2rayU 更新";

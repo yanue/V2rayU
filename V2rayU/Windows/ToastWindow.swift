@@ -38,6 +38,18 @@ func alertDialog(title: String, message: String) {
 }
 
 @MainActor
+func showAlertSync(title: String, message: String, confirmTitle: String = String(localized: .OK)) {
+    let alert = NSAlert()
+    if let icon = NSImage(named: "V2rayU") {
+        alert.icon = icon
+    }
+    alert.messageText = title
+    alert.informativeText = message
+    alert.alertStyle = .warning
+    alert.addButton(withTitle: confirmTitle)
+}
+
+@MainActor
 func showConfirmAlertSync(title: String, message: String, confirmTitle: String = String(localized: .OK), cancelTitle: String = String(localized: .Cancel)) -> Bool {
     let alert = NSAlert()
     if let icon = NSImage(named: "V2rayU") {

@@ -12,6 +12,9 @@ import Combine
 @MainActor
 final class AppMenuManager: NSObject {
     static let shared = AppMenuManager()
+    
+    let versionController = AppVersionController()
+    
     private var inited = false
     private var statusItem: NSStatusItem!
     private var hostingView: NSHostingView<StatusItemView>!
@@ -441,7 +444,7 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func checkForUpdate(_ sender: NSMenuItem) {
-        V2rayUpdater.checkForUpdates(showWindow: true)
+        versionController.checkForUpdates(showWindow: true)
     }
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {

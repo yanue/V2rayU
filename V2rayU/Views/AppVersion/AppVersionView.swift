@@ -13,8 +13,8 @@ struct AppVersionView: View {
     var body: some View {
         switch vm.stage {
         case .checking:
-            VStack(spacing: 20) {
-                HStack {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top, spacing: 10) {
                     Image("V2rayU")
                         .resizable()
                         .frame(width: 64, height: 64)
@@ -24,18 +24,22 @@ struct AppVersionView: View {
 
                     VStack {
                         HStack {
-                            ProgressView(vm.progressText)
+                            ProgressView(String(localized: .CheckingForUpdates))
                                 .progressViewStyle(LinearProgressViewStyle())
                                 .padding(.horizontal)
                         }
 
                         HStack {
+                            if vm.checkError != "" {
+                                Text(vm.checkError ?? "")
+                                    .foregroundColor(.red)
+                            }
                             Spacer()
-                            Button("Cancel") {
+                            Button(String(localized: .Cancel)) {
                                 vm.onClose?()
                             }
-                            .padding(.trailing, 20)
                         }
+                        .padding(.horizontal)
                     }
                 }
                 .padding()
@@ -58,7 +62,7 @@ struct AppVersionView: View {
                         Text(vm.description)
                             .padding(.trailing, 20)
 
-                        Text(vm.releaseNodesTitle)
+                        Text(String(localized: .releaseNodesTitle))
                             .font(.headline)
                             .bold()
                             .padding(.top, 20)
@@ -73,13 +77,13 @@ struct AppVersionView: View {
                         }
 
                         HStack {
-                            Button(vm.skipVersion) {
+                            Button(String(localized: .SkipVersion)) {
                                 vm.onSkip?()
                             }
 
                             Spacer()
 
-                            Button(vm.installUpdate) {
+                            Button(String(localized: .InstallUpdate)) {
                                 vm.onDownload?()
                             }
                             .padding(.trailing, 20)
@@ -96,13 +100,12 @@ struct AppVersionView: View {
             if let release = vm.selectedRelease {
                 DownloadView(
                     version: release,
+                    downloadedBtn : String(localized: .InstallV2rayU),
                     onDownloadSuccess: { filePath in
                         vm.onInstall?(filePath)
                     },
                     onDownloadFail: { err in
-                        vm.progressText = "Download failed: \(err)"
-                    },
-                    closeDownloadDialog: {
+                        vm.checkError = err
                         vm.onClose?()
                     }
                 )

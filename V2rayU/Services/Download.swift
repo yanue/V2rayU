@@ -7,6 +7,7 @@ final class DownloadManager: ObservableObject {
     @Published var progress: Double = 0
     @Published var speed: String = ""
     @Published var downloadedSize: String = "0 B"
+    @Published var downloadedPath: String = ""
     @Published var totalSize: String = "—"
     @Published var isFinished: Bool = false
     @Published var errorMessage: String = ""

@@ -13,17 +13,12 @@ import SwiftUI
 // 参考 UI: Sparkle(https://github.com/sparkle-project/Sparkle)
 // 基于 https://github.com/yanue/V2rayU/releases 进行版本检查
 
-@MainActor
-let V2rayUpdater = AppVersionController()
-
-
 enum UpdateStage {
     case checking
     case versionAvailable
     case downloading
 }
 
-@MainActor
 class AppVersionController: NSWindowController {
     private var hostingView: NSHostingView<AppVersionView>!
     private var vm = AppVersionViewModel()
@@ -42,7 +37,7 @@ class AppVersionController: NSWindowController {
         super.init(window: window)
 
         vm.onClose = { [weak self] in
-            self?.window?.close()
+            self?.closeWindow()
         }
         vm.onSkip = { [weak self] in
             self?.skipVersion()
@@ -56,43 +51,96 @@ class AppVersionController: NSWindowController {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    func showWindow() {
-        window?.center()
-        window?.makeKeyAndOrderFront(nil)
-        
-        // 1. 切回常规模式（显示 Dock 图标、主菜单）
-        NSApp.setActivationPolicy(.regular)
-        // 2. 激活应用，确保接收键盘事件
-        NSApp.activate(ignoringOtherApps: true)
-    }
     
+    func showWindow() {
+        guard let window = window else { return }
+        // 更新win title
+        window.title = String(localized: .V2rayUUpdateTitle)
+        // 1. 确保在主线程
+        DispatchQueue.main.async {
+
+            // 2 激活应用
+            NSApp.activate(ignoringOtherApps: true)
+            
+            // 3. 再显示窗口
+            window.center()
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
     func closeWindow(){
         window?.close()
     }
 
     func checkForUpdates(showWindow: Bool) {
+        logger.info("checkForUpdates: \(showWindow)")
+        // 设置stage
+        vm.stage = .checking
+        vm.checkError = nil
         if showWindow {
             self.showWindow()
         } else {
             self.closeWindow()
         }
+        
         // 开始检查
         Task { [service] in
-            vm.stage = .checking
+            //
             do {
                 let releases = try await service.fetchReleases(repo: "yanue/V2rayU")
-                if let latest = releases.first {
-                    vm.title = "A new version (\(latest.tagName)) is available!"
-                    vm.description = latest.name
-                    vm.releaseNotes = latest.body
-                    vm.selectedRelease = latest
-                    vm.stage = .versionAvailable
+                if let release = releases.first {
+                    logger.info("checkForUpdates-lateast: release=\(release.tagName) body=\(release.body)")
+                    let releaseVersion = release.tagName.replacingOccurrences(of: "v", with: "").replacingOccurrences(of: "V", with: "").trimmingCharacters(in: .whitespaces) // v4.1.0 => 4.1.0
+                    // get old version
+                    let appVer = appVersion.versionToInt()
+                    let releaseVer = releaseVersion.versionToInt()
+
+                    // new version is bigger than old version
+                    if appVer.lexicographicallyPrecedes(releaseVer) {
+                        // 如果用户选择跳过版本更新, 则不显示新版本详情页面
+                        if let skipVersion = UserDefaults.standard.string(forKey: "skipAppVersion") {
+                            if skipVersion == release.tagName {
+                                // 后台检查时,过滤不显示窗口
+                                if !showWindow {
+                                    logger.info("checkForUpdates-Skip: release=\(release.tagName) skipVersion=\(skipVersion)")
+                                    return
+                                }
+                            }
+                        }
+                        await MainActor.run {
+                            // 新版本
+                            vm.title = String(localized: .NewVersionTip, arguments: release.tagName)
+                            vm.description = release.name
+                            vm.releaseNotes = release.body
+                            vm.selectedRelease = release
+                            vm.stage = .versionAvailable
+                            logger.info("checkForUpdates-newVersion: release=\(release.tagName) body=\(release.body)")
+                            
+                            // 有新版本, 显示窗口
+                            self.showWindow()
+                        }
+                    } else {
+                        await MainActor.run {
+                            vm.checkError = String(localized: .AlreadyLastestToast,arguments: appVersion)
+                            if showWindow {
+                                let title = String(localized: .AlreadyLastestVersion)
+                                let toast = String(localized: .AlreadyLastestToast,arguments: appVersion)
+                                alertDialog(title: title,message:toast)
+                            }
+                        }
+                        logger.info("checkForUpdates-no need: release=\(release.tagName) body=\(release.body)")
+                    }
                 } else {
-                    vm.progressText = "No releases found"
+                    logger.info("checkForUpdates-no found: No releases found")
+                    await MainActor.run {
+                        vm.checkError = "No releases found"
+                    }
                 }
             } catch {
-                vm.progressText = "Error: \(error.localizedDescription)"
+                logger.info("checkForUpdates-error: \(error.localizedDescription)")
+                await MainActor.run {
+                    vm.checkError = error.localizedDescription
+                }
             }
         }
     }
