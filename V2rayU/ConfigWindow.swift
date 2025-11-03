@@ -369,9 +369,9 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         v2rayConfig.securityTls.serverName = self.streamTlsServerName.stringValue
         let streamTlsAlpn = self.streamTlsAlpn.stringValue
         if streamTlsAlpn.count != 0 {
-            v2rayConfig.securityTls.alpn = [streamTlsAlpn]
+            v2rayConfig.securityTls.alpn = streamTlsAlpn.components(separatedBy: ",").map { $0.trimmingCharacters(in: CharacterSet(charactersIn: " \"")) }
         } else {
-            v2rayConfig.securityTls.alpn = []
+            v2rayConfig.securityTls.alpn = ["h2", "http/1.1"]
         }
         // reality
         v2rayConfig.securityReality.serverName = self.streamRealityServerName.stringValue
@@ -511,7 +511,7 @@ class ConfigWindowController: NSWindowController, NSWindowDelegate, NSTabViewDel
         self.streamSecurity.selectItem(withTitle: v2rayConfig.streamSecurity)
         self.streamTlsAllowInsecure.intValue = v2rayConfig.securityTls.allowInsecure ? 1 : 0
         self.streamTlsServerName.stringValue = v2rayConfig.securityTls.serverName
-        self.streamTlsAlpn.stringValue = v2rayConfig.securityTls.alpn.count > 0 ? v2rayConfig.securityTls.alpn[0] : ""
+        self.streamTlsAlpn.stringValue = v2rayConfig.securityTls.alpn.map { "\"\($0)\"" }.joined(separator: ", ")
         
         // reality
         self.streamRealityServerName.stringValue = v2rayConfig.securityReality.serverName
