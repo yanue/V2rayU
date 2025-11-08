@@ -11,6 +11,10 @@
 "FollowSystem" = "Follow System";
 
 // MARK: - Base operations
+"Enable" = "Enable";
+"Minute" = "Minute";
+"Hour"   = "Hour";
+"Day"    = "Day";
 "Save" = "Save";
 "Confirm" = "Confirm";
 "Cancel" = "Cancel";

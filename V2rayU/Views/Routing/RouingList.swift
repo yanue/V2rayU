@@ -134,7 +134,7 @@ struct RoutingListView: View {
                 }
                 .width(20)
 
-                TableColumn("#") { (row: RoutingDTO) in
+                TableColumn(String(localized: .TableFieldSort)) { (row: RoutingDTO) in
                     HStack(spacing: 4) {
                         Image(systemName: "line.3.horizontal")
                     }
@@ -149,7 +149,7 @@ struct RoutingListView: View {
                         }
                     }
                 }
-                .width(20)
+                .width(24)
 
                 TableColumn(String(localized: .TableFieldRemark)) { (row: RoutingDTO) in
                     HStack(spacing: 4) {

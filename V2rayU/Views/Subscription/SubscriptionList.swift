@@ -168,9 +168,9 @@ struct SubscriptionListView: View {
                         }
                     }
                 }
-                .width(20)
+                .width(30)
                 
-                TableColumn(String(localized: .TableFieldSort)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldRemark)) { (row: SubDTO) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -193,12 +193,12 @@ struct SubscriptionListView: View {
                 .width(min: 200,max: 400)
 
                 TableColumn(String(localized: .TableFieldInterval)) { (row: SubDTO) in
-                    Text("\(row.updateInterval)")
+                    Text(row.updateInterval.localizedInterval(locale: LanguageManager.shared.currentLocale))
                 }
                 .width(100)
 
                 TableColumn(String(localized: .TableFieldUpdateTime)) { (row: SubDTO) in
-                    Text("\(row.updateTime)")
+                    Text(row.updateTime.formattedDate)
                 }
                 .width(160)
 

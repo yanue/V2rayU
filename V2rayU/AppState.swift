@@ -133,9 +133,7 @@ final class AppState: ObservableObject {
         // 刷新图标等
         AppMenuManager.shared.refreshBasicMenus()
         Task {
-            if AppSettings.shared.autoUpdateServers {
-                await SubscriptionHandler.shared.sync()
-            }
+            await SubscriptionScheduler.shared.runAtStart()
         }
         // 检查是否需要更新
         if AppSettings.shared.checkForUpdates {

@@ -11,6 +11,10 @@
 "FollowSystem" = "跟隨系統";
 
 // MARK: - 基本操作
+"Enable" = "啟用";
+"Minute" = "分鐘";
+"Hour"   = "小時";
+"Day"    = "天";
 "Save" = "儲存";
 "Confirm" = "確認";
 "Cancel" = "取消";

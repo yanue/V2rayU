@@ -250,7 +250,7 @@ struct ProfileListView: View {
                 .width(20)
 
                 TableColumn(String(localized: .TableFieldSort)) { (row: ProfileDTO) in
-                    HStack(spacing: 4) {
+                    HStack(spacing: 5) {
                         Image(systemName: "line.3.horizontal")
                     }
                     .contentShape(Rectangle()) // 扩大点击/拖拽区域
@@ -264,7 +264,7 @@ struct ProfileListView: View {
                         }
                     }
                 }
-                .width(20)
+                .width(26)
 
                 TableColumn(String(localized: .TableFieldRemark)) { (row: ProfileDTO) in
                     HStack(spacing: 4) {

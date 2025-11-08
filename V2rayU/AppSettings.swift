@@ -162,5 +162,10 @@ final class AppSettings: ObservableObject {
                 await LocalHttpServer.shared.restart()
             }
         }
+        if old.autoUpdateServers != autoUpdateServers {
+            Task {
+                await SubscriptionScheduler.shared.refreshAll()
+            }
+        }
     }
 }

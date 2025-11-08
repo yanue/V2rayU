@@ -78,6 +78,30 @@ struct SubDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRe
     }
 }
 
+extension SubDTO {
+    func upsert() {
+        do {
+            var toSave = self
+            // 如果 updateInterval 为 0，默认设置为 3600
+            if toSave.updateInterval == 0 {
+                toSave.updateInterval = 3600
+            }
+            
+            let dbWriter = AppDatabase.shared.dbWriter
+            try dbWriter.write { db in
+                try toSave.save(db)
+            }
+        } catch {
+            logger.info("upsert error: \(error)")
+        }
+        
+        // 更新后，触发订阅更新任务调度
+        Task {
+            await SubscriptionScheduler.shared.startOrUpdate(for: self)
+        }
+    }
+}
+
 // MARK: - UI Model (SwiftUI 绑定)
 
 @dynamicMemberLookup

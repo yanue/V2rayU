@@ -38,10 +38,20 @@ actor SubscriptionHandler {
         }
         SubscriptionHandlering = true
         logger.info("SubscriptionHandler start syncOne")
+
         Task {
+            defer {
+                self.SubscriptionHandlering = false
+                self.refreshMenu()
+            }
             do {
                 try await self.dlFromUrl(url: item.url, sub: item)
                 logger.info("SubscriptionHandler syncOne success")
+                
+                // 下载成功后更新 updateTime 并保存
+                var updated = item
+                updated.updateTime = Int(Date().timeIntervalSince1970)
+                updated.upsert()
             } catch {
                 logger.info("SubscriptionHandler syncOne error: \(error)")
                 logTip(title: "syncOne fail: ", uri: item.url, informativeText: error.localizedDescription)
@@ -56,6 +66,10 @@ actor SubscriptionHandler {
                 Task {
                     do {
                         try await self.dlFromUrl(url: item.url, sub: item)
+                        // 下载成功后更新 updateTime 并保存
+                        var updated = item
+                        updated.updateTime = Int(Date().timeIntervalSince1970)
+                        updated.upsert()
                         promise(.success(()))
                     } catch {
                         promise(.failure(error))

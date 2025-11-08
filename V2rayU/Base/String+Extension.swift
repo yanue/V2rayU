@@ -73,3 +73,24 @@ extension utsname {
         sMachine == "arm64"
     }
 }
+
+extension Int {
+    var formattedDate: String {
+        let date = Date(timeIntervalSince1970: TimeInterval(self))
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter.string(from: date)
+    }
+}
+
+extension Int {
+    func localizedInterval(locale: Locale = .current) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.day, .hour, .minute, .second]
+        formatter.zeroFormattingBehavior = .dropAll
+        formatter.calendar = Calendar.current
+        formatter.calendar?.locale = locale
+        return formatter.string(from: TimeInterval(self)) ?? "\(self)"
+    }
+}

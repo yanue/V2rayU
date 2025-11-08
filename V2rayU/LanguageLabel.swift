@@ -15,6 +15,10 @@ enum LanguageLabel: String, CaseIterable {
     case Dark
     case FollowSystem
     // base
+    case Enable
+    case Minute
+    case Hour
+    case Day
     case Save
     case Confirm
     case Cancel
@@ -310,44 +314,44 @@ enum LanguageLabel: String, CaseIterable {
     case UsedButNotLimitedTo     // 有用到且不限于以下
     case OpenInBrowser
     // core update
-    case CoreSettingsTitle = "CoreSettingsTitle"               // Core Settings
-    case CoreSettingsSubtitle = "CoreSettingsSubtitle"         // Manage your core versions
+    case CoreSettingsTitle                // Core Settings
+    case CoreSettingsSubtitle          // Manage your core versions
     // 基本操作
-    case CheckLatestVersion = "CheckLatestVersion"             // 检查最新版本
-    case LocalCoreDirectory = "LocalCoreDirectory"             // 本地 Xray Core 目录
-    case FileDirectory = "FileDirectory"                       // 文件目录:
-    case LocalCoreVersionDetail = "LocalCoreVersionDetail"     // 本地 Xray Core 版本明细
-    case GithubLatestVersion = "GithubLatestVersion"           // GitHub 最新版本
-    case DownloadAndReplace = "DownloadAndReplace"             // 下载并替换
+    case CheckLatestVersion             // 检查最新版本
+    case LocalCoreDirectory             // 本地 Xray Core 目录
+    case FileDirectory                        // 文件目录:
+    case LocalCoreVersionDetail     // 本地 Xray Core 版本明细
+    case GithubLatestVersion           // GitHub 最新版本
+    case DownloadAndReplace             // 下载并替换
     // 下载弹窗
-    case Downloading = "Downloading"                           // 正在下载:
-    case DownloadedStatus = "DownloadedStatus"                 // 已下载: %@ / 总大小: %@
-    case CancelDownload = "CancelDownload"                     // 取消下载
-    case DownloadHint = "DownloadHint"                         // 下载提示
-    case DownloadCanceled = "DownloadCanceled"                 // 下载已取消
-    case DownloadURLInvalid = "DownloadURLInvalid"             // 下载地址错误: %@
-    case ReplaceSuccess = "ReplaceSuccess"                     // 替换成功！
-    case OperationFailed = "OperationFailed"                   // 操作失败: %@
-    case DownloadTimeoutError = "DownloadTimeoutError"
-    case DownloadSaveFailed = "SaveError"
-    case DownloadErrorOccurred = "DownloadErrorOccurred"
-    case ClearLogFileFailed = "ClearLogFileFailed"           // 清除日志文件失败
-    case PortInUse = "PortInUse"                       // 端口已被占用
-    case PortInUseTip = "PortInUseTip"                       // 端口已被占用, 请更换其他端口号。
-    case Install = "Install" // 安装
-    case InstallTitle = "InstallTitle"               // 安装V2rayUTool工具
-    case InstallPermissionTip = "InstallPermissionTip" // "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
-    case InstallFailed = "InstallFailed"               // 安装失败
-    case InstallFailedTip = "InstallFailedTip" // 安装 V2rayUTool 失败: %@
-    case InstallFailedManual = "InstallFailedManual" // 请手动运行安装脚本进行安装。
-    case ReplaceCore = "ReplaceCore"                           // 替换Core
-    case releaseNodesTitle = "releaseNodesTitle" // release Nodes
-    case SkipVersion = "skipVersion" //  skip Version
-    case InstallUpdate = "installUpdate" // install Update
-    case CheckingForUpdates = "CheckingForUpdates" // Checking For Updates ...
-    case InstallV2rayU = "InstallV2rayU" // Install V2rayU
-    case NewVersionTip = "NewVersionTip" // "A new version (\(release.tagName)) is available!"
-    case AlreadyLastestVersion = "AlreadyLastestVersion" // Already Lastest Version
-    case AlreadyLastestToast = "AlreadyLastestToast" // 当前 %@ 已经是最新版了
-    case V2rayUUpdateTitle = "V2rayUUpdateTitle" // V2rayU Update
+    case Downloading                            // 正在下载:
+    case DownloadedStatus                 // 已下载: %@ / 总大小: %@
+    case CancelDownload                     // 取消下载
+    case DownloadHint                          // 下载提示
+    case DownloadCanceled                  // 下载已取消
+    case DownloadURLInvalid              // 下载地址错误: %@
+    case ReplaceSuccess                      // 替换成功！
+    case OperationFailed                   // 操作失败: %@
+    case DownloadTimeoutError
+    case DownloadSaveFailed
+    case DownloadErrorOccurred
+    case ClearLogFileFailed            // 清除日志文件失败
+    case PortInUse                        // 端口已被占用
+    case PortInUseTip                       // 端口已被占用, 请更换其他端口号。
+    case Install  // 安装
+    case InstallTitle                // 安装V2rayUTool工具
+    case InstallPermissionTip  // "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
+    case InstallFailed                // 安装失败
+    case InstallFailedTip // 安装 V2rayUTool 失败: %@
+    case InstallFailedManual // 请手动运行安装脚本进行安装。
+    case ReplaceCore                            // 替换Core
+    case releaseNodesTitle // release Nodes
+    case SkipVersion  //  skip Version
+    case InstallUpdate  // install Update
+    case CheckingForUpdates // Checking For Updates ...
+    case InstallV2rayU // Install V2rayU
+    case NewVersionTip  // "A new version (\(release.tagName)) is available!"
+    case AlreadyLastestVersion  // Already Lastest Version
+    case AlreadyLastestToast  // 当前 %@ 已经是最新版了
+    case V2rayUUpdateTitle  // V2rayU Update
 }
