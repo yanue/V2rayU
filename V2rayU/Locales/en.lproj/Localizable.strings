@@ -276,7 +276,8 @@
 "GeoipProblem" = "geoip.dat is missing, which may cause some functions to fail.";
 "V2rayCoreProblem" = "v2ray-core is not installed or not executable.";
 "Diagnostics" = "Diagnostics";
-"QA" = "FAQ";
+"FAQ" = "FAQ";
+"FaqSubtitle" = "Frequently Asked Questions";
 
 // MARK: - Table Fields
 "TableFieldSort" = "Sort";

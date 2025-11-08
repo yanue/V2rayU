@@ -19,6 +19,7 @@ struct DiagnosticsView: View {
     @State private var pingStatus: Bool = false
     @State private var showOpenSettingsAlert = false
     @State private var checking: Bool = false
+    @State private var showFAQ: Bool = false
 
     // 问题描述
     var v2rayUToolProblem: String? {
@@ -189,6 +190,14 @@ struct DiagnosticsView: View {
                 RefreshButton(checking: $checking) {
                     runAllChecks()
                 }
+                // 新增 FAQ 按钮
+               Button {
+                   showFAQ = true
+               } label: {
+                   Image(systemName: "questionmark.circle")
+                   Text(String(localized: .FAQ))
+               }
+               .buttonStyle(.bordered) // 可选：让按钮更明显
             }
             .padding(.horizontal, 10)
 
@@ -274,6 +283,11 @@ struct DiagnosticsView: View {
                     message: Text(String(localized: .PleaseManuallyOpenBackgroundActivity)),
                     dismissButton: .default(Text(String(localized: .Confirm)))
                 )
+            }
+            .sheet(isPresented: $showFAQ) {
+                FAQSheetView() {
+                    showFAQ = false
+                }
             }
         }
      }

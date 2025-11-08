@@ -15,7 +15,7 @@ struct ContentView: View {
         case subscription
         case routing
         case setting
-        case help
+        case diagnostic
         case about
     }
 
@@ -32,18 +32,18 @@ struct ContentView: View {
                     Text("V2rayU")
                     Text("v"+version).font(.footnote).foregroundColor(.secondary)
                 }
-                .padding(.vertical,20)
+                .padding(.vertical, 20)
 
                 SidebarButton(tab: .subscription, title: .Subscriptions, icon: "personalhotspot")
                 SidebarButton(tab: .server, title: .Servers, icon: "shield.lefthalf.filled")
                 SidebarButton(tab: .routing, title: .Routings, icon: "bonjour")
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
-                SidebarButton(tab: .help, title: .Help, icon: "questionmark.circle")
+                SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "questionmark.circle")
                 SidebarButton(tab: .about, title: .About, icon: "info.circle")
                 Spacer()
             }
-            .frame(width: 160)
-            .padding(.leading, 16)
+            .frame(width: 136)
+            .padding(.leading, 24)
             
 
             // 右侧内容区，根据选中状态切换
@@ -57,8 +57,8 @@ struct ContentView: View {
                     RoutingListView()
                 case .setting:
                     SettingView()
-                case .help:
-                    HelpPageView()
+                case .diagnostic:
+                    DiagnosticsView()
                 case .about:
                     AboutView()
 

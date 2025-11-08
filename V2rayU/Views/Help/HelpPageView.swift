@@ -13,8 +13,8 @@ struct HelpPageView: View {
 
     // Enum for Tabs
     enum HelpTab {
-        case diagnostic
         case qa
+        case about
     }
 
     var body: some View {
@@ -44,8 +44,8 @@ struct HelpPageView: View {
 
                 // Segmented Picker (Tabs)
                 Picker("", selection: $appState.helpTab) {
-                    localized(.Diagnostics).tag(HelpTab.diagnostic)
-                    localized(.QA).tag(HelpTab.qa)
+                    localized(.FAQ).tag(HelpTab.qa)
+                    localized(.About).tag(HelpTab.about)
                 }
                 .pickerStyle(.segmented)
                 
@@ -55,10 +55,10 @@ struct HelpPageView: View {
                 HStack{
                     VStack {
                         switch appState.helpTab {
-                        case .diagnostic:
-                            DiagnosticsView()
                         case .qa:
-                            QAView()
+                            FAQView()
+                        case .about:
+                            AboutView()
                         }
                     }
                 }

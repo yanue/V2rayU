@@ -275,8 +275,9 @@
 "BackgroundProblem" = "應用程式未在背景運行，可能被系統限制或核心程序已停止。";
 "GeoipProblem" = "geoip.dat 檔案缺失，可能導致部分功能異常。";
 "V2rayCoreProblem" = "v2ray-core 未安裝或不可執行。";
-"Diagnostics" = "異常診斷";
-"QA" = "常見問題";
+"Diagnostics" = "診斷";
+"FAQ" = "常見問題";
+"FaqSubtitle" = "查看常見問題與解決方案";
 
 // MARK: - 表格欄位
 "TableFieldSort" = "排序";

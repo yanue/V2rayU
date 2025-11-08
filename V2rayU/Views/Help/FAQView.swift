@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct QAView: View {
+struct FAQView: View {
     @ObservedObject private var lm = LanguageManager.shared
     @State private var expandedIndices: Set<Int> = []
 
@@ -16,7 +16,7 @@ struct QAView: View {
         let question: String
         let answer: String
     }
-    
+
     private var items: [QAItem] {
         switch lm.selectedLanguage {
         case .zhHans:
@@ -26,7 +26,7 @@ struct QAView: View {
                 """),
                 QAItem(question: "配置文件存储在哪里？", answer: """
                 V2rayU 的配置文件存储在用户主目录下的 ~/.V2rayU/ 目录中(~代表用户名)，可在命令行执行 ls -al ~/.V2rayU/ 查看文件明细。
-                
+
                 文件说明:
                 ~/.V2rayU/config.json - v2ray-core主要配置文件
                 ~/.V2rayU/V2rayUTool - 重要!!! 系统代理设置的辅助工具, 必须要有 -rwsrwsrwx 1 root admin 权限
@@ -62,7 +62,7 @@ struct QAView: View {
                 """),
                 QAItem(question: "設定檔儲存在哪裡？", answer: """
                 V2rayU 的設定檔儲存在使用者主目錄下的 ~/.V2rayU/ 目錄中 (~ 代表使用者名稱)，可在終端機執行 ls -al ~/.V2rayU/ 查看檔案明細。
-                
+
                 檔案說明:
                 ~/.V2rayU/config.json - v2ray-core 主要設定檔
                 ~/.V2rayU/V2rayUTool - 重要!!! 系統代理設定的輔助工具，必須要有 -rwsrwsrwx 1 root admin 權限
@@ -98,7 +98,7 @@ struct QAView: View {
                 """),
                 QAItem(question: "Where are the configuration files stored?", answer: """
                 V2rayU stores its configuration files in the ~/.V2rayU/ directory in the user's home folder (~ represents the username). You can run `ls -al ~/.V2rayU/` in the terminal to view the details.
-                
+
                 File descriptions:
                 ~/.V2rayU/config.json - Main v2ray-core configuration file
                 ~/.V2rayU/V2rayUTool - IMPORTANT!!! Helper tool for system proxy settings, must have -rwsrwsrwx 1 root admin permissions
@@ -129,10 +129,10 @@ struct QAView: View {
             ]
         }
     }
-    
+
     var body: some View {
         ScrollView {
-            VStack() {
+            VStack {
                 ForEach(items.indices, id: \.self) { idx in
                     let item = items[idx]
 
@@ -187,6 +187,7 @@ struct QAView: View {
                                     .foregroundColor(Color.primary)
                                     .fixedSize(horizontal: false, vertical: true)
                                     .multilineTextAlignment(.leading)
+                                    .textSelection(.enabled)   // 展开时可复制
                             }
                             .padding([.horizontal, .bottom])
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -202,6 +203,50 @@ struct QAView: View {
         .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
             // 语言变更时折叠所有项，避免内容错位
             withAnimation { expandedIndices.removeAll() }
+        }
+    }
+}
+
+struct FAQSheetView: View {
+    var onClose: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "questionmark.circle")
+                    .resizable()
+                    .frame(width: 32, height: 32)
+                    .foregroundColor(.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    localized(.FAQ)
+                        .font(.headline)
+                    localized(.FaqSubtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+            .padding(.vertical, 18)
+            .padding(.leading, 24)
+            
+            Divider()
+
+            FAQView()
+                .padding()
+            
+            Divider()
+            Spacer()
+
+            // Footer buttons
+            HStack {
+                Spacer()
+                Button(String(localized: .Close)) {
+                    onClose()
+                }
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 24)
         }
     }
 }

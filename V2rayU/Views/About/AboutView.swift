@@ -6,103 +6,78 @@
 //
 
 import SwiftUI
+
 struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var appVersion = getAppVersion()
-    @State private var appBuild = getAppBuild()
-    @State private var coreVersion = getCoreVersion()
-    @State private var year = Calendar.current.component(.year, from: Date())
-
+    
+    @State private var appVersion: String = ""
+    @State private var appBuild: String = ""
+    @State private var coreVersion: String = ""
+    @State private var year: Int = Calendar.current.component(.year, from: Date())
+    
     // 相关文件路径列表
-    private var fileLocations: [String] {
-        [
-            "~/.V2rayU/",
-            "~/Library/Preferences/net.yanue.V2rayU.plist",
-            "~/Library/Application Support/net.yanue.V2rayU/",
-            "~/Library/Caches/net.yanue.V2rayU/",
-            "~/Library/HTTPStorages/net.yanue.V2rayU/",
-        ]
-    }
-
+    private let fileLocations: [String] = [
+        "~/.V2rayU/",
+        "~/Library/Preferences/net.yanue.V2rayU.plist",
+        "~/Library/Application Support/net.yanue.V2rayU/",
+        "~/Library/Caches/net.yanue.V2rayU/",
+        "~/Library/HTTPStorages/net.yanue.V2rayU/"
+    ]
+    
     // 开源库 链接
-    private var openSources: [String] {
-        [
-            "https://github.com/groue/GRDB.swift",
-            "https://github.com/swhitty/FlyingFox.git",
-            "https://github.com/jpsim/Yams.git",
-            "https://github.com/sindresorhus/KeyboardShortcuts.git",
-            "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
-        ]
-    }
-
+    private let openSources: [String] = [
+        "https://github.com/groue/GRDB.swift",
+        "https://github.com/swhitty/FlyingFox.git",
+        "https://github.com/jpsim/Yams.git",
+        "https://github.com/sindresorhus/KeyboardShortcuts.git",
+        "https://github.com/SwiftyBeaver/SwiftyBeaver.git"
+    ]
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image("V2rayU")
-                    .resizable()
-                    .frame(width: 32, height: 32)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    localized(.About)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    HStack {
-                        Text("\(String(localized: .Version)) \(appVersion) (\(String(localized: .Build)) \(appBuild))")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text("\(coreVersion)")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                
+                // Header
+                HStack {
+                    Image("V2rayU")
+                        .resizable()
+                        .frame(width: 32, height: 32)
+                        .foregroundColor(.accentColor)
+                    VStack(alignment: .leading, spacing: 2) {
+                        localized(.About)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        HStack {
+                            Text("\(String(localized: .Version)) \(appVersion) (\(String(localized: .Build)) \(appBuild))")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Text(coreVersion)
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
-            }
-            Divider()
-
-            HStack(spacing: 20) {
+                
+                Divider()
+                
                 Text(String(localized: .AboutSubHead))
                     .font(.body)
                     .foregroundColor(.primary)
-            }
-
-            // 开源地址
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(String(localized: .OpenSourceProject))
-                        .font(.headline)
-                    Text("(\(String(localized: .OpenSourceLicense))")
-                        .font(.caption)
-                    Spacer()
-                }
+                
+                // 开源地址
+                sectionHeader(title: String(localized: .OpenSourceProject), subtitle: String(localized: .OpenSourceLicense))
                 HStack(spacing: 24) {
-                    Button(action: { openLink(url: "https://github.com/yanue/V2rayU.git") }) {
-                        Image(systemName: "link")
-                            .foregroundColor(.gray)
-                        Text("https://github.com/yanue/V2rayU.git")
-                            .foregroundColor(.blue)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .help(String(localized: .OpenInBrowser))
-                    .font(.callout)
-                    .underline()
-
+                    linkButton("https://github.com/yanue/V2rayU.git")
                     Spacer()
-
-                    Link(String(localized: .GithubIssues), destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
+                    Link(String(localized: .GithubIssues),
+                         destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
                         .foregroundColor(.blue)
                 }
-            }
-
-            // 相关文件位置
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(String(localized: .RelatedFileLocations))
-                        .font(.headline)
-                    Text("(\(String(localized: .ClickAndOpenInFinder)))")
-                        .font(.caption)
-                    Spacer()
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(fileLocations, id: \ .self) { path in
+                
+                // 相关文件位置
+                sectionHeader(title: String(localized: .RelatedFileLocations), subtitle: String(localized: .ClickAndOpenInFinder))
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(fileLocations, id: \.self) { path in
                         Button(action: { openInFinder(path: path) }) {
                             HStack(spacing: 6) {
                                 Image(systemName: "folder")
@@ -117,57 +92,72 @@ struct AboutView: View {
                         .underline()
                     }
                 }
-            }
-
-            // 开源库引用
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(String(localized: .OpenSourceLibraries))
-                        .font(.headline)
-                    Text("(\(String(localized: .UsedButNotLimitedTo)))")
-                        .font(.caption)
-                    Spacer()
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(openSources, id: \ .self) { url in
-                        Button(action: { openLink(url: url) }) {
-                            Image(systemName: "link")
-                                .foregroundColor(.gray)
-                            Text(url)
-                                .foregroundColor(.blue)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .help(String(localized: .OpenInBrowser))
-                        .font(.callout)
-                        .underline()
+                
+                // 开源库引用
+                sectionHeader(title: String(localized: .OpenSourceLibraries), subtitle: String(localized: .UsedButNotLimitedTo))
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(openSources, id: \.self) { url in
+                        linkButton(url)
                     }
                 }
+                
+                // 版权信息
+                HStack {
+                    Text("Copyright © 2018-\(year) yanue")
+                        .font(.subheadline)
+                    Text("All rights reserved.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
-
-            // 版权信息
-            HStack {
-                Text("Copyright © 2018-\(year) yanue")
-                    .font(.subheadline)
-                Text("All rights reserved.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+            .padding()
+        }
+        .onAppear {
+            // 避免初始化时阻塞 UI
+            appVersion = getAppVersion()
+            appBuild = getAppBuild()
+            
+            DispatchQueue.global().async {
+                let version = getCoreVersion()
+                DispatchQueue.main.async {
+                    coreVersion = version
+                }
             }
         }
-        .padding()
     }
-
-    // 打开 Finder 方法
+    
+    // MARK: - Helper Views
+    private func sectionHeader(title: String, subtitle: String) -> some View {
+        HStack {
+            Text(title).font(.headline)
+            Text("(\(subtitle))").font(.caption)
+            Spacer()
+        }
+    }
+    
+    private func linkButton(_ url: String) -> some View {
+        Button(action: { openLink(url: url) }) {
+            Image(systemName: "link")
+                .foregroundColor(.gray)
+            Text(url)
+                .foregroundColor(.blue)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .help(String(localized: .OpenInBrowser))
+        .font(.callout)
+        .underline()
+    }
+    
+    // MARK: - Actions
     private func openInFinder(path: String) {
         let expandedPath = (path as NSString).expandingTildeInPath
         let url = URL(fileURLWithPath: expandedPath)
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
-
+    
     private func openLink(url: String) {
         if let url = URL(string: url) {
             NSWorkspace.shared.open(url)
-        } else {
-            logger.info("Invalid URL: \(url)")
         }
     }
 }
