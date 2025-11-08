@@ -3,10 +3,9 @@ import SwiftUI
 import Foundation
 import OSLog
 
-//import FirebaseCore
-//import AppCenter
-//import AppCenterAnalytics
-//import AppCenterCrashes
+import FirebaseCore
+import AppCenterAnalytics
+import AppCenterCrashes
 
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
@@ -22,6 +21,7 @@ let logger = Logger(subsystem: "net.yanue.V2rayU", category: "app")
 let uiLogger = Logger(subsystem: "net.yanue.V2rayU", category: "ui")
 let appVersion = getAppVersion()
 let coreVersion = getCoreShortVersion()
+let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 
@@ -42,6 +42,11 @@ struct V2rayUApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         logger.info("Application did finish launching.")
+        FirebaseCore.FirebaseApp.configure()
+        AppCenter.start(withAppSecret: "d52dd1a1-7a3a-4143-b159-a30434f87713", services:[
+          Analytics.self,
+          Crashes.self
+        ])
         // 初始化状态栏项目
         AppMenuManager.shared.setupStatusItem()
         Task{

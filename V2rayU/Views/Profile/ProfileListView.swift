@@ -66,15 +66,6 @@ struct ProfileListView: View {
             VStack {
                 Spacer()
                 HStack {
-                    // checkbox
-                    Toggle(isOn: $selectAll) {
-                        Text(String(localized: .SelectAll))
-                    }
-                    Button(action: { withAnimation { loadData() } }) {
-                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
-                    }
-                    .buttonStyle(.bordered)
-                    Spacer()
                     Button(action: { withAnimation {
                         let newProxy = ProfileModel(from: ProfileDTO())
                         self.selectedRow = newProxy

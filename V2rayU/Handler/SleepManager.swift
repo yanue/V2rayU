@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import AppCenterAnalytics
 
 actor SystemSleepManager {
     static let shared = SystemSleepManager()
