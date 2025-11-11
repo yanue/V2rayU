@@ -11,7 +11,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 // 实现GRDB
-struct RoutingDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord {
+struct RoutingEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol  {
     var uuid: String
     var name: String
     var remark: String
@@ -25,6 +25,7 @@ struct RoutingDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
     var id: String {
         return uuid
     }
+    static var idColumn: Column { RoutingEntity.Columns.uuid }
 
     // 拖动排序
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
@@ -94,29 +95,4 @@ struct RoutingDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
             }
         }
     }
-}
-
-// MARK: - UI Model (SwiftUI 绑定)
-
-@dynamicMemberLookup
-final class RoutingModel: ObservableObject, Identifiable {
-    @Published var dto: RoutingDTO
-    var id: String { dto.uuid }
-
-    init(from dto: RoutingDTO) {
-        self.dto = dto
-    }
-
-    // 动态代理属性访问
-    subscript<T>(dynamicMember keyPath: KeyPath<RoutingDTO, T>) -> T {
-        dto[keyPath: keyPath]
-    }
-
-    subscript<T>(dynamicMember keyPath: WritableKeyPath<RoutingDTO, T>) -> T {
-        get { dto[keyPath: keyPath] }
-        set { dto[keyPath: keyPath] = newValue }
-    }
-
-    // 转换回 DTO
-    func toDTO() -> RoutingDTO { dto }
 }

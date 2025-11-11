@@ -19,9 +19,9 @@ extension AppDatabase {
         var migrator = DatabaseMigrator()
       
         // 注册所有模型的迁移逻辑
-        ProfileDTO.registerMigrations(in: &migrator)
-        SubDTO.registerMigrations(in: &migrator)
-        RoutingDTO.registerMigrations(in: &migrator)
+        ProfileEntity.registerMigrations(in: &migrator)
+        SubscriptionEntity.registerMigrations(in: &migrator)
+        RoutingEntity.registerMigrations(in: &migrator)
         
         return migrator
     }

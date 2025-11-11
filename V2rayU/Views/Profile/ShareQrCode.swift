@@ -101,7 +101,7 @@ struct ShareQrCodeView: View {
     }
     
     func regenerate() {
-        shareUri = ShareUri.generateShareUri(item: profile.toDTO())
+        shareUri = ShareUri.generateShareUri(item: profile.toEntity())
         currentQRCode = generateQRCode(from: shareUri)
         logger.debug("regenerate: \(self.shareUri)")
     }

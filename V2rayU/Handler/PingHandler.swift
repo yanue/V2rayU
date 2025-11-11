@@ -29,7 +29,7 @@ actor PingAll {
         killAllPing()
         self.finishedCount = 0
 
-        let items = ProfileViewModel.all()
+        let items = ProfileStore.shared.fetchAll()
         guard !items.isEmpty else {
             logger.info("No items to ping.")
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "没有可 Ping 的节点")
@@ -47,7 +47,7 @@ actor PingAll {
         pingTaskGroup(items: items)
     }
 
-    private func pingTaskGroup(items: [ProfileDTO]) {
+    private func pingTaskGroup(items: [ProfileEntity]) {
         items.publisher
             .flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
                 Future<Void, Error> { promise in
@@ -90,7 +90,7 @@ actor PingAll {
         inPing = false
     }
     
-    private func pingEachServer(item: ProfileDTO) async throws {
+    private func pingEachServer(item: ProfileEntity) async throws {
         let ping = PingServer(uuid: item.uuid)
         try await ping.doPing()
         let speed = await ping.getSpeed()
@@ -105,7 +105,7 @@ actor PingAll {
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-done: \(item.remark) - \(speed) ms")
     }
     
-    func pingOne(item: ProfileDTO) {
+    func pingOne(item: ProfileEntity) {
         // 开始执行异步任务
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 节点")
         self.pingTaskGroup(items: [item])
@@ -115,7 +115,7 @@ actor PingAll {
 
 actor PingServer {
     private var uuid: String = ""
-    private var item: ProfileDTO = ProfileDTO()
+    private var item: ProfileEntity = ProfileEntity()
     private var process: Process = Process()
     private var jsonFile: String = ""
     private var bindPort: UInt16 = 0
@@ -129,7 +129,7 @@ actor PingServer {
     }
     
     func doPing() async throws {
-        guard let item = ProfileViewModel.fetchOne(uuid: uuid) else {
+        guard let item = ProfileStore.shared.fetchOne(uuid: uuid) else {
             throw NSError(domain: "PingServerError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Item not found"])
         }
         self.item = item
@@ -150,7 +150,7 @@ actor PingServer {
     
     private func ping() async throws {
         defer {
-            ProfileViewModel.update_speed(uuid: self.item.uuid, speed: self.item.speed)
+            ProfileStore.shared.update_speed(uuid: self.item.uuid, speed: self.item.speed)
         }
         do {
             let pingTime = try await testLatencyByProxyPort(port: self.bindPort)
@@ -262,7 +262,7 @@ actor PingRunning {
     
     private var failureCount = 0
     private var isExecuting = false
-    private var item: ProfileDTO = ProfileDTO()
+    private var item: ProfileEntity = ProfileEntity()
 
     /// 开始 Ping 流程
     func startPing() async throws {
@@ -270,7 +270,7 @@ actor PingRunning {
             logger.info("Ping task is already running.")
             return
         }
-        guard let item = ProfileViewModel.getRunning() else {
+        guard let item = ProfileStore.shared.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return
         }
@@ -309,7 +309,7 @@ actor PingRunning {
 
     private func updateSpeed(pingTime: Int) {
         // 更新 speed
-        ProfileViewModel.update_speed(uuid: self.item.uuid, speed: pingTime)
+        ProfileStore.shared.update_speed(uuid: self.item.uuid, speed: pingTime)
     }
     
     /// 重置失败计数
@@ -341,7 +341,7 @@ actor PingRunning {
             return
         }
         
-        let serverList = ProfileViewModel.all()
+        let serverList = ProfileStore.shared.fetchAll()
         guard serverList.count > 1 else {
             return
         }

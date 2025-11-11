@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ProfileListView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    @State private var list: [ProfileDTO] = []
-    @State private var sortOrder: [KeyPathComparator<ProfileDTO>] = []
+    @State private var list: [ProfileEntity] = []
+    @State private var sortOrder: [KeyPathComparator<ProfileEntity>] = []
     @State private var selection: Set<ProfileModel.ID> = []
     @State private var selectedRow: ProfileModel? = nil
     @State private var pingRow: ProfileModel? = nil
@@ -22,7 +22,7 @@ struct ProfileListView: View {
     @State private var showPingSheet: Bool = false
     @State private var showShareSheet: Bool = false
 
-    var filteredAndSortedItems: [ProfileDTO] {
+    var filteredAndSortedItems: [ProfileEntity] {
         let filtered = viewModel.list.filter { item in
             (selectGroup == "" || selectGroup == item.subid) &&
                 (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
@@ -67,7 +67,7 @@ struct ProfileListView: View {
                 Spacer()
                 HStack {
                     Button(action: { withAnimation {
-                        let newProxy = ProfileModel(from: ProfileDTO())
+                        let newProxy = ProfileModel(from: ProfileEntity())
                         self.selectedRow = newProxy
                     }}) {
                         Label(String(localized: .Add), systemImage: "plus")
@@ -114,7 +114,7 @@ struct ProfileListView: View {
             }
         }
         .sheet(item: $pingRow) { _ in
-            ProfilePingView(profile: pingRow?.toDTO(), isAll: false) {
+            ProfilePingView(profile: pingRow?.toEntity(), isAll: false) {
                 pingRow = nil
             }
         }
@@ -132,7 +132,7 @@ struct ProfileListView: View {
 
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
-    func handleDrop(index: Int, rows: [ProfileDTO]) {
+    func handleDrop(index: Int, rows: [ProfileEntity]) {
         guard let firstRow = rows.first, let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid }) else { return }
 
         viewModel.list.removeAll(where: { row in
@@ -145,7 +145,7 @@ struct ProfileListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func contextMenuProvider(item: ProfileDTO) -> some View {
+    private func contextMenuProvider(item: ProfileEntity) -> some View {
         Group {
             Button {
                 chooseItem(item: ProfileModel(from: item))
@@ -227,9 +227,9 @@ struct ProfileListView: View {
     // 提取的 Table 子视图，减少主视图表达式复杂度
     private var tableView: some View {
         // 表格主体
-        Table(of: ProfileDTO.self, selection: $selection, sortOrder: $sortOrder) {
+        Table(of: ProfileEntity.self, selection: $selection, sortOrder: $sortOrder) {
             Group {
-                TableColumn("#") { (row: ProfileDTO) in
+                TableColumn("#") { (row: ProfileEntity) in
                     HStack(spacing: 4) {
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
@@ -240,7 +240,7 @@ struct ProfileListView: View {
                 }
                 .width(20)
 
-                TableColumn(String(localized: .TableFieldSort)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldSort)) { (row: ProfileEntity) in
                     HStack(spacing: 5) {
                         Image(systemName: "line.3.horizontal")
                     }
@@ -257,7 +257,7 @@ struct ProfileListView: View {
                 }
                 .width(26)
 
-                TableColumn(String(localized: .TableFieldRemark)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldRemark)) { (row: ProfileEntity) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -284,7 +284,7 @@ struct ProfileListView: View {
                 }
                 .width(min: 120, max: 300)
 
-                TableColumn(String(localized: .TableFieldLatency)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldLatency)) { (row: ProfileEntity) in
                     Text("\(row.speed)")
                         .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
                 }
@@ -302,22 +302,22 @@ struct ProfileListView: View {
                 }.width(40)
             }
             Group {
-                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileEntity) in
                     Text(row.todayDown.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileEntity) in
                     Text(row.todayUp.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileEntity) in
                     Text(row.totalDown.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileDTO) in
+                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileEntity) in
                     Text(row.totalUp.humanSize)
                 }
                 .width(min: 40, max: 100)
@@ -328,7 +328,7 @@ struct ProfileListView: View {
                     .draggable(row)
                     .contextMenu { contextMenuProvider(item: row) }
             }
-            .dropDestination(for: ProfileDTO.self, action: handleDrop)
+            .dropDestination(for: ProfileEntity.self, action: handleDrop)
         }
     }
 
@@ -339,11 +339,11 @@ struct ProfileListView: View {
 
     private func duplicateItem(item: ProfileModel) {
         let newItem = item.clone()
-        viewModel.upsert(item: newItem.dto)
+        viewModel.upsert(item: newItem.entity)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func copyItem(item: ProfileDTO) {
+    private func copyItem(item: ProfileEntity) {
         // 复制到剪贴板
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -357,27 +357,27 @@ struct ProfileListView: View {
         }
     }
 
-    private func moveToTop(item: ProfileDTO) {
+    private func moveToTop(item: ProfileEntity) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         viewModel.list.remove(at: index)
         viewModel.list.insert(item, at: 0)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveToBottom(item: ProfileDTO) {
+    private func moveToBottom(item: ProfileEntity) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
         viewModel.list.remove(at: index)
         viewModel.list.append(item)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveUp(item: ProfileDTO) {
+    private func moveUp(item: ProfileEntity) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index > 0 else { return }
         viewModel.list.swapAt(index, index - 1)
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func moveDown(item: ProfileDTO) {
+    private func moveDown(item: ProfileEntity) {
         guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index < viewModel.list.count - 1 else { return }
         viewModel.list.swapAt(index, index + 1)
         viewModel.updateSortOrderInDBAsync()

@@ -256,7 +256,7 @@ final class AppMenuManager: NSObject {
         
         let menu = NSMenu()
 
-        let routings = RoutingViewModel.all()
+        let routings = RoutingStore.shared.fetchAll()
         for routing in routings {
             let item = createRoutingMenuItem(routing: routing)
             menu.addItem(item)
@@ -264,7 +264,7 @@ final class AppMenuManager: NSObject {
         return menu
     }
     
-    private func createRoutingMenuItem(routing: RoutingDTO) -> NSMenuItem {
+    private func createRoutingMenuItem(routing: RoutingEntity) -> NSMenuItem {
         let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
         item.representedObject = routing.uuid  // 可选：存储路由名称
         item.isEnabled =  true
@@ -287,7 +287,7 @@ final class AppMenuManager: NSObject {
         let menu = NSMenu()
         
         // 直接拿有序数组
-        let groupedServers = ProfileViewModel.getGroupedProfiles()
+        let groupedServers = ProfileStore.shared.getGroupedProfiles()
         let useGrouping = groupedServers.count >= 2
         
         if useGrouping {
@@ -318,7 +318,7 @@ final class AppMenuManager: NSObject {
     }
 
     // 辅助方法：创建对齐的服务器菜单项
-    private func createServerMenuItem(profile: ProfileDTO) -> NSMenuItem {
+    private func createServerMenuItem(profile: ProfileEntity) -> NSMenuItem {
         let speedText: String = "[\(profile.speed)ms]"
         let speedColor: NSColor = getSpeedColor(latency: Double(profile.speed))
         

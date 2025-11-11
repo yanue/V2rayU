@@ -8,7 +8,6 @@ import SwiftUI
 
 struct ConfigFormView: View {
     @ObservedObject var item: ProfileModel
-    @StateObject private var viewModel = ProfileViewModel()
     
     var onClose: () -> Void
 
@@ -59,7 +58,7 @@ struct ConfigFormView: View {
                 }
                 .buttonStyle(.bordered)
                 Button(String(localized: .Save)) {
-                    viewModel.upsert(item: item.dto)
+                    ProfileStore.shared.upsert(item.entity)
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

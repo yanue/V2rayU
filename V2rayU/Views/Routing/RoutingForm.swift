@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RoutingFormView: View {
     @ObservedObject var item: RoutingModel
-    @StateObject private var viewModel = RoutingViewModel()
 
     private let domainStrategys = ["AsIs", "IPIfNonMatch", "IPOnDemand"]
     private let domainMatchers = ["hybrid", "linear"]
@@ -114,7 +113,7 @@ struct RoutingFormView: View {
                     onClose()
                 }
                 Button(String(localized: .Save)) {
-                    viewModel.upsert(item: item)
+                    RoutingStore.shared.upsert(item.toEntity())
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

@@ -26,21 +26,21 @@ import Foundation
 
 class VlessUri: BaseShareUri {
 
-    private var profile: ProfileDTO
+    private var profile: ProfileEntity
     private var error: String?
 
     // 初始化
     init() {
-        self.profile = ProfileDTO(remark: "vless", protocol: .vless)
+        self.profile = ProfileEntity(remark: "vless", protocol: .vless)
     }
 
     // 从 ProfileModel 初始化
-    required init(from model: ProfileDTO) {
+    required init(from model: ProfileEntity) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         self.profile = model
     }
 
-    func getProfile() -> ProfileDTO {
+    func getProfile() -> ProfileEntity {
         return self.profile
     }
 

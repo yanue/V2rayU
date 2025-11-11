@@ -21,7 +21,7 @@ actor SubscriptionHandler {
         SubscriptionHandlering = true
         logger.info("SubscriptionHandler start")
 
-        let list = SubViewModel().all()
+        let list = SubscriptionStore.shared.fetchAll()
 
         if list.count == 0 {
             logTip(title: "fail: ", uri: "", informativeText: " please add Subscription Url")
@@ -31,7 +31,7 @@ actor SubscriptionHandler {
         syncTaskGroup(items: list)
     }
 
-    func syncOne(item: SubDTO) {
+    func syncOne(item: SubscriptionEntity) {
         if SubscriptionHandlering {
             logger.info("SubscriptionHandler Syncing ...")
             return
@@ -59,7 +59,7 @@ actor SubscriptionHandler {
         }
     }
 
-    private func syncTaskGroup(items: [SubDTO]) {
+    private func syncTaskGroup(items: [SubscriptionEntity]) {
         // 使用 Combine 处理多个异步任务
         items.publisher.flatMap(maxPublishers: .max(maxConcurrentTasks)) { item in
             Future<Void, Error> { promise in
@@ -106,7 +106,7 @@ actor SubscriptionHandler {
         }
     }
 
-    public func dlFromUrl(url: String, sub: SubDTO) async throws {
+    public func dlFromUrl(url: String, sub: SubscriptionEntity) async throws {
         logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
 
         guard let reqUrl = URL(string: url) else {
@@ -129,7 +129,7 @@ actor SubscriptionHandler {
         }
     }
 
-    func handle(base64Str: String, sub: SubDTO, url: String) {
+    func handle(base64Str: String, sub: SubscriptionEntity, url: String) {
         guard let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded() else {
             logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
             return
@@ -143,12 +143,12 @@ actor SubscriptionHandler {
         importByNormal(strTmp: strTmp, sub: sub)
     }
 
-    func getOldCount(sub: SubDTO) -> Int {
-        return ProfileViewModel.count(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
+    func getOldCount(sub: SubscriptionEntity) -> Int {
+        return ProfileStore.shared.count(filter: [ProfileEntity.Columns.subid.name: sub.uuid])
     }
 
-    func importByYaml(strTmp: String, sub: SubDTO) -> Bool {
-        var list: [ProfileDTO] = []
+    func importByYaml(strTmp: String, sub: SubscriptionEntity) -> Bool {
+        var list: [ProfileEntity] = []
         let oldCount = getOldCount(sub: sub)
 
         // parse clash yaml
@@ -170,10 +170,10 @@ actor SubscriptionHandler {
                 return false
             }
             // 删除旧的
-            ProfileViewModel.delete(filter: [ProfileDTO.Columns.subid.name: sub.uuid])
+            ProfileStore.shared.delete(filter: [ProfileEntity.Columns.subid.name: sub.uuid])
 
             // 插入新的
-            ProfileViewModel.insert_many(items: list)
+            ProfileStore.shared.insertMany(list)
 
             return true
         } catch {
@@ -183,8 +183,8 @@ actor SubscriptionHandler {
         return false
     }
 
-    func importByNormal(strTmp: String, sub: SubDTO) {
-        var list: [ProfileDTO] = []
+    func importByNormal(strTmp: String, sub: SubscriptionEntity) {
+        var list: [ProfileEntity] = []
         
         // 文本按行拆分
         let lines = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
@@ -204,17 +204,17 @@ actor SubscriptionHandler {
         }
 
         // 查询旧的
-        let olds = ProfileViewModel.getGroupProfiles(subid: sub.uuid)
+        let olds = ProfileStore.shared.getGroupProfiles(subid: sub.uuid)
 
         // 组合旧的 unique key 集合
-        var oldMap = [String: ProfileDTO]()
+        var oldMap = [String: ProfileEntity]()
         for item in olds {
             let key = item.uniqueKey()
             oldMap[key] = item
         }
 
-        var adds = [ProfileDTO]()
-        var dels = [ProfileDTO]()
+        var adds = [ProfileEntity]()
+        var dels = [ProfileEntity]()
         var exists = Set<String>()
 
         // 遍历新的列表
@@ -223,7 +223,7 @@ actor SubscriptionHandler {
             if let old = oldMap[key] {
                 exists.insert(key)
                 // 更新旧的
-                ProfileViewModel.update_profile(oldDto:  old, newDto: item)
+                ProfileStore.shared.updateProfile(oldDto:  old, newDto: item)
                 logTip(title: "update existing profile: ", informativeText: "\(sub.remark), \(item.remark), \(item.address):\(item.port)")
             } else {
                 // 新增
@@ -242,12 +242,12 @@ actor SubscriptionHandler {
 
         // 插入新的
         if !adds.isEmpty {
-            ProfileViewModel.insert_many(items: adds)
+            ProfileStore.shared.insertMany(adds)
         }
         
         // 删除旧的
         for del in dels {
-            ProfileViewModel.delete(uuid: del.uuid)
+            ProfileStore.shared.delete(uuid: del.uuid)
         }
         
         logTip(title: "importByNormal: ", informativeText: "\(sub.remark), \(sub.url) added=\(adds.count), deleted=\(dels.count), exists=\(exists.count)")

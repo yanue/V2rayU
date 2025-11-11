@@ -57,7 +57,7 @@ actor V2rayLaunch {
     
     func start() async -> Bool {
         logger.info("start v2ray-core begin")
-        guard let item = ProfileViewModel.getRunning() else {
+        guard let item = ProfileStore.shared.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return false
         }
@@ -84,7 +84,7 @@ actor V2rayLaunch {
         setSystemProxy(mode: .off)
     }
 
-    private func createJsonFile(item: ProfileDTO) {
+    private func createJsonFile(item: ProfileEntity) {
         let vCfg = V2rayConfigHandler()
         let jsonText = vCfg.toJSON(item: item)
         do {

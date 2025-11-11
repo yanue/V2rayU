@@ -9,7 +9,7 @@ import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct ProfileDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord {
+struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
     // 公共属性
     var uuid: String // 唯一标识
     var remark: String // 备注
@@ -46,6 +46,7 @@ struct ProfileDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
     var id: String {
         return uuid
     }
+    static var idColumn: Column { RoutingEntity.Columns.uuid }
 
     // 拖动排序
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
@@ -192,117 +193,10 @@ struct ProfileDTO: Codable, Identifiable, Equatable, Hashable, Transferable, Tab
             }
         }
     }
-
-    func save() {
-        do {
-            let dbWriter = AppDatabase.shared.dbWriter
-            try dbWriter.write { db in
-                try self.save(db)
-            }
-        } catch {
-            logger.info("save error: \(error)")
-        }
-    }
     
     /// profile 唯一标识符, 用于检测重复配置
     /// 不需要 subid, 因为比较时已筛选
     func uniqueKey() -> String {
         return "\(`protocol`.rawValue)-\(address)-\(port)-\(password)-\(alterId)-\(network.rawValue)-\(host)-\(path)-\(security.rawValue)"
-    }
-
-    /// 更新 `profile_stat` 表中指定 `uuid` 的统计数据
-    static func update_stat(uuid: String, up: Int, down: Int, lastUpdate: Date) throws {
-        let sql = """
-        UPDATE profile
-        SET
-            todayUp   = todayUp + ?,
-            todayDown = todayDown + ?,
-            totalUp   = totalUp + ?,
-            totalDown = totalDown + ?,
-            lastUpdate = ?
-        WHERE uuid = ?
-        """
-        do {
-            let dbWriter = AppDatabase.shared.dbWriter
-            try dbWriter.write { db in
-                try db.execute(
-                    sql: sql,
-                    arguments: [up, down, up, down, lastUpdate, uuid]
-                )
-            }
-        } catch {
-            logger.info("update_stat error: \(error)")
-        }
-    }
-
-    /// 清空 `profile_stat` 表中指定 `uuid` 的今日数据
-    /// 如果 `lastUpdate` 日期非今天，则将 `todayUp` 和 `todayDown` 清零，并更新 `lastUpdate` 为当前时间
-    /// - Parameters:
-    ///   - uuid: 唯一标识符
-    static func clearTodayData(uuid: String) throws {
-        // 获取当前日期的开始时间（00:00:00）
-        let calendar = Calendar.current
-        let todayStart = calendar.startOfDay(for: Date())
-        do {
-            let dbReader = AppDatabase.shared.reader
-            return try dbReader.read { db in
-                let sql = "SELECT lastUpdate FROM profile WHERE uuid = ?"
-                // 查询指定 `uuid` 的 `lastUpdate`
-                guard let lastUpdate: Date = try Date.fetchOne(db, sql: sql, arguments: [uuid]) else {
-                    // 如果未查询到记录，直接返回
-                    return
-                }
-                // 如果 `lastUpdate` 小于今日开始时间，表示非今天，需要清空今日数据
-                if lastUpdate < todayStart {
-                    do {
-                        let dbWriter = AppDatabase.shared.dbWriter
-                        return try dbWriter.write { db in
-                            try db.execute(
-                                sql: """
-                                UPDATE profile
-                                SET todayUp = 0, todayDown = 0, lastUpdate = ?
-                                WHERE uuid = ?
-                                """,
-                                arguments: [Date(), uuid]
-                            )
-                        }
-                    } catch {
-                        logger.info("getFastOne error: \(error)")
-                    }
-                }
-            }
-        } catch {
-            logger.info("clearTodayData error: \(error)")
-            return
-        }
-    }
-}
-
-// MARK: - UI Model (SwiftUI 绑定)
-
-@dynamicMemberLookup
-final class ProfileModel: ObservableObject, Identifiable {
-    @Published var dto: ProfileDTO
-    var id: String { dto.uuid }
-
-    init(from dto: ProfileDTO) {
-        self.dto = dto
-    }
-
-    // 动态代理属性访问
-    subscript<T>(dynamicMember keyPath: KeyPath<ProfileDTO, T>) -> T {
-        dto[keyPath: keyPath]
-    }
-
-    subscript<T>(dynamicMember keyPath: WritableKeyPath<ProfileDTO, T>) -> T {
-        get { dto[keyPath: keyPath] }
-        set { dto[keyPath: keyPath] = newValue }
-    }
-
-    // 转换回 DTO
-    func toDTO() -> ProfileDTO { dto }
-
-    func clone() -> ProfileModel {
-        return ProfileModel(from: self.toDTO())
     }
 }

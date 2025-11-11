@@ -31,10 +31,10 @@
 		662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3F42D1BED9B006E8450 /* GeneralView.swift */; };
 		662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E72D1BED9B006E8450 /* V2rayStruct.swift */; };
 		662CC4152D1BED9B006E8450 /* RoutingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */; };
-		662CC4172D1BED9B006E8450 /* RoutingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CB2D1BED9B006E8450 /* RoutingModel.swift */; };
-		662CC4192D1BED9B006E8450 /* SubModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CC2D1BED9B006E8450 /* SubModel.swift */; };
+		662CC4172D1BED9B006E8450 /* RoutingEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CB2D1BED9B006E8450 /* RoutingEntity.swift */; };
+		662CC4192D1BED9B006E8450 /* SubscriptionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CC2D1BED9B006E8450 /* SubscriptionEntity.swift */; };
 		662CC41A2D1BED9B006E8450 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3D22D1BED9B006E8450 /* Database.swift */; };
-		662CC41C2D1BED9B006E8450 /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CA2D1BED9B006E8450 /* ProfileModel.swift */; };
+		662CC41C2D1BED9B006E8450 /* ProfileEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CA2D1BED9B006E8450 /* ProfileEntity.swift */; };
 		662CC41D2D1BED9B006E8450 /* Port.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C32D1BED9B006E8450 /* Port.swift */; };
 		662CC4202D1BED9B006E8450 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C82D1BED9B006E8450 /* Util.swift */; };
 		662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */; };
@@ -57,7 +57,7 @@
 		662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC43C2D1C4CE9006E8450 /* ShareHandler.swift */; };
 		662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */; };
 		662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */; };
-		662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44B2D1C4D38006E8450 /* SubViewModel.swift */; };
+		662CC44E2D1C4D38006E8450 /* SubscriptionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44B2D1C4D38006E8450 /* SubscriptionViewModel.swift */; };
 		662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC44F2D1C4D46006E8450 /* Scanner.swift */; };
 		6632EF1A2EBF2A7200CED47B /* AppCenterAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6632EF192EBF2A7200CED47B /* AppCenterAnalytics */; };
 		6632EF1C2EBF2A7200CED47B /* AppCenterCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = 6632EF1B2EBF2A7200CED47B /* AppCenterCrashes */; };
@@ -65,6 +65,13 @@
 		6632EF232EBF4DA400CED47B /* DiagnosticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF222EBF4D9000CED47B /* DiagnosticModel.swift */; };
 		6632EF262EBF4E2700CED47B /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF252EBF4E2600CED47B /* DiagnosticsViewModel.swift */; };
 		6632EF292EBF4F6300CED47B /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF282EBF4F5600CED47B /* Network.swift */; };
+		6632EF2B2EC35F6500CED47B /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF2A2EC35F5E00CED47B /* ProfileModel.swift */; };
+		6632EF2D2EC35F9C00CED47B /* RoutingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF2C2EC35F9500CED47B /* RoutingModel.swift */; };
+		6632EF2F2EC35FCF00CED47B /* SubscriptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF2E2EC35FC500CED47B /* SubscriptionModel.swift */; };
+		6632EF352EC3670C00CED47B /* RoutingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF342EC3670A00CED47B /* RoutingStore.swift */; };
+		6632EF372EC36B6200CED47B /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF362EC36B5C00CED47B /* ProfileStore.swift */; };
+		6632EF3D2EC370CC00CED47B /* Protocal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF3C2EC370C000CED47B /* Protocal.swift */; };
+		6632EF3F2EC3720100CED47B /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF3E2EC371F000CED47B /* SubscriptionStore.swift */; };
 		663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */; };
 		663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */; };
 		663814B32E02E0FD00F5FCF3 /* RoutingForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B22E02E0F600F5FCF3 /* RoutingForm.swift */; };
@@ -178,9 +185,9 @@
 		662CC3C62D1BED9B006E8450 /* Url+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Url+Extension.swift"; sourceTree = "<group>"; };
 		662CC3C72D1BED9B006E8450 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		662CC3C82D1BED9B006E8450 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
-		662CC3CA2D1BED9B006E8450 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
-		662CC3CB2D1BED9B006E8450 /* RoutingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingModel.swift; sourceTree = "<group>"; };
-		662CC3CC2D1BED9B006E8450 /* SubModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModel.swift; sourceTree = "<group>"; };
+		662CC3CA2D1BED9B006E8450 /* ProfileEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEntity.swift; sourceTree = "<group>"; };
+		662CC3CB2D1BED9B006E8450 /* RoutingEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingEntity.swift; sourceTree = "<group>"; };
+		662CC3CC2D1BED9B006E8450 /* SubscriptionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionEntity.swift; sourceTree = "<group>"; };
 		662CC3D22D1BED9B006E8450 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		662CC3D32D1BED9B006E8450 /* Migrate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrate.swift; sourceTree = "<group>"; };
 		662CC3D62D1BED9B006E8450 /* RoutingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingHandler.swift; sourceTree = "<group>"; };
@@ -212,12 +219,19 @@
 		662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayOutboundHandler.swift; sourceTree = "<group>"; };
 		662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingViewModel.swift; sourceTree = "<group>"; };
-		662CC44B2D1C4D38006E8450 /* SubViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubViewModel.swift; sourceTree = "<group>"; };
+		662CC44B2D1C4D38006E8450 /* SubscriptionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionViewModel.swift; sourceTree = "<group>"; };
 		662CC44F2D1C4D46006E8450 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		6632EF202EBF381000CED47B /* StatusItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
 		6632EF222EBF4D9000CED47B /* DiagnosticModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticModel.swift; sourceTree = "<group>"; };
 		6632EF252EBF4E2600CED47B /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
 		6632EF282EBF4F5600CED47B /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		6632EF2A2EC35F5E00CED47B /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
+		6632EF2C2EC35F9500CED47B /* RoutingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingModel.swift; sourceTree = "<group>"; };
+		6632EF2E2EC35FC500CED47B /* SubscriptionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModel.swift; sourceTree = "<group>"; };
+		6632EF342EC3670A00CED47B /* RoutingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingStore.swift; sourceTree = "<group>"; };
+		6632EF362EC36B5C00CED47B /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		6632EF3C2EC370C000CED47B /* Protocal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocal.swift; sourceTree = "<group>"; };
+		6632EF3E2EC371F000CED47B /* SubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStore.swift; sourceTree = "<group>"; };
 		663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionForm.swift; sourceTree = "<group>"; };
 		663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionSync.swift; sourceTree = "<group>"; };
 		663814B22E02E0F600F5FCF3 /* RoutingForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingForm.swift; sourceTree = "<group>"; };
@@ -349,31 +363,22 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
-		662CC3CD2D1BED9B006E8450 /* Models */ = {
+		662CC3CD2D1BED9B006E8450 /* Entity */ = {
 			isa = PBXGroup;
 			children = (
-				662CC3CA2D1BED9B006E8450 /* ProfileModel.swift */,
-				662CC3CB2D1BED9B006E8450 /* RoutingModel.swift */,
-				662CC3CC2D1BED9B006E8450 /* SubModel.swift */,
+				662CC3CA2D1BED9B006E8450 /* ProfileEntity.swift */,
+				662CC3CC2D1BED9B006E8450 /* SubscriptionEntity.swift */,
+				662CC3CB2D1BED9B006E8450 /* RoutingEntity.swift */,
 			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		662CC3D12D1BED9B006E8450 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */,
-				662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */,
-				662CC44B2D1C4D38006E8450 /* SubViewModel.swift */,
-			);
-			path = ViewModels;
+			path = Entity;
 			sourceTree = "<group>";
 		};
 		662CC3D42D1BED9B006E8450 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				662CC3CD2D1BED9B006E8450 /* Models */,
-				662CC3D12D1BED9B006E8450 /* ViewModels */,
+				662CC3CD2D1BED9B006E8450 /* Entity */,
+				6632EF302EC3635A00CED47B /* Store */,
+				6632EF3C2EC370C000CED47B /* Protocal.swift */,
 				662CC3D22D1BED9B006E8450 /* Database.swift */,
 				662CC3D32D1BED9B006E8450 /* Migrate.swift */,
 			);
@@ -493,9 +498,24 @@
 		6632EF242EBF4DFB00CED47B /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				662CC4492D1C4D38006E8450 /* ProfileViewModel.swift */,
+				662CC44A2D1C4D38006E8450 /* RoutingViewModel.swift */,
+				662CC44B2D1C4D38006E8450 /* SubscriptionViewModel.swift */,
+				66764BD92EB4EF8A002F330B /* CoreViewModel.swift */,
 				6632EF252EBF4E2600CED47B /* DiagnosticsViewModel.swift */,
+				66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		6632EF302EC3635A00CED47B /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				6632EF362EC36B5C00CED47B /* ProfileStore.swift */,
+				6632EF3E2EC371F000CED47B /* SubscriptionStore.swift */,
+				6632EF342EC3670A00CED47B /* RoutingStore.swift */,
+			);
+			path = Store;
 			sourceTree = "<group>";
 		};
 		663814AB2E00657000F5FCF3 /* Routing */ = {
@@ -529,11 +549,12 @@
 		66764BD82EB4EF64002F330B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6632EF2E2EC35FC500CED47B /* SubscriptionModel.swift */,
+				6632EF2C2EC35F9500CED47B /* RoutingModel.swift */,
+				6632EF2A2EC35F5E00CED47B /* ProfileModel.swift */,
 				6632EF222EBF4D9000CED47B /* DiagnosticModel.swift */,
 				66764BEB2EB50FC5002F330B /* DownloadModel.swift */,
 				669DCEA12E3D90760085278B /* GithubModel.swift */,
-				66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */,
-				66764BD92EB4EF8A002F330B /* CoreViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -843,6 +864,7 @@
 				66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */,
 				66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
+				6632EF2F2EC35FCF00CED47B /* SubscriptionModel.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
 				66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */,
 				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
@@ -863,6 +885,7 @@
 				66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */,
 				66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */,
 				662CC4442D1C4CE9006E8450 /* V2rayConfigHandler.swift in Sources */,
+				6632EF372EC36B6200CED47B /* ProfileStore.swift in Sources */,
 				66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */,
 				66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */,
 				662CC4452D1C4CE9006E8450 /* V2rayOutboundHandler.swift in Sources */,
@@ -875,11 +898,13 @@
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
 				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,
 				669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */,
+				6632EF3F2EC3720100CED47B /* SubscriptionStore.swift in Sources */,
 				66764BE12EB4F049002F330B /* CoreManager.swift in Sources */,
 				66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */,
 				6632EF212EBF381200CED47B /* StatusItemView.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,
 				662CC4072D1BED9B006E8450 /* ServerView.swift in Sources */,
+				6632EF3D2EC370CC00CED47B /* Protocal.swift in Sources */,
 				66389D0B2E4342D70050CB27 /* BaseWindow.swift in Sources */,
 				663814B52E0448DB00F5FCF3 /* ProfilePing.swift in Sources */,
 				662CC4082D1BED9B006E8450 /* SecurityView.swift in Sources */,
@@ -893,20 +918,22 @@
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
 				660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */,
 				662CC4102D1BED9B006E8450 /* AdvanceView.swift in Sources */,
+				6632EF352EC3670C00CED47B /* RoutingStore.swift in Sources */,
 				662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */,
 				662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */,
 				66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */,
 				662CC4152D1BED9B006E8450 /* RoutingHandler.swift in Sources */,
-				662CC4172D1BED9B006E8450 /* RoutingModel.swift in Sources */,
+				662CC4172D1BED9B006E8450 /* RoutingEntity.swift in Sources */,
 				6632EF292EBF4F6300CED47B /* Network.swift in Sources */,
-				662CC4192D1BED9B006E8450 /* SubModel.swift in Sources */,
+				662CC4192D1BED9B006E8450 /* SubscriptionEntity.swift in Sources */,
 				662CC4502D1C4D46006E8450 /* Scanner.swift in Sources */,
 				662CC41A2D1BED9B006E8450 /* Database.swift in Sources */,
 				660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */,
-				662CC41C2D1BED9B006E8450 /* ProfileModel.swift in Sources */,
+				662CC41C2D1BED9B006E8450 /* ProfileEntity.swift in Sources */,
 				662CC41D2D1BED9B006E8450 /* Port.swift in Sources */,
 				662CC4202D1BED9B006E8450 /* Util.swift in Sources */,
 				66764BDF2EB4F031002F330B /* GithubService.swift in Sources */,
+				6632EF2D2EC35F9C00CED47B /* RoutingModel.swift in Sources */,
 				66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */,
 				66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */,
 				662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */,
@@ -920,10 +947,11 @@
 				662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */,
 				662CC4262D1BED9B006E8450 /* V2rayStream.swift in Sources */,
 				662CC42A2D1BED9B006E8450 /* V2rayOutbound.swift in Sources */,
+				6632EF2B2EC35F6500CED47B /* ProfileModel.swift in Sources */,
 				662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */,
 				66F66F832D1E450000E77C64 /* AppState.swift in Sources */,
 				662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */,
-				662CC44E2D1C4D38006E8450 /* SubViewModel.swift in Sources */,
+				662CC44E2D1C4D38006E8450 /* SubscriptionViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
 				663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */,

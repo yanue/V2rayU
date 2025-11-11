@@ -10,8 +10,8 @@ import SwiftUI
 struct RoutingListView: View {
     @StateObject private var viewModel = RoutingViewModel()
     
-    @State private var list: [RoutingDTO] = []
-    @State private var sortOrder: [KeyPathComparator<RoutingDTO>] = []
+    @State private var list: [RoutingEntity] = []
+    @State private var sortOrder: [KeyPathComparator<RoutingEntity>] = []
     @State private var selection: Set<RoutingModel.ID> = []
     @State private var selectedRow: RoutingModel? = nil
     @State private var draggedRow: RoutingModel?
@@ -33,7 +33,7 @@ struct RoutingListView: View {
                 }
                 Spacer()
                 Button(action: { withAnimation {
-                    let newProxy = RoutingModel(from: RoutingDTO())
+                    let newProxy = RoutingModel(from: RoutingEntity())
                     self.selectedRow = newProxy
                 } }) {
                     Label(String(localized: .Add), systemImage: "plus")
@@ -81,7 +81,7 @@ struct RoutingListView: View {
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
 
-    func handleDrop(index: Int, rows: [RoutingDTO]) {
+    func handleDrop(index: Int, rows: [RoutingEntity]) {
         let uuids = rows.map(\.uuid)
 
         // 先移除拖拽的元素
@@ -98,7 +98,7 @@ struct RoutingListView: View {
     }
 
     
-    private func contextMenuProvider(item: RoutingDTO) -> some View {
+    private func contextMenuProvider(item: RoutingEntity) -> some View {
         Group {
             Button(String(localized: .Edit)) {
                 self.selectedRow = RoutingModel(from: item)
@@ -122,8 +122,8 @@ struct RoutingListView: View {
     // 提取的 Table 子视图，减少主视图表达式复杂度
     private var routingTable: some View {
         ZStack {
-            Table(of: RoutingDTO.self, selection: $selection, sortOrder: $sortOrder) {
-                TableColumn("#") { (row: RoutingDTO) in
+            Table(of: RoutingEntity.self, selection: $selection, sortOrder: $sortOrder) {
+                TableColumn("#") { (row: RoutingEntity) in
                     HStack(spacing: 4) {
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
@@ -134,7 +134,7 @@ struct RoutingListView: View {
                 }
                 .width(20)
 
-                TableColumn(String(localized: .TableFieldSort)) { (row: RoutingDTO) in
+                TableColumn(String(localized: .TableFieldSort)) { (row: RoutingEntity) in
                     HStack(spacing: 4) {
                         Image(systemName: "line.3.horizontal")
                     }
@@ -151,7 +151,7 @@ struct RoutingListView: View {
                 }
                 .width(24)
 
-                TableColumn(String(localized: .TableFieldRemark)) { (row: RoutingDTO) in
+                TableColumn(String(localized: .TableFieldRemark)) { (row: RoutingEntity) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
@@ -192,7 +192,7 @@ struct RoutingListView: View {
                 ForEach(viewModel.list) { row in
                     TableRow(row).contextMenu { contextMenuProvider(item: row) }
                 }
-                .dropDestination(for: RoutingDTO.self) { index, items in
+                .dropDestination(for: RoutingEntity.self) { index, items in
                     handleDrop(index: index, rows: items)
                 }
             }

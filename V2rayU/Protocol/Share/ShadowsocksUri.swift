@@ -2,21 +2,21 @@ import Foundation
 
 // link: https://github.com/shadowsocks/ShadowsocksX-NG
 class ShadowsocksUri: BaseShareUri {
-    var profile: ProfileDTO
+    var profile: ProfileEntity
     var error: String?
 
     // 初始化
     init() {
-        self.profile = ProfileDTO(remark: "ss", protocol: .shadowsocks)
+        self.profile = ProfileEntity(remark: "ss", protocol: .shadowsocks)
     }
 
     // 从 ProfileModel 初始化
-    required init(from model: ProfileDTO) {
+    required init(from model: ProfileEntity) {
         // 通过传入的 model 初始化 Profile 类的所有属性
         self.profile = model
     }
 
-    func getProfile() -> ProfileDTO {
+    func getProfile() -> ProfileEntity {
         return self.profile
     }
 

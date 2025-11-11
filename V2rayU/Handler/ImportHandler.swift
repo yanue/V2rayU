@@ -22,7 +22,7 @@ func importUri(url: String) {
 
         if let profile = importUri.doImport() {
             // 保存到数据库
-            profile.save()
+            ProfileStore.shared.insert(profile)
             continue
         } else {
             noticeTip(title: "import server fail", informativeText: importUri.error)
@@ -47,7 +47,7 @@ class ImportUri {
         self.share_uri = share_uri
     }
 
-    func doImport() -> ProfileDTO? {
+    func doImport() -> ProfileEntity? {
         var url = URL(string: share_uri)
         if url == nil {
             // 标准url不支持非url-encoded

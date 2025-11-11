@@ -26,7 +26,7 @@ final class AppState: ObservableObject {
     {
         didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
     }
-    @Published var runningServer: ProfileDTO? = ProfileViewModel.getRunning()
+    @Published var runningServer: ProfileEntity? = ProfileStore.shared.getRunning()
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
@@ -51,7 +51,7 @@ final class AppState: ObservableObject {
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
         // 更新数据库
-        ProfileViewModel.update_speed(uuid: self.runningProfile, speed: Int(latency))
+        ProfileStore.shared.update_speed(uuid: self.runningProfile, speed: Int(latency))
     }
 
     func resetSpeed(){
@@ -113,7 +113,7 @@ final class AppState: ObservableObject {
         runningProfile = uuid
         v2rayTurnOn = true // 先更改状态
         setCoreRunning(v2rayTurnOn)
-        runningServer = ProfileViewModel.getRunning()
+        runningServer = ProfileStore.shared.getRunning()
         logger.info("switchServer-end: \(self.runningProfile)")
         AppMenuManager.shared.refreshServerItems()
     }

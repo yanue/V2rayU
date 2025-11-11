@@ -12,8 +12,7 @@ enum IntervalUnit: String, CaseIterable {
 }
 
 struct SubscriptionFormView: View {
-    @ObservedObject var item: SubModel
-    @StateObject private var viewModel = SubViewModel()
+    @ObservedObject var item: SubscriptionModel
     
     @State private var intervalUnit: IntervalUnit = .minute
     
@@ -99,7 +98,7 @@ struct SubscriptionFormView: View {
                 Button(String(localized: .Save)) {
                     // updateInterval 已经在 Binding 中转换为秒
                     Task {
-                        item.dto.upsert()
+                        item.entity.upsert()
                     }
                     onClose()
                 }

@@ -1,5 +1,5 @@
 //
-//  SubModel.swift
+//  SubscriptionModel.swift
 //  V2rayU
 //
 //  Created by yanue on 2024/12/2.
@@ -9,9 +9,9 @@ import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
 
-// MARK: - DTO (数据库层)
+// MARK: - entity (数据库层)
 
-struct SubDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord {
+struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
     var uuid: String
     var remark: String
     var url: String
@@ -23,6 +23,7 @@ struct SubDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRe
     var id: String {
         return uuid
     }
+    static var idColumn: Column { RoutingEntity.Columns.uuid }
 
     // 拖动排序
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
@@ -78,7 +79,7 @@ struct SubDTO: Codable, Identifiable, Equatable, Hashable, Transferable, TableRe
     }
 }
 
-extension SubDTO {
+extension SubscriptionEntity {
     func upsert() {
         do {
             var toSave = self
@@ -100,28 +101,4 @@ extension SubDTO {
             await SubscriptionScheduler.shared.startOrUpdate(for: self)
         }
     }
-}
-
-// MARK: - UI Model (SwiftUI 绑定)
-
-@dynamicMemberLookup
-final class SubModel: ObservableObject, Identifiable {
-    @Published var dto: SubDTO
-
-    var id: String { dto.uuid }
-
-    init(from dto: SubDTO) { self.dto = dto }
-
-    // 动态代理属性访问
-    subscript<T>(dynamicMember keyPath: KeyPath<SubDTO, T>) -> T {
-        dto[keyPath: keyPath]
-    }
-
-    subscript<T>(dynamicMember keyPath: WritableKeyPath<SubDTO, T>) -> T {
-        get { dto[keyPath: keyPath] }
-        set { dto[keyPath: keyPath] = newValue }
-    }
-
-    // 转换回 DTO
-    func toDTO() -> SubDTO { dto }
 }

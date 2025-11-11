@@ -31,10 +31,10 @@ let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
 class RoutingManager {
 
     let defaultRules = Dictionary(uniqueKeysWithValues: [
-       (RoutingRuleGlobal, RoutingDTO(name: RoutingRuleGlobal, remark: "🌏 Global")),
-       (RoutingRuleLAN, RoutingDTO(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
-       (RoutingRuleCn, RoutingDTO(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
-       (RoutingRuleLANAndCn, RoutingDTO(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
+       (RoutingRuleGlobal, RoutingEntity(name: RoutingRuleGlobal, remark: "🌏 Global")),
+       (RoutingRuleLAN, RoutingEntity(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
+       (RoutingRuleCn, RoutingEntity(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
+       (RoutingRuleLANAndCn, RoutingEntity(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
     ])
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
@@ -42,7 +42,7 @@ class RoutingManager {
         // 查询当前使用的规则
         let runningRouting = UserDefaults.get(forKey: .runningRouting)
         // 查询所有规则
-        var all = RoutingViewModel.all()
+        var all = RoutingStore.shared.fetchAll()
         // 如果没有规则，则创建默认规则
         if all.count == 0 {
             for var (rule, item) in defaultRules {
@@ -51,7 +51,7 @@ class RoutingManager {
                     item.domainMatcher = "hybrid"
                     item.remark = defaultRuleCn[rule] ?? item.remark
                 }
-                RoutingViewModel.upsert(item: RoutingModel(from: item))
+                RoutingStore.shared.upsert(item)
                 // 添加到 all
                 all.append(item)
             }
@@ -73,9 +73,9 @@ class RoutingManager {
 }
 
 class RoutingHandler {
-    private(set) var routing: RoutingDTO
+    private(set) var routing: RoutingEntity
 
-    init(from model: RoutingDTO) {
+    init(from model: RoutingEntity) {
         self.routing = model
     }
 

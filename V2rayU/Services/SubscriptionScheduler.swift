@@ -33,12 +33,12 @@ actor SubscriptionScheduler {
         }
         
         // 获取所有订阅
-        let subs = SubViewModel().all()
+        let subs = SubscriptionStore.shared.fetchAll()
 
         // 目标集合：仅启用的, 如果周期<=0则设为3600秒
         let active = subs
             .filter { $0.enable }
-            .map { sub -> SubDTO in
+            .map { sub -> SubscriptionEntity in
                 var copy = sub
                 if copy.updateInterval <= 0 {
                     copy.updateInterval = 3600
@@ -59,7 +59,7 @@ actor SubscriptionScheduler {
     }
 
     // 启动或更新指定订阅的计时器
-    func startOrUpdate(for sub: SubDTO) {
+    func startOrUpdate(for sub: SubscriptionEntity) {
         // 若已存在且周期相同，保持；若不同，则重建
         let existing = timers[sub.uuid]
         let desiredInterval = TimeInterval(sub.updateInterval)

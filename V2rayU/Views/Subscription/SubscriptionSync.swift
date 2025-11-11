@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubscriptionSyncView: View {
-    var subscription: SubDTO?
+    var subscription: SubscriptionEntity?
     var isAll: Bool
     var onClose: () -> Void
     @State private var logs: [String] = []
@@ -145,7 +145,7 @@ struct SubscriptionSyncView: View {
         }
     }
 
-    func doSyncItem(item: SubDTO) {
+    func doSyncItem(item: SubscriptionEntity) {
         Task {
             await SubscriptionHandler.shared.syncOne(item: item)
         }

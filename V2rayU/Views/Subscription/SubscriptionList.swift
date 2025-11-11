@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct SubscriptionListView: View {
-    @StateObject private var viewModel = SubViewModel()
+    @StateObject private var viewModel = SubscriptionViewModel()
 
-    @State private var list: [SubDTO] = []
-    @State private var sortOrder: [KeyPathComparator<SubDTO>] = []
-    @State private var selection: Set<SubModel.ID> = []
-    @State private var selectedRow: SubModel? = nil
-    @State private var draggedRow: SubModel?
-    @State private var syncingRow: SubModel? = nil
+    @State private var list: [SubscriptionEntity] = []
+    @State private var sortOrder: [KeyPathComparator<SubscriptionEntity>] = []
+    @State private var selection: Set<SubscriptionModel.ID> = []
+    @State private var selectedRow: SubscriptionModel? = nil
+    @State private var draggedRow: SubscriptionModel?
+    @State private var syncingRow: SubscriptionModel? = nil
     @State private var syncingAll: Bool = false
     
     var body: some View {
@@ -35,7 +35,7 @@ struct SubscriptionListView: View {
                 }
                 Spacer()
 
-                Button(action: { withAnimation { self.selectedRow = SubModel(from: SubDTO()) } }) {
+                Button(action: { withAnimation { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) } }) {
                     Label(localizedString(.Add), systemImage: "plus")
                 }
                 .buttonStyle(.bordered)
@@ -80,7 +80,7 @@ struct SubscriptionListView: View {
             }
         }
         .sheet(item: $syncingRow) { row in
-            SubscriptionSyncView(subscription: row.dto, isAll: false) { syncingRow = nil }
+            SubscriptionSyncView(subscription: row.entity, isAll: false) { syncingRow = nil }
         }
         .sheet(isPresented: $syncingAll) {
             SubscriptionSyncView(subscription: nil, isAll: true) { syncingAll = false }
@@ -91,9 +91,9 @@ struct SubscriptionListView: View {
     // 处理拖拽排序逻辑:
     // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
     // 去掉这个没用的状态
-    // @State private var list: [SubDTO] = []
+    // @State private var list: [SubscriptionEntity] = []
 
-    func handleDrop(index: Int, rows: [SubDTO]) {
+    func handleDrop(index: Int, rows: [SubscriptionEntity]) {
         let uuids = rows.map(\.uuid)
 
         // 先移除拖拽的元素
@@ -109,15 +109,15 @@ struct SubscriptionListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
-    private func contextMenuProvider(item: SubDTO) -> some View {
+    private func contextMenuProvider(item: SubscriptionEntity) -> some View {
         Group {
             Button {
-                self.selectedRow = SubModel(from: item)
+                self.selectedRow = SubscriptionModel(from: item)
             } label: {
                 Text(localizedString(.Edit))
             }
             Button {
-                self.syncingRow = SubModel(from: item)
+                self.syncingRow = SubscriptionModel(from: item)
             } label: {
                 Text(localizedString(.SyncSubscriptionNow))
             }
@@ -141,8 +141,8 @@ struct SubscriptionListView: View {
     // 提取的 Table 子视图，减少主视图表达式复杂度
     private var subscriptionTable: some View {
         ZStack {
-            Table(of: SubDTO.self, selection: $selection, sortOrder: $sortOrder) {
-                TableColumn("#") { (row: SubDTO) in
+            Table(of: SubscriptionEntity.self, selection: $selection, sortOrder: $sortOrder) {
+                TableColumn("#") { (row: SubscriptionEntity) in
                     HStack(spacing: 4) {
                         if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
@@ -153,7 +153,7 @@ struct SubscriptionListView: View {
                 }
                 .width(10)
                 
-                TableColumn(String(localized: .TableFieldSort)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldSort)) { (row: SubscriptionEntity) in
                     HStack(spacing: 4) {
                         Image(systemName: "line.3.horizontal")
                     }
@@ -170,13 +170,13 @@ struct SubscriptionListView: View {
                 }
                 .width(30)
                 
-                TableColumn(String(localized: .TableFieldRemark)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldRemark)) { (row: SubscriptionEntity) in
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
-                    .onTapGesture() { selectedRow = SubModel(from: row) }
+                    .onTapGesture() { selectedRow = SubscriptionModel(from: row) }
                     .onHover { inside in
                         if inside {
                             NSCursor.pointingHand.push()
@@ -187,17 +187,17 @@ struct SubscriptionListView: View {
                 }
                 .width(min: 100,max: 200)
 
-                TableColumn(String(localized: .TableFieldUrl)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldUrl)) { (row: SubscriptionEntity) in
                     Text(row.url)
                 }
                 .width(min: 200,max: 400)
 
-                TableColumn(String(localized: .TableFieldInterval)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldInterval)) { (row: SubscriptionEntity) in
                     Text(row.updateInterval.localizedInterval(locale: LanguageManager.shared.currentLocale))
                 }
                 .width(100)
 
-                TableColumn(String(localized: .TableFieldUpdateTime)) { (row: SubDTO) in
+                TableColumn(String(localized: .TableFieldUpdateTime)) { (row: SubscriptionEntity) in
                     Text(row.updateTime.formattedDate)
                 }
                 .width(160)
@@ -207,7 +207,7 @@ struct SubscriptionListView: View {
                     TableRow(row)
                         .contextMenu { contextMenuProvider(item: row) }
                 }
-                .dropDestination(for: SubDTO.self) { index, items in
+                .dropDestination(for: SubscriptionEntity.self) { index, items in
                     handleDrop(index: index, rows: items)
                 }
 
