@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 @MainActor
-final class DownloadManager: ObservableObject {
+final class DownloadViewModel: ObservableObject {
     // 直接用 @Published 保存状态
     @Published var progress: Double = 0
     @Published var speed: String = ""

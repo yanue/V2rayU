@@ -45,7 +45,7 @@ class RoutingManager {
         var all = RoutingStore.shared.fetchAll()
         // 如果没有规则，则创建默认规则
         if all.count == 0 {
-            for var (rule, item) in defaultRules {
+            for (rule, var item) in defaultRules {
                 if isMainland {
                     item.domainStrategy = "AsIs"
                     item.domainMatcher = "hybrid"

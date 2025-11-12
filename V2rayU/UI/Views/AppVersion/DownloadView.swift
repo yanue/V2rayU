@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DownloadView: View {
-    @StateObject private var manager = DownloadManager()
+    @StateObject private var manager = DownloadViewModel()
     
     var version: GithubRelease
     var downloadedBtn: String = String(localized: .Downloading)

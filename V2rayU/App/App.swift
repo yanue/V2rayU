@@ -85,8 +85,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationWillTerminate(_ aNotification: Notification) {
         logger.info("Application will terminate.")
-        AppLogStream.stopLogging()
-        V2rayLogStream.stopLogging()
         Task {
             await LocalHttpServer.shared.stop()
         }
