@@ -110,7 +110,7 @@ struct ProfileListView: View {
         .sheet(item: $selectedRow) { row in
             ConfigFormView(item: row) {
                 selectedRow = nil
-                loadData()
+                loadData()                
             }
         }
         .sheet(item: $pingRow) { _ in

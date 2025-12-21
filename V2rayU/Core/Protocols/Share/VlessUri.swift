@@ -31,7 +31,7 @@ class VlessUri: BaseShareUri {
 
     // 初始化
     init() {
-        self.profile = ProfileEntity(remark: "vless", protocol: .vless)
+        self.profile = ProfileEntity(protocol: .vless)
     }
 
     // 从 ProfileModel 初始化
@@ -99,13 +99,25 @@ class VlessUri: BaseShareUri {
     func parse(url: URL) -> Error? {
         // vless://YXV0bzpwYXNzd29yZEB2bGVzcy5ob3N0OjQ0Mw==?remarks=vless_vision_reality&tls=1&peer=sni.vless.host&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
         // vless://password@address:port?query#remark
-        guard var address = url.host else {
+        // vless://:password@address:port?query#remark
+        // vless://user:password@address:port#remark
+        guard let rawHost = url.host else {
             return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey:  "error:missing host"])
         }
-        let host = url.user ?? "" // 可能是 user:password@address:port 的 user 或 password@address:port 中的 空值
-        var port = url.port ?? 0 // 可能没有 port
-        var password = url.password ?? "" // 可能没有 password
-        if host.count == 0 || port == 0 {
+        // 可能是 user:password@address:port 的 user 或 password@address:port 中的 password 或 :password@address:port 中的 空值 或 空值(vless://base64encode?query#remark)
+        let rawUser = url.user ?? ""
+        // 可能是 user:password@address:port 的 password 或 :password@address:port 中的 password 或 password@address:port 中的 空值 或 空值(vless://base64encode?query#remark)
+        let rawPass = url.password ?? ""
+        // 可能是 user:password@address:port 的 port 或 空值
+        var port = url.port ?? 0
+        logger.info("vless parse: host=\(rawHost),port=\(port),rawUser=\(rawUser),rawPass=\(rawPass),url=\(url)")
+        
+        // 待解析
+        var password = ""
+        var address = ""
+        var host = ""
+        
+        if rawUser.isEmpty && rawPass.isEmpty {
             // 可能是 shadowrocket 的链接: vless://base64encode?query#remark
             // base64encode 是 auto:password@address:port 的 base64 编码
             guard let base64Str = url.absoluteString.components(separatedBy: "://").last?.components(separatedBy: "?").first else {
@@ -135,6 +147,14 @@ class VlessUri: BaseShareUri {
             // 替换原始的 password 和 address, port
             address = String(addressAndPort[0])
             port = Int(addressAndPort[1]) ?? 0
+            host = address
+        } else {
+            // 常规 vless:// 格式
+            // vless://password@address:port?query#remark
+            // vless://:password@address:port?query#remark
+            password = rawPass.isEmpty ? rawUser : rawPass
+            address = rawHost
+            host = rawHost
         }
         self.profile.address = address
         self.profile.port = Int(port)

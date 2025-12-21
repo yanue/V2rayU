@@ -96,7 +96,9 @@ actor SubscriptionHandler {
         SubscriptionHandlering = false
         do {
             // refresh server
-//            menuController.showServers()
+            Task {
+                await AppMenuManager.shared.refreshServerItems()
+            }
             // sleep 2
             sleep(2)
             // do ping
@@ -188,7 +190,7 @@ actor SubscriptionHandler {
         
         // 文本按行拆分
         let lines = strTmp.trimmingCharacters(in: .newlines).components(separatedBy: CharacterSet.newlines)
-        for uri in lines {
+        for (i, uri) in lines.enumerated() {
             let filterUri = uri.trimmingCharacters(in: .whitespacesAndNewlines)
             // import every server
             if filterUri.count == 0 {
@@ -199,7 +201,7 @@ actor SubscriptionHandler {
                 profile.subid = sub.uuid
                 list.append(profile)
             } else {
-                logTip()
+                logTip(title: "line \(i) importByNormal fail ", uri: uri, informativeText: "line \(i) import uri fail: " + importTask.error)
             }
         }
 
@@ -220,6 +222,7 @@ actor SubscriptionHandler {
         // 遍历新的列表
         for item in list {
             let key = item.uniqueKey()
+            logTip(title: "正在处理 \(key)", informativeText: "\(item)")
             if let old = oldMap[key] {
                 exists.insert(key)
                 // 更新旧的

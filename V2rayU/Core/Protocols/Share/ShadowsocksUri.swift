@@ -7,7 +7,7 @@ class ShadowsocksUri: BaseShareUri {
 
     // 初始化
     init() {
-        self.profile = ProfileEntity(remark: "ss", protocol: .shadowsocks)
+        self.profile = ProfileEntity(protocol: .shadowsocks)
     }
 
     // 从 ProfileModel 初始化

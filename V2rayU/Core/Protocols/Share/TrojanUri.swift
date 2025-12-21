@@ -7,7 +7,7 @@ class TrojanUri: BaseShareUri {
 
     // 初始化
     init() {
-        profile = ProfileEntity(remark: "trojan", protocol: .trojan)
+        profile = ProfileEntity(protocol: .trojan)
     }
 
     // 从 ProfileModel 初始化
@@ -66,6 +66,7 @@ class TrojanUri: BaseShareUri {
         guard let password = url.user else {
             return NSError(domain: "TrojanUriError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Missing password"])
         }
+        logger.info("Parsed URI: \(url),")
 
         profile.address = host
         profile.port = port
@@ -100,8 +101,11 @@ class TrojanUri: BaseShareUri {
         default:
             break
         }
+        if let fragment = url.fragment, !fragment.isEmpty {
+            self.profile.remark = fragment.urlDecoded()
+        }
         if self.profile.remark.isEmpty {
-            self.profile.remark = (url.fragment ?? "trojan").urlDecoded()
+            self.profile.remark = "trojan"
         }
         // shadowrocket trojan url: trojan://%3Apassword@host:port?query#remark
         if url.absoluteString.contains("trojan://%3A") {

@@ -8,6 +8,7 @@
 import GRDB
 import SwiftUI
 import UniformTypeIdentifiers
+import CryptoKit
 
 struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
     // 公共属性
@@ -194,9 +195,20 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         }
     }
     
-    /// profile 唯一标识符, 用于检测重复配置
+}
+
+
+extension ProfileEntity {
+    /// profile 唯一标识符, 用于检测更新时的重复配置
     /// 不需要 subid, 因为比较时已筛选
     func uniqueKey() -> String {
-        return "\(`protocol`.rawValue)-\(address)-\(port)-\(password)-\(alterId)-\(network.rawValue)-\(host)-\(path)-\(security.rawValue)"
+        // 只取订阅相关字段，不包含统计字段
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys] // 保证字段顺序稳定
+        guard let data = try? encoder.encode(self) else {
+            return uuid // fallback
+        }
+        let digest = SHA256.hash(data: data)
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 }

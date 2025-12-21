@@ -69,9 +69,15 @@ actor PingAll {
                 case .finished:
                     NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-all-done\n")
                     logger.info("Ping completed")
+                    Task {
+                        await AppMenuManager.shared.refreshServerItems() // 刷新servers
+                    }
                 case let .failure(error):
                     NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-some-failed: \(error.localizedDescription)")
                     logger.info("Ping Error: \(error)")
+                    Task {
+                        await AppMenuManager.shared.refreshServerItems() // 刷新servers
+                    }
                 }
                 killAllPing()
                 
@@ -369,6 +375,7 @@ actor PingRunning {
         UserDefaults.set(forKey: .runningProfile, value: newSvrName)
         Task {
             await V2rayLaunch.shared.restart()
+            await AppMenuManager.shared.refreshServerItems() // 刷新servers
         }
     }
 }

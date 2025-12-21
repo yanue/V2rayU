@@ -49,26 +49,26 @@ struct VmessShare: Codable {
         self.serviceName = model.network == .grpc ? model.path : ""
         self.seed = model.network == .kcp ? model.path : ""
     }
-
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        v = try container.decode(String.self, forKey: .v)
-        ps = try container.decode(String.self, forKey: .ps)
-        add = try container.decode(String.self, forKey: .add)
-        id = try container.decode(String.self, forKey: .id)
-        aid = try container.decode(String.self, forKey: .aid)
-        net = try container.decode(String.self, forKey: .net)
-        type = try container.decode(String.self, forKey: .type)
-        host = try container.decode(String.self, forKey: .host)
-        path = try container.decode(String.self, forKey: .path)
-        tls = try container.decode(String.self, forKey: .tls)
-        alpn = try container.decode(String.self, forKey: .alpn)
-        sni = try container.decode(String.self, forKey: .sni)
-        scy = try container.decode(String.self, forKey: .scy)
-        fp = try container.decode(String.self, forKey: .fp)
-        serviceName = try container.decode(String.self, forKey: .serviceName)
-        seed = try container.decode(String.self, forKey: .seed)
+
+        v   = try container.decodeIfPresent(String.self, forKey: .v) ?? "2"
+        ps  = try container.decodeIfPresent(String.self, forKey: .ps) ?? ""
+        add = try container.decodeIfPresent(String.self, forKey: .add) ?? ""
+        id  = try container.decodeIfPresent(String.self, forKey: .id) ?? ""
+        net = try container.decodeIfPresent(String.self, forKey: .net) ?? ""
+        type = try container.decodeIfPresent(String.self, forKey: .type) ?? "none"
+        host = try container.decodeIfPresent(String.self, forKey: .host) ?? ""
+        path = try container.decodeIfPresent(String.self, forKey: .path) ?? ""
+        tls  = try container.decodeIfPresent(String.self, forKey: .tls) ?? "tls"
+        alpn = try container.decodeIfPresent(String.self, forKey: .alpn) ?? ""
+        sni  = try container.decodeIfPresent(String.self, forKey: .sni) ?? ""
+        scy  = try container.decodeIfPresent(String.self, forKey: .scy) ?? "auto"
+        security = try container.decodeIfPresent(String.self, forKey: .security) ?? "auto"
+        fp   = try container.decodeIfPresent(String.self, forKey: .fp) ?? ""
+        serviceName = try container.decodeIfPresent(String.self, forKey: .serviceName) ?? ""
+        seed = try container.decodeIfPresent(String.self, forKey: .seed) ?? ""
 
         // 处理 port 字段的类型不确定性
         if let portValue = try? container.decode(Int.self, forKey: .port) {
@@ -76,13 +76,16 @@ struct VmessShare: Codable {
         } else if let portValue = try? container.decode(String.self, forKey: .port) {
             port = portValue
         } else {
+            port = ""
         }
-        // 处理 aid
+
+        // 处理 aid 字段的类型不确定性
         if let aidValue = try? container.decode(Int.self, forKey: .aid) {
             aid = String(aidValue)
         } else if let aidValue = try? container.decode(String.self, forKey: .aid) {
             aid = aidValue
         } else {
+            aid = ""
         }
     }
 }
@@ -94,7 +97,7 @@ class VmessUri: BaseShareUri {
 
     // 初始化
     init() {
-        profile = ProfileEntity(remark: "vless", protocol: .vless)
+        profile = ProfileEntity(protocol: .vmess)
     }
 
     // 从 ProfileModel 初始化
@@ -107,17 +110,18 @@ class VmessUri: BaseShareUri {
         return profile
     }
 
-    // 分享链接
+
+    // 分享链接编码：ProfileEntity -> VmessShare -> JSON -> Base64
     func encode() -> String {
         let share = VmessShare(from: self.profile)
         let encoder = JSONEncoder()
-        if let data = try? encoder.encode(share) {
-            let uri = String(data: data, encoding: .utf8)!
-            return "vmess://" + uri.base64Encoded()!
-        } else {
+        guard let data = try? encoder.encode(share),
+              let uri = String(data: data, encoding: .utf8),
+              let b64 = uri.safeBase64Encoded() else {
             error = "encode uri error"
+            return ""
         }
-        return ""
+        return "vmess://" + b64
     }
 
     func parse(url: URL) -> Error? {
@@ -128,7 +132,7 @@ class VmessUri: BaseShareUri {
             parseType1(url: url)
         }
         if error.count > 0 {
-            return NSError(domain: "VlessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "vmess error"])
+            return NSError(domain: "VmessUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: error])
         }
         return nil
     }
@@ -318,9 +322,10 @@ class VmessUri: BaseShareUri {
             error = "decode vmess error"
             return
         }
-        let jsonData = decodeStr.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-        let decoder = JSONDecoder()
         do {
+            let jsonData = decodeStr.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+            logger.info("parseType2: url=\(url),decodeStr=\(decodeStr),jsonData=\(jsonData)")
+            let decoder = JSONDecoder()
             let vmess = try decoder.decode(VmessShare.self, from: jsonData)
             // 将解析结果赋值到 profile
             profile.remark = vmess.ps.urlDecoded()
@@ -328,9 +333,9 @@ class VmessUri: BaseShareUri {
             profile.port = Int(vmess.port) ?? 0
             profile.password = vmess.id
             profile.alterId = Int(vmess.aid) ?? 0
-            profile.encryption = vmess.scy == "auth" && vmess.security != "auto" ? vmess.security : vmess.scy
+            profile.encryption = vmess.scy == "auto" && vmess.security != "auto" ? vmess.security : vmess.scy
             profile.alpn = V2rayStreamAlpn(rawValue: vmess.alpn) ?? .none
-            profile.sni = vmess.sni
+            profile.sni = !vmess.sni.isEmpty ? vmess.sni : vmess.host
             profile.network = V2rayStreamNetwork(rawValue: vmess.net) ?? .tcp
             profile.host = vmess.host
             profile.path = vmess.path
@@ -340,13 +345,26 @@ class VmessUri: BaseShareUri {
 
             if profile.network == .grpc {
                 profile.path = vmess.serviceName
+                if profile.path.isEmpty {
+                    profile.path = vmess.path
+                }
             }
             if profile.network == .kcp {
                 profile.path = vmess.seed
+                if vmess.seed.isEmpty {
+                    profile.path = vmess.path
+                }
+            }
+            if profile.remark.isEmpty {
+                if let fragment = url.fragment, !fragment.isEmpty {
+                    profile.remark = fragment.urlDecoded()
+                } else {
+                    profile.remark = "vmess-"+profile.host
+                }
             }
         } catch {
-            self.error = error.localizedDescription
-            return
+            logger.info("parseType2: url=\(url),decodeStr=\(decodeStr),error=\(error)")
+            self.error = "\(error)"
         }
     }
 }

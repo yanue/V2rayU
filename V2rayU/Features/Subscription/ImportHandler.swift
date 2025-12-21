@@ -83,6 +83,7 @@ class ImportUri {
             let parseError = handler.parse(url: url!)
             if let error = parseError {
                 // 如果解析失败，返回 nil
+                self.error = error.localizedDescription
                 return nil
             }
             // 解析成功返回 ProfileModel
@@ -91,6 +92,8 @@ class ImportUri {
                 profile.remark = self.remark
             }
             return profile
+        } else {
+            self.error = "unsupported protocol"
         }
 
         return nil

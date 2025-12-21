@@ -94,3 +94,24 @@ extension Int {
         return formatter.string(from: TimeInterval(self)) ?? "\(self)"
     }
 }
+
+extension String {
+    func safeBase64Encoded() -> String? {
+        let data = self.data(using: .utf8)
+        return data?.base64EncodedString()
+    }
+
+    func safeBase64Decoded() -> String? {
+        var s = self
+        // Normalize URL-safe base64
+        s = s.replacingOccurrences(of: "-", with: "+")
+             .replacingOccurrences(of: "_", with: "/")
+        // Pad to multiple of 4
+        let rem = s.count % 4
+        if rem != 0 {
+            s.append(String(repeating: "=", count: 4 - rem))
+        }
+        guard let data = Data(base64Encoded: s) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+}

@@ -59,6 +59,13 @@ struct ConfigFormView: View {
                 .buttonStyle(.bordered)
                 Button(String(localized: .Save)) {
                     ProfileStore.shared.upsert(item.entity)
+                    Task {
+                        AppMenuManager.shared.refreshServerItems() // 刷新servers
+                        uiLogger.info("edit profile: runningProfile=\(AppState.shared.runningProfile), edit=\(item.uuid)")
+                        if AppState.shared.runningProfile == item.uuid {
+                            await V2rayLaunch.shared.restart()
+                        }
+                    }
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

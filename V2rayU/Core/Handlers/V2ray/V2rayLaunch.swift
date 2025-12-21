@@ -61,6 +61,7 @@ actor V2rayLaunch {
             noticeTip(title: "启动失败", informativeText: "配置文件不存在")
             return false
         }
+        await AppState.shared.resetSpeed()
         await V2rayTraffics.shared.resetData()
         createJsonFile(item: item)
         // 停止之前的
