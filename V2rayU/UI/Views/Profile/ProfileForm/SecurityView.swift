@@ -29,9 +29,8 @@ struct ConfigTransportView: View {
                     getTextFieldWithLabel(label: .PublicKey, text: $item.publicKey)
                     getTextFieldWithLabel(label: .ShortID, text: $item.shortId)
                     getTextFieldWithLabel(label: .SpiderX, text: $item.spiderX)
-                } else {
-                    getPickerWithLabel(label: .Alpn, selection: $item.alpn)
                 }
+                getPickerWithLabel(label: .Alpn, selection: $item.alpn)
             }
             .padding() // 1. 内边距
             .background() // 2. 然后背景

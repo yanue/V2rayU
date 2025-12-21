@@ -156,10 +156,16 @@ class V2rayOutboundHandler {
     private func configureStreamSettings(network: V2rayStreamNetwork, settings: inout V2rayStreamSettings) {
         switch network {
         case .tcp:
-            streamTcp.header.type = self.profile.headerType.rawValue
+            if self.profile.headerType != .none {
+                streamTcp.header = TcpSettingHeader()
+                streamTcp.header?.type = self.profile.headerType.rawValue
+            }
             settings.tcpSettings = streamTcp
         case .kcp:
-            streamKcp.header.type = self.profile.headerType.rawValue
+            if self.profile.headerType != .none {
+                streamKcp.header = KcpSettingsHeader()
+                streamKcp.header?.type = self.profile.headerType.rawValue
+            }
             streamKcp.seed = self.profile.path
             settings.kcpSettings = streamKcp
         case .h2:
@@ -203,6 +209,7 @@ class V2rayOutboundHandler {
             securityReality = RealitySettings(
                 fingerprint: self.profile.fingerprint.rawValue,
                 serverName: self.profile.sni,
+                publicKey: self.profile.publicKey,
                 shortId: self.profile.shortId,
                 spiderX: self.profile.spiderX
             )

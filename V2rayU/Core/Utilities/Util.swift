@@ -39,10 +39,10 @@ func getCoreShortVersion() -> String {
 }
 
 func getCoreVersion() -> String {
-    guard FileManager.default.fileExists(atPath: v2rayCoreFile) else {
+    guard FileManager.default.fileExists(atPath: xrayCoreFile) else {
         return "Not Found"
     }
-    if let output = shell(launchPath: v2rayCoreFile, arguments: ["version"]) {
+    if let output = shell(launchPath: xrayCoreFile, arguments: ["version"]) {
         let lines = output.split(separator: "\n")
         if let firstLine = lines.first {
             return String(firstLine)
@@ -257,4 +257,10 @@ extension Int64 {
         }
         return String(format: "%.2f %@", value, units[index])
     }
+}
+
+func isFileQuarantined(at path: String) -> Bool {
+    let attrName = "com.apple.quarantine"
+    let result = getxattr(path, attrName, nil, 0, 0, 0)
+    return result >= 0
 }

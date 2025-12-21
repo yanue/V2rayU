@@ -29,13 +29,18 @@ actor LaunchAgent: NSObject {
 
         // write launch agent
         // 兼容 v2ray | xray
-        let agentArguments = ["./v2ray-core/v2ray", "run", "-config", "config.json"]
+        #if arch(arm64)
+        let coreFile = "./bin/xray-core/xray-arm64"
+        #else
+        let coreFile = "./bin/xray-core/xray-64"
+        #endif
+        let agentArguments = [coreFile, "run", "-config", "config.json"]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_NAME,
             "WorkingDirectory": AppHomePath,
-            "StandardOutPath": v2rayLogFilePath,
-            "StandardErrorPath": v2rayLogFilePath,
+            "StandardOutPath": coreLogFilePath,
+            "StandardErrorPath": coreLogFilePath,
             "ProgramArguments": agentArguments,
             "RunAtLoad": false, // 不能开机自启(需要停止)
             "KeepAlive": false, // 不能自动重启(需要停止)

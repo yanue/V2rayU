@@ -120,7 +120,7 @@ final class AppState: ObservableObject {
 
     // MARK: - App 启动时调用
     func appDidLaunch() {
-        truncateLogFile(v2rayLogFilePath)
+        truncateLogFile(coreLogFilePath)
         truncateLogFile(appLogFilePath)
         startHttpServer()
         Task { await V2rayTrafficStats.shared.initTask() }

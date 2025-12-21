@@ -367,7 +367,7 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func openLogs(_ sender: NSMenuItem) {
-        OpenLogs(logFilePath: v2rayLogFilePath)
+        OpenLogs(logFilePath: coreLogFilePath)
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {

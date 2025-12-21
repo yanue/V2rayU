@@ -12,6 +12,8 @@ actor AppInstaller: NSObject {
     static let shared = AppInstaller()
     // 检查是否需要安装
     func checkInstall() {
+        logger.info("source apth: \(AppResourcesPath)")
+
         // Ensure launch agent directory is existed.
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: AppHomePath) {
@@ -22,17 +24,23 @@ actor AppInstaller: NSObject {
         // make sure new version
         logger.info("install: \(AppResourcesPath)")
         var needRunInstall = false
-        if !needRunInstall && !FileManager.default.isExecutableFile(atPath: v2rayCoreFile) {
-            logger.info("\(v2rayCoreFile) not accessable")
+        
+        if !needRunInstall && !FileManager.default.isExecutableFile(atPath: xrayCoreFile) {
+            logger.info("\(xrayCoreFile) not accessable")
             needRunInstall = true
         }
-        // 检查 v2rayCoreFile 是否允许 App Background Activity
+        // 检查 xrayCoreFile 是否允许 App Background Activity
         // Ensure permission with root admin
         if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
             needRunInstall = true
         }
-        if !needRunInstall && !FileManager.default.fileExists(atPath: v2rayCorePath + "/geoip.dat") {
-            logger.info("\(v2rayCorePath)/geoip.dat not exists,need install")
+        if !needRunInstall && !FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat") {
+            logger.info("\(xrayCorePath)/geoip.dat not exists,need install")
+            needRunInstall = true
+        }
+        // 检查 core 文件的 quarantine flag
+        if !needRunInstall && isFileQuarantined(at: xrayCoreFile) {
+            logger.info("\(xrayCoreFile) is quarantined,need install")
             needRunInstall = true
         }
         if !needRunInstall {

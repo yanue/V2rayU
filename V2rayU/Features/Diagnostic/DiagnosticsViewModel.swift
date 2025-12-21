@@ -19,7 +19,7 @@ final class DiagnosticsViewModel: ObservableObject {
     // 依赖（根据你的项目实际路径/服务替换）
     private let appState = AppState.shared
     private let v2rayUToolPath = v2rayUTool              // 工具路径
-    private let logPath = v2rayLogFilePath               // 日志路径
+    private let logPath = coreLogFilePath               // 日志路径
     private let localSocksPort = 1080                    // 本地代理端口（示例）
     private let localHTTPPort = 1081                     // 本地 HTTP 端口（示例）
     private let nodeHostProvider: () -> String?          // 获取当前节点主机
@@ -187,7 +187,7 @@ final class DiagnosticsViewModel: ObservableObject {
     }
     
     private func checkCoreInstall() async -> DiagnosticItem {
-        let installed = FileManager.default.fileExists(atPath: v2rayCoreFile) && FileManager.default.isExecutableFile(atPath: v2rayCoreFile)
+        let installed = FileManager.default.fileExists(atPath: xrayCoreFile) && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
         let version = installed ? getCoreVersion() : ""
         return DiagnosticItem(
             step: .coreInstall,
@@ -297,7 +297,7 @@ final class DiagnosticsViewModel: ObservableObject {
     }
     
     private func checkGeoipFile() async -> DiagnosticItem {
-        let exists = FileManager.default.fileExists(atPath: v2rayCorePath + "/geoip.dat")
+        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat")
         return DiagnosticItem(
             step: .geoipFile,
             title: "GeoIP 文件",

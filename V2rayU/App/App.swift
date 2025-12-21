@@ -11,9 +11,6 @@ let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
-let v2rayCorePath = AppHomePath + "/v2ray-core"
-let v2rayCoreFile = v2rayCorePath + "/v2ray"
-let v2rayLogFilePath = AppHomePath + "/v2ray-core.log"
 let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
@@ -24,6 +21,13 @@ let coreVersion = getCoreShortVersion()
 let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
+let coreLogFilePath = AppHomePath + "/xray-core.log"
+let xrayCorePath = AppHomePath + "/bin/xray-core"
+#if arch(arm64)
+let xrayCoreFile = xrayCorePath + "/xray-arm64"
+#else
+let xrayCoreFile = xrayCorePath + "/xray-64"
+#endif
 
 /// Mark - 入口
 @main

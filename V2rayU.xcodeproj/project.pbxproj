@@ -83,6 +83,8 @@
 		66389D0B2E4342D70050CB27 /* BaseWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66389D0A2E4342CF0050CB27 /* BaseWindow.swift */; };
 		6638B6C12EBEFD3D0081767E /* SubscriptionScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638B6C02EBEFD3C0081767E /* SubscriptionScheduler.swift */; };
 		6653B5182E7FBE3F003D0A6F /* PingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6653B5172E7FBE39003D0A6F /* PingHandler.swift */; };
+		6658194B2EF7EDC7002799E1 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 6658194A2EF7EDB2002799E1 /* bin */; };
+		665819542EF7F28D002799E1 /* pac in Resources */ = {isa = PBXBuildFile; fileRef = 665819532EF7F288002799E1 /* pac */; };
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
 		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
 		66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BD92EB4EF8A002F330B /* CoreViewModel.swift */; };
@@ -102,7 +104,6 @@
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66B1B55A2D297B140032DD09 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5592D297B140032DD09 /* install.sh */; };
-		66B1B5842D297D030032DD09 /* v2ray-core in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5832D297D030032DD09 /* v2ray-core */; };
 		66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ShareQrCode.swift */; };
 		66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchAgent.swift */; };
 		66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F842E5F44850024E338 /* AppInstaller.swift */; };
@@ -140,16 +141,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		6627FB9D2D0D2324009B736F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 6;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		66B1B54A2D2979060032DD09 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -242,6 +233,8 @@
 		66389D0A2E4342CF0050CB27 /* BaseWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseWindow.swift; sourceTree = "<group>"; };
 		6638B6C02EBEFD3C0081767E /* SubscriptionScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionScheduler.swift; sourceTree = "<group>"; };
 		6653B5172E7FBE39003D0A6F /* PingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingHandler.swift; sourceTree = "<group>"; };
+		6658194A2EF7EDB2002799E1 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
+		665819532EF7F288002799E1 /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pac; sourceTree = "<group>"; };
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
 		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		66764BD92EB4EF8A002F330B /* CoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreViewModel.swift; sourceTree = "<group>"; };
@@ -266,14 +259,8 @@
 		66B1B5652D297B590032DD09 /* bg.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg.sketch; sourceTree = "<group>"; };
 		66B1B5662D297B590032DD09 /* icns.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icns.sketch; sourceTree = "<group>"; };
 		66B1B5672D297B590032DD09 /* icon.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icon.sketch; sourceTree = "<group>"; };
-		66B1B5692D297B590032DD09 /* geoip.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = geoip.dat; sourceTree = "<group>"; };
-		66B1B56A2D297B590032DD09 /* geoip-only-cn-private.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "geoip-only-cn-private.dat"; sourceTree = "<group>"; };
-		66B1B56B2D297B590032DD09 /* geosite.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = geosite.dat; sourceTree = "<group>"; };
-		66B1B56C2D297B590032DD09 /* v2ray */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = v2ray; sourceTree = "<group>"; };
-		66B1B56D2D297B590032DD09 /* v2ray-arm64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "v2ray-arm64"; sourceTree = "<group>"; };
 		66B1B56F2D297B590032DD09 /* V2rayU.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = V2rayU.icns; sourceTree = "<group>"; };
 		66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "V2rayU-dmg@2x.png"; sourceTree = "<group>"; };
-		66B1B5832D297D030032DD09 /* v2ray-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "v2ray-core"; path = "Build/v2ray-core"; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D27AE42E098E3A004C600D /* ShareQrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrCode.swift; sourceTree = "<group>"; };
 		66DF3F842E5F44850024E338 /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
@@ -289,7 +276,6 @@
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
 		66EB6C162E37C83C00A12DB3 /* HttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpServer.swift; sourceTree = "<group>"; };
-		66EB6C1A2E3B985300A12DB3 /* TODO */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
@@ -728,11 +714,12 @@
 		66B1B55C2D297B3F0032DD09 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				665819532EF7F288002799E1 /* pac */,
+				6658194A2EF7EDB2002799E1 /* bin */,
 				66B1B55D2D297B590032DD09 /* appdmg.json */,
 				66B1B55E2D297B590032DD09 /* appdmg.sh */,
 				66B1B5642D297B590032DD09 /* release.sh */,
 				66B1B5682D297B590032DD09 /* sketch */,
-				66B1B56E2D297B590032DD09 /* v2ray-core */,
 				66B1B56F2D297B590032DD09 /* V2rayU.icns */,
 				66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */,
 			);
@@ -749,23 +736,9 @@
 			path = sketch;
 			sourceTree = "<group>";
 		};
-		66B1B56E2D297B590032DD09 /* v2ray-core */ = {
-			isa = PBXGroup;
-			children = (
-				66B1B5692D297B590032DD09 /* geoip.dat */,
-				66B1B56A2D297B590032DD09 /* geoip-only-cn-private.dat */,
-				66B1B56B2D297B590032DD09 /* geosite.dat */,
-				66B1B56C2D297B590032DD09 /* v2ray */,
-				66B1B56D2D297B590032DD09 /* v2ray-arm64 */,
-			);
-			path = "v2ray-core";
-			sourceTree = "<group>";
-		};
 		66CBCECE2C63B16400313949 = {
 			isa = PBXGroup;
 			children = (
-				66EB6C1A2E3B985300A12DB3 /* TODO */,
-				66B1B5832D297D030032DD09 /* v2ray-core */,
 				66B1B55C2D297B3F0032DD09 /* Build */,
 				66CBCED92C63B16400313949 /* V2rayU */,
 				66B1B54D2D2979060032DD09 /* V2rayUTool */,
@@ -848,7 +821,6 @@
 				66CBCED32C63B16400313949 /* Sources */,
 				66CBCED42C63B16400313949 /* Frameworks */,
 				66CBCED52C63B16400313949 /* Resources */,
-				6627FB9D2D0D2324009B736F /* Embed Frameworks */,
 				66B1B5552D2979B40032DD09 /* CopyFiles */,
 			);
 			buildRules = (
@@ -913,7 +885,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66B1B5842D297D030032DD09 /* v2ray-core in Resources */,
+				665819542EF7F28D002799E1 /* pac in Resources */,
+				6658194B2EF7EDC7002799E1 /* bin in Resources */,
 				66B1B55A2D297B140032DD09 /* install.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
