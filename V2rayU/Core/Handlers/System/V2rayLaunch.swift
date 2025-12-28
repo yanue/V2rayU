@@ -69,6 +69,7 @@ actor V2rayLaunch {
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreFile: item.getCoreFile())
         if !started {
+            noticeTip(title: "启动失败", informativeText: "无法启动launchAgent")
             return false
         }
         let mode = await AppState.shared.runMode

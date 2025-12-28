@@ -37,6 +37,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var shortId: String = "" // shortId(reality): reality
     var spiderX: String = "" // spiderX(reality): reality
     var extra: String = "" // xhttp额外字段extra
+    var shareUri: String = "" // 原始分享链接(判断订阅是否更新)
     // 统计
     var totalUp: Int64 = 0 // 总上传
     var totalDown: Int64 = 0 // 总下载
@@ -58,7 +59,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, totalUp, totalDown, todayUp, todayDown, lastUpdate
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
     // 提供默认值的初始化器
@@ -87,7 +88,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         publicKey: String = "",
         shortId: String = "",
         spiderX: String = "",
-        extra: String = ""
+        extra: String = "",
+        shareUri: String = ""
     ) {
         self.uuid = uuid
         self.speed = speed
@@ -114,6 +116,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.shortId = shortId
         self.spiderX = spiderX
         self.extra = extra
+        self.shareUri = shareUri
         self.totalUp = 0
         self.totalDown = 0
         self.todayUp = 0
@@ -152,6 +155,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let shortId = Column(CodingKeys.shortId)
         static let spiderX = Column(CodingKeys.spiderX)
         static let extra = Column(CodingKeys.extra)
+        static let shareUri = Column(CodingKeys.shareUri)
         // 统计
         static let totalUp = Column(CodingKeys.totalUp)
         static let totalDown = Column(CodingKeys.totalDown)
@@ -190,6 +194,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 t.column(Columns.shortId.name, .text)
                 t.column(Columns.spiderX.name, .text)
                 t.column(Columns.extra.name, .text)
+                t.column(Columns.shareUri.name, .text)
                 // 统计
                 t.column(Columns.totalUp.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.totalDown.name, .integer).notNull().defaults(to: 0)
@@ -200,20 +205,4 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         }
     }
     
-}
-
-
-extension ProfileEntity {
-    /// profile 唯一标识符, 用于检测更新时的重复配置
-    /// 不需要 subid, 因为比较时已筛选
-    func uniqueKey() -> String {
-        // 只取订阅相关字段，不包含统计字段
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys] // 保证字段顺序稳定
-        guard let data = try? encoder.encode(self) else {
-            return uuid // fallback
-        }
-        let digest = SHA256.hash(data: data)
-        return digest.map { String(format: "%02x", $0) }.joined()
-    }
 }

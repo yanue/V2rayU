@@ -74,6 +74,13 @@ final class AppState: ObservableObject {
             v2rayTurnOn = success
             icon = success ? runMode.icon : RunMode.off.icon
             logger.info("setCoreRunning: started=\(success), v2rayTurnOn=\(self.v2rayTurnOn.description)")
+            // 启动失败,不能设置系统代理
+            if !success {
+                await V2rayLaunch.shared.stop()
+                v2rayTurnOn = false
+                icon = RunMode.off.icon
+                logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
+            }
         } else {
             await V2rayLaunch.shared.stop()
             v2rayTurnOn = false
@@ -118,15 +125,12 @@ final class AppState: ObservableObject {
         Task { await V2rayTrafficStats.shared.initTask() }
         
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
-        // generate plist
+
         Task {
-          await LaunchAgent.shared.generateLaunchAgentPlist()
+            // 根据启动状态
+            await setCoreRunning(v2rayTurnOn)
         }
-        if v2rayTurnOn {
-            Task {
-                await setCoreRunning(v2rayTurnOn)
-            }
-        }
+    
         AppMenuManager.shared.refreshBasicMenus()
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             Task {

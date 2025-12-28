@@ -208,6 +208,7 @@ enum LanguageLabel: String, CaseIterable {
     case PublicKey
     case ShortID
     case SpiderX
+    case Extra
     case Alpn
     case TransportSettings
     case ServerSettings

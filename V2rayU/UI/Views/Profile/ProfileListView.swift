@@ -272,34 +272,37 @@ struct ProfileListView: View {
                         }
                     }
                 }
-                .width(min: 120, max: 300)
-
-                TableColumn(String(localized: .TableFieldType)) { row in
-                    Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
-                }
-                .width(40)
-
-                TableColumn(String(localized: .TableFieldAddress)) { row in
-                    Text(row.address)
-                }
-                .width(min: 120, max: 300)
+                .width(min: 150, max: 300)
 
                 TableColumn(String(localized: .TableFieldLatency)) { (row: ProfileEntity) in
                     Text("\(row.speed)")
                         .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
                 }
-                .width(76)
+                .width(40)
+                
+                TableColumn(String(localized: .TableFieldType)) { row in
+                    Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
+                }
+                .width(40)
+
+                TableColumn(String(localized: .TableFieldNetwork)) { row in
+                    Text(row.network.rawValue)
+                }.width(50)
+                
+                TableColumn(String(localized: .TableFieldSecurity)) { row in
+                    Text(row.security.rawValue)
+                }.width(40)
+                
+                TableColumn(String(localized: .TableFieldAddress)) { row in
+                    Text(row.address)
+                }
+                .width(min: 120, max: 300)
 
                 TableColumn(String(localized: .TableFieldPort)) { row in
                     Text("\(row.port)")
                 }
                 .width(40)
-                TableColumn(String(localized: .TableFieldNetwork)) { row in
-                    Text(row.network.rawValue)
-                }.width(50)
-                TableColumn(String(localized: .TableFieldSecurity)) { row in
-                    Text(row.security.rawValue)
-                }.width(40)
+
             }
             Group {
                 TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileEntity) in

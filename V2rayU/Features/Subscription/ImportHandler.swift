@@ -88,6 +88,8 @@ class ImportUri {
             }
             // 解析成功返回 ProfileModel
             var profile = handler.getProfile()
+            // 原始分享链接保存下来(用于比较是否订阅是否有变化)
+            profile.shareUri = share_uri
             if self.remark.count > 0 {
                 profile.remark = self.remark
             }

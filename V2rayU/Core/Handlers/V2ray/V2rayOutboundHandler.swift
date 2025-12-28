@@ -272,3 +272,14 @@ func getCoreFile(mode: CoreVersion = .latest) -> String {
 #endif
     return coreFile
 }
+
+extension ProfileEntity {
+    /// 使用分享链接保存下来(用于比较是否订阅是否有变化)
+    func uniqueKey() -> String {
+        if self.shareUri.isEmpty {
+            return ShareUri.generateShareUri(item: self)
+        } else {
+            return self.shareUri
+        }
+    }
+}

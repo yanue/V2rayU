@@ -61,15 +61,12 @@ struct ConfigStreamView: View {
                     getTextFieldWithLabel(label: .Seed, text: $item.path)
                     getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
                     getBoolFieldWithLabel(label: .Congestion, isOn: $item.allowInsecure)
-                    getNumFieldWithLabel(label: .MTU, num: $item.port)
-                    getNumFieldWithLabel(label: .TTI, num: $item.port)
-                    getNumFieldWithLabel(label: .UplinkCapacity, num: $item.port)
-                    getNumFieldWithLabel(label: .DownloadCapacity, num: $item.port)
                 }
                 
                 if item.network == .xhttp {
                     getTextFieldWithLabel(label: .xhttpHost, text: $item.host)
                     getTextFieldWithLabel(label: .xhttpPath, text: $item.path)
+                    getTextEditorWithLabel(label: .Extra, text: $item.extra)
                 }
             }
             .padding() // 1. 内边距
