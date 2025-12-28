@@ -189,6 +189,25 @@ class V2rayOutboundHandler {
         case .xhttp:
             streamXhttp.path = self.profile.path
             streamXhttp.host = self.profile.host
+            // 假设 profile.extra 是一个 JSON 字符串
+            let extraString = self.profile.extra
+            if !extraString.isEmpty, let data = extraString.data(using: .utf8) {
+                do {
+                    let decoder = JSONDecoder()
+                    let extra = try decoder.decode(JSONAny.self, from: data)
+                    
+                    // 赋值给 streamXhttp.extra
+                    streamXhttp.extra = extra
+                    
+                    // 如果外层套了一层 { "extra": { ... } }
+                    if let dict = extra.value as? [String: Any], let inner = dict["extra"] {
+                        streamXhttp.extra = JSONAny(inner)
+                    }
+                } catch {
+                    print("解析 extra 失败: \(error)")
+                }
+            }
+
             settings.xhttpSettings = streamXhttp
         }
     }

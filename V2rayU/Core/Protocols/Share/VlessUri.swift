@@ -161,9 +161,19 @@ class VlessUri: BaseShareUri {
         self.profile.password = password
         let query = url.queryParams()
         self.profile.network = query.getEnum(forKey: "type",type: V2rayStreamNetwork.self, defaultValue: .tcp)
-        self.profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .xtls)
+        self.profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
+        self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)
         self.profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        // 从 query 获取字符串
+        let alpnString = query.getString(forKey: "alpn", defaultValue: "")
+        // 尝试转换成枚举
+        if let alpnEnum = V2rayStreamAlpn(rawValue: alpnString) {
+            self.profile.alpn = alpnEnum
+        } else {
+            // 如果转换失败，给一个默认值
+            self.profile.alpn = .h2h1
+        }
 
         switch self.profile.network {
         case .tcp:
@@ -172,6 +182,8 @@ class VlessUri: BaseShareUri {
         case .xhttp:
             self.profile.path = query.getString(forKey: "path", defaultValue: "/")
             self.profile.host = query.getString(forKey: "host", defaultValue: host)
+            self.profile.extra = query.getString(forKey: "extra", defaultValue: "")
+            logger.debug("VlessUri xhttp extra: \(self.profile.extra)")
             break
         case .ws:
             self.profile.path = query.getString(forKey: "path", defaultValue: "/")
