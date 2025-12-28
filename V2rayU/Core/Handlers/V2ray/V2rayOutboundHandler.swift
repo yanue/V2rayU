@@ -159,6 +159,9 @@ class V2rayOutboundHandler {
             if self.profile.headerType != .none {
                 streamTcp.header = TcpSettingHeader()
                 streamTcp.header?.type = self.profile.headerType.rawValue
+                streamTcp.header?.request = TcpSettingHeaderRequest()
+                streamTcp.header?.request?.path = [self.profile.path]
+                streamTcp.header?.request?.headers.host = [self.profile.host]
             }
             settings.tcpSettings = streamTcp
         case .kcp:
@@ -237,4 +240,35 @@ class V2rayOutboundHandler {
             break
         }
     }
+}
+
+
+extension ProfileEntity {
+    // 是否需要使用oldCore
+    func getCoreFile() -> String {
+        var mode: CoreVersion = .latest
+        if self.network == .grpc || self.network == .h2 || self.network == .ws {
+            mode = .legacy
+        }
+        logger.info("getCoreFile: \(self.network.rawValue) -> \(mode.rawValue)")
+        return  V2rayU.getCoreFile(mode: mode)
+    }
+}
+
+func getCoreFile(mode: CoreVersion = .latest) -> String {
+    var coreFile: String
+#if arch(arm64)
+    if mode == .legacy {
+        coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64-old"
+    } else {
+        coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64"
+    }
+#else
+    if mode == .legacy {
+        coreFile = "\(AppHomePath)/bin/xray-core/xray-64-old"
+    } else {
+        coreFile = "\(AppHomePath)/bin/xray-core/xray-64"
+    }
+#endif
+    return coreFile
 }

@@ -13,6 +13,7 @@ actor LaunchAgent: NSObject {
     private let LAUNCH_AGENT_NAME = "yanue.v2rayu.v2ray-core"
     let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/"
     let launchAgentPlistFile: String
+    var lastCoreFile = getCoreFile()
 
     override init() {
         self.launchAgentPlistFile = NSHomeDirectory() + "/Library/LaunchAgents/" + LAUNCH_AGENT_NAME + ".plist"
@@ -27,14 +28,8 @@ actor LaunchAgent: NSObject {
             try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
         }
 
-        // write launch agent
-        // 兼容 v2ray | xray
-        #if arch(arm64)
-        let coreFile = "./bin/xray-core/xray-arm64"
-        #else
-        let coreFile = "./bin/xray-core/xray-64"
-        #endif
-        let agentArguments = [coreFile, "run", "-config", "config.json"]
+        // coreFile 会变, 需要重新生成 plist
+        let agentArguments = [lastCoreFile, "run", "-config", "config.json"]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_NAME,
@@ -51,6 +46,7 @@ actor LaunchAgent: NSObject {
         unloadAgent()
         // load launch service
         loadAgent()
+        logger.info("generateLaunchAgentPlist: \(self.launchAgentPlistFile) with args: \(agentArguments)")
     }
 
     // 加载 LaunchAgent
@@ -72,18 +68,24 @@ actor LaunchAgent: NSObject {
             logger.info("launchctl unload \(self.launchAgentPlistFile) failed. \(error)")
         }
     }
-
+    
     // 启动任务
-    func startAgent() -> Bool {
+    func startAgent(coreFile: String) -> Bool {
         do {
+            // core文件更换了, 重新生成plist
+            if lastCoreFile != coreFile {
+                lastCoreFile = coreFile
+                generateLaunchAgentPlist()
+            }
+
             // 先load, 确保是最新的配置
             loadAgent()
             // 启动
             let output = try runCommand(at: "/bin/launchctl", with: ["start", LAUNCH_AGENT_NAME])
-            logger.info("Start v2ray-core: ok \(output)")
+            logger.info("startAgent: \(coreFile) ok \(output)")
             return true
         } catch let error {
-            alertDialog(title: "Start v2ray-core failed.", message: error.localizedDescription)
+            alertDialog(title: "startAgent failed.", message: error.localizedDescription)
             return false
         }
     }
@@ -93,11 +95,11 @@ actor LaunchAgent: NSObject {
         do {
             // 先停止
             let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
-            // unload,确保没问题
+            // 再卸载，确保彻底停止
             unloadAgent()
-            logger.info("Stop v2ray-core: ok \(output)")
+            logger.info("stopAgent-ok \(output)")
         } catch let error {
-            alertDialog(title: "Stop v2ray-core failed.", message: error.localizedDescription)
+            alertDialog(title: "stopAgent-failed.", message: error.localizedDescription)
         }
     }
 }

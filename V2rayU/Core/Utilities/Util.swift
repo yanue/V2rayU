@@ -307,3 +307,8 @@ func isFileQuarantined(at path: String) -> Bool {
     let result = getxattr(path, attrName, nil, 0, 0, 0)
     return result >= 0
 }
+
+enum CoreVersion: String {
+    case legacy
+    case latest
+}

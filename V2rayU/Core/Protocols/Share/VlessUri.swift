@@ -161,6 +161,10 @@ class VlessUri: BaseShareUri {
         self.profile.password = password
         let query = url.queryParams()
         self.profile.network = query.getEnum(forKey: "type",type: V2rayStreamNetwork.self, defaultValue: .tcp)
+        // h2 特例兼容
+        if query.getString(forKey: "type") == "http" {
+            self.profile.network = .h2
+        }
         self.profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
         self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)

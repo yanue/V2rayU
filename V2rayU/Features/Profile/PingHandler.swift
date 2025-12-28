@@ -214,7 +214,8 @@ actor PingServer {
     }
     
     private func launchProcess() async throws {
-        let pingCmd = "cd \(AppHomePath) && ./v2ray-core/v2ray run -config \(jsonFile)"
+        let corePath = self.item.getCoreFile()
+        let pingCmd = "cd \(AppHomePath) && \(corePath) run -config \(jsonFile)"
         self.process = createProcess(command: pingCmd)
         self.process.launch()
         

@@ -67,7 +67,7 @@ actor V2rayLaunch {
         // 停止之前的
         await LaunchAgent.shared.stopAgent()
         // 启动
-        let started = await LaunchAgent.shared.startAgent()
+        let started = await LaunchAgent.shared.startAgent(coreFile: item.getCoreFile())
         if !started {
             return false
         }
