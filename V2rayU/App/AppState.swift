@@ -1,7 +1,6 @@
 import Combine
 import SwiftUI
 
-
 @MainActor
 final class AppState: ObservableObject {
     static let shared = AppState()
@@ -18,12 +17,10 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.set(forKey: .runMode, value: runMode.rawValue) }
     }
     @Published var icon: String = RunMode.off.icon
-    @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "")
-    {
+    @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "") {
         didSet { UserDefaults.set(forKey: .runningProfile, value: runningProfile) }
     }
-    @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "")
-    {
+    @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "") {
         didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
     }
     @Published var runningServer: ProfileEntity? = ProfileStore.shared.getRunning()
@@ -42,19 +39,20 @@ final class AppState: ObservableObject {
 
     // MARK: - 更新速度
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
-        if !self.v2rayTurnOn {
-            return
-        }
+        if !self.v2rayTurnOn { return }
         self.latency = latency
         self.directUpSpeed = directUpSpeed
         self.directDownSpeed = directDownSpeed
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
-        // 更新数据库
         ProfileStore.shared.update_speed(uuid: self.runningProfile, speed: Int(latency))
     }
+    
+    func setLatency(latency: Double) {
+        self.latency = latency
+    }
 
-    func resetSpeed(){
+    func resetSpeed() {
         self.latency = 0
         self.directUpSpeed = 0
         self.directDownSpeed = 0
@@ -63,56 +61,50 @@ final class AppState: ObservableObject {
     }
     
     // MARK: - 启动/停止核心
-    
-    func setCoreRunning(_ running: Bool) {
-        guard !isCoreOperationInProgress else { return }
+    func setCoreRunning(_ running: Bool) async {
+        guard !isCoreOperationInProgress else {
+            logger.info("setCoreRunning: isCoreOperationInProgress, return")
+            return
+        }
         isCoreOperationInProgress = true
+        defer { isCoreOperationInProgress = false }
 
-        Task {
-            defer { isCoreOperationInProgress = false }
-
-            self.resetSpeed()
-
-            if running {
-                let success = await V2rayLaunch.shared.start()
-                if success {
-                    v2rayTurnOn = true
-                    icon = runMode.icon
-                } else {
-                    v2rayTurnOn = false
-                    icon = RunMode.off.icon
-                }
-            } else {
-                await V2rayLaunch.shared.stop()
-                v2rayTurnOn = false
-                icon = RunMode.off.icon
-            }
+        if running {
+            let success = await V2rayLaunch.shared.start()
+            v2rayTurnOn = success
+            icon = success ? runMode.icon : RunMode.off.icon
+            logger.info("setCoreRunning: started=\(success), v2rayTurnOn=\(self.v2rayTurnOn.description)")
+        } else {
+            await V2rayLaunch.shared.stop()
+            v2rayTurnOn = false
+            icon = RunMode.off.icon
+            logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
         }
     }
 
     // MARK: - 切换运行模式
-    func switchRunMode(mode: RunMode) {
+    func switchRunMode(mode: RunMode) async {
         runMode = mode
-        v2rayTurnOn = true // 先更改状态
-        logger.info("appState-switchRunMode: \(mode.rawValue), \(self.runMode.rawValue)")
-        setCoreRunning(v2rayTurnOn)
+        v2rayTurnOn = true
+        logger.info("switchRunMode: \(mode.rawValue), \(self.runMode.rawValue)")
+        await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
 
     // MARK: - 切换路由
-    func switchRouting(uuid: String) {
+    func switchRouting(uuid: String) async {
         runningRouting = uuid
-        v2rayTurnOn = true // 先更改状态
-        setCoreRunning(v2rayTurnOn)
+        v2rayTurnOn = true
+        await setCoreRunning(v2rayTurnOn)
         logger.info("switchRouting: \(self.runningRouting)")
         AppMenuManager.shared.refreshRoutingItems()
     }
 
     // MARK: - 切换配置
-    func switchServer(uuid: String) {
+    func switchServer(uuid: String) async {
         runningProfile = uuid
-        v2rayTurnOn = true // 先更改状态
-        setCoreRunning(v2rayTurnOn)
+        v2rayTurnOn = true
+        await setCoreRunning(v2rayTurnOn)
         runningServer = ProfileStore.shared.getRunning()
         logger.info("switchServer-end: \(self.runningProfile)")
         AppMenuManager.shared.refreshServerItems()
@@ -125,19 +117,24 @@ final class AppState: ObservableObject {
         startHttpServer()
         Task { await V2rayTrafficStats.shared.initTask() }
         
-        logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description)")
-
-        if v2rayTurnOn {
-            setCoreRunning(v2rayTurnOn)
-        }
-        // 刷新图标等
-        AppMenuManager.shared.refreshBasicMenus()
+        logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
+        // generate plist
         Task {
-            await SubscriptionScheduler.shared.runAtStart()
+          await LaunchAgent.shared.generateLaunchAgentPlist()
         }
-        // 检查是否需要更新
+        if v2rayTurnOn {
+            Task {
+                await setCoreRunning(v2rayTurnOn)
+            }
+        }
+        AppMenuManager.shared.refreshBasicMenus()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            Task {
+                await SubscriptionScheduler.shared.runAtStart()
+            }
+        }
+
         if AppSettings.shared.checkForUpdates {
-            // 10秒后检查
             DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                 AppMenuManager.shared.versionController.checkForUpdates(showWindow: false)
             }
@@ -145,21 +142,21 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - 菜单栏 Toggle
-    func toggleCore() {
-        v2rayTurnOn = !v2rayTurnOn  // 先更改状态
-        setCoreRunning(v2rayTurnOn)
+    func toggleCore() async {
+        v2rayTurnOn.toggle()
+        await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
     
-    func turnOnCore() {
-        v2rayTurnOn = true // 先更改状态
-        setCoreRunning(v2rayTurnOn)
+    func turnOnCore() async {
+        v2rayTurnOn = true
+        await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
     
-    func turnOffCore() {
-        v2rayTurnOn = false // 先更改状态
-        setCoreRunning(v2rayTurnOn)
+    func turnOffCore() async {
+        v2rayTurnOn = false
+        await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
 }

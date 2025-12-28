@@ -371,7 +371,9 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {
-        AppState.shared.toggleCore()
+        Task {
+            await AppState.shared.toggleCore()
+        }
     }
 
     @objc private func quitClicked(_ sender: NSMenuItem) {
@@ -417,7 +419,9 @@ final class AppMenuManager: NSObject {
             return
         }
         logger.info("switchServer: \(uuid)")
-        AppState.shared.switchServer(uuid: uuid)
+        Task {
+            await AppState.shared.switchServer(uuid: uuid)
+        }
     }
 
     @objc private func switchRouting(_ sender: NSMenuItem) {
@@ -426,7 +430,9 @@ final class AppMenuManager: NSObject {
             return
         }
         logger.info("switchRouting: \(uuid)")
-        AppState.shared.switchRouting(uuid: uuid)
+        Task {
+            await AppState.shared.switchRouting(uuid: uuid)
+        }
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {
@@ -440,7 +446,9 @@ final class AppMenuManager: NSObject {
             return
         }
         logger.info("switchRunMode: \(mode.rawValue)")
-        AppState.shared.switchRunMode(mode: mode)
+        Task {
+            await AppState.shared.switchRunMode(mode: mode)
+        }
     }
 
     @objc private func checkForUpdate(_ sender: NSMenuItem) {

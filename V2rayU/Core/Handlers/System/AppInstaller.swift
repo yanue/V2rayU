@@ -70,10 +70,6 @@ actor AppInstaller: NSObject {
         }
 
         showInstallAlert()
-        // generate plist
-        Task {
-          await LaunchAgent.shared.generateLaunchAgentPlist()
-        }
     }
 
     func showInstallAlert() {

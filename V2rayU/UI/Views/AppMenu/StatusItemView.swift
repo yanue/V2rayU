@@ -21,10 +21,15 @@ struct StatusItemView: View {
                 .scaledToFit()
                 .frame(width: 20, height: 20)
             if settings.showLatencyOnTray {
-                // 延迟信息
-                Text("● \(String(format: "%.0f", appState.latency)) ms")
-                    .font(.system(size: 10))
-                    .foregroundColor(Color(getSpeedColor(latency: appState.latency))) // 绿色
+                HStack(spacing: 4) {
+                    Text("●")
+                        .font(.system(size: 10))
+                        .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
+                    // 延迟信息
+                    Text("\(String(format: "%.0f", appState.latency)) ms")
+                        .font(.system(size: 10))
+                        .foregroundColor(Color(getSpeedColor(latency: appState.latency))) // 绿色
+                }
             }
             if settings.showSpeedOnTray {
                 // 速度信息（两行显示）
@@ -50,12 +55,12 @@ struct CoreStatusItemView: View {
         HStack() {
             HStack(spacing: 0) {
                 Image(systemName: appState.v2rayTurnOn ? "wifi" : "wifi.slash")
+                    .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
                 // 延迟信息
                 Text(" \(String(format: "%.0f", appState.latency)) ms")
                     .font(.system(size: 11))
+                    .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
             }
-            .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
-
             
             Spacer()
             

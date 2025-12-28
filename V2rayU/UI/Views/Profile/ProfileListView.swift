@@ -334,7 +334,9 @@ struct ProfileListView: View {
 
     private func chooseItem(item: ProfileModel) {
         // 选择当前配置
-        AppState.shared.switchServer(uuid: item.uuid)
+        Task {
+            await AppState.shared.switchServer(uuid: item.uuid)
+        }
     }
 
     private func duplicateItem(item: ProfileModel) {

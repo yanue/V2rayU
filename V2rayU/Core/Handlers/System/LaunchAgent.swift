@@ -76,6 +76,9 @@ actor LaunchAgent: NSObject {
     // 启动任务
     func startAgent() -> Bool {
         do {
+            // 先load, 确保是最新的配置
+            loadAgent()
+            // 启动
             let output = try runCommand(at: "/bin/launchctl", with: ["start", LAUNCH_AGENT_NAME])
             logger.info("Start v2ray-core: ok \(output)")
             return true
@@ -88,7 +91,10 @@ actor LaunchAgent: NSObject {
     // 停止任务
     func stopAgent() {
         do {
+            // 先停止
             let output = try runCommand(at: "/bin/launchctl", with: ["stop", LAUNCH_AGENT_NAME])
+            // unload,确保没问题
+            unloadAgent()
             logger.info("Stop v2ray-core: ok \(output)")
         } catch let error {
             alertDialog(title: "Stop v2ray-core failed.", message: error.localizedDescription)

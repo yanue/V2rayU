@@ -82,6 +82,8 @@ actor V2rayLaunch {
 
     func stop() async {
         await LaunchAgent.shared.stopAgent()
+        await AppState.shared.resetSpeed()
+        await V2rayTraffics.shared.resetData()
         setSystemProxy(mode: .off)
     }
 

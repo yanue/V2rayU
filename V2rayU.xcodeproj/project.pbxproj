@@ -584,6 +584,7 @@
 				66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */,
 				66DF3F842E5F44850024E338 /* AppInstaller.swift */,
 				66DF3F852E5F44850024E338 /* LaunchAgent.swift */,
+				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -591,7 +592,6 @@
 		6632EF5D2EC4C50A00CED47B /* V2ray */ = {
 			isa = PBXGroup;
 			children = (
-				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 				662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */,
 				662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */,
 				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,

@@ -394,18 +394,18 @@ final class DiagnosticsViewModel: ObservableObject {
         Task {
             await V2rayLaunch.shared.stop()
             try? await Task.sleep(nanoseconds: 300_000_000)
-            AppState.shared.turnOnCore()
+            await AppState.shared.turnOnCore()
             await MainActor.run { self.runSequentialChecks() }
         }
     }
     
     private func toggleCoreOnOff() {
-        if appState.v2rayTurnOn {
-            AppState.shared.turnOffCore()
-        } else {
-            AppState.shared.turnOnCore()
-        }
         Task {
+            if appState.v2rayTurnOn {
+                await AppState.shared.turnOffCore()
+            } else {
+                await AppState.shared.turnOnCore()
+            }
             try? await Task.sleep(nanoseconds: 500_000_000)
             await MainActor.run { self.runSequentialChecks() }
         }

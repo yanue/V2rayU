@@ -315,6 +315,9 @@ actor PingRunning {
 
     private func updateSpeed(pingTime: Int) {
         // 更新 speed
+        Task {
+            await AppState.shared.setLatency(latency: Double(pingTime))
+        }
         ProfileStore.shared.update_speed(uuid: self.item.uuid, speed: pingTime)
     }
     
