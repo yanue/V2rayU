@@ -56,7 +56,9 @@ actor SystemSleepManager {
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {
             // 自动检查更新
-//            V2rayUpdater.checkForUpdates()
+            Task {
+                await AppMenuManager.shared.versionController.checkForUpdates(showWindow: false)
+            }
         }
         if UserDefaults.getBool(forKey: .autoUpdateServers) {
             // 自动更新订阅服务器

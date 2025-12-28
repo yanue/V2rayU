@@ -79,6 +79,49 @@ func checkFileIsRootAdmin(file: String) -> Bool {
     return false
 }
 
+func checkFileIsCurrentArch(file: String) -> Bool {
+    do {
+        let data = try Data(contentsOf: URL(fileURLWithPath: file))
+        guard data.count >= 20 else { return false }
+
+        var fileArch: String?
+
+        // 判断 ELF
+        if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
+            // e_machine 在偏移 18
+            let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
+            switch eMachine {
+            case 62: fileArch = "x86_64"   // EM_X86_64
+            case 183: fileArch = "arm64"   // EM_AARCH64
+            default: fileArch = "unknown"
+            }
+        }
+        // 判断 Mach-O
+        else if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
+            let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
+            switch cpuType {
+            case 0x01000007: fileArch = "x86_64"
+            case 0x0100000C: fileArch = "arm64"
+            default: fileArch = "unknown"
+            }
+        }
+
+        // 当前系统架构
+        var uts = utsname()
+        uname(&uts)
+        let machine = withUnsafePointer(to: &uts.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: Int(_SYS_NAMELEN)) {
+                String(cString: $0)
+            }
+        }
+
+        return machine.contains(fileArch ?? "unknown")
+    } catch {
+        return false
+    }
+}
+
+
 // get ip address
 
 func GetIPAddresses() -> String? {

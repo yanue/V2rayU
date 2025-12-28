@@ -20,10 +20,10 @@ func shell(launchPath: String, arguments: [String]) -> String? {
         return ""
     }
 }
-
 enum CommandExecutionError: Error {
     case fileNotFound(String)
     case insufficientPermissions(String)
+    case executionFailed(String, Int32) // stderr + exit code
     case unknown(Error)
 }
 
@@ -41,11 +41,14 @@ func runCommand(at path: String, with arguments: [String]) throws -> String {
         process.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        if let output = String(data: data, encoding: .utf8) {
-            return output
-        } else {
-            return ""
+        let output = String(data: data, encoding: .utf8) ?? ""
+
+        // 检查退出码
+        if process.terminationStatus != 0 {
+            throw CommandExecutionError.executionFailed(output, process.terminationStatus)
         }
+
+        return output
     } catch {
         if (error as NSError).domain == NSCocoaErrorDomain {
             switch (error as NSError).code {

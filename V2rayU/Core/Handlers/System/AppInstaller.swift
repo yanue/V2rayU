@@ -10,133 +10,138 @@ import Cocoa
 
 actor AppInstaller: NSObject {
     static let shared = AppInstaller()
-    // 检查是否需要安装
-    func checkInstall() {
-        logger.info("source apth: \(AppResourcesPath)")
+    var installReason: String = ""
 
-        // Ensure launch agent directory is existed.
+    func checkInstall() async {
+        logger.info("source path: \(AppResourcesPath)")
+
         let fileMgr = FileManager.default
-        if !fileMgr.fileExists(atPath: AppHomePath) {
-            logger.info("app home dir \(AppHomePath) not exists,need install")
-            try! fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
-        }
-        // 检查 V2rayU 自身是否允许 App Background Activity
-        // make sure new version
-        logger.info("install: \(AppResourcesPath)")
         var needRunInstall = false
-        
-        if !needRunInstall && !FileManager.default.isExecutableFile(atPath: xrayCoreFile) {
-            logger.info("\(xrayCoreFile) not accessable")
-            needRunInstall = true
-        }
-        // 检查 xrayCoreFile 是否允许 App Background Activity
-        // Ensure permission with root admin
-        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
-            needRunInstall = true
-        }
-        if !needRunInstall && !FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat") {
-            logger.info("\(xrayCorePath)/geoip.dat not exists,need install")
-            needRunInstall = true
-        }
-        // 检查 core 文件的 quarantine flag
-        if !needRunInstall && isFileQuarantined(at: xrayCoreFile) {
-            logger.info("\(xrayCoreFile) is quarantined,need install")
-            needRunInstall = true
-        }
-        if !needRunInstall {
-            // use /bin/bash to fix crash when V2rayUTool is not exist
-            let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
-            logger.info("toolVersion - \(v2rayUTool): \(String(describing: toolVersion))")
-            if toolVersion != nil {
-                let _version = toolVersion ?? "" // old version
-                if _version.contains("Usage:") {
-                    logger.info("\(v2rayUTool) old version,need install")
-                    needRunInstall = true
-                } else {
-                    if !(_version >= "4.0.0") {
-                        logger.info("\(v2rayUTool) old version,need install")
-                        needRunInstall = true
-                    }
-                }
-            } else {
-                logger.info("\(v2rayUTool) not exists,need install")
+
+        // 确保目录存在
+        if !fileMgr.fileExists(atPath: AppHomePath) {
+            logger.info("app home dir \(AppHomePath) not exists, need install")
+            do {
+                try fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                logger.error("createDirectory failed: \(error)")
                 needRunInstall = true
             }
         }
-        logger.info("launchedBefore, \(needRunInstall)")
+
+        // 检查核心文件是否可执行
+        if !needRunInstall && !fileMgr.isExecutableFile(atPath: xrayCoreFile) {
+            logger.info("\(xrayCoreFile) not executable")
+            installReason = "Core file not executable"
+            needRunInstall = true
+        }
+
+        // 检查架构
+        if !needRunInstall && !checkFileIsCurrentArch(file: xrayCoreFile) {
+            logger.info("\(xrayCoreFile) not current arch")
+            installReason = "Core file arch mismatch"
+            needRunInstall = true
+        }
+
+        // 检查 root 权限
+        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
+            installReason = "v2rayUTool not root admin"
+            needRunInstall = true
+        }
+
+        // 检查 geoip.dat
+        if !needRunInstall && !fileMgr.fileExists(atPath: xrayCorePath + "/geoip.dat") {
+            logger.info("geoip.dat missing")
+            installReason = "geoip.dat missing"
+            needRunInstall = true
+        }
+
+        // 检查 quarantine
+        if !needRunInstall && isFileQuarantined(at: xrayCoreFile) {
+            logger.info("\(xrayCoreFile) is quarantined")
+            installReason = "File quarantined"
+            needRunInstall = true
+        }
+
+        // 检查工具版本
         if !needRunInstall {
-            logger.info("no need install")
-            return
-        }
-
-        showInstallAlert()
-    }
-
-    func showInstallAlert() {
-        // 将 UI 操作放到主线程, 同步执行, 确保在调用后才能继续
-        DispatchQueue.main.sync {
-
-            let alert = NSAlert()
-            alert.alertStyle = .warning
-            alert.messageText = String(localized: .InstallTitle)
-            alert.informativeText = String(localized: .InstallPermissionTip)
-            alert.addButton(withTitle: String(localized: .Install))
-            alert.addButton(withTitle: String(localized: .Quit))
-
-            switch alert.runModal() {
-            case .alertFirstButtonReturn:
-                Task {
-                    await self.showInstallAlertSynchronously()
+            let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
+            if let version = toolVersion {
+                if version.contains("Usage:") {
+                    installReason = "Old tool version"
+                    needRunInstall = true
+                } else if version.compare("4.0.0", options: .numeric) == .orderedAscending {
+                    installReason = "Tool version too old"
+                    needRunInstall = true
                 }
-            default:
-                NSApp.terminate(self)
+            } else {
+                installReason = "Tool not exists"
+                needRunInstall = true
             }
         }
-    }
 
-    func showInstallAlertSynchronously() -> Bool {
-        // 定义返回值
-        var shouldInstall = false
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        // 将 UI 操作放到主线程
-        DispatchQueue.main.sync {
-            let alert = NSAlert()
-            alert.messageText = "Install V2rayUTool"
-            alert.addButton(withTitle: "Install")
-            alert.addButton(withTitle: "Quit")
-            let response = alert.runModal()
-            if response == .alertFirstButtonReturn {
-                shouldInstall = true
-            }
-            // 释放信号量，让阻塞的线程继续
-            semaphore.signal()
+        logger.info("launchedBefore, needRunInstall=\(needRunInstall)")
+        if needRunInstall {
+            await showInstallAlert()
+        } else {
+            logger.info("no need install")
         }
-        // 阻塞等待 alert 的返回
-        semaphore.wait()
-        return shouldInstall
+        logger.info("checkInstall end")
     }
 
+    func showInstallAlert() async {
+       let reason = self.installReason
+       
+       // Use a continuation to bridge the sync NSAlert.runModal() with async
+       await withCheckedContinuation { continuation in
+           DispatchQueue.main.async {  // Async dispatch to avoid strict mode warnings
+               let alert = NSAlert()
+               alert.alertStyle = .warning
+               alert.messageText = String(localized: .InstallTitle)
+               alert.informativeText = reason
+               alert.addButton(withTitle: String(localized: .Install))
+               alert.addButton(withTitle: String(localized: .Quit))
 
-    func install() {
+               let response = alert.runModal()
+               if response == .alertFirstButtonReturn {
+                   Task {
+                       await self.install()
+                       continuation.resume()  // Resume after install completes
+                   }
+               } else {
+                   NSApp.terminate(self)
+                   continuation.resume()  // Optional: resume on quit, though app terminates
+               }
+           }
+       }
+   }
+    
+    func install() async {
         let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         // Create authorization reference for the user
-        executeAppleScriptWithOsascript(script: doSh)
+        await executeAppleScriptWithOsascript(script: doSh)
     }
 
     // 高版本macos执行NSAppleScript会出现授权失败
-    func executeAppleScriptWithOsascript(script: String) {
-        do {
-            let output = try runCommand(at: "/usr/bin/osascript", with: ["-e", "do shell script \"" + script + "\" with administrator privileges"])
-            logger.info("executeAppleScript-Output: \(output)")
-        } catch {
-            logger.info("executeAppleScript-Error: \(error)")
-            DispatchQueue.main.sync {
-                let title =  String(localized: .InstallFailed)
-                let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
-                alertDialog(title: title, message: toast)
-            }
-        }
-    }
-
+   func executeAppleScriptWithOsascript(script: String) async {
+       do {
+           // Assuming runCommand is sync; wrap in continuation for async
+           let output = try await withCheckedThrowingContinuation { continuation in
+               do {
+                   let result = try runCommand(at: "/usr/bin/osascript", with: ["-e", "do shell script \"" + script + "\" with administrator privileges"])
+                   continuation.resume(returning: result)
+               } catch {
+                   continuation.resume(throwing: error)
+               }
+           }
+           logger.info("executeAppleScript-Output: \(output)")
+       } catch {
+           logger.info("executeAppleScript-Error: \(error)")
+           DispatchQueue.main.sync {
+               let title =  String(localized: .InstallFailed)
+               let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
+               alertDialog(title: title, message: toast)
+           }
+       }
+   }
 }
