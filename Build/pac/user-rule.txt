@@ -1,0 +1,7 @@
+! Put user rules line by line in this file.
+! See https://adblockplus.org/en/filter-cheatsheet
+||githubusercontent.com
+||api.github.com
+||github.com
+||chat.openai.com
+||openai.com
