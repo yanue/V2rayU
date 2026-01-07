@@ -89,10 +89,11 @@ actor V2rayLaunch {
     }
 
     private func createJsonFile(item: ProfileEntity) {
-        let vCfg = V2rayConfigHandler()
-        let jsonText = vCfg.toJSON(item: item)
+        let cfg = CoreConfigHandler()
+        let jsonText = cfg.toJSON(item: item)
         do {
             try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
+            logger.info("createJsonFile: \(jsonText)")
         } catch {
             logger.info("Failed to write JSON file: \(error)")
             noticeTip(title: "Failed to write JSON file: \(error)")

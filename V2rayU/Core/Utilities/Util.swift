@@ -312,3 +312,9 @@ enum CoreVersion: String {
     case legacy
     case latest
 }
+
+
+enum CoreType: String {
+    case SingBox
+    case XrayCore
+}

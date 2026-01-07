@@ -86,6 +86,10 @@
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
 		667028E42F0D467E008F27D8 /* pac in Resources */ = {isa = PBXBuildFile; fileRef = 667028E32F0D4678008F27D8 /* pac */; };
 		667028F52F0D46E0008F27D8 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 667028F42F0D46DA008F27D8 /* bin */; };
+		667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */; };
+		6674641C2F0E801800D3D1E9 /* SingBoxConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6674641B2F0E801400D3D1E9 /* SingBoxConfig.swift */; };
+		667464202F0E851000D3D1E9 /* SingBoxOutboundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6674641F2F0E84FE00D3D1E9 /* SingBoxOutboundHandler.swift */; };
+		667464222F0E895300D3D1E9 /* CoreConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */; };
 		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
 		66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BD92EB4EF8A002F330B /* CoreViewModel.swift */; };
 		66764BDF2EB4F031002F330B /* GithubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BDE2EB4F030002F330B /* GithubService.swift */; };
@@ -236,6 +240,10 @@
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
 		667028E32F0D4678008F27D8 /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pac; sourceTree = "<group>"; };
 		667028F42F0D46DA008F27D8 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
+		667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigHandler.swift; sourceTree = "<group>"; };
+		6674641B2F0E801400D3D1E9 /* SingBoxConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfig.swift; sourceTree = "<group>"; };
+		6674641F2F0E84FE00D3D1E9 /* SingBoxOutboundHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxOutboundHandler.swift; sourceTree = "<group>"; };
+		667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreConfigHandler.swift; sourceTree = "<group>"; };
 		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		66764BD92EB4EF8A002F330B /* CoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreViewModel.swift; sourceTree = "<group>"; };
 		66764BDE2EB4F030002F330B /* GithubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubService.swift; sourceTree = "<group>"; };
@@ -572,7 +580,9 @@
 		6632EF5A2EC4C41800CED47B /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
+				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
 				6632EF5B2EC4C44B00CED47B /* System */,
+				667464172F0E7FD800D3D1E9 /* Singbox */,
 				6632EF5D2EC4C50A00CED47B /* V2ray */,
 			);
 			path = Handlers;
@@ -663,6 +673,23 @@
 				663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */,
 			);
 			path = Subscription;
+			sourceTree = "<group>";
+		};
+		667464172F0E7FD800D3D1E9 /* Singbox */ = {
+			isa = PBXGroup;
+			children = (
+				667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */,
+				6674641F2F0E84FE00D3D1E9 /* SingBoxOutboundHandler.swift */,
+			);
+			path = Singbox;
+			sourceTree = "<group>";
+		};
+		6674641A2F0E7FFC00D3D1E9 /* SingBox */ = {
+			isa = PBXGroup;
+			children = (
+				6674641B2F0E801400D3D1E9 /* SingBoxConfig.swift */,
+			);
+			path = SingBox;
 			sourceTree = "<group>";
 		};
 		66764BCF2EB4E8E7002F330B /* AppVersion */ = {
@@ -783,6 +810,7 @@
 		66EB6C1C2E3B99F300A12DB3 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				6674641A2F0E7FFC00D3D1E9 /* SingBox */,
 				662CC43B2D1C4CE9006E8450 /* Share */,
 				662CC3E82D1BED9B006E8450 /* V2ray */,
 			);
@@ -909,12 +937,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */,
 				662CC4012D1BED9B006E8450 /* RouingList.swift in Sources */,
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,
 				663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */,
 				6632EF262EBF4E2700CED47B /* DiagnosticsViewModel.swift in Sources */,
 				66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */,
 				66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */,
+				667464202F0E851000D3D1E9 /* SingBoxOutboundHandler.swift in Sources */,
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				6632EF2F2EC35FCF00CED47B /* SubscriptionModel.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
@@ -966,9 +996,11 @@
 				66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */,
 				662CC40E2D1BED9B006E8450 /* SubscriptionList.swift in Sources */,
 				66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */,
+				6674641C2F0E801800D3D1E9 /* SingBoxConfig.swift in Sources */,
 				662CC40F2D1BED9B006E8450 /* Migrate.swift in Sources */,
 				660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */,
 				662CC4102D1BED9B006E8450 /* AdvanceView.swift in Sources */,
+				667464222F0E895300D3D1E9 /* CoreConfigHandler.swift in Sources */,
 				6632EF352EC3670C00CED47B /* RoutingStore.swift in Sources */,
 				662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */,
 				662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */,

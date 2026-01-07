@@ -244,28 +244,32 @@ class V2rayOutboundHandler {
 
 
 extension ProfileEntity {
+    func AdaptCore() -> CoreType {
+        var mode: CoreType = .XrayCore
+        if self.network == .grpc || self.network == .h2 || self.network == .ws {
+            mode = .SingBox
+        }
+        logger.info("AdaptCore: \(self.network.rawValue) -> \(mode.rawValue)")
+        return mode
+    }
+    
     // 是否需要使用oldCore
     func getCoreFile() -> String {
-        var mode: CoreVersion = .latest
-        if self.network == .grpc || self.network == .h2 || self.network == .ws {
-            mode = .legacy
-        }
-        logger.info("getCoreFile: \(self.network.rawValue) -> \(mode.rawValue)")
-        return  V2rayU.getCoreFile(mode: mode)
+        return  V2rayU.getCoreFile(mode: AdaptCore())
     }
 }
 
-func getCoreFile(mode: CoreVersion = .latest) -> String {
+func getCoreFile(mode: CoreType = .SingBox) -> String {
     var coreFile: String
 #if arch(arm64)
-    if mode == .legacy {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64-old"
+    if mode == .SingBox {
+        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-arm64"
     } else {
         coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64"
     }
 #else
-    if mode == .legacy {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-64-old"
+    if mode == .SingBox {
+        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-64"
     } else {
         coreFile = "\(AppHomePath)/bin/xray-core/xray-64"
     }
