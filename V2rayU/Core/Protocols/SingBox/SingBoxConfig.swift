@@ -51,9 +51,21 @@ struct SingboxOutbound: Codable {
     var tag: String?
     var server: String?
     var server_port: Int?
-    var password: String?
-    var tls: TLSConfig?
+    var password: String? // trojan
+    var method: String? // 仅ss
+    var uuid: String? // vmess|vless
+    var flow: String? // 新增支持 vless flow
     var domain_resolver: String?
+    var tls: TLSConfig?
+    var transport: TransportConfig?
+}
+
+// Transport 配置
+struct TransportConfig: Codable {
+    var type: String?              // "tcp", "ws", "grpc"
+    var path: String?              // ws 路径
+    var headers: [String:String]?  // ws 头部
+    var service_name: String?      // grpc service_name
 }
 
 // TLS
@@ -63,6 +75,14 @@ struct TLSConfig: Codable {
     var insecure: Bool?
     var alpn: [String]?
     var utls: UTLSConfig?
+    var reality: RealityConfig?   // 新增
+}
+
+struct RealityConfig: Codable {
+    var enabled: Bool
+    var public_key: String
+    var short_id: String?
+    var spider_x: String?
 }
 
 struct UTLSConfig: Codable {

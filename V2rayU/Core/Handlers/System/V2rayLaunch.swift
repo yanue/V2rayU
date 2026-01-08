@@ -63,9 +63,10 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await V2rayTraffics.shared.resetData()
-        createJsonFile(item: item)
-        // 停止之前的
         await LaunchAgent.shared.stopAgent()
+        
+        createJsonFile(item: item)
+
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreFile: item.getCoreFile())
         if !started {

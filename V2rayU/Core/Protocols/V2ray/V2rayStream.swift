@@ -253,7 +253,7 @@ struct XhttpSettings: Codable {
     var mode: String = "auto" // auto | packet-up | stream-up | stream-one
     // extra 是 host、path、mode 以外的所有参数的原始 JSON 分享方案，当 extra 存在时，只有该四项会生效。且分享链接中只有这四项，
     // GUI 一般也只有这四项，因为 extra 中的参数都相对低频，且应当由服务发布者直接下发给客户端，不应该让客户端随意改。
-    var extra: JSONAny? // 用字典存储任意 JSON
+    var extra: AnyCodable? // 用字典存储任意 JSON
 }
 
 struct XhttpSettingExtraXmux: Codable {

@@ -108,7 +108,7 @@ struct DnsView: View {
         encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
 
         do {
-            let formattedData = try encoder.encode(JSONAny(jsonObj))
+            let formattedData = try encoder.encode(AnyCodable(jsonObj))
 
             if let formattedStr = String(data: formattedData, encoding: .utf8) {
                 // 触发配置更新

@@ -29,7 +29,7 @@ actor LaunchAgent: NSObject {
         }
 
         // coreFile 会变, 需要重新生成 plist
-        let agentArguments = [lastCoreFile, "run", "-config", "config.json"]
+        let agentArguments = [lastCoreFile, "run", "-c", "config.json"]
 
         let dictAgent: NSMutableDictionary = [
             "Label": LAUNCH_AGENT_NAME,
@@ -99,7 +99,7 @@ actor LaunchAgent: NSObject {
             unloadAgent()
             logger.info("stopAgent-ok \(output)")
         } catch let error {
-            alertDialog(title: "stopAgent-failed.", message: error.localizedDescription)
+//            alertDialog(title: "stopAgent-failed.", message: error.localizedDescription)
         }
     }
 }

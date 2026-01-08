@@ -44,7 +44,8 @@ class SingboxOutboundHandler {
             server: profile.address,
             server_port: profile.port,
             password: profile.password,
-            tls: buildTLS()
+            tls: buildTLS(),
+            transport: buildTransport()
         )
     }
 
@@ -54,8 +55,10 @@ class SingboxOutboundHandler {
             tag: "proxy",
             server: profile.address,
             server_port: profile.port,
-            password: profile.password, // vless 用 id
-            tls: buildTLS()
+            uuid: profile.password, // vless 用 id
+            flow: profile.flow,
+            tls: buildTLS(),
+            transport: buildTransport()
         )
     }
 
@@ -65,8 +68,9 @@ class SingboxOutboundHandler {
             tag: "proxy",
             server: profile.address,
             server_port: profile.port,
-            password: profile.password, // vmess 用 id
-            tls: buildTLS()
+            uuid: profile.password, // vmess 用 id
+            tls: buildTLS(),
+            transport: buildTransport()
         )
     }
 
@@ -77,7 +81,9 @@ class SingboxOutboundHandler {
             server: profile.address,
             server_port: profile.port,
             password: profile.password,
-            domain_resolver: "default-dns"
+            method: profile.encryption,
+            tls: buildTLS(),
+            transport: buildTransport()
         )
     }
 
@@ -86,25 +92,98 @@ class SingboxOutboundHandler {
             type: "socks",
             tag: "proxy",
             server: profile.address,
-            server_port: profile.port
+            server_port: profile.port,
+            tls: buildTLS(),
+            transport: buildTransport()
         )
     }
-
+    
     private func buildTLS() -> TLSConfig? {
         guard profile.security == .tls || profile.security == .reality else { return nil }
-        var alpn = profile.alpn.rawValue.isEmpty ? [] : [profile.alpn.rawValue]
-        if self.profile.network == .h2{
-            if alpn.isEmpty {
-            }
+        
+        var alpn: [String] = ["http"]
+        
+        if profile.network == .h2 || profile.network == .grpc {
+            alpn = ["h2"]
+        } else if !profile.alpn.rawValue.isEmpty {
+            alpn = profile.alpn.rawValue.split(separator: ",").map { String($0) }
         }
-        alpn = ["http/1.1"]
-
-        return TLSConfig(
+        
+        var tls = TLSConfig(
             enabled: true,
             server_name: profile.sni.isEmpty ? profile.address : profile.sni,
             insecure: profile.allowInsecure,
             alpn: alpn,
-            utls: UTLSConfig(enabled: true, fingerprint: profile.fingerprint.rawValue)
+            utls: UTLSConfig(
+                enabled: true,
+                fingerprint: profile.fingerprint.rawValue
+            ),
+            reality: nil
         )
+        
+        if profile.security == .reality {
+            tls.reality = RealityConfig(
+                enabled: true,
+                public_key: profile.publicKey,
+                short_id: profile.shortId.isEmpty ? nil : profile.shortId,
+                spider_x: profile.spiderX.isEmpty ? nil : profile.spiderX
+            )
+        }
+        
+        return tls
     }
+
+    // Transport
+    private func buildTransport() -> TransportConfig? {
+        switch profile.network {
+        case .tcp: // tcp不支持配置
+            return nil
+            
+        case .ws:
+            return TransportConfig(
+                type: "ws",
+                path: profile.path.isEmpty ? nil : profile.path,
+                headers: profile.host.isEmpty ? nil : ["Host": profile.host]
+            )
+            
+        case .h2:
+            return TransportConfig(
+                type: "http",
+                path: profile.path.isEmpty ? nil : profile.path,
+                headers: profile.host.isEmpty ? nil : ["Host": profile.host]
+            )
+            
+        case .grpc:
+            return TransportConfig(
+                type: "grpc",
+                service_name: profile.path.isEmpty ? nil : profile.path
+            )
+            
+        case .xhttp:
+            return TransportConfig(
+                type: "xhttp",
+                path: profile.path.isEmpty ? nil : profile.path,
+                headers: profile.host.isEmpty ? nil : ["Host": profile.host],
+            )
+            
+        case .quic:
+            return TransportConfig(
+                type: "quic",
+                path: profile.path.isEmpty ? nil : profile.path // key
+            )
+            
+        case .kcp:
+            return TransportConfig(
+                type: "kcp",
+                path: profile.path.isEmpty ? nil : profile.path // seed
+            )
+            
+        case .domainsocket:
+            return TransportConfig(type: "domainsocket")
+            
+        default:
+            return nil
+        }
+    }
+
 }

@@ -197,14 +197,14 @@ class V2rayOutboundHandler {
             if !extraString.isEmpty, let data = extraString.data(using: .utf8) {
                 do {
                     let decoder = JSONDecoder()
-                    let extra = try decoder.decode(JSONAny.self, from: data)
+                    let extra = try decoder.decode(AnyCodable.self, from: data)
                     
                     // 赋值给 streamXhttp.extra
                     streamXhttp.extra = extra
                     
                     // 如果外层套了一层 { "extra": { ... } }
                     if let dict = extra.value as? [String: Any], let inner = dict["extra"] {
-                        streamXhttp.extra = JSONAny(inner)
+                        streamXhttp.extra = AnyCodable(inner)
                     }
                 } catch {
                     print("解析 extra 失败: \(error)")
@@ -245,7 +245,7 @@ class V2rayOutboundHandler {
 
 extension ProfileEntity {
     func AdaptCore() -> CoreType {
-        var mode: CoreType = .XrayCore
+        var mode: CoreType = .SingBox
         if self.network == .grpc || self.network == .h2 || self.network == .ws {
             mode = .SingBox
         }

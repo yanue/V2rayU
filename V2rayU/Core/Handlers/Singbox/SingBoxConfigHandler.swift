@@ -19,7 +19,7 @@ class SingboxConfigHandler {
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
-    var enableTun = false
+    var enableTun = true
     var forPing = false
     var domain_resolver = "default-dns"
     
@@ -75,95 +75,67 @@ class SingboxConfigHandler {
                 auto_route: true,
                 strict_route: true,
                 mtu: 9000,
-                stack: "gvisor" // system 需要 root 权限
+                stack: "system" // system 需要 root 权限
             )
             self.singbox.inbounds = [tunInbound]
         } else {
-            // ------------------------------------- inbound start ---------------------------------------------
-            // 默认 inbound: tun
-            if enableTun {
-                let tunInbound = SingboxInbound(
-                    type: "tun",
-                    tag: "tun-in",
-                    address: ["10.0.0.1/30"],
-                    auto_route: true,
-                    strict_route: true,
-                    mtu: 9000,
-                    stack: "gvisor" // system 需要 root 权限
-                )
-                self.singbox.inbounds = [tunInbound]
-            } else {
-                if enableTun {
-                    let tunInbound = SingboxInbound(
-                        type: "tun",
-                        tag: "tun-in",
-                        address: ["10.0.0.1/30"],
-                        auto_route: true,
-                        strict_route: true,
-                        mtu: 9000,
-                        stack: "gvisor" // system 需要 root 权限
-                    )
-                    self.singbox.inbounds = [tunInbound]
-                } else {
-                    // 避免 httpPort 与 socksPort 冲突
-                    if self.httpPort == self.socksPort {
-                        self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
-                    }
-                    
-                    let httpInbound = SingboxInbound(
-                        type: "http",
-                        tag: "http-in",
-                        listen: self.httpHost,
-                        listen_port: Int(self.httpPort),
-                    )
-                    
-                    let socksInbound = SingboxInbound(
-                        type: "socks",
-                        tag: "socks-in",
-                        listen: self.socksHost,
-                        listen_port: Int(self.socksPort),
-                    )
-                    
-                    let metricsInbound = SingboxInbound(
-                        type: "dokodemo-door",
-                        tag: "metrics_in",
-                        listen: "127.0.0.1",
-                        listen_port: 11111,
-                        sniff: false
-                    )
-                    
-                    
-                    var inbounds: [SingboxInbound] = [httpInbound]
-                    
-                    if !self.forPing {
-                        
-                        inbounds.append(socksInbound)
-                        inbounds.append(metricsInbound)
-                    }
-                    
-                    self.singbox.inbounds = inbounds
-                }
+            // 避免 httpPort 与 socksPort 冲突
+            if self.httpPort == self.socksPort {
+                self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
             }
             
-            logger.debug("_outbounds: \(_outbounds)")
-            self.singbox.outbounds = _outbounds
+            let httpInbound = SingboxInbound(
+                type: "http",
+                tag: "http-in",
+                listen: self.httpHost,
+                listen_port: Int(self.httpPort),
+            )
             
-            // 默认 DNS
-            self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
-            ]
-            self.singbox.dns.rules = [
-                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-            ]
+            let socksInbound = SingboxInbound(
+                type: "socks",
+                tag: "socks-in",
+                listen: self.socksHost,
+                listen_port: Int(self.socksPort),
+            )
             
-            // 默认路由
-            self.singbox.route.rules = [
-                RouteRule(outbound: "direct", domain: ["geosite:cn", "localhost"]),
-                RouteRule(outbound: "proxy", domain: ["geosite:geolocation-!cn"])
-            ]
+            let metricsInbound = SingboxInbound(
+                type: "dokodemo-door",
+                tag: "metrics_in",
+                listen: "127.0.0.1",
+                listen_port: 11111,
+                sniff: false
+            )
+            
+//
+            var inbounds: [SingboxInbound] = [httpInbound]
+            
+            if !self.forPing {
+                
+                inbounds.append(socksInbound)
+//                        inbounds.append(metricsInbound)
+            }
+            
+            self.singbox.inbounds = inbounds
         }
+    
+        logger.debug("_outbounds: \(_outbounds)")
+        self.singbox.outbounds = _outbounds
+        
+        // 默认 DNS
+        self.singbox.dns.servers = [
+            DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
+            DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+            DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+        ]
+        self.singbox.dns.rules = [
+            DNSRule(server: "china-dns", domain: ["geosite:cn"]),
+            DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
+        ]
+        
+        // 默认路由
+        self.singbox.route.rules = [
+            RouteRule(outbound: "direct", domain: ["geosite:cn", "localhost"]),
+            RouteRule(outbound: "proxy", domain: ["geosite:geolocation-!cn"])
+        ]
     }
 }
