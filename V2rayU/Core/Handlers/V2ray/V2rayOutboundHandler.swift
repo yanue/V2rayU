@@ -245,7 +245,7 @@ class V2rayOutboundHandler {
 
 extension ProfileEntity {
     func AdaptCore() -> CoreType {
-        var mode: CoreType = .SingBox
+        var mode: CoreType = .XrayCore
         if self.network == .grpc || self.network == .h2 || self.network == .ws {
             mode = .SingBox
         }

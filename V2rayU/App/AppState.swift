@@ -48,6 +48,11 @@ final class AppState: ObservableObject {
         ProfileStore.shared.update_speed(uuid: self.runningProfile, speed: Int(latency))
     }
     
+    func setTraffic(upSpeed: Double, downSpeed: Double) {
+        self.proxyUpSpeed = upSpeed
+        self.proxyDownSpeed = downSpeed
+    }
+    
     func setLatency(latency: Double) {
         self.latency = latency
     }
@@ -122,7 +127,6 @@ final class AppState: ObservableObject {
         truncateLogFile(coreLogFilePath)
         truncateLogFile(appLogFilePath)
         startHttpServer()
-        Task { await V2rayTrafficStats.shared.initTask() }
         
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
 

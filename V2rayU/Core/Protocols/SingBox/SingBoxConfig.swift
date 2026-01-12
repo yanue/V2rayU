@@ -14,6 +14,7 @@ struct SingboxStruct: Codable {
     var outbounds: [SingboxOutbound] = []
     var dns: DNSConfig = DNSConfig()
     var route: RouteConfig = RouteConfig()
+    var experimental: ExperimentalConfig? = nil   // 新增字段
 
     func toJSON() -> String {
         let encoder = JSONEncoder()
@@ -24,6 +25,17 @@ struct SingboxStruct: Codable {
         }
         return jsonString
     }
+}
+
+// 顶层 experimental 改成 clash_api
+struct ExperimentalConfig: Codable {
+    var clash_api: ClashAPIConfig
+}
+
+// Clash API 配置
+struct ClashAPIConfig: Codable {
+    var external_controller: String   // API监听地址，例如 "127.0.0.1:9090"
+    var secret: String?              // 可选，访问API的密钥
 }
 
 // 日志配置

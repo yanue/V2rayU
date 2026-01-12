@@ -62,7 +62,7 @@ actor V2rayLaunch {
             return false
         }
         await AppState.shared.resetSpeed()
-        await V2rayTraffics.shared.resetData()
+        await CoreTrafficStatsHandler.shared.resetData()
         await LaunchAgent.shared.stopAgent()
         
         createJsonFile(item: item)
@@ -77,6 +77,7 @@ actor V2rayLaunch {
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
         Task {
+            await CoreTrafficStatsHandler.shared.startTask(coreType: item.AdaptCore())
             try await PingRunning.shared.startPing()
         }
         return true
@@ -85,7 +86,7 @@ actor V2rayLaunch {
     func stop() async {
         await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
-        await V2rayTraffics.shared.resetData()
+        await CoreTrafficStatsHandler.shared.resetData()
         setSystemProxy(mode: .off)
     }
 

@@ -90,6 +90,7 @@
 		6674641C2F0E801800D3D1E9 /* SingBoxConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6674641B2F0E801400D3D1E9 /* SingBoxConfig.swift */; };
 		667464202F0E851000D3D1E9 /* SingBoxOutboundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6674641F2F0E84FE00D3D1E9 /* SingBoxOutboundHandler.swift */; };
 		667464222F0E895300D3D1E9 /* CoreConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */; };
+		667464262F1526BC00D3D1E9 /* CoreStatsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */; };
 		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
 		66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BD92EB4EF8A002F330B /* CoreViewModel.swift */; };
 		66764BDF2EB4F031002F330B /* GithubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BDE2EB4F030002F330B /* GithubService.swift */; };
@@ -120,7 +121,6 @@
 		66E94B392D26B971003745B5 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B382D26B971003745B5 /* SettingView.swift */; };
 		66E94B3A2D26B971003745B5 /* AppContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B362D26B971003745B5 /* AppContentView.swift */; };
 		66E94B3B2D26B971003745B5 /* ProfileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B372D26B971003745B5 /* ProfileListView.swift */; };
-		66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B3C2D27E74C003745B5 /* V2rayStats.swift */; };
 		66EB6C132E37B87200A12DB3 /* FlyingFox in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C122E37B87200A12DB3 /* FlyingFox */; };
 		66EB6C152E37B87200A12DB3 /* FlyingSocks in Frameworks */ = {isa = PBXBuildFile; productRef = 66EB6C142E37B87200A12DB3 /* FlyingSocks */; };
 		66EB6C172E37C84100A12DB3 /* HttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB6C162E37C83C00A12DB3 /* HttpServer.swift */; };
@@ -244,6 +244,7 @@
 		6674641B2F0E801400D3D1E9 /* SingBoxConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfig.swift; sourceTree = "<group>"; };
 		6674641F2F0E84FE00D3D1E9 /* SingBoxOutboundHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxOutboundHandler.swift; sourceTree = "<group>"; };
 		667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreConfigHandler.swift; sourceTree = "<group>"; };
+		667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreStatsHandler.swift; sourceTree = "<group>"; };
 		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		66764BD92EB4EF8A002F330B /* CoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreViewModel.swift; sourceTree = "<group>"; };
 		66764BDE2EB4F030002F330B /* GithubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubService.swift; sourceTree = "<group>"; };
@@ -282,7 +283,6 @@
 		66E94B362D26B971003745B5 /* AppContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentView.swift; sourceTree = "<group>"; };
 		66E94B372D26B971003745B5 /* ProfileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileListView.swift; sourceTree = "<group>"; };
 		66E94B382D26B971003745B5 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
-		66E94B3C2D27E74C003745B5 /* V2rayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayStats.swift; sourceTree = "<group>"; };
 		66EB6C162E37C83C00A12DB3 /* HttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpServer.swift; sourceTree = "<group>"; };
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
@@ -580,6 +580,7 @@
 		6632EF5A2EC4C41800CED47B /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
+				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
 				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
 				6632EF5B2EC4C44B00CED47B /* System */,
 				667464172F0E7FD800D3D1E9 /* Singbox */,
@@ -604,7 +605,6 @@
 			children = (
 				662CC43D2D1C4CE9006E8450 /* V2rayConfigHandler.swift */,
 				662CC43E2D1C4CE9006E8450 /* V2rayOutboundHandler.swift */,
-				66E94B3C2D27E74C003745B5 /* V2rayStats.swift */,
 			);
 			path = V2ray;
 			sourceTree = "<group>";
@@ -950,7 +950,6 @@
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
 				66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */,
 				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
-				66E94B3D2D27E74F003745B5 /* V2rayStats.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
 				66EB76B02E31135200E72DE2 /* DownloadViewModel.swift in Sources */,
@@ -1036,6 +1035,7 @@
 				662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */,
 				662CC44E2D1C4D38006E8450 /* SubscriptionViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
+				667464262F1526BC00D3D1E9 /* CoreStatsHandler.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
 				663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */,
 				66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */,

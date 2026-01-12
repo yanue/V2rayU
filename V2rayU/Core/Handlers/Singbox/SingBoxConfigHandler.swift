@@ -19,7 +19,7 @@ class SingboxConfigHandler {
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
-    var enableTun = true
+    var enableTun = false
     var forPing = false
     var domain_resolver = "default-dns"
     
@@ -91,28 +91,25 @@ class SingboxConfigHandler {
                 listen_port: Int(self.httpPort),
             )
             
-            let socksInbound = SingboxInbound(
-                type: "socks",
-                tag: "socks-in",
-                listen: self.socksHost,
-                listen_port: Int(self.socksPort),
-            )
-            
-            let metricsInbound = SingboxInbound(
-                type: "dokodemo-door",
-                tag: "metrics_in",
-                listen: "127.0.0.1",
-                listen_port: 11111,
-                sniff: false
-            )
-            
-//
             var inbounds: [SingboxInbound] = [httpInbound]
             
             if !self.forPing {
-                
+                let socksInbound = SingboxInbound(
+                    type: "socks",
+                    tag: "socks-in",
+                    listen: self.socksHost,
+                    listen_port: Int(self.socksPort),
+                )
                 inbounds.append(socksInbound)
-//                        inbounds.append(metricsInbound)
+                
+                let clashConfig = ExperimentalConfig(
+                    clash_api: ClashAPIConfig(
+                        external_controller: "127.0.0.1:11111",
+                        secret: ""
+                    )
+                )
+
+                singbox.experimental = clashConfig
             }
             
             self.singbox.inbounds = inbounds
@@ -134,8 +131,18 @@ class SingboxConfigHandler {
         
         // 默认路由
         self.singbox.route.rules = [
-            RouteRule(outbound: "direct", domain: ["geosite:cn", "localhost"]),
-            RouteRule(outbound: "proxy", domain: ["geosite:geolocation-!cn"])
+            RouteRule(
+                outbound: "direct",
+                domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]
+            ),
+            RouteRule(
+                outbound: "direct",
+                domain: ["geosite:private"] // 可选：内网域名直连
+            ),
+            RouteRule(
+                outbound: "proxy",
+                domain: ["geosite:geolocation-!cn"]
+            )
         ]
     }
 }
