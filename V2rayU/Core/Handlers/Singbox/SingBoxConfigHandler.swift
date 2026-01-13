@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 class SingboxConfigHandler {
     var singbox: SingboxStruct = SingboxStruct()
     var isValid = false
@@ -115,34 +116,40 @@ class SingboxConfigHandler {
             self.singbox.inbounds = inbounds
         }
     
-        logger.debug("_outbounds: \(_outbounds)")
         self.singbox.outbounds = _outbounds
         
-        // 默认 DNS
-        self.singbox.dns.servers = [
-            DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-            DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
-            DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
-        ]
-        self.singbox.dns.rules = [
-            DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-            DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-        ]
-        
-        // 默认路由
-        self.singbox.route.rules = [
-            RouteRule(
-                outbound: "direct",
-                domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]
-            ),
-            RouteRule(
-                outbound: "direct",
-                domain: ["geosite:private"] // 可选：内网域名直连
-            ),
-            RouteRule(
-                outbound: "proxy",
-                domain: ["geosite:geolocation-!cn"]
-            )
-        ]
+        if self.forPing {
+            // 默认 DNS
+            self.singbox.dns.servers = [
+                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
+            ]
+        } else {
+            // dns
+            self.singbox.dns.servers = [
+                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
+                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+            ]
+            self.singbox.dns.rules = [
+                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
+                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
+            ]
+            // 默认路由
+            self.singbox.route.rules = [
+                RouteRule(
+                    outbound: "direct",
+                    domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]
+                ),
+                RouteRule(
+                    outbound: "direct",
+                    domain: ["geosite:private"] // 可选：内网域名直连
+                ),
+                RouteRule(
+                    outbound: "proxy",
+                    domain: ["geosite:geolocation-!cn"]
+                )
+            ]
+        }
+        logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
     }
 }

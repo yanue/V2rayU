@@ -186,7 +186,7 @@ actor PingServer {
     }
     
     private func createV2rayJsonFileForPing() {
-        let vCfg = V2rayConfigHandler()
+        let vCfg = CoreConfigHandler()
         let jsonText = vCfg.toJSON(item: item, httpPort: String(self.bindPort))
         do {
             try jsonText.write(to: URL(fileURLWithPath: jsonFile), atomically: true, encoding: .utf8)
@@ -215,7 +215,8 @@ actor PingServer {
     
     private func launchProcess() async throws {
         let corePath = self.item.getCoreFile()
-        let pingCmd = "cd \(AppHomePath) && \(corePath) run -config \(jsonFile)"
+        // 通用: run -c
+        let pingCmd = "cd \(AppHomePath) && \(corePath) run -c \(jsonFile)"
         self.process = createProcess(command: pingCmd)
         self.process.launch()
         

@@ -200,6 +200,8 @@ class VmessUri: BaseShareUri {
         profile.remark = query.getString(forKey: "remark", defaultValue: "vmess")
         switch profile.network {
         case .tcp:
+            profile.headerType = query.getEnum(forKey: "headerType", type: V2rayHeaderType.self, defaultValue: .none)
+            profile.path = query.getString(forKey: "path", defaultValue: "")
             break
         case .ws:
             profile.path = query.getString(forKey: "wsPath", defaultValue: "/")

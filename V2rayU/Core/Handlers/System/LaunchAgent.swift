@@ -40,6 +40,12 @@ actor LaunchAgent: NSObject {
             "RunAtLoad": false, // 不能开机自启(需要停止)
             "KeepAlive": false, // 不能自动重启(需要停止)
         ]
+        
+        if #available(macOS 11.0, *) {
+            dictAgent["AbandonProcessGroup"] = true
+        }
+        // 避免macos26提醒App Background Activity
+        dictAgent["ProcessType"] = "Background"
 
         dictAgent.write(toFile: launchAgentPlistFile, atomically: true)
         // unload launch service(避免更改后无法生效)
@@ -99,6 +105,7 @@ actor LaunchAgent: NSObject {
             unloadAgent()
             logger.info("stopAgent-ok \(output)")
         } catch let error {
+            logger.info("stopAgent-failed: \(error)")
 //            alertDialog(title: "stopAgent-failed.", message: error.localizedDescription)
         }
     }

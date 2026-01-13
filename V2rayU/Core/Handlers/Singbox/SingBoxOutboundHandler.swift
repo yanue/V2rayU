@@ -101,19 +101,11 @@ class SingboxOutboundHandler {
     private func buildTLS() -> TLSConfig? {
         guard profile.security == .tls || profile.security == .reality else { return nil }
         
-        var alpn: [String] = ["http"]
-        
-        if profile.network == .h2 || profile.network == .grpc {
-            alpn = ["h2"]
-        } else if !profile.alpn.rawValue.isEmpty {
-            alpn = profile.alpn.rawValue.split(separator: ",").map { String($0) }
-        }
-        
         var tls = TLSConfig(
             enabled: true,
             server_name: profile.sni.isEmpty ? profile.address : profile.sni,
             insecure: profile.allowInsecure,
-            alpn: alpn,
+            alpn: profile.entity.getAlpn(),
             utls: UTLSConfig(
                 enabled: true,
                 fingerprint: profile.fingerprint.rawValue

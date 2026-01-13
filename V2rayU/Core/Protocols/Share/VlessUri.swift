@@ -182,6 +182,8 @@ class VlessUri: BaseShareUri {
         switch self.profile.network {
         case .tcp:
             self.profile.headerType = query.getEnum(forKey: "headerType", type: V2rayHeaderType.self, defaultValue: .none)
+            self.profile.path = query.getString(forKey: "path", defaultValue: "")
+            self.profile.host = query.getString(forKey: "host", defaultValue: "")
             break
         case .xhttp:
             self.profile.path = query.getString(forKey: "path", defaultValue: "/")

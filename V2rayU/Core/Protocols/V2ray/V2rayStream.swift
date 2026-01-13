@@ -86,7 +86,7 @@ struct TlsSettings: Codable {
     var allowInsecure: Bool = true
     var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
-    var alpn: String?
+    var alpn: [String]?
     var fingerprint: String = "chrome" // 必填，使用 tls 库模拟客户端 TLS 指纹
 }
 
@@ -127,7 +127,7 @@ struct TcpSettingHeaderRequest: Codable {
     var version: String? // 默认 "1.1"
     var method: String? // 默认 "GET"
     var path: [String] = ["/"] // 默认 "/"。当有多个值时，每次请求随机选择一个值。
-    var headers: TcpSettingHeaderRequestHeaders = TcpSettingHeaderRequestHeaders()
+    var headers: TcpSettingHeaderRequestHeaders?
 }
 
 struct TcpSettingHeaderRequestHeaders: Codable {

@@ -159,9 +159,14 @@ class V2rayOutboundHandler {
             if self.profile.headerType != .none {
                 streamTcp.header = TcpSettingHeader()
                 streamTcp.header?.type = self.profile.headerType.rawValue
-                streamTcp.header?.request = TcpSettingHeaderRequest()
-                streamTcp.header?.request?.path = [self.profile.path]
-                streamTcp.header?.request?.headers.host = [self.profile.host]
+                if !self.profile.path.isEmpty {
+                    streamTcp.header?.request = TcpSettingHeaderRequest()
+                    streamTcp.header?.request?.path = [self.profile.path]
+                    if !self.profile.host.isEmpty {
+                        streamTcp.header?.request?.headers = TcpSettingHeaderRequestHeaders()
+                        streamTcp.header?.request?.headers?.host = [self.profile.host]
+                    }
+                }
             }
             settings.tcpSettings = streamTcp
         case .kcp:
@@ -223,7 +228,7 @@ class V2rayOutboundHandler {
             securityTls = TlsSettings(
                 serverName: self.profile.sni,
                 allowInsecure: self.profile.allowInsecure,
-                alpn: self.profile.alpn.rawValue,
+                alpn: profile.entity.getAlpn(),
                 fingerprint: self.profile.fingerprint.rawValue
             )
             settings.tlsSettings = securityTls
@@ -242,48 +247,3 @@ class V2rayOutboundHandler {
     }
 }
 
-
-extension ProfileEntity {
-    func AdaptCore() -> CoreType {
-        var mode: CoreType = .XrayCore
-        if self.network == .grpc || self.network == .h2 || self.network == .ws {
-            mode = .SingBox
-        }
-        logger.info("AdaptCore: \(self.network.rawValue) -> \(mode.rawValue)")
-        return mode
-    }
-    
-    // 是否需要使用oldCore
-    func getCoreFile() -> String {
-        return  V2rayU.getCoreFile(mode: AdaptCore())
-    }
-}
-
-func getCoreFile(mode: CoreType = .SingBox) -> String {
-    var coreFile: String
-#if arch(arm64)
-    if mode == .SingBox {
-        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-arm64"
-    } else {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64"
-    }
-#else
-    if mode == .SingBox {
-        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-64"
-    } else {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-64"
-    }
-#endif
-    return coreFile
-}
-
-extension ProfileEntity {
-    /// 使用分享链接保存下来(用于比较是否订阅是否有变化)
-    func uniqueKey() -> String {
-        if self.shareUri.isEmpty {
-            return ShareUri.generateShareUri(item: self)
-        } else {
-            return self.shareUri
-        }
-    }
-}
