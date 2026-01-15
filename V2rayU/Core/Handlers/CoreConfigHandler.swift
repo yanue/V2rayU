@@ -45,6 +45,11 @@ extension ProfileEntity {
         return  V2rayU.getCoreFile(mode: AdaptCore())
     }
     
+    // 是否需要使用oldCore
+    func getCore() -> String {
+        return  V2rayU.getCoreFile(mode: AdaptCore())
+    }
+    
     func getAlpn() -> [String] {
         var alpn: [String] = ["http/1.1"]
         if self.network == .h2 || self.network == .grpc {

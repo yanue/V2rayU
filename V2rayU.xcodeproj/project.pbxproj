@@ -84,6 +84,8 @@
 		6638B6C12EBEFD3D0081767E /* SubscriptionScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638B6C02EBEFD3C0081767E /* SubscriptionScheduler.swift */; };
 		6653B5182E7FBE3F003D0A6F /* PingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6653B5172E7FBE39003D0A6F /* PingHandler.swift */; };
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
+		666A61072F1933A0003654D3 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61062F1933A0003654D3 /* install.sh */; };
+		666A610C2F193A5C003654D3 /* plist in Resources */ = {isa = PBXBuildFile; fileRef = 666A610B2F193A56003654D3 /* plist */; };
 		667028E42F0D467E008F27D8 /* pac in Resources */ = {isa = PBXBuildFile; fileRef = 667028E32F0D4678008F27D8 /* pac */; };
 		667028F52F0D46E0008F27D8 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 667028F42F0D46DA008F27D8 /* bin */; };
 		667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */; };
@@ -108,9 +110,8 @@
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		66B1B55A2D297B140032DD09 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66B1B5592D297B140032DD09 /* install.sh */; };
 		66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ShareQrCode.swift */; };
-		66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchAgent.swift */; };
+		66DF3F862E5F44850024E338 /* LaunchDaemon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchDaemon.swift */; };
 		66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F842E5F44850024E338 /* AppInstaller.swift */; };
 		66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */; };
 		66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */; };
@@ -238,6 +239,8 @@
 		6638B6C02EBEFD3C0081767E /* SubscriptionScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionScheduler.swift; sourceTree = "<group>"; };
 		6653B5172E7FBE39003D0A6F /* PingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingHandler.swift; sourceTree = "<group>"; };
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
+		666A61062F1933A0003654D3 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		666A610B2F193A56003654D3 /* plist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plist; sourceTree = "<group>"; };
 		667028E32F0D4678008F27D8 /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pac; sourceTree = "<group>"; };
 		667028F42F0D46DA008F27D8 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
 		667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigHandler.swift; sourceTree = "<group>"; };
@@ -261,7 +264,6 @@
 		669DCEAC2E3D9C400085278B /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
-		66B1B5592D297B140032DD09 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
 		66B1B55E2D297B590032DD09 /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
 		66B1B5642D297B590032DD09 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
@@ -273,7 +275,7 @@
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D27AE42E098E3A004C600D /* ShareQrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrCode.swift; sourceTree = "<group>"; };
 		66DF3F842E5F44850024E338 /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
-		66DF3F852E5F44850024E338 /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
+		66DF3F852E5F44850024E338 /* LaunchDaemon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchDaemon.swift; sourceTree = "<group>"; };
 		66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		66E0AF3E2E7DABBD004E44FF /* ShareWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareWindow.swift; sourceTree = "<group>"; };
@@ -480,7 +482,6 @@
 		6632EF4C2EC4B9E100CED47B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				66B1B5582D297AE60032DD09 /* Scpipts */,
 				6632EF482EC4B9E100CED47B /* Assets.xcassets */,
 				6632EF492EC4B9E100CED47B /* GoogleService-Info.plist */,
 				6632EF4A2EC4B9E100CED47B /* Info.plist */,
@@ -594,7 +595,7 @@
 			children = (
 				66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */,
 				66DF3F842E5F44850024E338 /* AppInstaller.swift */,
-				66DF3F852E5F44850024E338 /* LaunchAgent.swift */,
+				66DF3F852E5F44850024E338 /* LaunchDaemon.swift */,
 				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 			);
 			path = System;
@@ -730,17 +731,11 @@
 			path = About;
 			sourceTree = "<group>";
 		};
-		66B1B5582D297AE60032DD09 /* Scpipts */ = {
-			isa = PBXGroup;
-			children = (
-				66B1B5592D297B140032DD09 /* install.sh */,
-			);
-			path = Scpipts;
-			sourceTree = "<group>";
-		};
 		66B1B55C2D297B3F0032DD09 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				666A61062F1933A0003654D3 /* install.sh */,
+				666A610B2F193A56003654D3 /* plist */,
 				667028F42F0D46DA008F27D8 /* bin */,
 				667028E32F0D4678008F27D8 /* pac */,
 				66B1B55D2D297B590032DD09 /* appdmg.json */,
@@ -913,8 +908,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				666A610C2F193A5C003654D3 /* plist in Resources */,
 				667028F52F0D46E0008F27D8 /* bin in Resources */,
-				66B1B55A2D297B140032DD09 /* install.sh in Resources */,
+				666A61072F1933A0003654D3 /* install.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
 				6632EF4F2EC4B9E100CED47B /* Info.plist in Resources */,
@@ -948,7 +944,7 @@
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				6632EF2F2EC35FCF00CED47B /* SubscriptionModel.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
-				66DF3F862E5F44850024E338 /* LaunchAgent.swift in Sources */,
+				66DF3F862E5F44850024E338 /* LaunchDaemon.swift in Sources */,
 				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,

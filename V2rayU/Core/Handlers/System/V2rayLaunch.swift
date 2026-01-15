@@ -63,14 +63,14 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        await LaunchAgent.shared.stopAgent()
+        await LaunchDaemon.shared.stopAgent()
         
         createJsonFile(item: item)
 
         // 启动
-        let started = await LaunchAgent.shared.startAgent(coreFile: item.getCoreFile())
+        let started = await LaunchDaemon.shared.startAgent(coreType: item.AdaptCore())
         if !started {
-            noticeTip(title: "启动失败", informativeText: "无法启动launchAgent")
+            noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
             return false
         }
         let mode = await AppState.shared.runMode
@@ -84,7 +84,7 @@ actor V2rayLaunch {
     }
 
     func stop() async {
-        await LaunchAgent.shared.stopAgent()
+        await LaunchDaemon.shared.stopAgent()
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
         setSystemProxy(mode: .off)

@@ -20,7 +20,7 @@ class SingboxConfigHandler {
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
-    var enableTun = false
+    var enableTun = true
     var forPing = false
     var domain_resolver = "default-dns"
     

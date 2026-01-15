@@ -20,6 +20,7 @@ func shell(launchPath: String, arguments: [String]) -> String? {
         return ""
     }
 }
+
 enum CommandExecutionError: Error {
     case fileNotFound(String)
     case insufficientPermissions(String)
