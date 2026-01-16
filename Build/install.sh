@@ -28,9 +28,15 @@ sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
 sed "s#__XRAYCORE_BIN__#$XRAYCORE_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
     ./plist/yanue.v2rayu.xray-core.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist > /dev/null
 
-# bootstrap
-sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+
+sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 
 # pac 文件
 if [ ! -d "$APP_HOME_DIR/pac" ]; then
@@ -51,18 +57,24 @@ tool="./V2rayUTool"
 sudo chown root:admin "$tool"
 sudo chmod a+rxs ${tool}
 # sudoers 条目
-ENTRY="${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+ENTRY="# generate by V2rayU install.sh
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootout system /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.sing-box
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootout system /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.xray-core
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.xray-core
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.xray-core
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.xray-core"
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.xray-core
+# end by V2rayU"
 
 TARGET="/private/etc/sudoers.d/v2rayu-helper"
 
