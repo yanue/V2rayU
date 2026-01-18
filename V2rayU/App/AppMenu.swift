@@ -25,6 +25,7 @@ final class AppMenuManager: NSObject {
     private var viewPacItem: NSMenuItem!
     private var viewLogItem: NSMenuItem!
     private var pacModeItem: NSMenuItem!
+    private var tunnelModeItem: NSMenuItem!
     private var globalModeItem: NSMenuItem!
     private var manualModeItem: NSMenuItem!
     private var routingItem: NSMenuItem!
@@ -103,6 +104,7 @@ final class AppMenuManager: NSObject {
         // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
+        tunnelModeItem.state = (.tunnel == AppState.shared.runMode) ? .on : .off
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
         manualModeItem.state = (.manual == AppState.shared.runMode) ? .on : .off
     }
@@ -121,6 +123,7 @@ final class AppMenuManager: NSObject {
         pacModeItem?.title = String(localized: .PacMode)
         globalModeItem?.title = String(localized: .GlobalMode)
         manualModeItem?.title = String(localized: .ManualMode)
+        tunnelModeItem?.title = String(localized: .TunnelMode)
         goSubscriptionsItem?.title = String(localized: .goSubscriptionSettings)
         goRoutingSettingItem?.title = String(localized: .goRoutingSettings)
         goServerSettingItem?.title = String(localized: .goServerSettings)
@@ -160,9 +163,11 @@ final class AppMenuManager: NSObject {
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
         globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
         manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
-        menu.addItem(pacModeItem)
+        tunnelModeItem = getRunModeItem(mode: .tunnel, title: String(localized: .TunnelMode), keyEquivalent: "")
+        menu.addItem(tunnelModeItem)
         menu.addItem(globalModeItem)
         menu.addItem(manualModeItem)
+        menu.addItem(pacModeItem)
         menu.addItem(NSMenuItem.separator())
         // 路由与服务器
         routingItem = getRoutingItem()

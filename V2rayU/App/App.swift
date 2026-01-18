@@ -21,7 +21,7 @@ let coreVersion = getCoreShortVersion()
 let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
-let coreLogFilePath = AppHomePath + "/xray-core.log"
+let coreLogFilePath = AppHomePath + "/core.log"
 let xrayCorePath = AppHomePath + "/bin/xray-core"
 #if arch(arm64)
 let xrayCoreFile = xrayCorePath + "/xray-arm64"

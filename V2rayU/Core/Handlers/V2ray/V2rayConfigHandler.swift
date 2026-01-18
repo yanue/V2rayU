@@ -40,9 +40,10 @@ class V2rayConfigHandler {
     var enableSniffing = false
     var mux = 8
     var forPing = false
+    var enableTun = false
 
     // Initialization
-    init() {
+    init(enableTun: Bool = false) {
         self.enableMux = UserDefaults.getBool(forKey: .enableMux)
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -51,6 +52,7 @@ class V2rayConfigHandler {
         self.socksPort = String(getSocksProxyPort())
 
         self.mux = UserDefaults.getInt(forKey: .muxConcurrent ,defaultValue: 8)
+        self.enableTun = enableTun
 
         self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
     }
@@ -101,10 +103,17 @@ class V2rayConfigHandler {
         var inbounds: [V2rayInbound] = [inHttp]
         // for ping just use http
         if !self.forPing {
-            let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort , enableSniffing: self.enableSniffing)
-            inbounds.append(inSocks)
-            let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
-            inbounds.append(inApi)
+            if self.enableTun {
+                let inTun = getInbound(protocol: .tun, listen: "", port: "",enableSniffing: false)
+                inbounds.append(inTun)
+                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
+                inbounds.append(inApi)
+            } else {
+                let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort , enableSniffing: self.enableSniffing)
+                inbounds.append(inSocks)
+                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
+                inbounds.append(inApi)
+            }
         }
         self.v2ray.inbounds = inbounds
 
@@ -167,9 +176,11 @@ class V2rayConfigHandler {
     
     func getInbound(`protocol`: V2rayProtocolInbound, listen: String, port: String, enableSniffing:Bool, tag: String? = nil) -> V2rayInbound {
         var inbound = V2rayInbound()
-        inbound.tag = tag
-        inbound.listen = listen
-        inbound.port = port
+        if `protocol` != .tun {
+            inbound.tag = tag
+            inbound.listen = listen
+            inbound.port = port
+        }
         inbound.protocol = `protocol`
         if enableSniffing {
             inbound.sniffing = V2rayInboundSniffing()

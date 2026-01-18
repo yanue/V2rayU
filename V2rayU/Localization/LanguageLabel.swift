@@ -224,6 +224,7 @@ enum LanguageLabel: String, CaseIterable {
     case PacMode
     case GlobalMode
     case ManualMode
+    case TunnelMode
     case RoutingList
     case ServerList
     case goSubscriptionSettings

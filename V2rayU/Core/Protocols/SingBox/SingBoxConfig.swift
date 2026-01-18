@@ -41,6 +41,8 @@ struct ClashAPIConfig: Codable {
 // 日志配置
 struct LogConfig: Codable {
     var level: String
+    var output: String?
+    var timestamp: Bool? = true
 }
 
 // Inbound
@@ -53,8 +55,9 @@ struct SingboxInbound: Codable {
     var auto_route: Bool?
     var strict_route: Bool?
     var mtu: Int?
-    var stack: String?
-    var sniff: Bool?
+    var stack: String?  // 对 tun 需要: system
+    var sniff: Bool? // 对 tun 需要
+    var sniff_override_destination: Bool? // 对 tun 需要, 很重要, 不然需要手动在设置界面上设置dns
 }
 
 // Outbound

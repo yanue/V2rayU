@@ -219,16 +219,17 @@
 "StreamSettings" = "流设置";
 
 // MARK: - 菜单操作
-"CoreOn" = "xray-core: 已启动";
-"CoreOff" = "xray-core: 已停止";
-"TurnCoreOn" = "启动 xray-core";
-"TurnCoreOff" = "关闭 xray-core";
-"ViewLog" = "查看 xray-core 日志";
+"CoreOn" = "core: 已启动";
+"CoreOff" = "core: 已停止";
+"TurnCoreOn" = "启动 core";
+"TurnCoreOff" = "关闭 core";
+"ViewLog" = "查看 core 日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 pac 文件";
-"PacMode" = "PAC 模式";
-"GlobalMode" = "全局模式";
-"ManualMode" = "手动模式";
+"PacMode" = "pac模式";
+"TunnelMode" = "tun模式(透明代理)";
+"GlobalMode" = "全局模式(设置系统代理)";
+"ManualMode" = "手动模式(清除系统代理)";
 "RoutingList" = "选择路由";
 "ServerList" = "选择服务器";
 "goSubscriptionSettings" = "订阅配置 ...";
@@ -251,8 +252,8 @@
 "HelpPageSubHead" = "检测关键组件状态并提供常见问题修复操作";
 "GithubIssues" = "问题反馈";
 "Refresh" = "刷新";
-"V2rayCoreSwitchStatus" = "v2ray-core 开关状态";
-"V2rayCoreRunningStatus" = "v2ray-core 运行状态 (launchd)";
+"V2rayCoreSwitchStatus" = "core 开关状态";
+"V2rayCoreRunningStatus" = "core 运行状态 (launchd)";
 "BackgroundActivity" = "后台活动";
 "BackgroundActivitySubtitleRunning" = "核心进程在运行";
 "BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
@@ -260,13 +261,13 @@
 "Restart" = "重启";
 "PingState" = "Ping 测试状态";
 "RunPingNow" = "运行 Ping 测试";
-"V2rayCoreInstallAndVersion" = "v2ray-core 安装与版本";
+"V2rayCoreInstallAndVersion" = "core 安装与版本";
 "V2rayUToolPermission" = "V2rayUTool 权限";
 "GeoipFile" = "geoip.dat 文件";
 "Installed" = "已安装";
 "Missing" = "缺失";
 "PermissionException" = "权限异常";
-"V2rayCoreNotInstalled" = "v2ray-core 未安装或不可执行";
+"V2rayCoreNotInstalled" = "core 未安装或不可执行";
 "UnableToOpenSystemSettings" = "无法打开系统设置";
 "PleaseManuallyOpenBackgroundActivity" = "请手动前往 系统设置 → 通用 → 后台活动，允许 V2rayU 后台运行。";
 "Fix" = "修复";
@@ -274,7 +275,7 @@
 "V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法启动核心";
 "BackgroundProblem" = "应用未在后台运行，可能被系统限制或核心进程已停止";
 "GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常";
-"V2rayCoreProblem" = "v2ray-core 未安装或不可执行";
+"V2rayCoreProblem" = "core 未安装或不可执行";
 "Diagnostics" = "诊断";
 "FAQ" = "常见问题";
 "FaqSubtitle" = "查看常见问题与解决方案";

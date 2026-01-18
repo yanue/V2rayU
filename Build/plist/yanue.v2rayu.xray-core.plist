@@ -14,7 +14,7 @@
 		<key>RunAtLoad</key>
 		<false/>
 		<key>KeepAlive</key>
-		<true/>
+		<false/>
 		<key>WorkingDirectory</key>
 		<string>__APP_HOME_DIR__</string>
 		<key>StandardOutPath</key>

@@ -15,10 +15,10 @@ cp -rf ./bin/ "$APP_HOME_DIR/bin/"
 ARCH=$(uname -m)
 if [ "$ARCH" = "arm64" ]; then
     SINGBOX_BIN="$APP_HOME_DIR/bin/sing-box/sing-box-arm64"
-    XRAYCORE_BIN="$APP_HOME_DIR/bin/xray-core/xray-core-arm64"
+    XRAYCORE_BIN="$APP_HOME_DIR/bin/xray-core/xray-arm64"
 else
     SINGBOX_BIN="$APP_HOME_DIR/bin/sing-box/sing-box-64"
-    XRAYCORE_BIN="$APP_HOME_DIR/bin/xray-core/xray-core-64"
+    XRAYCORE_BIN="$APP_HOME_DIR/bin/xray-core/xray-64"
 fi
 
 # 替换并直接写入目标路径
@@ -46,7 +46,7 @@ fi
 # 权限
 sudo chmod -R 755 "$APP_HOME_DIR"
 sudo chown -R root:wheel "$APP_HOME_DIR/bin"
-sudo chown -R 777 "$APP_HOME_DIR/bin"
+sudo chmod -R 777 "$APP_HOME_DIR/bin"
 
 # 去除隔离标记
 sudo /usr/bin/xattr -rd com.apple.quarantine "$APP_HOME_DIR/"
@@ -59,17 +59,13 @@ sudo chmod a+rxs ${tool}
 # sudoers 条目
 ENTRY="# generate by V2rayU install.sh
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootout system /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.sing-box
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootstrap system /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl bootout system /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.xray-core
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.xray-core
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.xray-core

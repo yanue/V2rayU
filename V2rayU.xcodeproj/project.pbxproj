@@ -108,10 +108,10 @@
 		669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA52E3D908C0085278B /* AppSettings.swift */; };
 		669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEAC2E3D9C400085278B /* AboutView.swift */; };
 		66A078BC2D008A3700490469 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 66A078BB2D008A3700490469 /* SwiftyBeaver */; };
+		66A2527B2F1CB8100008F536 /* LaunchDaemon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A2527A2F1CB8100008F536 /* LaunchDaemon.swift */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ShareQrCode.swift */; };
-		66DF3F862E5F44850024E338 /* LaunchDaemon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F852E5F44850024E338 /* LaunchDaemon.swift */; };
 		66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F842E5F44850024E338 /* AppInstaller.swift */; };
 		66DF3F8B2E5F4F3B0024E338 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */; };
 		66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */; };
@@ -262,6 +262,7 @@
 		669DCEA22E3D90760085278B /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
 		669DCEA52E3D908C0085278B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		669DCEAC2E3D9C400085278B /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		66A2527A2F1CB8100008F536 /* LaunchDaemon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchDaemon.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
@@ -275,7 +276,6 @@
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D27AE42E098E3A004C600D /* ShareQrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrCode.swift; sourceTree = "<group>"; };
 		66DF3F842E5F44850024E338 /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
-		66DF3F852E5F44850024E338 /* LaunchDaemon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchDaemon.swift; sourceTree = "<group>"; };
 		66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		66E0AF3E2E7DABBD004E44FF /* ShareWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareWindow.swift; sourceTree = "<group>"; };
@@ -581,8 +581,8 @@
 		6632EF5A2EC4C41800CED47B /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
-				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
 				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
+				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
 				6632EF5B2EC4C44B00CED47B /* System */,
 				667464172F0E7FD800D3D1E9 /* Singbox */,
 				6632EF5D2EC4C50A00CED47B /* V2ray */,
@@ -593,9 +593,9 @@
 		6632EF5B2EC4C44B00CED47B /* System */ = {
 			isa = PBXGroup;
 			children = (
+				66A2527A2F1CB8100008F536 /* LaunchDaemon.swift */,
 				66DF3F8A2E5F4F2F0024E338 /* SleepManager.swift */,
 				66DF3F842E5F44850024E338 /* AppInstaller.swift */,
-				66DF3F852E5F44850024E338 /* LaunchDaemon.swift */,
 				662CC3E12D1BED9B006E8450 /* V2rayLaunch.swift */,
 			);
 			path = System;
@@ -944,11 +944,11 @@
 				66E94B332D26B95D003745B5 /* Common.swift in Sources */,
 				6632EF2F2EC35FCF00CED47B /* SubscriptionModel.swift in Sources */,
 				66E94B352D26B95D003745B5 /* JsonView.swift in Sources */,
-				66DF3F862E5F44850024E338 /* LaunchDaemon.swift in Sources */,
 				66DF3F872E5F44850024E338 /* AppInstaller.swift in Sources */,
 				662CC4402D1C4CE9006E8450 /* ShadowsocksRUri.swift in Sources */,
 				662CC4412D1C4CE9006E8450 /* TrojanUri.swift in Sources */,
 				66EB76B02E31135200E72DE2 /* DownloadViewModel.swift in Sources */,
+				66A2527B2F1CB8100008F536 /* LaunchDaemon.swift in Sources */,
 				66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */,
 				662CC4422D1C4CE9006E8450 /* BaseShareUri.swift in Sources */,
 				662CC4432D1C4CE9006E8450 /* VmessUri.swift in Sources */,

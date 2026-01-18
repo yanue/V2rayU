@@ -5,15 +5,18 @@
 //  Created by yanue on 2026/1/7.
 //
 
+import Foundation
+
 class CoreConfigHandler {
         
     public func toJSON(item: ProfileEntity) -> String {
+        let enableTun = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) == .tunnel
         switch item.AdaptCore() {
         case .SingBox:
-            let cfg = SingboxConfigHandler()
+            let cfg = SingboxConfigHandler(enableTun: enableTun)
             return cfg.toJSON(item: item)
         case .XrayCore:
-            let vCfg = V2rayConfigHandler()
+            let vCfg = V2rayConfigHandler(enableTun: enableTun)
             return vCfg.toJSON(item: item)
         }
     }
@@ -46,7 +49,7 @@ extension ProfileEntity {
     }
     
     // 是否需要使用oldCore
-    func getCore() -> String {
+    func getCoreName() -> String {
         return  V2rayU.getCoreFile(mode: AdaptCore())
     }
     

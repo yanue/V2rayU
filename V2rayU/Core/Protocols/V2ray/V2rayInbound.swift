@@ -13,12 +13,13 @@ enum V2rayProtocolInbound: String, CaseIterable, Codable {
     case http
     case socks
     case dokodemoDoor = "dokodemo-door"
+    case tun
 }
 
 // Inbound
 struct V2rayInbound: Codable {
-    var port: String = "1080"
-    var listen: String = "127.0.0.1"
+    var port: String?
+    var listen: String? 
     var `protocol`: V2rayProtocolInbound = .socks
     var tag: String?
     var streamSettings: V2rayStreamSettings?
@@ -28,6 +29,7 @@ struct V2rayInbound: Codable {
     var settingHttp: V2rayInboundHttp = V2rayInboundHttp()
     var settingSocks: V2rayInboundSocks = V2rayInboundSocks()
     var settingDokodemoDoor: V2rayInboundDokodemoDoor = V2rayInboundDokodemoDoor()
+    var settingTun: V2rayInboundTun = V2rayInboundTun()
 
     enum CodingKeys: String, CodingKey {
         case port
@@ -70,13 +72,19 @@ extension V2rayInbound {
         case .dokodemoDoor:
             settingDokodemoDoor = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
             break
+        case .tun:
+            settingTun = try container.decode(V2rayInboundTun.self, forKey: CodingKeys.settings)
+            break
         }
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(port, forKey: .port)
-        try container.encode(listen, forKey: .listen)
+        // tun no port & listen
+        if `protocol` != .tun {
+            try container.encode(port, forKey: .port)
+            try container.encode(listen, forKey: .listen)
+        }
         try container.encode(`protocol`, forKey: .`protocol`)
 
         // ignore nil
@@ -105,6 +113,9 @@ extension V2rayInbound {
         case .dokodemoDoor:
             try container.encode(self.settingDokodemoDoor, forKey: .settings)
             break
+        case .tun:
+            try container.encode(self.settingTun, forKey: .settings)
+            break;
         }
     }
 }
@@ -165,4 +176,10 @@ struct V2rayInboundDokodemoDoor: Codable {
     var network: String? // "tcp"
     var followRedirect: Bool? // false
     var userLevel: Int? // 0
+}
+
+struct V2rayInboundTun: Codable {
+    var name: String?
+    var MTU: Int? = 9000
+    var userLevel: Int?
 }

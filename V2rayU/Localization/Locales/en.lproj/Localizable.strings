@@ -219,16 +219,17 @@
 "StreamSettings" = "Stream Settings";
 
 // MARK: - Menu Operations
-"CoreOn" = "xray-core: Running";
-"CoreOff" = "xray-core: Stopped";
-"TurnCoreOn" = "Start xray-core";
-"TurnCoreOff" = "Stop xray-core";
-"ViewLog" = "View xray-core log";
+"CoreOn" = "core: Running";
+"CoreOff" = "core: Stopped";
+"TurnCoreOn" = "Start core";
+"TurnCoreOff" = "Stop core";
+"ViewLog" = "View core log";
 "ViewConfigJson" = "View config.json";
 "ViewPacFile" = "View PAC file";
-"PacMode" = "PAC Mode";
-"GlobalMode" = "Global Mode";
-"ManualMode" = "Manual Mode";
+"PacMode" = "pac Mode";
+"TunnelMode" = "Tunnel Mode";
+"GlobalMode" = "Global Mode(change system proxies)";
+"ManualMode" = "Manual Mode(don't change system proxies)";
 "RoutingList" = "Select Routing";
 "ServerList" = "Select Server";
 "goSubscriptionSettings" = "Subscription Settings...";
@@ -251,8 +252,8 @@
 "HelpPageSubHead" = "Check core components and fix common problems";
 "GithubIssues" = "Feedback / Issues";
 "Refresh" = "Refresh";
-"V2rayCoreSwitchStatus" = "v2ray-core Switch Status";
-"V2rayCoreRunningStatus" = "v2ray-core Running State (launchd)";
+"V2rayCoreSwitchStatus" = "core Switch Status";
+"V2rayCoreRunningStatus" = "core Running State (launchd)";
 "BackgroundActivity" = "Background Activity";
 "BackgroundActivitySubtitleRunning" = "Core process is running";
 "BackgroundActivitySubtitleNotRunning" = "Core process is not running";
@@ -260,13 +261,13 @@
 "Restart" = "Restart";
 "PingState" = "Ping State";
 "RunPingNow" = "Run Ping";
-"V2rayCoreInstallAndVersion" = "v2ray-core Installation & Version";
+"V2rayCoreInstallAndVersion" = "core Installation & Version";
 "V2rayUToolPermission" = "V2rayUTool Permission";
 "GeoipFile" = "geoip.dat File";
 "Installed" = "Installed";
 "Missing" = "Missing";
 "PermissionException" = "Permission Exception";
-"V2rayCoreNotInstalled" = "v2ray-core is not installed or not executable.";
+"V2rayCoreNotInstalled" = "core is not installed or not executable.";
 "UnableToOpenSystemSettings" = "Unable to open system settings.";
 "PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity, and allow V2rayU to run in background.";
 "Fix" = "Fix";
@@ -274,7 +275,7 @@
 "V2rayUToolProblem" = "V2rayUTool permission issue. The core may fail to start.";
 "BackgroundProblem" = "App is not running in background; might be limited by system or core process stopped.";
 "GeoipProblem" = "geoip.dat is missing, which may cause some functions to fail.";
-"V2rayCoreProblem" = "v2ray-core is not installed or not executable.";
+"V2rayCoreProblem" = "core is not installed or not executable.";
 "Diagnostics" = "Diagnostics";
 "FAQ" = "FAQ";
 "FaqSubtitle" = "Frequently Asked Questions";

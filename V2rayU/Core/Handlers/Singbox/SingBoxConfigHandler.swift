@@ -15,18 +15,20 @@ class SingboxConfigHandler {
     var errors: [String] = []
     
     // base
-    var logLevel: String = "info"
     var socksPort = "1080"
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
-    var enableTun = true
+    var enableTun = false
     var forPing = false
     var domain_resolver = "default-dns"
-    
-    init() {
+    var logLevel: V2rayLogLevel = .info
+
+    init(enableTun: Bool = false) {
+        self.enableTun = enableTun
         self.httpPort = String(getHttpProxyPort())
         self.socksPort = String(getSocksProxyPort())
+        self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
     }
     
     // ping配置
@@ -67,18 +69,39 @@ class SingboxConfigHandler {
     }
     
     func combine(_outbounds: [SingboxOutbound]) {
+        // base
+        self.singbox.log.level = (V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info).rawValue
+        if !self.forPing {
+            self.singbox.log.output = coreLogFilePath
+        }
+        var inbounds: [SingboxInbound] = []
         // 默认 inbound: tun
         if enableTun {
+            /**
+             {
+               "type": "tun",
+               "tag": "tun-in",
+               "address": ["10.0.0.1/30"],
+               "auto_route": true,
+               "strict_route": true,
+               "mtu": 9000,
+               "stack": "system",
+               "sniff": true,
+               "sniff_override_destination": true
+             }
+             */
             let tunInbound = SingboxInbound(
                 type: "tun",
                 tag: "tun-in",
                 address: ["10.0.0.1/30"],
                 auto_route: true,
                 strict_route: true,
-                mtu: 9000,
-                stack: "system" // system 需要 root 权限
+                mtu: 1500,
+                stack: "system", // system 需要 root 权限
+                sniff: true,
+                sniff_override_destination: true // 很重要
             )
-            self.singbox.inbounds = [tunInbound]
+            inbounds.append(tunInbound)
         } else {
             // 避免 httpPort 与 socksPort 冲突
             if self.httpPort == self.socksPort {
@@ -91,9 +114,8 @@ class SingboxConfigHandler {
                 listen: self.httpHost,
                 listen_port: Int(self.httpPort),
             )
-            
-            var inbounds: [SingboxInbound] = [httpInbound]
-            
+            inbounds.append(httpInbound)
+
             if !self.forPing {
                 let socksInbound = SingboxInbound(
                     type: "socks",
@@ -102,19 +124,21 @@ class SingboxConfigHandler {
                     listen_port: Int(self.socksPort),
                 )
                 inbounds.append(socksInbound)
-                
-                let clashConfig = ExperimentalConfig(
-                    clash_api: ClashAPIConfig(
-                        external_controller: "127.0.0.1:11111",
-                        secret: ""
-                    )
-                )
-
-                singbox.experimental = clashConfig
             }
-            
-            self.singbox.inbounds = inbounds
         }
+
+        if !self.forPing {
+            let clashConfig = ExperimentalConfig(
+                clash_api: ClashAPIConfig(
+                    external_controller: "127.0.0.1:11111",
+                    secret: ""
+                )
+            )
+
+            singbox.experimental = clashConfig
+        }
+        
+        self.singbox.inbounds = inbounds
     
         self.singbox.outbounds = _outbounds
         

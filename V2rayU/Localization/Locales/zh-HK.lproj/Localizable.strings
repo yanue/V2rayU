@@ -219,16 +219,17 @@
 "StreamSettings" = "串流設定";
 
 // MARK: - 功能選單
-"CoreOn" = "xray-core: 已啟動";
-"CoreOff" = "xray-core: 已停止";
-"TurnCoreOn" = "啟動 xray-core";
-"TurnCoreOff" = "停止 xray-core";
-"ViewLog" = "查看 xray-core 日誌";
+"CoreOn" = "core: 已啟動";
+"CoreOff" = "core: 已停止";
+"TurnCoreOn" = "啟動 core";
+"TurnCoreOff" = "停止 core";
+"ViewLog" = "查看 core 日誌";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 PAC 檔案";
-"PacMode" = "PAC 模式";
-"GlobalMode" = "全域模式";
-"ManualMode" = "手動模式";
+"PacMode" = "pac模式";
+"TunnelMode" = "tun模式(透明代理)";
+"GlobalMode" = "全域模式(设置系统代理)";
+"ManualMode" = "手動模式(清除系统代理)";
 "RoutingList" = "選擇路由";
 "ServerList" = "選擇伺服器";
 "goSubscriptionSettings" = "訂閱設定...";
@@ -251,8 +252,8 @@
 "HelpPageSubHead" = "檢測關鍵元件狀態並提供常見問題修復操作";
 "GithubIssues" = "問題回報";
 "Refresh" = "重新整理";
-"V2rayCoreSwitchStatus" = "v2ray-core 開關狀態";
-"V2rayCoreRunningStatus" = "v2ray-core 執行狀態 (launchd)";
+"V2rayCoreSwitchStatus" = "core 開關狀態";
+"V2rayCoreRunningStatus" = "core 執行狀態 (launchd)";
 "BackgroundActivity" = "背景活動";
 "BackgroundActivitySubtitleRunning" = "核心程序正在運行";
 "BackgroundActivitySubtitleNotRunning" = "核心程序未運行";
@@ -260,13 +261,13 @@
 "Restart" = "重新啟動";
 "PingState" = "Ping 測試狀態";
 "RunPingNow" = "執行 Ping 測試";
-"V2rayCoreInstallAndVersion" = "v2ray-core 安裝與版本";
+"V2rayCoreInstallAndVersion" = "core 安裝與版本";
 "V2rayUToolPermission" = "V2rayUTool 權限";
 "GeoipFile" = "geoip.dat 檔案";
 "Installed" = "已安裝";
 "Missing" = "缺失";
 "PermissionException" = "權限異常";
-"V2rayCoreNotInstalled" = "v2ray-core 未安裝或不可執行。";
+"V2rayCoreNotInstalled" = "core 未安裝或不可執行。";
 "UnableToOpenSystemSettings" = "無法開啟系統設定";
 "PleaseManuallyOpenBackgroundActivity" = "請手動前往 系統設定 → 一般 → 背景活動，允許 V2rayU 在背景運行。";
 "Fix" = "修復";
@@ -274,7 +275,7 @@
 "V2rayUToolProblem" = "V2rayUTool 權限異常，可能無法正常啟動核心。";
 "BackgroundProblem" = "應用程式未在背景運行，可能被系統限制或核心程序已停止。";
 "GeoipProblem" = "geoip.dat 檔案缺失，可能導致部分功能異常。";
-"V2rayCoreProblem" = "v2ray-core 未安裝或不可執行。";
+"V2rayCoreProblem" = "core 未安裝或不可執行。";
 "Diagnostics" = "診斷";
 "FAQ" = "常見問題";
 "FaqSubtitle" = "查看常見問題與解決方案";
