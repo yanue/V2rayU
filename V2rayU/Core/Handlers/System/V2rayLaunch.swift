@@ -50,11 +50,12 @@ enum RunMode: String, CaseIterable {
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
+    var lastCore: CoreType? = nil
 
     func restart() async {
        let _ = await start()
     }
-    
+
     func start() async -> Bool {
         logger.info("start v2ray-core begin")
         guard let item = ProfileStore.shared.getRunning() else {
@@ -64,7 +65,7 @@ actor V2rayLaunch {
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
         await LaunchDaemon.shared.stopAgent()
-        
+
         createJsonFile(item: item)
 
         // 启动
@@ -79,7 +80,12 @@ actor V2rayLaunch {
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: item.AdaptCore())
             try await PingRunning.shared.startPing()
+            // xray的tun需要手动设置系统路由
+            if mode == .tunnel && item.AdaptCore() == .XrayCore {
+                try TunManager.smartSetup(server: item.address)
+            }
         }
+        self.lastCore = item.AdaptCore()
         return true
     }
 
@@ -87,6 +93,13 @@ actor V2rayLaunch {
         await LaunchDaemon.shared.stopAgent()
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
+
+        Task {
+            if self.lastCore == .XrayCore {
+                try TunManager.smartTeardown()
+            }
+        }
+
         setSystemProxy(mode: .off)
     }
 

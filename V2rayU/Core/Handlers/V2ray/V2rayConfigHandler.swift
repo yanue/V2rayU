@@ -135,16 +135,9 @@ class V2rayConfigHandler {
             outboundBlackhole.tag = "block"
             outboundBlackhole.settings = V2rayOutboundBlackhole()
             
-            // outbound Dns
-            let outboundDns = V2rayOutbound()
-            outboundBlackhole.protocol = .dns
-            outboundBlackhole.tag = "dns_out"
-            outboundBlackhole.settings = V2rayOutboundDns()
-            
             // 添加
             outbounds.append(outboundFreedom)
             outbounds.append(outboundBlackhole)
-            outbounds.append(outboundDns)
         }
 
         self.v2ray.outbounds = outbounds

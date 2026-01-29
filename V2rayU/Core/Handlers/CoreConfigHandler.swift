@@ -54,7 +54,7 @@ extension ProfileEntity {
     }
     
     func getAlpn() -> [String] {
-        var alpn: [String] = ["http/1.1"]
+        var alpn: [String] = []
         if self.network == .h2 || self.network == .grpc {
             alpn = ["h2"]
         } else if !self.alpn.rawValue.isEmpty {

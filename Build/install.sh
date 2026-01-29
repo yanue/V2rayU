@@ -28,6 +28,10 @@ sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
 sed "s#__XRAYCORE_BIN__#$XRAYCORE_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
     ./plist/yanue.v2rayu.xray-core.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist > /dev/null
 
+sudo cp ./bin/tun-helper.sh /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
+sudo chown root:wheel  /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
+sudo chmod +x /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
+
 sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
@@ -58,6 +62,7 @@ sudo chown root:admin "$tool"
 sudo chmod a+rxs ${tool}
 # sudoers 条目
 ENTRY="# generate by V2rayU install.sh
+${USERNAME} ALL=(root) NOPASSWD: /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh *
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.sing-box
