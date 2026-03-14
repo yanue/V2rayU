@@ -134,4 +134,5 @@ struct RouteConfig: Codable {
 struct RouteRule: Codable {
     var outbound: String
     var domain: [String]?
+    var process_name: [String]?
 }

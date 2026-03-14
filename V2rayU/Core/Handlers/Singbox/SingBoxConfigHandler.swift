@@ -71,12 +71,16 @@ class SingboxConfigHandler {
     func combine(_outbounds: [SingboxOutbound]) {
         // base
         self.singbox.log.level = (V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info).rawValue
+        self.singbox.log.timestamp = true
         if !self.forPing {
             self.singbox.log.output = coreLogFilePath
         }
         var inbounds: [SingboxInbound] = []
-        // 默认 inbound: tun
+        
+        // TUN模式配置
         if enableTun {
+            // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
+            self.singbox.log.output = tunLogFilePath
             /**
              {
                "type": "tun",
@@ -102,32 +106,69 @@ class SingboxConfigHandler {
                 sniff_override_destination: true // 很重要
             )
             inbounds.append(tunInbound)
-        } else {
-            // 避免 httpPort 与 socksPort 冲突
-            if self.httpPort == self.socksPort {
-                self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
-            }
             
-            let httpInbound = SingboxInbound(
-                type: "http",
-                tag: "http-in",
-                listen: self.httpHost,
-                listen_port: Int(self.httpPort),
+            // TUN模式: outbound使用socks代理到本地
+            let socksOutbound = SingboxOutbound(
+                type: "socks",
+                tag: "proxy",
+                server: "127.0.0.1",
+                server_port: Int(getSocksProxyPort())
             )
-            inbounds.append(httpInbound)
-
-            if !self.forPing {
-                let socksInbound = SingboxInbound(
-                    type: "socks",
-                    tag: "socks-in",
-                    listen: self.socksHost,
-                    listen_port: Int(self.socksPort),
-                )
-                inbounds.append(socksInbound)
-            }
+            let directOutbound = SingboxOutbound(type: "direct", tag: "direct")
+            let blockOutbound = SingboxOutbound(type: "block", tag: "block")
+            
+            self.singbox.outbounds = [socksOutbound, directOutbound, blockOutbound]
+            
+            // DNS配置
+            self.singbox.dns.servers = [
+                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
+                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+            ]
+            self.singbox.dns.rules = [
+                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
+                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
+            ]
+            
+            // TUN模式路由配置
+            self.singbox.route = RouteConfig(
+                auto_detect_interface: true,
+                default_domain_resolver: "default-dns",
+                rules: [
+                    RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64"]),
+                    RouteRule(outbound: "direct", domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]),
+                    RouteRule(outbound: "direct", domain: ["geosite:private"]),
+                    RouteRule(outbound: "proxy", domain: ["geosite:geolocation-!cn"])
+                ]
+            )
+            
+            self.singbox.inbounds = inbounds
+            return
         }
+        
+        // 非TUN模式配置
+        // 默认 inbound: socks + http
+        if self.httpPort == self.socksPort {
+            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        }
+        
+        let httpInbound = SingboxInbound(
+            type: "http",
+            tag: "http-in",
+            listen: self.httpHost,
+            listen_port: Int(self.httpPort),
+        )
+        inbounds.append(httpInbound)
 
         if !self.forPing {
+            let socksInbound = SingboxInbound(
+                type: "socks",
+                tag: "socks-in",
+                listen: self.socksHost,
+                listen_port: Int(self.socksPort),
+            )
+            inbounds.append(socksInbound)
+
             let clashConfig = ExperimentalConfig(
                 clash_api: ClashAPIConfig(
                     external_controller: "127.0.0.1:11111",

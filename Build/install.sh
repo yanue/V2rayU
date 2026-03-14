@@ -1,8 +1,41 @@
 #!/bin/sh
+
+#  install.sh
+#  V2rayU
+#
+#  Created by yanue on 2021/01/30.
+#  Copyright © 2021 yanue. All rights reserved.
+
 set -x
 
-USERNAME=$(logname)
-APP_HOME_DIR="$HOME/.V2rayU"
+get_current_user() {
+    _user=""
+
+    for _candidate in "$USER" "$SUDO_USER" ""; do
+        if [ -n "$_candidate" ] && [ "$_candidate" != "root" ]; then
+            echo "$_candidate"
+            return
+        fi
+    done
+
+    _candidate=$(logname 2>/dev/null)
+    if [ -n "$_candidate" ] && [ "$_candidate" != "root" ]; then
+        echo "$_candidate"
+        return
+    fi
+
+    _candidate=$(stat -f "%Su" /dev/console 2>/dev/null)
+    if [ -n "$_candidate" ] && [ "$_candidate" != "root" ]; then
+        echo "$_candidate"
+        return
+    fi
+
+    echo ""
+}
+
+USERNAME="${USERNAME:-$(get_current_user)}"
+
+APP_HOME_DIR="/Users/$USERNAME/.V2rayU"
 
 # 清理并复制工具
 rm -rf "$APP_HOME_DIR/V2rayUTool"
@@ -21,26 +54,15 @@ else
     XRAYCORE_BIN="$APP_HOME_DIR/bin/xray-core/xray-64"
 fi
 
-# 替换并直接写入目标路径
+# 安装 tun-helper plist (LaunchDaemon - root权限)
 sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
-    ./plist/yanue.v2rayu.sing-box.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist > /dev/null
+    ./plist/yanue.v2rayu.tun-helper.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist > /dev/null
 
-sed "s#__XRAYCORE_BIN__#$XRAYCORE_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
-    ./plist/yanue.v2rayu.xray-core.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist > /dev/null
+sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
+sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
 
-sudo cp ./bin/tun-helper.sh /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
-sudo chown root:wheel  /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
-sudo chmod +x /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh
-
-sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-sudo chmod 644 /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-
-sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
+sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
+sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
 
 # pac 文件
 if [ ! -d "$APP_HOME_DIR/pac" ]; then
@@ -60,21 +82,16 @@ cd $APP_HOME_DIR
 tool="./V2rayUTool"
 sudo chown root:admin "$tool"
 sudo chmod a+rxs ${tool}
-# sudoers 条目
+
+# sudoers 条目 (只需要 tun-helper)
 ENTRY="# generate by V2rayU install.sh
 ${USERNAME} ALL=(root) NOPASSWD: /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh *
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.sing-box.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.sing-box
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.sing-box
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.sing-box
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.sing-box
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.xray-core.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.xray-core
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.xray-core
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.xray-core
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.xray-core
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.tun-helper
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.tun-helper
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
+${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
 # end by V2rayU"
 
 TARGET="/private/etc/sudoers.d/v2rayu-helper"

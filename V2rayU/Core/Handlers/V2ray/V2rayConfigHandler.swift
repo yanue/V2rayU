@@ -40,7 +40,7 @@ class V2rayConfigHandler {
     var enableSniffing = false
     var mux = 8
     var forPing = false
-    var enableTun = false
+    var enableTun = false // (暂时不用)这里是xray的tun功能, 但需要单独设置系统路由,需要涉及到代理服务器ip,比较麻烦,因此用sing-box的tun功能->xray的socks作为替换
 
     // Initialization
     init(enableTun: Bool = false) {

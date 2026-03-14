@@ -50,10 +50,10 @@ enum RunMode: String, CaseIterable {
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
-    var lastCore: CoreType? = nil
+    var lastCore: CoreType?
 
     func restart() async {
-       let _ = await start()
+        let _ = await start()
     }
 
     func start() async -> Bool {
@@ -64,12 +64,12 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        await LaunchDaemon.shared.stopAgent()
+        await LaunchAgent.shared.stopAgent()
 
         createJsonFile(item: item)
 
         // 启动
-        let started = await LaunchDaemon.shared.startAgent(coreType: item.AdaptCore())
+        let started = await LaunchAgent.shared.startAgent(coreType: item.AdaptCore())
         if !started {
             noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
             return false
@@ -80,26 +80,27 @@ actor V2rayLaunch {
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: item.AdaptCore())
             try await PingRunning.shared.startPing()
-            // xray的tun需要手动设置系统路由
-            if mode == .tunnel && item.AdaptCore() == .XrayCore {
-                try TunManager.smartSetup(server: item.address)
+        }
+        // TUN模式: 使用sing-box(tun) -> xray/sing(socks)
+        if mode == .tunnel {
+            createTunJsonFile(item: item)
+            logger.info("create tun config ok, path: \(TunConfigFilePath)")
+
+            let tunStarted = await LaunchAgent.shared.startTunHelper()
+            if !tunStarted {
+                noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                return false
             }
+            logger.info("start tun-helper ok")
         }
         self.lastCore = item.AdaptCore()
         return true
     }
 
     func stop() async {
-        await LaunchDaemon.shared.stopAgent()
+        await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-
-        Task {
-            if self.lastCore == .XrayCore {
-                try TunManager.smartTeardown()
-            }
-        }
-
         setSystemProxy(mode: .off)
     }
 
@@ -112,6 +113,20 @@ actor V2rayLaunch {
         } catch {
             logger.info("Failed to write JSON file: \(error)")
             noticeTip(title: "Failed to write JSON file: \(error)")
+        }
+    }
+
+    // TUN模式: 创建tun配置文件
+    private func createTunJsonFile(item: ProfileEntity) {
+        // TUN模式使用sing-box
+        let cfg = SingboxConfigHandler(enableTun: true)
+        let jsonText = cfg.toJSON(item: item)
+        do {
+            try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)
+            logger.info("createTunJsonFile: \(jsonText)")
+        } catch {
+            logger.info("Failed to write tun JSON file: \(error)")
+            noticeTip(title: "Failed to write tun JSON file: \(error)")
         }
     }
 

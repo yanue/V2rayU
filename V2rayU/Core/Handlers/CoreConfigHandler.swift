@@ -10,13 +10,13 @@ import Foundation
 class CoreConfigHandler {
         
     public func toJSON(item: ProfileEntity) -> String {
-        let enableTun = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) == .tunnel
+        // 目前架构: sing-box的tun服务(daemon) -> socks(sing-box|xray-core) ,因此这里agent端不需要内部的tun功能了
         switch item.AdaptCore() {
         case .SingBox:
-            let cfg = SingboxConfigHandler(enableTun: enableTun)
+            let cfg = SingboxConfigHandler(enableTun: false) // 这里不需要内部的tun功能
             return cfg.toJSON(item: item)
         case .XrayCore:
-            let vCfg = V2rayConfigHandler(enableTun: enableTun)
+            let vCfg = V2rayConfigHandler(enableTun: false) // 这里不需要xray内部的tun功能
             return vCfg.toJSON(item: item)
         }
     }

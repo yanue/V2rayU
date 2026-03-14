@@ -13,6 +13,7 @@ let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
 let v2rayUTool = AppHomePath + "/V2rayUTool"
 let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
+let TunConfigFilePath = AppHomePath + "/tun-config.json"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
 let logger = Logger(subsystem: "net.yanue.V2rayU", category: "app")
 let uiLogger = Logger(subsystem: "net.yanue.V2rayU", category: "ui")
@@ -22,6 +23,7 @@ let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 let coreLogFilePath = AppHomePath + "/core.log"
+let tunLogFilePath = AppHomePath + "/tun.log"
 let xrayCorePath = AppHomePath + "/bin/xray-core"
 #if arch(arm64)
 let xrayCoreFile = xrayCorePath + "/xray-arm64"

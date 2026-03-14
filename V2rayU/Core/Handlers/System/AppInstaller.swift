@@ -11,6 +11,7 @@ import Cocoa
 actor AppInstaller: NSObject {
     static let shared = AppInstaller()
     var installReason: String = ""
+    let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
 
     func checkInstall() async {
         logger.info("source path: \(AppResourcesPath)")
@@ -90,58 +91,61 @@ actor AppInstaller: NSObject {
     }
 
     func showInstallAlert() async {
-       let reason = self.installReason
-       
-       // Use a continuation to bridge the sync NSAlert.runModal() with async
-       await withCheckedContinuation { continuation in
-           DispatchQueue.main.async {  // Async dispatch to avoid strict mode warnings
-               let alert = NSAlert()
-               alert.alertStyle = .warning
-               alert.messageText = String(localized: .InstallTitle)
-               alert.informativeText = reason
-               alert.addButton(withTitle: String(localized: .Install))
-               alert.addButton(withTitle: String(localized: .Quit))
+        let reason = installReason
 
-               let response = alert.runModal()
-               if response == .alertFirstButtonReturn {
-                   Task {
-                       await self.install()
-                       continuation.resume()  // Resume after install completes
-                   }
-               } else {
-                   NSApp.terminate(self)
-                   continuation.resume()  // Optional: resume on quit, though app terminates
-               }
-           }
-       }
-   }
-    
+        // Use a continuation to bridge the sync NSAlert.runModal() with async
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async { // Async dispatch to avoid strict mode warnings
+                let alert = NSAlert()
+                alert.alertStyle = .warning
+                alert.messageText = String(localized: .InstallTitle) + "\n\n" + reason
+                alert.informativeText = self.doSh
+                alert.addButton(withTitle: String(localized: .Install))
+                alert.addButton(withTitle: String(localized: .Quit))
+
+                let response = alert.runModal()
+                if response == .alertFirstButtonReturn {
+                    Task {
+                        await self.install()
+                        continuation.resume() // Resume after install completes
+                    }
+                } else {
+                    NSApp.terminate(self)
+                    continuation.resume() // Optional: resume on quit, though app terminates
+                }
+            }
+        }
+    }
+
     func install() async {
-        let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
         // Create authorization reference for the user
         await executeAppleScriptWithOsascript(script: doSh)
     }
 
     // 高版本macos执行NSAppleScript会出现授权失败
-   func executeAppleScriptWithOsascript(script: String) async {
-       do {
-           // Assuming runCommand is sync; wrap in continuation for async
-           let output = try await withCheckedThrowingContinuation { continuation in
-               do {
-                   let result = try runCommand(at: "/usr/bin/osascript", with: ["-e", "do shell script \"" + script + "\" with administrator privileges"])
-                   continuation.resume(returning: result)
-               } catch {
-                   continuation.resume(throwing: error)
-               }
-           }
-           logger.info("executeAppleScript-Output: \(output)")
-       } catch {
-           logger.info("executeAppleScript-Error: \(error)")
-           DispatchQueue.main.sync {
-               let title =  String(localized: .InstallFailed)
-               let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
-               alertDialog(title: title, message: toast)
-           }
-       }
-   }
+    func executeAppleScriptWithOsascript(script: String) async {
+        do {
+            // Assuming runCommand is sync; wrap in continuation for async
+            let output = try await withCheckedThrowingContinuation { continuation in
+                do {
+                    let escapedScript = script
+                        .replacingOccurrences(of: "\\", with: "\\\\")
+                        .replacingOccurrences(of: "\"", with: "\\\"")
+                    let appleScript = "do shell script \"\(escapedScript)\" with administrator privileges"
+                    let result = try runCommand(at: "/usr/bin/osascript", with: ["-e", appleScript])
+                    continuation.resume(returning: result)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+            logger.info("executeAppleScript-Output: \(output)")
+        } catch {
+            logger.info("executeAppleScript-Error: \(error)")
+            DispatchQueue.main.sync {
+                let title = String(localized: .InstallFailed)
+                let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
+                alertDialog(title: title, message: toast)
+            }
+        }
+    }
 }
