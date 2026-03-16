@@ -10,6 +10,10 @@
 		660330042D0D5504009FEB56 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 660330032D0D5504009FEB56 /* GRDB */; };
 		660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 660330082D0D5540009FEB56 /* GRDBSQLite */; };
 		6603305A2D11BF28009FEB56 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 660330592D11BF28009FEB56 /* KeyboardShortcuts */; };
+		66078E332F6838E5002E64AE /* AppInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E2F2F6838E5002E64AE /* AppInstaller.swift */; };
+		66078E342F6838E5002E64AE /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E302F6838E5002E64AE /* LaunchAgent.swift */; };
+		66078E352F6838E5002E64AE /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E312F6838E5002E64AE /* SleepManager.swift */; };
+		66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E322F6838E5002E64AE /* V2rayLaunch.swift */; };
 		660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AB2E2CF99600D84D5D /* CoreView.swift */; };
 		660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AD2E2CF9AD00D84D5D /* DnsView.swift */; };
 		660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AF2E2CF9B700D84D5D /* PacView.swift */; };
@@ -165,6 +169,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		66078E2F2F6838E5002E64AE /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
+		66078E302F6838E5002E64AE /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
+		66078E312F6838E5002E64AE /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
+		66078E322F6838E5002E64AE /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		660A63AB2E2CF99600D84D5D /* CoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreView.swift; sourceTree = "<group>"; };
 		660A63AD2E2CF9AD00D84D5D /* DnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsView.swift; sourceTree = "<group>"; };
 		660A63AF2E2CF9B700D84D5D /* PacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacView.swift; sourceTree = "<group>"; };
@@ -290,7 +298,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		66638BDA2F2BAAAF003E7CBC /* System */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = System; sourceTree = "<group>"; };
 		66B1B54D2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTool; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -577,11 +584,14 @@
 		6632EF5A2EC4C41800CED47B /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
-				66638BDA2F2BAAAF003E7CBC /* System */,
-				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
-				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
 				667464172F0E7FD800D3D1E9 /* Singbox */,
 				6632EF5D2EC4C50A00CED47B /* V2ray */,
+				66078E312F6838E5002E64AE /* SleepManager.swift */,
+				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
+				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
+				66078E2F2F6838E5002E64AE /* AppInstaller.swift */,
+				66078E302F6838E5002E64AE /* LaunchAgent.swift */,
+				66078E322F6838E5002E64AE /* V2rayLaunch.swift */,
 			);
 			path = Handlers;
 			sourceTree = "<group>";
@@ -836,9 +846,6 @@
 			dependencies = (
 				66B1B5542D2979530032DD09 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				66638BDA2F2BAAAF003E7CBC /* System */,
-			);
 			name = V2rayU;
 			productName = V2rayU;
 			productReference = 66CBCED72C63B16400313949 /* V2rayU.app */;
@@ -955,6 +962,10 @@
 				6632EF232EBF4DA400CED47B /* DiagnosticModel.swift in Sources */,
 				662CC4462D1C4CE9006E8450 /* VlessUri.swift in Sources */,
 				662CC4472D1C4CE9006E8450 /* ShadowsocksUri.swift in Sources */,
+				66078E332F6838E5002E64AE /* AppInstaller.swift in Sources */,
+				66078E342F6838E5002E64AE /* LaunchAgent.swift in Sources */,
+				66078E352F6838E5002E64AE /* SleepManager.swift in Sources */,
+				66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */,
 				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */,
 				662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */,
@@ -1224,7 +1235,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14;
-				MARKETING_VERSION = 4.3.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1258,7 +1269,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14;
-				MARKETING_VERSION = 4.3.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
