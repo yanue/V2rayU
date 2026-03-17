@@ -20,6 +20,8 @@ enum LanguageLabel: String, CaseIterable {
     case Hour
     case Day
     case Save
+    case Saved
+    case Total
     case Confirm
     case Cancel
     case Close
@@ -49,6 +51,7 @@ enum LanguageLabel: String, CaseIterable {
     case ActivitySubHead
     case Servers
     case ServerSubHead
+    case Items
     case Subscriptions
     case SubscriptionSubHead
     case Routings

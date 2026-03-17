@@ -21,6 +21,8 @@ struct ProfileListView: View {
     @State private var selectAll: Bool = false
     @State private var showPingSheet: Bool = false
     @State private var showShareSheet: Bool = false
+    @State private var showExportSheet: Bool = false
+    @State private var exportItems: [ProfileEntity] = []
 
     var filteredAndSortedItems: [ProfileEntity] {
         let filtered = viewModel.list.filter { item in
@@ -35,70 +37,68 @@ struct ProfileListView: View {
             HStack {
                 Image(systemName: "shield.lefthalf.filled")
                     .resizable()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
+                    .frame(width: 32, height: 32)
+                    .foregroundStyle(.linearGradient(colors: [.accentColor, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+                VStack(alignment: .leading, spacing: 4) {
                     localized(.Servers)
-                        .font(.title)
+                        .font(.title2)
                         .fontWeight(.bold)
                     localized(.ServerSubHead)
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Picker(String(localized: .SelectGroup), selection: $selectGroup) {
-                    Text(String(localized: .AllGroup)).tag("")
-                    ForEach(viewModel.groups, id: \.self) { group in
-                        Text(group).tag(group)
-                    }
+                Button(action: { withAnimation {
+                    let newProxy = ProfileModel(from: ProfileEntity())
+                    self.selectedRow = newProxy
+                }}) {
+                    Label(String(localized: .Add), systemImage: "plus")
                 }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 140)
-                HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    TextField(String(localized: .SearchTip), text: $searchText)
-                        .frame(width: 200)
+                .buttonStyle(.bordered)
+
+                Button(action: { withAnimation { loadData() } }) {
+                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
+                .buttonStyle(.bordered)
+
+                Button(action: { showPingSheet = true }) {
+                    Label(String(localized: .Ping), systemImage: "network")
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(viewModel.list.isEmpty)
             }
 
             Spacer()
             VStack {
                 Spacer()
                 HStack {
-                    Button(action: { withAnimation {
-                        let newProxy = ProfileModel(from: ProfileEntity())
-                        self.selectedRow = newProxy
-                    }}) {
-                        Label(String(localized: .Add), systemImage: "plus")
-                    }
-                    .buttonStyle(.bordered)
-                    Button(action: {
-                        if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
-                            withAnimation {
-                                for selectedID in self.selection {
-                                    viewModel.delete(uuid: selectedID)
-                                }
-                                selection.removeAll()
-                            }
+                    Picker(String(localized: .SelectGroup), selection: $selectGroup) {
+                        Text(String(localized: .AllGroup)).tag("")
+                        ForEach(viewModel.groups, id: \.self) { group in
+                            Text(group).tag(group)
                         }
-                    }) {
-                        Label(String(localized: .Delete), systemImage: "trash")
                     }
-                    .disabled(selection.isEmpty)
-                    .buttonStyle(.bordered)
-
-                    Button(action: { showPingSheet = true }) {
-                        Label(String(localized: .Ping), systemImage: "lasso.badge.sparkles")
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 200)
+                    Spacer()
+                    
+                    HStack(spacing: 6) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                        TextField(String(localized: .SearchTip), text: $searchText)
+                            .textFieldStyle(.plain)
+                            .frame(width: 180)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(viewModel.list.isEmpty)
-                    // 分享
-                    Button(action: {
-                    }) {
-                        Label(String(localized: .Export), systemImage: "square.and.arrow.up")
-                    }.disabled(selection.isEmpty)
-                        .buttonStyle(.bordered)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(NSColor.controlBackgroundColor))
+                    .cornerRadius(6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    
                 }.padding(.horizontal, 10)
                 tableView
             }
@@ -123,9 +123,16 @@ struct ProfileListView: View {
                 showPingSheet = false
             }
         }
-        .sheet(item: $shareRow) { _ in
+        .sheet(item: $shareRow) { row in
+            ShareQrCodeView(profile: row) {
+                shareRow = nil
+            }
         }
-        .sheet(isPresented: $showShareSheet) {
+        .sheet(isPresented: $showExportSheet) {
+            ExportView(items: exportItems) {
+                showExportSheet = false
+                exportItems = []
+            }
         }
         .task { loadData() }
     }
@@ -145,7 +152,10 @@ struct ProfileListView: View {
         viewModel.updateSortOrderInDBAsync()
     }
 
+    @ViewBuilder
     private func contextMenuProvider(item: ProfileEntity) -> some View {
+        let isMultiSelect = selection.contains(item.uuid) && selection.count > 1
+
         Group {
             Button {
                 chooseItem(item: ProfileModel(from: item))
@@ -162,16 +172,25 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                copyItem(item: item)
-            } label: {
-                Label(String(localized: .CopyURI), systemImage: "doc.on.doc")
-            }
-
-            Button {
                 self.shareRow = ProfileModel(from: item)
             } label: {
                 Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
+            .disabled(isMultiSelect)
+
+            Button {
+                let selectedItems: [ProfileEntity]
+                if !selection.isEmpty {
+                    selectedItems = filteredAndSortedItems.filter { selection.contains($0.uuid) }
+                } else {
+                    selectedItems = [item]
+                }
+                exportItems = selectedItems
+                showExportSheet = true
+            } label: {
+                Label(String(localized: .Export), systemImage: "square.and.arrow.up")
+            }
+
 
             Divider()
 
@@ -180,24 +199,30 @@ struct ProfileListView: View {
             }) {
                 Label(String(localized: .MoveToTop), systemImage: "arrow.up.to.line")
             }
+            .disabled(isMultiSelect)
 
             Button(action: {
                 moveToBottom(item: item)
             }) {
                 Label(String(localized: .MoveToBottom), systemImage: "arrow.down.to.line")
             }
+            .disabled(isMultiSelect)
+
 
             Button(action: {
                 moveUp(item: item)
             }) {
                 Label(String(localized: .MoveUp), systemImage: "chevron.up")
             }
+            .disabled(isMultiSelect)
+
 
             Button(action: {
                 moveDown(item: item)
             }) {
                 Label(String(localized: .MoveDown), systemImage: "chevron.down")
             }
+            .disabled(isMultiSelect)
 
             Divider()
 
@@ -206,12 +231,14 @@ struct ProfileListView: View {
             } label: {
                 Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
             }
+            .disabled(isMultiSelect)
 
             Button {
                 self.selectedRow = ProfileModel(from: item)
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
             }
+            .disabled(isMultiSelect)
 
             Button {
                 if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
