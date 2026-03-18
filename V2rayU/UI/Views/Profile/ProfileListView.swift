@@ -7,29 +7,50 @@
 
 import SwiftUI
 
+private enum ActiveSheet: Identifiable {
+    case edit(ProfileModel)
+    case ping(ProfileModel)
+    case share(ProfileModel)
+    case export([ProfileEntity])
+    case pingAll
+
+    var id: String {
+        switch self {
+        case .edit(let m):       return "edit-\(m.uuid)"
+        case .ping(let m):       return "ping-\(m.uuid)"
+        case .share(let m):      return "share-\(m.uuid)"
+        case .export(let items):
+            let head = items.first?.uuid ?? ""
+            let tail = items.last?.uuid ?? ""
+            return "export-\(items.count)-\(head)-\(tail)"
+        case .pingAll:           return "pingAll"
+        }
+    }
+}
+
 struct ProfileListView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    @State private var list: [ProfileEntity] = []
     @State private var sortOrder: [KeyPathComparator<ProfileEntity>] = []
     @State private var selection: Set<ProfileModel.ID> = []
-    @State private var selectedRow: ProfileModel? = nil
-    @State private var pingRow: ProfileModel? = nil
-    @State private var shareRow: ProfileModel? = nil
     @State private var selectGroup: String = ""
     @State private var searchText = ""
-    @State private var draggedRow: ProfileModel?
     @State private var selectAll: Bool = false
-    @State private var showPingSheet: Bool = false
-    @State private var showShareSheet: Bool = false
-    @State private var showExportSheet: Bool = false
-    @State private var exportItems: [ProfileEntity] = []
+    @State private var activeSheet: ActiveSheet? = nil
 
     var filteredAndSortedItems: [ProfileEntity] {
-        let filtered = viewModel.list.filter { item in
-            (selectGroup == "" || selectGroup == item.subid) &&
-                (searchText.isEmpty || item.address.lowercased().contains(searchText.lowercased()) || item.remark.lowercased().contains(searchText.lowercased()))
+        viewModel.list.filter { item in
+            (selectGroup.isEmpty || selectGroup == item.subid) &&
+            (searchText.isEmpty ||
+             item.address.lowercased().contains(searchText.lowercased()) ||
+             item.remark.lowercased().contains(searchText.lowercased()))
         }
-        return filtered
+    }
+
+    private func resolveSelectedItems(for item: ProfileEntity) -> [ProfileEntity] {
+        if selection.contains(item.uuid) && selection.count > 1 {
+            return filteredAndSortedItems.filter { selection.contains($0.uuid) }
+        }
+        return [item]
     }
 
     var body: some View {
@@ -48,10 +69,12 @@ struct ProfileListView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Button(action: { withAnimation {
-                    let newProxy = ProfileModel(from: ProfileEntity())
-                    self.selectedRow = newProxy
-                }}) {
+                Button(action: {
+                    withAnimation {
+                        let newProxy = ProfileModel(from: ProfileEntity())
+                        activeSheet = .edit(newProxy)
+                    }
+                }) {
                     Label(String(localized: .Add), systemImage: "plus")
                 }
                 .buttonStyle(.bordered)
@@ -61,7 +84,7 @@ struct ProfileListView: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button(action: { showPingSheet = true }) {
+                Button(action: { activeSheet = .pingAll }) {
                     Label(String(localized: .Ping), systemImage: "network")
                 }
                 .buttonStyle(.borderedProminent)
@@ -81,7 +104,7 @@ struct ProfileListView: View {
                     .pickerStyle(MenuPickerStyle())
                     .frame(width: 200)
                     Spacer()
-                    
+
                     HStack(spacing: 6) {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.secondary)
@@ -98,7 +121,6 @@ struct ProfileListView: View {
                         RoundedRectangle(cornerRadius: 6)
                             .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                     )
-                    
                 }.padding(.horizontal, 10)
                 tableView
             }
@@ -107,64 +129,61 @@ struct ProfileListView: View {
             .cornerRadius(8)
         }
         .padding(8)
-        .sheet(item: $selectedRow) { row in
-            ConfigFormView(item: row) {
-                selectedRow = nil
-                loadData()                
-            }
-        }
-        .sheet(item: $pingRow) { _ in
-            ProfilePingView(profile: pingRow?.toEntity(), isAll: false) {
-                pingRow = nil
-            }
-        }
-        .sheet(isPresented: $showPingSheet) {
-            ProfilePingView(profile: nil, isAll: true) {
-                showPingSheet = false
-            }
-        }
-        .sheet(item: $shareRow) { row in
-            ShareQrCodeView(profile: row) {
-                shareRow = nil
-            }
-        }
-        .sheet(isPresented: $showExportSheet) {
-            ExportView(items: exportItems) {
-                showExportSheet = false
-                exportItems = []
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .edit(let model):
+                ConfigFormView(item: model) {
+                    activeSheet = nil
+                    loadData()
+                }
+            case .ping(let model):
+                ProfilePingView(profile: model.toEntity(), isAll: false) {
+                    activeSheet = nil
+                }
+            case .pingAll:
+                ProfilePingView(profile: nil, isAll: true) {
+                    activeSheet = nil
+                }
+            case .share(let model):
+                ShareQrCodeView(profile: model) {
+                    activeSheet = nil
+                }
+            case .export(let items):
+                ExportView(items: items) {
+                    activeSheet = nil
+                }
             }
         }
         .task { loadData() }
     }
 
-    // 处理拖拽排序逻辑:
-    // 参考: https://levelup.gitconnected.com/swiftui-enable-drag-and-drop-for-table-rows-with-custom-transferable-aa0e6eb9f5ce
     func handleDrop(index: Int, rows: [ProfileEntity]) {
-        guard let firstRow = rows.first, let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid }) else { return }
+        guard let firstRow = rows.first,
+              let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid })
+        else { return }
 
         viewModel.list.removeAll(where: { row in
-            rows.contains(where: { insertRow in insertRow.uuid == row.uuid })
+            rows.contains(where: { $0.uuid == row.uuid })
         })
-
         viewModel.list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
-        logger.info("handleDrop: \(index) \(rows.count)")
-        // 更新排序
         viewModel.updateSortOrderInDBAsync()
     }
 
     @ViewBuilder
     private func contextMenuProvider(item: ProfileEntity) -> some View {
-        let isMultiSelect = selection.contains(item.uuid) && selection.count > 1
+        let resolvedItems = resolveSelectedItems(for: item)
+        let isMultiSelect = resolvedItems.count > 1
+        let singleModel = ProfileModel(from: item)
 
         Group {
             Button {
-                chooseItem(item: ProfileModel(from: item))
+                chooseItem(item: singleModel)
             } label: {
                 Label(String(localized: .Select), systemImage: "checkmark.circle")
             }
 
             Button {
-                self.pingRow = ProfileModel(from: item)
+                activeSheet = .ping(singleModel)
             } label: {
                 Label(String(localized: .Ping), systemImage: "speedometer")
             }
@@ -172,76 +191,55 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                self.shareRow = ProfileModel(from: item)
+                activeSheet = .share(singleModel)
             } label: {
                 Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
             .disabled(isMultiSelect)
 
             Button {
-                let selectedItems: [ProfileEntity]
-                if !selection.isEmpty {
-                    selectedItems = filteredAndSortedItems.filter { selection.contains($0.uuid) }
-                } else {
-                    selectedItems = [item]
-                }
-                exportItems = selectedItems
-                showExportSheet = true
+                activeSheet = .export(resolvedItems)
             } label: {
                 Label(String(localized: .Export), systemImage: "square.and.arrow.up")
             }
 
-
             Divider()
 
-            Button(action: {
-                moveToTop(item: item)
-            }) {
+            Button { moveToTop(item: item) } label: {
                 Label(String(localized: .MoveToTop), systemImage: "arrow.up.to.line")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
-            Button(action: {
-                moveToBottom(item: item)
-            }) {
+            Button { moveToBottom(item: item) } label: {
                 Label(String(localized: .MoveToBottom), systemImage: "arrow.down.to.line")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
-
-            Button(action: {
-                moveUp(item: item)
-            }) {
+            Button { moveUp(item: item) } label: {
                 Label(String(localized: .MoveUp), systemImage: "chevron.up")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
-
-            Button(action: {
-                moveDown(item: item)
-            }) {
+            Button { moveDown(item: item) } label: {
                 Label(String(localized: .MoveDown), systemImage: "chevron.down")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
             Divider()
 
             Button {
-                duplicateItem(item: ProfileModel(from: item))
+                duplicateItem(item: singleModel)
             } label: {
                 Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
             Button {
-                self.selectedRow = ProfileModel(from: item)
+                activeSheet = .edit(singleModel)
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
-            }
-            .disabled(isMultiSelect)
+            }.disabled(isMultiSelect)
 
             Button {
-                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
+                if showConfirmAlertSync(
+                    title: String(localized: .DeleteSelectedConfirm),
+                    message: String(localized: .DeleteTip)
+                ) {
                     viewModel.delete(uuid: item.uuid)
                 }
             } label: {
@@ -251,9 +249,7 @@ struct ProfileListView: View {
         }
     }
 
-    // 提取的 Table 子视图，减少主视图表达式复杂度
     private var tableView: some View {
-        // 表格主体
         Table(of: ProfileEntity.self, selection: $selection, sortOrder: $sortOrder) {
             Group {
                 TableColumn("#") { (row: ProfileEntity) in
@@ -271,15 +267,11 @@ struct ProfileListView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "line.3.horizontal")
                     }
-                    .contentShape(Rectangle()) // 扩大点击/拖拽区域
-                    .draggable(row) // 整个区域作为拖拽手柄
-                    .onTapGesture { } // 吃掉点击事件，避免触发行选择
+                    .contentShape(Rectangle())
+                    .draggable(row)
+                    .onTapGesture { }
                     .onHover { inside in
-                        if inside {
-                            NSCursor.openHand.push()
-                        } else {
-                            NSCursor.pop()
-                        }
+                        if inside { NSCursor.openHand.push() } else { NSCursor.pop() }
                     }
                 }
                 .width(26)
@@ -289,14 +281,10 @@ struct ProfileListView: View {
                         Image(systemName: "square.and.pencil")
                         Text(row.remark)
                     }
-                    .contentShape(Rectangle()) // 扩大点击/拖拽区域
-                    .onTapGesture { selectedRow = ProfileModel(from: row) }
+                    .contentShape(Rectangle())
+                    .onTapGesture { activeSheet = .edit(ProfileModel(from: row)) }
                     .onHover { inside in
-                        if inside {
-                            NSCursor.pointingHand.push()
-                        } else {
-                            NSCursor.pop()
-                        }
+                        if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
                     }
                 }
                 .width(min: 150, max: 300)
@@ -306,7 +294,7 @@ struct ProfileListView: View {
                         .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
                 }
                 .width(40)
-                
+
                 TableColumn(String(localized: .TableFieldType)) { row in
                     Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)
                 }
@@ -315,11 +303,11 @@ struct ProfileListView: View {
                 TableColumn(String(localized: .TableFieldNetwork)) { row in
                     Text(row.network.rawValue)
                 }.width(50)
-                
+
                 TableColumn(String(localized: .TableFieldSecurity)) { row in
                     Text(row.security.rawValue)
                 }.width(40)
-                
+
                 TableColumn(String(localized: .TableFieldAddress)) { row in
                     Text(row.address)
                 }
@@ -329,7 +317,6 @@ struct ProfileListView: View {
                     Text("\(row.port)")
                 }
                 .width(40)
-
             }
             Group {
                 TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileEntity) in
@@ -363,7 +350,6 @@ struct ProfileListView: View {
     }
 
     private func chooseItem(item: ProfileModel) {
-        // 选择当前配置
         Task {
             await AppState.shared.switchServer(uuid: item.uuid)
         }
@@ -371,20 +357,21 @@ struct ProfileListView: View {
 
     private func duplicateItem(item: ProfileModel) {
         let newItem = item.clone()
-        viewModel.upsert(item: newItem.entity)
-        viewModel.updateSortOrderInDBAsync()
+        newItem.remark = newItem.remark + "-" + (String(localized: .Copy))
+        // 显示编辑界面
+        withAnimation {
+            let newProxy = ProfileModel(from: newItem.entity)
+            activeSheet = .edit(newProxy)
+        }
     }
 
     private func copyItem(item: ProfileEntity) {
-        // 复制到剪贴板
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         let profileString = ShareUri.generateShareUri(item: item)
         if pasteboard.setString(profileString, forType: .string) {
-            logger.info("Copied to clipboard: \(profileString)")
             alertDialog(title: String(localized: .Copied), message: "")
         } else {
-            logger.info("Failed to copy to clipboard")
             alertDialog(title: String(localized: .CopyFailed), message: "")
         }
     }
@@ -410,12 +397,13 @@ struct ProfileListView: View {
     }
 
     private func moveDown(item: ProfileEntity) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index < viewModel.list.count - 1 else { return }
+        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }),
+              index < viewModel.list.count - 1 else { return }
         viewModel.list.swapAt(index, index + 1)
         viewModel.updateSortOrderInDBAsync()
     }
 
     private func loadData() {
-        viewModel.getList() // Load data when the view appears
+        viewModel.getList()
     }
 }
