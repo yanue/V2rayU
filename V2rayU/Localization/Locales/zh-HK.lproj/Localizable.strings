@@ -303,6 +303,7 @@
 "SyncAll" = "同步全部";
 "SearchTip" = "搜尋";
 "AllGroup" = "全部群組";
+"DefaultGroup" = "默認群組";
 "SelectGroup" = "選擇群組";
 "SelectAll" = "全選";
 "CopyURI" = "複製 URI 連結";

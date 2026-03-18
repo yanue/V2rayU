@@ -303,6 +303,7 @@
 "SyncAll" = "同步全部";
 "SearchTip" = "搜索";
 "AllGroup" = "全部分组";
+"DefaultGroup" = "默认分组";
 "SelectGroup" = "选择分组";
 "SelectAll" = "全选";
 "CopyURI" = "复制 URI 链接";

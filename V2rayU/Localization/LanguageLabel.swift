@@ -300,6 +300,7 @@ enum LanguageLabel: String, CaseIterable {
     case SyncAll
     case SearchTip
     case AllGroup
+    case DefaultGroup
     case SelectGroup
     case SelectAll
     case CopyURI

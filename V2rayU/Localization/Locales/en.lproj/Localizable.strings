@@ -303,6 +303,7 @@
 "SyncAll" = "Sync All";
 "SearchTip" = "Search";
 "AllGroup" = "All Groups";
+"DefaultGroup" = "Default Group";
 "SelectGroup" = "Select Group";
 "SelectAll" = "Select All";
 "CopyURI" = "Copy URI";

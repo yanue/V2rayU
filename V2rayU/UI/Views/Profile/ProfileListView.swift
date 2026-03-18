@@ -39,11 +39,22 @@ struct ProfileListView: View {
 
     var filteredAndSortedItems: [ProfileEntity] {
         viewModel.list.filter { item in
-            (selectGroup.isEmpty || selectGroup == item.subid) &&
-            (searchText.isEmpty ||
-             item.address.lowercased().contains(searchText.lowercased()) ||
-             item.remark.lowercased().contains(searchText.lowercased()))
+            let itemGroupName = getGroupName(for: item)
+            return (selectGroup.isEmpty || selectGroup == itemGroupName) &&
+                (searchText.isEmpty ||
+                 item.address.lowercased().contains(searchText.lowercased()) ||
+                 item.remark.lowercased().contains(searchText.lowercased()))
         }
+    }
+    
+    private func getGroupName(for item: ProfileEntity) -> String {
+        if item.subid.isEmpty {
+            return String(localized: .DefaultGroup)
+        }
+        if let sub = SubscriptionStore.shared.fetchOne(uuid: item.subid) {
+            return sub.remark.isEmpty ? sub.url : sub.remark
+        }
+        return item.subid
     }
 
     private func resolveSelectedItems(for item: ProfileEntity) -> [ProfileEntity] {
@@ -69,6 +80,12 @@ struct ProfileListView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
+                
+                Button(action: { withAnimation { loadData() } }) {
+                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+
                 Button(action: {
                     withAnimation {
                         let newProxy = ProfileModel(from: ProfileEntity())
@@ -76,11 +93,6 @@ struct ProfileListView: View {
                     }
                 }) {
                     Label(String(localized: .Add), systemImage: "plus")
-                }
-                .buttonStyle(.bordered)
-
-                Button(action: { withAnimation { loadData() } }) {
-                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
 
@@ -358,6 +370,8 @@ struct ProfileListView: View {
     private func duplicateItem(item: ProfileModel) {
         let newItem = item.clone()
         newItem.remark = newItem.remark + "-" + (String(localized: .Copy))
+        newItem.uuid = UUID().uuidString // 新的 UUID
+        newItem.entity.subid = "" // 清除分组信息
         // 显示编辑界面
         withAnimation {
             let newProxy = ProfileModel(from: newItem.entity)
