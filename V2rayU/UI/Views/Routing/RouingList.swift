@@ -15,6 +15,7 @@ struct RoutingListView: View {
     @State private var selection: Set<RoutingModel.ID> = []
     @State private var selectedRow: RoutingModel? = nil
     @State private var draggedRow: RoutingModel?
+    @State private var tableOpacity: Double = 1.0
     
     var body: some View {
         VStack() {
@@ -55,7 +56,17 @@ struct RoutingListView: View {
                 .disabled(selection.isEmpty)
                 .buttonStyle(.bordered)
 
-                Button(action: { withAnimation { loadData() } }) {
+                Button(action: {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        tableOpacity = 0
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        loadData()
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            tableOpacity = 1
+                        }
+                    }
+                }) {
                     Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
@@ -65,6 +76,7 @@ struct RoutingListView: View {
             Divider()
             
             routingTable
+                .opacity(tableOpacity)
         }
         .padding(8)
         .sheet(item: $selectedRow) { row in

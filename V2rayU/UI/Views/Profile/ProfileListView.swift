@@ -41,6 +41,7 @@ struct ProfileListView: View {
     @State private var searchText = ""
     @State private var selectAll: Bool = false
     @State private var activeSheet: ActiveSheet? = nil
+    @State private var tableOpacity: Double = 1.0
 
     var filteredAndSortedItems: [ProfileEntity] {
         viewModel.list.filter { item in
@@ -86,7 +87,17 @@ struct ProfileListView: View {
                 }
                 Spacer()
                 
-                Button(action: { withAnimation { loadData() } }) {
+                Button(action: {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        tableOpacity = 0
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        loadData()
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            tableOpacity = 1
+                        }
+                    }
+                }) {
                     Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
@@ -140,6 +151,7 @@ struct ProfileListView: View {
                     )
                 }.padding(.horizontal, 10)
                 tableView
+                    .opacity(tableOpacity)
             }
             .background(.ultraThinMaterial)
             .border(Color.gray.opacity(0.1), width: 1)

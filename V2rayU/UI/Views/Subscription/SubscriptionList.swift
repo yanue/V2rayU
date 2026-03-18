@@ -17,6 +17,7 @@ struct SubscriptionListView: View {
     @State private var draggedRow: SubscriptionModel?
     @State private var syncingRow: SubscriptionModel? = nil
     @State private var syncingAll: Bool = false
+    @State private var tableOpacity: Double = 1.0
     
     var body: some View {
         VStack(spacing: 0) {
@@ -60,7 +61,17 @@ struct SubscriptionListView: View {
                 .disabled(viewModel.list.isEmpty)
                 .buttonStyle(.borderedProminent)
 
-                Button(action: { withAnimation { loadData() } }) {
+                Button(action: {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        tableOpacity = 0
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        loadData()
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            tableOpacity = 1
+                        }
+                    }
+                }) {
                     Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(.bordered)
@@ -70,6 +81,7 @@ struct SubscriptionListView: View {
 
             // 将复杂的 Table 表达式提取到单独的计算属性以降低类型检查复杂度
             subscriptionTable
+                .opacity(tableOpacity)
 
         }
         .padding(8)
