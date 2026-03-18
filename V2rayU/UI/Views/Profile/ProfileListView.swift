@@ -10,6 +10,7 @@ import SwiftUI
 private enum ActiveSheet: Identifiable {
     case edit(ProfileModel)
     case ping(ProfileModel)
+    case pingMultiple([ProfileEntity])
     case share(ProfileModel)
     case export([ProfileEntity])
     case pingAll
@@ -18,6 +19,10 @@ private enum ActiveSheet: Identifiable {
         switch self {
         case .edit(let m):       return "edit-\(m.uuid)"
         case .ping(let m):       return "ping-\(m.uuid)"
+        case .pingMultiple(let items):
+            let head = items.first?.uuid ?? ""
+            let tail = items.last?.uuid ?? ""
+            return "pingMulti-\(items.count)-\(head)-\(tail)"
         case .share(let m):      return "share-\(m.uuid)"
         case .export(let items):
             let head = items.first?.uuid ?? ""
@@ -99,7 +104,7 @@ struct ProfileListView: View {
                 Button(action: { activeSheet = .pingAll }) {
                     Label(String(localized: .Ping), systemImage: "network")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.bordered)
                 .disabled(viewModel.list.isEmpty)
             }
 
@@ -113,8 +118,8 @@ struct ProfileListView: View {
                             Text(group).tag(group)
                         }
                     }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200)
+                    .pickerStyle(.menu)
+                    .frame(width: 150)
                     Spacer()
 
                     HStack(spacing: 6) {
@@ -156,6 +161,10 @@ struct ProfileListView: View {
                 ProfilePingView(profile: nil, isAll: true) {
                     activeSheet = nil
                 }
+            case .pingMultiple(let items):
+                ProfilePingView(profiles: items, isAll: false) {
+                    activeSheet = nil
+                }
             case .share(let model):
                 ShareQrCodeView(profile: model) {
                     activeSheet = nil
@@ -195,7 +204,7 @@ struct ProfileListView: View {
             }
 
             Button {
-                activeSheet = .ping(singleModel)
+                activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
             } label: {
                 Label(String(localized: .Ping), systemImage: "speedometer")
             }

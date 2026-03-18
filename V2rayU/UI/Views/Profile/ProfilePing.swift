@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfilePingView: View {
     var profile: ProfileEntity?
+    var profiles: [ProfileEntity]?
     var isAll: Bool
     var onClose: () -> Void
     @State private var logs: [String] = []
@@ -18,7 +19,7 @@ struct ProfilePingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text(isAll ? "Ping All Proxies" : "Ping Proxy")
+                Text(pingTitle)
                     .font(.title2).bold()
                 Spacer()
                 Button(isPinging ? "Pinging..." : "Ping Now") {
@@ -28,6 +29,8 @@ struct ProfilePingView: View {
                         doPingAll()
                     } else if let p = profile {
                         doPingItem(item: p)
+                    } else if let items = profiles {
+                        doPingMultiple(items: items)
                     }
                 }
                 .disabled(isPinging)
@@ -47,6 +50,17 @@ struct ProfilePingView: View {
                     Text("Remark: \(p.remark)")
                         .font(.subheadline)
                     Text("Protocol: \(p.protocol.rawValue), Address: \(p.address):\(p.port)")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                Divider().padding(.top, 8)
+            } else if let items = profiles, !items.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Selected: \(items.count) proxies")
+                        .font(.subheadline)
+                    Text("Protocol: \(Array(Set(items.map { $0.protocol.rawValue })).joined(separator: ", "))")
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
@@ -150,9 +164,27 @@ struct ProfilePingView: View {
         }
     }
 
+    func doPingMultiple(items: [ProfileEntity]) {
+        Task {
+            for item in items {
+                await PingAll.shared.pingOne(item: item)
+            }
+        }
+    }
+
     func doPingAll() {
         Task {
             await PingAll.shared.run()
+        }
+    }
+
+    private var pingTitle: String {
+        if isAll {
+            return "Ping All Proxies"
+        } else if let items = profiles, !items.isEmpty {
+            return "Ping \(items.count) Proxies"
+        } else {
+            return "Ping Proxy"
         }
     }
 }
