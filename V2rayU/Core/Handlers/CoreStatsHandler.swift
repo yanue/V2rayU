@@ -61,19 +61,19 @@ actor CoreTrafficStatsHandler {
         if timeInterval < 1 {
             return
         }
-        // 计算速度
+        // 计算速度（用增量除以时间）
         let directUpSpeed = (Double(directUpLink - self.directUpLink) / 1024  / timeInterval)
         let directDownSpeed = (Double(directDownLink - self.directDownLink) / 1024 / timeInterval)
         let proxyUpSpeed = (Double(proxyUpLink - self.proxyUpLink) / 1024 /  timeInterval)
-        let proxyDownSpeed = (Double(proxyDownLink - self.proxyDownLink) / 1024 / timeInterval)
-        // 替换
+        let proxyDownSpeed = (Double(proxyDownLink - self.proxyDownLink) / 1024 /  timeInterval)
+        // 计算流量增量（当前累计值 - 上次累计值）
+        let up = (directUpLink + proxyUpLink) - (self.directUpLink + self.proxyUpLink)
+        let down = (directDownLink + proxyDownLink) - (self.directDownLink + self.proxyDownLink)
+        // 保存当前累计值
         self.directUpLink = directUpLink
         self.directDownLink = directDownLink
         self.proxyUpLink = proxyUpLink
         self.proxyDownLink = proxyDownLink
-        // 计算流量(代理流量=代理上行+代理下行)
-        let up = directUpLink + proxyUpLink
-        let down = directDownLink + proxyDownLink
         Task {
             // 更新到 UI
             await AppState.shared.setSpeed(latency: latency, directUpSpeed: directUpSpeed, directDownSpeed: directDownSpeed, proxyUpSpeed: proxyUpSpeed, proxyDownSpeed: proxyDownSpeed)

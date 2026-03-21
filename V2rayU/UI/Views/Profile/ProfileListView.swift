@@ -362,12 +362,12 @@ struct ProfileListView: View {
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn(String(localized: .TableFieldTodayDown)) { (row: ProfileEntity) in
+                TableColumn(String(localized: .TableFieldTotalDown)) { (row: ProfileEntity) in
                     Text(row.totalDown.humanSize)
                 }
                 .width(min: 40, max: 100)
 
-                TableColumn(String(localized: .TableFieldTodayUp)) { (row: ProfileEntity) in
+                TableColumn(String(localized: .TableFieldTotalUp)) { (row: ProfileEntity) in
                     Text(row.totalUp.humanSize)
                 }
                 .width(min: 40, max: 100)
