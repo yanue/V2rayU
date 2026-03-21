@@ -31,25 +31,25 @@ struct PacView: View {
                 .buttonStyle(.borderedProminent)
             }
 
-            Spacer()
-
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 8) {
                 localized(.GFWListDownloadURL)
                     .font(.headline)
                 TextField(String(localized: .EnterGFWListURL), text: $gfwPacListUrl)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
             }
 
-            Spacer()
-
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 8) {
                 localized(.CustomRules)
                     .font(.headline)
                 localized(.AddCustomRules)
                     .font(.caption)
                     .foregroundColor(.secondary)
                 TextEditor(text: $pacUserRules)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                    )
             }
 
             HStack {
@@ -77,10 +77,10 @@ struct PacView: View {
                 .buttonStyle(.borderedProminent)
             }
         }
+        .padding()
+        .frame(width: 500, height: 400)
         .onAppear {
-            // Load GFW List URL and PAC File Path from UserDefaults
             gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
-            // Load PAC File Content
             pacUserRules = getPacUserRules()
         }
         .alert(isPresented: $showAlert) {
@@ -91,34 +91,27 @@ struct PacView: View {
     func viewPacFile(_ sender: Any) {
         let pacUrl = getPacUrl()
         logger.info("viewPacFile PACUrl: \(pacUrl)")
-        guard let url = URL(string: pacUrl) else {
-            return
-        }
+        guard let url = URL(string: pacUrl) else { return }
         NSWorkspace.shared.open(url)
     }
 
-    /// 更新 PAC 文件（由用户规则触发）
     func updatePac(_ sender: Any) {
-        tips = String(localized: .UpdatingPacRules) // Updating Pac Rules ...
+        tips = String(localized: .UpdatingPacRules)
 
         do {
-            // 保存用户规则
             logger.info("user-rules: \(pacUserRules)")
             try pacUserRules.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
-
-            // 从 GFWList 更新
             UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl)
 
             if GeneratePACFile(rewrite: true) {
-                tips = String(localized: .PacUpdatedByUserRules) // PAC has been updated by User Rules.
+                tips = String(localized: .PacUpdatedByUserRules)
             } else {
-                tips = String(localized: .PacUpdateFailedByUserRules) // It's failed to update PAC by User Rules.
+                tips = String(localized: .PacUpdateFailedByUserRules)
             }
             showAlert = true
 
         } catch {
             logger.info("updatePac error \(error)")
-            // 使用本地化模板字符串
             tips = String(localized: .UpdatePacError) + "\(error.localizedDescription)"
             showAlert = true
         }
@@ -128,7 +121,6 @@ struct PacView: View {
         }
     }
 
-    /// 从 GFWList 在线地址更新
     func UpdatePACFromGFWList(gfwPacListUrl: String) {
         if !FileManager.default.fileExists(atPath: PACRulesDirPath) {
             try? FileManager.default.createDirectory(atPath: PACRulesDirPath, withIntermediateDirectories: true)
@@ -166,7 +158,7 @@ struct PacView: View {
             do {
                 try outputStr.write(toFile: GFWListFilePath, atomically: true, encoding: .utf8)
                 DispatchQueue.main.async {
-                    self.tips = String(localized: .GfwListUpdated) // gfwList has been updated
+                    self.tips = String(localized: .GfwListUpdated)
                     self.showAlert = true
                 }
 

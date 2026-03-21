@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import KeyboardShortcuts
 
-// Placeholder Views for Content
 extension KeyboardShortcuts.Name {
     static let toggleV2rayOnOff = Self("toggleV2rayOnOff")
     static let swiftProxyMode = Self("swiftProxyMode")
@@ -21,52 +20,54 @@ struct GeneralView: View {
     @State private var proxyModeShortcut: String = ""
 
     @StateObject private var languageManager = LanguageManager.shared
-    @ObservedObject var settings = AppSettings.shared // 引用单例
-    @ObservedObject var state = AppState.shared // 引用单例
+    @ObservedObject var settings = AppSettings.shared
+    @ObservedObject var state = AppState.shared
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Form {
-                Section {
-                    Toggle(String(localized: .LaunchAtLogin), isOn: $settings.launchAtLogin)
-                    Toggle(String(localized: .CheckForUpdateAutomatically), isOn: $settings.checkForUpdates)
-                    Toggle(String(localized: .AutoUpdateServersFromSubscriptions), isOn: $settings.autoUpdateServers)
-                    Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
-                    Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
-                    Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
-                    Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
-                }
-                Spacer()
+        VStack(alignment: .leading, spacing: 12) {
+            Toggle(String(localized: .LaunchAtLogin), isOn: $settings.launchAtLogin)
+            Toggle(String(localized: .CheckForUpdateAutomatically), isOn: $settings.checkForUpdates)
+            Toggle(String(localized: .AutoUpdateServersFromSubscriptions), isOn: $settings.autoUpdateServers)
+            Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
+            Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
+            Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
+            Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
 
-                // 语言选择器
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
                 Picker(String(localized: .Language), selection: $languageManager.selectedLanguage) {
                     ForEach(Language.allCases, id: \.self) { item in
                         localized(item.rawValue).tag(item.rawValue)
                     }
                 }
-               .padding()
-                    
+
                 Picker(String(localized: .Theme), selection: $settings.selectedTheme) {
                     ForEach(Theme.allCases, id: \.self) { item in
-                        Text(String(localized: item.rawValue)).tag(item) // 保持 tag 类型为 Theme
+                        Text(String(localized: item.rawValue)).tag(item)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                .padding()
+            }
 
-                Spacer()
-                Section(header: localized(.KeyboardShortcuts)) {
-                    HStack {
-                        KeyboardShortcuts.Recorder(String(localized: .ToggleV2rayOnOff), name: .toggleV2rayOnOff)
-                    }
-                    HStack {
-                        KeyboardShortcuts.Recorder(String(localized: .SwitchProxyMode), name: .swiftProxyMode)
-                    }
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(String(localized: .KeyboardShortcuts))
+                    .font(.headline)
+
+                HStack {
+                    Text(String(localized: .ToggleV2rayOnOff))
+                    KeyboardShortcuts.Recorder(String(localized: .ToggleV2rayOnOff), name: .toggleV2rayOnOff)
                 }
-                Spacer()
-              
+
+                HStack {
+                    Text(String(localized: .SwitchProxyMode))
+                    KeyboardShortcuts.Recorder(String(localized: .SwitchProxyMode), name: .swiftProxyMode)
+                }
             }
         }
+        .padding()
         .frame(width: 500, height: 400)
         .onDisappear {
             AppSettings.shared.saveSettings()

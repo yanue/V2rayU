@@ -12,10 +12,10 @@ struct AdvanceView: View {
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
     private var labelWidth: CGFloat = 240
-    @ObservedObject var settings = AppSettings.shared // 引用单例
+    @ObservedObject var settings = AppSettings.shared
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 getTextLabel(label: .LocalSocksListenPort, labelWidth: labelWidth)
                 TextField(String(localized: .LocalSocksListenPort), value: $settings.socksPort, formatter: NumberFormatter())
@@ -46,6 +46,9 @@ struct AdvanceView: View {
                     }
                 }
             }
+
+            Divider()
+
             HStack {
                 Button(String(localized: .Save)) {
                     settings.saveSettings()
@@ -53,7 +56,7 @@ struct AdvanceView: View {
                 Spacer()
             }
         }
+        .padding()
         .frame(width: 500, height: 400)
-        Spacer()
     }
 }

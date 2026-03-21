@@ -12,7 +12,7 @@ struct DnsView: View {
     @State private var dnsJson: String = ""
     @State private var tips: String = ""
     @State private var showAlert: Bool = false
-    @ObservedObject var settings = AppSettings() // 引用单例
+    @ObservedObject var settings = AppSettings()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -31,23 +31,20 @@ struct DnsView: View {
                 .buttonStyle(.borderedProminent)
             }
 
-            VStack {
-                TextEditor(text: $dnsJson)
-                    .font(.system(.body, design: .monospaced))
-            }
-            .background() // 2. 然后背景
-            .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                    .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-            ) // 4. 添加边框和阴影
+            TextEditor(text: $dnsJson)
+                .font(.system(.body, design: .monospaced))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
 
             HStack {
                 Button(action: { goHelp(self) }) {
                     Label(String(localized: .Help), systemImage: "questionmark.circle")
                 }
                 .buttonStyle(.bordered)
+
                 Spacer()
 
                 if !tips.isEmpty {
@@ -59,12 +56,15 @@ struct DnsView: View {
                 }
 
                 Spacer()
+
                 Button(action: { saveDnsServers() }) {
                     Label(String(localized: .Save), systemImage: "tray.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
             }
         }
+        .padding()
+        .frame(width: 500, height: 400)
         .onAppear { loadDnsServers() }
         .alert(isPresented: $showAlert) {
             Alert(title: Text(String(localized: .Notification)), message: Text(tips), dismissButton: .default(Text(String(localized: .Confirm))) )
@@ -75,21 +75,17 @@ struct DnsView: View {
         dnsJson = AppSettings.shared.dnsJson
     }
 
-    // MARK: - 保存 DNS 配置（本地化 + 结构化）
     private func saveDnsServers() {
-        // 去除首尾空白和换行
         var str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // 检查输入能否编码为 UTF-8
         guard let data = str.data(using: .utf8) else {
-            tips = String(localized: .DnsInvalidUTF8) // 错误：输入内容无法编码为 UTF-8
+            tips = String(localized: .DnsInvalidUTF8)
             showAlert = true
             return
         }
 
         var jsonObj: Any
 
-        // 尝试解析 JSON 内容
         do {
             jsonObj = try JSONSerialization.jsonObject(with: data, options: [])
         } catch {
@@ -98,12 +94,10 @@ struct DnsView: View {
             return
         }
 
-        // 如果 JSON 顶层包含 dns 节点，提取其内部内容
         if let dict = jsonObj as? [String: Any], let dnsConfig = dict["dns"] {
             jsonObj = dnsConfig
         }
 
-        // 重新编码 JSON（格式化输出，key 按字母排序）
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
 
@@ -111,26 +105,20 @@ struct DnsView: View {
             let formattedData = try encoder.encode(AnyCodable(jsonObj))
 
             if let formattedStr = String(data: formattedData, encoding: .utf8) {
-                // 触发配置更新
                 AppSettings.shared.dnsJson = formattedStr
                 AppSettings.shared.saveSettings()
-
-                // 提示成功
-                tips = String(localized: .DnsSaveSuccess) // DNS 配置保存成功
+                tips = String(localized: .DnsSaveSuccess)
             } else {
-                // 再次编码为字符串失败
-                tips = String(localized: .DnsFormatEncodingFail) // Error: 格式化后内容无法编码为字符串
+                tips = String(localized: .DnsFormatEncodingFail)
             }
 
             showAlert = true
 
         } catch {
-            // 保存失败
             tips = "\(String(localized: .DnsSaveFail)):\(error.localizedDescription)"
             showAlert = true
         }
 
-        // 5 秒后自动清空提示信息
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.tips = ""
         }
