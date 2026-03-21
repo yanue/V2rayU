@@ -107,12 +107,12 @@ struct SubscriptionListView: View {
             Button {
                 self.selectedRow = SubscriptionModel(from: item)
             } label: {
-                Text(localizedString(.Edit))
+                Label(localizedString(.Edit), systemImage: "pencil")
             }
             Button {
                 self.syncingRow = SubscriptionModel(from: item)
             } label: {
-                Text(localizedString(.SyncSubscriptionNow))
+                Label(localizedString(.SyncSubscriptionNow), systemImage: "arrow.triangle.2.circlepath")
             }
             Divider()
             Button {
@@ -120,7 +120,8 @@ struct SubscriptionListView: View {
                     viewModel.delete(uuid: item.uuid)
                 }
             } label: {
-                Text(localizedString(.Delete))
+                Label(localizedString(.Delete), systemImage: "trash")
+                    .foregroundColor(.red)
             }
         }
     }

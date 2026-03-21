@@ -38,6 +38,7 @@ enum LanguageLabel: String, CaseIterable {
     case Add
     case Export
     case Select
+    case SetActive
     case Duplicate
     // profile share
     case Regenerate
@@ -234,7 +235,7 @@ enum LanguageLabel: String, CaseIterable {
     case goRoutingSettings
     case goServerSettings
     case goPreferences
-    case Ping
+    case LatencyTest
     case Testing
     case ImportServersFromClipboard
     case ScanQRCodeFromScreen

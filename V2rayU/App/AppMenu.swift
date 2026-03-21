@@ -55,7 +55,7 @@ final class AppMenuManager: NSObject {
         pingTipSubject // 500毫秒刷新一下,避免很多时一直刷新UI
             .throttle(for: .milliseconds(500), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] tip in
-                self?.pingItem?.title = String(localized: .Ping) + " \(tip)"
+                self?.pingItem?.title = String(localized: .LatencyTest) + " \(tip)"
             }
             .store(in: &cancellables)
     }
@@ -114,7 +114,7 @@ final class AppMenuManager: NSObject {
             return
         }
         // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
-        pingItem?.title = String(localized: .Ping) + " \(self.pingTip)"
+        pingItem?.title = String(localized: .LatencyTest) + " \(self.pingTip)"
         diagnosticsItem?.title = String(localized: .Diagnostics)
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         viewConfigItem?.title = String(localized: .ViewConfigJson)
@@ -173,7 +173,7 @@ final class AppMenuManager: NSObject {
         routingItem = getRoutingItem()
         serverItem = getServerItem()
         // 预先初始化一次
-        pingItem = NSMenuItem(title: String(localized: .Ping) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
+        pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)

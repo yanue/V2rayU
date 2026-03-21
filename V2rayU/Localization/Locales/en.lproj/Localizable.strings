@@ -32,6 +32,7 @@
 "Add" = "Add";
 "Export" = "Export";
 "Select" = "Select";
+"SetActive" = "Set as Active";
 "Duplicate" = "Duplicate";
 "Copy" = "Copy";
 "Copied" = "Copied";
@@ -236,7 +237,7 @@
 "goRoutingSettings" = "Routing Settings...";
 "goServerSettings" = "Server Settings...";
 "goPreferences" = "Preferences...";
-"Ping" = "Ping Test";
+"LatencyTest" = "Latency Test";
 "Testing" = "Testing";
 "ImportServersFromClipboard" = "Import servers from clipboard";
 "ScanQRCodeFromScreen" = "Scan QR code from screen";
@@ -259,8 +260,8 @@
 "BackgroundActivitySubtitleNotRunning" = "Core process is not running";
 "OpenSettings" = "Open Settings";
 "Restart" = "Restart";
-"PingState" = "Ping State";
-"RunPingNow" = "Run Ping";
+"PingState" = "Latency State";
+"RunPingNow" = "Run Latency Test";
 "V2rayCoreInstallAndVersion" = "core Installation & Version";
 "V2rayUToolPermission" = "V2rayUTool Permission";
 "GeoipFile" = "geoip.dat File";
@@ -271,7 +272,7 @@
 "UnableToOpenSystemSettings" = "Unable to open system settings.";
 "PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity, and allow V2rayU to run in background.";
 "Fix" = "Fix";
-"PingProblem" = "Current node unavailable or network issue.";
+"PingProblem" = "Latency test failed: node unavailable or network issue.";
 "V2rayUToolProblem" = "V2rayUTool permission issue. The core may fail to start.";
 "BackgroundProblem" = "App is not running in background; might be limited by system or core process stopped.";
 "GeoipProblem" = "geoip.dat is missing, which may cause some functions to fail.";

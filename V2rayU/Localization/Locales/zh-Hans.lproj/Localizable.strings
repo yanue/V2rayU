@@ -32,6 +32,7 @@
 "Add" = "添加";
 "Export" = "导出";
 "Select" = "选择";
+"SetActive" = "设为活跃";
 "Duplicate" = "复制一份";
 "Copy" = "复制";
 "Copied" = "已复制";
@@ -236,7 +237,7 @@
 "goRoutingSettings" = "路由设置 ...";
 "goServerSettings" = "服务器配置 ...";
 "goPreferences" = "偏好设置 ...";
-"Ping" = "Ping 测试";
+"LatencyTest" = "延迟测试";
 "Testing" = "测试中";
 "ImportServersFromClipboard" = "从剪贴板导入服务器";
 "ScanQRCodeFromScreen" = "扫描屏幕二维码";
@@ -259,8 +260,8 @@
 "BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
 "OpenSettings" = "打开设置";
 "Restart" = "重启";
-"PingState" = "Ping 测试状态";
-"RunPingNow" = "运行 Ping 测试";
+"PingState" = "延迟测试状态";
+"RunPingNow" = "运行延迟测试";
 "V2rayCoreInstallAndVersion" = "core 安装与版本";
 "V2rayUToolPermission" = "V2rayUTool 权限";
 "GeoipFile" = "geoip.dat 文件";
@@ -271,7 +272,7 @@
 "UnableToOpenSystemSettings" = "无法打开系统设置";
 "PleaseManuallyOpenBackgroundActivity" = "请手动前往 系统设置 → 通用 → 后台活动，允许 V2rayU 后台运行。";
 "Fix" = "修复";
-"PingProblem" = "节点不可用或网络异常";
+"PingProblem" = "延迟测试失败：节点不可用或网络异常";
 "V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法启动核心";
 "BackgroundProblem" = "应用未在后台运行，可能被系统限制或核心进程已停止";
 "GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常";

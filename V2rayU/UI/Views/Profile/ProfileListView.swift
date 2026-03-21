@@ -43,6 +43,10 @@ struct ProfileListView: View {
     @State private var activeSheet: ActiveSheet? = nil
     @State private var tableOpacity: Double = 1.0
 
+    private var isRunningRow: (ProfileEntity) -> Bool {
+        { $0.uuid == AppState.shared.runningProfile }
+    }
+
     var filteredAndSortedItems: [ProfileEntity] {
         viewModel.list.filter { item in
             let itemGroupName = getGroupName(for: item)
@@ -79,7 +83,7 @@ struct ProfileListView: View {
             ) {
                 HStack(spacing: 8) {
                     Button(action: { activeSheet = .pingAll }) {
-                        Label(String(localized: .Ping), systemImage: "network")
+                        Label(String(localized: .LatencyTest), systemImage: "network")
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(viewModel.list.isEmpty)
@@ -207,13 +211,13 @@ struct ProfileListView: View {
             Button {
                 chooseItem(item: singleModel)
             } label: {
-                Label(String(localized: .Select), systemImage: "checkmark.circle")
+                Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
 
             Button {
                 activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
             } label: {
-                Label(String(localized: .Ping), systemImage: "speedometer")
+                Label(String(localized: .LatencyTest), systemImage: "speedometer")
             }
 
             Divider()
@@ -282,18 +286,27 @@ struct ProfileListView: View {
             Group {
                 TableColumn("#") { (row: ProfileEntity) in
                     HStack(spacing: 4) {
-                        if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                        if isRunningRow(row) {
+                           Image(systemName: "checkmark.circle.fill")
+                               .foregroundColor(.green)
+                               .font(.system(size: 13))
+                        } else if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
                     }
                 }
-                .width(20)
+                .width(28)
 
                 TableColumn(String(localized: .TableFieldSort)) { (row: ProfileEntity) in
                     HStack(spacing: 5) {
-                        Image(systemName: "line.3.horizontal")
+                        if isRunningRow(row) {
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundColor(.green)
+                        } else {
+                            Image(systemName: "line.3.horizontal")
+                        }
                     }
                     .contentShape(Rectangle())
                     .draggable(row)
@@ -306,8 +319,17 @@ struct ProfileListView: View {
 
                 TableColumn(String(localized: .TableFieldRemark)) { (row: ProfileEntity) in
                     HStack(spacing: 4) {
-                        Image(systemName: "square.and.pencil")
-                        Text(row.remark)
+                        if isRunningRow(row) {
+                            Image(systemName: "square.and.pencil")
+                                .foregroundColor(.green)
+                                .font(.system(size: 13))
+                            Text(row.remark)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.green)
+                        } else {
+                            Image(systemName: "square.and.pencil")
+                            Text(row.remark)
+                        }
                     }
                     .contentShape(Rectangle())
                     .onTapGesture { activeSheet = .edit(ProfileModel(from: row)) }
@@ -380,6 +402,7 @@ struct ProfileListView: View {
     private func chooseItem(item: ProfileModel) {
         Task {
             await AppState.shared.switchServer(uuid: item.uuid)
+            loadData()
         }
     }
 

@@ -16,6 +16,10 @@ struct RoutingListView: View {
     @State private var selectedRow: RoutingModel? = nil
     @State private var draggedRow: RoutingModel?
     @State private var tableOpacity: Double = 1.0
+
+    private var isRunningRow: (RoutingEntity) -> Bool {
+        { $0.uuid == AppState.shared.runningRouting }
+    }
     
     var body: some View {
         VStack {
@@ -88,15 +92,30 @@ struct RoutingListView: View {
     
     private func contextMenuProvider(item: RoutingEntity) -> some View {
         Group {
-            Button(String(localized: .Edit)) {
-                self.selectedRow = RoutingModel(from: item)
+            Button {
+                Task {
+                    await AppState.shared.switchRouting(uuid: item.uuid)
+                    loadData()
+                }
+            } label: {
+                Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
 
             Divider()
-            Button(String(localized: .Delete)) {
+
+            Button {
+                self.selectedRow = RoutingModel(from: item)
+            } label: {
+                Label(String(localized: .Edit), systemImage: "pencil")
+            }
+
+            Button {
                 if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
                     viewModel.delete(uuid: item.uuid)
                 }
+            } label: {
+                Label(String(localized: .Delete), systemImage: "trash")
+                    .foregroundColor(.red)
             }
         }
     }
@@ -113,18 +132,27 @@ struct RoutingListView: View {
             Table(of: RoutingEntity.self, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("#") { (row: RoutingEntity) in
                     HStack(spacing: 4) {
-                        if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                        if isRunningRow(row) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .font(.system(size: 13))
+                        } else if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
                             Text("\(idx + 1)")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
                     }
                 }
-                .width(20)
+                .width(28)
 
                 TableColumn(String(localized: .TableFieldSort)) { (row: RoutingEntity) in
-                    HStack(spacing: 4) {
-                        Image(systemName: "line.3.horizontal")
+                    HStack(spacing: 5) {
+                        if isRunningRow(row) {
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundColor(.green)
+                        } else {
+                            Image(systemName: "line.3.horizontal")
+                        }
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
                     .draggable(row)              // 整个区域作为拖拽手柄
@@ -141,8 +169,16 @@ struct RoutingListView: View {
 
                 TableColumn(String(localized: .TableFieldRemark)) { (row: RoutingEntity) in
                     HStack(spacing: 4) {
-                        Image(systemName: "square.and.pencil")
-                        Text(row.remark)
+                        if isRunningRow(row) {
+                            Image(systemName: "square.and.pencil")
+                                .foregroundColor(.green)
+                                .font(.system(size: 13))
+                            Text(row.remark)
+                                .fontWeight(.semibold)
+                        } else {
+                            Image(systemName: "square.and.pencil")
+                            Text(row.remark)
+                        }
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
                     .onTapGesture() { selectedRow = RoutingModel(from: row) }
