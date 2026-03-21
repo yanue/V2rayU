@@ -17,36 +17,46 @@ struct DiagnosticsView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Text(String(localized: .Diagnostics))
-                    .font(.title3)
-                Spacer()
-                if !viewModel.progressText.isEmpty {
-                    Text(viewModel.progressText)
-                        .foregroundColor(.secondary)
-                }
-                RefreshButton(checking: $viewModel.checking) {
-                    viewModel.runSequentialChecks()
-                }
-                Button {
-                    viewModel.showFAQ = true
-                } label: {
-                    Image(systemName: "questionmark.circle")
-                    Text(String(localized: .FAQ))
-                }
-                .buttonStyle(.bordered)
-            }
-            .padding(.horizontal, 10)
-            
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(viewModel.items) { item in
-                        statusRow(item: item)
+            PageHeader(
+                icon: "questionmark.circle",
+                title: String(localized: .Diagnostics),
+                subtitle:  String(localized: .DiagnosticSubHead)
+            ) {
+                HStack(spacing: 8) {
+                    if !viewModel.progressText.isEmpty {
+                        Text(viewModel.progressText)
+                            .foregroundColor(.secondary)
                     }
+                    RefreshButton(checking: $viewModel.checking) {
+                        viewModel.runSequentialChecks()
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        viewModel.showFAQ = true
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                        Text(String(localized: .FAQ))
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .padding(.top, 6)
             }
-            .padding(.horizontal, 10)
+
+            Spacer()
+            VStack {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(viewModel.items) { item in
+                            statusRow(item: item)
+                        }
+                    }
+                    .padding(.top, 6)
+                }
+                .padding(.horizontal, 10)
+            }
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
             .onAppear { viewModel.runSequentialChecks() }
             .alert(isPresented: $viewModel.showOpenSettingsAlert) {
                 Alert(
@@ -61,6 +71,7 @@ struct DiagnosticsView: View {
                 }
             }
         }
+        .padding(8)
     }
 }
 

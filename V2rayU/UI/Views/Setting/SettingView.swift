@@ -20,52 +20,41 @@ struct SettingView: View {
     }
 
     var body: some View {
-        VStack() {
-            HStack {
-                Image(systemName: "gear")
-                    .resizable()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    localized(.Settings)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    localized(.SettingsSubHead)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                
-            }.padding(.bottom, 10)
-            
+        VStack {
+            PageHeader(
+                icon: "gear",
+                title: String(localized: .Settings),
+                subtitle: String(localized: .SettingsSubHead)
+            )
+
             // Segmented Picker (Tabs)
             Picker("", selection: $appState.settingTab) {
                 localized(.General).tag(SettingTab.general)
                 localized(.Advanced).tag(SettingTab.advance)
                 localized(.DNS).tag(SettingTab.dns)
                 localized(.PAC).tag(SettingTab.pac)
-//                localized(.Core).tag(SettingTab.core)
             }
             .pickerStyle(.segmented)
+
+            Spacer(minLength: 20)
             
-            Spacer(minLength: 20) 
-            // Content based on Selected Tab
-            HStack{
-                VStack {
-                    switch appState.settingTab {
-                    case .general:
-                        GeneralView()
-                    case .advance:
-                        AdvanceView()
-                    case .dns:
-                        DnsView()
-                    case .pac:
-                        PacView()
-//                    case .core:
-//                        CoreView()
-                    }
+            VStack {
+                // Content based on Selected Tab
+                switch appState.settingTab {
+                case .general:
+                    GeneralView()
+                case .advance:
+                    AdvanceView()
+                case .dns:
+                    DnsView()
+                case .pac:
+                    PacView()
                 }
             }
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
         }
+        .padding(8)
     }
 }

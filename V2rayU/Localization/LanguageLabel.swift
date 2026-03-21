@@ -275,6 +275,7 @@ enum LanguageLabel: String, CaseIterable {
     case GeoipProblem
     case V2rayCoreProblem
     case Diagnostics
+    case DiagnosticSubHead
     case FAQ
     case FaqSubtitle
     // table fields

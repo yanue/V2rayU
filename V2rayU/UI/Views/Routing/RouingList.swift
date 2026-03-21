@@ -18,63 +18,39 @@ struct RoutingListView: View {
     @State private var tableOpacity: Double = 1.0
     
     var body: some View {
-        VStack() {
-            HStack {
-                Image(systemName: "bonjour")
-                    .resizable()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    localized(.Routings)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    localized(.RoutingSubHead)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                Button(action: { withAnimation {
-                    let newProxy = RoutingModel(from: RoutingEntity())
-                    self.selectedRow = newProxy
-                } }) {
-                    Label(String(localized: .Add), systemImage: "plus")
-                }
-                .buttonStyle(.bordered)
+        VStack {
+            PageHeader(
+                icon: "bonjour",
+                title: localizedString(.Routings),
+                subtitle: localizedString(.RoutingSubHead)
+            ) {
+                HStack(spacing: 8) {
+                    Button(action: { withAnimation {
+                        let newProxy = RoutingModel(from: RoutingEntity())
+                        self.selectedRow = newProxy
+                    } }) {
+                        Label(String(localized: .Add), systemImage: "plus")
+                    }
+                    .buttonStyle(.bordered)
 
-                Button(action: {
-                    if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
-                        withAnimation {
-                            for selectedID in self.selection {
-                                viewModel.delete(uuid: selectedID)
+                    Button(action: {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            tableOpacity = 0
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            loadData()
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                tableOpacity = 1
                             }
-                            selection.removeAll()
                         }
+                    }) {
+                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
-                }) {
-                    Label(String(localized: .Delete), systemImage: "trash")
+                    .buttonStyle(.bordered)
                 }
-                .disabled(selection.isEmpty)
-                .buttonStyle(.bordered)
-
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.15)) {
-                        tableOpacity = 0
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        loadData()
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            tableOpacity = 1
-                        }
-                    }
-                }) {
-                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
-                }
-                .buttonStyle(.bordered)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            Divider()
-            
+
+            Spacer()
             routingTable
                 .opacity(tableOpacity)
         }

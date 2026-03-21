@@ -21,60 +21,41 @@ struct SubscriptionListView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "personalhotspot")
-                    .resizable()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(localizedString(.Subscriptions))
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text(localizedString(.SubscriptionSubHead))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
+            PageHeader(
+                icon: "personalhotspot",
+                title: localizedString(.Subscriptions),
+                subtitle: localizedString(.SubscriptionSubHead)
+            ) {
+                HStack(spacing: 8) {
+                    Button(action: { syncingAll = true }) {
+                        Label(localizedString(.SyncAll), systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(viewModel.list.isEmpty)
 
-                Button(action: { withAnimation { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) } }) {
-                    Label(localizedString(.Add), systemImage: "plus")
-                }
-                .buttonStyle(.bordered)
-                Button(action: {
-                    if showConfirmAlertSync(title: localizedString(.DeleteSelectedConfirm), message: localizedString(.DeleteTip)) {
-                        withAnimation {
-                            for selectedID in self.selection {
-                                viewModel.delete(uuid: selectedID)
+                    Button(action: { withAnimation { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) } }) {
+                        Label(localizedString(.Add), systemImage: "plus")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Divider()
+                        .frame(height: 20)
+
+                    Button(action: {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            tableOpacity = 0
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            loadData()
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                tableOpacity = 1
                             }
-                            selection.removeAll()
                         }
+                    }) {
+                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
-                }) {
-                    Label(localizedString(.DeleteSelected), systemImage: "trash")
+                    .buttonStyle(.bordered)
                 }
-                .disabled(selection.isEmpty)
-                .buttonStyle(.bordered)
-
-                Button(action: { syncingAll = true }) {
-                    Label(localizedString(.SyncAll), systemImage: "arrow.triangle.2.circlepath")
-                }
-                .disabled(viewModel.list.isEmpty)
-                .buttonStyle(.borderedProminent)
-
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.15)) {
-                        tableOpacity = 0
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        loadData()
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            tableOpacity = 1
-                        }
-                    }
-                }) {
-                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
-                }
-                .buttonStyle(.bordered)
             }
 
             Spacer()

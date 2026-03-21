@@ -34,86 +34,76 @@ struct AboutView: View {
     ]
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                
-                // Header
-                HStack {
-                    Image("V2rayU")
-                        .resizable()
-                        .frame(width: 32, height: 32)
-                        .foregroundColor(.accentColor)
-                    VStack(alignment: .leading, spacing: 2) {
-                        localized(.About)
-                            .font(.title)
-                            .fontWeight(.bold)
-                        HStack {
-                            Text("\(String(localized: .Version)) \(appVersion) (\(String(localized: .Build)) \(appBuild))")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text(coreVersion)
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
+        VStack {
+            PageHeader(
+                icon: "info.circle",
+                title: String(localized: .About),
+                subtitle: "\(String(localized: .Version)) \(appVersion) (\(String(localized: .Build)) \(appBuild))"
+            )
+
+            Spacer()
+            VStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text(String(localized: .AboutSubHead))
+                            .font(.body)
+                            .foregroundColor(.primary)
+                        
+                        // 开源地址
+                        sectionHeader(title: String(localized: .OpenSourceProject), subtitle: String(localized: .OpenSourceLicense))
+                        HStack(spacing: 24) {
+                            linkButton("https://github.com/yanue/V2rayU.git")
+                            Spacer()
+                            Link(String(localized: .GithubIssues),
+                                 destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
+                                .foregroundColor(.blue)
                         }
-                    }
-                }
-                
-                Divider()
-                
-                Text(String(localized: .AboutSubHead))
-                    .font(.body)
-                    .foregroundColor(.primary)
-                
-                // 开源地址
-                sectionHeader(title: String(localized: .OpenSourceProject), subtitle: String(localized: .OpenSourceLicense))
-                HStack(spacing: 24) {
-                    linkButton("https://github.com/yanue/V2rayU.git")
-                    Spacer()
-                    Link(String(localized: .GithubIssues),
-                         destination: URL(string: "https://github.com/yanue/V2rayU/issues")!)
-                        .foregroundColor(.blue)
-                }
-                
-                // 相关文件位置
-                sectionHeader(title: String(localized: .RelatedFileLocations), subtitle: String(localized: .ClickAndOpenInFinder))
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    ForEach(fileLocations, id: \.self) { path in
-                        Button(action: { openInFinder(path: path) }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "folder")
-                                    .foregroundColor(.gray)
-                                Text(path)
-                                    .foregroundColor(.blue)
+                        
+                        // 相关文件位置
+                        sectionHeader(title: String(localized: .RelatedFileLocations), subtitle: String(localized: .ClickAndOpenInFinder))
+                        LazyVStack(alignment: .leading, spacing: 8) {
+                            ForEach(fileLocations, id: \.self) { path in
+                                Button(action: { openInFinder(path: path) }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "folder")
+                                            .foregroundColor(.gray)
+                                        Text(path)
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .help(String(localized: .OpenInFinder))
+                                .font(.callout)
+                                .underline()
                             }
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .help(String(localized: .OpenInFinder))
-                        .font(.callout)
-                        .underline()
+                        
+                        // 开源库引用
+                        sectionHeader(title: String(localized: .OpenSourceLibraries), subtitle: String(localized: .UsedButNotLimitedTo))
+                        LazyVStack(alignment: .leading, spacing: 8) {
+                            ForEach(openSources, id: \.self) { url in
+                                linkButton(url)
+                            }
+                        }
+                        
+                        // 版权信息
+                        HStack {
+                            Text("Copyright © 2018-\(year) yanue")
+                                .font(.subheadline)
+                            Text("All rights reserved.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
-                }
-                
-                // 开源库引用
-                sectionHeader(title: String(localized: .OpenSourceLibraries), subtitle: String(localized: .UsedButNotLimitedTo))
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    ForEach(openSources, id: \.self) { url in
-                        linkButton(url)
-                    }
-                }
-                
-                // 版权信息
-                HStack {
-                    Text("Copyright © 2018-\(year) yanue")
-                        .font(.subheadline)
-                    Text("All rights reserved.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    .padding()
                 }
             }
-            .padding()
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
         }
+        .padding(8)
         .onAppear {
-            // 避免初始化时阻塞 UI
             appVersion = getAppVersion()
             appBuild = getAppBuild()
             

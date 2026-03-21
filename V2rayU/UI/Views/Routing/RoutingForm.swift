@@ -15,98 +15,109 @@ struct RoutingFormView: View {
     var onClose: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack {
             HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "bonjour")
+                Image(systemName: "map")
                     .resizable()
-                    .frame(width: 32, height: 32)
+                    .frame(width: 28, height: 28)
                     .foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
-                    localized(.RoutingSettings)
-                        .font(.headline)
-                    localized(.RoutingSettingsSubHead)
-                        .font(.subheadline)
+                    Text(String(localized: .RoutingSettings))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text(String(localized: .RoutingSettingsSubHead))
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
             }
-            .padding(.vertical, 18)
-            .padding(.leading, 24)
-            Divider()
+            .padding(.vertical, 8)
+
             Spacer()
-            VStack() {
-                getTextFieldWithLabel(label: .Remark, text: $item.remark)
-                HStack {
-                    getTextLabel(label: .domainStrategy)
-                    Spacer()
-                    Picker("", selection: $item.domainStrategy) {
-                        ForEach(domainStrategys, id: \.self) { pick in
-                            Text(pick)
-                        }
-                    }
-                }
-                HStack {
-                    getTextLabel(label: .domainMatcher)
-                    Spacer()
-                    Picker("", selection: $item.domainMatcher) {
-                        ForEach(domainMatchers, id: \.self) { pick in
-                            Text(pick)
-                        }
-                    }
-                }
-                Divider()
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "info.circle")
-                        .foregroundColor(.accentColor)
-                        .font(.title2)
-                        .padding(.top, 2)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: .CustomRuleGuideTitle)) // 自定义规则填写说明
-                            .font(.headline)
-                        Text(String(localized: .CustomRuleGuideDescription)) // 每行填写一个规则，可为域名、IP 或 预定义列表。
-                            .font(.subheadline)
-                        Text(String(localized: .CustomRulePriorityDescription)) // 优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(alignment: .top, spacing: 4) {
-                                Text(String(localized: .CustomRuleDomainIntro)) // • 域名：
-                                    .bold()
-                                Text(String(localized: .CustomRuleDomainExample)) // 如 example.com、*.google.com
-                            }
-                            HStack(alignment: .top, spacing: 4) {
-                                Text(String(localized: .CustomRuleIPIntro)) // • IP：
-                                    .bold()
-                                Text(String(localized: .CustomRuleIPExample)) // 如 8.8.8.8、192.168.0.0/16
-                            }
-                            HStack(alignment: .top, spacing: 4) {
-                                Text(String(localized: .CustomRulePredefinedIntro)) // • 预定义：
-                                    .bold()
-                                Text(String(localized: .CustomRulePredefinedExample)) // 如 geoip:private、geosite:cn、localhost
+            VStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        getTextFieldWithLabel(label: .Remark, text: $item.remark)
+                        HStack {
+                            getTextLabel(label: .domainStrategy)
+                            Spacer()
+                            Picker("", selection: $item.domainStrategy) {
+                                ForEach(domainStrategys, id: \.self) { pick in
+                                    Text(pick)
+                                }
                             }
                         }
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Button(action: {
-                        if let url = URL(string: "https://xtls.github.io/config/routing.html") {
-                            NSWorkspace.shared.open(url)
+                        HStack {
+                            getTextLabel(label: .domainMatcher)
+                            Spacer()
+                            Picker("", selection: $item.domainMatcher) {
+                                ForEach(domainMatchers, id: \.self) { pick in
+                                    Text(pick)
+                                }
+                            }
                         }
-                    }) {
-                        Image(systemName: "questionmark.circle.fill")
-                            .foregroundColor(.accentColor)
+                        
+                        Divider()
+                        
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.accentColor)
+                                .font(.title2)
+                                .padding(.top, 2)
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(String(localized: .CustomRuleGuideTitle))
+                                    .font(.headline)
+                                Text(String(localized: .CustomRuleGuideDescription))
+                                    .font(.subheadline)
+                                Text(String(localized: .CustomRulePriorityDescription))
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack(alignment: .top, spacing: 4) {
+                                        Text(String(localized: .CustomRuleDomainIntro))
+                                            .bold()
+                                        Text(String(localized: .CustomRuleDomainExample))
+                                    }
+                                    HStack(alignment: .top, spacing: 4) {
+                                        Text(String(localized: .CustomRuleIPIntro))
+                                            .bold()
+                                        Text(String(localized: .CustomRuleIPExample))
+                                    }
+                                    HStack(alignment: .top, spacing: 4) {
+                                        Text(String(localized: .CustomRulePredefinedIntro))
+                                            .bold()
+                                        Text(String(localized: .CustomRulePredefinedExample))
+                                    }
+                                }
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button(action: {
+                                if let url = URL(string: "https://xtls.github.io/config/routing.html") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }) {
+                                Image(systemName: "questionmark.circle.fill")
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        getTextEditorWithLabel(label: .Direct, text: $item.direct)
+                        getTextEditorWithLabel(label: .Block, text: $item.block)
+                        getTextEditorWithLabel(label: .Proxy, text: $item.proxy)
                     }
+                    .padding(16)
                 }
-                Divider()
-                getTextEditorWithLabel(label: .Direct, text: $item.direct)
-                getTextEditorWithLabel(label: .Block, text: $item.block)
-                getTextEditorWithLabel(label: .Proxy, text: $item.proxy)
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
-            Spacer()
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
+            
             Divider()
+            
             HStack {
                 Spacer()
                 Button(String(localized: .Cancel)) {
@@ -119,7 +130,8 @@ struct RoutingFormView: View {
                 .buttonStyle(.borderedProminent)
             }
             .padding(.vertical, 12)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 8)
         }
+        .padding(8)
     }
 }

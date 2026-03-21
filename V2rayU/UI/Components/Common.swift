@@ -87,6 +87,40 @@ func getTextEditorWithLabel(label: LanguageLabel, text: Binding<String>, labelWi
     }
 }
 
+struct PageHeader<Actions: View>: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    @ViewBuilder let actions: () -> Actions
+
+    init(icon: String, title: String, subtitle: String, @ViewBuilder actions: @escaping () -> Actions = { EmptyView() }) {
+        self.icon = icon
+        self.title = title
+        self.subtitle = subtitle
+        self.actions = actions
+    }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: icon)
+                .resizable()
+                .frame(width: 28, height: 28)
+                .foregroundColor(.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            actions()
+        }
+        .padding(.vertical, 8)
+    }
+}
+
 struct RefreshButton: View {
     @Binding var checking: Bool
     var action: () -> Void

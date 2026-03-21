@@ -72,51 +72,46 @@ struct ProfileListView: View {
 
     var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "shield.lefthalf.filled")
-                    .resizable()
-                    .frame(width: 32, height: 32)
-                    .foregroundStyle(.linearGradient(colors: [.accentColor, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
-                VStack(alignment: .leading, spacing: 4) {
-                    localized(.Servers)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    localized(.ServerSubHead)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.15)) {
-                        tableOpacity = 0
+            PageHeader(
+                icon: "shield.lefthalf.filled",
+                title: String(localized: .Servers),
+                subtitle: String(localized: .ServerSubHead)
+            ) {
+                HStack(spacing: 8) {
+                    Button(action: { activeSheet = .pingAll }) {
+                        Label(String(localized: .Ping), systemImage: "network")
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        loadData()
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            tableOpacity = 1
+                    .buttonStyle(.borderedProminent)
+                    .disabled(viewModel.list.isEmpty)
+
+                    Button(action: {
+                        withAnimation {
+                            let newProxy = ProfileModel(from: ProfileEntity())
+                            activeSheet = .edit(newProxy)
                         }
+                    }) {
+                        Label(String(localized: .Add), systemImage: "plus")
                     }
-                }) {
-                    Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
-                }
-                .buttonStyle(.bordered)
+                    .buttonStyle(.bordered)
 
-                Button(action: {
-                    withAnimation {
-                        let newProxy = ProfileModel(from: ProfileEntity())
-                        activeSheet = .edit(newProxy)
+                    Divider()
+                        .frame(height: 20)
+
+                    Button(action: {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            tableOpacity = 0
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            loadData()
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                tableOpacity = 1
+                            }
+                        }
+                    }) {
+                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
-                }) {
-                    Label(String(localized: .Add), systemImage: "plus")
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
-
-                Button(action: { activeSheet = .pingAll }) {
-                    Label(String(localized: .Ping), systemImage: "network")
-                }
-                .buttonStyle(.bordered)
-                .disabled(viewModel.list.isEmpty)
             }
 
             Spacer()
