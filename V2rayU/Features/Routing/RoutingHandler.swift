@@ -28,6 +28,34 @@ let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
     (RoutingRuleLANAndCn, "🌏 Bypassing LAN and mainland address"),
 ])
 
+func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) {
+    let all = domainIpStr.split(separator: "\n")
+    var domains: [String] = []
+    var ips: [String] = []
+    
+    for item in all {
+        let tmp = item.trimmingCharacters(in: .whitespacesAndNewlines)
+        if tmp.isEmpty { continue }
+        
+        if isIp(str: tmp) || tmp.contains("geoip:") {
+            ips.append(tmp)
+        } else if tmp.contains("domain:") || tmp.contains("geosite:") || isDomain(str: tmp) {
+            domains.append(tmp)
+        }
+    }
+    return (domains, ips)
+}
+
+func isIp(str: String) -> Bool {
+    let pattern = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/[0-9]{2})?$"
+    return str.range(of: pattern, options: .regularExpression) != nil
+}
+
+func isDomain(str: String) -> Bool {
+    let pattern = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+"
+    return str.range(of: pattern, options: .regularExpression) != nil
+}
+
 class RoutingManager {
 
     let defaultRules = Dictionary(uniqueKeysWithValues: [
@@ -70,6 +98,75 @@ class RoutingManager {
         UserDefaults.set(forKey: .runningRouting, value: defaultRouting.uuid)
         return handler.getRouting()
     }
+    
+    func getSingboxRoutingRules() -> [RouteRule] {
+        let routingEntity = getRunningEntity()
+        var rules: [RouteRule] = []
+        
+        let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: routingEntity.block)
+        let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: routingEntity.proxy)
+        let (directDomains, directIps) = parseDomainOrIp(domainIpStr: routingEntity.direct)
+        
+        if !blockDomains.isEmpty || !blockIps.isEmpty {
+            rules.append(RouteRule(outbound: "block", domain: blockDomains + blockIps))
+        }
+        
+        if !proxyDomains.isEmpty || !proxyIps.isEmpty {
+            rules.append(RouteRule(outbound: "proxy", domain: proxyDomains + proxyIps))
+        }
+        
+        if !directDomains.isEmpty || !directIps.isEmpty {
+            rules.append(RouteRule(outbound: "direct", domain: directDomains + directIps))
+        }
+        
+        switch routingEntity.name {
+        case RoutingRuleGlobal:
+            break
+        case RoutingRuleLAN:
+            if !directIps.contains("geoip:private") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+            }
+            if !directDomains.contains("localhost") {
+                rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
+            }
+        case RoutingRuleCn:
+            if !directIps.contains("geoip:cn") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geoip:cn"]))
+            }
+            if !directDomains.contains("geosite:cn") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geosite:cn"]))
+            }
+        case RoutingRuleLANAndCn:
+            if !directIps.contains("geoip:cn") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geoip:cn"]))
+            }
+            if !directIps.contains("geoip:private") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+            }
+            if !directDomains.contains("geosite:cn") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geosite:cn"]))
+            }
+            if !directDomains.contains("localhost") {
+                rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
+            }
+        default:
+            break
+        }
+        
+        return rules
+    }
+    
+    func getRunningEntity() -> RoutingEntity {
+        let runningRouting = UserDefaults.get(forKey: .runningRouting)
+        let all = RoutingStore.shared.fetchAll()
+        for item in all {
+            if item.uuid == runningRouting {
+                return item
+            }
+        }
+        return RoutingEntity(name: RoutingRuleGlobal, remark: "Global", block: "", proxy: "", direct: "")
+    }
+    
 }
 
 class RoutingHandler {
@@ -213,54 +310,6 @@ class RoutingHandler {
         rule.port = port
         rule.network = network
         return rule
-    }
-
-    func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) {
-        let all = domainIpStr.split(separator: "\n")
-
-        var domains: [String] = []
-        var ips: [String] = []
-
-        for item in all {
-            let tmp = item.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            // is ip
-            if isIp(str: tmp) || tmp.contains("geoip:") {
-                ips.append(tmp)
-                continue
-            }
-
-            // is domain
-            if tmp.contains("domain:") || tmp.contains("geosite:") {
-                domains.append(tmp)
-                continue
-            }
-
-            if isDomain(str: tmp) {
-                domains.append(tmp)
-                continue
-            }
-        }
-
-//        logger.info("ips", ips, "domains", domains)
-
-        return (domains, ips)
-    }
-
-    func isIp(str: String) -> Bool {
-        let pattern = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/[0-9]{2})?$"
-        if (str.count == 0) || (str.range(of: pattern, options: .regularExpression) == nil) {
-            return false
-        }
-        return true
-    }
-
-    func isDomain(str: String) -> Bool {
-        let pattern = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+"
-        if (str.count == 0) || (str.range(of: pattern, options: .regularExpression) == nil) {
-            return false
-        }
-        return true
     }
 }
 

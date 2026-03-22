@@ -130,15 +130,12 @@ class SingboxConfigHandler {
                 DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
             ]
             
-            // TUN模式路由配置
+            // TUN模式路由配置 - 所有流量转发到SOCKS，由SOCKS端处理路由
             self.singbox.route = RouteConfig(
                 auto_detect_interface: true,
                 default_domain_resolver: "default-dns",
                 rules: [
-                    RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64"]),
-                    RouteRule(outbound: "direct", domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]),
-                    RouteRule(outbound: "direct", domain: ["geosite:private"]),
-                    RouteRule(outbound: "proxy", domain: ["geosite:geolocation-!cn"])
+                    RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]),
                 ]
             )
             
@@ -199,21 +196,8 @@ class SingboxConfigHandler {
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),
                 DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
             ]
-            // 默认路由
-            self.singbox.route.rules = [
-                RouteRule(
-                    outbound: "direct",
-                    domain: ["geosite:cn", "localhost", "127.0.0.1", "::1"]
-                ),
-                RouteRule(
-                    outbound: "direct",
-                    domain: ["geosite:private"] // 可选：内网域名直连
-                ),
-                RouteRule(
-                    outbound: "proxy",
-                    domain: ["geosite:geolocation-!cn"]
-                )
-            ]
+            // 路由配置
+            self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
     }
