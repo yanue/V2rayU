@@ -101,6 +101,7 @@ struct AboutView: View {
             .background(.ultraThinMaterial)
             .border(Color.gray.opacity(0.1), width: 1)
             .cornerRadius(8)
+            Spacer()
         }
         .padding(8)
         .onAppear {

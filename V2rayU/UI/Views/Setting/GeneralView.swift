@@ -68,7 +68,6 @@ struct GeneralView: View {
             }
         }
         .padding()
-        .frame(width: 500, height: 400)
         .onDisappear {
             AppSettings.shared.saveSettings()
         }

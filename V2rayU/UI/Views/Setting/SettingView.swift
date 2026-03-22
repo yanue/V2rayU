@@ -35,9 +35,8 @@ struct SettingView: View {
                 localized(.PAC).tag(SettingTab.pac)
             }
             .pickerStyle(.segmented)
+            .padding(.vertical, 12)
 
-            Spacer(minLength: 20)
-            
             VStack {
                 // Content based on Selected Tab
                 switch appState.settingTab {

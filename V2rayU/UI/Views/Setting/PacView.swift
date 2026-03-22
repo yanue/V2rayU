@@ -78,7 +78,6 @@ struct PacView: View {
             }
         }
         .padding()
-        .frame(width: 500, height: 400)
         .onAppear {
             gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
             pacUserRules = getPacUserRules()

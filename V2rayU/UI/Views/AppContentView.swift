@@ -61,7 +61,6 @@ struct ContentView: View {
                     DiagnosticsView()
                 case .about:
                     AboutView()
-
                 }
                 Spacer()
             }
@@ -74,7 +73,7 @@ struct ContentView: View {
                     .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
             ) // 4. 添加边框和阴影
             .padding(.all, 16) // 5. 外边距
-            .frame(width: 640) // 设置右侧内容区的宽度
+            .frame(minWidth: 640) // 设置右侧内容区的宽度
         }
     }
   

@@ -64,7 +64,6 @@ struct DnsView: View {
             }
         }
         .padding()
-        .frame(width: 500, height: 400)
         .onAppear { loadDnsServers() }
         .alert(isPresented: $showAlert) {
             Alert(title: Text(String(localized: .Notification)), message: Text(tips), dismissButton: .default(Text(String(localized: .Confirm))) )

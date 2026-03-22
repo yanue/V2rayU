@@ -104,7 +104,6 @@ struct CoreView: View {
             }
         }
         .padding()
-        .frame(width: 500, height: 400)
         .onAppear {
             vm.loadCoreVersions()
             vm.checkVersions()

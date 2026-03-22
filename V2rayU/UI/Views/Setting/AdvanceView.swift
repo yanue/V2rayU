@@ -49,14 +49,17 @@ struct AdvanceView: View {
 
             Divider()
 
-            HStack {
-                Button(String(localized: .Save)) {
-                    settings.saveSettings()
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Button(String(localized: .Save)) {
+                        settings.saveSettings()
+                    }
                 }
-                Spacer()
             }
         }
         .padding()
-        .frame(width: 500, height: 400)
+        .onDisappear {
+            AppSettings.shared.saveSettings()
+        }
     }
 }
