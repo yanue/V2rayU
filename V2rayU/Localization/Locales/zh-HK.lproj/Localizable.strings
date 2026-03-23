@@ -59,6 +59,7 @@
 
 // MARK: - 設定分頁
 "General" = "一般設定";
+"Shortcuts" = "快捷鍵";
 "Advanced" = "進階設定";
 "PAC" = "PAC 設定";
 "DNS" = "DNS 設定";
@@ -73,8 +74,16 @@
 "ShowLatencyOnTrayIcon" = "托盤圖示顯示延遲值";
 "EnableProxyStatistics" = "啟用代理統計";
 "KeyboardShortcuts" = "快捷鍵";
+"Toggle" = "開關";
+"ProxyModes" = "代理模式";
+"View" = "檢視";
+"Tools" = "工具";
 "ToggleV2rayOnOff" = "切換 V2Ray 開關";
 "SwitchProxyMode" = "切換代理模式";
+"SwitchToTunnelMode" = "切換到 Tun 模式";
+"SwitchToGlobalMode" = "切換到 全域 模式";
+"SwitchToManualMode" = "切換到 手動 模式";
+"SwitchToPacMode" = "切換到 PAC 模式";
 
 // MARK: - 進階設定
 "LocalSocksListenPort" = "本地 SOCKS 監聽埠";

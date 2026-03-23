@@ -59,6 +59,7 @@
 
 // MARK: - 设置标签
 "General" = "通用设置";
+"Shortcuts" = "快捷键";
 "Advanced" = "高级设置";
 "PAC" = "PAC 设置";
 "DNS" = "DNS 设置";
@@ -73,8 +74,16 @@
 "ShowLatencyOnTrayIcon" = "托盘图标显示 Ping 值";
 "EnableProxyStatistics" = "启用代理统计";
 "KeyboardShortcuts" = "快捷键";
+"Toggle" = "开关";
+"ProxyModes" = "代理模式";
+"View" = "查看";
+"Tools" = "工具";
 "ToggleV2rayOnOff" = "切换 V2Ray 开关";
 "SwitchProxyMode" = "切换代理模式";
+"SwitchToTunnelMode" = "切换到 Tun 模式";
+"SwitchToGlobalMode" = "切换到 全局 模式";
+"SwitchToManualMode" = "切换到 手动 模式";
+"SwitchToPacMode" = "切换到 PAC 模式";
 
 // MARK: - 高级设置
 "LocalSocksListenPort" = "本地 SOCKS 监听端口";

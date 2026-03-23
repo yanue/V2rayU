@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 import Foundation
 import OSLog
+import KeyboardShortcuts
 
 import FirebaseCore
 import AppCenterAnalytics

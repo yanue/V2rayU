@@ -1,5 +1,6 @@
 import Combine
 import SwiftUI
+import KeyboardShortcuts
 
 @MainActor
 final class AppState: ObservableObject {
@@ -33,6 +34,83 @@ final class AppState: ObservableObject {
     
     init() {
         self.icon = runMode.icon
+        
+        // 注册键盘快捷键处理
+        KeyboardShortcuts.onKeyDown(for: .toggleV2rayOnOff) { [weak self] in
+            Task { @MainActor in
+                await self?.toggleCore()
+            }
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .switchProxyMode) { [weak self] in
+            Task { @MainActor in
+                guard let self = self else { return }
+                // 循环切换: off -> pac -> manual -> global -> tunnel -> off
+                let modes: [RunMode] = [.off, .pac, .manual, .global, .tunnel]
+                if let currentIndex = modes.firstIndex(of: self.runMode) {
+                    let nextIndex = (currentIndex + 1) % modes.count
+                    await self.switchRunMode(mode: modes[nextIndex])
+                } else {
+                    await self.switchRunMode(mode: .pac)
+                }
+            }
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .switchToTunnelMode) { [weak self] in
+            Task { @MainActor in
+                await self?.switchRunMode(mode: .tunnel)
+            }
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .switchToGlobalMode) { [weak self] in
+            Task { @MainActor in
+                await self?.switchRunMode(mode: .global)
+            }
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .switchToManualMode) { [weak self] in
+            Task { @MainActor in
+                await self?.switchRunMode(mode: .manual)
+            }
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .switchToPacMode) { [weak self] in
+            Task { @MainActor in
+                await self?.switchRunMode(mode: .pac)
+            }
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .viewConfigJson) {
+            AppMenuManager.shared.openConfigFile()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .viewPacFile) {
+            AppMenuManager.shared.openPacFile()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .viewLog) {
+            AppMenuManager.shared.openLogsFile()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .pingSpeed) {
+            AppMenuManager.shared.pingSpeedTest()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .importServers) {
+            AppMenuManager.shared.importFromPasteboard()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .scanQRCode) {
+            AppMenuManager.shared.scanQRCode()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .shareQRCode) {
+            AppMenuManager.shared.shareQRCode()
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .copyHttpProxy) {
+            AppMenuManager.shared.copyProxyExportCommand()
+        }
     }
     
     private var isCoreOperationInProgress = false
@@ -152,6 +230,10 @@ final class AppState: ObservableObject {
     // MARK: - 菜单栏 Toggle
     func toggleCore() async {
         v2rayTurnOn.toggle()
+        if !v2rayTurnOn {
+            runMode = .off
+            icon = RunMode.off.icon
+        }
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }

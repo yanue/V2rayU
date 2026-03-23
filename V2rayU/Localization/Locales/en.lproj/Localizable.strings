@@ -59,6 +59,7 @@
 
 // MARK: - Settings Tabs
 "General" = "General";
+"Shortcuts" = "Shortcuts";
 "Advanced" = "Advanced";
 "PAC" = "PAC";
 "DNS" = "DNS";
@@ -73,8 +74,16 @@
 "ShowLatencyOnTrayIcon" = "Show latency on tray icon";
 "EnableProxyStatistics" = "Enable proxy statistics";
 "KeyboardShortcuts" = "Keyboard Shortcuts";
+"Toggle" = "Toggle";
+"ProxyModes" = "Proxy Modes";
+"View" = "View";
+"Tools" = "Tools";
 "ToggleV2rayOnOff" = "Toggle V2Ray On/Off";
 "SwitchProxyMode" = "Switch Proxy Mode";
+"SwitchToTunnelMode" = "Switch to Tunnel Mode";
+"SwitchToGlobalMode" = "Switch to Global Mode";
+"SwitchToManualMode" = "Switch to Manual Mode";
+"SwitchToPacMode" = "Switch to PAC Mode";
 
 // MARK: - Advanced Settings
 "LocalSocksListenPort" = "Local SOCKS listen port";

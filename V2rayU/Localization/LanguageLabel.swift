@@ -63,6 +63,7 @@ enum LanguageLabel: String, CaseIterable {
     case AboutSubHead
     // settiings tab
     case General
+    case Shortcuts
     case Advanced
     case PAC
     case DNS
@@ -76,8 +77,16 @@ enum LanguageLabel: String, CaseIterable {
     case ShowLatencyOnTrayIcon
     case EnableProxyStatistics
     case KeyboardShortcuts
+    case Toggle
+    case ProxyModes
+    case View
+    case Tools
     case ToggleV2rayOnOff
     case SwitchProxyMode
+    case SwitchToTunnelMode
+    case SwitchToGlobalMode
+    case SwitchToManualMode
+    case SwitchToPacMode
     // advanced settings
     case LocalSocksListenPort
     case EnableUDP

@@ -13,6 +13,7 @@ struct SettingView: View {
     // Enum for Tabs
     enum SettingTab {
         case general
+        case shortcuts
         case advance
         case dns
         case pac
@@ -31,6 +32,7 @@ struct SettingView: View {
             Picker("", selection: $appState.settingTab) {
                 localized(.General).tag(SettingTab.general)
                 localized(.Advanced).tag(SettingTab.advance)
+                localized(.Shortcuts).tag(SettingTab.shortcuts)
                 localized(.DNS).tag(SettingTab.dns)
                 localized(.PAC).tag(SettingTab.pac)
             }
@@ -44,6 +46,8 @@ struct SettingView: View {
                     GeneralView()
                 case .advance:
                     AdvanceView()
+                case .shortcuts:
+                    ShortcutsView()
                 case .dns:
                     DnsView()
                 case .pac:
