@@ -375,3 +375,36 @@
 "AlreadyLastestVersion" = "已經是最新版本";
 "AlreadyLastestToast" = "目前 %@ 已經是最新版了";
 "V2rayUUpdateTitle" = "V2rayU 更新";
+
+"FaqHowItWorks" = "V2rayU 是如何運作的？";
+"FaqConfigLocation" = "設定檔儲存在哪裡？";
+"FaqOperationModes" = "運行模式說明";
+"FaqModeRoutingRelation" = "運行模式與路由的關係";
+"FaqRoutingPriority" = "路由匹配優先順序";
+"FaqTrueGlobalProxy" = "如何實現真正的全域代理？";
+"FaqManualCoreUpdate" = "如何手動更新 core";
+"FaqHowItWorksDetail" = "V2rayU 是一個基於 V2Ray/Sing-Box 核心的 macOS 應用，提供圖形介面來簡化設定與管理。它使用 launchd 啟動並管理核心行程，並為其設定系統代理（HTTP/SOCKS 或 Tunnel）以實現代理上網功能。";
+"FaqConfigLocationDetail2" = "V2rayU 的設定檔儲存在使用者主目錄下的 ~/.V2rayU/ 目錄中，可在終端機執行 ls -al ~/.V2rayU/ 查看檔案明細。
+
+檔案說明:
+~/.V2rayU/config.json - 核心主要設定檔
+~/.V2rayU/V2rayUTool - 重要!!! 系統代理設定的輔助工具，必須要有 -rwsrwsrwx 1 root admin 權限
+~/.V2rayU/.V2rayU.db - 5.0 以上版本的 SQLite 資料庫，儲存訂閱與伺服器資訊
+~/.V2rayU/v2ray-core/v2ray - 執行的 core 可執行檔，需對應系統架構版本 (x86_64 或 arm64)
+~/.V2rayU/proxy.js - Pac 模式下的自動代理設定檔
+~/.V2rayU/v2ray-core.log - core 日誌";
+"FaqOperationModesDetail2" = "主要是如何設定系統代理:
+
+• PAC 模式：系統設定 PAC 代理 (設定->網路->WIFI->詳細資訊->代理->自動代理設定)
+• Global 模式：系統設定全域 HTTP/SOCKS 代理 (設定->網路->WIFI->詳細資訊->代理->HTTP,HTTPS 和 SOCKS 代理)
+• Manual 模式：手動模式，不設定系統代理 (會清理系統代理，包括 PAC,HTTP,HTTPS,SOCKS 代理)
+• Tunnel 模式：使用 sing-box 的 TUN 功能（網路擴展）實現真正的系統級代理，所有應用自動走代理
+
+說明: 以上 PAC、Global、Manual 模式主要是以瀏覽器等系統級應用會走系統代理，其他應用通常需要手動設定代理或使用 Tunnel 模式。";
+"FaqModeRoutingRelationDetail" = "運行模式決定了系統代理的設定方式，而路由規則則決定哪些流量透過代理伺服器，哪些流量直連。兩者結合使用，可以實現靈活的網路存取策略。";
+"FaqRoutingPriorityDetail2" = "路由匹配優先順序: 網域封鎖 -> 網域代理 -> 網域直連 -> IP 封鎖 -> IP 代理 -> IP 直連";
+"FaqTrueGlobalProxyDetail2" = "使用 Tunnel 模式！V2rayU 支援透過 sing-box 的 TUN 功能（網路擴展）實現 Tunnel 模式，可以實現真正的系統級代理。Mac 上的所有網路流量都會自動走代理，無需在各個應用中進行代理設定。
+
+啟用方法：點擊選單列的 V2rayU 圖示 -> 選擇 Tunnel 模式，或使用快捷鍵。";
+"FaqManualCoreUpdateDetail2" = "可以手動下載 xray-core 或 sing-box 對應系統架構版本，替換到 ~/.V2rayU/v2ray-core/ 目錄下，請注意，需要將 core 檔案名稱更改為 ~/.V2rayU/v2ray-core/v2ray";
+

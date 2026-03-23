@@ -372,4 +372,25 @@ enum LanguageLabel: String, CaseIterable {
     case AlreadyLastestVersion  // Already Lastest Version
     case AlreadyLastestToast  // 当前 %@ 已经是最新版了
     case V2rayUUpdateTitle  // V2rayU Update
+    // FAQ
+    case FaqHowItWorks
+    case FaqConfigLocation
+    case FaqConfigLocationDetail
+    case FaqOperationModes
+    case FaqOperationModesDetail
+    case FaqModeRoutingRelation
+    case FaqRoutingPriority
+    case FaqRoutingPriorityDetail
+    case FaqTrueGlobalProxy
+    case FaqTrueGlobalProxyDetail
+    case FaqManualCoreUpdate
+    case FaqManualCoreUpdateDetail
+    // FAQ 详细答案 (带参数)
+    case FaqHowItWorksDetail
+    case FaqConfigLocationDetail2
+    case FaqOperationModesDetail2
+    case FaqModeRoutingRelationDetail
+    case FaqRoutingPriorityDetail2
+    case FaqTrueGlobalProxyDetail2
+    case FaqManualCoreUpdateDetail2
 }

@@ -78,7 +78,7 @@
 "ProxyModes" = "Proxy Modes";
 "View" = "View";
 "Tools" = "Tools";
-"ToggleV2rayOnOff" = "Toggle V2Ray On/Off";
+"ToggleV2rayOnOff" = "Toggle Proxy On/Off";
 "SwitchProxyMode" = "Switch Proxy Mode";
 "SwitchToTunnelMode" = "Switch to Tunnel Mode";
 "SwitchToGlobalMode" = "Switch to Global Mode";
@@ -375,3 +375,36 @@
 "AlreadyLastestVersion" = "Already Latest Version";
 "AlreadyLastestToast" = "Current %@ is already the latest version";
 "V2rayUUpdateTitle" = "V2rayU Update";
+
+"FaqHowItWorks" = "How does V2rayU work?";
+"FaqConfigLocation" = "Where are the configuration files stored?";
+"FaqOperationModes" = "What are the operation modes?";
+"FaqModeRoutingRelation" = "What is the relationship between operation mode and routing?";
+"FaqRoutingPriority" = "What is the routing priority?";
+"FaqTrueGlobalProxy" = "How to achieve a true global proxy?";
+"FaqManualCoreUpdate" = "How to manually update the core?";
+"FaqHowItWorksDetail" = "V2rayU is a macOS application based on Xray-core/Sing-Box core, providing a graphical interface to simplify configuration and management. It uses launchd to start and manage the core process and sets the system proxy (HTTP/SOCKS or Tunnel) to enable proxy internet access.";
+"FaqConfigLocationDetail2" = "V2rayU stores its configuration files in the ~/.V2rayU/ directory in the user's home folder. You can run 'ls -al ~/.V2rayU/' in the terminal to view the details.
+
+File descriptions:
+~/.V2rayU/config.json - Main core configuration file
+~/.V2rayU/V2rayUTool - IMPORTANT!!! Helper tool for system proxy settings, must have -rwsrwsrwx 1 root admin permissions
+~/.V2rayU/.V2rayU.db - SQLite database (version 5.0+), stores subscriptions and server information
+~/.V2rayU/v2ray-core/v2ray - Executable core binary, must match system architecture (x86_64 or arm64)
+~/.V2rayU/proxy.js - Auto proxy configuration file for PAC mode
+~/.V2rayU/v2ray-core.log - Core log file";
+"FaqOperationModesDetail2" = "Mainly about how the system proxy is set:
+
+• PAC mode: System sets PAC proxy (Settings -> Network -> Wi-Fi -> Details -> Proxy -> Auto Proxy Configuration)
+• Global mode: System sets global HTTP/SOCKS proxy (Settings -> Network -> Wi-Fi -> Details -> Proxy -> HTTP, HTTPS and SOCKS Proxy)
+• Manual mode: Do not set system proxy (clears all system proxy settings including PAC, HTTP, HTTPS, SOCKS)
+• Tunnel mode: Uses sing-box's TUN function (network extension) to implement true system-level proxy, all applications automatically go through the proxy
+
+Note: PAC, Global, Manual modes mainly affect browsers and other system-level applications that use system proxy. For applications that don't use system proxy, you need to configure proxy manually or use Tunnel mode.";
+"FaqModeRoutingRelationDetail" = "The operation mode determines how the system proxy is configured, while routing rules decide which traffic goes through the proxy server and which goes directly. Together, they enable flexible network access strategies.";
+"FaqRoutingPriorityDetail2" = "Routing priority: Domain block -> Domain proxy -> Domain direct -> IP block -> IP proxy -> IP direct";
+"FaqTrueGlobalProxyDetail2" = "Use Tunnel mode! V2rayU supports Tunnel mode through sing-box's TUN function (network extension), which can implement true system-level proxy. All network traffic on your Mac will automatically go through the proxy without needing to configure proxy in individual applications.
+
+To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mode, or use the keyboard shortcut.";
+"FaqManualCoreUpdateDetail2" = "You can manually download the xray-core or sing-box version that matches your system architecture and replace it in the ~/.V2rayU/v2ray-core/ directory. Make sure to rename the core file to ~/.V2rayU/v2ray-core/v2ray";
+
