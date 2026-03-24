@@ -7,10 +7,6 @@
 
 import Foundation
 import Network
-import Foundation
-import Network
-import Foundation
-import Network
 
 /// Actor 用于保护一次性 resume 的状态
 ///
@@ -187,21 +183,28 @@ struct TCPConnectivity {
             let params = NWParameters.tcp
             let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(rawValue: port)!)
             let conn = NWConnection(to: endpoint, using: params)
+            let flag = ResumeFlag()
+            
             conn.stateUpdateHandler = { state in
                 switch state {
                 case .ready:
-                    conn.cancel()
-                    cont.resume(returning: true)
+                    Task {
+                        await flag.tryResume(cont, result: true, conn: conn)
+                    }
                 case .failed, .cancelled:
-                    cont.resume(returning: false)
+                    Task {
+                        await flag.tryResume(cont, result: false, conn: conn)
+                    }
                 default:
                     break
                 }
             }
             conn.start(queue: .global())
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                conn.cancel()
-                cont.resume(returning: false)
+            
+            // 超时后取消连接
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+                await flag.tryResume(cont, result: false, conn: conn)
             }
         }
     }
@@ -213,6 +216,101 @@ struct ConfigValidator {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else { return false }
         return (try? JSONSerialization.jsonObject(with: data)) != nil
     }
+
+    /// 详细验证配置文件
+    /// - Parameter filePath: 配置文件路径
+    /// - Returns: (isValid: Bool, problems: [String]) - 是否有效及问题列表
+    static func validateConfig(filePath: String) -> (isValid: Bool, problems: [String]) {
+        var problems: [String] = []
+        
+        // 1. 文件是否存在
+        guard FileManager.default.fileExists(atPath: filePath) else {
+            return (false, ["配置文件不存在"])
+        }
+        
+        // 2. JSON 格式是否合法
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else {
+            return (false, ["配置文件无法读取，可能是权限问题"])
+        }
+        
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return (false, ["配置文件格式错误，不是有效的 JSON"])
+        }
+        
+        // 3. 判断是 xray 还是 sing-box 配置
+        // Sing-box 有 dns 或 route 字段，优先判断
+        let isSingBox = json["route"] != nil || json["dns"] != nil
+        
+        if isSingBox {
+            // Sing-box 配置格式检查
+            let hasInbounds = json["inbounds"] != nil
+            let hasOutbounds = json["outbounds"] != nil
+            
+            if !hasInbounds {
+                problems.append("缺少入站配置（inbounds）")
+            }
+            if !hasOutbounds {
+                problems.append("缺少出站配置（outbounds）")
+            }
+            
+            // 检查 inbounds - 更宽松，tun 模式只需要 tun
+            if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
+                var foundSocks = false
+                var foundHttp = false
+                var foundTun = false
+                for inbound in inbounds {
+                    // Sing-box uses "type" and "listen_port"
+                    if let type = inbound["type"] as? String {
+                        if type == "socks" {
+                            foundSocks = true
+                        } else if type == "http" {
+                            foundHttp = true
+                        } else if type == "tun" {
+                            foundTun = true
+                        }
+                    }
+                }
+                // Sing-box: 只要有任一入站就认为有效（socks/http/tun 都可以）
+                if !foundSocks && !foundHttp && !foundTun {
+                    // 不报错，可能配置了其他类型的入站
+                }
+            }
+        } else {
+            // Xray/V2Ray 配置格式检查
+            let hasLog = json["log"] != nil
+            let hasInbounds = json["inbounds"] != nil
+            let hasOutbounds = json["outbounds"] != nil
+            
+            if !hasInbounds {
+                problems.append("缺少入站配置（inbounds）")
+            }
+            if !hasOutbounds {
+                problems.append("缺少出站配置（outbounds）")
+            }
+            
+            // 检查 inbounds - Xray 使用 "protocol" 字段
+            if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
+                var foundSocks = false
+                var foundHttp = false
+                for inbound in inbounds {
+                    // Xray uses "protocol"
+                    if let protocol_ = inbound["protocol"] as? String {
+                        if protocol_ == "socks" {
+                            foundSocks = true
+                        } else if protocol_ == "http" {
+                            foundHttp = true
+                        }
+                    }
+                }
+                // Xray 模式需要 SOCKS 或 HTTP
+                if !foundSocks && !foundHttp {
+                    problems.append("未配置 SOCKS 或 HTTP 入站代理")
+                }
+            }
+        }
+        
+        return (problems.isEmpty, problems)
+    }
 }
 
 /// 日志分析：映射关键错误到用户提示
@@ -220,27 +318,49 @@ struct LogAnalyzer {
     static func analyze(logPath: String, lastLines: Int = 300) -> [String] {
         guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
         let lines = content.components(separatedBy: .newlines)
-        let recent = lines.suffix(lastLines).joined(separator: "\n")
+        let recent = lines.suffix(lastLines).joined(separator: "\n").lowercased()
         var problems: [String] = []
         
-        if recent.contains("failed to dial") {
-            problems.append("无法连接远程服务器，可能是网络不可达或被防火墙阻断")
+        if recent.contains("failed to dial") || recent.contains("connect: cannot assign requested address") {
+            problems.append("【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点")
         }
-        if recent.contains("tls handshake error") {
-            problems.append("TLS 握手失败，可能是证书问题或 SNI 配置错误")
+        
+        if recent.contains("tls handshake error") || recent.contains("tls:") && recent.contains("error") {
+            problems.append("【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商")
         }
-        if recent.contains("connection reset by peer") {
-            problems.append("服务器主动断开连接，请检查账号或端口是否正确")
+        
+        if recent.contains("connection reset by peer") || recent.contains("connection closed") {
+            problems.append("【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点")
         }
-        if recent.contains("invalid user") || recent.contains("user not found") {
-            problems.append("用户凭据错误（UUID/账号），请检查配置")
+        
+        if recent.contains("invalid user") || recent.contains("user not found") || recent.contains("authentication error") {
+            problems.append("【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期")
         }
-        if recent.contains("remote_addr not found") || recent.contains("dial tcp") && recent.contains("no such host") {
-            problems.append("域名解析失败，DNS 可能异常或节点域名错误")
+        
+        if recent.contains("remote_addr not found") || (recent.contains("dial tcp") && recent.contains("no such host")) {
+            problems.append("【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点")
         }
-        if recent.contains("i/o timeout") || recent.contains("timeout") {
-            problems.append("连接超时，网络质量差或服务器不可达")
+        
+        if recent.contains("i/o timeout") || recent.contains("timeout") || recent.contains("deadline exceeded") {
+            problems.append("【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复")
         }
+        
+        if recent.contains("quic") && (recent.contains("error") || recent.contains("failed")) {
+            problems.append("【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议")
+        }
+        
+        if recent.contains("websocket") && (recent.contains("error") || recent.contains("failed")) {
+            problems.append("【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点")
+        }
+        
+        if recent.contains("permission denied") || recent.contains("access denied") {
+            problems.append("【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU")
+        }
+        
+        if recent.contains("port") && recent.contains("in use") {
+            problems.append("【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口")
+        }
+        
         return problems
     }
 }

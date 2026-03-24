@@ -56,6 +56,7 @@ final class DiagnosticsViewModel: ObservableObject {
             await step(.geoipFile)          { await checkGeoipFile() }
             await step(.pingLatency)        { await checkPingLatency() }
             await step(.logAnalysis)        { await checkLogAnalysis() }
+            await step(.configValidity)     { await checkConfigValidity() }
             
             withAnimation {
                 self.progressText = "诊断完成"
@@ -117,19 +118,19 @@ final class DiagnosticsViewModel: ObservableObject {
     /// 标题映射
    private func title(for step: DiagnosticStep) -> String {
        switch step {
-       case .networkConnectivity: return "网络连接"
-       case .systemProxy:        return "系统代理设置"
-       case .firewall:           return "防火墙与安全软件"
-       case .coreInstall:        return "核心安装与版本"
-       case .coreRunning:        return "核心运行状态"
-       case .uToolPermission:    return "权限与辅助工具"
-       case .dnsResolution:      return "DNS 解析"
-       case .portConnectivity:   return "端口连通性"
-       case .localPortConflict:  return "本地端口冲突"
-       case .geoipFile:          return "GeoIP 文件"
-       case .pingLatency:        return "延迟与丢包"
-       case .logAnalysis:        return "日志分析"
-       case .configValidity:     return "配置合法性"
+       case .networkConnectivity: return String(localized: .DiagNetworkConnectivity)
+       case .systemProxy:        return String(localized: .DiagSystemProxy)
+       case .firewall:           return String(localized: .DiagFirewall)
+       case .coreInstall:        return String(localized: .DiagCoreInstall)
+       case .coreRunning:        return String(localized: .DiagCoreRunning)
+       case .uToolPermission:    return String(localized: .DiagUToolPermission)
+       case .dnsResolution:      return String(localized: .DiagDNSResolution)
+       case .portConnectivity:   return String(localized: .DiagPortConnectivity)
+       case .localPortConflict:  return String(localized: .DiagLocalPortConflict)
+       case .geoipFile:          return String(localized: .DiagGeoipFile)
+       case .pingLatency:        return String(localized: .DiagPingLatency)
+       case .logAnalysis:        return String(localized: .DiagLogAnalysis)
+       case .configValidity:     return String(localized: .DiagConfigValidity)
        }
    }
     // MARK: - 各项检查（返回 DiagnosticItem）
@@ -142,87 +143,265 @@ final class DiagnosticsViewModel: ObservableObject {
         let googleIP = await NetworkChecker.canReachIP("8.8.8.8")
         let ipOK = cloudflareIP || googleIP
         let ok = dnsOK && ipOK
+        
+        let subtitle: String
+        let problem: String?
+        
+        if ok {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if !dnsOK && !ipOK {
+            subtitle = String(localized: .DiagNetUnavailable)
+            problem = String(localized: .DiagNetUnavailable)
+        } else if !dnsOK {
+            subtitle = String(localized: .DiagNetDNSFailed)
+            problem = String(localized: .DiagNetDNSFailed)
+        } else {
+            subtitle = String(localized: .DiagNetIPFailed)
+            problem = String(localized: .DiagNetIPFailed)
+        }
+        
         return DiagnosticItem(
             step: .networkConnectivity,
-            title: "网络连接",
-            subtitle: ok ? "已联网（DNS/公网连通正常）" : "网络不可用或 DNS 异常",
+            title: String(localized: .DiagNetworkConnectivity),
+            subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "请检查路由器/宽带连接、DNS 设置或网络代理是否影响直连",
-            actionTitle: ok ? nil : "打开网络设置",
+            problem: problem,
+            actionTitle: ok ? nil : String(localized: .DiagOpenNetworkSettings),
             action: ok ? nil : { self.openSystemNetworkSettings() }
         )
     }
     
     private func checkSystemProxy() async -> DiagnosticItem {
-        // 通过 networksetup 检查系统代理是否开启（简化解析）
-        let (enabled, port) = getSystemProxyStatus()
-        let ok = enabled && (port == localSocksPort || port == localHTTPPort)
-        let subtitle = enabled ? "系统代理已开启（端口 \(port)）" : "系统代理未开启"
+        let currentMode = appState.runMode
+        let actualSocksPort = AppSettings.shared.socksPort
+        let actualHttpPort = AppSettings.shared.httpPort
+        
+        let subtitle: String
+        let problem: String?
+        let ok: Bool
+        
+        switch currentMode {
+        case .tunnel:
+            subtitle = String(localized: .DiagProxyNotNeededTunnel)
+            problem = nil
+            ok = true
+            
+        case .manual:
+            subtitle = String(localized: .DiagProxyNotNeededManual)
+            problem = nil
+            ok = true
+            
+        case .off:
+            subtitle = String(localized: .DiagProxyNotNeededOff)
+            problem = nil
+            ok = true
+            
+        case .pac, .global:
+            let (enabled, port) = getSystemProxyStatus()
+            let correctPort = port == actualSocksPort || port == actualHttpPort
+            ok = enabled && correctPort
+            
+            if enabled && correctPort {
+                subtitle = String(format: String(localized: .DiagPassed), port)
+                problem = nil
+            } else if enabled && !correctPort {
+                subtitle = String(format: String(localized: .DiagProxyPortMismatch), port, actualSocksPort)
+                problem = String(format: String(localized: .DiagProxyPortWrong), actualSocksPort, actualHttpPort)
+            } else {
+                subtitle = String(localized: .DiagProxyRequired)
+                problem = String(localized: .DiagProxyNotEnabled)
+            }
+        }
+        
         return DiagnosticItem(
             step: .systemProxy,
-            title: "系统代理设置",
+            title: String(localized: .DiagSystemProxy),
             subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "系统代理未正确设置或端口不匹配，可能导致应用不走代理",
-            actionTitle: "打开设置",
-            action: { self.openSystemNetworkSettings() }
+            problem: problem,
+            actionTitle: (currentMode == .pac || currentMode == .global) ? String(localized: .DiagOpenNetworkSettings) : nil,
+            action: (currentMode == .pac || currentMode == .global) ? { self.openSystemNetworkSettings() } : nil
         )
     }
     
     private func checkFirewall() async -> DiagnosticItem {
-        // 无法直接探测第三方杀软阻断，这里给出提示项
         let coreRunning = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
         let socksListening = ProcessChecker.isPortListening(localSocksPort)
         let httpListening = ProcessChecker.isPortListening(localHTTPPort)
-        let ok = !coreRunning || (socksListening || httpListening)
+        
+        let ok: Bool
+        let subtitle: String
+        let problem: String?
+        
+        if !coreRunning {
+            ok = true
+            subtitle = String(localized: .DiagCoreNotRunning)
+            problem = nil
+        } else if socksListening || httpListening {
+            ok = true
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else {
+            ok = false
+            subtitle = String(localized: .DiagFailed)
+            problem = String(localized: .DiagFirewallBlocked)
+        }
+        
         return DiagnosticItem(
             step: .firewall,
-            title: "防火墙与安全软件",
-            subtitle: ok ? "未发现明显阻断迹象" : "可能阻断了进程或端口",
+            title: String(localized: .DiagFirewall),
+            subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "安全软件或系统防火墙可能阻止 v2ray 进程或端口，请添加信任或放行规则",
+            problem: problem,
             actionTitle: nil,
             action: nil
         )
     }
     
     private func checkCoreInstall() async -> DiagnosticItem {
-        let installed = FileManager.default.fileExists(atPath: xrayCoreFile) && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
-        let version = installed ? getCoreVersion() : ""
+        let installed = FileManager.default.fileExists(atPath: xrayCoreFile)
+        let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
+        let version = executable ? getCoreVersion() : ""
+        
+        let subtitle: String
+        let problem: String?
+        
+        if executable {
+            subtitle = String(format: String(localized: .DiagPassed), version)
+            problem = nil
+        } else if installed {
+            subtitle = String(localized: .DiagCoreNotExecutable)
+            problem = String(localized: .DiagCoreNotExecutable)
+        } else {
+            subtitle = String(localized: .DiagCoreNotInstalled)
+            problem = String(localized: .DiagCoreNotInstalled)
+        }
+        
         return DiagnosticItem(
             step: .coreInstall,
-            title: "核心安装与版本",
-            subtitle: installed ? "版本：\(version)" : "未安装或不可执行",
-            ok: installed,
-            problem: installed ? nil : "v2ray/xray 核心未安装或权限不足，无法运行",
-            actionTitle: installed ? nil : "一键修复",
-            action: installed ? nil : { self.fixInstallAll() }
+            title: String(localized: .DiagCoreInstall),
+            subtitle: subtitle,
+            ok: executable,
+            problem: problem,
+            actionTitle: executable ? nil : String(localized: .DiagFixNow),
+            action: executable ? nil : { self.fixInstallAll() }
         )
     }
     
     private func checkCoreRunning() async -> DiagnosticItem {
         let running = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
+        
+        let subtitle: String
+        let problem: String?
+        
+        if running {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if !appState.v2rayTurnOn {
+            subtitle = String(localized: .DiagCoreStopped)
+            problem = String(localized: .DiagCoreStopped)
+        } else {
+            subtitle = String(localized: .DiagCoreStartFailed)
+            problem = String(localized: .DiagCoreStartFailed)
+        }
+        
         return DiagnosticItem(
             step: .coreRunning,
-            title: "核心运行状态",
-            subtitle: running ? "核心正在运行" : "核心未运行",
+            title: String(localized: .DiagCoreRunning),
+            subtitle: subtitle,
             ok: running,
-            problem: running ? nil : "核心未运行，无法提供代理服务",
-            actionTitle: running ? "重启核心" : "启动核心",
+            problem: problem,
+            actionTitle: running ? String(localized: .DiagRestartCore) : String(localized: .DiagStartCore),
             action: running ? { self.restartCore() } : { self.toggleCoreOnOff() }
         )
     }
     
-    private func checkUToolPermission() async -> DiagnosticItem {
-        let ok = FileManager.default.fileExists(atPath: v2rayUToolPath) && checkFileIsRootAdmin(file: v2rayUToolPath)
+    private func checkVPNConflict() async -> DiagnosticItem {
+        let vpnProcesses = [
+            "clash_for_windows",
+            "clashx",
+            "clash",
+            "v2rayng",
+            "v2ray",
+            "shadowsocks",
+            "ss-local",
+            "trojan",
+            "qv2ray",
+            "nekobox",
+            "sing-box",
+            "Outline",
+            "tunnelblick",
+            "private-internet-access",
+            "expressvpn",
+            "nordvpn",
+            "surfshark"
+        ]
+        
+        var runningVPNs: [String] = []
+        for vpn in vpnProcesses {
+            if ProcessChecker.isProcessRunning(vpn) {
+                runningVPNs.append(vpn)
+            }
+        }
+        
+        let ok = runningVPNs.isEmpty
+        let subtitle: String
+        let problem: String?
+        
+        if ok {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else {
+            subtitle = String(localized: .DiagFailed)
+            problem = String(localized: .DiagFailed)
+        }
+        
         return DiagnosticItem(
             step: .uToolPermission,
-            title: "工具权限",
-            subtitle: ok ? "权限正常（管理员）" : "权限不足或缺失",
+            title: String(localized: .DiagVPNConflict),
+            subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "权限不足可能导致安装/修复失败，请提升权限",
-            actionTitle: ok ? nil : "修复权限",
-            action: ok ? nil : { self.fixV2rayUTool() }
+            problem: problem,
+            actionTitle: ok ? nil : nil,
+            action: ok ? nil : nil
+        )
+    }
+    
+    private func showRunningProcesses() {
+        let task = Process()
+        task.launchPath = "/bin/ps"
+        task.arguments = ["aux"]
+        task.standardOutput = Pipe()
+        try? task.run()
+    }
+    
+    private func checkUToolPermission() async -> DiagnosticItem {
+        let toolExists = FileManager.default.fileExists(atPath: v2rayUToolPath)
+        let hasPermission = toolExists && checkFileIsRootAdmin(file: v2rayUToolPath)
+        
+        let subtitle: String
+        let problem: String?
+        
+        if hasPermission {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if !toolExists {
+            subtitle = String(localized: .DiagToolMissing)
+            problem = String(localized: .DiagToolMissing)
+        } else {
+            subtitle = String(localized: .DiagToolNoPermission)
+            problem = String(localized: .DiagToolNoPermission)
+        }
+        
+        return DiagnosticItem(
+            step: .uToolPermission,
+            title: String(localized: .DiagUToolPermission),
+            subtitle: subtitle,
+            ok: hasPermission,
+            problem: problem,
+            actionTitle: hasPermission ? nil : String(localized: .DiagFixNow),
+            action: hasPermission ? nil : { self.fixV2rayUTool() }
         )
     }
 
@@ -230,23 +409,35 @@ final class DiagnosticsViewModel: ObservableObject {
         guard let host = nodeHostProvider() else {
             return DiagnosticItem(
                 step: .dnsResolution,
-                title: "节点域名解析",
-                subtitle: "未选择节点或缺少域名",
+                title: String(localized: .DiagDNSResolution),
+                subtitle: String(localized: .DiagNodeNotSelected),
                 ok: false,
-                problem: "请选择有效节点后再诊断",
+                problem: String(localized: .DiagNodeNotSelected),
                 actionTitle: nil,
                 action: nil
             )
         }
         let ok = await NetworkChecker.canResolve(host: host)
+        
+        let subtitle: String
+        let problem: String?
+        
+        if ok {
+            subtitle = String(format: String(localized: .DiagPassed), host)
+            problem = nil
+        } else {
+            subtitle = String(format: String(localized: .DiagDNSResolveFailed), host)
+            problem = String(format: String(localized: .DiagDNSResolveFailed), host)
+        }
+        
         return DiagnosticItem(
             step: .dnsResolution,
-            title: "节点域名解析",
-            subtitle: ok ? "域名可解析：\(host)" : "域名不可解析：\(host)",
+            title: String(localized: .DiagDNSResolution),
+            subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "DNS 无法解析节点域名，可能是 DNS 设置或域名错误",
-            actionTitle: "打开网络设置",
-            action: { self.openSystemNetworkSettings() }
+            problem: problem,
+            actionTitle: ok ? nil : String(localized: .DiagCheckNetwork),
+            action: ok ? nil : { self.openSystemNetworkSettings() }
         )
     }
     
@@ -254,57 +445,105 @@ final class DiagnosticsViewModel: ObservableObject {
         guard let host = nodeHostProvider(), let port = nodePortProvider() else {
             return DiagnosticItem(
                 step: .portConnectivity,
-                title: "远端端口连通性",
-                subtitle: "缺少节点信息",
+                title: String(localized: .DiagPortConnectivity),
+                subtitle: String(localized: .DiagNodeNotSelected),
                 ok: false,
-                problem: "请选择有效节点后再诊断",
+                problem: String(localized: .DiagNodeNotSelected),
                 actionTitle: nil,
                 action: nil
             )
         }
         let ok = await TCPConnectivity.canConnect(host: host, port: port)
+        
+        let subtitle: String
+        let problem: String?
+        
+        if ok {
+            subtitle = String(format: String(localized: .DiagPassed), port)
+            problem = nil
+        } else {
+            subtitle = String(format: String(localized: .DiagPortConnectFailed), host, port)
+            problem = String(format: String(localized: .DiagPortConnectFailed), host, port)
+        }
+        
         return DiagnosticItem(
             step: .portConnectivity,
-            title: "远端端口连通性",
-            subtitle: ok ? "端口 \(port) 可连接" : "端口 \(port) 不可连接",
+            title: String(localized: .DiagPortConnectivity),
+            subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "远端服务器不可达或端口被防火墙阻断，请检查节点端口与服务端状态",
+            problem: problem,
             actionTitle: nil,
             action: nil
         )
     }
     
     private func checkLocalPortConflict() async -> DiagnosticItem {
-        let conflictSocks = ProcessChecker.isPortListening(localSocksPort) && !ProcessChecker.isProcessRunning("v2ray") && !ProcessChecker.isProcessRunning("xray")
-        let conflictHTTP = ProcessChecker.isPortListening(localHTTPPort) && !ProcessChecker.isProcessRunning("v2ray") && !ProcessChecker.isProcessRunning("xray")
+        let socksListening = ProcessChecker.isPortListening(localSocksPort)
+        let httpListening = ProcessChecker.isPortListening(localHTTPPort)
+        let coreRunning = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
+        
+        let conflictSocks = socksListening && !coreRunning
+        let conflictHTTP = httpListening && !coreRunning
         let ok = !(conflictSocks || conflictHTTP)
-        let ownerSocks = ProcessChecker.portOwner(localSocksPort) ?? "未知进程"
-        let ownerHTTP = ProcessChecker.portOwner(localHTTPPort) ?? "未知进程"
-        let problemText: String? = {
-            if conflictSocks { return "本地端口 \(localSocksPort) 已被 \(ownerSocks) 占用" }
-            if conflictHTTP { return "本地端口 \(localHTTPPort) 已被 \(ownerHTTP) 占用" }
-            return nil
-        }()
+        
+        let ownerSocks = ProcessChecker.portOwner(localSocksPort) ?? "未知"
+        let ownerHTTP = ProcessChecker.portOwner(localHTTPPort) ?? "未知"
+        
+        let subtitle: String
+        let problem: String?
+        
+        if !socksListening && !httpListening {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if coreRunning {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if conflictSocks || conflictHTTP {
+            subtitle = String(localized: .DiagPortOccupied)
+            if conflictSocks && conflictHTTP {
+                problem = String(format: String(localized: .DiagPortOccupied), localSocksPort, ownerSocks)
+            } else if conflictSocks {
+                problem = String(format: String(localized: .DiagPortOccupied), localSocksPort, ownerSocks)
+            } else {
+                problem = String(format: String(localized: .DiagPortOccupied), localHTTPPort, ownerHTTP)
+            }
+        } else {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        }
+        
         return DiagnosticItem(
             step: .localPortConflict,
-            title: "本地端口冲突",
-            subtitle: ok ? "端口正常可用" : "端口被占用",
+            title: String(localized: .DiagLocalPortConflict),
+            subtitle: subtitle,
             ok: ok,
-            problem: problemText,
-            actionTitle: ok ? nil : "尝试重启核心",
+            problem: problem,
+            actionTitle: ok ? nil : String(localized: .DiagFixNow),
             action: ok ? nil : { self.restartCore() }
         )
     }
     
     private func checkGeoipFile() async -> DiagnosticItem {
         let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat")
+        
+        let subtitle: String
+        let problem: String?
+        
+        if exists {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else {
+            subtitle = String(localized: .DiagGeoipMissing)
+            problem = String(localized: .DiagGeoipMissing)
+        }
+        
         return DiagnosticItem(
             step: .geoipFile,
-            title: "GeoIP 文件",
-            subtitle: exists ? "已安装" : "缺失",
+            title: String(localized: .DiagGeoipFile),
+            subtitle: subtitle,
             ok: exists,
-            problem: exists ? nil : "规则可能不完整，影响分流与访问",
-            actionTitle: exists ? nil : "一键修复",
+            problem: problem,
+            actionTitle: exists ? nil : String(localized: .DiagFixNow),
             action: exists ? nil : { self.fixGeoip() }
         )
     }
@@ -312,15 +551,36 @@ final class DiagnosticsViewModel: ObservableObject {
     private func checkPingLatency() async -> DiagnosticItem {
         await PingAll.shared.run()
         let latency = appState.latency
-        let ok = latency > 0
-        let subtitle = ok ? String(format: "延迟 %.0f ms", latency) : "无法测得延迟"
+        
+        let subtitle: String
+        let problem: String?
+        let ok: Bool
+        
+        if latency > 0 && latency < 100 {
+            ok = true
+            subtitle = String(format: String(localized: .DiagPassed), Int(latency))
+            problem = nil
+        } else if latency > 0 && latency < 300 {
+            ok = true
+            subtitle = String(format: String(localized: .DiagPassed), Int(latency))
+            problem = nil
+        } else if latency > 0 {
+            ok = false
+            subtitle = String(format: String(localized: .DiagLatencyHigh), Int(latency))
+            problem = String(format: String(localized: .DiagLatencyHigh), Int(latency))
+        } else {
+            ok = false
+            subtitle = String(localized: .DiagLatencyFailed)
+            problem = String(localized: .DiagLatencyFailed)
+        }
+        
         return DiagnosticItem(
             step: .pingLatency,
-            title: "延迟与可用性",
+            title: String(localized: .DiagPingLatency),
             subtitle: subtitle,
             ok: ok,
-            problem: ok ? nil : "可能无法连通或被阻断，请切换节点或重试",
-            actionTitle: "立即测试",
+            problem: problem,
+            actionTitle: String(localized: .DiagReTest),
             action: { self.doPingNow() }
         )
     }
@@ -330,13 +590,41 @@ final class DiagnosticsViewModel: ObservableObject {
         let ok = problems.isEmpty
         return DiagnosticItem(
             step: .logAnalysis,
-            title: "日志分析",
-            subtitle: ok ? "未发现异常" : "发现问题（见下）",
+            title: String(localized: .DiagLogAnalysis),
+            subtitle: ok ? String(localized: .DiagPassed) : String(localized: .DiagFailed),
             ok: ok,
             problem: ok ? nil : problems.joined(separator: "\n"),
             actionTitle: nil,
             action: nil
         )
+    }
+    
+    private func checkConfigValidity() async -> DiagnosticItem {
+        let (isValid, problems) = ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
+        
+        let subtitle: String
+        if !FileManager.default.fileExists(atPath: JsonConfigFilePath) {
+            subtitle = "配置文件不存在"
+        } else if isValid {
+            subtitle = "配置格式正确"
+        } else {
+            subtitle = "配置存在问题"
+        }
+        
+        return DiagnosticItem(
+            step: .configValidity,
+            title: "配置合法性",
+            subtitle: subtitle,
+            ok: isValid,
+            problem: isValid ? nil : problems.joined(separator: "；"),
+            actionTitle: isValid ? nil : "查看配置",
+            action: isValid ? nil : { self.openConfigFile() }
+        )
+    }
+    
+    private func openConfigFile() {
+        let url = URL(fileURLWithPath: JsonConfigFilePath)
+        NSWorkspace.shared.open(url)
     }
     
     // MARK: - 标题辅助

@@ -407,4 +407,62 @@ Note: PAC, Global, Manual modes mainly affect browsers and other system-level ap
 
 To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mode, or use the keyboard shortcut.";
 "FaqManualCoreUpdateDetail2" = "You can manually download the xray-core or sing-box version that matches your system architecture and replace it in the ~/.V2rayU/v2ray-core/ directory. Make sure to rename the core file to ~/.V2rayU/v2ray-core/v2ray";
+// Diagnostics - Check item titles
+"DiagNetworkConnectivity" = "Network Connection";
+"DiagSystemProxy" = "System Proxy Settings";
+"DiagFirewall" = "Firewall & Security Software";
+"DiagCoreInstall" = "Core Installation & Version";
+"DiagCoreRunning" = "Core Running Status";
+"DiagUToolPermission" = "Tool Permissions";
+"DiagConfigValidity" = "Configuration Validity";
+"DiagDNSResolution" = "Node Domain Resolution";
+"DiagPortConnectivity" = "Remote Port Connectivity";
+"DiagLocalPortConflict" = "Local Port Conflict";
+"DiagGeoipFile" = "GeoIP Database";
+"DiagPingLatency" = "Latency & Availability";
+"DiagLogAnalysis" = "Log Analysis";
+"DiagVPNConflict" = "VPN Conflict Detection";
+// Diagnostics - Status descriptions
+"DiagPending" = "Pending...";
+"DiagChecking" = "Checking...";
+"DiagPassed" = "Passed";
+"DiagFailed" = "Failed";
+// Diagnostics - Detailed problem descriptions
+"DiagNetUnavailable" = "Computer cannot access the internet. Please check:\n1. Router/broadband is working\n2. Wi-Fi is connected\n3. Ethernet cable is plugged in";
+"DiagNetDNSFailed" = "DNS server cannot resolve domain names. This may be due to network settings or VPN software conflict. Please check DNS settings";
+"DiagNetIPFailed" = "Cannot access public IPs, network may be restricted or blocked by firewall";
+"DiagProxyNotEnabled" = "System proxy is not enabled. Applications won't use the proxy. Please enable proxy in system network settings, or select 'Global'/'PAC' mode in V2rayU";
+"DiagProxyPortWrong" = "System proxy port is incorrect. V2rayU uses port %d (SOCKS) or %d (HTTP). Please modify in system proxy settings";
+"DiagProxyPortMismatch" = "System proxy port is wrong (current: %d, should be: %d)";
+"DiagFirewallBlocked" = "Firewall or security software (like 360, Tencent Security, MacKeeper, etc.) may be blocking the proxy process or ports. Please try:\n1. Add trust in security software\n2. Temporarily disable firewall\n3. Allow V2rayU in System Preferences";
+"DiagCoreNotInstalled" = "V2ray core is not installed. This is required for proxy functionality. Click 'Fix Now' to auto-download and install";
+"DiagCoreNotExecutable" = "Core file exists but is not executable. Try reinstalling or manually fix permissions";
+"DiagCoreNotRunning" = "Core process is not running, proxy service unavailable";
+"DiagCoreStopped" = "Proxy is disabled. Click 'Start Core' to enable proxy";
+"DiagCoreStartFailed" = "Core process is not running. Possible reasons:\n1. Configuration error\n2. Port is occupied\n3. Core crashed\n\nCheck log analysis for more info, or try restarting core";
+"DiagToolMissing" = "V2rayU helper tool is not installed. This may prevent auto-installation. Try reinstalling V2rayU";
+"DiagToolNoPermission" = "Helper tool permission is insufficient. Running V2rayU requires admin privileges. Please try:\n1. Reopen V2rayU\n2. Grant Full Disk Access in System Settings";
+"DiagConfigNotExist" = "Configuration file does not exist";
+"DiagConfigInvalid" = "Configuration file format is invalid JSON";
+"DiagConfigMissingField" = "Configuration file missing required fields";
+"DiagNodeNotSelected" = "Please select a node first";
+"DiagDNSResolveFailed" = "DNS cannot resolve node domain '%@'. Possible reasons:\n1. Current network's DNS cannot resolve this domain\n2. Node domain has expired\n3. Network uses custom DNS that cannot resolve\n\nTry changing network or switching nodes";
+"DiagPortConnectFailed" = "Cannot connect to remote server (%@:%d). Possible reasons:\n1. Node server is offline\n2. Port is blocked (common ports like 443, 8388 are easily blocked)\n3. Current network has overseas connection limits\n\nTry switching nodes or ports";
+"DiagPortOccupied" = "Local port %d is occupied by '%@'. Close that program or change port in settings";
+"DiagGeoipMissing" = "GeoIP database file is not installed. This will prevent routing rules from working (domestic direct, overseas proxy). Click 'Fix Now' to auto-download";
+"DiagLatencyHigh" = "High latency (%dms), may affect browsing experience. Try switching to a node with lower latency";
+"DiagLatencyFailed" = "Cannot connect to node for latency test. Node may be unavailable or blocked. Try switching nodes";
+// Diagnostics - Action buttons
+"DiagOpenNetworkSettings" = "Open Network Settings";
+"DiagFixNow" = "Fix Now";
+"DiagRestartCore" = "Restart Core";
+"DiagStartCore" = "Start Core";
+"DiagCheckNetwork" = "Check Network";
+"DiagViewConfig" = "View Config";
+"DiagReTest" = "Re-test";
+// Diagnostics - Special mode descriptions
+"DiagProxyNotNeededTunnel" = "Tunnel mode does not require system proxy (uses network extension)";
+"DiagProxyNotNeededManual" = "Manual mode does not set system proxy";
+"DiagProxyNotNeededOff" = "Proxy is disabled";
+"DiagProxyRequired" = "System proxy required (PAC/Global mode)";
 

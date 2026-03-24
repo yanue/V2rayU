@@ -408,4 +408,62 @@
 
 启用方法：点击菜单栏的 V2rayU 图标 -> 选择 Tunnel 模式，或使用快捷键。";
 "FaqManualCoreUpdateDetail2" = "可以手动下载 xray-core 或 sing-box 对应系统架构版本替换到 ~/.V2rayU/v2ray-core/ 目录下，请注意，需要更改 core 名称为 ~/.V2rayU/v2ray-core/v2ray";
+// Diagnostics - 检查步骤标题
+"DiagNetworkConnectivity" = "网络连接";
+"DiagSystemProxy" = "系统代理设置";
+"DiagFirewall" = "防火墙与安全软件";
+"DiagCoreInstall" = "核心安装与版本";
+"DiagCoreRunning" = "核心运行状态";
+"DiagUToolPermission" = "工具权限";
+"DiagConfigValidity" = "配置合法性";
+"DiagDNSResolution" = "节点域名解析";
+"DiagPortConnectivity" = "远端端口连通性";
+"DiagLocalPortConflict" = "本地端口冲突";
+"DiagGeoipFile" = "GeoIP 数据库";
+"DiagPingLatency" = "延迟与可用性";
+"DiagLogAnalysis" = "日志分析";
+"DiagVPNConflict" = "VPN 冲突检测";
+// Diagnostics - 状态描述
+"DiagPending" = "等待检查…";
+"DiagChecking" = "正在检查…";
+"DiagPassed" = "检查通过";
+"DiagFailed" = "检查失败";
+// Diagnostics - 详细问题描述
+"DiagNetUnavailable" = "电脑无法访问互联网。请检查：\n1. 路由器/宽带是否正常\n2. Wi-Fi 是否已连接\n3. 网线是否插好";
+"DiagNetDNSFailed" = "DNS 服务器无法解析域名。可能是网络设置问题或 VPN 软件冲突。请检查网络设置中的 DNS 配置";
+"DiagNetIPFailed" = "无法访问公网 IP，可能是网络被限制或防火墙阻止";
+"DiagProxyNotEnabled" = "系统代理未开启，软件产生的代理无法被系统使用。请在系统网络设置中开启代理，或在 V2rayU 中选择「全局模式」/「PAC 模式」自动配置";
+"DiagProxyPortWrong" = "系统代理端口配置不正确。V2rayU 使用的端口是 %d（SOCKS）或 %d（HTTP），请在系统代理设置中修改";
+"DiagProxyPortMismatch" = "系统代理端口错误（当前：%d，应改为：%d）";
+"DiagFirewallBlocked" = "防火墙或安全软件（如 360、腾讯安全卫士、MacKeeper 等）可能阻止了代理进程或端口。请尝试：\n1. 在安全软件中添加信任\n2. 暂时关闭防火墙测试\n3. 在系统偏好设置中允许 V2rayU";
+"DiagCoreNotInstalled" = "V2ray 核心未安装。这是必须的组件，否则无法使用代理功能。请点击「一键修复」自动下载安装";
+"DiagCoreNotExecutable" = "核心文件存在但没有执行权限。请尝试重新安装或手动修复权限";
+"DiagCoreNotRunning" = "核心进程未运行，无法提供代理服务";
+"DiagCoreStopped" = "代理功能已关闭。如果需要使用代理，请点击「启动核心」";
+"DiagCoreStartFailed" = "核心进程未运行。可能的原因：\n1. 配置文件有误\n2. 端口被占用\n3. 核心程序崩溃\n\n请查看日志分析获取更多信息，或尝试重启核心";
+"DiagToolMissing" = "V2rayU 辅助工具未安装。这可能导致无法自动安装核心等功能。请尝试重新安装 V2rayU";
+"DiagToolNoPermission" = "辅助工具权限不足。运行 V2rayU 时需要管理员权限来安装核心和修改系统设置。请尝试：\n1. 重新打开 V2rayU\n2. 在系统设置中授予完整磁盘访问权限";
+"DiagConfigNotExist" = "配置文件不存在";
+"DiagConfigInvalid" = "配置文件格式错误，不是有效的 JSON";
+"DiagConfigMissingField" = "配置文件缺少必要字段";
+"DiagNodeNotSelected" = "请先选择一个节点后再进行诊断";
+"DiagDNSResolveFailed" = "DNS 无法解析节点域名「%@」。可能原因：\n1. 当前网络的 DNS 服务器无法解析该域名\n2. 节点域名已过期或失效\n3. 网络使用了自定义 DNS 但该 DNS 无法解析\n\n请尝试更换网络或手动更换节点";
+"DiagPortConnectFailed" = "无法连接到远程服务器（%@:%d）。可能原因：\n1. 节点服务器已下线或不可用\n2. 端口被墙（常用端口如 443、8388 等容易被封）\n3. 当前网络对海外连接有限制\n\n请尝试更换节点或更换端口";
+"DiagPortOccupied" = "本地端口 %d 被「%@」占用。请关闭该程序或在设置中修改端口";
+"DiagGeoipMissing" = "GeoIP 数据库文件未安装。这会导致无法使用分流规则（如国内走直连、国外走代理）。请点击「一键修复」自动下载";
+"DiagLatencyHigh" = "延迟较高（%dms），可能会影响上网体验。请尝试更换延迟更低的节点";
+"DiagLatencyFailed" = "无法连接到节点进行测速。可能节点不可用或网络被阻断。请尝试更换节点";
+// Diagnostics - 动作按钮
+"DiagOpenNetworkSettings" = "打开网络设置";
+"DiagFixNow" = "一键修复";
+"DiagRestartCore" = "重启核心";
+"DiagStartCore" = "启动核心";
+"DiagCheckNetwork" = "检查网络";
+"DiagViewConfig" = "查看配置";
+"DiagReTest" = "重新测试";
+// Diagnostics - 特殊模式说明
+"DiagProxyNotNeededTunnel" = "Tunnel 模式不需要系统代理（使用网络扩展）";
+"DiagProxyNotNeededManual" = "Manual 模式不设置系统代理";
+"DiagProxyNotNeededOff" = "代理已关闭";
+"DiagProxyRequired" = "需要开启系统代理（PAC/全局模式）";
 

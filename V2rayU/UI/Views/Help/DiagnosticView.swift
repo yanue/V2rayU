@@ -9,10 +9,14 @@ import SwiftUI
 import AppKit
 
 struct DiagnosticsView: View {
-    // 提供当前节点信息的闭包（你可以从 AppState 或配置源取值）
+    // 提供当前节点信息的闭包
     @StateObject private var viewModel = DiagnosticsViewModel(
-        nodeHostProvider: { nil },   // 替换为你的取值
-        nodePortProvider: { nil }    // 替换为你的取值
+        nodeHostProvider: {
+            AppState.shared.runningServer?.address
+        },
+        nodePortProvider: {
+            AppState.shared.runningServer.flatMap { UInt16($0.port) }
+        }
     )
     
     var body: some View {

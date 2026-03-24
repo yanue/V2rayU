@@ -393,4 +393,62 @@ enum LanguageLabel: String, CaseIterable {
     case FaqRoutingPriorityDetail2
     case FaqTrueGlobalProxyDetail2
     case FaqManualCoreUpdateDetail2
+    // Diagnostics - 检查步骤标题
+    case DiagNetworkConnectivity
+    case DiagSystemProxy
+    case DiagFirewall
+    case DiagCoreInstall
+    case DiagCoreRunning
+    case DiagUToolPermission
+    case DiagConfigValidity
+    case DiagDNSResolution
+    case DiagPortConnectivity
+    case DiagLocalPortConflict
+    case DiagGeoipFile
+    case DiagPingLatency
+    case DiagLogAnalysis
+    case DiagVPNConflict
+    // Diagnostics - 状态描述
+    case DiagPending
+    case DiagChecking
+    case DiagPassed
+    case DiagFailed
+    // Diagnostics - 详细问题描述
+    case DiagNetUnavailable
+    case DiagNetDNSFailed
+    case DiagNetIPFailed
+    case DiagProxyNotEnabled
+    case DiagProxyPortWrong
+    case DiagProxyPortMismatch
+    case DiagFirewallBlocked
+    case DiagCoreNotInstalled
+    case DiagCoreNotExecutable
+    case DiagCoreNotRunning
+    case DiagCoreStopped
+    case DiagCoreStartFailed
+    case DiagToolMissing
+    case DiagToolNoPermission
+    case DiagConfigNotExist
+    case DiagConfigInvalid
+    case DiagConfigMissingField
+    case DiagNodeNotSelected
+    case DiagDNSResolveFailed
+    case DiagPortConnectFailed
+    case DiagPortOccupied
+    case DiagGeoipMissing
+    case DiagLatencyHigh
+    case DiagLatencyFailed
+    // Diagnostics - 动作按钮
+    case DiagOpenNetworkSettings
+    case DiagFixNow
+    case DiagRestartCore
+    case DiagStartCore
+    case DiagCheckNetwork
+    case DiagViewConfig
+    case DiagReTest
+    // Diagnostics - 特殊模式说明
+    case DiagProxyNotNeededTunnel
+    case DiagProxyNotNeededManual
+    case DiagProxyNotNeededOff
+    case DiagProxyRequired
 }
