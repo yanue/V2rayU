@@ -465,4 +465,17 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "DiagProxyNotNeededManual" = "Manual mode does not set system proxy";
 "DiagProxyNotNeededOff" = "Proxy is disabled";
 "DiagProxyRequired" = "System proxy required (PAC/Global mode)";
+// Diagnostics - Core Architecture
+"DiagCoreArch" = "Core Architecture";
+"DiagCoreArchCorrect" = "Architecture matches system (%@)";
+"DiagCoreArchMismatch" = "Architecture mismatch (file: %@, system: %@)";
+// Diagnostics - Basic Files
+"DiagV2rayUToolInstall" = "V2rayUTool Installation";
+"DiagConfigFile" = "Configuration File";
+"DiagConfigFileExists" = "Config file exists (%d bytes)";
+"DiagConfigFileMissing" = "Configuration file is missing";
+"DiagConfigFileEmpty" = "Configuration file is empty";
+// Diagnostics - Geo Files
+"DiagGeositeFile" = "GeoSite Database";
+"DiagGeositeMissing" = "GeoSite database file is not installed. Click 'Fix Now' to auto-download";
 

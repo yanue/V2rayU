@@ -9,7 +9,6 @@ import SwiftUI
 import AppKit
 
 struct DiagnosticsView: View {
-    // 提供当前节点信息的闭包
     @StateObject private var viewModel = DiagnosticsViewModel(
         nodeHostProvider: {
             AppState.shared.runningServer?.address
@@ -18,6 +17,7 @@ struct DiagnosticsView: View {
             AppState.shared.runningServer.flatMap { UInt16($0.port) }
         }
     )
+    @State private var selectedTab: DiagnosticCategory = .files
     
     var body: some View {
         VStack {
@@ -46,20 +46,30 @@ struct DiagnosticsView: View {
                 }
             }
 
-            Spacer()
-            VStack {
+            VStack(spacing: 0) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(DiagnosticCategory.allCases) { category in
+                            tabButton(for: category)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+                .frame(height: 40)
+//                .background(Color(NSColor.controlBackgroundColor))
+                
+                Divider()
+                
                 ScrollView {
                     VStack(spacing: 10) {
-                        ForEach(viewModel.items) { item in
+                        ForEach(viewModel.itemsForCategory(selectedTab)) { item in
                             statusRow(item: item)
                         }
                     }
-                    .padding(.top, 6)
+                    .padding(10)
                 }
-                .padding(.horizontal, 10)
             }
             .background(.ultraThinMaterial)
-            .border(Color.gray.opacity(0.1), width: 1)
             .cornerRadius(8)
             .onAppear { viewModel.runSequentialChecks() }
             .alert(isPresented: $viewModel.showOpenSettingsAlert) {
@@ -77,41 +87,32 @@ struct DiagnosticsView: View {
         }
         .padding(8)
     }
-}
-
-@MainActor
-@ViewBuilder
-func statusRow1(title: String, subtitle: String?, ok: Bool, problem: String?, actionTitle: String? = nil, action: (() -> Void)? = nil) -> some View {
-    HStack(alignment: .top, spacing: 10) {
-        Image(systemName: ok ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-            .resizable()
-            .frame(width: 24, height: 24)
-            .foregroundColor(ok ? .green : .orange)
-            .padding(.top, 4)
-
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(title).font(.headline)
-                Spacer()
-                if let actionTitle = actionTitle, let action = action {
-                    Button(actionTitle) { action() }
-                        .background(Color.accentColor.opacity(0.12))
-                        .cornerRadius(6)
-                }
+    
+    @ViewBuilder
+    private func tabButton(for category: DiagnosticCategory) -> some View {
+        let isSelected = selectedTab == category
+        let items = viewModel.itemsForCategory(category)
+        let passedCount = items.filter { $0.ok }.count
+        
+        Button {
+            selectedTab = category
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: category.icon)
+                    .font(.system(size: 11))
+                Text(category.rawValue)
+                    .font(.system(size: 12))
+                Text("\(passedCount)/\(items.count)")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
             }
-            if let subtitle = subtitle {
-                if ok {
-                    Text(subtitle).font(.subheadline).foregroundColor(.green)
-                }
-            }
-            if let problem = problem {
-                Text(problem).font(.caption).foregroundColor(.red)
-            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+            .cornerRadius(6)
         }
+        .buttonStyle(.plain)
     }
-    .padding(12)
-    .background(RoundedRectangle(cornerRadius: 10).fill(Color(NSColor.windowBackgroundColor)))
-    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.08)))
 }
 
 @MainActor

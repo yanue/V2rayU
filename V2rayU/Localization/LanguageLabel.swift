@@ -451,4 +451,17 @@ enum LanguageLabel: String, CaseIterable {
     case DiagProxyNotNeededManual
     case DiagProxyNotNeededOff
     case DiagProxyRequired
+    // Diagnostics - Core 架构
+    case DiagCoreArch
+    case DiagCoreArchCorrect
+    case DiagCoreArchMismatch
+    // Diagnostics - 基础文件
+    case DiagV2rayUToolInstall
+    case DiagConfigFile
+    case DiagConfigFileExists
+    case DiagConfigFileMissing
+    case DiagConfigFileEmpty
+    // Diagnostics - Geo 文件
+    case DiagGeositeFile
+    case DiagGeositeMissing
 }

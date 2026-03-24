@@ -7,10 +7,39 @@
 
 import SwiftUI
 
+/// 诊断分类
+enum DiagnosticCategory: String, CaseIterable, Identifiable {
+    case files = "文件相关"
+    case status = "运行状态"
+    case configAndLogs = "配置及日志"
+    
+    var id: String { rawValue }
+    
+    var icon: String {
+        switch self {
+        case .files: return "folder.badge.gearshape"
+        case .status: return "cpu"
+        case .configAndLogs: return "doc.text.magnifyingglass"
+        }
+    }
+    
+    var steps: [DiagnosticStep] {
+        switch self {
+        case .files:
+            return [.uToolPermission, .v2rayUToolInstall, .configFile, .coreInstall, .coreArch, .geoipFile, .geositeFile]
+        case .status:
+            return [.coreRunning, .networkConnectivity, .portConnectivity, .localPortConflict, .systemProxy, .firewall, .pingLatency]
+        case .configAndLogs:
+            return [.configValidity, .logAnalysis, .dnsResolution]
+        }
+    }
+}
+
 /// 单个诊断项的数据模型：驱动 UI
 struct DiagnosticItem: Identifiable, @unchecked Sendable {
     let id = UUID()
     let step: DiagnosticStep
+    var category: DiagnosticCategory { step.category }
     let title: String
     let subtitle: String?
     var status: DiagnosticStatus = .pending
@@ -65,15 +94,30 @@ enum DiagnosticStep: String, CaseIterable {
     case systemProxy                  // 系统代理设置
     case firewall                     // 防火墙/安全软件阻断（提示级）
     case coreInstall                  // v2ray 核心安装
+    case coreArch                      // Core 架构检查 (amd64/arm64)
     case coreRunning                  // 核心运行状态
     case uToolPermission              // v2rayU 工具权限
+    case v2rayUToolInstall            // V2rayUTool 安装
+    case configFile                   // 配置文件存在
     case configValidity               // 配置文件合法性（JSON）
     case dnsResolution                // 节点域名解析
     case portConnectivity             // 节点端口连通性（TCP）
     case localPortConflict            // 本地端口占用
     case geoipFile                    // GeoIP 文件存在
+    case geositeFile                  // GeoSite 文件存在
     case pingLatency                  // 延迟（可用性）
     case logAnalysis                  // 日志解析（错误映射）
+    
+    var category: DiagnosticCategory {
+        switch self {
+        case .uToolPermission, .v2rayUToolInstall, .configFile, .coreInstall, .coreArch, .geoipFile, .geositeFile:
+            return .files
+        case .coreRunning, .networkConnectivity, .portConnectivity, .localPortConflict, .systemProxy, .firewall, .pingLatency:
+            return .status
+        case .configValidity, .logAnalysis, .dnsResolution:
+            return .configAndLogs
+        }
+    }
 }
 
 enum DiagnosticStatus {

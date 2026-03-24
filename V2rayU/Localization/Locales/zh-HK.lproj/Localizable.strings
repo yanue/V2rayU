@@ -465,4 +465,17 @@
 "DiagProxyNotNeededManual" = "Manual 模式不設定系統代理";
 "DiagProxyNotNeededOff" = "代理已關閉";
 "DiagProxyRequired" = "需要開啟系統代理（PAC/全域模式）";
+// Diagnostics - Core 架構
+"DiagCoreArch" = "Core 架構檢查";
+"DiagCoreArchCorrect" = "架構與系統匹配 (%@)";
+"DiagCoreArchMismatch" = "架構不匹配 (檔案: %@, 系統: %@)";
+// Diagnostics - 基礎檔案
+"DiagV2rayUToolInstall" = "V2rayUTool 安裝";
+"DiagConfigFile" = "設定檔";
+"DiagConfigFileExists" = "設定檔存在 (%d 位元組)";
+"DiagConfigFileMissing" = "設定檔缺失";
+"DiagConfigFileEmpty" = "設定檔為空";
+// Diagnostics - Geo 檔案
+"DiagGeositeFile" = "GeoSite 資料庫";
+"DiagGeositeMissing" = "GeoSite 資料庫檔案未安裝。點擊「立即修復」自動下載";
 

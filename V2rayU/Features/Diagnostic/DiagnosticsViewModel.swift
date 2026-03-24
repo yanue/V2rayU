@@ -33,6 +33,10 @@ final class DiagnosticsViewModel: ObservableObject {
         self.items = DiagnosticStep.allCases.map { makePendingItem(for: $0) }
     }
     
+    func itemsForCategory(_ category: DiagnosticCategory) -> [DiagnosticItem] {
+        items.filter { $0.category == category }
+    }
+    
     /// 开始逐项诊断（按步骤顺序）
     func runSequentialChecks() {
         Task {
@@ -48,12 +52,16 @@ final class DiagnosticsViewModel: ObservableObject {
             await step(.systemProxy)        { await checkSystemProxy() }
             await step(.firewall)           { await checkFirewall() }
             await step(.coreInstall)        { await checkCoreInstall() }
+            await step(.coreArch)           { await checkCoreArch() }
             await step(.coreRunning)        { await checkCoreRunning() }
             await step(.uToolPermission)    { await checkUToolPermission() }
+            await step(.v2rayUToolInstall)  { await checkV2rayUToolInstall() }
+            await step(.configFile)         { await checkConfigFile() }
             await step(.dnsResolution)      { await checkDNSResolution() }
             await step(.portConnectivity)   { await checkPortConnectivity() }
             await step(.localPortConflict)  { await checkLocalPortConflict() }
             await step(.geoipFile)          { await checkGeoipFile() }
+            await step(.geositeFile)        { await checkGeositeFile() }
             await step(.pingLatency)        { await checkPingLatency() }
             await step(.logAnalysis)        { await checkLogAnalysis() }
             await step(.configValidity)     { await checkConfigValidity() }
@@ -122,12 +130,16 @@ final class DiagnosticsViewModel: ObservableObject {
        case .systemProxy:        return String(localized: .DiagSystemProxy)
        case .firewall:           return String(localized: .DiagFirewall)
        case .coreInstall:        return String(localized: .DiagCoreInstall)
+       case .coreArch:           return String(localized: .DiagCoreArch)
        case .coreRunning:        return String(localized: .DiagCoreRunning)
        case .uToolPermission:    return String(localized: .DiagUToolPermission)
+       case .v2rayUToolInstall:  return String(localized: .DiagV2rayUToolInstall)
+       case .configFile:         return String(localized: .DiagConfigFile)
        case .dnsResolution:      return String(localized: .DiagDNSResolution)
        case .portConnectivity:   return String(localized: .DiagPortConnectivity)
        case .localPortConflict:  return String(localized: .DiagLocalPortConflict)
        case .geoipFile:          return String(localized: .DiagGeoipFile)
+       case .geositeFile:        return String(localized: .DiagGeositeFile)
        case .pingLatency:        return String(localized: .DiagPingLatency)
        case .logAnalysis:        return String(localized: .DiagLogAnalysis)
        case .configValidity:     return String(localized: .DiagConfigValidity)
@@ -286,6 +298,42 @@ final class DiagnosticsViewModel: ObservableObject {
             problem: problem,
             actionTitle: executable ? nil : String(localized: .DiagFixNow),
             action: executable ? nil : { self.fixInstallAll() }
+        )
+    }
+    
+    private func checkCoreArch() async -> DiagnosticItem {
+        let installed = FileManager.default.fileExists(atPath: xrayCoreFile)
+        let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
+        
+        let currentArch = isARM64() ? "arm64" : "amd64"
+        let actualArch = executable ? getFileArch(file: xrayCoreFile) : nil
+        let ok = actualArch == currentArch
+        
+        let subtitle: String
+        let problem: String?
+        
+        if !installed {
+            subtitle = String(localized: .DiagCoreNotInstalled)
+            problem = String(localized: .DiagCoreNotInstalled)
+        } else if !executable {
+            subtitle = String(localized: .DiagCoreNotExecutable)
+            problem = String(localized: .DiagCoreNotExecutable)
+        } else if ok {
+            subtitle = String(format: String(localized: .DiagCoreArchCorrect), actualArch ?? "unknown")
+            problem = nil
+        } else {
+            subtitle = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
+            problem = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
+        }
+        
+        return DiagnosticItem(
+            step: .coreArch,
+            title: String(localized: .DiagCoreArch),
+            subtitle: subtitle,
+            ok: ok,
+            problem: problem,
+            actionTitle: ok ? nil : String(localized: .DiagFixNow),
+            action: ok ? nil : { self.fixInstallAll() }
         )
     }
     
@@ -548,6 +596,91 @@ final class DiagnosticsViewModel: ObservableObject {
         )
     }
     
+    private func checkGeositeFile() async -> DiagnosticItem {
+        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/geosite.dat")
+        
+        let subtitle: String
+        let problem: String?
+        
+        if exists {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else {
+            subtitle = String(localized: .DiagGeositeMissing)
+            problem = String(localized: .DiagGeositeMissing)
+        }
+        
+        return DiagnosticItem(
+            step: .geositeFile,
+            title: String(localized: .DiagGeositeFile),
+            subtitle: subtitle,
+            ok: exists,
+            problem: problem,
+            actionTitle: exists ? nil : String(localized: .DiagFixNow),
+            action: exists ? nil : { self.fixGeoip() }
+        )
+    }
+    
+    private func checkConfigFile() async -> DiagnosticItem {
+        let exists = FileManager.default.fileExists(atPath: JsonConfigFilePath)
+        
+        let subtitle: String
+        let problem: String?
+        
+        if exists {
+            let fileSize = (try? FileManager.default.attributesOfItem(atPath: JsonConfigFilePath)[.size] as? Int) ?? 0
+            if fileSize > 0 {
+                subtitle = String(format: String(localized: .DiagConfigFileExists), fileSize)
+                problem = nil
+            } else {
+                subtitle = String(localized: .DiagConfigFileEmpty)
+                problem = String(localized: .DiagConfigFileEmpty)
+            }
+        } else {
+            subtitle = String(localized: .DiagConfigFileMissing)
+            problem = String(localized: .DiagConfigFileMissing)
+        }
+        
+        return DiagnosticItem(
+            step: .configFile,
+            title: String(localized: .DiagConfigFile),
+            subtitle: subtitle,
+            ok: exists && ((try? FileManager.default.attributesOfItem(atPath: JsonConfigFilePath)[.size] as? Int) ?? 0) > 0,
+            problem: problem,
+            actionTitle: exists ? nil : String(localized: .DiagFixNow),
+            action: exists ? nil : { self.fixInstallAll() }
+        )
+    }
+    
+    private func checkV2rayUToolInstall() async -> DiagnosticItem {
+        let exists = FileManager.default.fileExists(atPath: v2rayUToolPath)
+        let executable = exists && FileManager.default.isExecutableFile(atPath: v2rayUToolPath)
+        
+        let subtitle: String
+        let problem: String?
+        
+        if executable {
+            subtitle = String(localized: .DiagPassed)
+            problem = nil
+        } else if exists {
+            subtitle = String(localized: .DiagToolNoPermission)
+            problem = String(localized: .DiagToolNoPermission)
+        } else {
+            subtitle = String(localized: .DiagToolMissing)
+            problem = String(localized: .DiagToolMissing)
+        }
+        
+        return DiagnosticItem(
+            step: .v2rayUToolInstall,
+            title: String(localized: .DiagV2rayUToolInstall),
+            subtitle: subtitle,
+            ok: executable,
+            problem: problem,
+            actionTitle: executable ? nil : String(localized: .DiagFixNow),
+            action: executable ? nil : { self.fixV2rayUTool() }
+        )
+    }
+    
     private func checkPingLatency() async -> DiagnosticItem {
         await PingAll.shared.run()
         let latency = appState.latency
@@ -635,13 +768,17 @@ final class DiagnosticsViewModel: ObservableObject {
         case .systemProxy: return "系统代理设置"
         case .firewall: return "防火墙与安全软件"
         case .coreInstall: return "核心安装与版本"
+        case .coreArch: return "核心架构检查"
         case .coreRunning: return "核心运行状态"
         case .uToolPermission: return "工具权限"
+        case .v2rayUToolInstall: return "V2rayUTool 安装"
+        case .configFile: return "配置文件"
         case .configValidity: return "配置合法性"
         case .dnsResolution: return "节点域名解析"
         case .portConnectivity: return "远端端口连通性"
         case .localPortConflict: return "本地端口冲突"
         case .geoipFile: return "GeoIP 文件"
+        case .geositeFile: return "GeoSite 文件"
         case .pingLatency: return "延迟与可用性"
         case .logAnalysis: return "日志分析"
         }
@@ -725,6 +862,42 @@ final class DiagnosticsViewModel: ObservableObject {
             return (enabled, port)
         } catch {
             return (false, 0)
+        }
+    }
+    
+    private func isARM64() -> Bool {
+        #if arch(arm64)
+        return true
+        #else
+        return false
+        #endif
+    }
+    
+    private func getFileArch(file: String) -> String? {
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: file))
+            guard data.count >= 20 else { return nil }
+            
+            if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
+                let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
+                switch eMachine {
+                case 62: return "amd64"
+                case 183: return "arm64"
+                default: return "unknown"
+                }
+            }
+            else if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
+                let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
+                switch cpuType {
+                case 0x01000007: return "x86_64"
+                case 0x0100000C: return "arm64"
+                default: return "unknown"
+                }
+            }
+            
+            return nil
+        } catch {
+            return nil
         }
     }
 }
