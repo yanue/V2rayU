@@ -290,6 +290,8 @@
 "DiagnosticSubHead" = "检查常见问题与解决方案";
 "FAQ" = "常见问题";
 "FaqSubtitle" = "查看常见问题与解决方案";
+"SubmitIssue" = "提交问题";
+"RunDiagnostic" = "运行诊断";
 
 // MARK: - 表格字段
 "TableFieldSort" = "排序";

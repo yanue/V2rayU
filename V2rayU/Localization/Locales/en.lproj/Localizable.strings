@@ -290,6 +290,8 @@
 "DiagnosticSubHead" = "Check for common issues and solutions";
 "FAQ" = "FAQ";
 "FaqSubtitle" = "Frequently Asked Questions";
+"SubmitIssue" = "Submit Issue";
+"RunDiagnostic" = "Run Diagnostic";
 
 // MARK: - Table Fields
 "TableFieldSort" = "Sort";

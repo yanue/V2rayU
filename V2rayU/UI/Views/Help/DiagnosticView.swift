@@ -26,16 +26,29 @@ struct DiagnosticsView: View {
                 title: String(localized: .Diagnostics),
                 subtitle:  String(localized: .DiagnosticSubHead)
             ) {
-                Button {
-                    viewModel.showFAQ = true
-                } label: {
-                    Image(systemName: "questionmark.circle")
-                    Text(String(localized: .FAQ))
+                if !viewModel.progressText.isEmpty {
+                    Text(viewModel.progressText)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+
+                RunDiagnosticButton(checking: $viewModel.checking) {
+                    viewModel.runSequentialChecks()
                 }
                 .buttonStyle(.bordered)
+
+                Button {
+                    viewModel.submitToGitHub()
+                } label: {
+                    Image(systemName: "paperplane")
+                    Text(String(localized: .SubmitIssue))
+                }
+                .buttonStyle(.bordered)
+                .disabled(viewModel.checking || !viewModel.hasFailures)
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 0) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 4) {
                         ForEach(DiagnosticCategory.allCases) { category in
@@ -45,32 +58,20 @@ struct DiagnosticsView: View {
                     .padding(.horizontal, 8)
                 }
                 .frame(height: 40)
-
-                if !viewModel.progressText.isEmpty {
-                    Text(viewModel.progressText)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-
-                RefreshButton(checking: $viewModel.checking) {
-                    viewModel.runSequentialChecks()
-                }
-                .buttonStyle(.bordered)
-
                 Button {
-                    viewModel.submitToGitHub()
+                    viewModel.showFAQ = true
                 } label: {
-                    Image(systemName: "paperplane")
-                    Text("提交问题")
+                    Image(systemName: "questionmark.circle")
+                    Text(String(localized: .FAQ))
                 }
                 .buttonStyle(.bordered)
-                .disabled(viewModel.checking || !viewModel.hasFailures)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 6)
             .padding(.vertical, 6)
-            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+            .background(.ultraThinMaterial)
 
+            Divider()
+            
             ScrollView {
                 VStack(spacing: 10) {
                     ForEach(viewModel.itemsForCategory(selectedTab)) { item in
@@ -78,11 +79,16 @@ struct DiagnosticsView: View {
                     }
                     
                     if selectedTab == .logs && !viewModel.logContent.isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
+                        HStack {
                             Text("错误日志")
                                 .font(.headline)
                                 .foregroundColor(.secondary)
-                            
+                            Spacer()
+                        }
+                        
+                        Divider()
+
+                        VStack(alignment: .leading, spacing: 6) {
                             ScrollView(.horizontal, showsIndicators: true) {
                                 Text(viewModel.logContent)
                                     .font(.system(size: 10, design: .monospaced))
@@ -91,12 +97,16 @@ struct DiagnosticsView: View {
                             }
                             .frame(maxHeight: 150)
                             .padding(8)
-                            .background(Color(NSColor.textBackgroundColor))
-                            .cornerRadius(6)
                         }
                         .padding(10)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(NSColor.windowBackgroundColor)))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.08)))
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(NSColor.textBackgroundColor).opacity(0.5))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.gray.opacity(0.1), lineWidth: 0.5)
+                        )
                     }
                 }
                 .padding(10)
@@ -125,23 +135,38 @@ struct DiagnosticsView: View {
         let isSelected = selectedTab == category
         let items = viewModel.itemsForCategory(category)
         let passedCount = items.filter { $0.ok }.count
+        let failedCount = items.count - passedCount
+        let hasFailure = failedCount > 0
+        
+        let statusColor: Color = hasFailure ? .orange : .green
+        let statusIcon = hasFailure ? "exclamationmark.circle.fill" : "checkmark.circle.fill"
         
         Button {
             selectedTab = category
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: category.icon)
-                    .font(.system(size: 11))
+            HStack(spacing: 5) {
+                Image(systemName: statusIcon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(statusColor)
+                
                 Text(category.rawValue)
-                    .font(.system(size: 12))
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .foregroundColor(.primary)
+                
                 Text("\(passedCount)/\(items.count)")
-                    .font(.system(size: 10))
+                    .font(.system(size: 11))
                     .foregroundColor(.secondary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
-            .cornerRadius(6)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.08))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.accentColor.opacity(0.4) : Color.gray.opacity(0.15), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
     }
@@ -151,11 +176,14 @@ struct DiagnosticsView: View {
 @ViewBuilder
 func statusRow(item: DiagnosticItem) -> some View {
     HStack(alignment: .top, spacing: 10) {
-        Image(systemName: item.icon)
-            .resizable()
-            .frame(width: 24, height: 24)
-            .foregroundColor(item.color)
-            .padding(.top, 4)
+        ZStack {
+            Circle()
+                .fill(item.color.opacity(0.12))
+                .frame(width: 28, height: 28)
+            Image(systemName: item.icon)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(item.color)
+        }
 
         VStack(alignment: .leading, spacing: 6) {
             HStack {
@@ -184,6 +212,12 @@ func statusRow(item: DiagnosticItem) -> some View {
         }
     }
     .padding(12)
-    .background(RoundedRectangle(cornerRadius: 10).fill(Color(NSColor.windowBackgroundColor)))
-    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.08)))
+    .background(
+        RoundedRectangle(cornerRadius: 10)
+            .fill(Color(NSColor.textBackgroundColor).opacity(0.5))
+    )
+    .overlay(
+        RoundedRectangle(cornerRadius: 10)
+            .stroke(Color.gray.opacity(0.1), lineWidth: 0.5)
+    )
 }

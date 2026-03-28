@@ -91,7 +91,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, alignment: .leading) // Align content to the left
             .padding(.vertical, 8) // Adjusted vertical padding for comfortable clicking
             .padding(.horizontal, 10) // Horizontal padding for balance
-            .background(isSelected ? Color.blue.opacity(0.2) : Color.clear) // Blue background when selected
+            .background(isSelected ? Color.accentColor.opacity(0.4) : Color.clear)
             .cornerRadius(6) // Rounded corners for a smoother look
             .contentShape(Rectangle()) // Ensures full area is tappable
             .scaleEffect(isSelected ? 1.05 : 1.0) // Slight scaling effect on selection

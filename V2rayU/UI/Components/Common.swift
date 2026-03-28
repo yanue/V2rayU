@@ -121,7 +121,7 @@ struct PageHeader<Actions: View>: View {
     }
 }
 
-struct RefreshButton: View {
+struct RunDiagnosticButton: View {
     @Binding var checking: Bool
     var action: () -> Void
     
@@ -141,7 +141,7 @@ struct RefreshButton: View {
                 }
                 .frame(width: 16, height: 16)
                 
-                Text(String(localized: .Refresh))
+                Text(String(localized: .RunDiagnostic))
             }
         }
     }

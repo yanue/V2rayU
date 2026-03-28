@@ -288,6 +288,8 @@ enum LanguageLabel: String, CaseIterable {
     case DiagnosticSubHead
     case FAQ
     case FaqSubtitle
+    case SubmitIssue
+    case RunDiagnostic
     // table fields
     case TableFieldSort
     case TableFieldRemark
