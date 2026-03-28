@@ -29,6 +29,7 @@ struct PacView: View {
                     Label(String(localized: .ViewPACFile), systemImage: "doc.text.magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -57,6 +58,7 @@ struct PacView: View {
                     Label(String(localized: .ViewPACFile), systemImage: "doc.text")
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
 
                 Spacer()
 
@@ -75,6 +77,7 @@ struct PacView: View {
                     Label(String(localized: .UpdatePAC), systemImage: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
         }
         .padding()

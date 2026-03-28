@@ -32,6 +32,7 @@ struct CoreView: View {
                           systemImage: "arrow.triangle.2.circlepath")
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
                 .disabled(vm.isLoading)
             }
 

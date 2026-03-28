@@ -129,11 +129,10 @@ struct RunDiagnosticButton: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 ZStack {
-                    // 固定占位，避免布局跳动
                     if checking {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
-                            .scaleEffect(0.5) // 缩小到 60%
+                            .scaleEffect(0.5)
                             .frame(width: 16, height: 16)
                     } else {
                         Image(systemName: "arrow.clockwise")
@@ -144,5 +143,6 @@ struct RunDiagnosticButton: View {
                 Text(String(localized: .RunDiagnostic))
             }
         }
+        .focusable(false)
     }
 }

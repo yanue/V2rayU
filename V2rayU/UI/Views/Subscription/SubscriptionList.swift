@@ -31,12 +31,14 @@ struct SubscriptionListView: View {
                         Label(localizedString(.SyncAll), systemImage: "arrow.triangle.2.circlepath")
                     }
                     .buttonStyle(.borderedProminent)
+                    .focusable(false)
                     .disabled(viewModel.list.isEmpty)
 
                     Button(action: { withAnimation { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) } }) {
                         Label(localizedString(.Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
 
                     Divider()
                         .frame(height: 20)
@@ -55,6 +57,7 @@ struct SubscriptionListView: View {
                         Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
                 }
             }
 
@@ -109,11 +112,15 @@ struct SubscriptionListView: View {
             } label: {
                 Label(localizedString(.Edit), systemImage: "pencil")
             }
+            .focusable(false)
+
             Button {
                 self.syncingRow = SubscriptionModel(from: item)
             } label: {
                 Label(localizedString(.SyncSubscriptionNow), systemImage: "arrow.triangle.2.circlepath")
             }
+            .focusable(false)
+
             Divider()
             Button {
                 if showConfirmAlertSync(title: localizedString(.DeleteConfirm), message: localizedString(.DeleteTip)) {
@@ -123,6 +130,7 @@ struct SubscriptionListView: View {
                 Label(localizedString(.Delete), systemImage: "trash")
                     .foregroundColor(.red)
             }
+            .focusable(false)
         }
     }
 

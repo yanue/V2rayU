@@ -36,6 +36,7 @@ struct RoutingListView: View {
                         Label(String(localized: .Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
 
                     Button(action: {
                         withAnimation(.easeOut(duration: 0.15)) {
@@ -51,6 +52,7 @@ struct RoutingListView: View {
                         Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
                 }
             }
 
@@ -100,6 +102,7 @@ struct RoutingListView: View {
             } label: {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
+            .focusable(false)
 
             Divider()
 
@@ -108,6 +111,7 @@ struct RoutingListView: View {
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
             }
+            .focusable(false)
 
             Button {
                 if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
@@ -117,6 +121,7 @@ struct RoutingListView: View {
                 Label(String(localized: .Delete), systemImage: "trash")
                     .foregroundColor(.red)
             }
+            .focusable(false)
         }
     }
     

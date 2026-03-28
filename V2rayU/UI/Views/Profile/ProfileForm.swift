@@ -57,6 +57,7 @@ struct ConfigFormView: View {
                     onClose()
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
                 Button(String(localized: .Save)) {
                     ProfileStore.shared.upsert(item.entity)
                     Task {
@@ -69,6 +70,7 @@ struct ConfigFormView: View {
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 24)

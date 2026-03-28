@@ -29,6 +29,8 @@ struct ShareQrCodeView: View {
                         LocalizedTextLabelView(label: .Regenerate)
                     }
                 }
+                .focusable(false)
+
                 
                 Button(action: copyToClipboard) {
                     if copyed {
@@ -37,10 +39,12 @@ struct ShareQrCodeView: View {
                         LocalizedTextLabelView(label: .Copy)
                     }
                 }
-                
+                .focusable(false)
+
                 Button(action: onClose) {
                     LocalizedTextLabelView(label: .Close)
                 }
+                .focusable(false)
             }
 
             Divider()

@@ -101,6 +101,7 @@ struct RoutingFormView: View {
                                 Image(systemName: "questionmark.circle.fill")
                                     .foregroundColor(.accentColor)
                             }
+                            .focusable(false)
                         }
                         
                         Divider()
@@ -123,11 +124,13 @@ struct RoutingFormView: View {
                 Button(String(localized: .Cancel)) {
                     onClose()
                 }
+                .focusable(false)
                 Button(String(localized: .Save)) {
                     RoutingStore.shared.upsert(item.toEntity())
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 8)

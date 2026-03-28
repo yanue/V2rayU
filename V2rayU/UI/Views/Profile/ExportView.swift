@@ -64,6 +64,7 @@ struct ExportView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
                 .disabled(copied)
 
                 Button(action: saveToFile) {
@@ -74,6 +75,7 @@ struct ExportView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
                 .disabled(saved)
             }
             .padding()

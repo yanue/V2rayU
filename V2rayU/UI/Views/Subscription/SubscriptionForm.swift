@@ -95,6 +95,7 @@ struct SubscriptionFormView: View {
                 Button(String(localized: .Cancel)) {
                     onClose()
                 }
+                .focusable(false)
                 Button(String(localized: .Save)) {
                     // updateInterval 已经在 Binding 中转换为秒
                     Task {
@@ -103,6 +104,7 @@ struct SubscriptionFormView: View {
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 24)

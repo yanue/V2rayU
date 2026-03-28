@@ -32,9 +32,11 @@ struct SubscriptionSyncView: View {
                 }
                 .disabled(isSyncing)
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
                 Button(action: onClose) {
                     localized(.Close)
                 }
+                .focusable(false)
             }
             .padding([.top, .horizontal], 20)
             .padding(.bottom, 8)

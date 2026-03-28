@@ -55,6 +55,7 @@ struct FAQView: View {
                             .padding()
                         }
                         .buttonStyle(PlainButtonStyle())
+                        .focusable(false)
                         .accessibilityElement(children: .combine)
 
                         if expandedIndices.contains(idx) {
@@ -130,6 +131,7 @@ struct FAQSheetView: View {
                 Button(String(localized: .Close)) {
                     onClose()
                 }
+                .focusable(false)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 24)

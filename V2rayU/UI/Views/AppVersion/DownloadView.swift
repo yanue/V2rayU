@@ -37,6 +37,7 @@ struct DownloadView: View {
                     Label(String(localized: .OpenInBrowser), systemImage: "safari")
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
             }
 
             VStack(alignment: .leading) {
@@ -75,6 +76,7 @@ struct DownloadView: View {
                                 Label(downloadedBtn, systemImage: "tray.and.arrow.down.fill")
                             }
                             .buttonStyle(.borderedProminent)
+                            .focusable(false)
                         } else {
                             Button(action: {
                                 onDownloadFail(manager.errorMessage)
@@ -82,12 +84,14 @@ struct DownloadView: View {
                                 Label(String(localized: .Close), systemImage: "xmark.circle")
                             }
                             .buttonStyle(.borderedProminent)
+                            .focusable(false)
                         }
                     } else {
                         Button(action: { manager.cancelTask() }) {
                             Label(String(localized: .CancelDownload), systemImage: "xmark.circle")
                         }
                         .buttonStyle(.borderedProminent)
+                        .focusable(false)
                     }
                 }
             }

@@ -54,6 +54,7 @@ struct AdvanceView: View {
                     Button(String(localized: .Save)) {
                         settings.saveSettings()
                     }
+                    .focusable(false)
                 }
             }
         }

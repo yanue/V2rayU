@@ -98,5 +98,6 @@ struct ContentView: View {
             .animation(.easeInOut(duration: 0.2), value: isSelected) // Smooth animation on tap
         }
         .buttonStyle(.plain) // Remove default button styling
+        .focusable(false)
     }
 }

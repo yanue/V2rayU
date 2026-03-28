@@ -37,6 +37,7 @@ struct DiagnosticsView: View {
                     viewModel.runSequentialChecks()
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
 
                 Button {
                     viewModel.submitToGitHub()
@@ -45,6 +46,7 @@ struct DiagnosticsView: View {
                     Text(String(localized: .SubmitIssue))
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
                 .disabled(viewModel.checking || !viewModel.hasFailures)
             }
 
@@ -65,6 +67,7 @@ struct DiagnosticsView: View {
                     Text(String(localized: .FAQ))
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
             }
             .padding(.horizontal, 6)
             .padding(.vertical, 6)
@@ -169,6 +172,7 @@ struct DiagnosticsView: View {
             )
         }
         .buttonStyle(.plain)
+        .focusable(false)
     }
 }
 
@@ -191,6 +195,7 @@ func statusRow(item: DiagnosticItem) -> some View {
                 Spacer()
                 if let actionTitle = item.actionTitle, let action = item.action {
                     Button(actionTitle) { action() }
+                        .focusable(false)
                         .background(Color.accentColor.opacity(0.12))
                         .cornerRadius(6)
                 }

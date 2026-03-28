@@ -35,10 +35,12 @@ struct ProfilePingView: View {
                 }
                 .disabled(isPinging)
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
                 
                 Button(action: onClose) {
                     Text("Close")
                 }
+                .focusable(false)
             }
             .padding([.top, .horizontal], 20)
             .padding(.bottom, 8)

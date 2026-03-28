@@ -72,6 +72,7 @@ struct AboutView: View {
                                     }
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .focusable(false)
                                 .help(String(localized: .OpenInFinder))
                                 .font(.callout)
                                 .underline()
@@ -134,6 +135,7 @@ struct AboutView: View {
                 .foregroundColor(.blue)
         }
         .buttonStyle(PlainButtonStyle())
+        .focusable(false)
         .help(String(localized: .OpenInBrowser))
         .font(.callout)
         .underline()

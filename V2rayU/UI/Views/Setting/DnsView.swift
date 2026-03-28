@@ -29,6 +29,7 @@ struct DnsView: View {
                     Label(String(localized: .ViewConfiguration), systemImage: "doc.text.magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
 
             TextEditor(text: $dnsJson)
@@ -44,6 +45,7 @@ struct DnsView: View {
                     Label(String(localized: .Help), systemImage: "questionmark.circle")
                 }
                 .buttonStyle(.bordered)
+                .focusable(false)
 
                 Spacer()
 
@@ -61,6 +63,7 @@ struct DnsView: View {
                     Label(String(localized: .Save), systemImage: "tray.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
             }
         }
         .padding()

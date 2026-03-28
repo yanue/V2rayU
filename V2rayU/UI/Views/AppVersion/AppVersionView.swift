@@ -38,6 +38,7 @@ struct AppVersionView: View {
                             Button(String(localized: .Cancel)) {
                                 vm.onClose?()
                             }
+                            .focusable(false)
                         }
                         .padding(.horizontal)
                     }
@@ -80,12 +81,14 @@ struct AppVersionView: View {
                             Button(String(localized: .SkipVersion)) {
                                 vm.onSkip?()
                             }
-
+                            .focusable(false)
+                            
                             Spacer()
 
                             Button(String(localized: .InstallUpdate)) {
                                 vm.onDownload?()
                             }
+                            .focusable(false)
                             .padding(.trailing, 20)
                             .keyboardShortcut(.defaultAction)
                         }

@@ -86,6 +86,7 @@ struct ProfileListView: View {
                         Label(String(localized: .LatencyTest), systemImage: "network")
                     }
                     .buttonStyle(.borderedProminent)
+                    .focusable(false)
                     .disabled(viewModel.list.isEmpty)
 
                     Button(action: {
@@ -97,6 +98,7 @@ struct ProfileListView: View {
                         Label(String(localized: .Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
 
                     Divider()
                         .frame(height: 20)
@@ -115,6 +117,7 @@ struct ProfileListView: View {
                         Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(.bordered)
+                    .focusable(false)
                 }
             }
 
@@ -213,12 +216,14 @@ struct ProfileListView: View {
             } label: {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
+            .focusable(false)
 
             Button {
                 activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
             } label: {
                 Label(String(localized: .LatencyTest), systemImage: "speedometer")
             }
+            .focusable(false)
 
             Divider()
 
@@ -227,6 +232,7 @@ struct ProfileListView: View {
             } label: {
                 Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
+            .focusable(false)
             .disabled(isMultiSelect)
 
             Button {
@@ -234,24 +240,33 @@ struct ProfileListView: View {
             } label: {
                 Label(String(localized: .Export), systemImage: "square.and.arrow.up")
             }
+            .focusable(false)
 
             Divider()
 
             Button { moveToTop(item: item) } label: {
                 Label(String(localized: .MoveToTop), systemImage: "arrow.up.to.line")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Button { moveToBottom(item: item) } label: {
                 Label(String(localized: .MoveToBottom), systemImage: "arrow.down.to.line")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Button { moveUp(item: item) } label: {
                 Label(String(localized: .MoveUp), systemImage: "chevron.up")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Button { moveDown(item: item) } label: {
                 Label(String(localized: .MoveDown), systemImage: "chevron.down")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Divider()
 
@@ -259,13 +274,17 @@ struct ProfileListView: View {
                 duplicateItem(item: singleModel)
             } label: {
                 Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Button {
                 activeSheet = .edit(singleModel)
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
-            }.disabled(isMultiSelect)
+            }
+            .focusable(false)
+            .disabled(isMultiSelect)
 
             Button {
                 if showConfirmAlertSync(
@@ -278,6 +297,7 @@ struct ProfileListView: View {
                 Label(String(localized: .Delete), systemImage: "trash")
                     .foregroundColor(.red)
             }
+            .focusable(false)
         }
     }
 
