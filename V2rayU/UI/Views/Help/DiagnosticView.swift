@@ -20,33 +20,22 @@ struct DiagnosticsView: View {
     @State private var selectedTab: DiagnosticCategory = .files
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             PageHeader(
                 icon: "questionmark.circle",
                 title: String(localized: .Diagnostics),
                 subtitle:  String(localized: .DiagnosticSubHead)
             ) {
-                HStack(spacing: 8) {
-                    if !viewModel.progressText.isEmpty {
-                        Text(viewModel.progressText)
-                            .foregroundColor(.secondary)
-                    }
-                    RefreshButton(checking: $viewModel.checking) {
-                        viewModel.runSequentialChecks()
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button {
-                        viewModel.showFAQ = true
-                    } label: {
-                        Image(systemName: "questionmark.circle")
-                        Text(String(localized: .FAQ))
-                    }
-                    .buttonStyle(.bordered)
+                Button {
+                    viewModel.showFAQ = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                    Text(String(localized: .FAQ))
                 }
+                .buttonStyle(.bordered)
             }
 
-            VStack(spacing: 0) {
+            HStack(spacing: 8) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 4) {
                         ForEach(DiagnosticCategory.allCases) { category in
@@ -56,18 +45,61 @@ struct DiagnosticsView: View {
                     .padding(.horizontal, 8)
                 }
                 .frame(height: 40)
-//                .background(Color(NSColor.controlBackgroundColor))
-                
-                Divider()
-                
-                ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(viewModel.itemsForCategory(selectedTab)) { item in
-                            statusRow(item: item)
-                        }
-                    }
-                    .padding(10)
+
+                if !viewModel.progressText.isEmpty {
+                    Text(viewModel.progressText)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
                 }
+
+                RefreshButton(checking: $viewModel.checking) {
+                    viewModel.runSequentialChecks()
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    viewModel.submitToGitHub()
+                } label: {
+                    Image(systemName: "paperplane")
+                    Text("提交问题")
+                }
+                .buttonStyle(.bordered)
+                .disabled(viewModel.checking || !viewModel.hasFailures)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(viewModel.itemsForCategory(selectedTab)) { item in
+                        statusRow(item: item)
+                    }
+                    
+                    if selectedTab == .logs && !viewModel.logContent.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("错误日志")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            ScrollView(.horizontal, showsIndicators: true) {
+                                Text(viewModel.logContent)
+                                    .font(.system(size: 10, design: .monospaced))
+                                    .foregroundColor(.primary)
+                                    .textSelection(.enabled)
+                            }
+                            .frame(maxHeight: 150)
+                            .padding(8)
+                            .background(Color(NSColor.textBackgroundColor))
+                            .cornerRadius(6)
+                        }
+                        .padding(10)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(NSColor.windowBackgroundColor)))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.08)))
+                    }
+                }
+                .padding(10)
             }
             .background(.ultraThinMaterial)
             .cornerRadius(8)
