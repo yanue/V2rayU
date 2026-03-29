@@ -140,17 +140,25 @@ struct DiagnosticsView: View {
         let passedCount = items.filter { $0.ok }.count
         let failedCount = items.count - passedCount
         let hasFailure = failedCount > 0
-        
+        let isChecking = viewModel.checking
+
         let statusColor: Color = hasFailure ? .orange : .green
         let statusIcon = hasFailure ? "exclamationmark.circle.fill" : "checkmark.circle.fill"
-        
+
         Button {
             selectedTab = category
         } label: {
             HStack(spacing: 5) {
-                Image(systemName: statusIcon)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(statusColor)
+                if isChecking {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(0.5)
+                        .frame(width: 16, height: 16)
+                } else {
+                    Image(systemName: statusIcon)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(statusColor)
+                }
                 
                 Text(category.rawValue)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
