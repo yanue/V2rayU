@@ -41,6 +41,8 @@
 		662CC41C2D1BED9B006E8450 /* ProfileEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3CA2D1BED9B006E8450 /* ProfileEntity.swift */; };
 		662CC41D2D1BED9B006E8450 /* Port.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C32D1BED9B006E8450 /* Port.swift */; };
 		662CC4202D1BED9B006E8450 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C82D1BED9B006E8450 /* Util.swift */; };
+		afe3cb16bd1b48cba200bdf16bba3fa0 /* LogRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664b3bd4b2d847108fa8dd99adbadeba /* LogRotation.swift */; };
+		8bac94762c284acf89157bc0fd60737c /* LogWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28f3a1efc56d4d7c92ae25f66d3a2684 /* LogWindowManager.swift */; };
 		662CC4222D1BED9B006E8450 /* V2rayInbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3E42D1BED9B006E8450 /* V2rayInbound.swift */; };
 		662CC4232D1BED9B006E8450 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3BF2D1BED9B006E8450 /* App.swift */; };
 		662CC4252D1BED9B006E8450 /* Url+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662CC3C62D1BED9B006E8450 /* Url+Extension.swift */; };
@@ -185,6 +187,8 @@
 		662CC3C62D1BED9B006E8450 /* Url+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Url+Extension.swift"; sourceTree = "<group>"; };
 		662CC3C72D1BED9B006E8450 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		662CC3C82D1BED9B006E8450 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		664b3bd4b2d847108fa8dd99adbadeba /* LogRotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRotation.swift; sourceTree = "<group>"; };
+		28f3a1efc56d4d7c92ae25f66d3a2684 /* LogWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindowManager.swift; sourceTree = "<group>"; };
 		662CC3CA2D1BED9B006E8450 /* ProfileEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEntity.swift; sourceTree = "<group>"; };
 		662CC3CB2D1BED9B006E8450 /* RoutingEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingEntity.swift; sourceTree = "<group>"; };
 		662CC3CC2D1BED9B006E8450 /* SubscriptionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionEntity.swift; sourceTree = "<group>"; };
@@ -356,6 +360,7 @@
 				662CC3C62D1BED9B006E8450 /* Url+Extension.swift */,
 				662CC3C72D1BED9B006E8450 /* UserDefaults.swift */,
 				662CC3C82D1BED9B006E8450 /* Util.swift */,
+				664b3bd4b2d847108fa8dd99adbadeba /* LogRotation.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -799,6 +804,7 @@
 				66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */,
 				66E0AF3E2E7DABBD004E44FF /* ShareWindow.swift */,
 				669DCEA22E3D90760085278B /* ToastWindow.swift */,
+				28f3a1efc56d4d7c92ae25f66d3a2684 /* LogWindowManager.swift */,
 			);
 			path = Windows;
 			sourceTree = "<group>";
@@ -1013,6 +1019,8 @@
 				662CC41C2D1BED9B006E8450 /* ProfileEntity.swift in Sources */,
 				662CC41D2D1BED9B006E8450 /* Port.swift in Sources */,
 				662CC4202D1BED9B006E8450 /* Util.swift in Sources */,
+				afe3cb16bd1b48cba200bdf16bba3fa0 /* LogRotation.swift in Sources */,
+				8bac94762c284acf89157bc0fd60737c /* LogWindowManager.swift in Sources */,
 				66764BDF2EB4F031002F330B /* GithubService.swift in Sources */,
 				6632EF2D2EC35F9C00CED47B /* RoutingModel.swift in Sources */,
 				66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */,

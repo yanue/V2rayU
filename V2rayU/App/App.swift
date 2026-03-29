@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         logger.info("applicationShouldTerminate")
 
         // 停止所有快捷键监听
-        // todo
+        KeyboardShortcuts.removeAllHandlers()
 
         // 停止 V2ray
         Task{

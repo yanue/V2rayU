@@ -25,6 +25,9 @@ final class AppMenuManager: NSObject {
     private var viewConfigItem: NSMenuItem!
     private var viewPacItem: NSMenuItem!
     private var viewLogItem: NSMenuItem!
+    private var viewErrorLogItem: NSMenuItem!
+    private var viewLogFilesItem: NSMenuItem!
+    private var clearLogsItem: NSMenuItem!
     private var pacModeItem: NSMenuItem!
     private var tunnelModeItem: NSMenuItem!
     private var globalModeItem: NSMenuItem!
@@ -197,6 +200,9 @@ final class AppMenuManager: NSObject {
         viewConfigItem?.title = String(localized: .ViewConfigJson)
         viewPacItem?.title = String(localized: .ViewPacFile)
         viewLogItem?.title = String(localized: .ViewLog)
+        viewErrorLogItem?.title = String(localized: .ViewErrorLog)
+        viewLogFilesItem?.title = String(localized: .ViewLogFiles)
+        clearLogsItem?.title = String(localized: .ClearAllLogs)
         pacModeItem?.title = String(localized: .PacMode)
         globalModeItem?.title = String(localized: .GlobalMode)
         manualModeItem?.title = String(localized: .ManualMode)
@@ -224,17 +230,23 @@ final class AppMenuManager: NSObject {
         // 基本菜单项
         coreStatusItem = getCoreStatusItem()
         menu.addItem(coreStatusItem)
-        menu.addItem(NSMenuItem.separator())
 
         toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn), action: #selector(toggleRunning), keyEquivalent: "t")
         viewConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewConfig), keyEquivalent: "")
         viewPacItem = NSMenuItem(title: String(localized: .ViewPacFile), action: #selector(viewPacFile), keyEquivalent: "")
         viewLogItem = NSMenuItem(title: String(localized: .ViewLog), action: #selector(openLogs), keyEquivalent: "")
+        viewErrorLogItem = NSMenuItem(title: String(localized: .ViewErrorLog), action: #selector(openErrorLogs), keyEquivalent: "")
+        viewLogFilesItem = NSMenuItem(title: String(localized: .ViewLogFiles), action: #selector(openLogFiles), keyEquivalent: "")
+        clearLogsItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
         // 配置查看
         menu.addItem(toggleCoreItem)
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(viewConfigItem)
         menu.addItem(viewPacItem)
         menu.addItem(viewLogItem)
+        menu.addItem(viewErrorLogItem)
+        menu.addItem(viewLogFilesItem)
+        menu.addItem(clearLogsItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
@@ -507,6 +519,29 @@ final class AppMenuManager: NSObject {
 
     @objc private func openLogs(_ sender: NSMenuItem) {
         OpenLogs(logFilePath: coreLogFilePath)
+    }
+
+    @objc private func openErrorLogs(_ sender: NSMenuItem) {
+        LogRotation.extractErrors()
+        OpenLogs(logFilePath: LogRotation.recentErrorLogFilePath)
+    }
+
+    @objc private func openLogFiles(_ sender: NSMenuItem) {
+        LogWindowManager.shared.openLogWindow()
+    }
+
+    @objc private func clearLogs(_ sender: NSMenuItem) {
+        let alert = NSAlert()
+        alert.messageText = String(localized: .ClearAllLogs)
+        alert.informativeText = "确定要清除所有日志文件吗？此操作不可撤销。"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: String(localized: .Confirm))
+        alert.addButton(withTitle: String(localized: .Cancel))
+        
+        if alert.runModal() == .alertFirstButtonReturn {
+            LogRotation.clearAllLogs()
+            noticeTip(title: String(localized: .ClearAllLogs), informativeText: "日志已清除")
+        }
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {

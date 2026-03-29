@@ -234,6 +234,9 @@
 "TurnCoreOn" = "启动 core";
 "TurnCoreOff" = "关闭 core";
 "ViewLog" = "查看 core 日志";
+"ViewErrorLog" = "查看异常日志";
+"ViewLogFiles" = "查看日志文件 ...";
+"ClearAllLogs" = "清除所有日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 pac 文件";
 "PacMode" = "pac模式";

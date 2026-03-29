@@ -94,6 +94,12 @@ actor V2rayLaunch {
             logger.info("start tun-helper ok")
         }
         self.lastCore = item.AdaptCore()
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            LogRotation.rotateIfNeeded()
+            LogRotation.extractErrors()
+        }
+        
         return true
     }
 

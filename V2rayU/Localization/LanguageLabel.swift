@@ -232,6 +232,9 @@ enum LanguageLabel: String, CaseIterable {
     case TurnCoreOff
     case TurnCoreOn
     case ViewLog
+    case ViewErrorLog
+    case ViewLogFiles
+    case ClearAllLogs
     case ViewConfigJson
     case ViewPacFile
     case PacMode

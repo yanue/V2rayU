@@ -15,7 +15,15 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn) }
     }
     @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) {
-        didSet { UserDefaults.set(forKey: .runMode, value: runMode.rawValue) }
+        didSet {
+            UserDefaults.set(forKey: .runMode, value: runMode.rawValue)
+            if runMode != .off {
+                lastRunMode = runMode
+            }
+        }
+    }
+    @Published var lastRunMode: RunMode = UserDefaults.getEnum(forKey: .lastRunMode, type: RunMode.self, defaultValue: .pac) {
+        didSet { UserDefaults.set(forKey: .lastRunMode, value: lastRunMode.rawValue) }
     }
     @Published var icon: String = RunMode.off.icon
     @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "") {
@@ -202,8 +210,8 @@ final class AppState: ObservableObject {
 
     // MARK: - App 启动时调用
     func appDidLaunch() {
-        truncateLogFile(coreLogFilePath)
-        truncateLogFile(appLogFilePath)
+        LogRotation.rotateIfNeeded()
+        LogRotation.extractErrors()
         startHttpServer()
         
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
@@ -231,7 +239,6 @@ final class AppState: ObservableObject {
     func toggleCore() async {
         v2rayTurnOn.toggle()
         if !v2rayTurnOn {
-            runMode = .off
             icon = RunMode.off.icon
         }
         await setCoreRunning(v2rayTurnOn)

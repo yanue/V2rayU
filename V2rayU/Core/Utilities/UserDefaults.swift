@@ -28,6 +28,8 @@ extension UserDefaults {
         case autoSelectFastestServer
         // pac|manual|global
         case runMode
+        // last run mode before turning off
+        case lastRunMode
         // enable Traffic Statistics
         case enableStat
         // show speed in menu bar

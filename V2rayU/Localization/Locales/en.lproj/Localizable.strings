@@ -234,6 +234,9 @@
 "TurnCoreOn" = "Start core";
 "TurnCoreOff" = "Stop core";
 "ViewLog" = "View core log";
+"ViewErrorLog" = "View error log";
+"ViewLogFiles" = "View log files...";
+"ClearAllLogs" = "Clear all logs";
 "ViewConfigJson" = "View config.json";
 "ViewPacFile" = "View PAC file";
 "PacMode" = "pac Mode";
