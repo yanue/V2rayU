@@ -122,7 +122,7 @@ final class AppMenuManager: NSObject {
         // 刷新模式状态
         toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
-        tunnelModeItem.state = (.tunnel == AppState.shared.runMode) ? .on : .off
+        tunnelModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
         manualModeItem.state = (.manual == AppState.shared.runMode) ? .on : .off
 
@@ -252,7 +252,7 @@ final class AppMenuManager: NSObject {
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
         globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
         manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
-        tunnelModeItem = getRunModeItem(mode: .tunnel, title: String(localized: .TunnelMode), keyEquivalent: "")
+        tunnelModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
         menu.addItem(tunnelModeItem)
         menu.addItem(globalModeItem)
         menu.addItem(manualModeItem)
@@ -341,7 +341,7 @@ final class AppMenuManager: NSObject {
         menu.isEnabled =  true
         menu.target = self
         menu.keyEquivalent = keyEquivalent // todo 快捷键设置
-        menu.state = (mode == AppState.shared.runMode) ? .on : .off
+        menu.state = (AppState.shared.v2rayTurnOn && mode == AppState.shared.runMode) ? .on : .off
         menu.toolTip = String(localized: mode.tip)
         return menu
     }

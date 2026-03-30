@@ -11,10 +11,9 @@ import SystemConfiguration
 
 enum RunMode: String, CaseIterable {
     case global
-    case off
     case pac
     case manual
-    case tunnel
+    case tun
 
     var icon: String {
         switch self {
@@ -22,11 +21,9 @@ enum RunMode: String, CaseIterable {
             return "IconOnG"
         case .pac:
             return "IconOnP"
-        case .off:
-            return "IconOff"
         case .manual:
             return "IconOnM"
-        case .tunnel:
+        case .tun:
             return "IconOnT"
         }
     }
@@ -37,11 +34,9 @@ enum RunMode: String, CaseIterable {
             return "Global.tip"
         case .pac:
             return "Pac.tip"
-        case .off:
-            return "Off.tip"
         case .manual:
             return "Manual.tip"
-        case .tunnel:
+        case .tun:
             return "Tunnel.tip"
         }
     }
@@ -99,7 +94,7 @@ actor V2rayLaunch {
             }
         }
         // TUN模式: 使用sing-box(tun) -> xray/sing(socks)
-        if mode == .tunnel {
+        if mode == .tun {
             createTunJsonFile(item: item)
             logger.info("create tun config ok, path: \(TunConfigFilePath)")
 
@@ -124,7 +119,7 @@ actor V2rayLaunch {
         await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        setSystemProxy(mode: .off)
+        setSystemProxy(mode: nil)
     }
 
     private func createJsonFile(item: ProfileEntity) {
@@ -153,8 +148,9 @@ actor V2rayLaunch {
         }
     }
 
-    func setSystemProxy(mode: RunMode) {
-        logger.info("setSystemProxy: \(v2rayUTool), \(mode.rawValue)")
+    func setSystemProxy(mode: RunMode?) {
+        let modeValue = mode?.rawValue ?? "off"
+        logger.info("setSystemProxy: \(v2rayUTool), \(modeValue)")
         var httpPort = ""
         var sockPort = ""
         var pacUrl = ""
@@ -167,7 +163,7 @@ actor V2rayLaunch {
         }
         do {
             let output = try runCommand(at: v2rayUTool, with: [
-                "-mode", mode.rawValue,
+                "-mode", modeValue,
                 "-pac-url", pacUrl,
                 "-http-port", httpPort,
                 "-sock-port", sockPort

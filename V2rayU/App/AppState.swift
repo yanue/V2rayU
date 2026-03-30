@@ -12,20 +12,22 @@ final class AppState: ObservableObject {
     @Published var helpTab: HelpPageView.HelpTab = .qa
 
     @Published var v2rayTurnOn: Bool = UserDefaults.getBool(forKey: .v2rayTurnOn) {
-        didSet { UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn) }
+        didSet { 
+            UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn)
+            icon = v2rayTurnOn ? runMode.icon : "IconOff"
+        }
     }
-    @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .off) {
+    @Published var runMode: RunMode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .tun) {
         didSet {
             UserDefaults.set(forKey: .runMode, value: runMode.rawValue)
-            if runMode != .off {
-                lastRunMode = runMode
-            }
+            lastRunMode = runMode
+            icon = v2rayTurnOn ? runMode.icon : "IconOff"
         }
     }
     @Published var lastRunMode: RunMode = UserDefaults.getEnum(forKey: .lastRunMode, type: RunMode.self, defaultValue: .pac) {
         didSet { UserDefaults.set(forKey: .lastRunMode, value: lastRunMode.rawValue) }
     }
-    @Published var icon: String = RunMode.off.icon
+    @Published var icon: String = "IconOff"
     @Published var runningProfile: String = UserDefaults.get(forKey: .runningProfile, defaultValue: "") {
         didSet { UserDefaults.set(forKey: .runningProfile, value: runningProfile) }
     }
@@ -41,7 +43,7 @@ final class AppState: ObservableObject {
     @Published var proxyDownSpeed = 0.0
     
     init() {
-        self.icon = runMode.icon
+        self.icon = v2rayTurnOn ? runMode.icon : "IconOff"
         
         // 注册键盘快捷键处理
         KeyboardShortcuts.onKeyDown(for: .toggleV2rayOnOff) { [weak self] in
@@ -53,8 +55,8 @@ final class AppState: ObservableObject {
         KeyboardShortcuts.onKeyDown(for: .switchProxyMode) { [weak self] in
             Task { @MainActor in
                 guard let self = self else { return }
-                // 循环切换: off -> pac -> manual -> global -> tunnel -> off
-                let modes: [RunMode] = [.off, .pac, .manual, .global, .tunnel]
+                // 循环切换: pac -> manual -> global -> tun -> pac
+                let modes: [RunMode] = [.pac, .manual, .global, .tun]
                 if let currentIndex = modes.firstIndex(of: self.runMode) {
                     let nextIndex = (currentIndex + 1) % modes.count
                     await self.switchRunMode(mode: modes[nextIndex])
@@ -66,7 +68,7 @@ final class AppState: ObservableObject {
         
         KeyboardShortcuts.onKeyDown(for: .switchToTunnelMode) { [weak self] in
             Task { @MainActor in
-                await self?.switchRunMode(mode: .tunnel)
+                await self?.switchRunMode(mode: .tun)
             }
         }
         
@@ -163,19 +165,15 @@ final class AppState: ObservableObject {
         if running {
             let success = await V2rayLaunch.shared.start()
             v2rayTurnOn = success
-            icon = success ? runMode.icon : RunMode.off.icon
             logger.info("setCoreRunning: started=\(success), v2rayTurnOn=\(self.v2rayTurnOn.description)")
-            // 启动失败,不能设置系统代理
             if !success {
                 await V2rayLaunch.shared.stop()
                 v2rayTurnOn = false
-                icon = RunMode.off.icon
                 logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
             }
         } else {
             await V2rayLaunch.shared.stop()
             v2rayTurnOn = false
-            icon = RunMode.off.icon
             logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
         }
     }
@@ -259,9 +257,6 @@ final class AppState: ObservableObject {
     // MARK: - 菜单栏 Toggle
     func toggleCore() async {
         v2rayTurnOn.toggle()
-        if !v2rayTurnOn {
-            icon = RunMode.off.icon
-        }
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
