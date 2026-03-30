@@ -59,8 +59,21 @@ actor V2rayLaunch {
     func start() async -> Bool {
         logger.info("start v2ray-core begin")
         guard let item = ProfileStore.shared.getRunning() else {
-            noticeTip(title: "启动失败", informativeText: "配置文件不存在")
+            noticeTip(title: "启动失败", informativeText: "无可用服务器配置，请先添加服务器或订阅")
+            await MainActor.run {
+                AppState.shared.runningProfile = ""
+                AppState.shared.runningServer = nil
+            }
             return false
+        }
+        // 同步 AppState 与实际使用的服务器
+        await MainActor.run {
+            if AppState.shared.runningProfile != item.uuid {
+                AppState.shared.runningProfile = item.uuid
+                AppState.shared.runningServer = item
+                logger.info("V2rayLaunch.start: sync runningProfile to \(item.remark)")
+            }
+            AppMenuManager.shared.refreshServerItems()
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()

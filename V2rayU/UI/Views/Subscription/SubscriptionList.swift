@@ -76,6 +76,7 @@ struct SubscriptionListView: View {
             } onSaveAndSync: { [row] in
                 Task {
                     await SubscriptionHandler.shared.syncOne(item: row.entity)
+                    await PingAll.shared.run()
                     loadData()
                 }
             }

@@ -214,6 +214,27 @@ final class AppState: ObservableObject {
         LogRotation.extractErrors()
         startHttpServer()
         
+        // 同步运行中的服务器配置
+        if let running = ProfileStore.shared.getRunning() {
+            if runningProfile != running.uuid {
+                runningProfile = running.uuid
+                logger.info("appDidLaunch: sync server to \(running.remark)")
+            }
+            runningServer = running
+        } else {
+            runningProfile = ""
+            runningServer = nil
+            logger.info("appDidLaunch: no available server")
+        }
+        
+        // 同步运行中的路由配置
+        let routingManager = RoutingManager()
+        let runningRoutingEntity = routingManager.getRunningEntity()
+        if runningRouting != runningRoutingEntity.uuid {
+            runningRouting = runningRoutingEntity.uuid
+            logger.info("appDidLaunch: sync routing to \(runningRoutingEntity.remark)")
+        }
+        
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
 
         Task {

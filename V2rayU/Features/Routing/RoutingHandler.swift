@@ -67,11 +67,17 @@ class RoutingManager {
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
     func getRunning() -> V2rayRouting {
-        // 查询当前使用的规则
-        let runningRouting = UserDefaults.get(forKey: .runningRouting)
-        // 查询所有规则
+        let entity = getRunningEntity()
+        let handler = RoutingHandler(from: entity)
+        if UserDefaults.get(forKey: .runningRouting) != entity.uuid {
+            UserDefaults.set(forKey: .runningRouting, value: entity.uuid)
+        }
+        return handler.getRouting()
+    }
+    
+    // 确保默认路由存在
+    private func ensureDefaultRouting() {
         var all = RoutingStore.shared.fetchAll()
-        // 如果没有规则，则创建默认规则
         if all.count == 0 {
             for (rule, var item) in defaultRules {
                 if isMainland {
@@ -80,23 +86,9 @@ class RoutingManager {
                     item.remark = defaultRuleCn[rule] ?? item.remark
                 }
                 RoutingStore.shared.upsert(item)
-                // 添加到 all
                 all.append(item)
             }
         }
-        for item in all {
-            // 如果匹配到选中的规则，则返回
-            if item.uuid == runningRouting {
-                let handler = RoutingHandler(from: item)
-                return handler.getRouting()
-            }
-        }
-        let defaultRouting = defaultRules[RoutingRuleLANAndCn]!
-        // 如果没有匹配到选中的规则，则返回默认规则
-        let handler = RoutingHandler(from: defaultRouting)
-        // 设置默认规则
-        UserDefaults.set(forKey: .runningRouting, value: defaultRouting.uuid)
-        return handler.getRouting()
     }
     
     func getSingboxRoutingRules() -> [RouteRule] {
@@ -157,6 +149,7 @@ class RoutingManager {
     }
     
     func getRunningEntity() -> RoutingEntity {
+        ensureDefaultRouting()
         let runningRouting = UserDefaults.get(forKey: .runningRouting)
         let all = RoutingStore.shared.fetchAll()
         for item in all {
@@ -164,7 +157,10 @@ class RoutingManager {
                 return item
             }
         }
-        return RoutingEntity(name: RoutingRuleGlobal, remark: "Global", block: "", proxy: "", direct: "")
+        if let first = all.first {
+            return first
+        }
+        return defaultRules[RoutingRuleLANAndCn]!
     }
     
 }

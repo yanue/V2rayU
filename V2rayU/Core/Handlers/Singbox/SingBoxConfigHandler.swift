@@ -80,6 +80,7 @@ class SingboxConfigHandler {
         // TUN模式配置
         if enableTun {
             // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
+            self.singbox.log.level = "warning"
             self.singbox.log.output = tunLogFilePath
             /**
              {
@@ -115,15 +116,13 @@ class SingboxConfigHandler {
                 server_port: Int(getSocksProxyPort())
             )
             let directOutbound = SingboxOutbound(type: "direct", tag: "direct")
-            let blockOutbound = SingboxOutbound(type: "block", tag: "block")
-            
-            self.singbox.outbounds = [socksOutbound, directOutbound, blockOutbound]
+
+            self.singbox.outbounds = [socksOutbound, directOutbound]
             
             // DNS配置
             self.singbox.dns.servers = [
                 DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29")
             ]
             self.singbox.dns.rules = [
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),
