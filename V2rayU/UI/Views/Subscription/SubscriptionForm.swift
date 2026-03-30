@@ -17,6 +17,7 @@ struct SubscriptionFormView: View {
     @State private var intervalUnit: IntervalUnit = .minute
     
     var onClose: () -> Void
+    var onSaveAndSync: (() -> Void)?
     
     // 绑定显示值和内部秒数的转换
     private var displayedInterval: Binding<Double> {
@@ -100,6 +101,9 @@ struct SubscriptionFormView: View {
                     // updateInterval 已经在 Binding 中转换为秒
                     Task {
                         item.entity.upsert()
+                        if let callback = onSaveAndSync {
+                            callback()
+                        }
                     }
                     onClose()
                 }

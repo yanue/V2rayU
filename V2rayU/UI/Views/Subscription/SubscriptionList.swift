@@ -73,6 +73,11 @@ struct SubscriptionListView: View {
             SubscriptionFormView(item: row) {
                 selectedRow = nil
                 loadData()
+            } onSaveAndSync: { [row] in
+                Task {
+                    await SubscriptionHandler.shared.syncOne(item: row.entity)
+                    loadData()
+                }
             }
         }
         .sheet(item: $syncingRow) { row in
