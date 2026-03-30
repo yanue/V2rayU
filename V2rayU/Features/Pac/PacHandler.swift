@@ -27,7 +27,7 @@ func getConfigUrl() -> String {
 
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
-    let socksPort = String(getPacPort())
+    let socksPort = String(getSocksProxyPort())
     let pacAddress = getPacAddress()
     
     // permission

@@ -14,8 +14,7 @@ enum Theme: String, CaseIterable {
 @MainActor
 final class AppSettings: ObservableObject {
     static var shared = AppSettings()
-    var lock = NSLock()
-    
+
     @Published var selectedTheme: Theme {
         didSet {
             setAppearance(selectedTheme)
@@ -77,9 +76,25 @@ final class AppSettings: ObservableObject {
     }
     
     func reload() {
-        lock.lock()
-        defer { lock.unlock() }
-        AppSettings.shared = AppSettings()
+        // 从 UserDefaults 重新读取所有设置到当前实例（保持 UI 绑定有效）
+        checkForUpdates = UserDefaults.getBool(forKey: .autoCheckVersion)
+        autoUpdateServers = UserDefaults.getBool(forKey: .autoUpdateServers)
+        selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
+        showSpeedOnTray = UserDefaults.getBool(forKey: .showSpeedOnTray)
+        showLatencyOnTray = UserDefaults.getBool(forKey: .showLatencyOnTray)
+        socksPort = Int(getSocksProxyPort())
+        httpPort = Int(getHttpProxyPort())
+        pacPort = Int(getPacPort())
+        allowLAN = UserDefaults.getBool(forKey: .allowLAN)
+        enableUdp = UserDefaults.getBool(forKey: .enableUdp)
+        enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
+        enableMux = UserDefaults.getBool(forKey: .enableMux)
+        mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
+        enableStat = UserDefaults.getBool(forKey: .enableStat)
+        logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+        dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
+        gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
+        launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
     func saveSettings() {
@@ -107,8 +122,6 @@ final class AppSettings: ObservableObject {
     }
 
     func _save() {
-        lock.lock()
-        defer { self.lock.unlock() }
         // 保存到UserDefaults
         UserDefaults.setBool(forKey: .autoCheckVersion, value: checkForUpdates)
         UserDefaults.setBool(forKey: .autoUpdateServers, value: autoUpdateServers)

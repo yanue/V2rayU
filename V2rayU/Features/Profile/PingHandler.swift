@@ -156,7 +156,7 @@ actor PingServer {
     
     private func ping() async throws {
         defer {
-            ProfileStore.shared.update_speed(uuid: self.item.uuid, speed: self.item.speed)
+            ProfileStore.shared.updateSpeed(uuid: self.item.uuid, speed: self.item.speed)
         }
         do {
             let pingTime = try await testLatencyByProxyPort(port: self.bindPort)
@@ -224,6 +224,7 @@ actor PingServer {
         let ready = await waitForPortReady(self.bindPort, timeout: 2)
         if !ready {
             self.terminate()
+            throw NSError(domain: "PingServerError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Port \(self.bindPort) not ready after timeout"])
         }
     }
     
@@ -320,7 +321,7 @@ actor PingRunning {
         Task {
             await AppState.shared.setLatency(latency: Double(pingTime))
         }
-        ProfileStore.shared.update_speed(uuid: self.item.uuid, speed: pingTime)
+        ProfileStore.shared.updateSpeed(uuid: self.item.uuid, speed: pingTime)
     }
     
     /// 重置失败计数

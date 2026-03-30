@@ -27,7 +27,7 @@ struct ProfileStore: StoreProtocol {
             }
             return true
         } catch {
-            logger.info("ProfileStore.insertMany error: \(error)")
+            logger.error("ProfileStore.insertMany error: \(error)")
             return false
         }
     }
@@ -56,7 +56,7 @@ struct ProfileStore: StoreProtocol {
                 try ProfileEntity.order(ProfileEntity.Columns.speed.desc).fetchOne(db)
             }
         } catch {
-            logger.info("ProfileStore.getFastOne error: \(error)")
+            logger.error("ProfileStore.getFastOne error: \(error)")
             return nil
         }
     }
@@ -69,7 +69,7 @@ struct ProfileStore: StoreProtocol {
                 return try query.fetchAll(db)
             }
         } catch {
-            logger.info("ProfileStore.getGroupProfiles error: \(error)")
+            logger.error("ProfileStore.getGroupProfiles error: \(error)")
             return []
         }
     }
@@ -92,7 +92,7 @@ struct ProfileStore: StoreProtocol {
             }
             return true
         } catch {
-            logger.info("ProfileStore.updateProfile error: \(error)")
+            logger.error("ProfileStore.updateProfile error: \(error)")
             return false
         }
     }
@@ -107,7 +107,7 @@ struct ProfileStore: StoreProtocol {
             }
             return true
         } catch {
-            logger.info("ProfileStore.updateSpeed error: \(error)")
+            logger.error("ProfileStore.updateSpeed error: \(error)")
             return false
         }
     }
@@ -123,24 +123,13 @@ struct ProfileStore: StoreProtocol {
             }
             return true
         } catch {
-            logger.info("ProfileStore.updateSortOrder error: \(error)")
+            logger.error("ProfileStore.updateSortOrder error: \(error)")
             return false
         }
     }
     
-    func update_speed(uuid: String, speed: Int) {
-        do {
-            let dbWriter = AppDatabase.shared.dbWriter
-            try dbWriter.write { db in
-                try _ = ProfileEntity.filter(ProfileEntity.Columns.uuid == uuid).updateAll(db, [ProfileEntity.Columns.speed.set(to: speed)])
-            }
-        } catch {
-            logger.info("delete error: \(error)")
-        }
-    }
-    
-    /// 更新 `profile_stat` 表中指定 `uuid` 的统计数据
-    func update_stat(uuid: String, up: Int, down: Int, lastUpdate: Date) throws {
+    /// 更新 `profile` 表中指定 `uuid` 的统计数据
+    func updateStat(uuid: String, up: Int, down: Int, lastUpdate: Date) throws {
         let sql = """
         UPDATE profile
         SET
@@ -160,7 +149,7 @@ struct ProfileStore: StoreProtocol {
                 )
             }
         } catch {
-            logger.info("update_stat error: \(error)")
+            logger.error("updateStat error: \(error)")
         }
     }
 
@@ -172,37 +161,30 @@ struct ProfileStore: StoreProtocol {
         // 获取当前日期的开始时间（00:00:00）
         let calendar = Calendar.current
         let todayStart = calendar.startOfDay(for: Date())
-        do {
-            let dbReader = AppDatabase.shared.reader
-            return try dbReader.read { db in
-                let sql = "SELECT lastUpdate FROM profile WHERE uuid = ?"
-                // 查询指定 `uuid` 的 `lastUpdate`
-                guard let lastUpdate: Date = try Date.fetchOne(db, sql: sql, arguments: [uuid]) else {
-                    // 如果未查询到记录，直接返回
-                    return
-                }
-                // 如果 `lastUpdate` 小于今日开始时间，表示非今天，需要清空今日数据
-                if lastUpdate < todayStart {
-                    do {
-                        let dbWriter = AppDatabase.shared.dbWriter
-                        return try dbWriter.write { db in
-                            try db.execute(
-                                sql: """
-                                UPDATE profile
-                                SET todayUp = 0, todayDown = 0, lastUpdate = ?
-                                WHERE uuid = ?
-                                """,
-                                arguments: [Date(), uuid]
-                            )
-                        }
-                    } catch {
-                        logger.info("getFastOne error: \(error)")
-                    }
-                }
-            }
-        } catch {
-            logger.info("clearTodayData error: \(error)")
+
+        // 先读取 lastUpdate
+        let lastUpdate: Date? = try dbReader.read { db in
+            let sql = "SELECT lastUpdate FROM profile WHERE uuid = ?"
+            return try Date.fetchOne(db, sql: sql, arguments: [uuid])
+        }
+
+        guard let lastUpdate = lastUpdate else {
+            // 如果未查询到记录，直接返回
             return
+        }
+
+        // 如果 `lastUpdate` 小于今日开始时间，表示非今天，需要清空今日数据
+        if lastUpdate < todayStart {
+            try dbWriter.write { db in
+                try db.execute(
+                    sql: """
+                    UPDATE profile
+                    SET todayUp = 0, todayDown = 0, lastUpdate = ?
+                    WHERE uuid = ?
+                    """,
+                    arguments: [Date(), uuid]
+                )
+            }
         }
     }
 

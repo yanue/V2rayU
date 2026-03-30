@@ -168,7 +168,7 @@ class SingboxConfigHandler {
 
             let clashConfig = ExperimentalConfig(
                 clash_api: ClashAPIConfig(
-                    external_controller: "127.0.0.1:11111",
+                    external_controller: "127.0.0.1:\(coreApiPort)",
                     secret: ""
                 )
             )

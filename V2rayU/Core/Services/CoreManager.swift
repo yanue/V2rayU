@@ -9,7 +9,7 @@ import Foundation
 
 final class CoreManager {
     private let fm = FileManager.default
-    private let destPath = AppHomePath + "/xray-core"
+    private let destPath = xrayCorePath
     private var backupPath: String { destPath + ".bak" }
 
     func backupCore() {

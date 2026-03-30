@@ -11,7 +11,7 @@ import Cocoa
 actor AppInstaller: NSObject {
     static let shared = AppInstaller()
     var installReason: String = ""
-    let doSh = "cd " + AppResourcesPath + " && sudo chown root:admin ./install.sh && sudo chmod a+rsx  ./install.sh && ./install.sh"
+    let doSh = "cd '\(AppResourcesPath)' && sudo chown root:admin ./install.sh && sudo chmod a+rsx ./install.sh && ./install.sh"
 
     func checkInstall() async {
         logger.info("source path: \(AppResourcesPath)")

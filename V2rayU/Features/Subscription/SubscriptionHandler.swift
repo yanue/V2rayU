@@ -85,26 +85,31 @@ actor SubscriptionHandler {
             case let .failure(error):
                 logger.info("Error: \(error)")
             }
-            self.SubscriptionHandlering = false
-            self.refreshMenu()
+            Task {
+                await self.onSyncComplete()
+            }
         }, receiveValue: { _ in })
         .store(in: &cancellables)
+    }
+
+    /// actor-isolated 完成回调
+    private func onSyncComplete() {
+        SubscriptionHandlering = false
+        refreshMenu()
     }
 
     func refreshMenu() {
         logger.info("SubscriptionHandler refreshMenu")
         SubscriptionHandlering = false
-        do {
-            // refresh server
-            Task {
-                await AppMenuManager.shared.refreshServerItems()
-            }
-            // sleep 2
-            sleep(2)
+        // refresh server
+        Task {
+            await AppMenuManager.shared.refreshServerItems()
+        }
+        // 使用 Task.sleep 替代 sleep() 避免阻塞 actor
+        Task {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
             // do ping
-            Task {
-                await PingAll.shared.run()
-            }
+            await PingAll.shared.run()
         }
     }
 

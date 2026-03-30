@@ -80,7 +80,7 @@ actor CoreTrafficStatsHandler {
             let uuid = await AppState.shared.runningProfile
 //             logger.info("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
             // 更新到数据库
-            try ProfileStore.shared.update_stat(uuid: uuid, up: up, down: down,lastUpdate: now)
+            try ProfileStore.shared.updateStat(uuid: uuid, up: up, down: down, lastUpdate: now)
         }
     }
 }
@@ -109,8 +109,8 @@ actor XrayApiStatsHandler: NSObject {
 
     // 将 fetchV2RayStats 改为异步函数
     func fetchV2RayStats() async {
-        guard let url = URL(string: "http://127.0.0.1:11111/debug/vars") else {
-            logger.info("Invalid URL")
+        guard let url = URL(string: "\(coreApiBaseUrl)/debug/vars") else {
+            logger.error("Invalid URL")
             return
         }
         
@@ -118,17 +118,17 @@ actor XrayApiStatsHandler: NSObject {
             let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                logger.info("Invalid response")
+                logger.error("Invalid response")
                 return
             }
             
             if httpResponse.statusCode == 200 {
                 await parseV2RayStats(jsonData: data)
             } else {
-                logger.info("Failed with status code: \(httpResponse.statusCode)")
+                logger.warning("Failed with status code: \(httpResponse.statusCode)")
             }
         } catch {
-            logger.info("Request failed: \(error.localizedDescription)")
+            logger.warning("Request failed: \(error.localizedDescription)")
         }
     }
     
@@ -144,7 +144,7 @@ actor XrayApiStatsHandler: NSObject {
             var proxyUpLink = 0
             var proxyDownLink = 0
             guard let stats = vars.stats else {
-                logger.info("Invalid V2Ray Stats")
+                logger.warning("Invalid V2Ray Stats")
                 return
             }
             if let latencyValue = vars.observatory?["proxy"] {
@@ -161,7 +161,7 @@ actor XrayApiStatsHandler: NSObject {
             await CoreTrafficStatsHandler.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
 //            logger.info("Parsed V2Ray Stats: \(stats)")
         } catch {
-            logger.info("Failed to parse JSON: \(error.localizedDescription)")
+            logger.error("Failed to parse JSON: \(error.localizedDescription)")
         }
     }
 }
@@ -189,7 +189,7 @@ actor ClashApilatencyHandler: NSObject {
     }
     
     private func checkDelayByClashApi(proxyName: String) {
-        guard let url = URL(string: "http://127.0.0.1:11111/proxies/\(proxyName)/delay?timeout=5000&url=http://www.gstatic.com/generate_204") else { return }
+        guard let url = URL(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay?timeout=5000&url=http://www.gstatic.com/generate_204") else { return }
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data,
                let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -222,7 +222,7 @@ final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate {
     
    // MARK: - 流量监听
    func startTask() {
-       guard let url = URL(string: "http://127.0.0.1:11111/traffic") else { return }
+       guard let url = URL(string: "\(coreApiBaseUrl)/traffic") else { return }
        let request = URLRequest(url: url)
        clashApiTask = clashApiSession.dataTask(with: request)
        clashApiTask?.resume()

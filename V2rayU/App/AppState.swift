@@ -131,7 +131,7 @@ final class AppState: ObservableObject {
         self.directDownSpeed = directDownSpeed
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
-        ProfileStore.shared.update_speed(uuid: self.runningProfile, speed: Int(latency))
+        ProfileStore.shared.updateSpeed(uuid: self.runningProfile, speed: Int(latency))
     }
     
     func setTraffic(upSpeed: Double, downSpeed: Double) {

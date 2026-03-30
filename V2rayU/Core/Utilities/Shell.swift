@@ -16,7 +16,7 @@ func shell(launchPath: String, arguments: [String]) -> String? {
         let output = try runCommand(at: launchPath, with: arguments)
         return output
     } catch let error {
-        logger.info("shell error: \(error)")
+        logger.error("shell error: \(error)")
         return ""
     }
 }

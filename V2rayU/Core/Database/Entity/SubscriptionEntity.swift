@@ -23,7 +23,7 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
     var id: String {
         return uuid
     }
-    static var idColumn: Column { RoutingEntity.Columns.uuid }
+    static var idColumn: Column { SubscriptionEntity.Columns.uuid }
 
     // 拖动排序
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
@@ -93,7 +93,7 @@ extension SubscriptionEntity {
                 try toSave.save(db)
             }
         } catch {
-            logger.info("upsert error: \(error)")
+            logger.error("upsert error: \(error)")
         }
         
         // 更新后，触发订阅更新任务调度

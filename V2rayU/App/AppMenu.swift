@@ -630,67 +630,31 @@ final class AppMenuManager: NSObject {
     }
 
     @objc private func generateQrcode(_ sender: NSMenuItem) {
-        guard let v2ray = AppState.shared.runningServer else {
-            logger.info("v2ray config not found")
-            noticeTip(title: "generate Qrcode fail", informativeText: "no available servers")
-            return
-        }
-        ShareWindowManager.shared.openShareWindow(item: ProfileModel(from: v2ray))
+        shareQRCode()
     }
 
     @objc private func copyExportCommand(_ sender: NSMenuItem) {
-        // Get the Http proxy config.
-        let httpPort = AppSettings.shared.httpPort
-        let socksPort = AppSettings.shared.socksPort
-
-        // Format an export string.
-        let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);export ALL_PROXY=socks5://127.0.0.1:\(socksPort)"
-
-        // Copy to paste board.
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(command, forType: NSPasteboard.PasteboardType.string)
-
-        // Show a toast notification.
-        noticeTip(title: "Export Command Copied.", informativeText: "")
+        copyProxyExportCommand()
     }
 
     @objc private func scanQrcode(_ sender: NSMenuItem) {
-        let uri: String = Scanner.scanQRCodeFromScreen()
-        if uri.count > 0 {
-            importUri(url: uri)
-        } else {
-            noticeTip(title: "import server fail", informativeText: "no found qrcode")
-        }
+        scanQRCode()
     }
 
     @objc private func ImportFromPasteboard(_ sender: NSMenuItem) {
-        if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
-            importUri(url: uri)
-        } else {
-            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or ss:// from Pasteboard")
-        }
+        importFromPasteboard()
     }
 
     @objc private func pingSpeed(_ sender: NSMenuItem) {
-        Task {
-            await PingAll.shared.run()
-        }
+        pingSpeedTest()
     }
 
     @objc private func viewConfig(_ sender: Any) {
-        let confUrl = getConfigUrl()
-        guard let url = URL(string: confUrl) else {
-            return
-        }
-        NSWorkspace.shared.open(url)
+        openConfigFile()
     }
 
     @objc private func viewPacFile(_ sender: Any) {
-        let pacUrl = getPacUrl()
-        guard let url = URL(string: pacUrl) else {
-            return
-        }
-        NSWorkspace.shared.open(url)
+        openPacFile()
     }
 
 

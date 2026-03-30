@@ -228,15 +228,18 @@ func truncateLogFile(_ logFilePath: String) {
 }
 
 func getHttpProxyPort() -> UInt16 {
-    return UInt16(UserDefaults.get(forKey: .localHttpPort)) ?? 1087
+    let port = UserDefaults.getInt(forKey: .localHttpPort, defaultValue: 1087)
+    return UInt16(port)
 }
 
 func getSocksProxyPort() -> UInt16 {
-    return UInt16(UserDefaults.get(forKey: .localSockPort)) ?? 1080
+    let port = UserDefaults.getInt(forKey: .localSockPort, defaultValue: 1080)
+    return UInt16(port)
 }
 
 func getPacPort() -> UInt16 {
-    return UInt16(UserDefaults.get(forKey: .localPacPort)) ?? 11085
+    let port = UserDefaults.getInt(forKey: .localPacPort, defaultValue: 11085)
+    return UInt16(port)
 }
 
 func getListenAddress() -> String {

@@ -56,8 +56,19 @@ actor LocalHttpServer {
         // 最简单的目录映射(其他方式不能正常使用)
         await server.appendRoute("GET /*") { request in
             let path = request.path
-            let filePath = AppHomePath + (path == "/" ? "/index.html" : path)
+            let requestedPath = path == "/" ? "/index.html" : path
 
+            // 安全过滤：规范化路径，防止 ../ 目录遍历攻击
+            let baseURL = URL(fileURLWithPath: AppHomePath)
+            let resolvedURL = URL(fileURLWithPath: requestedPath, relativeTo: baseURL).standardized
+
+            // 确保解析后的路径仍在 AppHomePath 下
+            guard resolvedURL.path.hasPrefix(baseURL.standardized.path) else {
+                logger.warning("Path traversal attempt blocked: \(path)")
+                return HTTPResponse(statusCode: .forbidden)
+            }
+
+            let filePath = resolvedURL.path
             logger.info("Requested: \(path) \(filePath)")
 
             if FileManager.default.fileExists(atPath: filePath),

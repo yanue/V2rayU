@@ -79,7 +79,11 @@ actor V2rayLaunch {
         logger.info("start v2ray-core ok: \(mode.rawValue)")
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: item.AdaptCore())
-            try await PingRunning.shared.startPing()
+            do {
+                try await PingRunning.shared.startPing()
+            } catch {
+                logger.error("PingRunning.startPing failed: \(error)")
+            }
         }
         // TUN模式: 使用sing-box(tun) -> xray/sing(socks)
         if mode == .tunnel {

@@ -49,7 +49,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var id: String {
         return uuid
     }
-    static var idColumn: Column { RoutingEntity.Columns.uuid }
+    static var idColumn: Column { ProfileEntity.Columns.uuid }
 
     // 拖动排序
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")

@@ -89,7 +89,7 @@ extension StoreProtocol {
                 try query.deleteAll(db)
             }
         } catch {
-            logger.info("delete error: where=\(filter) error=\(error)")
+            logger.error("delete error: where=\(filter) error=\(error)")
         }
     }
 
@@ -109,7 +109,7 @@ extension StoreProtocol {
                 return try query.fetchCount(db)
             }
         } catch {
-            logger.info("count error: \(error)")
+            logger.error("count error: \(error)")
             return 0
         }
     }

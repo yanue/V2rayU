@@ -106,12 +106,12 @@ class V2rayConfigHandler {
             if self.enableTun {
                 let inTun = getInbound(protocol: .tun, listen: "", port: "",enableSniffing: false)
                 inbounds.append(inTun)
-                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
+                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
                 inbounds.append(inApi)
             } else {
                 let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort , enableSniffing: self.enableSniffing)
                 inbounds.append(inSocks)
-                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: "11111", enableSniffing: false, tag: "metrics_in")
+                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
                 inbounds.append(inApi)
             }
         }

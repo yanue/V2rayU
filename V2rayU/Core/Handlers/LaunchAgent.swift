@@ -33,7 +33,12 @@ actor LaunchAgent: NSObject {
 
         let fileMgr = FileManager.default
         if !fileMgr.fileExists(atPath: launchAgentDirPath) {
-            try! fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
+            do {
+                try fileMgr.createDirectory(atPath: launchAgentDirPath, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                logger.error("Failed to create LaunchAgents directory: \(error)")
+                return
+            }
         }
 
         let agentArguments = [lastCoreFile, "run", "-c", "config.json"]

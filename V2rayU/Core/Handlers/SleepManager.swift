@@ -71,9 +71,4 @@ actor SystemSleepManager {
             await PingAll.shared.run()
         }
     }
-    
-    deinit {
-        // 移除通知观察者
-        NotificationCenter.default.removeObserver(self)
-    }
 }

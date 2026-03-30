@@ -8,7 +8,7 @@
 import Foundation
 import GRDB
 
-/// 封装 RoutingEntity 的数据库操作
+/// 封装 SubscriptionEntity 的数据库操作
 struct SubscriptionStore: StoreProtocol {
     typealias Entity = SubscriptionEntity
 
@@ -30,7 +30,7 @@ struct SubscriptionStore: StoreProtocol {
             }
             return true
         } catch {
-            logger.error("RoutingStore.updateSortOrder error: \(error)")
+            logger.error("SubscriptionStore.updateSortOrder error: \(error)")
             return false
         }
     }

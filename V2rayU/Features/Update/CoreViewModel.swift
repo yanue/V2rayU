@@ -10,7 +10,7 @@ import SwiftUI
 @MainActor
 final class CoreViewModel: ObservableObject {
     @Published var xrayCoreVersion: String = "Unknown"
-    @Published var xrayCorePath: String = AppHomePath + "/xray-core"
+    @Published var xrayCorePath: String = V2rayU.xrayCorePath
     @Published var isLoading = false
     @Published var versions: [GithubRelease] = []
     @Published var selectedVersion: GithubRelease?

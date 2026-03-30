@@ -47,7 +47,7 @@ struct RoutingEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.block = block
         self.proxy = proxy
         self.direct = direct
-        self.sort = 0
+        self.sort = sort
     }
 
     // 自定义表名

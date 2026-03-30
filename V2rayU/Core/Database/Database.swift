@@ -45,9 +45,25 @@ extension AppDatabase {
 
             return appDatabase
         } catch {
-            // MARK: TODO
-
-            fatalError("Unresolved error \(error)")
+            // 尝试删除损坏的数据库文件并重建
+            logger.error("Database init failed: \(error). Attempting to recreate database.")
+            do {
+                let fm = FileManager.default
+                if fm.fileExists(atPath: databasePath) {
+                    // 备份旧数据库
+                    let backupPath = databasePath + ".bak"
+                    try? fm.removeItem(atPath: backupPath)
+                    try? fm.moveItem(atPath: databasePath, toPath: backupPath)
+                }
+                // 重新创建
+                let config = AppDatabase.makeConfiguration()
+                let db = try DatabaseQueue(path: databasePath, configuration: config)
+                let appDatabase = try AppDatabase(db)
+                logger.info("Database recreated successfully after corruption.")
+                return appDatabase
+            } catch {
+                fatalError("Failed to recreate database after corruption: \(error)")
+            }
         }
     }
 }
