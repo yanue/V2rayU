@@ -241,26 +241,35 @@ actor PingServer {
 /// 执行 Ping 操作并返回响应时间（单位：毫秒）
 func testLatencyByProxyPort(port: UInt16) async throws -> Int {
     logger.info("testLatencyByProxyPort: \(port)")
-    let start = Date()
-    
-    // 使用 URLSession 测试延迟
     let session = URLSession(configuration: getProxyUrlSessionConfigure(httpProxyPort: port))
+
+    // 预热一次连接，避免把首次 DNS / TLS / WS / VMess 握手时间全部算进延迟。
+    _ = try await performLatencyRequest(session: session)
+
+    var samples: [Int] = []
+    for _ in 0..<2 {
+        let start = Date()
+        _ = try await performLatencyRequest(session: session)
+        samples.append(Int(Date().timeIntervalSince(start) * 1000))
+    }
+
+    let pingTime = samples.min() ?? -1
+    logger.info("testLatencyByProxyPort-end: \(port) - \(pingTime)ms")
+    return pingTime
+}
+
+private func performLatencyRequest(session: URLSession) async throws -> HTTPURLResponse {
     let (_, response) = try await session.data(for: URLRequest(url: AppSettings.shared.pingURL))
 
-    // 这里可以根据 data 或 response 做更多校验
     guard let httpResponse = response as? HTTPURLResponse else {
         throw URLError(.badServerResponse)
     }
 
-    // 只接受 204 状态码
     guard httpResponse.statusCode == 204 else {
         throw URLError(.badServerResponse)
     }
-    
-    // 最终延迟
-    let pingTime = Int(Date().timeIntervalSince(start) * 1000)
-    logger.info("testLatencyByProxyPort-end: \(port) - \(pingTime)ms")
-    return pingTime
+
+    return httpResponse
 }
 
 actor PingRunning {

@@ -20,8 +20,6 @@ import Foundation
 
 class V2rayOutboundHandler {
     private(set) var profile: ProfileModel
-    private let enableMux = UserDefaults.getBool(forKey: .enableMux)
-    private let muxConcurrent = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
     private(set) var serverSocks5 = V2rayOutboundSockServer()
@@ -83,11 +81,7 @@ class V2rayOutboundHandler {
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [serverVmess]
             outbound.settings = vmess
-            if enableMux {
-                outbound.mux = V2rayOutboundMux(enabled: true, concurrency: muxConcurrent)
-            } else {
-                outbound.mux = nil
-            }
+            outbound.mux = nil
 
         case .vless:
             // user
