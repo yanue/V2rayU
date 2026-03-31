@@ -75,7 +75,12 @@ actor V2rayLaunch {
         await LaunchAgent.shared.stopAgent()
 
         createJsonFile(item: item)
-
+        
+        // Clear log files on start
+        truncateLogFile(appLogFilePath)
+        truncateLogFile(coreLogFilePath)
+        truncateLogFile(tunLogFilePath)
+        
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreType: item.AdaptCore())
         if !started {
