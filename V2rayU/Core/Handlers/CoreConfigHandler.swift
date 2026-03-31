@@ -36,10 +36,10 @@ class CoreConfigHandler {
 extension ProfileEntity {
     func AdaptCore() -> CoreType {
         var mode: CoreType = .XrayCore
-        if self.network == .grpc || self.network == .h2 || self.network == .ws {
+        if self.protocol == .vless && (self.network == .grpc || self.network == .h2 || self.network == .ws) {
             mode = .SingBox
         }
-        logger.info("AdaptCore: \(self.network.rawValue) -> \(mode.rawValue)")
+        logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(mode.rawValue)")
         return mode
     }
     

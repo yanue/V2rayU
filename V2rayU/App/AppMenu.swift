@@ -28,6 +28,8 @@ final class AppMenuManager: NSObject {
     private var viewErrorLogItem: NSMenuItem!
     private var viewLogFilesItem: NSMenuItem!
     private var clearLogsItem: NSMenuItem!
+    private var logsItem: NSMenuItem!
+    private var logsSubMenu: NSMenu!
     private var pacModeItem: NSMenuItem!
     private var tunnelModeItem: NSMenuItem!
     private var globalModeItem: NSMenuItem!
@@ -203,6 +205,7 @@ final class AppMenuManager: NSObject {
         viewErrorLogItem?.title = String(localized: .ViewErrorLog)
         viewLogFilesItem?.title = String(localized: .ViewLogFiles)
         clearLogsItem?.title = String(localized: .ClearAllLogs)
+        logsItem?.title = String(localized: .Logs)
         pacModeItem?.title = String(localized: .PacMode)
         globalModeItem?.title = String(localized: .GlobalMode)
         manualModeItem?.title = String(localized: .ManualMode)
@@ -238,25 +241,22 @@ final class AppMenuManager: NSObject {
         viewErrorLogItem = NSMenuItem(title: String(localized: .ViewErrorLog), action: #selector(openErrorLogs), keyEquivalent: "")
         viewLogFilesItem = NSMenuItem(title: String(localized: .ViewLogFiles), action: #selector(openLogFiles), keyEquivalent: "")
         clearLogsItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
+        logsItem = getLogsItem()
         // 配置查看
         menu.addItem(toggleCoreItem)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(viewConfigItem)
         menu.addItem(viewPacItem)
-        menu.addItem(viewLogItem)
-        menu.addItem(viewErrorLogItem)
-        menu.addItem(viewLogFilesItem)
-        menu.addItem(clearLogsItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
         globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
         manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
         tunnelModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
+        menu.addItem(pacModeItem)
         menu.addItem(tunnelModeItem)
         menu.addItem(globalModeItem)
         menu.addItem(manualModeItem)
-        menu.addItem(pacModeItem)
         menu.addItem(NSMenuItem.separator())
         // 路由与服务器
         routingItem = getRoutingItem()
@@ -295,6 +295,7 @@ final class AppMenuManager: NSObject {
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
         helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))", action: #selector(goHelp), keyEquivalent: "")
+        menu.addItem(logsItem)
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
@@ -321,6 +322,24 @@ final class AppMenuManager: NSObject {
         coreHosting.frame = NSRect(x: 0, y: 0, width: 220, height: 40)
         item.view = coreHosting
         item.isEnabled = false
+        return item
+    }
+
+    func getLogsItem() -> NSMenuItem {
+        viewLogItem.target = self
+        viewErrorLogItem.target = self
+        viewLogFilesItem.target = self
+        clearLogsItem.target = self
+
+        logsSubMenu = NSMenu()
+        logsSubMenu.addItem(viewLogItem)
+        logsSubMenu.addItem(viewErrorLogItem)
+        logsSubMenu.addItem(viewLogFilesItem)
+        logsSubMenu.addItem(NSMenuItem.separator())
+        logsSubMenu.addItem(clearLogsItem)
+
+        let item = NSMenuItem(title: String(localized: .Logs), action: nil, keyEquivalent: "")
+        item.submenu = logsSubMenu
         return item
     }
     

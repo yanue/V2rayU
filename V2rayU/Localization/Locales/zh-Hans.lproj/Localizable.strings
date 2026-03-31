@@ -237,6 +237,7 @@
 "ViewErrorLog" = "查看异常日志";
 "ViewLogFiles" = "查看日志文件 ...";
 "ClearAllLogs" = "清除所有日志";
+"Logs" = "日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 pac 文件";
 "PacMode" = "pac模式";
@@ -484,4 +485,3 @@
 // Diagnostics - Geo 文件
 "DiagGeositeFile" = "GeoSite 数据库";
 "DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「立即修复」自动下载";
-

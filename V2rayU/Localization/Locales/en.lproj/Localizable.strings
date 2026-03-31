@@ -237,6 +237,7 @@
 "ViewErrorLog" = "View error log";
 "ViewLogFiles" = "View log files...";
 "ClearAllLogs" = "Clear all logs";
+"Logs" = "Logs";
 "ViewConfigJson" = "View config.json";
 "ViewPacFile" = "View PAC file";
 "PacMode" = "pac Mode";
@@ -483,4 +484,3 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 // Diagnostics - Geo Files
 "DiagGeositeFile" = "GeoSite Database";
 "DiagGeositeMissing" = "GeoSite database file is not installed. Click 'Fix Now' to auto-download";
-

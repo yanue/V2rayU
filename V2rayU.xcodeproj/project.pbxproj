@@ -79,7 +79,6 @@
 		6632EF3F2EC3720100CED47B /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632EF3E2EC371F000CED47B /* SubscriptionStore.swift */; };
 		6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6632EF462EC4B9E100CED47B /* Localizable.strings */; };
 		6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6632EF482EC4B9E100CED47B /* Assets.xcassets */; };
-		6632EF4F2EC4B9E100CED47B /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6632EF4A2EC4B9E100CED47B /* Info.plist */; };
 		6632EF502EC4B9E100CED47B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6632EF492EC4B9E100CED47B /* GoogleService-Info.plist */; };
 		663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814AE2E01937700F5FCF3 /* SubscriptionForm.swift */; };
 		663814B12E0195F700F5FCF3 /* SubscriptionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663814B02E0195ED00F5FCF3 /* SubscriptionSync.swift */; };
@@ -920,7 +919,6 @@
 				666A61072F1933A0003654D3 /* install.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
-				6632EF4F2EC4B9E100CED47B /* Info.plist in Resources */,
 				6632EF502EC4B9E100CED47B /* GoogleService-Info.plist in Resources */,
 				667028E42F0D467E008F27D8 /* pac in Resources */,
 			);
