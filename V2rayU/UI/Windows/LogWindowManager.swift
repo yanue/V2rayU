@@ -92,7 +92,7 @@ struct LogFilesView: View {
     var body: some View {
         HSplitView {
             VStack(alignment: .leading, spacing: 8) {
-                Text("日志文件")
+                Text(String(localized: .LogFile))
                     .font(.headline)
                     .padding(.horizontal, 8)
                     .padding(.top, 8)
@@ -159,7 +159,7 @@ struct LogFilesView: View {
                         Image(systemName: "doc.text")
                             .font(.system(size: 48))
                             .foregroundColor(.secondary)
-                        Text("选择日志文件查看")
+                        Text(String(localized: .SelectLogFile))
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

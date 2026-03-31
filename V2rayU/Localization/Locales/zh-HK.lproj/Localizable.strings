@@ -56,8 +56,9 @@
 "SettingsSubHead" = "一般應用設定";
 "About" = "關於";
 "AboutSubHead" = "關於此應用程式";
+"AboutAppIntroduction" = "V2rayU 是一款 macOS VPN 客戶端,支援 V2Ray、Sing-Box、Shadowsocks、Trojan 等多種協定。它提供直觀的用戶介面來管理代理連線、訂閱和路由規則。";
 
-// MARK: - 設定分頁
+ // MARK: - 設定分頁
 "General" = "一般設定";
 "Shortcuts" = "快捷鍵";
 "Advanced" = "進階設定";
@@ -340,6 +341,34 @@
 "OpenSourceLibraries" = "引用開源函式庫";
 "UsedButNotLimitedTo" = "有使用且不限於以下";
 "OpenInBrowser" = "在瀏覽器開啟";
+"Copyright" = "版權所有";
+"AllRightsReserved" = "保留所有權利。";
+"ErrorLog" = "錯誤日誌";
+"LogFile" = "日誌檔案";
+"SelectLogFile" = "選擇日誌檔案查看";
+"OKButton" = "確定";
+"Close" = "關閉";
+"Remark" = "備註";
+"Protocol" = "協定";
+"Address" = "位址";
+"Selected" = "已選擇";
+"Hysteria2Configuration" = "Hysteria 2 設定";
+"ObfuscationSettings" = "混淆設定";
+"ObfsType" = "混淆類型";
+"ObfsPassword" = "混淆密碼";
+"AuthenticationSettings" = "認證設定";
+"AuthType" = "認證類型";
+"None" = "無";
+"Password" = "密碼";
+"Token" = "權杖";
+"AuthPassword" = "認證密碼";
+"BandwidthSettings" = "頻寬設定";
+"UploadBandwidth" = "上傳頻寬";
+"DownloadBandwidth" = "下載頻寬";
+"AdvancedSettings" = "進階設定";
+"HopInterval" = "跳躍間隔(秒)";
+"Proxies" = "個代理";
+"PingAllProxies" = "這將 ping 所有代理並顯示結果日誌。";
 
 // MARK: - Core 更新管理
 "CoreSettingsTitle" = "核心設定";

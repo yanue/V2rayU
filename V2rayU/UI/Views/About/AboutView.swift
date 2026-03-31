@@ -53,6 +53,11 @@ struct AboutView: View {
                             .font(.body)
                             .foregroundColor(.primary)
                         
+                        Text(String(localized: .AboutAppIntroduction))
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 8)
+                        
                         // 开源地址
                         sectionHeader(title: String(localized: .OpenSourceProject), subtitle: String(localized: .OpenSourceLicense))
                         HStack(spacing: 24) {

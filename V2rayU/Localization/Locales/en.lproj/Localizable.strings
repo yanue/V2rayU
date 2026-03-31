@@ -56,6 +56,7 @@
 "SettingsSubHead" = "General application settings";
 "About" = "About";
 "AboutSubHead" = "About this application";
+"AboutAppIntroduction" = "V2rayU is a macOS VPN client supporting V2Ray, Sing-Box, Shadowsocks, Trojan and more. It provides an intuitive user interface for managing proxy connections, subscriptions, and routing rules.";
 
 // MARK: - Settings Tabs
 "General" = "General";
@@ -340,6 +341,34 @@
 "OpenSourceLibraries" = "Open Source Libraries";
 "UsedButNotLimitedTo" = "Used but not limited to:";
 "OpenInBrowser" = "Open in Browser";
+"Copyright" = "Copyright";
+"AllRightsReserved" = "All rights reserved.";
+"ErrorLog" = "Error Log";
+"LogFile" = "Log File";
+"SelectLogFile" = "Select log file to view";
+"OKButton" = "OK";
+"Close" = "Close";
+"Remark" = "Remark";
+"Protocol" = "Protocol";
+"Address" = "Address";
+"Selected" = "Selected";
+"Hysteria2Configuration" = "Hysteria 2 Configuration";
+"ObfuscationSettings" = "Obfuscation Settings";
+"ObfsType" = "Obfs Type";
+"ObfsPassword" = "Obfs Password";
+"AuthenticationSettings" = "Authentication Settings";
+"AuthType" = "Auth Type";
+"None" = "None";
+"Password" = "Password";
+"Token" = "Token";
+"AuthPassword" = "Auth Password";
+"BandwidthSettings" = "Bandwidth Settings";
+"UploadBandwidth" = "Upload Bandwidth";
+"DownloadBandwidth" = "Download Bandwidth";
+"AdvancedSettings" = "Advanced Settings";
+"HopInterval" = "Hop Interval (seconds)";
+"Proxies" = "proxies";
+"PingAllProxies" = "This will ping all proxies and show the result log.";
 
 // MARK: - Core Update Management
 "CoreSettingsTitle" = "Core Settings";

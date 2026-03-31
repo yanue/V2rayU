@@ -61,6 +61,7 @@ enum LanguageLabel: String, CaseIterable {
     case SettingsSubHead
     case About
     case AboutSubHead
+    case AboutAppIntroduction
     // settiings tab
     case General
     case Shortcuts
@@ -336,6 +337,16 @@ enum LanguageLabel: String, CaseIterable {
     case OpenSourceLibraries     // 引用开源库
     case UsedButNotLimitedTo     // 有用到且不限于以下
     case OpenInBrowser
+    case Copyright
+    case AllRightsReserved
+    case ErrorLog
+    case LogFile
+    case SelectLogFile
+    case OKButton
+    case CloseButton
+    case Selected
+    case Proxies
+    case PingAllProxies
     // core update
     case CoreSettingsTitle                // Core Settings
     case CoreSettingsSubtitle          // Manage your core versions
