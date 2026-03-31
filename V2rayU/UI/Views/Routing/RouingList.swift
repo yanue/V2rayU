@@ -24,7 +24,7 @@ struct RoutingListView: View {
     var body: some View {
         VStack {
             PageHeader(
-                icon: "bonjour",
+                icon: "arrow.triangle.branch",
                 title: localizedString(.Routings),
                 subtitle: localizedString(.RoutingSubHead)
             ) {

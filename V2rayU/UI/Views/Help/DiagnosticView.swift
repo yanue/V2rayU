@@ -22,7 +22,7 @@ struct DiagnosticsView: View {
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
-                icon: "questionmark.circle",
+                icon: "antenna.radiowaves.left.and.right",
                 title: String(localized: .Diagnostics),
                 subtitle:  String(localized: .DiagnosticSubHead)
             ) {

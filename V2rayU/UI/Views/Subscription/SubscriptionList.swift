@@ -22,7 +22,7 @@ struct SubscriptionListView: View {
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
-                icon: "personalhotspot",
+                icon: "link.circle",
                 title: localizedString(.Subscriptions),
                 subtitle: localizedString(.SubscriptionSubHead)
             ) {

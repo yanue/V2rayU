@@ -19,9 +19,12 @@ struct GeneralView: View {
             VStack(alignment: .leading, spacing: 20) {
                 generalSection
                 languageSection
+                Spacer()
             }
             .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .onDisappear {
             AppSettings.shared.saveSettings()
         }

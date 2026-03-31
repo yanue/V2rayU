@@ -77,13 +77,13 @@ struct ProfileListView: View {
     var body: some View {
         VStack {
             PageHeader(
-                icon: "shield.lefthalf.filled",
+                icon: "globe",
                 title: String(localized: .Servers),
                 subtitle: String(localized: .ServerSubHead)
             ) {
                 HStack(spacing: 8) {
                     Button(action: { activeSheet = .pingAll }) {
-                        Label(String(localized: .LatencyTest), systemImage: "network")
+                        Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
                     }
                     .buttonStyle(.borderedProminent)
                     .focusable(false)
@@ -221,7 +221,7 @@ struct ProfileListView: View {
             Button {
                 activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
             } label: {
-                Label(String(localized: .LatencyTest), systemImage: "speedometer")
+                Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
             }
             .focusable(false)
 
