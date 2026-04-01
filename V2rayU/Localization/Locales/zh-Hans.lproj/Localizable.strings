@@ -31,6 +31,7 @@
 "DeleteConfirm" = "确定要删除此项吗？";
 "DeleteSelectedConfirm" = "确定要删除所选项目吗？";
 "DeleteTip" = "此操作无法撤销。";
+"DeleteMultipleConfirm" = "确定要删除 %d 个项目吗？此操作无法撤销。";
 "OK" = "确定";
 "Add" = "添加";
 "Export" = "导出";

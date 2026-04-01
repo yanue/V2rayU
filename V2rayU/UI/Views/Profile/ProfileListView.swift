@@ -302,11 +302,16 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
+                let itemsToDelete = resolveSelectedItems(for: item)
                 if showConfirmAlertSync(
                     title: String(localized: .DeleteSelectedConfirm),
-                    message: String(localized: .DeleteTip)
+                    message: itemsToDelete.count > 1 
+                        ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count)
+                        : String(localized: .DeleteTip)
                 ) {
-                    viewModel.delete(uuid: item.uuid)
+                    for entity in itemsToDelete {
+                        viewModel.delete(uuid: entity.uuid)
+                    }
                 }
             } label: {
                 Label(String(localized: .Delete), systemImage: "trash")

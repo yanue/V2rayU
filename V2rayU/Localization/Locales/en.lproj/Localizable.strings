@@ -30,6 +30,7 @@
 "DeleteConfirm" = "Are you sure you want to delete this item?";
 "DeleteSelectedConfirm" = "Are you sure you want to delete the selected items?";
 "DeleteTip" = "This action cannot be undone.";
+"DeleteMultipleConfirm" = "Are you sure you want to delete %d items? This action cannot be undone.";
 "OK" = "OK";
 "Add" = "Add";
 "Export" = "Export";

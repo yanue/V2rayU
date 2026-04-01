@@ -30,6 +30,7 @@
 "DeleteConfirm" = "確定要刪除此項嗎？";
 "DeleteSelectedConfirm" = "確定要刪除所選項目嗎？";
 "DeleteTip" = "此操作無法復原。";
+"DeleteMultipleConfirm" = "確定要刪除 %d 個項目嗎？此操作無法復原。";
 "OK" = "確定";
 "Add" = "新增";
 "Export" = "匯出";
