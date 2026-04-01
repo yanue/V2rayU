@@ -501,6 +501,13 @@ final class AppMenuManager: NSObject {
         }
     }
 
+    private func reopenMenuAfterAction() {
+        guard let button = statusItem?.button else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            button.performClick(nil)
+        }
+    }
+
     func importFromPasteboard() {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             importUri(url: uri)
@@ -666,6 +673,7 @@ final class AppMenuManager: NSObject {
 
     @objc private func pingSpeed(_ sender: NSMenuItem) {
         pingSpeedTest()
+        reopenMenuAfterAction()
     }
 
     @objc private func viewConfig(_ sender: Any) {

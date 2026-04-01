@@ -124,7 +124,8 @@ class SingboxConfigHandler {
             // DNS配置
             self.singbox.dns.servers = [
                 DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29")
+                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
             ]
             self.singbox.dns.rules = [
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),

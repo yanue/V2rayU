@@ -161,11 +161,19 @@ actor PingServer {
         do {
             let pingTime = try await testLatencyByProxyPort(port: self.bindPort)
             self.item.speed = pingTime
+            let runningProfile = await AppState.shared.runningProfile
+            if self.item.uuid == runningProfile {
+                await AppState.shared.setLatency(latency: Double(pingTime))
+            }
             logger.info("Ping success: \(self.item.remark), \(self.item.uuid) \(pingTime)ms")
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-success: \(item.remark) - \(pingTime)ms")
         } catch {
             // ping 失败
             self.item.speed = -1
+            let runningProfile = await AppState.shared.runningProfile
+            if self.item.uuid == runningProfile {
+                await AppState.shared.setLatency(latency: -1)
+            }
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-error: \(item.remark) - \(error)")
             logger.info("Ping error: \(self.item.remark), \(self.item.uuid) \(error)")
         }

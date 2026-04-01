@@ -202,6 +202,7 @@ final class AppState: ObservableObject {
         v2rayTurnOn = true
         await setCoreRunning(v2rayTurnOn)
         runningServer = ProfileStore.shared.getRunning()
+        latency = Double(runningServer?.speed ?? 0)
         logger.info("switchServer-end: \(self.runningProfile)")
         AppMenuManager.shared.refreshServerItems()
     }
@@ -219,9 +220,11 @@ final class AppState: ObservableObject {
                 logger.info("appDidLaunch: sync server to \(running.remark)")
             }
             runningServer = running
+            latency = Double(running.speed)
         } else {
             runningProfile = ""
             runningServer = nil
+            latency = 0
             logger.info("appDidLaunch: no available server")
         }
         
