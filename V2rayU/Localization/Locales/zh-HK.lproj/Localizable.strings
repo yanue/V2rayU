@@ -513,3 +513,12 @@
 // MARK: - 診斷 - Geo 檔案
 "DiagGeositeFile" = "GeoSite 資料庫";
 "DiagGeositeMissing" = "GeoSite 資料庫檔案未安裝。點擊「一鍵修復」自動下載。";
+
+// MARK: - 舊版資料遷移
+"ImportLegacyData" = "匯入 v4 資料";
+"ImportLegacyDataTitle" = "從 v4 版本匯入資料";
+"ImportLegacyDataTip" = "從 V2rayU v4（UserDefaults 版本）匯入伺服器和訂閱";
+"LegacyDataMigrated" = "資料已經遷移完成";
+"LegacyDataMigrationSuccess" = "遷移完成：匯入了 %d 個伺服器，%d 個訂閱";
+"LegacyDataMigrationFailed" = "遷移失敗：%@";
+"LegacyDataMigrationNoData" = "沒有找到需要匯入的舊版資料";

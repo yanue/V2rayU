@@ -514,3 +514,12 @@
 // MARK: - 诊断 - Geo 文件
 "DiagGeositeFile" = "GeoSite 数据库";
 "DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「一键修复」自动下载。";
+
+// MARK: - 旧版数据迁移
+"ImportLegacyData" = "导入 v4 数据";
+"ImportLegacyDataTitle" = "从 v4 版本导入数据";
+"ImportLegacyDataTip" = "从 V2rayU v4（UserDefaults 版本）导入服务器和订阅";
+"LegacyDataMigrated" = "数据已经迁移完成";
+"LegacyDataMigrationSuccess" = "迁移完成：导入了 %d 个服务器，%d 个订阅";
+"LegacyDataMigrationFailed" = "迁移失败：%@";
+"LegacyDataMigrationNoData" = "没有找到需要导入的旧版数据";

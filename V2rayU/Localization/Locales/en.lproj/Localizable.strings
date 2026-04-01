@@ -512,3 +512,12 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "DiagGeositeFile" = "GeoSite Database";
 "DiagGeositeMissing" = "GeoSite database file is not installed. Click 'Fix Now' to auto-download";
 
+// MARK: - Legacy Migration
+"ImportLegacyData" = "Import from v4";
+"ImportLegacyDataTitle" = "Import Data from v4";
+"ImportLegacyDataTip" = "Import servers and subscriptions from V2rayU v4 (UserDefaults version)";
+"LegacyDataMigrated" = "Data has already been migrated";
+"LegacyDataMigrationSuccess" = "Migration completed: %d servers, %d subscriptions imported";
+"LegacyDataMigrationFailed" = "Migration failed: %@";
+"LegacyDataMigrationNoData" = "No legacy data found to import";
+

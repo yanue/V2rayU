@@ -65,6 +65,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             await SystemSleepManager.shared.setup()
             // 启动设置
             AppState.shared.appDidLaunch()
+
+            // 检查并迁移旧版数据（首次启动时）
+            await LegacyMigrationHandler.shared.checkAndPromptForMigration()
         }
     }
     

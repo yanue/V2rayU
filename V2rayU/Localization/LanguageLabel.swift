@@ -500,4 +500,13 @@ enum LanguageLabel: String, CaseIterable {
     case DiagConfigFileEmpty
     case DiagGeositeFile
     case DiagGeositeMissing
+
+    // MARK: - Legacy Migration
+    case ImportLegacyData
+    case ImportLegacyDataTitle
+    case ImportLegacyDataTip
+    case LegacyDataMigrated
+    case LegacyDataMigrationSuccess
+    case LegacyDataMigrationFailed
+    case LegacyDataMigrationNoData
 }
