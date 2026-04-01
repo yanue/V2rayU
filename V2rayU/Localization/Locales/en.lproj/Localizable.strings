@@ -521,4 +521,23 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "LegacyDataMigrationSuccess" = "Migration completed: %d servers, %d subscriptions imported";
 "LegacyDataMigrationFailed" = "Migration failed: %@";
 "LegacyDataMigrationNoData" = "No legacy data found to import";
+"ImportLegacyDataMigrating" = "Migrating data...";
+"ImportLegacyDataDetected" = "Legacy data detected:";
+"ImportLegacyDataNoData" = "No legacy data detected";
+"ImportLegacyDataServerCount" = "%d servers";
+"ImportLegacyDataSubCount" = "%d subscriptions";
+"ImportLegacyConfirmTitle" = "Confirm Import";
+"ImportLegacyConfirmMessage" = "Import %d servers and %d subscriptions from v4 to v5?";
+"ImportLegacyDetectedKeys" = "Detected keys:";
+"ImportLegacyServerList" = "Server list:";
+"ImportLegacySubList" = "Subscription list:";
+"ImportLegacyMigratingStart" = "Starting migration...";
+"ImportLegacyMigratingComplete" = "Migration complete!";
+"ImportLegacyNoDataFound" = "No legacy data found";
+"ImportLegacyMigrationFailed" = "Migration failed: ";
+"ImportLegacyItemsRemaining" = "%d items remaining";
+"ImportLegacyV2rayServerList" = "v2rayServerList: ";
+"ImportLegacyV2raySubList" = "v2raySubList: ";
+"ImportLegacySuccessServers" = "Successfully imported %d servers";
+"ImportLegacySuccessSubscriptions" = "Successfully imported %d subscriptions";
 

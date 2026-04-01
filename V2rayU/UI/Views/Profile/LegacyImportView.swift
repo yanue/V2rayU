@@ -21,187 +21,274 @@ struct LegacyImportView: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
-            // 标题区域
-            HStack {
-                Image(systemName: "arrow.down.doc")
-                    .font(.system(size: 40))
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: .ImportLegacyDataTitle))
-                        .font(.headline)
-                    Text(String(localized: .ImportLegacyDataTip))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-            }
-            .padding()
-            .background(Color(NSColor.controlBackgroundColor))
-            .cornerRadius(10)
+        VStack(spacing: 0) {
+            headerSection
 
-            // 内容区域
+            Divider()
+
             if isMigrating {
-                // 迁移中状态
-                VStack(spacing: 12) {
-                    ProgressView()
-                        .scaleEffect(1.2)
-                    Text("正在迁移数据...")
-                        .foregroundColor(.secondary)
-                }
-                .padding()
-
+                migratingView
             } else if showResult, let result = migrationResult {
-                // 显示迁移结果
                 resultView(result: result)
-
             } else {
-                // 准备迁移界面
-                VStack(spacing: 16) {
-                    // 检测到的数据统计
-                    if legacyDataCount.servers > 0 || legacyDataCount.subs > 0 {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label {
-                                Text("检测到旧版数据:")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                            } icon: {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.orange)
-                            }
-
-                            HStack {
-                                Label("\(legacyDataCount.servers) 个服务器", systemImage: "server.rack")
-                                Spacer()
-                                Label("\(legacyDataCount.subs) 个订阅", systemImage: "list.bullet.rectangle")
-                            }
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        }
-                        .padding()
-                        .background(Color.orange.opacity(0.1))
-                        .cornerRadius(8)
-                    } else {
-                        VStack(spacing: 8) {
-                            Image(systemName: "checkmark.circle")
-                                .font(.system(size: 40))
-                                .foregroundColor(.green)
-                            Text("未检测到旧版数据")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-
-                    // 调试信息
-                    if !debugInfo.isEmpty {
-                        Text(debugInfo)
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(8)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(4)
-                    }
-
-                    // 导入按钮
-                    Button(action: {
-                        showConfirmDialog = true
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down.on.square")
-                            Text(String(localized: .ImportLegacyData))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(legacyDataCount.servers == 0 && legacyDataCount.subs == 0)
-                }
+                contentSection
             }
 
-            // 底部按钮
-            HStack {
-                Button(String(localized: .Close)) {
-                    onDismiss()
-                }
-                .keyboardShortcut(.cancelAction)
-            }
+            Divider()
+
+            footerSection
         }
-        .padding(30)
-        .frame(width: 450, height: 350)
+        .frame(width: 500, height: 400)
         .onAppear {
             checkLegacyData()
         }
-        .alert("确认导入", isPresented: $showConfirmDialog) {
-            Button("取消", role: .cancel) { }
-            Button("导入") {
+        .alert(String(localized: .ImportLegacyConfirmTitle), isPresented: $showConfirmDialog) {
+            Button(String(localized: .Cancel), role: .cancel) { }
+            Button(String(localized: .ImportLegacyData)) {
                 performMigration()
             }
         } message: {
-            Text("即将从旧版本导入 \(legacyDataCount.servers) 个服务器和 \(legacyDataCount.subs) 个订阅到新版本。是否继续？")
+            Text(String(localized: .ImportLegacyConfirmMessage, arguments: legacyDataCount.servers, legacyDataCount.subs))
         }
     }
 
-    /// 显示迁移结果的视图
+    private var headerSection: some View {
+        HStack(spacing: 16) {
+            Image(systemName: "arrow.down.doc.fill")
+                .font(.system(size: 36))
+                .foregroundStyle(.blue.gradient)
+                .frame(width: 50)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: .ImportLegacyDataTitle))
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                Text(String(localized: .ImportLegacyDataTip))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button(action: { onDismiss() }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut(.cancelAction)
+        }
+        .padding(20)
+        .background(Color(nsColor: .controlBackgroundColor))
+    }
+
+    private var contentSection: some View {
+        VStack(spacing: 16) {
+            if legacyDataCount.servers > 0 || legacyDataCount.subs > 0 {
+                dataCard
+            } else {
+                noDataCard
+            }
+
+            if !debugInfo.isEmpty {
+                debugCard
+            }
+        }
+        .padding(20)
+    }
+
+    private var dataCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.orange)
+                Text(String(localized: .ImportLegacyDataDetected))
+                    .font(.headline)
+                Spacer()
+            }
+
+            HStack(spacing: 24) {
+                dataItem(
+                    icon: "server.rack",
+                    title: String(localized: .ImportLegacyDataServerCount, arguments: legacyDataCount.servers),
+                    color: .blue
+                )
+
+                dataItem(
+                    icon: "list.bullet.rectangle",
+                    title: String(localized: .ImportLegacyDataSubCount, arguments: legacyDataCount.subs),
+                    color: .purple
+                )
+            }
+
+            Button(action: { showConfirmDialog = true }) {
+                HStack {
+                    Image(systemName: "square.and.arrow.down.on.square")
+                    Text(String(localized: .ImportLegacyData))
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+        .padding(16)
+        .background(Color.orange.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func dataItem(icon: String, title: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var noDataCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+            Text(String(localized: .ImportLegacyDataNoData))
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(32)
+        .background(Color.green.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var debugCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Debug Info")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+
+            ScrollView {
+                Text(debugInfo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: 100)
+        }
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var migratingView: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            ProgressView()
+                .scaleEffect(1.5)
+            Text(String(localized: .ImportLegacyDataMigrating))
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            if !debugInfo.isEmpty {
+                Text(debugInfo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: 300)
+                    .multilineTextAlignment(.center)
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     @ViewBuilder
     private func resultView(result: LegacyMigrationResult) -> some View {
         switch result {
         case .success(let profiles, let subscriptions):
             VStack(spacing: 16) {
+                Spacer()
+
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 50))
-                    .foregroundColor(.green)
+                    .font(.system(size: 60))
+                    .foregroundStyle(.green)
                 Text(String(localized: .LegacyDataMigrationSuccess, arguments: profiles, subscriptions))
+                    .font(.title3)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+
                 if !debugInfo.isEmpty {
                     Text(debugInfo)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(8)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(4)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 300)
+                        .multilineTextAlignment(.center)
                 }
+
+                Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
 
         case .noData:
             VStack(spacing: 12) {
+                Spacer()
                 Image(systemName: "tray")
-                    .font(.system(size: 40))
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
                 Text(String(localized: .LegacyDataMigrationNoData))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
 
         case .error(let message):
             VStack(spacing: 16) {
+                Spacer()
+
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 50))
-                    .foregroundColor(.orange)
+                    .font(.system(size: 60))
+                    .foregroundStyle(.orange)
                 Text(String(localized: .LegacyDataMigrationFailed, arguments: message))
+                    .font(.title3)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+
                 if !debugInfo.isEmpty {
                     Text(debugInfo)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(8)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(4)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 300)
+                        .multilineTextAlignment(.center)
                 }
+
+                Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
         }
     }
 
-    /// 检查旧版数据
+    private var footerSection: some View {
+        HStack {
+            Button(String(localized: .Close)) {
+                onDismiss()
+            }
+            .keyboardShortcut(.cancelAction)
+
+            Spacer()
+        }
+        .padding(16)
+    }
+
     private func checkLegacyData() {
         Task {
-            // v4 版本使用 net.yanue.V2rayU domain
             let defaults = UserDefaults(suiteName: "net.yanue.V2rayU") ?? .standard
             let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
             let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
@@ -209,28 +296,27 @@ struct LegacyImportView: View {
             await MainActor.run {
                 legacyDataCount = (serverList.count, subList.count)
 
-                // 生成调试信息
-                var info = "检测到的键:\n"
-                info += "- v2rayServerList: \(serverList.count) 项\n"
-                info += "- v2raySubList: \(subList.count) 项\n\n"
+                var info = String(localized: .ImportLegacyDetectedKeys) + "\n"
+                info += String(localized: .ImportLegacyV2rayServerList) + "\(serverList.count)\n"
+                info += String(localized: .ImportLegacyV2raySubList) + "\(subList.count)"
 
                 if !serverList.isEmpty {
-                    info += "服务器列表:\n"
-                    for (index, item) in serverList.prefix(5).enumerated() {
+                    info += "\n\n" + String(localized: .ImportLegacyServerList) + "\n"
+                    for (index, item) in serverList.prefix(3).enumerated() {
                         info += "  \(index + 1). \(item)\n"
                     }
-                    if serverList.count > 5 {
-                        info += "  ... 还有 \(serverList.count - 5) 项\n"
+                    if serverList.count > 3 {
+                        info += "  " + String(localized: .ImportLegacyItemsRemaining, arguments: serverList.count - 3)
                     }
                 }
 
                 if !subList.isEmpty {
-                    info += "\n订阅列表:\n"
-                    for (index, item) in subList.prefix(5).enumerated() {
+                    info += "\n\n" + String(localized: .ImportLegacySubList) + "\n"
+                    for (index, item) in subList.prefix(3).enumerated() {
                         info += "  \(index + 1). \(item)\n"
                     }
-                    if subList.count > 5 {
-                        info += "  ... 还有 \(subList.count - 5) 项\n"
+                    if subList.count > 3 {
+                        info += "  " + String(localized: .ImportLegacyItemsRemaining, arguments: subList.count - 3)
                     }
                 }
 
@@ -239,13 +325,11 @@ struct LegacyImportView: View {
         }
     }
 
-    /// 执行迁移
     private func performMigration() {
         isMigrating = true
-        debugInfo = "开始迁移...\n"
+        debugInfo = String(localized: .ImportLegacyMigratingStart) + "\n"
 
         Task {
-            // 直接调用 migrate 方法，不再检查 hasMigrated
             let result = await LegacyMigrationHandler.shared.migrate()
 
             await MainActor.run {
@@ -253,16 +337,15 @@ struct LegacyImportView: View {
                 migrationResult = result
                 showResult = true
 
-                // 添加结果到调试信息
                 switch result {
                 case .success(let profiles, let subscriptions):
-                    debugInfo += "\n迁移完成!\n"
-                    debugInfo += "- 成功导入 \(profiles) 个服务器\n"
-                    debugInfo += "- 成功导入 \(subscriptions) 个订阅"
+                    debugInfo = String(localized: .ImportLegacyMigratingComplete) + "\n\n"
+                    debugInfo += String(localized: .ImportLegacySuccessServers, arguments: profiles) + "\n"
+                    debugInfo += String(localized: .ImportLegacySuccessSubscriptions, arguments: subscriptions)
                 case .noData:
-                    debugInfo += "\n没有找到旧版数据"
+                    debugInfo = String(localized: .ImportLegacyNoDataFound)
                 case .error(let message):
-                    debugInfo += "\n迁移失败: \(message)"
+                    debugInfo = String(localized: .ImportLegacyMigrationFailed) + message
                 }
             }
         }

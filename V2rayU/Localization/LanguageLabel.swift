@@ -510,4 +510,23 @@ enum LanguageLabel: String, CaseIterable {
     case LegacyDataMigrationSuccess
     case LegacyDataMigrationFailed
     case LegacyDataMigrationNoData
+    case ImportLegacyDataMigrating
+    case ImportLegacyDataDetected
+    case ImportLegacyDataNoData
+    case ImportLegacyDataServerCount
+    case ImportLegacyDataSubCount
+    case ImportLegacyConfirmTitle
+    case ImportLegacyConfirmMessage
+    case ImportLegacyDetectedKeys
+    case ImportLegacyServerList
+    case ImportLegacySubList
+    case ImportLegacyMigratingStart
+    case ImportLegacyMigratingComplete
+    case ImportLegacyNoDataFound
+    case ImportLegacyMigrationFailed
+    case ImportLegacyItemsRemaining
+    case ImportLegacyV2rayServerList
+    case ImportLegacyV2raySubList
+    case ImportLegacySuccessServers
+    case ImportLegacySuccessSubscriptions
 }
