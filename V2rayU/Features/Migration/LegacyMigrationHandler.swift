@@ -155,17 +155,37 @@ class LegacyV2raySubItem: NSObject, NSCoding {
         do {
             // 创建解档器
             let unarchiver = try NSKeyedUnarchiver(forReadingFrom: myModelData)
+            unarchiver.requiresSecureCoding = false
 
             // 注册类名映射
             unarchiver.setClass(LegacyV2raySubItem.self, forClassName: "V2rayU.V2raySubItem")
             unarchiver.setClass(LegacyV2raySubItem.self, forClassName: "V2raySubItem")
             unarchiver.setClass(LegacyV2raySubItem.self, forClassName: "yanue.V2rayU.V2raySubItem")
+            unarchiver.setClass(NSString.self, forClassName: "NSString")
 
             // 解档根对象
             let result = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey)
-            logger.debug("LegacyV2raySubItem.load: Successfully loaded '\(name)'")
+            logger.debug("LegacyV2raySubItem.load: Successfully loaded '\(name)', result type: \(String(describing: type(of: result)))")
 
-            return result as? LegacyV2raySubItem
+            if let item = result as? LegacyV2raySubItem {
+                logger.debug("LegacyV2raySubItem.load: decoded - name='\(item.name)', remark='\(item.remark)', url='\(item.url.prefix(30))...', isValid=\(item.isValid)")
+                return item
+            } else {
+                // 尝试直接解码
+                logger.debug("LegacyV2raySubItem.load: result is nil or not LegacyV2raySubItem, trying direct decode")
+                let directName = unarchiver.decodeObject(forKey: "Name") as? String ?? ""
+                let directRemark = unarchiver.decodeObject(forKey: "Remark") as? String ?? ""
+                let directUrl = unarchiver.decodeObject(forKey: "Url") as? String ?? ""
+                let directIsValid = unarchiver.decodeBool(forKey: "IsValid")
+                logger.debug("LegacyV2raySubItem.load: direct - name='\(directName)', remark='\(directRemark)', url='\(directUrl.prefix(30))...', isValid=\(directIsValid)")
+
+                let item = LegacyV2raySubItem()
+                item.name = directName
+                item.remark = directRemark
+                item.url = directUrl
+                item.isValid = directIsValid
+                return item
+            }
         } catch {
             logger.error("LegacyV2raySubItem.load: Failed to load '\(name)': \(error)")
             return nil
