@@ -33,9 +33,7 @@ struct LegacyImportView: View {
             } else {
                 contentSection
             }
-
             Divider()
-
             footerSection
         }
         .frame(width: 500, height: 400)
@@ -76,6 +74,7 @@ struct LegacyImportView: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
+            .focusable(false)
             .keyboardShortcut(.cancelAction)
         }
         .padding(20)
@@ -277,12 +276,13 @@ struct LegacyImportView: View {
 
     private var footerSection: some View {
         HStack {
+            Spacer()
+
             Button(String(localized: .Close)) {
                 onDismiss()
             }
+            .focusable(false)
             .keyboardShortcut(.cancelAction)
-
-            Spacer()
         }
         .padding(16)
     }
