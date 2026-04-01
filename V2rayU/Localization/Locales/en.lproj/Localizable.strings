@@ -2,6 +2,9 @@
 
 // MARK: - Language & Theme
 "Language" = "Language";
+"English" = "English";
+"Simplified Chinese" = "简体中文";
+"Traditional Chinese" = "繁體中文";
 "Theme" = "Theme";
 "Light" = "Light";
 "Dark" = "Dark";
