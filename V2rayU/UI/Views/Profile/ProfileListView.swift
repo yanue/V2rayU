@@ -101,33 +101,35 @@ struct ProfileListView: View {
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
-
+                    
                     Divider()
                         .frame(height: 20)
-
-                    Button(action: {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            tableOpacity = 0
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            loadData()
-                            withAnimation(.easeIn(duration: 0.2)) {
-                                tableOpacity = 1
+                    
+                    Menu {
+                        Button(action: {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                tableOpacity = 0
                             }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                loadData()
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    tableOpacity = 1
+                                }
+                            }
+                        }) {
+                            Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                         }
-                    }) {
-                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
-                    }
-                    .buttonStyle(.bordered)
-                    .focusable(false)
 
-                    Button(action: {
-                        activeSheet = .importLegacy
-                    }) {
-                        Label(String(localized: .ImportLegacyData), systemImage: "square.and.arrow.down.on.square")
+                        Button(action: {
+                            activeSheet = .importLegacy
+                        }) {
+                            Label(String(localized: .ImportLegacyData), systemImage: "square.and.arrow.down.on.square")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
-                    .buttonStyle(.bordered)
                     .focusable(false)
+                    .frame(width: 50)
                 }
             }
 
@@ -142,7 +144,7 @@ struct ProfileListView: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .frame(width: 150)
+                    .focusable(false)
                     Spacer()
 
                     HStack(spacing: 6) {
