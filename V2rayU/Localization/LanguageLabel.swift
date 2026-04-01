@@ -9,12 +9,14 @@ import SwiftUI
 
 // MARK: - 多语言本地化标签枚举
 enum LanguageLabel: String, CaseIterable {
+    // MARK: - Language & Theme
     case Language
     case Theme
     case Light
     case Dark
     case FollowSystem
-    // base
+
+    // MARK: - Base Operations
     case Enable
     case Minute
     case Hour
@@ -40,36 +42,39 @@ enum LanguageLabel: String, CaseIterable {
     case Select
     case SetActive
     case Duplicate
-    // profile share
     case Regenerate
     case Regenerated
+    case Generate
+    case Generated
     case Copy
     case Copied
     case CopyFailed
     case ShareProfile
-    // app content
+
+    // MARK: - App Content
     case Activity
     case ActivitySubHead
     case Servers
     case ServerSubHead
-    case Items
     case Subscriptions
     case SubscriptionSubHead
     case Routings
-    case RoutingSubHead // "匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连"
+    case RoutingSubHead
     case Settings
     case SettingsSubHead
     case About
     case AboutSubHead
     case AboutAppIntroduction
-    // settiings tab
+
+    // MARK: - Settings Tabs
     case General
     case Shortcuts
     case Advanced
     case PAC
     case DNS
     case Core
-    // general settings
+
+    // MARK: - General Settings
     case LaunchAtLogin
     case CheckForUpdateAutomatically
     case AutoUpdateServersFromSubscriptions
@@ -88,7 +93,8 @@ enum LanguageLabel: String, CaseIterable {
     case SwitchToGlobalMode
     case SwitchToManualMode
     case SwitchToPacMode
-    // advanced settings
+
+    // MARK: - Advanced Settings
     case LocalSocksListenPort
     case EnableUDP
     case LocalHttpListenPort
@@ -99,7 +105,8 @@ enum LanguageLabel: String, CaseIterable {
     case Mux
     case EnableTrafficStatistics
     case V2rayCoreLogLevel
-    // pac settings
+
+    // MARK: - PAC Settings
     case PacSettings
     case ConfigureProxyRules
     case GFWListDownloadURL
@@ -108,47 +115,39 @@ enum LanguageLabel: String, CaseIterable {
     case AddCustomRules
     case ViewPACFile
     case UpdatePAC
-    case PACUpdatedByUserRules
-    case PACUpdateFailed
-    case PACUpdatedByGFWList
-    case FailedToDownloadGFWList
-    case FailedToWriteGFWList
-    case FailedToUpdatePAC
-    case UpdatingPACRules
-    case PACUpdateError
-    case PACUpdateSuccess
     case PACUpdateNotification
-    // updatePac 主流程提示
-    case UpdatingPacRules = "UpdatingPacRules" // Updating Pac Rules ...
-    case PacUpdatedByUserRules = "PacUpdatedByUserRules" // PAC has been updated by User Rules.
-    case PacUpdateFailedByUserRules = "PacUpdateFailedByUserRules" // It's failed to update PAC by User Rules.
-    case UpdatePacError = "UpdatePacError" // updatePac error: \(error)
-    // GFWList 相关提示
-    case InvalidGfwUrl = "InvalidGfwUrl" // Failed to download latest GFW List: url is not valid
-    case GfwListDownloadFailed = "GfwListDownloadFailed" // Failed to download latest GFW List.
-    case GfwListDownloadError = "GfwListDownloadError" // Failed to download latest GFW List: \(error)
-    case GfwListWriteFailed = "GfwListWriteFailed" // Failed to write latest GFW List.
-    case GfwListUpdated = "GfwListUpdated" // gfwList has been updated
-    // PAC 更新提示
-    case PacUpdatedByGfwList = "PacUpdatedByGfwList" // PAC has been updated by latest GFW List.
-    case PacUpdateFailedByCurl = "PacUpdateFailedByCurl" // Failed to update PAC by curl method.
-    // dns settings
+
+    // MARK: - PAC Notifications & Errors
+    case UpdatingPacRules
+    case PacUpdatedByUserRules
+    case PacUpdateFailedByUserRules
+    case UpdatePacError
+    case InvalidGfwUrl
+    case GfwListDownloadFailed
+    case GfwListDownloadError
+    case GfwListWriteFailed
+    case GfwListUpdated
+    case PacUpdatedByGfwList
+    case PacUpdateFailedByCurl
+
+    // MARK: - DNS Settings
     case DnsConfiguration
     case DnsJsonFormatTip
     case ViewConfiguration
     case Help
     case Notification
-    case DnsInvalidUTF8 = "DnsInvalidUTF8" // Error: 输入内容无法编码为 UTF-8
-    case DnsJSONFormatError = "DnsJSONFormatError" // Error: JSON 格式错误 - \(error.localizedDescription)
-    case DnsFormatEncodingFail = "DnsFormatEncodingFail" // Error: 格式化后内容无法编码为字符串
-    case DnsSaveSuccess = "DnsSaveSuccess" // DNS 配置保存成功
-    case DnsSaveFail = "DnsSaveFail" // Error: 保存 DNS 配置失败 - \(error.localizedDescription)
-    // subscription form
+    case DnsInvalidUTF8
+    case DnsJSONFormatError
+    case DnsFormatEncodingFail
+    case DnsSaveSuccess
+    case DnsSaveFail
+
+    // MARK: - Subscription Settings
     case SubscriptionSettings
     case SubscriptionSettingsSubHead
     case SubscriptionUrl
-    case sort
-    case updateInterval
+    case Sort
+    case UpdateInterval
     case AddSubscription
     case EditSubscription
     case SyncAllSubscriptionTitle
@@ -156,28 +155,30 @@ enum LanguageLabel: String, CaseIterable {
     case SyncAllSubscriptionTip
     case SyncSubscriptionNow
     case SyncSubscriptionIng
-    // routing settings
+
+    // MARK: - Routing Settings
     case RoutingSettings
     case RoutingSettingsSubHead
     case AddRoutingRule
     case EditRoutingRule
-    case domainStrategy
-    case domainMatcher
+    case DomainStrategy
+    case DomainMatcher
     case Direct
     case Proxy
     case Block
-    // 自定义规则填写说明
-    case CustomRuleGuideTitle          // 标题: “自定义规则填写说明”
-    case CustomRuleGuideDescription    // 说明: “每行填写一个规则，可为域名、IP 或 预定义列表。”
-    case CustomRulePriorityDescription // 说明: “优先级: 域名阻断 -> 域名代理 -> ...”
-    // 规则格式说明部分
-    case CustomRuleDomainIntro         // “• 域名：”
-    case CustomRuleDomainExample       // “如 example.com、*.google.com”
-    case CustomRuleIPIntro             // “• IP：”
-    case CustomRuleIPExample           // “如 8.8.8.8、192.168.0.0/16”
-    case CustomRulePredefinedIntro     // “• 预定义：”
-    case CustomRulePredefinedExample   // “如 geoip:private、geosite:cn、localhost”
-    // Profile Settings
+
+    // MARK: - Custom Rules Guide
+    case CustomRuleGuideTitle
+    case CustomRuleGuideDescription
+    case CustomRulePriorityDescription
+    case CustomRuleDomainIntro
+    case CustomRuleDomainExample
+    case CustomRuleIPIntro
+    case CustomRuleIPExample
+    case CustomRulePredefinedIntro
+    case CustomRulePredefinedExample
+
+    // MARK: - Profile Settings
     case ProfileSettings
     case ProfileSettingsSubHead
     case `Protocol`
@@ -213,8 +214,8 @@ enum LanguageLabel: String, CaseIterable {
     case TTI
     case UplinkCapacity
     case DownloadCapacity
-    case xhttpPath
-    case xhttpHost
+    case XhttpPath
+    case XhttpHost
     case AllowInsecure
     case ProfileRemark
     case Sni
@@ -227,7 +228,24 @@ enum LanguageLabel: String, CaseIterable {
     case TransportSettings
     case ServerSettings
     case StreamSettings
-    // menu
+
+    // MARK: - Hysteria2 Settings
+    case Hysteria2Configuration
+    case ObfuscationSettings
+    case ObfsType
+    case ObfsPassword
+    case AuthenticationSettings
+    case AuthType
+    case None
+    case Token
+    case AuthPassword
+    case BandwidthSettings
+    case UploadBandwidth
+    case DownloadBandwidth
+    case AdvancedSettings
+    case HopInterval
+
+    // MARK: - Menu Operations
     case CoreOn
     case CoreOff
     case TurnCoreOff
@@ -244,10 +262,10 @@ enum LanguageLabel: String, CaseIterable {
     case TunnelMode
     case RoutingList
     case ServerList
-    case goSubscriptionSettings
-    case goRoutingSettings
-    case goServerSettings
-    case goPreferences
+    case GoSubscriptionSettings
+    case GoRoutingSettings
+    case GoServerSettings
+    case GoPreferences
     case LatencyTest
     case Testing
     case ImportServersFromClipboard
@@ -258,7 +276,8 @@ enum LanguageLabel: String, CaseIterable {
     case Quit
     case On
     case Off
-    // help page
+
+    // MARK: - Help & Diagnostics
     case HelpPageTitle
     case HelpPageSubHead
     case GithubIssues
@@ -283,7 +302,6 @@ enum LanguageLabel: String, CaseIterable {
     case PleaseManuallyOpenBackgroundActivity
     case Fix
     case PingProblem
-    // problem descriptions
     case V2rayUToolProblem
     case BackgroundProblem
     case GeoipProblem
@@ -294,7 +312,8 @@ enum LanguageLabel: String, CaseIterable {
     case FaqSubtitle
     case SubmitIssue
     case RunDiagnostic
-    // table fields
+
+    // MARK: - Table Fields
     case TableFieldSort
     case TableFieldRemark
     case TableFieldUrl
@@ -325,17 +344,18 @@ enum LanguageLabel: String, CaseIterable {
     case MoveToBottom
     case MoveUp
     case MoveDown
-    // about
+
+    // MARK: - About Page
     case Version
     case Build
     case CoreVersion
     case RelatedFileLocations
-    case ClickAndOpenInFinder // 点击路径可在 Finder 打开
-    case OpenInFinder // 在 Finder 打开
+    case ClickAndOpenInFinder
+    case OpenInFinder
     case OpenSourceProject
-    case OpenSourceLicense // 遵循 GNU GPL v3.0 许可协议
-    case OpenSourceLibraries     // 引用开源库
-    case UsedButNotLimitedTo     // 有用到且不限于以下
+    case OpenSourceLicense
+    case OpenSourceLibraries
+    case UsedButNotLimitedTo
     case OpenInBrowser
     case Copyright
     case AllRightsReserved
@@ -347,61 +367,55 @@ enum LanguageLabel: String, CaseIterable {
     case Selected
     case Proxies
     case PingAllProxies
-    // core update
-    case CoreSettingsTitle                // Core Settings
-    case CoreSettingsSubtitle          // Manage your core versions
-    // 基本操作
-    case CheckLatestVersion             // 检查最新版本
-    case LocalCoreDirectory             // 本地 Xray Core 目录
-    case FileDirectory                        // 文件目录:
-    case LocalCoreVersionDetail     // 本地 Xray Core 版本明细
-    case GithubLatestVersion           // GitHub 最新版本
-    case DownloadAndReplace             // 下载并替换
-    // 下载弹窗
-    case Downloading                            // 正在下载:
-    case DownloadedStatus                 // 已下载: %@ / 总大小: %@
-    case CancelDownload                     // 取消下载
-    case DownloadHint                          // 下载提示
-    case DownloadCanceled                  // 下载已取消
-    case DownloadURLInvalid              // 下载地址错误: %@
-    case ReplaceSuccess                      // 替换成功！
-    case OperationFailed                   // 操作失败: %@
+
+    // MARK: - Core Update Management
+    case CoreSettingsTitle
+    case CoreSettingsSubtitle
+    case CheckLatestVersion
+    case LocalCoreDirectory
+    case FileDirectory
+    case LocalCoreVersionDetail
+    case GithubLatestVersion
+    case DownloadAndReplace
+    case Downloading
+    case DownloadedStatus
+    case CancelDownload
+    case DownloadHint
+    case DownloadCanceled
+    case DownloadURLInvalid
+    case ReplaceSuccess
+    case OperationFailed
     case DownloadTimeoutError
     case DownloadSaveFailed
     case DownloadErrorOccurred
-    case ClearLogFileFailed            // 清除日志文件失败
-    case PortInUse                        // 端口已被占用
-    case PortInUseTip                       // 端口已被占用, 请更换其他端口号。
-    case Install  // 安装
-    case InstallTitle                // 安装V2rayUTool工具
-    case InstallPermissionTip  // "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool"
-    case InstallFailed                // 安装失败
-    case InstallFailedTip // 安装 V2rayUTool 失败: %@
-    case InstallFailedManual // 请手动运行安装脚本进行安装。
-    case ReplaceCore                            // 替换Core
-    case releaseNodesTitle // release Nodes
-    case SkipVersion  //  skip Version
-    case InstallUpdate  // install Update
-    case CheckingForUpdates // Checking For Updates ...
-    case InstallV2rayU // Install V2rayU
-    case NewVersionTip  // "A new version (\(release.tagName)) is available!"
-    case AlreadyLastestVersion  // Already Lastest Version
-    case AlreadyLastestToast  // 当前 %@ 已经是最新版了
-    case V2rayUUpdateTitle  // V2rayU Update
-    // FAQ
+    case ClearLogFileFailed
+    case PortInUse
+    case PortInUseTip
+    case Install
+    case InstallTitle
+    case InstallPermissionTip
+    case InstallFailed
+    case InstallFailedTip
+    case InstallFailedManual
+    case ReplaceCore
+    case ReleaseNotesTitle
+    case SkipVersion
+    case InstallUpdate
+    case CheckingForUpdates
+    case InstallV2rayU
+    case NewVersionTip
+    case AlreadyLatestVersion
+    case AlreadyLatestToast
+    case V2rayUUpdateTitle
+
+    // MARK: - FAQ
     case FaqHowItWorks
     case FaqConfigLocation
-    case FaqConfigLocationDetail
     case FaqOperationModes
-    case FaqOperationModesDetail
     case FaqModeRoutingRelation
     case FaqRoutingPriority
-    case FaqRoutingPriorityDetail
     case FaqTrueGlobalProxy
-    case FaqTrueGlobalProxyDetail
     case FaqManualCoreUpdate
-    case FaqManualCoreUpdateDetail
-    // FAQ 详细答案 (带参数)
     case FaqHowItWorksDetail
     case FaqConfigLocationDetail2
     case FaqOperationModesDetail2
@@ -409,7 +423,8 @@ enum LanguageLabel: String, CaseIterable {
     case FaqRoutingPriorityDetail2
     case FaqTrueGlobalProxyDetail2
     case FaqManualCoreUpdateDetail2
-    // Diagnostics - 检查步骤标题
+
+    // MARK: - Diagnostics - Check Item Titles
     case DiagNetworkConnectivity
     case DiagSystemProxy
     case DiagFirewall
@@ -424,12 +439,14 @@ enum LanguageLabel: String, CaseIterable {
     case DiagPingLatency
     case DiagLogAnalysis
     case DiagVPNConflict
-    // Diagnostics - 状态描述
+
+    // MARK: - Diagnostics - Status
     case DiagPending
     case DiagChecking
     case DiagPassed
     case DiagFailed
-    // Diagnostics - 详细问题描述
+
+    // MARK: - Diagnostics - Problem Descriptions
     case DiagNetUnavailable
     case DiagNetDNSFailed
     case DiagNetIPFailed
@@ -454,7 +471,8 @@ enum LanguageLabel: String, CaseIterable {
     case DiagGeoipMissing
     case DiagLatencyHigh
     case DiagLatencyFailed
-    // Diagnostics - 动作按钮
+
+    // MARK: - Diagnostics - Actions
     case DiagOpenNetworkSettings
     case DiagFixNow
     case DiagRestartCore
@@ -462,22 +480,24 @@ enum LanguageLabel: String, CaseIterable {
     case DiagCheckNetwork
     case DiagViewConfig
     case DiagReTest
-    // Diagnostics - 特殊模式说明
+
+    // MARK: - Diagnostics - Special Modes
     case DiagProxyNotNeededTunnel
     case DiagProxyNotNeededManual
     case DiagProxyNotNeededOff
     case DiagProxyRequired
-    // Diagnostics - Core 架构
+
+    // MARK: - Diagnostics - Core Architecture
     case DiagCoreArch
     case DiagCoreArchCorrect
     case DiagCoreArchMismatch
-    // Diagnostics - 基础文件
+
+    // MARK: - Diagnostics - Files
     case DiagV2rayUToolInstall
     case DiagConfigFile
     case DiagConfigFileExists
     case DiagConfigFileMissing
     case DiagConfigFileEmpty
-    // Diagnostics - Geo 文件
     case DiagGeositeFile
     case DiagGeositeMissing
 }

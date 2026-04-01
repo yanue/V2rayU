@@ -39,7 +39,7 @@ struct RoutingFormView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         getTextFieldWithLabel(label: .Remark, text: $item.remark)
                         HStack {
-                            getTextLabel(label: .domainStrategy)
+                            getTextLabel(label: .DomainStrategy)
                             Spacer()
                             Picker("", selection: $item.domainStrategy) {
                                 ForEach(domainStrategys, id: \.self) { pick in
@@ -48,7 +48,7 @@ struct RoutingFormView: View {
                             }
                         }
                         HStack {
-                            getTextLabel(label: .domainMatcher)
+                            getTextLabel(label: .DomainMatcher)
                             Spacer()
                             Picker("", selection: $item.domainMatcher) {
                                 ForEach(domainMatchers, id: \.self) { pick in

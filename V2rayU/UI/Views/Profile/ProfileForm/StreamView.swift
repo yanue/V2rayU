@@ -64,8 +64,8 @@ struct ConfigStreamView: View {
                 }
                 
                 if item.network == .xhttp {
-                    getTextFieldWithLabel(label: .xhttpHost, text: $item.host)
-                    getTextFieldWithLabel(label: .xhttpPath, text: $item.path)
+                    getTextFieldWithLabel(label: .XhttpHost, text: $item.host)
+                    getTextFieldWithLabel(label: .XhttpPath, text: $item.path)
                     getTextEditorWithLabel(label: .Extra, text: $item.extra)
                 }
             }
