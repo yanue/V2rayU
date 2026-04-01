@@ -201,8 +201,10 @@ struct LegacyImportView: View {
     /// 检查旧版数据
     private func checkLegacyData() {
         Task {
-            let serverList = UserDefaults.standard.array(forKey: "v2rayServerList") as? [String] ?? []
-            let subList = UserDefaults.standard.array(forKey: "v2raySubList") as? [String] ?? []
+            // v4 版本使用 net.yanue.V2rayU domain
+            let defaults = UserDefaults(suiteName: "net.yanue.V2rayU") ?? .standard
+            let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
+            let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
 
             await MainActor.run {
                 legacyDataCount = (serverList.count, subList.count)

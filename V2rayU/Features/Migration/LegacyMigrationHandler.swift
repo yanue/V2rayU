@@ -31,13 +31,14 @@ class LegacyV2rayItem: NSObject, NSCoding {
     }
 
     required init(coder decoder: NSCoder) {
-        self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
-        self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
-        self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
-        self.isValid = decoder.decodeBool(forKey: "IsValid")
-        self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
-        self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? ""
-        self.speed = decoder.decodeObject(forKey: "Speed") as? String ?? ""
+        // 尝试多种可能的大小写和命名方式
+        self.name = decoder.decodeObject(forKey: "Name") as? String ?? decoder.decodeObject(forKey: "name") as? String ?? ""
+        self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? decoder.decodeObject(forKey: "remark") as? String ?? ""
+        self.json = decoder.decodeObject(forKey: "Json") as? String ?? decoder.decodeObject(forKey: "json") as? String ?? decoder.decodeObject(forKey: "JSON") as? String ?? ""
+        self.isValid = decoder.decodeBool(forKey: "IsValid") || decoder.decodeBool(forKey: "isValid")
+        self.url = decoder.decodeObject(forKey: "Url") as? String ?? decoder.decodeObject(forKey: "url") as? String ?? decoder.decodeObject(forKey: "URL") as? String ?? ""
+        self.subscribe = decoder.decodeObject(forKey: "Subscribe") as? String ?? decoder.decodeObject(forKey: "subscribe") as? String ?? ""
+        self.speed = decoder.decodeObject(forKey: "Speed") as? String ?? decoder.decodeObject(forKey: "speed") as? String ?? ""
     }
 
     func encode(with coder: NSCoder) {
@@ -51,11 +52,13 @@ class LegacyV2rayItem: NSObject, NSCoding {
     }
 
     /// 从 UserDefaults 加载指定名称的配置
-    /// - Parameter name: 配置的完整名称（包括 "config." 前缀）
+    /// - Parameters:
+    ///   - name: 配置的完整名称（包括 "config." 前缀）
+    ///   - defaults: UserDefaults 实例
     /// - Returns: 解析后的 V2rayItem 对象，失败返回 nil
-    static func load(name: String) -> LegacyV2rayItem? {
+    static func load(name: String, defaults: UserDefaults) -> LegacyV2rayItem? {
         // 从 UserDefaults 获取编码后的数据
-        guard let myModelData = UserDefaults.standard.data(forKey: name) else {
+        guard let myModelData = defaults.data(forKey: name) else {
             logger.debug("LegacyV2rayItem.load: No data for key '\(name)'")
             return nil
         }
@@ -63,18 +66,47 @@ class LegacyV2rayItem: NSObject, NSCoding {
         do {
             // 创建解档器
             let unarchiver = try NSKeyedUnarchiver(forReadingFrom: myModelData)
+            unarchiver.requiresSecureCoding = false
 
             // 注册类名映射，解决 v4 和 v5 类名不同的问题
             // v4 版本可能使用不同的 bundle id 或类名
             unarchiver.setClass(LegacyV2rayItem.self, forClassName: "V2rayU.V2rayItem")
             unarchiver.setClass(LegacyV2rayItem.self, forClassName: "V2rayItem")
             unarchiver.setClass(LegacyV2rayItem.self, forClassName: "yanue.V2rayU.V2rayItem")
+            unarchiver.setClass(NSString.self, forClassName: "NSString")
 
             // 解档根对象
             let result = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey)
-            logger.debug("LegacyV2rayItem.load: Successfully loaded '\(name)'")
+            logger.debug("LegacyV2rayItem.load: Successfully loaded '\(name)', result type: \(String(describing: type(of: result)))")
 
-            return result as? LegacyV2rayItem
+            // 调试：检查解档结果的所有属性
+            if let item = result as? LegacyV2rayItem {
+                logger.debug("LegacyV2rayItem.load: decoded - name='\(item.name)', remark='\(item.remark)', url='\(item.url.count > 30 ? String(item.url.prefix(30)) + "..." : item.url)', json.count=\(item.json.count), subscribe='\(item.subscribe)', speed='\(item.speed)', isValid=\(item.isValid)")
+                return item
+            } else {
+                // 尝试直接解码所有属性
+                logger.debug("LegacyV2rayItem.load: result is nil or not LegacyV2rayItem, trying direct decode")
+                let directName = unarchiver.decodeObject(forKey: "Name") as? String ?? ""
+                let directRemark = unarchiver.decodeObject(forKey: "Remark") as? String ?? ""
+                let directUrl = unarchiver.decodeObject(forKey: "Url") as? String ?? ""
+                let directJson = unarchiver.decodeObject(forKey: "Json") as? String ?? ""
+                let directSubscribe = unarchiver.decodeObject(forKey: "Subscribe") as? String ?? ""
+                let directSpeed = unarchiver.decodeObject(forKey: "Speed") as? String ?? ""
+                let directIsValid = unarchiver.decodeBool(forKey: "IsValid")
+                logger.debug("LegacyV2rayItem.load: direct - name='\(directName)', remark='\(directRemark)', url='\(directUrl.count > 30 ? String(directUrl.prefix(30)) + "..." : directUrl)', json='\(directJson.prefix(50))...', subscribe='\(directSubscribe)', speed='\(directSpeed)', isValid=\(directIsValid)")
+
+                // 手动创建 LegacyV2rayItem 并填充数据
+                let item = LegacyV2rayItem()
+                item.name = directName
+                item.remark = directRemark
+                item.url = directUrl
+                item.json = directJson
+                item.subscribe = directSubscribe
+                item.speed = directSpeed
+                item.isValid = directIsValid
+                logger.debug("LegacyV2rayItem.load: manually created item")
+                return item
+            }
         } catch {
             logger.error("LegacyV2rayItem.load: Failed to load '\(name)': \(error)")
             return nil
@@ -95,10 +127,10 @@ class LegacyV2raySubItem: NSObject, NSCoding {
     }
 
     required init(coder decoder: NSCoder) {
-        self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
-        self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
-        self.isValid = decoder.decodeBool(forKey: "IsValid")
-        self.url = decoder.decodeObject(forKey: "Url") as? String ?? ""
+        self.name = decoder.decodeObject(forKey: "Name") as? String ?? decoder.decodeObject(forKey: "name") as? String ?? ""
+        self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? decoder.decodeObject(forKey: "remark") as? String ?? ""
+        self.isValid = decoder.decodeBool(forKey: "IsValid") || decoder.decodeBool(forKey: "isValid")
+        self.url = decoder.decodeObject(forKey: "Url") as? String ?? decoder.decodeObject(forKey: "url") as? String ?? decoder.decodeObject(forKey: "URL") as? String ?? ""
     }
 
     func encode(with coder: NSCoder) {
@@ -109,11 +141,13 @@ class LegacyV2raySubItem: NSObject, NSCoding {
     }
 
     /// 从 UserDefaults 加载指定名称的订阅
-    /// - Parameter name: 订阅的完整名称（包括 "subscribe." 前缀）
+    /// - Parameters:
+    ///   - name: 订阅的完整名称（包括 "subscribe." 前缀）
+    ///   - defaults: UserDefaults 实例
     /// - Returns: 解析后的 V2raySubItem 对象，失败返回 nil
-    static func load(name: String) -> LegacyV2raySubItem? {
+    static func load(name: String, defaults: UserDefaults) -> LegacyV2raySubItem? {
         // 从 UserDefaults 获取编码后的数据
-        guard let myModelData = UserDefaults.standard.data(forKey: name) else {
+        guard let myModelData = defaults.data(forKey: name) else {
             logger.debug("LegacyV2raySubItem.load: No data for key '\(name)'")
             return nil
         }
@@ -162,6 +196,12 @@ actor LegacyMigrationHandler {
     /// 标记是否已询问过用户的 UserDefaults key（用于首次启动）
     private let hasAskedKey = "legacyDataAsked_v1"
 
+    /// 获取 v4 版本数据使用的 UserDefaults
+    /// - Returns: v4 版本数据存储的 UserDefaults
+    nonisolated private func getLegacyDefaults() -> UserDefaults {
+        return UserDefaults(suiteName: "net.yanue.V2rayU") ?? .standard
+    }
+
     /// 检查是否已经完成迁移
     /// - Returns: 如果已迁移返回 true
     nonisolated func hasMigrated() -> Bool {
@@ -186,8 +226,9 @@ actor LegacyMigrationHandler {
     /// 检查是否有旧版数据可迁移
     /// - Returns: (服务器数量, 订阅数量)
     nonisolated func checkLegacyData() -> (servers: Int, subscriptions: Int) {
-        let serverList = UserDefaults.standard.array(forKey: "v2rayServerList") as? [String] ?? []
-        let subList = UserDefaults.standard.array(forKey: "v2raySubList") as? [String] ?? []
+        let defaults = getLegacyDefaults()
+        let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
+        let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
         return (serverList.count, subList.count)
     }
 
@@ -263,9 +304,10 @@ actor LegacyMigrationHandler {
         logger.info("Legacy migration: Starting migration process (user triggered)")
 
         // 读取服务器列表和订阅列表
-        // v4 版本使用固定的 key 存储列表
-        let serverList = UserDefaults.standard.array(forKey: "v2rayServerList") as? [String] ?? []
-        let subList = UserDefaults.standard.array(forKey: "v2raySubList") as? [String] ?? []
+        // v4 版本使用 net.yanue.V2rayU domain 的 UserDefaults 存储
+        let defaults = getLegacyDefaults()
+        let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
+        let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
 
         logger.info("Legacy migration: Found \(serverList.count) servers, \(subList.count) subscriptions")
 
@@ -288,7 +330,7 @@ actor LegacyMigrationHandler {
             for subName in subList {
                 logger.debug("Legacy migration: Loading subscription '\(subName)'")
 
-                guard let legacySub = LegacyV2raySubItem.load(name: subName) else {
+                guard let legacySub = LegacyV2raySubItem.load(name: subName, defaults: defaults) else {
                     logger.warning("Legacy migration: Failed to load subscription '\(subName)'")
                     continue
                 }
@@ -320,12 +362,15 @@ actor LegacyMigrationHandler {
             for serverName in serverList {
                 logger.debug("Legacy migration: Loading server '\(serverName)'")
 
-                guard let legacyServer = LegacyV2rayItem.load(name: serverName) else {
+                guard let legacyServer = LegacyV2rayItem.load(name: serverName, defaults: defaults) else {
                     logger.warning("Legacy migration: Failed to load server '\(serverName)'")
                     continue
                 }
 
                 logger.debug("Legacy migration: Server '\(serverName)' remark='\(legacyServer.remark)', url='\(legacyServer.url)', json.count=\(legacyServer.json.count)")
+
+                // 调试：检查 url 和 json 是否有效
+                logger.debug("Legacy migration: url.isEmpty=\(legacyServer.url.isEmpty), json.isEmpty=\(legacyServer.json.isEmpty)")
 
                 // 解析为新的 ProfileEntity
                 if let profile = await parseToProfile(legacyServer: legacyServer, subidMapping: subidMapping) {
@@ -337,7 +382,7 @@ actor LegacyMigrationHandler {
 
                     logger.info("Legacy migration: Migrated server '\(profile.remark)'")
                 } else {
-                    logger.warning("Legacy migration: Failed to parse server '\(serverName)'")
+                    logger.warning("Legacy migration: Failed to parse server '\(serverName)' - no valid URI or JSON data")
                 }
             }
 
@@ -376,6 +421,9 @@ actor LegacyMigrationHandler {
         profile.remark = legacyServer.remark
         profile.shareUri = legacyServer.url
 
+        // 调试：打印所有字段
+        logger.debug("LegacyMigration: remark='\(legacyServer.remark)', url='\(legacyServer.url)', json.count=\(legacyServer.json.count), subscribe='\(legacyServer.subscribe)', speed='\(legacyServer.speed)', isValid=\(legacyServer.isValid), name='\(legacyServer.name)'")
+
         // 解析延迟速度（格式如 "123ms"）
         if let speedStr = Int(legacyServer.speed.replacingOccurrences(of: "ms", with: "")) {
             profile.speed = speedStr > 0 ? speedStr : -1
@@ -383,21 +431,27 @@ actor LegacyMigrationHandler {
 
         // 关联订阅
         let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
-        if let newSubId = subidMapping[legacySubId] {
+        if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
             profile.subid = newSubId
             logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)' -> '\(newSubId)'")
         }
 
+        // 如果有 name 字段，尝试从 name 中提取 JSON（某些 v4 版本可能将 JSON 存储在 name 中）
+        if legacyServer.json.isEmpty && !legacyServer.name.isEmpty && legacyServer.name.hasPrefix("config.") {
+            // 尝试从 name 对应的 key 读取原始 JSON
+            logger.debug("LegacyMigration: json is empty, trying to find JSON from alternative storage")
+        }
+
         // 优先使用分享链接 URI 解析
         if !legacyServer.url.isEmpty {
-            logger.debug("LegacyMigration: Attempting to parse from URI")
-            if var importedProfile = importFromUri(uri: legacyServer.url) {
-                // 覆盖基本信息
-                importedProfile.remark = legacyServer.remark
-                importedProfile.subid = profile.subid
-                importedProfile.speed = profile.speed
-                importedProfile.shareUri = legacyServer.url
-                return importedProfile
+            logger.debug("LegacyMigration: Attempting to parse from URI, url.prefix(50)=\(legacyServer.url.prefix(50))")
+            if let importedProfile = importFromUri(uri: legacyServer.url) {
+                // 覆盖基本信息，保留从 legacyServer 获取的 subid 和 speed
+                var profile = importedProfile
+                profile.remark = legacyServer.remark
+                profile.shareUri = legacyServer.url
+                logger.debug("LegacyMigration: URI parsed successfully for '\(legacyServer.remark)'")
+                return profile
             } else {
                 logger.debug("LegacyMigration: URI parsing failed")
             }
@@ -406,15 +460,31 @@ actor LegacyMigrationHandler {
         // 尝试从 JSON 配置解析
         if !legacyServer.json.isEmpty {
             logger.debug("LegacyMigration: Attempting to parse from JSON, length=\(legacyServer.json.count)")
-            if var parsedProfile = parseFromJson(json: legacyServer.json) {
+            if let parsedProfile = parseFromJson(json: legacyServer.json) {
                 // 覆盖基本信息
-                parsedProfile.remark = legacyServer.remark
-                parsedProfile.subid = profile.subid
-                parsedProfile.speed = profile.speed
-                parsedProfile.shareUri = legacyServer.url
-                return parsedProfile
+                var profile = parsedProfile
+                profile.remark = legacyServer.remark
+                profile.shareUri = legacyServer.url
+                logger.debug("LegacyMigration: JSON parsed successfully for '\(legacyServer.remark)'")
+                return profile
             } else {
                 logger.debug("LegacyMigration: JSON parsing failed")
+            }
+        }
+
+        // 尝试直接解析 remark 字段（某些 v4 版本可能将 URI 存储在 remark 中）
+        if !legacyServer.remark.isEmpty {
+            if legacyServer.remark.hasPrefix("vmess://") || legacyServer.remark.hasPrefix("vless://") ||
+               legacyServer.remark.hasPrefix("trojan://") || legacyServer.remark.hasPrefix("ss://") ||
+               legacyServer.remark.hasPrefix("ssr://") {
+                logger.debug("LegacyMigration: Trying to parse from remark (URI format)")
+                if let importedProfile = importFromUri(uri: legacyServer.remark) {
+                    var profile = importedProfile
+                    profile.remark = legacyServer.remark
+                    profile.shareUri = legacyServer.remark
+                    logger.debug("LegacyMigration: Parsed from remark successfully")
+                    return profile
+                }
             }
         }
 
