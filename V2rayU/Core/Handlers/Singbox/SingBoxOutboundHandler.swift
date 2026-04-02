@@ -69,6 +69,8 @@ class SingboxOutboundHandler {
             server: profile.address,
             server_port: profile.port,
             uuid: profile.password, // vmess 用 id
+            security: profile.encryption.isEmpty ? "auto" : profile.encryption,
+            alter_id: profile.alterId,
             tls: buildTLS(),
             transport: buildTransport()
         )
@@ -92,12 +94,10 @@ class SingboxOutboundHandler {
             type: "socks",
             tag: "proxy",
             server: profile.address,
-            server_port: profile.port,
-            tls: buildTLS(),
-            transport: buildTransport()
+            server_port: profile.port
         )
     }
-    
+
     private func buildTLS() -> TLSConfig? {
         guard profile.security == .tls || profile.security == .reality else { return nil }
         
@@ -172,9 +172,6 @@ class SingboxOutboundHandler {
             
         case .domainsocket:
             return TransportConfig(type: "domainsocket")
-            
-        default:
-            return nil
         }
     }
 

@@ -164,6 +164,9 @@ actor V2rayLaunch {
             sockPort = String(getSocksProxyPort())
         }
         if mode == .pac {
+            if !GeneratePACFile(rewrite: false) {
+                noticeTip(title: "PAC 生成失败", informativeText: "无法生成 proxy.js，PAC 模式可能不会生效")
+            }
             pacUrl = getPacUrl()
         }
         do {

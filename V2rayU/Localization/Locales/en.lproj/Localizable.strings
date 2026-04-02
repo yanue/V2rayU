@@ -249,6 +249,7 @@
 "ViewErrorLog" = "View Error Log";
 "ViewLogFiles" = "View Log Files...";
 "ClearAllLogs" = "Clear All Logs";
+"Logs" = "Logs";
 "ViewConfigJson" = "View config.json";
 "ViewPacFile" = "View PAC File";
 "PacMode" = "PAC Mode";

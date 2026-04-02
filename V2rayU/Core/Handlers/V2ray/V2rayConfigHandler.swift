@@ -127,7 +127,7 @@ class V2rayConfigHandler {
             let outboundFreedom = V2rayOutbound()
             outboundFreedom.protocol = .freedom
             outboundFreedom.tag = "direct"
-            outboundFreedom.settings = V2rayOutboundFreedom()
+            outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
 
             // outbound Blackhole
             let outboundBlackhole = V2rayOutbound()

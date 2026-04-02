@@ -24,8 +24,8 @@ struct ConfigServerView: View {
             VStack {
                 getTextFieldWithLabel(label: .Remark, text: $item.remark)
                 
-                // 需要禁用显示: socks, dns, http, blackhole, freedom
-                getPickerWithLabel(label: .`Protocol`, selection: $item.protocol,ignore: [.socks, .dns, .http, .blackhole, .freedom])
+                // 需要禁用显示: dns, http, blackhole, freedom
+                getPickerWithLabel(label: .`Protocol`, selection: $item.protocol,ignore: [.dns, .http, .blackhole, .freedom])
 
                 if item.protocol == .trojan {
                     getTextFieldWithLabel(label: .Address, text: $item.address)
@@ -62,6 +62,11 @@ struct ConfigServerView: View {
                         }
                     }
                 }
+
+                if item.protocol == .socks {
+                    getTextFieldWithLabel(label: .Address, text: $item.address)
+                    getNumFieldWithLabel(label: .Port, num: $item.port)
+                }
             }
             .padding() // 1. 内边距
             .background() // 2. 然后背景
@@ -74,4 +79,3 @@ struct ConfigServerView: View {
         }
     }
 }
-

@@ -67,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             AppState.shared.appDidLaunch()
 
             // 检查并迁移旧版数据（首次启动时）
-            await LegacyMigrationHandler.shared.checkAndPromptForMigration()
+            _ = await LegacyMigrationHandler.shared.checkAndPromptForMigration()
         }
     }
     

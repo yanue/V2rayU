@@ -255,6 +255,7 @@ enum LanguageLabel: String, CaseIterable {
     case ViewErrorLog
     case ViewLogFiles
     case ClearAllLogs
+    case Logs
     case ViewConfigJson
     case ViewPacFile
     case PacMode

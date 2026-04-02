@@ -50,13 +50,16 @@ struct ProfileListView: View {
     }
 
     var filteredAndSortedItems: [ProfileEntity] {
-        viewModel.list.filter { item in
+        let filteredItems = viewModel.list.filter { item in
             let itemGroupName = getGroupName(for: item)
             return (selectGroup.isEmpty || selectGroup == itemGroupName) &&
                 (searchText.isEmpty ||
                  item.address.lowercased().contains(searchText.lowercased()) ||
                  item.remark.lowercased().contains(searchText.lowercased()))
         }
+
+        guard !sortOrder.isEmpty else { return filteredItems }
+        return filteredItems.sorted(using: sortOrder)
     }
     
     private func getGroupName(for item: ProfileEntity) -> String {
@@ -472,29 +475,54 @@ struct ProfileListView: View {
     }
 
     private func moveToTop(item: ProfileEntity) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
-        viewModel.list.remove(at: index)
-        viewModel.list.insert(item, at: 0)
-        viewModel.updateSortOrderInDBAsync()
+        move(item: item, toVisibleIndex: 0)
     }
 
     private func moveToBottom(item: ProfileEntity) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }) else { return }
-        viewModel.list.remove(at: index)
-        viewModel.list.append(item)
-        viewModel.updateSortOrderInDBAsync()
+        move(item: item, toVisibleIndex: max(filteredAndSortedItems.count - 1, 0))
     }
 
     private func moveUp(item: ProfileEntity) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }), index > 0 else { return }
-        viewModel.list.swapAt(index, index - 1)
-        viewModel.updateSortOrderInDBAsync()
+        guard let visibleIndex = filteredAndSortedItems.firstIndex(where: { $0.id == item.id }),
+              visibleIndex > 0 else { return }
+        move(item: item, toVisibleIndex: visibleIndex - 1)
     }
 
     private func moveDown(item: ProfileEntity) {
-        guard let index = viewModel.list.firstIndex(where: { $0.id == item.id }),
-              index < viewModel.list.count - 1 else { return }
-        viewModel.list.swapAt(index, index + 1)
+        guard let visibleIndex = filteredAndSortedItems.firstIndex(where: { $0.id == item.id }),
+              visibleIndex < filteredAndSortedItems.count - 1 else { return }
+        move(item: item, toVisibleIndex: visibleIndex + 1)
+    }
+
+    private func move(item: ProfileEntity, toVisibleIndex visibleIndex: Int) {
+        let visibleItems = filteredAndSortedItems
+        guard let sourceVisibleIndex = visibleItems.firstIndex(where: { $0.id == item.id }) else { return }
+
+        let clampedTargetIndex = min(max(visibleIndex, 0), max(visibleItems.count - 1, 0))
+        guard sourceVisibleIndex != clampedTargetIndex else { return }
+
+        var reorderedVisibleItems = visibleItems
+        let movingItem = reorderedVisibleItems.remove(at: sourceVisibleIndex)
+        reorderedVisibleItems.insert(movingItem, at: clampedTargetIndex)
+
+        let reorderedVisibleByUUID = Dictionary(uniqueKeysWithValues: reorderedVisibleItems.enumerated().map { ($1.uuid, $0) })
+
+        viewModel.list.sort { lhs, rhs in
+            let lhsVisibleOrder = reorderedVisibleByUUID[lhs.uuid]
+            let rhsVisibleOrder = reorderedVisibleByUUID[rhs.uuid]
+
+            switch (lhsVisibleOrder, rhsVisibleOrder) {
+            case let (l?, r?):
+                return l < r
+            case (_?, nil):
+                return true
+            case (nil, _?):
+                return false
+            case (nil, nil):
+                return lhs.sort < rhs.sort
+            }
+        }
+
         viewModel.updateSortOrderInDBAsync()
     }
 

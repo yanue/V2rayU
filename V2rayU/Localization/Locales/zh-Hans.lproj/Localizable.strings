@@ -250,6 +250,7 @@
 "ViewErrorLog" = "查看错误日志";
 "ViewLogFiles" = "查看日志文件...";
 "ClearAllLogs" = "清除所有日志";
+"Logs" = "日志";
 "ViewConfigJson" = "查看 config.json";
 "ViewPacFile" = "查看 PAC 文件";
 "PacMode" = "PAC 模式";

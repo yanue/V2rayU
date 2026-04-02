@@ -57,10 +57,11 @@ actor LocalHttpServer {
         await server.appendRoute("GET /*") { request in
             let path = request.path
             let requestedPath = path == "/" ? "/index.html" : path
+            let relativePath = requestedPath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
             // 安全过滤：规范化路径，防止 ../ 目录遍历攻击
             let baseURL = URL(fileURLWithPath: AppHomePath)
-            let resolvedURL = URL(fileURLWithPath: requestedPath, relativeTo: baseURL).standardized
+            let resolvedURL = baseURL.appendingPathComponent(relativePath).standardized
 
             // 确保解析后的路径仍在 AppHomePath 下
             guard resolvedURL.path.hasPrefix(baseURL.standardized.path) else {

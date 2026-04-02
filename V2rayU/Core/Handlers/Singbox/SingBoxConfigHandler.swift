@@ -70,9 +70,9 @@ class SingboxConfigHandler {
     
     func combine(_outbounds: [SingboxOutbound]) {
         // base
-        self.singbox.log.level = (V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info).rawValue
+        applyLogConfig(level: V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info)
         self.singbox.log.timestamp = true
-        if !self.forPing {
+        if !self.forPing && self.singbox.log.disabled != true {
             self.singbox.log.output = coreLogFilePath
         }
         var inbounds: [SingboxInbound] = []
@@ -80,8 +80,10 @@ class SingboxConfigHandler {
         // TUN模式配置
         if enableTun {
             // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
-            self.singbox.log.level = "warning"
-            self.singbox.log.output = tunLogFilePath
+            if self.singbox.log.disabled != true {
+                self.singbox.log.level = "warn"
+                self.singbox.log.output = tunLogFilePath
+            }
             /**
              {
                "type": "tun",
@@ -122,7 +124,8 @@ class SingboxConfigHandler {
             // DNS配置
             self.singbox.dns.servers = [
                 DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29")
+                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
             ]
             self.singbox.dns.rules = [
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),
@@ -199,5 +202,20 @@ class SingboxConfigHandler {
             self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
+    }
+
+    private func applyLogConfig(level: V2rayLogLevel) {
+        self.singbox.log.disabled = nil
+        self.singbox.log.output = nil
+
+        switch level {
+        case .warning:
+            self.singbox.log.level = "warn"
+        case .none:
+            self.singbox.log.disabled = true
+            self.singbox.log.level = "info"
+        default:
+            self.singbox.log.level = level.rawValue
+        }
     }
 }

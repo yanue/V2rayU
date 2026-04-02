@@ -40,9 +40,22 @@ struct ClashAPIConfig: Codable {
 
 // 日志配置
 struct LogConfig: Codable {
+    var disabled: Bool? = nil
     var level: String
     var output: String?
     var timestamp: Bool? = true
+
+    init(
+        disabled: Bool? = nil,
+        level: String,
+        output: String? = nil,
+        timestamp: Bool? = true
+    ) {
+        self.disabled = disabled
+        self.level = level
+        self.output = output
+        self.timestamp = timestamp
+    }
 }
 
 // Inbound
@@ -69,10 +82,76 @@ struct SingboxOutbound: Codable {
     var password: String? // trojan
     var method: String? // 仅ss
     var uuid: String? // vmess|vless
+    var security: String? // vmess
+    var alter_id: Int? // vmess
+    var global_padding: Bool? // vmess
+    var authenticated_length: Bool? // vmess
     var flow: String? // 新增支持 vless flow
     var domain_resolver: String?
+    var multiplex: SingboxMultiplexConfig?
     var tls: TLSConfig?
     var transport: TransportConfig?
+
+    init(
+        type: String,
+        tag: String? = nil,
+        server: String? = nil,
+        server_port: Int? = nil,
+        password: String? = nil,
+        method: String? = nil,
+        uuid: String? = nil,
+        security: String? = nil,
+        alter_id: Int? = nil,
+        global_padding: Bool? = nil,
+        authenticated_length: Bool? = nil,
+        flow: String? = nil,
+        domain_resolver: String? = nil,
+        multiplex: SingboxMultiplexConfig? = nil,
+        tls: TLSConfig? = nil,
+        transport: TransportConfig? = nil
+    ) {
+        self.type = type
+        self.tag = tag
+        self.server = server
+        self.server_port = server_port
+        self.password = password
+        self.method = method
+        self.uuid = uuid
+        self.security = security
+        self.alter_id = alter_id
+        self.global_padding = global_padding
+        self.authenticated_length = authenticated_length
+        self.flow = flow
+        self.domain_resolver = domain_resolver
+        self.multiplex = multiplex
+        self.tls = tls
+        self.transport = transport
+    }
+}
+
+struct SingboxMultiplexConfig: Codable {
+    var enabled: Bool
+    var `protocol`: String?
+    var max_connections: Int?
+    var min_streams: Int?
+    var max_streams: Int?
+    var padding: Bool?
+
+    init(
+        enabled: Bool,
+        protocol: String? = nil,
+        max_connections: Int? = nil,
+        min_streams: Int? = nil,
+        max_streams: Int? = nil,
+        padding: Bool? = nil
+    ) {
+        self.enabled = enabled
+        self.`protocol` = `protocol`
+        self.max_connections = max_connections
+        self.min_streams = min_streams
+        self.max_streams = max_streams
+        self.padding = padding
+    }
 }
 
 // Transport 配置

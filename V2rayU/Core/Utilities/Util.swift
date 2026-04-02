@@ -137,7 +137,8 @@ func GetIPAddresses() -> String? {
                 if addr.sa_family == UInt8(AF_INET) { // just ipv4
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     if getnameinfo(&addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST) == 0 {
-                        if let address = String(validatingUTF8: hostname) {
+                        let hostnameBytes = hostname.prefix { $0 != 0 }.map(UInt8.init(bitPattern:))
+                        if let address = String(bytes: hostnameBytes, encoding: .utf8) {
                             addresses.append(address)
                         }
                     }

@@ -78,7 +78,7 @@ struct DnsView: View {
     }
 
     private func saveDnsServers() {
-        var str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        let str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard let data = str.data(using: .utf8) else {
             tips = String(localized: .DnsInvalidUTF8)

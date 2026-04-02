@@ -129,7 +129,7 @@ extension StoreProtocol {
     func fetchAll() -> [Entity] {
         do {
             return try dbReader.read { db in
-                try Entity.fetchAll(db)
+                try Entity.order(Column("sort").asc).fetchAll(db)
             }
         } catch {
             logger.error("fetchAll error: \(error)")

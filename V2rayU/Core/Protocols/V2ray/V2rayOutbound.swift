@@ -109,8 +109,8 @@ extension V2rayOutbound {
 struct V2rayOutboundMux: Codable {
     var enabled: Bool = false
     var concurrency: Int = 8
-    var xudpConcurrency: Int = 16
-    var xudpProxyUDP443: Bool = false // 控制 Mux 对于被代理的 UDP/443（QUIC）流量的处理方式: reject-默认,allow-允许,skip-跳过
+    var xudpConcurrency: Int?
+    var xudpProxyUDP443: Bool? // 控制 Mux 对于被代理的 UDP/443（QUIC）流量的处理方式: reject-默认,allow-允许,skip-跳过
 }
 
 // protocol

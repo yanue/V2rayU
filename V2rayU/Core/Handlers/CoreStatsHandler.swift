@@ -32,7 +32,6 @@ actor CoreTrafficStatsHandler {
             switch coreType {
             case .SingBox:
                 ClashApiStreamHandler.shared.startTask()
-                await ClashApilatencyHandler.shared.startTask()
             case .XrayCore:
                 await XrayApiStatsHandler.shared.startTask()
             }
@@ -42,7 +41,6 @@ actor CoreTrafficStatsHandler {
     func stopTask() {
         Task {
             ClashApiStreamHandler.shared.stopTask()
-            await ClashApilatencyHandler.shared.stopTask()
             await XrayApiStatsHandler.shared.stopTask()
         }
     }
@@ -138,7 +136,6 @@ actor XrayApiStatsHandler: NSObject {
             decoder.dateDecodingStrategy = .iso8601 // 解析日期
             // try decode data
             let vars: V2rayMetricsVars = try decoder.decode(V2rayMetricsVars.self, from: jsonData)
-            var latency = 0.0
             var directUpLink = 0
             var directDownLink = 0
             var proxyUpLink = 0
@@ -146,9 +143,6 @@ actor XrayApiStatsHandler: NSObject {
             guard let stats = vars.stats else {
                 logger.warning("Invalid V2Ray Stats")
                 return
-            }
-            if let latencyValue = vars.observatory?["proxy"] {
-                latency = latencyValue.delay
             }
             if let directUpLinkValue = stats.outbound["direct"] {
                 directUpLink = directUpLinkValue.uplink
@@ -158,6 +152,7 @@ actor XrayApiStatsHandler: NSObject {
                 proxyUpLink = proxyUpLinkValue.uplink
                 proxyDownLink = proxyUpLinkValue.downlink
             }
+            let latency = await AppState.shared.latency
             await CoreTrafficStatsHandler.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
 //            logger.info("Parsed V2Ray Stats: \(stats)")
         } catch {
@@ -206,7 +201,7 @@ actor ClashApilatencyHandler: NSObject {
 
 }
 
-final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate {
+final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     static let shared = ClashApiStreamHandler()
     
     private var clashApiSession: URLSession!

@@ -72,7 +72,7 @@ class V2rayOutboundHandler {
             var user = V2rayOutboundVMessUser()
             user.id = self.profile.password
             user.alterId = Int(self.profile.alterId)
-            user.security = self.profile.encryption
+            user.security = self.profile.encryption.isEmpty ? "auto" : self.profile.encryption
             // vmess
             serverVmess = V2rayOutboundVMessItem()
             serverVmess.address = self.profile.address
@@ -81,6 +81,7 @@ class V2rayOutboundHandler {
             var vmess = V2rayOutboundVMess()
             vmess.vnext = [serverVmess]
             outbound.settings = vmess
+            outbound.mux = nil
 
         case .vless:
             // user
@@ -112,15 +113,11 @@ class V2rayOutboundHandler {
             outbound.settings = ss
 
         case .socks:
-            // user
-            var user = V2rayOutboundSockUser()
-//            user.user = self.profile.alterId // todo
-            user.pass = self.profile.password
             // socks5
             serverSocks5 = V2rayOutboundSockServer()
             serverSocks5.address = self.profile.address
             serverSocks5.port = self.profile.port
-            serverSocks5.users = [user]
+            serverSocks5.users = nil
             var socks = V2rayOutboundSocks()
             socks.servers = [serverSocks5]
             outbound.settings = socks
@@ -140,6 +137,11 @@ class V2rayOutboundHandler {
     }
 
     private func updateStreamSettings() {
+        if self.profile.protocol == .socks {
+            outbound.streamSettings = nil
+            return
+        }
+
         var streamSettings = V2rayStreamSettings()
         streamSettings.network = self.profile.network
 
@@ -226,7 +228,7 @@ class V2rayOutboundHandler {
         switch security {
         case .tls:
             securityTls = TlsSettings(
-                serverName: self.profile.sni,
+                serverName: self.profile.sni.isEmpty ? self.profile.address : self.profile.sni,
                 allowInsecure: self.profile.allowInsecure,
                 alpn: profile.entity.getAlpn(),
                 fingerprint: self.profile.fingerprint.rawValue
@@ -246,4 +248,3 @@ class V2rayOutboundHandler {
         }
     }
 }
-

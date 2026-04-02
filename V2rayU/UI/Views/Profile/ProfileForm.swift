@@ -35,9 +35,11 @@ struct ConfigFormView: View {
                     VStack{
                         ConfigServerView(item: item)
                         Spacer(minLength: 12)
-                        ConfigStreamView(item: item)
-                        Spacer(minLength: 12)
-                        ConfigTransportView(item: item)
+                        if item.protocol != .socks {
+                            ConfigStreamView(item: item)
+                            Spacer(minLength: 12)
+                            ConfigTransportView(item: item)
+                        }
                     }
                     .padding(.all, 12)
                     .padding(.leading, 8)

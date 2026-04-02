@@ -249,6 +249,8 @@
 "ViewErrorLog" = "檢視錯誤日誌";
 "ViewLogFiles" = "檢視日誌檔案...";
 "ClearAllLogs" = "清除所有日誌";
+"Logs" = "日誌";
+
 "ViewConfigJson" = "檢視 config.json";
 "ViewPacFile" = "檢視 PAC 檔案";
 "PacMode" = "PAC 模式";
