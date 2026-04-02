@@ -174,8 +174,6 @@ class RoutingHandler {
 
     // parse default settings
     func getRouting() -> V2rayRouting {
-        // dns-rule:  { "type": "field", "outboundTag": "dns-out", "network": "udp", "port": 53 }
-        let dnsRule = getRoutingRule(outTag: "dns_out", port: "53", network: "udp")
         // api-rule:  {"inboundTag": ["api"], "outboundTag": "api", "type": "field"}
         let apiRule = getRoutingRule(outTag: "metrics_out", inboundTag: ["metrics_in"])
 

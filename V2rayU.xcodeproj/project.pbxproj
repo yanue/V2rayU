@@ -137,6 +137,9 @@
 		66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F852D1E7D6A00E77C64 /* Clash.swift */; };
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
 		66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 66F66F8A2D1E7DE300E77C64 /* Yams */; };
+		66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 66F66F8A2D1E7DE300E77C64 /* Yams */; };
+		67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */; };
+		67A1B2C42D2F000000000002 /* LegacyImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A1B2C22D2F000000000002 /* LegacyImportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -302,6 +305,8 @@
 		66F66F822D1E450000E77C64 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
+		67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyMigrationHandler.swift; sourceTree = "<group>"; };
+		67A1B2C22D2F000000000002 /* LegacyImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -418,6 +423,7 @@
 				663814B42E0448DB00F5FCF3 /* ProfilePing.swift */,
 				66D27AE42E098E3A004C600D /* ShareQrCode.swift */,
 				66D27AE72E098E3A004C600E /* ExportView.swift */,
+				67A1B2C22D2F000000000002 /* LegacyImportView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -534,6 +540,7 @@
 				6632EF632EC4CDAD00CED47B /* Share */,
 				6632EF5F2EC4C87E00CED47B /* Diagnostic */,
 				6632EF622EC4C8F300CED47B /* Update */,
+				67A1B2C52D2F000000000003 /* Migration */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -644,6 +651,14 @@
 				66764BD92EB4EF8A002F330B /* CoreViewModel.swift */,
 			);
 			path = Update;
+			sourceTree = "<group>";
+		};
+		67A1B2C52D2F000000000003 /* Migration */ = {
+			isa = PBXGroup;
+			children = (
+				67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */,
+			);
+			path = Migration;
 			sourceTree = "<group>";
 		};
 		6632EF632EC4CDAD00CED47B /* Share */ = {
@@ -1047,6 +1062,8 @@
 				66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */,
 				669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */,
 				66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */,
+				67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */,
+				67A1B2C42D2F000000000002 /* LegacyImportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -86,7 +86,7 @@ actor SubscriptionHandler {
                 logger.info("Error: \(error)")
             }
             Task {
-                await self.onSyncComplete()
+                self.onSyncComplete()
             }
         }, receiveValue: { _ in })
         .store(in: &cancellables)

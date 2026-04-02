@@ -69,7 +69,7 @@ struct SubscriptionFormView: View {
                 getBoolFieldWithLabel(label: .Enable, isOn: $item.enable)
                 // 数字输入 + 单位选择
                 HStack {
-                    LocalizedTextLabelView(label: .updateInterval)
+                    LocalizedTextLabelView(label: .UpdateInterval)
                         .frame(width: 100, alignment: .trailing)
                     Spacer()
                     TextField("", value: displayedInterval, formatter: NumberFormatter())

@@ -19,10 +19,21 @@ struct SubscriptionListView: View {
     @State private var syncingAll: Bool = false
     @State private var tableOpacity: Double = 1.0
     
+    private var filteredAndSortedItems: [SubscriptionEntity] {
+        viewModel.list
+    }
+    
+    private func resolveSelectedItems(for item: SubscriptionEntity) -> [SubscriptionEntity] {
+        if selection.contains(item.uuid) && selection.count > 1 {
+            return filteredAndSortedItems.filter { selection.contains($0.uuid) }
+        }
+        return [item]
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
-                icon: "personalhotspot",
+                icon: "link.circle",
                 title: localizedString(.Subscriptions),
                 subtitle: localizedString(.SubscriptionSubHead)
             ) {
@@ -129,8 +140,11 @@ struct SubscriptionListView: View {
 
             Divider()
             Button {
-                if showConfirmAlertSync(title: localizedString(.DeleteConfirm), message: localizedString(.DeleteTip)) {
-                    viewModel.delete(uuid: item.uuid)
+                let itemsToDelete = resolveSelectedItems(for: item)
+                if showConfirmAlertSync(title: localizedString(.DeleteConfirm), message: itemsToDelete.count > 1 ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count) : localizedString(.DeleteTip)) {
+                    for entity in itemsToDelete {
+                        viewModel.delete(uuid: entity.uuid)
+                    }
                 }
             } label: {
                 Label(localizedString(.Delete), systemImage: "trash")

@@ -14,6 +14,7 @@ private enum ActiveSheet: Identifiable {
     case share(ProfileModel)
     case export([ProfileEntity])
     case pingAll
+    case importLegacy
 
     var id: String {
         switch self {
@@ -29,6 +30,7 @@ private enum ActiveSheet: Identifiable {
             let tail = items.last?.uuid ?? ""
             return "export-\(items.count)-\(head)-\(tail)"
         case .pingAll:           return "pingAll"
+        case .importLegacy:      return "importLegacy"
         }
     }
 }
@@ -80,13 +82,13 @@ struct ProfileListView: View {
     var body: some View {
         VStack {
             PageHeader(
-                icon: "shield.lefthalf.filled",
+                icon: "globe",
                 title: String(localized: .Servers),
                 subtitle: String(localized: .ServerSubHead)
             ) {
                 HStack(spacing: 8) {
                     Button(action: { activeSheet = .pingAll }) {
-                        Label(String(localized: .LatencyTest), systemImage: "network")
+                        Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
                     }
                     .buttonStyle(.borderedProminent)
                     .focusable(false)
@@ -102,25 +104,35 @@ struct ProfileListView: View {
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
-
+                    
                     Divider()
                         .frame(height: 20)
-
-                    Button(action: {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            tableOpacity = 0
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            loadData()
-                            withAnimation(.easeIn(duration: 0.2)) {
-                                tableOpacity = 1
+                    
+                    Menu {
+                        Button(action: {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                tableOpacity = 0
                             }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                loadData()
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    tableOpacity = 1
+                                }
+                            }
+                        }) {
+                            Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
                         }
-                    }) {
-                        Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
+
+                        Button(action: {
+                            activeSheet = .importLegacy
+                        }) {
+                            Label(String(localized: .ImportLegacyData), systemImage: "square.and.arrow.down.on.square")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
-                    .buttonStyle(.bordered)
                     .focusable(false)
+                    .frame(width: 50)
                 }
             }
 
@@ -135,7 +147,7 @@ struct ProfileListView: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .frame(width: 150)
+                    .focusable(false)
                     Spacer()
 
                     HStack(spacing: 6) {
@@ -190,6 +202,11 @@ struct ProfileListView: View {
                 ExportView(items: items) {
                     activeSheet = nil
                 }
+            case .importLegacy:
+                LegacyImportView {
+                    activeSheet = nil
+                    loadData()
+                }
             }
         }
         .task { loadData() }
@@ -224,7 +241,7 @@ struct ProfileListView: View {
             Button {
                 activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
             } label: {
-                Label(String(localized: .LatencyTest), systemImage: "speedometer")
+                Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
             }
             .focusable(false)
 
@@ -290,11 +307,16 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
+                let itemsToDelete = resolveSelectedItems(for: item)
                 if showConfirmAlertSync(
                     title: String(localized: .DeleteSelectedConfirm),
-                    message: String(localized: .DeleteTip)
+                    message: itemsToDelete.count > 1 
+                        ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count)
+                        : String(localized: .DeleteTip)
                 ) {
-                    viewModel.delete(uuid: item.uuid)
+                    for entity in itemsToDelete {
+                        viewModel.delete(uuid: entity.uuid)
+                    }
                 }
             } label: {
                 Label(String(localized: .Delete), systemImage: "trash")

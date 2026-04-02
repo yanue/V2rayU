@@ -277,7 +277,6 @@ struct ConfigValidator {
             }
         } else {
             // Xray/V2Ray 配置格式检查
-            let hasLog = json["log"] != nil
             let hasInbounds = json["inbounds"] != nil
             let hasOutbounds = json["outbounds"] != nil
             

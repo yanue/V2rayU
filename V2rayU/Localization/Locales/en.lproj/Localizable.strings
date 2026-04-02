@@ -1,21 +1,23 @@
 /* Multi-language localization LanguageLabel.strings (English) */
 
 // MARK: - Language & Theme
-"English" = "English";
-"Simplified Chinese" = "Simplified Chinese";
-"Traditional Chinese" = "Traditional Chinese";
 "Language" = "Language";
+"English" = "English";
+"Simplified Chinese" = "简体中文";
+"Traditional Chinese" = "繁體中文";
 "Theme" = "Theme";
 "Light" = "Light";
 "Dark" = "Dark";
 "FollowSystem" = "Follow System";
 
-// MARK: - Base operations
+// MARK: - Base Operations
 "Enable" = "Enable";
 "Minute" = "Minute";
 "Hour"   = "Hour";
 "Day"    = "Day";
 "Save" = "Save";
+"Saved" = "Saved";
+"Total" = "Total";
 "Confirm" = "Confirm";
 "Cancel" = "Cancel";
 "Close" = "Close";
@@ -28,19 +30,20 @@
 "DeleteConfirm" = "Are you sure you want to delete this item?";
 "DeleteSelectedConfirm" = "Are you sure you want to delete the selected items?";
 "DeleteTip" = "This action cannot be undone.";
+"DeleteMultipleConfirm" = "Are you sure you want to delete %d items? This action cannot be undone.";
 "OK" = "OK";
 "Add" = "Add";
 "Export" = "Export";
 "Select" = "Select";
 "SetActive" = "Set as Active";
 "Duplicate" = "Duplicate";
-"Copy" = "Copy";
-"Copied" = "Copied";
-"CopyFailed" = "Copy Failed";
 "Regenerate" = "Regenerate";
 "Regenerated" = "Regenerated";
 "Generate" = "Generate";
 "Generated" = "Generated";
+"Copy" = "Copy";
+"Copied" = "Copied";
+"CopyFailed" = "Copy Failed";
 "ShareProfile" = "Share Profile";
 
 // MARK: - App Content
@@ -56,6 +59,7 @@
 "SettingsSubHead" = "General application settings";
 "About" = "About";
 "AboutSubHead" = "About this application";
+"AboutAppIntroduction" = "V2rayU is a macOS VPN client supporting V2Ray, Sing-Box, Shadowsocks, Trojan and more. It provides an intuitive user interface for managing proxy connections, subscriptions, and routing rules.";
 
 // MARK: - Settings Tabs
 "General" = "General";
@@ -106,22 +110,13 @@
 "AddCustomRules" = "Add Custom Rules";
 "ViewPACFile" = "View PAC File";
 "UpdatePAC" = "Update PAC";
-"PACUpdatedByUserRules" = "PAC updated by user rules";
-"PACUpdateFailed" = "PAC update failed";
-"PACUpdatedByGFWList" = "PAC updated by GFWList";
-"FailedToDownloadGFWList" = "Failed to download GFWList";
-"FailedToWriteGFWList" = "Failed to write GFWList";
-"FailedToUpdatePAC" = "Failed to update PAC";
-"UpdatingPACRules" = "Updating PAC rules...";
-"PACUpdateError" = "PAC update error";
-"PACUpdateSuccess" = "PAC update success";
-"PACUpdateNotification" = "PAC update notification";
+"PACUpdateNotification" = "PAC Update Notification";
 
 // MARK: - PAC Notifications & Errors
 "UpdatingPacRules" = "Updating PAC rules...";
-"PacUpdatedByUserRules" = "PAC has been updated by User Rules.";
-"PacUpdateFailedByUserRules" = "Failed to update PAC via User Rules.";
-"UpdatePacError" = "updatePac error: %@";
+"PacUpdatedByUserRules" = "PAC has been updated by user rules.";
+"PacUpdateFailedByUserRules" = "Failed to update PAC via user rules.";
+"UpdatePacError" = "Failed to update PAC: %@";
 "InvalidGfwUrl" = "Failed to download GFW List: URL is invalid.";
 "GfwListDownloadFailed" = "Failed to download the latest GFW List.";
 "GfwListDownloadError" = "Failed to download GFW List: %@";
@@ -146,8 +141,8 @@
 "SubscriptionSettings" = "Subscription Settings";
 "SubscriptionSettingsSubHead" = "Manage subscription details";
 "SubscriptionUrl" = "Subscription URL";
-"sort" = "Sort";
-"updateInterval" = "Update Interval";
+"Sort" = "Sort";
+"UpdateInterval" = "Update Interval";
 "AddSubscription" = "Add Subscription";
 "EditSubscription" = "Edit Subscription";
 "SyncAllSubscriptionTitle" = "Sync All Subscriptions";
@@ -161,8 +156,8 @@
 "RoutingSettingsSubHead" = "Manage routing rules";
 "AddRoutingRule" = "Add Routing Rule";
 "EditRoutingRule" = "Edit Routing Rule";
-"domainStrategy" = "Domain Strategy";
-"domainMatcher" = "Domain Matcher";
+"DomainStrategy" = "Domain Strategy";
+"DomainMatcher" = "Domain Matcher";
 "Direct" = "Direct";
 "Proxy" = "Proxy";
 "Block" = "Block";
@@ -214,8 +209,8 @@
 "TTI" = "TTI";
 "UplinkCapacity" = "Uplink Capacity";
 "DownloadCapacity" = "Download Capacity";
-"xhttpPath" = "XHTTP Path";
-"xhttpHost" = "XHTTP Host";
+"XhttpPath" = "XHTTP Path";
+"XhttpHost" = "XHTTP Host";
 "AllowInsecure" = "Allow Insecure Connections";
 "ProfileRemark" = "Profile Remark";
 "Sni" = "SNI";
@@ -223,51 +218,68 @@
 "PublicKey" = "Public Key";
 "ShortID" = "Short ID";
 "SpiderX" = "SpiderX";
+"Extra" = "Extra";
 "Alpn" = "ALPN";
 "TransportSettings" = "Transport Settings";
 "ServerSettings" = "Server Settings";
 "StreamSettings" = "Stream Settings";
 
+// MARK: - Hysteria2 Settings
+"Hysteria2Configuration" = "Hysteria 2 Configuration";
+"ObfuscationSettings" = "Obfuscation Settings";
+"ObfsType" = "Obfs Type";
+"ObfsPassword" = "Obfs Password";
+"AuthenticationSettings" = "Authentication Settings";
+"AuthType" = "Auth Type";
+"None" = "None";
+"Token" = "Token";
+"AuthPassword" = "Auth Password";
+"BandwidthSettings" = "Bandwidth Settings";
+"UploadBandwidth" = "Upload Bandwidth";
+"DownloadBandwidth" = "Download Bandwidth";
+"AdvancedSettings" = "Advanced Settings";
+"HopInterval" = "Hop Interval (seconds)";
+
 // MARK: - Menu Operations
-"CoreOn" = "core: Running";
-"CoreOff" = "core: Stopped";
-"TurnCoreOn" = "Start core";
-"TurnCoreOff" = "Stop core";
-"ViewLog" = "View core log";
-"ViewErrorLog" = "View error log";
-"ViewLogFiles" = "View log files...";
-"ClearAllLogs" = "Clear all logs";
+"CoreOn" = "Core: Running";
+"CoreOff" = "Core: Stopped";
+"TurnCoreOn" = "Start Core";
+"TurnCoreOff" = "Stop Core";
+"ViewLog" = "View Core Log";
+"ViewErrorLog" = "View Error Log";
+"ViewLogFiles" = "View Log Files...";
+"ClearAllLogs" = "Clear All Logs";
 "Logs" = "Logs";
 "ViewConfigJson" = "View config.json";
-"ViewPacFile" = "View PAC file";
-"PacMode" = "pac Mode";
+"ViewPacFile" = "View PAC File";
+"PacMode" = "PAC Mode";
 "TunnelMode" = "Tunnel Mode";
-"GlobalMode" = "Global Mode(change system proxies)";
-"ManualMode" = "Manual Mode(don't change system proxies)";
+"GlobalMode" = "Global Mode (set system proxies)";
+"ManualMode" = "Manual Mode (clear system proxies)";
 "RoutingList" = "Select Routing";
 "ServerList" = "Select Server";
-"goSubscriptionSettings" = "Subscription Settings...";
-"goRoutingSettings" = "Routing Settings...";
-"goServerSettings" = "Server Settings...";
-"goPreferences" = "Preferences...";
+"GoSubscriptionSettings" = "Subscription Settings...";
+"GoRoutingSettings" = "Routing Settings...";
+"GoServerSettings" = "Server Settings...";
+"GoPreferences" = "Preferences...";
 "LatencyTest" = "Latency Test";
 "Testing" = "Testing";
-"ImportServersFromClipboard" = "Import servers from clipboard";
-"ScanQRCodeFromScreen" = "Scan QR code from screen";
+"ImportServersFromClipboard" = "Import Servers from Clipboard";
+"ScanQRCodeFromScreen" = "Scan QR Code from Screen";
 "ShareQrCode" = "Share QR Code";
-"CopyHttpProxyShellExportLine" = "Copy HTTP proxy shell export line";
+"CopyHttpProxyShellExportLine" = "Copy HTTP Proxy Shell Export Line";
 "CheckForUpdates" = "Check for Updates";
 "Quit" = "Quit";
 "On" = "On";
 "Off" = "Off";
 
-// MARK: - Help View
+// MARK: - Help & Diagnostics
 "HelpPageTitle" = "Diagnostics & Help";
 "HelpPageSubHead" = "Check core components and fix common problems";
 "GithubIssues" = "Feedback / Issues";
 "Refresh" = "Refresh";
-"V2rayCoreSwitchStatus" = "core Switch Status";
-"V2rayCoreRunningStatus" = "core Running State (launchd)";
+"V2rayCoreSwitchStatus" = "Core Switch Status";
+"V2rayCoreRunningStatus" = "Core Running State (launchd)";
 "BackgroundActivity" = "Background Activity";
 "BackgroundActivitySubtitleRunning" = "Core process is running";
 "BackgroundActivitySubtitleNotRunning" = "Core process is not running";
@@ -275,13 +287,13 @@
 "Restart" = "Restart";
 "PingState" = "Latency State";
 "RunPingNow" = "Run Latency Test";
-"V2rayCoreInstallAndVersion" = "core Installation & Version";
+"V2rayCoreInstallAndVersion" = "Core Installation & Version";
 "V2rayUToolPermission" = "V2rayUTool Permission";
 "GeoipFile" = "geoip.dat File";
 "Installed" = "Installed";
 "Missing" = "Missing";
 "PermissionException" = "Permission Exception";
-"V2rayCoreNotInstalled" = "core is not installed or not executable.";
+"V2rayCoreNotInstalled" = "Core is not installed or not executable.";
 "UnableToOpenSystemSettings" = "Unable to open system settings.";
 "PleaseManuallyOpenBackgroundActivity" = "Please manually go to System Settings → General → Background Activity, and allow V2rayU to run in background.";
 "Fix" = "Fix";
@@ -289,7 +301,7 @@
 "V2rayUToolProblem" = "V2rayUTool permission issue. The core may fail to start.";
 "BackgroundProblem" = "App is not running in background; might be limited by system or core process stopped.";
 "GeoipProblem" = "geoip.dat is missing, which may cause some functions to fail.";
-"V2rayCoreProblem" = "core is not installed or not executable.";
+"V2rayCoreProblem" = "Core is not installed or not executable.";
 "Diagnostics" = "Diagnostics";
 "DiagnosticSubHead" = "Check for common issues and solutions";
 "FAQ" = "FAQ";
@@ -341,6 +353,16 @@
 "OpenSourceLibraries" = "Open Source Libraries";
 "UsedButNotLimitedTo" = "Used but not limited to:";
 "OpenInBrowser" = "Open in Browser";
+"Copyright" = "Copyright";
+"AllRightsReserved" = "All rights reserved.";
+"ErrorLog" = "Error Log";
+"LogFile" = "Log File";
+"SelectLogFile" = "Select log file to view";
+"OKButton" = "OK";
+"CloseButton" = "Close";
+"Selected" = "Selected";
+"Proxies" = "Proxies";
+"PingAllProxies" = "This will ping all proxies and show the result log.";
 
 // MARK: - Core Update Management
 "CoreSettingsTitle" = "Core Settings";
@@ -360,7 +382,7 @@
 "ReplaceSuccess" = "Replace Successful!";
 "OperationFailed" = "Operation Failed: %@";
 "DownloadTimeoutError" = "Download timed out";
-"SaveError" = "Failed to save file";
+"DownloadSaveFailed" = "Failed to save file";
 "DownloadErrorOccurred" = "An error occurred during download";
 "ClearLogFileFailed" = "Failed to clear log file";
 "PortInUse" = "Port is already in use";
@@ -368,20 +390,21 @@
 "Install" = "Install";
 "InstallTitle" = "Install V2rayUTool";
 "InstallPermissionTip" = "V2rayU requires administrator privileges to install V2rayUTool to ~/.V2rayU/V2rayUTool";
-"InstallFailed" = "Installation failed";
+"InstallFailed" = "Installation Failed";
 "InstallFailedTip" = "Failed to install V2rayUTool: %@";
 "InstallFailedManual" = "Please run the installation script manually.";
 "ReplaceCore" = "Replace Core";
-"releaseNodesTitle" = "Release Nodes";
-"skipVersion" = "Skip Version";
-"installUpdate" = "Install Update";
-"CheckingForUpdates" = "Checking For Updates ...";
+"ReleaseNotesTitle" = "Release Notes";
+"SkipVersion" = "Skip This Version";
+"InstallUpdate" = "Install Update";
+"CheckingForUpdates" = "Checking for Updates...";
 "InstallV2rayU" = "Install V2rayU";
 "NewVersionTip" = "A new version (%@) is available!";
-"AlreadyLastestVersion" = "Already Latest Version";
-"AlreadyLastestToast" = "Current %@ is already the latest version";
+"AlreadyLatestVersion" = "Already Latest Version";
+"AlreadyLatestToast" = "Current %@ is already the latest version";
 "V2rayUUpdateTitle" = "V2rayU Update";
 
+// MARK: - FAQ
 "FaqHowItWorks" = "How does V2rayU work?";
 "FaqConfigLocation" = "Where are the configuration files stored?";
 "FaqOperationModes" = "What are the operation modes?";
@@ -413,7 +436,8 @@ Note: PAC, Global, Manual modes mainly affect browsers and other system-level ap
 
 To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mode, or use the keyboard shortcut.";
 "FaqManualCoreUpdateDetail2" = "You can manually download the xray-core or sing-box version that matches your system architecture and replace it in the ~/.V2rayU/v2ray-core/ directory. Make sure to rename the core file to ~/.V2rayU/v2ray-core/v2ray";
-// Diagnostics - Check item titles
+
+// MARK: - Diagnostics - Check Item Titles
 "DiagNetworkConnectivity" = "Network Connection";
 "DiagSystemProxy" = "System Proxy Settings";
 "DiagFirewall" = "Firewall & Security Software";
@@ -428,12 +452,14 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "DiagPingLatency" = "Latency & Availability";
 "DiagLogAnalysis" = "Log Analysis";
 "DiagVPNConflict" = "VPN Conflict Detection";
-// Diagnostics - Status descriptions
+
+// MARK: - Diagnostics - Status
 "DiagPending" = "Pending...";
 "DiagChecking" = "Checking...";
 "DiagPassed" = "Passed";
 "DiagFailed" = "Failed";
-// Diagnostics - Detailed problem descriptions
+
+// MARK: - Diagnostics - Problem Descriptions
 "DiagNetUnavailable" = "Computer cannot access the internet. Please check:\n1. Router/broadband is working\n2. Wi-Fi is connected\n3. Ethernet cable is plugged in";
 "DiagNetDNSFailed" = "DNS server cannot resolve domain names. This may be due to network settings or VPN software conflict. Please check DNS settings";
 "DiagNetIPFailed" = "Cannot access public IPs, network may be restricted or blocked by firewall";
@@ -458,7 +484,8 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "DiagGeoipMissing" = "GeoIP database file is not installed. This will prevent routing rules from working (domestic direct, overseas proxy). Click 'Fix Now' to auto-download";
 "DiagLatencyHigh" = "High latency (%dms), may affect browsing experience. Try switching to a node with lower latency";
 "DiagLatencyFailed" = "Cannot connect to node for latency test. Node may be unavailable or blocked. Try switching nodes";
-// Diagnostics - Action buttons
+
+// MARK: - Diagnostics - Actions
 "DiagOpenNetworkSettings" = "Open Network Settings";
 "DiagFixNow" = "Fix Now";
 "DiagRestartCore" = "Restart Core";
@@ -466,21 +493,50 @@ To enable Tunnel mode: Click the V2rayU icon in the menu bar -> Select Tunnel mo
 "DiagCheckNetwork" = "Check Network";
 "DiagViewConfig" = "View Config";
 "DiagReTest" = "Re-test";
-// Diagnostics - Special mode descriptions
+
+// MARK: - Diagnostics - Special Modes
 "DiagProxyNotNeededTunnel" = "Tunnel mode does not require system proxy (uses network extension)";
 "DiagProxyNotNeededManual" = "Manual mode does not set system proxy";
 "DiagProxyNotNeededOff" = "Proxy is disabled";
 "DiagProxyRequired" = "System proxy required (PAC/Global mode)";
-// Diagnostics - Core Architecture
+
+// MARK: - Diagnostics - Core Architecture
 "DiagCoreArch" = "Core Architecture";
 "DiagCoreArchCorrect" = "Architecture matches system (%@)";
 "DiagCoreArchMismatch" = "Architecture mismatch (file: %@, system: %@)";
-// Diagnostics - Basic Files
+
+// MARK: - Diagnostics - Files
 "DiagV2rayUToolInstall" = "V2rayUTool Installation";
 "DiagConfigFile" = "Configuration File";
 "DiagConfigFileExists" = "Config file exists (%d bytes)";
 "DiagConfigFileMissing" = "Configuration file is missing";
 "DiagConfigFileEmpty" = "Configuration file is empty";
-// Diagnostics - Geo Files
 "DiagGeositeFile" = "GeoSite Database";
 "DiagGeositeMissing" = "GeoSite database file is not installed. Click 'Fix Now' to auto-download";
+// MARK: - Legacy Migration
+"ImportLegacyData" = "Import from v4";
+"ImportLegacyDataTitle" = "Import Data from v4";
+"ImportLegacyDataTip" = "Import servers and subscriptions from V2rayU v4 (UserDefaults version)";
+"LegacyDataMigrated" = "Data has already been migrated";
+"LegacyDataMigrationSuccess" = "Migration completed: %d servers, %d subscriptions imported";
+"LegacyDataMigrationFailed" = "Migration failed: %@";
+"LegacyDataMigrationNoData" = "No legacy data found to import";
+"ImportLegacyDataMigrating" = "Migrating data...";
+"ImportLegacyDataDetected" = "Legacy data detected:";
+"ImportLegacyDataNoData" = "No legacy data detected";
+"ImportLegacyDataServerCount" = "%d servers";
+"ImportLegacyDataSubCount" = "%d subscriptions";
+"ImportLegacyConfirmTitle" = "Confirm Import";
+"ImportLegacyConfirmMessage" = "Import %d servers and %d subscriptions from v4 to v5?";
+"ImportLegacyDetectedKeys" = "Detected keys:";
+"ImportLegacyServerList" = "Server list:";
+"ImportLegacySubList" = "Subscription list:";
+"ImportLegacyMigratingStart" = "Starting migration...";
+"ImportLegacyMigratingComplete" = "Migration complete!";
+"ImportLegacyNoDataFound" = "No legacy data found";
+"ImportLegacyMigrationFailed" = "Migration failed: ";
+"ImportLegacyItemsRemaining" = "%d items remaining";
+"ImportLegacyV2rayServerList" = "v2rayServerList: ";
+"ImportLegacyV2raySubList" = "v2raySubList: ";
+"ImportLegacySuccessServers" = "Successfully imported %d servers";
+"ImportLegacySuccessSubscriptions" = "Successfully imported %d subscriptions";

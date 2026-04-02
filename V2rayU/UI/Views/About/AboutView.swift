@@ -18,6 +18,10 @@ struct AboutView: View {
     // 相关文件路径列表
     private let fileLocations: [String] = [
         "~/.V2rayU/",
+        "~/Library/LaunchAgents/yanue.v2rayu.sing-box.plist",
+        "/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist",
+        "/Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh",
+        "/private/etc/sudoers.d/v2rayu-helper",
         "~/Library/Preferences/net.yanue.V2rayU.plist",
         "~/Library/Application Support/net.yanue.V2rayU/",
         "~/Library/Caches/net.yanue.V2rayU/",
@@ -48,6 +52,11 @@ struct AboutView: View {
                         Text(String(localized: .AboutSubHead))
                             .font(.body)
                             .foregroundColor(.primary)
+                        
+                        Text(String(localized: .AboutAppIntroduction))
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 8)
                         
                         // 开源地址
                         sectionHeader(title: String(localized: .OpenSourceProject), subtitle: String(localized: .OpenSourceLicense))

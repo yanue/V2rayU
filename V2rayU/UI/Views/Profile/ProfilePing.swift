@@ -38,7 +38,7 @@ struct ProfilePingView: View {
                 .focusable(false)
                 
                 Button(action: onClose) {
-                    Text("Close")
+                    Text(String(localized: .Close))
                 }
                 .focusable(false)
             }
@@ -49,9 +49,9 @@ struct ProfilePingView: View {
 
             if let p = profile {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Remark: \(p.remark)")
+                    Text("\(String(localized: .Remark)): \(p.remark)")
                         .font(.subheadline)
-                    Text("Protocol: \(p.protocol.rawValue), Address: \(p.address):\(p.port)")
+                    Text("\(String(localized: .Protocol)): \(p.protocol.rawValue), \(String(localized: .Address)): \(p.address):\(p.port)")
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
@@ -60,9 +60,9 @@ struct ProfilePingView: View {
                 Divider().padding(.top, 8)
             } else if let items = profiles, !items.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Selected: \(items.count) proxies")
+                    Text("\(String(localized: .Selected)) \(items.count) \(String(localized: .Proxies))")
                         .font(.subheadline)
-                    Text("Protocol: \(Array(Set(items.map { $0.protocol.rawValue })).joined(separator: ", "))")
+                    Text("\(String(localized: .Protocol)): \(Array(Set(items.map { $0.protocol.rawValue })).joined(separator: ", "))")
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
@@ -70,7 +70,7 @@ struct ProfilePingView: View {
                 .padding(.top, 8)
                 Divider().padding(.top, 8)
             } else if isAll {
-                Text("This will ping all proxies and show the result log.")
+                Text(String(localized: .PingAllProxies))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 20)

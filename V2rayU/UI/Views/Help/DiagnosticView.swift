@@ -22,7 +22,7 @@ struct DiagnosticsView: View {
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
-                icon: "questionmark.circle",
+                icon: "antenna.radiowaves.left.and.right",
                 title: String(localized: .Diagnostics),
                 subtitle:  String(localized: .DiagnosticSubHead)
             ) {
@@ -83,7 +83,7 @@ struct DiagnosticsView: View {
                     
                     if selectedTab == .logs && !viewModel.logContent.isEmpty {
                         HStack {
-                            Text("错误日志")
+                            Text(String(localized: .ErrorLog))
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                             Spacer()

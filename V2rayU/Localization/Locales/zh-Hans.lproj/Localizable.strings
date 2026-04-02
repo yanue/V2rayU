@@ -1,10 +1,11 @@
 /* 多语言本地化 LanguageLabel.strings (Simplified Chinese) */
 
 // MARK: - 语言与主题
+"Language" = "语言";
 "English" = "English";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
-"Language" = "语言";
+
 "Theme" = "主题";
 "Light" = "浅色";
 "Dark" = "深色";
@@ -16,6 +17,8 @@
 "Hour"   = "小时";
 "Day"    = "天";
 "Save" = "保存";
+"Saved" = "已保存";
+"Total" = "共计";
 "Confirm" = "确认";
 "Cancel" = "取消";
 "Close" = "关闭";
@@ -28,20 +31,21 @@
 "DeleteConfirm" = "确定要删除此项吗？";
 "DeleteSelectedConfirm" = "确定要删除所选项目吗？";
 "DeleteTip" = "此操作无法撤销。";
+"DeleteMultipleConfirm" = "确定要删除 %d 个项目吗？此操作无法撤销。";
 "OK" = "确定";
 "Add" = "添加";
 "Export" = "导出";
 "Select" = "选择";
 "SetActive" = "设为活跃";
 "Duplicate" = "复制一份";
-"Copy" = "复制";
-"Copied" = "已复制";
-"CopyFailed" = "复制失败";
 "Regenerate" = "重新生成";
 "Regenerated" = "已重新生成";
 "Generate" = "生成";
 "Generated" = "已生成";
-"ShareProfile" = "分享配置文件";
+"Copy" = "复制";
+"Copied" = "已复制";
+"CopyFailed" = "复制失败";
+"ShareProfile" = "分享配置";
 
 // MARK: - App 内容
 "Activity" = "活动";
@@ -56,6 +60,7 @@
 "SettingsSubHead" = "通用应用设置";
 "About" = "关于";
 "AboutSubHead" = "关于此应用";
+"AboutAppIntroduction" = "V2rayU 是一款 macOS VPN 客户端，支持 V2Ray、Sing-Box、Shadowsocks、Trojan 等多种协议。它提供直观的用户界面来管理代理连接、订阅和路由规则。";
 
 // MARK: - 设置标签
 "General" = "通用设置";
@@ -63,7 +68,7 @@
 "Advanced" = "高级设置";
 "PAC" = "PAC 设置";
 "DNS" = "DNS 设置";
-"Core" = "Core 管理";
+"Core" = "核心管理";
 
 // MARK: - 通用设置
 "LaunchAtLogin" = "开机启动";
@@ -71,18 +76,18 @@
 "AutoUpdateServersFromSubscriptions" = "自动从订阅更新服务器";
 "AutomaticallySelectFastestServer" = "自动选择最快服务器";
 "ShowProxySpeedOnTrayIcon" = "托盘图标显示代理速度";
-"ShowLatencyOnTrayIcon" = "托盘图标显示 Ping 值";
+"ShowLatencyOnTrayIcon" = "托盘图标显示延迟值";
 "EnableProxyStatistics" = "启用代理统计";
 "KeyboardShortcuts" = "快捷键";
 "Toggle" = "开关";
 "ProxyModes" = "代理模式";
 "View" = "查看";
 "Tools" = "工具";
-"ToggleV2rayOnOff" = "切换 V2Ray 开关";
+"ToggleV2rayOnOff" = "切换代理开关";
 "SwitchProxyMode" = "切换代理模式";
-"SwitchToTunnelMode" = "切换到 Tun 模式";
-"SwitchToGlobalMode" = "切换到 全局 模式";
-"SwitchToManualMode" = "切换到 手动 模式";
+"SwitchToTunnelMode" = "切换到 Tunnel 模式";
+"SwitchToGlobalMode" = "切换到全局模式";
+"SwitchToManualMode" = "切换到手动模式";
 "SwitchToPacMode" = "切换到 PAC 模式";
 
 // MARK: - 高级设置
@@ -91,11 +96,11 @@
 "LocalHttpListenPort" = "本地 HTTP 监听端口";
 "LocalPacListenPort" = "本地 PAC 监听端口";
 "AllowLAN" = "允许局域网访问";
-"EnableSniffing" = "启用嗅探";
-"EnableMux" = "启用 Mux";
+"EnableSniffing" = "启用流量嗅探";
+"EnableMux" = "启用 Mux 多路复用";
 "Mux" = "Mux";
 "EnableTrafficStatistics" = "启用流量统计";
-"V2rayCoreLogLevel" = "V2Ray 核心日志级别";
+"V2rayCoreLogLevel" = "核心日志级别";
 
 // MARK: - PAC 设置
 "PacSettings" = "PAC 设置";
@@ -106,48 +111,39 @@
 "AddCustomRules" = "添加自定义规则";
 "ViewPACFile" = "查看 PAC 文件";
 "UpdatePAC" = "更新 PAC";
-"PACUpdatedByUserRules" = "PAC 已由用户规则更新";
-"PACUpdateFailed" = "PAC 更新失败";
-"PACUpdatedByGFWList" = "PAC 已由 GFWList 更新";
-"FailedToDownloadGFWList" = "下载 GFWList 失败";
-"FailedToWriteGFWList" = "写入 GFWList 失败";
-"FailedToUpdatePAC" = "更新 PAC 失败";
-"UpdatingPACRules" = "正在更新 PAC 规则";
-"PACUpdateError" = "PAC 更新出错";
-"PACUpdateSuccess" = "PAC 更新成功";
 "PACUpdateNotification" = "PAC 更新通知";
 
 // MARK: - PAC 提示与错误
 "UpdatingPacRules" = "正在更新 PAC 规则...";
-"PacUpdatedByUserRules" = "PAC 已由用户规则更新";
-"PacUpdateFailedByUserRules" = "更新 PAC (用户规则) 失败";
-"UpdatePacError" = "更新 PAC 错误: %@";
-"InvalidGfwUrl" = "下载 GFWList 失败: URL 无效";
-"GfwListDownloadFailed" = "下载 GFWList 失败";
+"PacUpdatedByUserRules" = "PAC 已通过用户规则更新。";
+"PacUpdateFailedByUserRules" = "通过用户规则更新 PAC 失败。";
+"UpdatePacError" = "更新 PAC 失败: %@";
+"InvalidGfwUrl" = "下载 GFWList 失败: URL 无效。";
+"GfwListDownloadFailed" = "下载最新 GFWList 失败。";
 "GfwListDownloadError" = "下载 GFWList 出错: %@";
-"GfwListWriteFailed" = "写入 GFWList 失败";
-"GfwListUpdated" = "GFWList 已更新";
-"PacUpdatedByGfwList" = "PAC 已由最新 GFWList 更新";
-"PacUpdateFailedByCurl" = "通过 curl 更新 PAC 失败";
+"GfwListWriteFailed" = "写入 GFWList 失败。";
+"GfwListUpdated" = "GFWList 已更新。";
+"PacUpdatedByGfwList" = "PAC 已通过最新 GFWList 更新。";
+"PacUpdateFailedByCurl" = "通过 curl 方式更新 PAC 失败。";
 
 // MARK: - DNS 设置
 "DnsConfiguration" = "DNS 配置";
-"DnsJsonFormatTip" = "提示: 使用 JSON 格式进行 DNS 配置";
+"DnsJsonFormatTip" = "提示: 请使用 JSON 格式配置 DNS。";
 "ViewConfiguration" = "查看配置";
 "Help" = "帮助";
 "Notification" = "通知";
-"DnsInvalidUTF8" = "错误: 输入内容无法编码为 UTF-8";
-"DnsJSONFormatError" = "错误: JSON 格式错误 - %@";
-"DnsFormatEncodingFail" = "错误: 格式化后内容无法编码为字符串";
-"DnsSaveSuccess" = "DNS 配置保存成功";
-"DnsSaveFail" = "保存 DNS 配置失败 - %@";
+"DnsInvalidUTF8" = "错误: 输入内容无法编码为 UTF-8。";
+"DnsJSONFormatError" = "错误: JSON 格式无效 - %@";
+"DnsFormatEncodingFail" = "错误: 格式化后的内容无法编码为字符串。";
+"DnsSaveSuccess" = "DNS 配置保存成功。";
+"DnsSaveFail" = "保存 DNS 配置失败: %@";
 
 // MARK: - 订阅设置
 "SubscriptionSettings" = "订阅设置";
 "SubscriptionSettingsSubHead" = "管理订阅详情";
 "SubscriptionUrl" = "订阅地址";
-"sort" = "排序";
-"updateInterval" = "更新间隔";
+"Sort" = "排序";
+"UpdateInterval" = "更新间隔";
 "AddSubscription" = "添加订阅";
 "EditSubscription" = "编辑订阅";
 "SyncAllSubscriptionTitle" = "同步所有订阅";
@@ -161,15 +157,15 @@
 "RoutingSettingsSubHead" = "管理路由规则";
 "AddRoutingRule" = "添加路由规则";
 "EditRoutingRule" = "编辑路由规则";
-"domainStrategy" = "域名策略";
-"domainMatcher" = "域名匹配方式";
+"DomainStrategy" = "域名策略";
+"DomainMatcher" = "域名匹配方式";
 "Direct" = "直连";
 "Proxy" = "代理";
 "Block" = "阻断";
 
 // MARK: - 自定义规则说明
 "CustomRuleGuideTitle" = "自定义规则填写说明";
-"CustomRuleGuideDescription" = "每行填写一个规则，可为域名、IP 或 预定义列表。";
+"CustomRuleGuideDescription" = "每行填写一条规则，可为域名、IP 或预定义列表。";
 "CustomRulePriorityDescription" = "优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP 阻断 -> IP 代理 -> IP 直连";
 "CustomRuleDomainIntro" = "• 域名：";
 "CustomRuleDomainExample" = "如 example.com、*.google.com";
@@ -178,9 +174,9 @@
 "CustomRulePredefinedIntro" = "• 预定义：";
 "CustomRulePredefinedExample" = "如 geoip:private、geosite:cn、localhost";
 
-// MARK: - Profile 设置
-"ProfileSettings" = "配置文件设置";
-"ProfileSettingsSubHead" = "管理配置文件详情";
+// MARK: - 配置设置
+"ProfileSettings" = "节点配置";
+"ProfileSettingsSubHead" = "管理节点配置详情";
 "Protocol" = "协议";
 "Address" = "地址";
 "Password" = "密码";
@@ -191,13 +187,13 @@
 "AlterID" = "额外 ID";
 "Security" = "安全";
 "Encryption" = "加密";
-"Network" = "网络";
-"HeaderType" = "头部类型";
+"Network" = "传输协议";
+"HeaderType" = "伪装类型";
 "HttpHost" = "HTTP 主机";
 "HttpPath" = "HTTP 路径";
 "WsHost" = "WebSocket 主机";
 "WsPath" = "WebSocket 路径";
-"DsPath" = "DS 路径";
+"DsPath" = "Domain Socket 路径";
 "WsHeaders" = "WebSocket 请求头";
 "Flow" = "流控";
 "TcpFastOpen" = "TCP 快速打开";
@@ -206,50 +202,67 @@
 "TlsSettings" = "TLS 设置";
 "XtlsSettings" = "XTLS 设置";
 "RealitySettings" = "REALITY 设置";
-"ServerName" = "服务器名称";
+"ServerName" = "服务器名称 (SNI)";
 "Key" = "密钥";
 "Seed" = "种子";
 "Congestion" = "拥塞控制";
 "MTU" = "MTU";
 "TTI" = "TTI";
-"UplinkCapacity" = "上行带宽";
-"DownloadCapacity" = "下行带宽";
-"xhttpPath" = "XHTTP 路径";
-"xhttpHost" = "XHTTP 主机";
+"UplinkCapacity" = "上行容量";
+"DownloadCapacity" = "下行容量";
+"XhttpPath" = "XHTTP 路径";
+"XhttpHost" = "XHTTP 主机";
 "AllowInsecure" = "允许不安全连接";
 "ProfileRemark" = "配置备注";
 "Sni" = "SNI";
-"Fingerprint" = "指纹";
+"Fingerprint" = "TLS 指纹";
 "PublicKey" = "公钥";
 "ShortID" = "短 ID";
 "SpiderX" = "SpiderX";
+"Extra" = "额外参数";
 "Alpn" = "ALPN";
 "TransportSettings" = "传输设置";
 "ServerSettings" = "服务器设置";
-"StreamSettings" = "流设置";
+"StreamSettings" = "底层传输设置";
+
+// MARK: - Hysteria2 设置
+"Hysteria2Configuration" = "Hysteria 2 配置";
+"ObfuscationSettings" = "混淆设置";
+"ObfsType" = "混淆类型";
+"ObfsPassword" = "混淆密码";
+"AuthenticationSettings" = "认证设置";
+"AuthType" = "认证类型";
+"None" = "无";
+"Token" = "令牌";
+"AuthPassword" = "认证密码";
+"BandwidthSettings" = "带宽设置";
+"UploadBandwidth" = "上传带宽";
+"DownloadBandwidth" = "下载带宽";
+"AdvancedSettings" = "高级设置";
+"HopInterval" = "端口跳跃间隔 (秒)";
 
 // MARK: - 菜单操作
-"CoreOn" = "core: 已启动";
-"CoreOff" = "core: 已停止";
-"TurnCoreOn" = "启动 core";
-"TurnCoreOff" = "关闭 core";
-"ViewLog" = "查看 core 日志";
-"ViewErrorLog" = "查看异常日志";
-"ViewLogFiles" = "查看日志文件 ...";
+"CoreOn" = "核心: 运行中";
+"CoreOff" = "核心: 已停止";
+"TurnCoreOn" = "启动核心";
+"TurnCoreOff" = "停止核心";
+"ViewLog" = "查看核心日志";
+"ViewErrorLog" = "查看错误日志";
+"ViewLogFiles" = "查看日志文件...";
 "ClearAllLogs" = "清除所有日志";
 "Logs" = "日志";
 "ViewConfigJson" = "查看 config.json";
-"ViewPacFile" = "查看 pac 文件";
-"PacMode" = "pac模式";
-"TunnelMode" = "tun模式(透明代理)";
-"GlobalMode" = "全局模式(设置系统代理)";
-"ManualMode" = "手动模式(清除系统代理)";
+"ViewPacFile" = "查看 PAC 文件";
+"PacMode" = "PAC 模式";
+"TunnelMode" = "Tunnel 模式 (透明代理)";
+"GlobalMode" = "全局模式 (设置系统代理)";
+"ManualMode" = "手动模式 (清除系统代理)";
 "RoutingList" = "选择路由";
 "ServerList" = "选择服务器";
-"goSubscriptionSettings" = "订阅配置 ...";
-"goRoutingSettings" = "路由设置 ...";
-"goServerSettings" = "服务器配置 ...";
-"goPreferences" = "偏好设置 ...";
+"GoSubscriptionSettings" = "订阅设置...";
+"GoRoutingSettings" = "路由设置...";
+"GoServerSettings" = "服务器配置...";
+"GoPreferences" = "偏好设置...";
 "LatencyTest" = "延迟测试";
 "Testing" = "测试中";
 "ImportServersFromClipboard" = "从剪贴板导入服务器";
@@ -261,35 +274,35 @@
 "On" = "开启";
 "Off" = "关闭";
 
-// MARK: - 帮助视图
+// MARK: - 帮助与诊断
 "HelpPageTitle" = "诊断与帮助";
-"HelpPageSubHead" = "检测关键组件状态并提供常见问题修复操作";
+"HelpPageSubHead" = "检测关键组件状态并修复常见问题";
 "GithubIssues" = "问题反馈";
 "Refresh" = "刷新";
-"V2rayCoreSwitchStatus" = "core 开关状态";
-"V2rayCoreRunningStatus" = "core 运行状态 (launchd)";
+"V2rayCoreSwitchStatus" = "核心开关状态";
+"V2rayCoreRunningStatus" = "核心运行状态 (launchd)";
 "BackgroundActivity" = "后台活动";
-"BackgroundActivitySubtitleRunning" = "核心进程在运行";
+"BackgroundActivitySubtitleRunning" = "核心进程运行中";
 "BackgroundActivitySubtitleNotRunning" = "核心进程未运行";
 "OpenSettings" = "打开设置";
 "Restart" = "重启";
 "PingState" = "延迟测试状态";
 "RunPingNow" = "运行延迟测试";
-"V2rayCoreInstallAndVersion" = "core 安装与版本";
+"V2rayCoreInstallAndVersion" = "核心安装与版本";
 "V2rayUToolPermission" = "V2rayUTool 权限";
 "GeoipFile" = "geoip.dat 文件";
 "Installed" = "已安装";
 "Missing" = "缺失";
 "PermissionException" = "权限异常";
-"V2rayCoreNotInstalled" = "core 未安装或不可执行";
-"UnableToOpenSystemSettings" = "无法打开系统设置";
+"V2rayCoreNotInstalled" = "核心未安装或不可执行。";
+"UnableToOpenSystemSettings" = "无法打开系统设置。";
 "PleaseManuallyOpenBackgroundActivity" = "请手动前往 系统设置 → 通用 → 后台活动，允许 V2rayU 后台运行。";
 "Fix" = "修复";
-"PingProblem" = "延迟测试失败：节点不可用或网络异常";
-"V2rayUToolProblem" = "V2rayUTool 权限异常，可能无法启动核心";
-"BackgroundProblem" = "应用未在后台运行，可能被系统限制或核心进程已停止";
-"GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常";
-"V2rayCoreProblem" = "core 未安装或不可执行";
+"PingProblem" = "延迟测试失败：节点不可用或网络异常。";
+"V2rayUToolProblem" = "V2rayUTool 权限异常，核心可能无法正常启动。";
+"BackgroundProblem" = "应用未在后台运行，可能被系统限制或核心进程已停止。";
+"GeoipProblem" = "geoip.dat 文件缺失，可能导致部分功能异常。";
+"V2rayCoreProblem" = "核心未安装或不可执行。";
 "Diagnostics" = "诊断";
 "DiagnosticSubHead" = "检查常见问题与解决方案";
 "FAQ" = "常见问题";
@@ -301,13 +314,13 @@
 "TableFieldSort" = "排序";
 "TableFieldRemark" = "备注";
 "TableFieldUrl" = "订阅地址";
-"TableFieldInterval" = "更新间隔(秒)";
+"TableFieldInterval" = "更新间隔 (秒)";
 "TableFieldUpdateTime" = "更新时间";
 "TableFieldType" = "类型";
 "TableFieldAddress" = "地址";
 "TableFieldPort" = "端口";
 "TableFieldLatency" = "延迟";
-"TableFieldNetwork" = "网络";
+"TableFieldNetwork" = "传输协议";
 "TableFieldSecurity" = "安全";
 "TableFieldTodayDown" = "今日下行";
 "TableFieldTodayUp" = "今日上行";
@@ -331,24 +344,34 @@
 
 // MARK: - 关于页
 "Version" = "版本";
-"Build" = "构建";
-"CoreVersion" = "Core 版本";
+"Build" = "构建号";
+"CoreVersion" = "核心版本";
 "RelatedFileLocations" = "相关文件位置";
-"ClickAndOpenInFinder" = "点击路径在 Finder 打开";
-"OpenInFinder" = "在 Finder 打开";
+"ClickAndOpenInFinder" = "点击路径在 Finder 中打开";
+"OpenInFinder" = "在 Finder 中打开";
 "OpenSourceProject" = "开源项目";
 "OpenSourceLicense" = "遵循 GNU GPL v3.0 许可协议";
 "OpenSourceLibraries" = "引用开源库";
-"UsedButNotLimitedTo" = "有用到且不限于以下";
-"OpenInBrowser" = "在浏览器打开";
+"UsedButNotLimitedTo" = "使用但不限于以下：";
+"OpenInBrowser" = "在浏览器中打开";
+"Copyright" = "版权所有";
+"AllRightsReserved" = "保留所有权利。";
+"ErrorLog" = "错误日志";
+"LogFile" = "日志文件";
+"SelectLogFile" = "选择日志文件查看";
+"OKButton" = "确定";
+"CloseButton" = "关闭";
+"Selected" = "已选择";
+"Proxies" = "个代理";
+"PingAllProxies" = "将对所有代理进行延迟测试并显示结果。";
 
-// MARK: - Core 更新管理
-"CoreSettingsTitle" = "Core 设置";
+// MARK: - 核心更新管理
+"CoreSettingsTitle" = "核心设置";
 "CoreSettingsSubtitle" = "管理核心版本";
 "CheckLatestVersion" = "检查最新版本";
 "LocalCoreDirectory" = "本地 Xray Core 目录";
 "FileDirectory" = "文件目录:";
-"LocalCoreVersionDetail" = "本地 Xray Core 版本明细";
+"LocalCoreVersionDetail" = "本地 Xray Core 版本详情";
 "GithubLatestVersion" = "GitHub 最新版本";
 "DownloadAndReplace" = "下载并替换";
 "Downloading" = "正在下载";
@@ -356,72 +379,73 @@
 "CancelDownload" = "取消下载";
 "DownloadHint" = "下载提示";
 "DownloadCanceled" = "下载已取消";
-"DownloadURLInvalid" = "下载地址错误: %@";
-"ReplaceSuccess" = "替换成功";
+"DownloadURLInvalid" = "下载地址无效: %@";
+"ReplaceSuccess" = "替换成功！";
 "OperationFailed" = "操作失败: %@";
 "DownloadTimeoutError" = "下载超时";
-"SaveError" = "保存文件失败";
+"DownloadSaveFailed" = "保存文件失败";
 "DownloadErrorOccurred" = "下载过程中发生错误";
 "ClearLogFileFailed" = "清除日志文件失败";
 "PortInUse" = "端口已被占用";
-"PortInUseTip" = "端口已被占用, 请更换其他端口号。";
+"PortInUseTip" = "端口已被占用，请更换其他端口号。";
 "Install" = "安装";
 "InstallTitle" = "安装 V2rayUTool 工具";
-"InstallPermissionTip" = "V2rayU 需要使用管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool";
+"InstallPermissionTip" = "V2rayU 需要管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool";
 "InstallFailed" = "安装失败";
 "InstallFailedTip" = "安装 V2rayUTool 失败: %@";
 "InstallFailedManual" = "请手动运行安装脚本进行安装。";
-
-"ReplaceCore" = "替换Core";
-"releaseNodesTitle" = "发布节点";
-"skipVersion" = "跳过此版本";
-"installUpdate" = "安装更新";
+"ReplaceCore" = "替换核心";
+"ReleaseNotesTitle" = "更新日志";
+"SkipVersion" = "跳过此版本";
+"InstallUpdate" = "安装更新";
 "CheckingForUpdates" = "正在检查更新...";
 "InstallV2rayU" = "安装 V2rayU";
 "NewVersionTip" = "发现新版本 (%@) 可用！";
-"AlreadyLastestVersion" = "已经是最新版本";
-"AlreadyLastestToast" = "当前 %@ 已经是最新版了";
+"AlreadyLatestVersion" = "已是最新版本";
+"AlreadyLatestToast" = "当前 %@ 已是最新版本";
 "V2rayUUpdateTitle" = "V2rayU 更新";
 
+// MARK: - 常见问题
 "FaqHowItWorks" = "V2rayU 是如何工作的？";
 "FaqConfigLocation" = "配置文件存储在哪里？";
-"FaqOperationModes" = "运行模式说明";
-"FaqModeRoutingRelation" = "运行模式与路由的关系";
-"FaqRoutingPriority" = "路由匹配优先级";
-"FaqTrueGlobalProxy" = "如何实现真全局代理？";
-"FaqManualCoreUpdate" = "如何手动更新 core";
-"FaqHowItWorksDetail" = "V2rayU 是一个基于 V2Ray/Sing-Box 核心的 macOS 应用，提供图形界面来简化配置与管理。它使用 launchd 启动并管理核心进程，并为其设置系统代理（HTTP/SOCKS 或 Tunnel）以实现代理上网功能。";
-"FaqConfigLocationDetail2" = "V2rayU 的配置文件存储在用户主目录下的 ~/.V2rayU/ 目录中，可在命令行执行 ls -al ~/.V2rayU/ 查看文件明细。
+"FaqOperationModes" = "运行模式有哪些？";
+"FaqModeRoutingRelation" = "运行模式与路由有什么关系？";
+"FaqRoutingPriority" = "路由匹配的优先级是什么？";
+"FaqTrueGlobalProxy" = "如何实现真正的全局代理？";
+"FaqManualCoreUpdate" = "如何手动更新核心？";
+"FaqHowItWorksDetail" = "V2rayU 是一个基于 Xray-core/Sing-Box 核心的 macOS 应用，提供图形界面来简化配置与管理。它使用 launchd 启动并管理核心进程，并设置系统代理（HTTP/SOCKS 或 Tunnel）以实现代理上网功能。";
+"FaqConfigLocationDetail2" = "V2rayU 的配置文件存储在用户主目录下的 ~/.V2rayU/ 目录中，可在终端执行 ls -al ~/.V2rayU/ 查看文件详情。
 
 文件说明:
 ~/.V2rayU/config.json - 核心主要配置文件
-~/.V2rayU/V2rayUTool - 重要!!! 系统代理设置的辅助工具, 必须要有 -rwsrwsrwx 1 root admin 权限
-~/.V2rayU/.V2rayU.db - 5.0以上版本的 SQLite 数据库，存储订阅和服务器信息
-~/.V2rayU/v2ray-core/v2ray - 运行的 core 可执行文件, 需对应系统架构版本 (x86_64 或 arm64)
-~/.V2rayU/proxy.js - Pac 模式下的自动代理配置文件
-~/.V2rayU/v2ray-core.log - core 日志";
-"FaqOperationModesDetail2" = "主要是怎么设置系统代理:
+~/.V2rayU/V2rayUTool - 重要!!! 系统代理设置辅助工具，必须拥有 -rwsrwsrwx 1 root admin 权限
+~/.V2rayU/.V2rayU.db - 5.0 以上版本的 SQLite 数据库，存储订阅和服务器信息
+~/.V2rayU/v2ray-core/v2ray - 核心可执行文件，需对应系统架构 (x86_64 或 arm64)
+~/.V2rayU/proxy.js - PAC 模式下的自动代理配置文件
+~/.V2rayU/v2ray-core.log - 核心运行日志";
+"FaqOperationModesDetail2" = "主要区别在于如何设置系统代理:
 
-• Pac 模式：系统设置pac代理(设置->网络->WIFI->详情->代理->自动代理配置)
-• Global 模式：系统设置http/socks代理(设置->网络->WIFI->详情->代理->HTTP,HTTPS和SOCKS代理)
-• Manual 模式：手动模式,不设置系统代理(会清理系统代理,包括pac,HTTP,HTTPS,SOCKS代理)
+• PAC 模式：设置系统 PAC 代理 (设置 → 网络 → Wi-Fi → 详情 → 代理 → 自动代理配置)
+• 全局模式：设置系统 HTTP/SOCKS 代理 (设置 → 网络 → Wi-Fi → 详情 → 代理 → HTTP、HTTPS 和 SOCKS 代理)
+• 手动模式：不设置系统代理 (会清除所有系统代理设置，包括 PAC、HTTP、HTTPS、SOCKS)
 • Tunnel 模式：使用 sing-box 的 TUN 功能（网络扩展）实现真正的系统级代理，所有应用自动走代理
 
-说明: 以上 Pac、Global、Manual 模式主要是以浏览器等系统级应用会走系统代理，其他应用通常需要手动设置代理或使用 Tunnel 模式。";
-"FaqModeRoutingRelationDetail" = "运行模式决定了系统代理的设置方式，而路由规则则决定了哪些流量通过代理服务器，哪些流量直连。两者结合使用，可以实现灵活的网络访问策略。";
-"FaqRoutingPriorityDetail2" = "路由匹配优先级: 域名阻断 -> 域名代理 -> 域名直连 -> IP阻断 -> IP代理 -> IP直连";
-"FaqTrueGlobalProxyDetail2" = "使用 Tunnel 模式！V2rayU 支持通过 sing-box 的 TUN 功能（网络扩展）实现 Tunnel 模式，可以实现真正的系统级代理。Mac 上的所有网络流量都会自动走代理，无需在各个应用中进行代理配置。
+说明: PAC、全局、手动模式主要影响浏览器等使用系统代理的应用；不走系统代理的应用需手动配置代理或使用 Tunnel 模式。";
+"FaqModeRoutingRelationDetail" = "运行模式决定了系统代理的设置方式，而路由规则决定哪些流量走代理、哪些流量直连。两者结合可实现灵活的网络访问策略。";
+"FaqRoutingPriorityDetail2" = "路由匹配优先级: 域名阻断 → 域名代理 → 域名直连 → IP 阻断 → IP 代理 → IP 直连";
+"FaqTrueGlobalProxyDetail2" = "使用 Tunnel 模式！V2rayU 通过 sing-box 的 TUN 功能（网络扩展）实现 Tunnel 模式，可以真正做到系统级全局代理。Mac 上的所有网络流量都会自动走代理，无需在各应用中单独配置。
 
-启用方法：点击菜单栏的 V2rayU 图标 -> 选择 Tunnel 模式，或使用快捷键。";
-"FaqManualCoreUpdateDetail2" = "可以手动下载 xray-core 或 sing-box 对应系统架构版本替换到 ~/.V2rayU/v2ray-core/ 目录下，请注意，需要更改 core 名称为 ~/.V2rayU/v2ray-core/v2ray";
-// Diagnostics - 检查步骤标题
+启用方法：点击菜单栏 V2rayU 图标 → 选择 Tunnel 模式，或使用快捷键切换。";
+"FaqManualCoreUpdateDetail2" = "可手动下载对应系统架构的 xray-core 或 sing-box 版本，替换到 ~/.V2rayU/v2ray-core/ 目录下。请注意需将核心文件重命名为 ~/.V2rayU/v2ray-core/v2ray";
+
+// MARK: - 诊断 - 检查项标题
 "DiagNetworkConnectivity" = "网络连接";
 "DiagSystemProxy" = "系统代理设置";
 "DiagFirewall" = "防火墙与安全软件";
 "DiagCoreInstall" = "核心安装与版本";
 "DiagCoreRunning" = "核心运行状态";
-"DiagUToolPermission" = "工具权限";
-"DiagConfigValidity" = "配置合法性";
+"DiagUToolPermission" = "辅助工具权限";
+"DiagConfigValidity" = "配置文件有效性";
 "DiagDNSResolution" = "节点域名解析";
 "DiagPortConnectivity" = "远端端口连通性";
 "DiagLocalPortConflict" = "本地端口冲突";
@@ -429,37 +453,40 @@
 "DiagPingLatency" = "延迟与可用性";
 "DiagLogAnalysis" = "日志分析";
 "DiagVPNConflict" = "VPN 冲突检测";
-// Diagnostics - 状态描述
+
+// MARK: - 诊断 - 状态描述
 "DiagPending" = "等待检查…";
 "DiagChecking" = "正在检查…";
 "DiagPassed" = "检查通过";
 "DiagFailed" = "检查失败";
-// Diagnostics - 详细问题描述
+
+// MARK: - 诊断 - 详细问题描述
 "DiagNetUnavailable" = "电脑无法访问互联网。请检查：\n1. 路由器/宽带是否正常\n2. Wi-Fi 是否已连接\n3. 网线是否插好";
-"DiagNetDNSFailed" = "DNS 服务器无法解析域名。可能是网络设置问题或 VPN 软件冲突。请检查网络设置中的 DNS 配置";
-"DiagNetIPFailed" = "无法访问公网 IP，可能是网络被限制或防火墙阻止";
-"DiagProxyNotEnabled" = "系统代理未开启，软件产生的代理无法被系统使用。请在系统网络设置中开启代理，或在 V2rayU 中选择「全局模式」/「PAC 模式」自动配置";
-"DiagProxyPortWrong" = "系统代理端口配置不正确。V2rayU 使用的端口是 %d（SOCKS）或 %d（HTTP），请在系统代理设置中修改";
-"DiagProxyPortMismatch" = "系统代理端口错误（当前：%d，应改为：%d）";
+"DiagNetDNSFailed" = "DNS 服务器无法解析域名。可能是网络设置问题或 VPN 软件冲突，请检查 DNS 配置。";
+"DiagNetIPFailed" = "无法访问公网 IP，网络可能受限或被防火墙阻止。";
+"DiagProxyNotEnabled" = "系统代理未开启，应用无法使用代理。请在系统网络设置中开启代理，或在 V2rayU 中选择「全局模式」/「PAC 模式」。";
+"DiagProxyPortWrong" = "系统代理端口配置不正确。V2rayU 使用端口 %d（SOCKS）或 %d（HTTP），请在系统代理设置中修改。";
+"DiagProxyPortMismatch" = "系统代理端口错误（当前: %d，应为: %d）";
 "DiagFirewallBlocked" = "防火墙或安全软件（如 360、腾讯安全卫士、MacKeeper 等）可能阻止了代理进程或端口。请尝试：\n1. 在安全软件中添加信任\n2. 暂时关闭防火墙测试\n3. 在系统偏好设置中允许 V2rayU";
-"DiagCoreNotInstalled" = "V2ray 核心未安装。这是必须的组件，否则无法使用代理功能。请点击「一键修复」自动下载安装";
-"DiagCoreNotExecutable" = "核心文件存在但没有执行权限。请尝试重新安装或手动修复权限";
-"DiagCoreNotRunning" = "核心进程未运行，无法提供代理服务";
-"DiagCoreStopped" = "代理功能已关闭。如果需要使用代理，请点击「启动核心」";
-"DiagCoreStartFailed" = "核心进程未运行。可能的原因：\n1. 配置文件有误\n2. 端口被占用\n3. 核心程序崩溃\n\n请查看日志分析获取更多信息，或尝试重启核心";
-"DiagToolMissing" = "V2rayU 辅助工具未安装。这可能导致无法自动安装核心等功能。请尝试重新安装 V2rayU";
-"DiagToolNoPermission" = "辅助工具权限不足。运行 V2rayU 时需要管理员权限来安装核心和修改系统设置。请尝试：\n1. 重新打开 V2rayU\n2. 在系统设置中授予完整磁盘访问权限";
+"DiagCoreNotInstalled" = "核心未安装，这是代理功能的必要组件。请点击「一键修复」自动下载安装。";
+"DiagCoreNotExecutable" = "核心文件存在但无执行权限。请尝试重新安装或手动修复权限。";
+"DiagCoreNotRunning" = "核心进程未运行，无法提供代理服务。";
+"DiagCoreStopped" = "代理功能已关闭。如需使用代理，请点击「启动核心」。";
+"DiagCoreStartFailed" = "核心进程未运行。可能原因：\n1. 配置文件有误\n2. 端口被占用\n3. 核心程序崩溃\n\n请查看日志分析获取更多信息，或尝试重启核心。";
+"DiagToolMissing" = "V2rayU 辅助工具未安装，可能导致核心无法自动安装。请尝试重新安装 V2rayU。";
+"DiagToolNoPermission" = "辅助工具权限不足。V2rayU 需要管理员权限来安装核心和修改系统设置。请尝试：\n1. 重新打开 V2rayU\n2. 在系统设置中授予完整磁盘访问权限";
 "DiagConfigNotExist" = "配置文件不存在";
 "DiagConfigInvalid" = "配置文件格式错误，不是有效的 JSON";
 "DiagConfigMissingField" = "配置文件缺少必要字段";
 "DiagNodeNotSelected" = "请先选择一个节点后再进行诊断";
-"DiagDNSResolveFailed" = "DNS 无法解析节点域名「%@」。可能原因：\n1. 当前网络的 DNS 服务器无法解析该域名\n2. 节点域名已过期或失效\n3. 网络使用了自定义 DNS 但该 DNS 无法解析\n\n请尝试更换网络或手动更换节点";
-"DiagPortConnectFailed" = "无法连接到远程服务器（%@:%d）。可能原因：\n1. 节点服务器已下线或不可用\n2. 端口被墙（常用端口如 443、8388 等容易被封）\n3. 当前网络对海外连接有限制\n\n请尝试更换节点或更换端口";
-"DiagPortOccupied" = "本地端口 %d 被「%@」占用。请关闭该程序或在设置中修改端口";
-"DiagGeoipMissing" = "GeoIP 数据库文件未安装。这会导致无法使用分流规则（如国内走直连、国外走代理）。请点击「一键修复」自动下载";
-"DiagLatencyHigh" = "延迟较高（%dms），可能会影响上网体验。请尝试更换延迟更低的节点";
-"DiagLatencyFailed" = "无法连接到节点进行测速。可能节点不可用或网络被阻断。请尝试更换节点";
-// Diagnostics - 动作按钮
+"DiagDNSResolveFailed" = "DNS 无法解析节点域名「%@」。可能原因：\n1. 当前网络的 DNS 无法解析该域名\n2. 节点域名已过期或失效\n3. 使用了无法解析的自定义 DNS\n\n请尝试更换网络或更换节点。";
+"DiagPortConnectFailed" = "无法连接到远程服务器（%@:%d）。可能原因：\n1. 节点服务器已下线\n2. 端口被封（443、8388 等常用端口容易被封）\n3. 当前网络限制海外连接\n\n请尝试更换节点或端口。";
+"DiagPortOccupied" = "本地端口 %d 被「%@」占用。请关闭该程序或在设置中修改端口。";
+"DiagGeoipMissing" = "GeoIP 数据库文件未安装，无法使用分流规则（国内直连、国外代理）。请点击「一键修复」自动下载。";
+"DiagLatencyHigh" = "延迟较高（%dms），可能影响上网体验。建议更换延迟更低的节点。";
+"DiagLatencyFailed" = "无法连接到节点进行测速。节点可能不可用或网络被阻断，请尝试更换节点。";
+
+// MARK: - 诊断 - 操作按钮
 "DiagOpenNetworkSettings" = "打开网络设置";
 "DiagFixNow" = "一键修复";
 "DiagRestartCore" = "重启核心";
@@ -467,21 +494,52 @@
 "DiagCheckNetwork" = "检查网络";
 "DiagViewConfig" = "查看配置";
 "DiagReTest" = "重新测试";
-// Diagnostics - 特殊模式说明
+
+// MARK: - 诊断 - 特殊模式说明
 "DiagProxyNotNeededTunnel" = "Tunnel 模式不需要系统代理（使用网络扩展）";
-"DiagProxyNotNeededManual" = "Manual 模式不设置系统代理";
+"DiagProxyNotNeededManual" = "手动模式不设置系统代理";
 "DiagProxyNotNeededOff" = "代理已关闭";
 "DiagProxyRequired" = "需要开启系统代理（PAC/全局模式）";
-// Diagnostics - Core 架构
-"DiagCoreArch" = "Core 架构检查";
+
+// MARK: - 诊断 - 核心架构
+"DiagCoreArch" = "核心架构检查";
 "DiagCoreArchCorrect" = "架构与系统匹配 (%@)";
-"DiagCoreArchMismatch" = "架构不匹配 (文件: %@, 系统: %@)";
-// Diagnostics - 基础文件
-"DiagV2rayUToolInstall" = "V2rayUTool 安装";
+"DiagCoreArchMismatch" = "架构不匹配（文件: %@，系统: %@）";
+
+// MARK: - 诊断 - 基础文件
+"DiagV2rayUToolInstall" = "V2rayUTool 安装状态";
 "DiagConfigFile" = "配置文件";
 "DiagConfigFileExists" = "配置文件存在 (%d 字节)";
 "DiagConfigFileMissing" = "配置文件缺失";
 "DiagConfigFileEmpty" = "配置文件为空";
-// Diagnostics - Geo 文件
+// MARK: - 诊断 - Geo 文件
 "DiagGeositeFile" = "GeoSite 数据库";
 "DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「立即修复」自动下载";
+
+// MARK: - 旧版数据迁移
+"ImportLegacyData" = "导入 v4 数据";
+"ImportLegacyDataTitle" = "从 v4 版本导入数据";
+"ImportLegacyDataTip" = "从 V2rayU v4（UserDefaults 版本）导入服务器和订阅";
+"LegacyDataMigrated" = "数据已经迁移完成";
+"LegacyDataMigrationSuccess" = "迁移完成：导入了 %d 个服务器，%d 个订阅";
+"LegacyDataMigrationFailed" = "迁移失败：%@";
+"LegacyDataMigrationNoData" = "没有找到需要导入的旧版数据";
+"ImportLegacyDataMigrating" = "正在迁移数据...";
+"ImportLegacyDataDetected" = "检测到旧版数据:";
+"ImportLegacyDataNoData" = "未检测到旧版数据";
+"ImportLegacyDataServerCount" = "%d 个服务器";
+"ImportLegacyDataSubCount" = "%d 个订阅";
+"ImportLegacyConfirmTitle" = "确认导入";
+"ImportLegacyConfirmMessage" = "即将从旧版本导入 %d 个服务器和 %d 个订阅到新版本。是否继续？";
+"ImportLegacyDetectedKeys" = "检测到的键:";
+"ImportLegacyServerList" = "服务器列表:";
+"ImportLegacySubList" = "订阅列表:";
+"ImportLegacyMigratingStart" = "开始迁移...";
+"ImportLegacyMigratingComplete" = "迁移完成!";
+"ImportLegacyNoDataFound" = "没有找到旧版数据";
+"ImportLegacyMigrationFailed" = "迁移失败: ";
+"ImportLegacyItemsRemaining" = "还有 %d 项";
+"ImportLegacyV2rayServerList" = "v2rayServerList: ";
+"ImportLegacyV2raySubList" = "v2raySubList: ";
+"ImportLegacySuccessServers" = "成功导入 %d 个服务器";
+"ImportLegacySuccessSubscriptions" = "成功导入 %d 个订阅";

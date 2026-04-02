@@ -201,7 +201,7 @@ actor ClashApilatencyHandler: NSObject {
 
 }
 
-final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate {
+final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     static let shared = ClashApiStreamHandler()
     
     private var clashApiSession: URLSession!

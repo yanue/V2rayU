@@ -121,10 +121,10 @@ class AppVersionController: NSWindowController {
                         }
                     } else {
                         await MainActor.run {
-                            vm.checkError = String(localized: .AlreadyLastestToast,arguments: appVersion)
+                            vm.checkError = String(localized: .AlreadyLatestToast,arguments: appVersion)
                             if showWindow {
-                                let title = String(localized: .AlreadyLastestVersion)
-                                let toast = String(localized: .AlreadyLastestToast,arguments: appVersion)
+                                let title = String(localized: .AlreadyLatestVersion)
+                                let toast = String(localized: .AlreadyLatestToast,arguments: appVersion)
                                 alertDialog(title: title,message:toast)
                             }
                         }

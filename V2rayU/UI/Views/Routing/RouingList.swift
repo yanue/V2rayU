@@ -21,10 +21,21 @@ struct RoutingListView: View {
         { $0.uuid == AppState.shared.runningRouting }
     }
     
+    private var filteredAndSortedItems: [RoutingEntity] {
+        viewModel.list
+    }
+    
+    private func resolveSelectedItems(for item: RoutingEntity) -> [RoutingEntity] {
+        if selection.contains(item.uuid) && selection.count > 1 {
+            return filteredAndSortedItems.filter { selection.contains($0.uuid) }
+        }
+        return [item]
+    }
+    
     var body: some View {
         VStack {
             PageHeader(
-                icon: "bonjour",
+                icon: "arrow.triangle.branch",
                 title: localizedString(.Routings),
                 subtitle: localizedString(.RoutingSubHead)
             ) {
@@ -114,8 +125,11 @@ struct RoutingListView: View {
             .focusable(false)
 
             Button {
-                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: String(localized: .DeleteTip)) {
-                    viewModel.delete(uuid: item.uuid)
+                let itemsToDelete = resolveSelectedItems(for: item)
+                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: itemsToDelete.count > 1 ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count) : String(localized: .DeleteTip)) {
+                    for entity in itemsToDelete {
+                        viewModel.delete(uuid: entity.uuid)
+                    }
                 }
             } label: {
                 Label(String(localized: .Delete), systemImage: "trash")

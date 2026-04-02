@@ -63,7 +63,7 @@ struct AppVersionView: View {
                         Text(vm.description)
                             .padding(.trailing, 20)
 
-                        Text(String(localized: .releaseNodesTitle))
+                        Text(String(localized: .ReleaseNotesTitle))
                             .font(.headline)
                             .bold()
                             .padding(.top, 20)

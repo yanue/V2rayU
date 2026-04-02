@@ -172,9 +172,6 @@ class SingboxOutboundHandler {
             
         case .domainsocket:
             return TransportConfig(type: "domainsocket")
-            
-        default:
-            return nil
         }
     }
 

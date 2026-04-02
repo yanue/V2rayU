@@ -86,7 +86,7 @@ struct PacView: View {
             pacUserRules = getPacUserRules()
         }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text(String(localized: .PACUpdateNotification)), message: Text(tips), dismissButton: .default(Text("确定")))
+            Alert(title: Text(String(localized: .PACUpdateNotification)), message: Text(tips), dismissButton: .default(Text(String(localized: .OK))))
         }
     }
 

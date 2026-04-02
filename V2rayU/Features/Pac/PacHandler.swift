@@ -134,16 +134,12 @@ func getPacUserRules() -> String {
     ||openai.com
     ||chatgpt.com
     """
-    do {
-        let url = URL(fileURLWithPath: PACUserRuleFilePath)
-        if let str = try? String(contentsOf: url, encoding: .utf8) {
-            logger.info("getPacUserRules: \(PACUserRuleFilePath) \(str.count)")
-            if str.count > 0 {
-                userRuleTxt = str
-            }
+    let url = URL(fileURLWithPath: PACUserRuleFilePath)
+    if let str = try? String(contentsOf: url, encoding: .utf8) {
+        logger.info("getPacUserRules: \(PACUserRuleFilePath) \(str.count)")
+        if str.count > 0 {
+            userRuleTxt = str
         }
-    } catch {
-        logger.info("getPacUserRules err \(error)")
     }
     // auto include githubusercontent.com api.github.com
     if !userRuleTxt.contains("githubusercontent.com") {
@@ -169,16 +165,12 @@ func getPacUserRules() -> String {
 
 func getPacGFWList() -> String {
     var gfwList = ""
-    do {
-        let url = URL(fileURLWithPath: GFWListFilePath)
-        if let str = try? String(contentsOf: url, encoding: String.Encoding.utf8) {
-            logger.info("getPacGFWList: \(GFWListFilePath) \(str.count)")
-            if str.count > 0 {
-                gfwList = str
-            }
+    let url = URL(fileURLWithPath: GFWListFilePath)
+    if let str = try? String(contentsOf: url, encoding: .utf8) {
+        logger.info("getPacGFWList: \(GFWListFilePath) \(str.count)")
+        if str.count > 0 {
+            gfwList = str
         }
-    } catch {
-        logger.info("getPacGFWList err \(error)")
     }
     return gfwList
 }

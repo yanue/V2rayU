@@ -34,11 +34,11 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 20)
 
-                SidebarButton(tab: .subscription, title: .Subscriptions, icon: "personalhotspot")
-                SidebarButton(tab: .server, title: .Servers, icon: "shield.lefthalf.filled")
-                SidebarButton(tab: .routing, title: .Routings, icon: "bonjour")
+                SidebarButton(tab: .subscription, title: .Subscriptions, icon: "link.circle")
+                SidebarButton(tab: .server, title: .Servers, icon: "globe")
+                SidebarButton(tab: .routing, title: .Routings, icon: "arrow.triangle.branch")
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
-                SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "questionmark.circle")
+                SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "antenna.radiowaves.left.and.right")
                 SidebarButton(tab: .about, title: .About, icon: "info.circle")
                 Spacer()
             }
@@ -86,7 +86,7 @@ struct ContentView: View {
                 Image(systemName: icon)
                     .frame(width: 20, height: 20) // Consistent icon size
                 LocalizedTextLabelView(label:title)
-                    .font(.body) // Adjust font size for better readability
+                    .font(.callout) // Adjust font size for better readability
             }
             .frame(maxWidth: .infinity, alignment: .leading) // Align content to the left
             .padding(.vertical, 8) // Adjusted vertical padding for comfortable clicking
