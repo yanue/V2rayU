@@ -84,7 +84,7 @@
 "Tools" = "工具";
 "ToggleV2rayOnOff" = "切換代理開關";
 "SwitchProxyMode" = "切換代理模式";
-"SwitchToTunnelMode" = "切換到 Tunnel 模式";
+"SwitchToTunnelMode" = "切換到 Tun 模式";
 "SwitchToGlobalMode" = "切換到全域模式";
 "SwitchToManualMode" = "切換到手動模式";
 "SwitchToPacMode" = "切換到 PAC 模式";
@@ -254,7 +254,7 @@
 "ViewConfigJson" = "檢視 config.json";
 "ViewPacFile" = "檢視 PAC 檔案";
 "PacMode" = "PAC 模式";
-"TunnelMode" = "Tunnel 模式 (透明代理)";
+"TunnelMode" = "Tun 模式 (透明代理)";
 "GlobalMode" = "全域模式 (設定系統代理)";
 "ManualMode" = "手動模式 (清除系統代理)";
 "RoutingList" = "選擇路由";
@@ -413,7 +413,7 @@
 "FaqRoutingPriority" = "路由比對的優先順序是什麼？";
 "FaqTrueGlobalProxy" = "如何實現真正的全域代理？";
 "FaqManualCoreUpdate" = "如何手動更新核心？";
-"FaqHowItWorksDetail" = "V2rayU 是一個基於 Xray-core/Sing-Box 核心的 macOS 應用，提供圖形介面來簡化設定與管理。它使用 launchd 啟動並管理核心程序，並設定系統代理（HTTP/SOCKS 或 Tunnel）以實現代理上網功能。";
+"FaqHowItWorksDetail" = "V2rayU 是一個基於 Xray-core/Sing-Box 核心的 macOS 應用，提供圖形介面來簡化設定與管理。它使用 launchd 啟動並管理核心程序，並設定系統代理（HTTP/SOCKS 或 Tun）以實現代理上網功能。";
 "FaqConfigLocationDetail2" = "V2rayU 的設定檔儲存在使用者主目錄下的 ~/.V2rayU/ 目錄中，可在終端機執行 ls -al ~/.V2rayU/ 檢視檔案詳情。
 
 檔案說明:
@@ -428,14 +428,14 @@
 • PAC 模式：設定系統 PAC 代理 (設定 → 網路 → Wi-Fi → 詳細資訊 → 代理 → 自動代理設定)
 • 全域模式：設定系統 HTTP/SOCKS 代理 (設定 → 網路 → Wi-Fi → 詳細資訊 → 代理 → HTTP、HTTPS 和 SOCKS 代理)
 • 手動模式：不設定系統代理 (會清除所有系統代理設定，包括 PAC、HTTP、HTTPS、SOCKS)
-• Tunnel 模式：使用 sing-box 的 TUN 功能（網路擴充功能）實現真正的系統級代理，所有應用自動走代理
+• Tun 模式：使用 sing-box 的 TUN 功能（網路擴充功能）實現真正的系統級代理，所有應用自動走代理
 
-說明: PAC、全域、手動模式主要影響瀏覽器等使用系統代理的應用；不走系統代理的應用需手動設定代理或使用 Tunnel 模式。";
+說明: PAC、全域、手動模式主要影響瀏覽器等使用系統代理的應用；不走系統代理的應用需手動設定代理或使用 Tun 模式。";
 "FaqModeRoutingRelationDetail" = "運行模式決定了系統代理的設定方式，而路由規則決定哪些流量走代理、哪些流量直連。兩者結合可實現靈活的網路存取策略。";
 "FaqRoutingPriorityDetail2" = "路由比對優先順序: 網域封鎖 → 網域代理 → 網域直連 → IP 封鎖 → IP 代理 → IP 直連";
-"FaqTrueGlobalProxyDetail2" = "使用 Tunnel 模式！V2rayU 透過 sing-box 的 TUN 功能（網路擴充功能）實現 Tunnel 模式，可以真正做到系統級全域代理。Mac 上的所有網路流量都會自動走代理，無需在各應用中單獨設定。
+"FaqTrueGlobalProxyDetail2" = "使用 Tun 模式！V2rayU 透過 sing-box 的 TUN 功能（網路擴充功能）實現 Tun 模式，可以真正做到系統級全域代理。Mac 上的所有網路流量都會自動走代理，無需在各應用中單獨設定。
 
-啟用方法：點擊選單列 V2rayU 圖示 → 選擇 Tunnel 模式，或使用快捷鍵切換。";
+啟用方法：點擊選單列 V2rayU 圖示 → 選擇 Tun 模式，或使用快捷鍵切換。";
 "FaqManualCoreUpdateDetail2" = "可手動下載對應系統架構的 xray-core 或 sing-box 版本，替換到 ~/.V2rayU/v2ray-core/ 目錄下。請注意需將核心檔案重新命名為 ~/.V2rayU/v2ray-core/v2ray";
 
 // MARK: - 診斷 - 檢查項標題
@@ -496,7 +496,7 @@
 "DiagReTest" = "重新測試";
 
 // MARK: - 診斷 - 特殊模式說明
-"DiagProxyNotNeededTunnel" = "Tunnel 模式不需要系統代理（使用網路擴充功能）";
+"DiagProxyNotNeededTunnel" = "Tun 模式不需要系統代理（使用網路擴充功能）";
 "DiagProxyNotNeededManual" = "手動模式不設定系統代理";
 "DiagProxyNotNeededOff" = "代理已關閉";
 "DiagProxyRequired" = "需要開啟系統代理（PAC/全域模式）";

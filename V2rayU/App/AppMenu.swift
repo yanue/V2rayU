@@ -31,7 +31,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var logsItem: NSMenuItem!
     private var logsSubMenu: NSMenu!
     private var pacModeItem: NSMenuItem!
-    private var tunnelModeItem: NSMenuItem!
+    private var tunModeItem: NSMenuItem!
     private var globalModeItem: NSMenuItem!
     private var manualModeItem: NSMenuItem!
     private var routingItem: NSMenuItem!
@@ -139,7 +139,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 刷新模式状态
         toggleCoreItem?.title = coreTitle()
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
-        tunnelModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
+        tunModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
         manualModeItem.state = (.manual == AppState.shared.runMode) ? .on : .off
 
@@ -165,8 +165,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private func updateMenuKeyEquivalents() {
         // toggleCoreItem
         setKeyEquivalent(for: .toggleV2rayOnOff, menuItem: toggleCoreItem)
-        // Tunnel Mode
-        setKeyEquivalent(for: .switchToTunnelMode, menuItem: tunnelModeItem)
+        // Tun Mode
+        setKeyEquivalent(for: .switchToTunnelMode, menuItem: tunModeItem)
         // Global Mode
         setKeyEquivalent(for: .switchToGlobalMode, menuItem: globalModeItem)
         // Manual Mode
@@ -239,7 +239,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         pacModeItem?.title = String(localized: .PacMode)
         globalModeItem?.title = String(localized: .GlobalMode)
         manualModeItem?.title = String(localized: .ManualMode)
-        tunnelModeItem?.title = String(localized: .TunnelMode)
+        tunModeItem?.title = String(localized: .TunnelMode)
         goSubscriptionsItem?.title = String(localized: .GoSubscriptionSettings)
         goRoutingSettingItem?.title = String(localized: .GoRoutingSettings)
         goServerSettingItem?.title = String(localized: .GoServerSettings)
@@ -283,8 +283,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
         globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
         manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
-        tunnelModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
-        menu.addItem(tunnelModeItem)
+        tunModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
+        menu.addItem(tunModeItem)
         menu.addItem(globalModeItem)
         menu.addItem(pacModeItem)
         menu.addItem(manualModeItem)

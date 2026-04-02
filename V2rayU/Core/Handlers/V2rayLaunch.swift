@@ -37,7 +37,7 @@ enum RunMode: String, CaseIterable {
         case .manual:
             return "Manual.tip"
         case .tun:
-            return "Tunnel.tip"
+            return "Tun.tip"
         }
     }
 }
