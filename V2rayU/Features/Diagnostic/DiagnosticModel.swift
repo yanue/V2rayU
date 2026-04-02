@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-/// 诊断分类（精简版）
+/// 诊断分类
 enum DiagnosticCategory: String, CaseIterable, Identifiable {
     case files = "文件检查"
     case status = "运行状态"
+    case network = "网络检查"
     case logs = "日志分析"
     
     var id: String { rawValue }
@@ -19,6 +20,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
         switch self {
         case .files: return "folder.badge.gearshape"
         case .status: return "cpu"
+        case .network: return "globe"
         case .logs: return "doc.text.magnifyingglass"
         }
     }
@@ -26,9 +28,11 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
     var steps: [DiagnosticStep] {
         switch self {
         case .files:
-            return [.v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .geoipFile, .geositeFile]
+            return [.v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .configValidity, .geoipFile, .geositeFile]
         case .status:
-            return [.coreRunning, .localPortConflict, .pingLatency]
+            return [.coreRunning, .systemProxy, .localPortConflict]
+        case .network:
+            return [.basicNetwork, .nodeConnectivity, .proxyConnectivity, .pingLatency]
         case .logs:
             return [.logAnalysis]
         }
@@ -90,29 +94,48 @@ extension DiagnosticItem {
 
 /// 诊断步骤枚举：顺序执行
 enum DiagnosticStep: String, CaseIterable {
+    // 文件检查
     case v2rayUToolInstall            // V2rayUTool 安装
     case uToolPermission              // v2rayU 工具权限
     case coreInstall                  // v2ray 核心安装
-    case coreArch                      // Core 架构检查 (amd64/arm64)
+    case coreArch                     // Core 架构检查 (amd64/arm64)
     case configFile                   // 配置文件存在
+    case configValidity               // 配置文件 JSON 合法性 + 字段完整性
     case geoipFile                    // GeoIP 文件存在
     case geositeFile                  // GeoSite 文件存在
+    // 运行状态
     case coreRunning                  // 核心运行状态
-    case nodeConnectivity             // 节点连接（域名解析 + 端口）
+    case systemProxy                  // 系统代理设置检查
     case localPortConflict            // 本地端口占用
-    case pingLatency                  // 延迟（可用性）- 无法翻墙时重点
+    // 网络检查
+    case basicNetwork                 // 基础网络连通 (apple.com)
+    case nodeConnectivity             // 节点连接（域名解析 + 端口）
+    case proxyConnectivity            // 通过代理访问外网
+    case pingLatency                  // 延迟（可用性）
+    // 日志
     case logAnalysis                  // 日志解析（错误映射）
     
     static var allCheckSteps: [DiagnosticStep] {
-        [.v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .geoipFile, .geositeFile, .coreRunning, .nodeConnectivity, .localPortConflict, .pingLatency, .logAnalysis]
+        [
+            // 文件检查
+            .v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .configValidity, .geoipFile, .geositeFile,
+            // 运行状态
+            .coreRunning, .systemProxy, .localPortConflict,
+            // 网络检查
+            .basicNetwork, .nodeConnectivity, .proxyConnectivity, .pingLatency,
+            // 日志
+            .logAnalysis
+        ]
     }
     
     var category: DiagnosticCategory {
         switch self {
-        case .v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .geoipFile, .geositeFile:
+        case .v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch, .configFile, .configValidity, .geoipFile, .geositeFile:
             return .files
-        case .coreRunning, .nodeConnectivity, .localPortConflict, .pingLatency:
+        case .coreRunning, .systemProxy, .localPortConflict:
             return .status
+        case .basicNetwork, .nodeConnectivity, .proxyConnectivity, .pingLatency:
+            return .network
         case .logAnalysis:
             return .logs
         }

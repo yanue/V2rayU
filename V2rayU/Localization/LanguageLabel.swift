@@ -441,6 +441,8 @@ enum LanguageLabel: String, CaseIterable {
     case DiagPingLatency
     case DiagLogAnalysis
     case DiagVPNConflict
+    case DiagBasicNetwork
+    case DiagProxyConnectivity
 
     // MARK: - Diagnostics - Status
     case DiagPending
@@ -473,6 +475,16 @@ enum LanguageLabel: String, CaseIterable {
     case DiagGeoipMissing
     case DiagLatencyHigh
     case DiagLatencyFailed
+    case DiagBasicNetworkFailed
+    case DiagProxyConnectFailed
+    case DiagProxyConnectOK
+    case DiagBasicNetworkOK
+    case DiagConfigValidOK
+    case DiagConfigValidProblems
+    case DiagSystemProxyOK
+    case DiagSystemProxyNotNeeded
+    case DiagReportCopied
+    case DiagReportTooLong
 
     // MARK: - Diagnostics - Actions
     case DiagOpenNetworkSettings
