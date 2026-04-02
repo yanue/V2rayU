@@ -452,6 +452,8 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagPingLatency" = "Latency & Availability";
 "DiagLogAnalysis" = "Log Analysis";
 "DiagVPNConflict" = "VPN Conflict Detection";
+"DiagBasicNetwork" = "Basic Network";
+"DiagProxyConnectivity" = "Proxy Connectivity";
 
 // MARK: - Diagnostics - Status
 "DiagPending" = "Pending...";
@@ -484,6 +486,16 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagGeoipMissing" = "GeoIP database file is not installed. This will prevent routing rules from working (domestic direct, overseas proxy). Click 'Fix Now' to auto-download";
 "DiagLatencyHigh" = "High latency (%dms), may affect browsing experience. Try switching to a node with lower latency";
 "DiagLatencyFailed" = "Cannot connect to node for latency test. Node may be unavailable or blocked. Try switching nodes";
+"DiagBasicNetworkFailed" = "Cannot access the internet (apple.com unreachable). Check your network connection";
+"DiagProxyConnectFailed" = "Cannot access external sites via local proxy. The proxy may not be working properly";
+"DiagProxyConnectOK" = "Proxy connectivity OK";
+"DiagBasicNetworkOK" = "Internet accessible";
+"DiagConfigValidOK" = "Configuration is valid JSON with required fields";
+"DiagConfigValidProblems" = "Configuration issues: %@";
+"DiagSystemProxyOK" = "System proxy correctly configured (port %d)";
+"DiagSystemProxyNotNeeded" = "System proxy not needed in current mode";
+"DiagReportCopied" = "Report copied to clipboard. Please paste into the GitHub issue.";
+"DiagReportTooLong" = "Report too long for URL, copied to clipboard instead";
 
 // MARK: - Diagnostics - Actions
 "DiagOpenNetworkSettings" = "Open Network Settings";

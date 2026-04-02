@@ -453,6 +453,8 @@
 "DiagPingLatency" = "延遲與可用性";
 "DiagLogAnalysis" = "日誌分析";
 "DiagVPNConflict" = "VPN 衝突檢測";
+"DiagBasicNetwork" = "基礎網路";
+"DiagProxyConnectivity" = "代理連線性";
 
 // MARK: - 診斷 - 狀態描述
 "DiagPending" = "等待檢查…";
@@ -485,6 +487,16 @@
 "DiagGeoipMissing" = "GeoIP 資料庫檔案未安裝，無法使用分流規則（國內直連、國外代理）。請點擊「一鍵修復」自動下載。";
 "DiagLatencyHigh" = "延遲較高（%dms），可能影響上網體驗。建議更換延遲更低的節點。";
 "DiagLatencyFailed" = "無法連線到節點進行測速。節點可能不可用或網路被阻擋，請嘗試更換節點。";
+"DiagBasicNetworkFailed" = "無法存取網際網路（apple.com 不可達），請檢查網路連線。";
+"DiagProxyConnectFailed" = "無法透過本機代理存取外網，代理可能未正常運作。";
+"DiagProxyConnectOK" = "代理連線正常";
+"DiagBasicNetworkOK" = "網際網路可存取";
+"DiagConfigValidOK" = "設定檔 JSON 合法且包含必要欄位";
+"DiagConfigValidProblems" = "設定問題：%@";
+"DiagSystemProxyOK" = "系統代理已正確設定（連接埠 %d）";
+"DiagSystemProxyNotNeeded" = "目前模式不需要系統代理";
+"DiagReportCopied" = "報告已複製到剪貼簿，請貼到 GitHub Issue 中。";
+"DiagReportTooLong" = "報告超出 URL 長度限制，已複製到剪貼簿";
 
 // MARK: - 診斷 - 動作按鈕
 "DiagOpenNetworkSettings" = "開啟網路設定";
