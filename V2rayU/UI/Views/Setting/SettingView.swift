@@ -37,6 +37,7 @@ struct SettingView: View {
                 localized(.PAC).tag(SettingTab.pac)
             }
             .pickerStyle(.segmented)
+            .focusable(false)
             .padding(.vertical, 12)
 
             VStack {

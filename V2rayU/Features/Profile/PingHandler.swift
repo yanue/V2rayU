@@ -19,7 +19,7 @@ actor PingAll {
     private var totalCount = 0
     private var finishedCount = 0
     
-    func run() {
+    func run() async {
         guard !inPing else {
             logger.info("Ping is already running.")
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 已经在运行中")

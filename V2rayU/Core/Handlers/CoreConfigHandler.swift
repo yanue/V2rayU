@@ -36,10 +36,12 @@ class CoreConfigHandler {
 extension ProfileEntity {
     func AdaptCore() -> CoreType {
         var mode: CoreType = .XrayCore
-        if self.protocol == .vless && (self.network == .grpc || self.network == .h2 || self.network == .ws) {
+        // 这里是因为xray新版v25版本后,开始禁止支持这些类型了
+        // [Warning] common/errors: This feature gRPC transport (with unnecessary costs, etc.) is deprecated and being migrated to XHTTP stream-up H2.
+        if self.network == .grpc || self.network == .h2 || self.network == .ws {
             mode = .SingBox
         }
-        logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(mode.rawValue)")
+         logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(mode.rawValue)")
         return mode
     }
     

@@ -10,70 +10,6 @@ import SwiftUI
 import Combine
 import KeyboardShortcuts
 
-final class PingMenuItemView: NSView {
-    private let titleField = NSTextField(labelWithString: "")
-    private let clickHandler: () -> Void
-    private var trackingAreaRef: NSTrackingArea?
-
-    init(title: String, clickHandler: @escaping () -> Void) {
-        self.clickHandler = clickHandler
-        super.init(frame: NSRect(x: 0, y: 0, width: 240, height: 22))
-
-        wantsLayer = true
-        layer?.cornerRadius = 4
-
-        titleField.stringValue = title
-        titleField.font = .menuFont(ofSize: 0)
-        titleField.textColor = .labelColor
-        titleField.backgroundColor = .clear
-        titleField.isBordered = false
-        titleField.isEditable = false
-        titleField.lineBreakMode = .byTruncatingTail
-        titleField.translatesAutoresizingMaskIntoConstraints = false
-
-        addSubview(titleField)
-        NSLayoutConstraint.activate([
-            // 对齐系统菜单项文本起始位置，给左侧预留勾选/图标槽位
-            titleField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            titleField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            titleField.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        if let trackingAreaRef {
-            removeTrackingArea(trackingAreaRef)
-        }
-        let options: NSTrackingArea.Options = [.activeAlways, .mouseEnteredAndExited, .inVisibleRect]
-        let trackingArea = NSTrackingArea(rect: bounds, options: options, owner: self, userInfo: nil)
-        addTrackingArea(trackingArea)
-        trackingAreaRef = trackingArea
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        layer?.backgroundColor = NSColor.selectedContentBackgroundColor.withAlphaComponent(0.18).cgColor
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        layer?.backgroundColor = NSColor.clear.cgColor
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        clickHandler()
-    }
-
-    func updateTitle(_ title: String) {
-        titleField.stringValue = title
-        needsDisplay = true
-    }
-}
-
 @MainActor
 final class AppMenuManager: NSObject, NSMenuDelegate {
     static let shared = AppMenuManager()
@@ -117,17 +53,16 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var helpItem: NSMenuItem!
     private var quitItem: NSMenuItem!
     private var pingTip: String = ""
-    private var pingItemView: PingMenuItemView!
     private let pingTipSubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     private weak var statusMenu: NSMenu?
 
     override private init() {
         super.init()
-        pingTipSubject // 500毫秒刷新一下,避免很多时一直刷新UI
-            .throttle(for: .milliseconds(500), scheduler: DispatchQueue.main, latest: true)
+        pingTipSubject // 1000毫秒刷新一下,避免很多时一直刷新UI
+            .throttle(for: .milliseconds(1000), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] tip in
-                self?.setPingMenuTitle(tip: tip)
+                self?.pingItem?.title = String(localized: .LatencyTest) + " \(tip)"
             }
             .store(in: &cancellables)
 
@@ -138,6 +73,20 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             name: UserDefaults.didChangeNotification,
             object: nil
         )
+
+        // 监听语言切换
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(languageDidChange),
+            name: .languageDidChange,
+            object: nil
+        )
+    }
+
+    @objc private nonisolated func languageDidChange() {
+        Task { @MainActor in
+            AppMenuManager.shared.refreshAllMenus()
+        }
     }
 
     @objc private nonisolated func keyboardShortcutsDidChange() {
@@ -188,7 +137,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     
     func refreshBasicMenus() {
         // 刷新模式状态
-        toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+        toggleCoreItem?.title = coreTitle()
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
         tunnelModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
@@ -196,6 +145,21 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         // 刷新快捷键显示
         updateMenuKeyEquivalents()
+    }
+
+    func refreshAllMenus() {
+        refreshBasicMenus()
+        refreshServerItems()
+        refreshRoutingItems()
+        updateMenuTitles()
+    }
+
+    private func coreTitle() -> String {
+        let onOff = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+        if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
+            return "\(onOff) (\(server.AdaptCore().rawValue))"
+        }
+        return onOff
     }
 
     private func updateMenuKeyEquivalents() {
@@ -262,9 +226,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             return
         }
         // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
-        setPingMenuTitle(tip: self.pingTip)
+        pingItem?.title = String(localized: .LatencyTest) + " \(self.pingTip)"
         diagnosticsItem?.title = String(localized: .Diagnostics)
-        toggleCoreItem?.title = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
+        toggleCoreItem?.title = coreTitle()
         viewConfigItem?.title = String(localized: .ViewConfigJson)
         viewPacItem?.title = String(localized: .ViewPacFile)
         viewLogItem?.title = String(localized: .ViewLog)
@@ -289,7 +253,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         helpItem?.title = String(localized: .Help)
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
-        serverItem?.title = String(localized: .ServerList)
+        let serverCount = ProfileStore.shared.fetchAll().count
+        serverItem?.title = serverCount > 0 ? "\(String(localized: .ServerList)) (\(serverCount))" : String(localized: .ServerList)
     }
 
 
@@ -307,33 +272,28 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         viewErrorLogItem = NSMenuItem(title: String(localized: .ViewErrorLog), action: #selector(openErrorLogs), keyEquivalent: "")
         viewLogFilesItem = NSMenuItem(title: String(localized: .ViewLogFiles), action: #selector(openLogFiles), keyEquivalent: "")
         clearLogsItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
-        logsItem = getLogsItem()
         // 配置查看
         menu.addItem(toggleCoreItem)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(viewConfigItem)
         menu.addItem(viewPacItem)
+        menu.addItem(viewLogFilesItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
         globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
         manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
         tunnelModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
-        menu.addItem(pacModeItem)
         menu.addItem(tunnelModeItem)
         menu.addItem(globalModeItem)
+        menu.addItem(pacModeItem)
         menu.addItem(manualModeItem)
         menu.addItem(NSMenuItem.separator())
         // 路由与服务器
         routingItem = getRoutingItem()
         serverItem = getServerItem()
         // 预先初始化一次
-        pingItem = NSMenuItem()
-        pingItemView = PingMenuItemView(title: String(localized: .LatencyTest)) { [weak self] in
-            self?.showPingTestingState()
-            self?.pingSpeedTest()
-        }
-        pingItem.view = pingItemView
+        pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
@@ -366,7 +326,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
         helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))", action: #selector(goHelp), keyEquivalent: "")
-        menu.addItem(logsItem)
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
@@ -385,16 +344,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         self.inited = true
     }
 
-    private func setPingMenuTitle(tip: String) {
-        pingTip = tip
-        guard let pingItem else { return }
-        let suffix = tip.isEmpty ? "" : " \(tip)"
-        let title = String(localized: .LatencyTest) + suffix
-        pingItem.title = title
-        pingItemView?.updateTitle(title)
-        statusMenu?.itemChanged(pingItem)
-    }
-    
     func getCoreStatusItem() -> NSMenuItem {
         // 使用 SwiftUI 视图替换原始的 title-only 菜单项，CoreStatusItemView 会观察 AppState 自动刷新
         let item = NSMenuItem()
@@ -473,7 +422,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 获取子菜单
         serverSubMenu = getServerSubMenus()
         // 返回菜单项
-        let item = NSMenuItem(title: String(localized: .ServerList), action: nil, keyEquivalent: "")
+        let count = ProfileStore.shared.fetchAll().count
+        let title = count > 0 ? "\(String(localized: .ServerList)) (\(count))" : String(localized: .ServerList)
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = serverSubMenu
         return item
     }
@@ -488,7 +439,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         
         if useGrouping {
             for (name, profiles) in groupedServers {
-                let groupName = name.isEmpty ? "Default" : name
+                let count = profiles.count
+                let groupName = (name.isEmpty ? "Default" : name) + " (\(count))"
                 let subMenu = NSMenu()
                 let groupItem = NSMenuItem()
                 groupItem.title = groupName
@@ -581,16 +533,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     func pingSpeedTest() {
         Task {
             await PingAll.shared.run()
-        }
-    }
-
-    func showPingTestingState() {
-        setPingMenuTitle(tip: " - " + String(localized: .Testing) + "...")
-    }
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        if menu === statusMenu {
-            setPingMenuTitle(tip: pingTip)
         }
     }
 
@@ -756,6 +698,11 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     @objc private func ImportFromPasteboard(_ sender: NSMenuItem) {
         importFromPasteboard()
     }
+    
+    @objc private func pingSpeed(_ sender: NSMenuItem) {
+        pingSpeedTest()
+    }
+
     @objc private func viewConfig(_ sender: Any) {
         openConfigFile()
     }
@@ -763,7 +710,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     @objc private func viewPacFile(_ sender: Any) {
         openPacFile()
     }
-
 
     @objc private func terminateApp() {
         NSApp.terminate(self)

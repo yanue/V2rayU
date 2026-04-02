@@ -60,7 +60,7 @@ struct GeneralView: View {
 
             Picker(String(localized: .Theme), selection: $settings.selectedTheme) {
                 ForEach(Theme.allCases, id: \.self) { item in
-                    Text(String(localized: item.rawValue)).tag(item)
+                    localized(item.rawValue).tag(item.rawValue)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())

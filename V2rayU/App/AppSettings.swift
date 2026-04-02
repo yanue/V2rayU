@@ -6,9 +6,6 @@ enum Theme: String, CaseIterable {
     case System = "FollowSystem"
     case Light
     case Dark
-    var localized: String {
-        return NSLocalizedString(rawValue, comment: "")
-    }
 }
 
 @MainActor
@@ -56,7 +53,7 @@ final class AppSettings: ObservableObject {
 
     // 更新应用外观的方法
     private func setAppearance(_ theme: Theme) {
-        logger.info("setAppearance: \(theme.rawValue)-\(theme.localized)")
+        logger.info("setAppearance: \(theme.rawValue)")
         // 保存主题设置
         UserDefaults.standard.set(theme.rawValue, forKey: "AppleThemes")
         // 刷新应用外观

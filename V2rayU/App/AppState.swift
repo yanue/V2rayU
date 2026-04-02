@@ -205,6 +205,7 @@ final class AppState: ObservableObject {
         latency = Double(runningServer?.speed ?? 0)
         logger.info("switchServer-end: \(self.runningProfile)")
         AppMenuManager.shared.refreshServerItems()
+        AppMenuManager.shared.refreshBasicMenus()
     }
 
     // MARK: - App 启动时调用

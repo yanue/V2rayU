@@ -17,7 +17,7 @@ enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
         switch self {
         case .en: return "en"
         case .zhHans: return "zh-Hans"
-        case .zhHant: return "zh-Hant"
+        case .zhHant: return "zh-HK"
         }
     }
 
@@ -25,7 +25,7 @@ enum Language: String, CaseIterable, Identifiable { // 添加 Identifiable
         switch localeIdentifier {
         case "en": self = .en
         case "zh-Hans": self = .zhHans
-        case "zh-Hant": self = .zhHant
+        case "zh-HK": self = .zhHant
         default: self = .en
         }
     }
