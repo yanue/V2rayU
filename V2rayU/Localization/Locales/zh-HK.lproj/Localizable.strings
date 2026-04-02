@@ -250,6 +250,7 @@
 "ViewLogFiles" = "檢視日誌檔案...";
 "ClearAllLogs" = "清除所有日誌";
 "Logs" = "日誌";
+
 "ViewConfigJson" = "檢視 config.json";
 "ViewPacFile" = "檢視 PAC 檔案";
 "PacMode" = "PAC 模式";
@@ -511,9 +512,10 @@
 "DiagConfigFileExists" = "設定檔存在 (%d 位元組)";
 "DiagConfigFileMissing" = "設定檔缺失";
 "DiagConfigFileEmpty" = "設定檔為空";
+
 // MARK: - 診斷 - Geo 檔案
 "DiagGeositeFile" = "GeoSite 資料庫";
-"DiagGeositeMissing" = "GeoSite 資料庫檔案未安裝。點擊「立即修復」自動下載";
+"DiagGeositeMissing" = "GeoSite 資料庫檔案未安裝。點擊「一鍵修復」自動下載。";
 
 // MARK: - 舊版資料遷移
 "ImportLegacyData" = "匯入 v4 資料";

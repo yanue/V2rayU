@@ -512,9 +512,10 @@
 "DiagConfigFileExists" = "配置文件存在 (%d 字节)";
 "DiagConfigFileMissing" = "配置文件缺失";
 "DiagConfigFileEmpty" = "配置文件为空";
+
 // MARK: - 诊断 - Geo 文件
 "DiagGeositeFile" = "GeoSite 数据库";
-"DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「立即修复」自动下载";
+"DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「一键修复」自动下载。";
 
 // MARK: - 旧版数据迁移
 "ImportLegacyData" = "导入 v4 数据";
