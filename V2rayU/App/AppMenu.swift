@@ -572,16 +572,25 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func openLogs(_ sender: NSMenuItem) {
-        OpenLogs(logFilePath: coreLogFilePath)
+        // 打开文件查看器并显示日志列表
+        FileViewerManager.shared.selectFileType(.logs)
+        FileViewerManager.shared.openFileViewer()
     }
 
     @objc private func openErrorLogs(_ sender: NSMenuItem) {
+        // 提取错误日志并在文件查看器中打开
         LogRotation.extractErrors()
-        OpenLogs(logFilePath: LogRotation.recentErrorLogFilePath)
+        FileViewerManager.shared.selectFileType(.logs)
+        FileViewerManager.shared.refreshFiles()
+        // 尝试选中最近提取的错误日志文件
+        if let file = FileViewerManager.shared.files.first(where: { $0.path == LogRotation.recentErrorLogFilePath }) {
+            FileViewerManager.shared.selectFile(file)
+        }
+        FileViewerManager.shared.openFileViewer()
     }
 
     @objc private func openLogFiles(_ sender: NSMenuItem) {
-        LogWindowManager.shared.openLogWindow()
+        FileViewerManager.shared.openFileViewer()
     }
 
     @objc private func clearLogs(_ sender: NSMenuItem) {
@@ -704,11 +713,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func viewConfig(_ sender: Any) {
-        openConfigFile()
+        // 使用文件查看器查看配置文件
+        FileViewerManager.shared.selectFileType(.config)
+        FileViewerManager.shared.openFileViewer()
     }
 
     @objc private func viewPacFile(_ sender: Any) {
-        openPacFile()
+        // 使用文件查看器查看 PAC 文件
+        FileViewerManager.shared.selectFileType(.pac)
+        FileViewerManager.shared.openFileViewer()
     }
 
     @objc private func terminateApp() {
