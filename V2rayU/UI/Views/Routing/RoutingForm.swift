@@ -126,7 +126,7 @@ struct RoutingFormView: View {
                 }
                 .focusable(false)
                 Button(String(localized: .Save)) {
-                    RoutingStore.shared.upsert(item.toEntity())
+                    RoutingManager().saveAndReloadIfNeeded(item.toEntity())
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)

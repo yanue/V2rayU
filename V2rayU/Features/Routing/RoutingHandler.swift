@@ -162,6 +162,26 @@ class RoutingManager {
         }
         return defaultRules[RoutingRuleLANAndCn]!
     }
+
+    @MainActor
+    func saveAndReloadIfNeeded(_ entity: RoutingEntity) {
+        let oldEntity = RoutingStore.shared.fetchOne(uuid: entity.uuid)
+        let hasChanges = oldEntity != entity
+
+        RoutingStore.shared.upsert(entity)
+
+        guard hasChanges,
+              AppState.shared.runningRouting == entity.uuid,
+              AppState.shared.v2rayTurnOn,
+              ProfileStore.shared.getRunning() != nil else {
+            return
+        }
+
+        logger.info("RoutingManager.saveAndReloadIfNeeded: running routing changed, restart current core")
+        Task {
+            await V2rayLaunch.shared.restart()
+        }
+    }
     
 }
 
