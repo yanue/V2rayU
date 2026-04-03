@@ -312,65 +312,43 @@ struct LogAnalyzer {
     }
     
     static func analyze(logPath: String, lastLines: Int = 500) async -> [String] {
-        await Task.detached(priority: .userInitiated) {
+        return await Task.detached(priority: .userInitiated) {
             guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
             let lines = content.components(separatedBy: .newlines)
             let recentLines = Array(lines.suffix(lastLines))
             
             var problems: [String] = []
-            var errorLines: [(index: Int, line: String)] = []
+            var addedMessages: Set<String> = []
             
             for (index, line) in recentLines.enumerated() {
                 let lowerLine = line.lowercased()
+                var msg: String? = nil
                 
                 if lowerLine.contains("failed to dial") || lowerLine.contains("connect: cannot assign requested address") {
-                    problems.append("【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点")
-                    errorLines.append((index, line))
+                    msg = "【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点"
+                } else if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
+                    msg = "【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商"
+                } else if lowerLine.contains("connection reset by peer") || lowerLine.contains("connection closed") {
+                    msg = "【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点"
+                } else if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
+                    msg = "【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期"
+                } else if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
+                    msg = "【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点"
+                } else if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
+                    msg = "【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复"
+                } else if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                    msg = "【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议"
+                } else if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                    msg = "【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点"
+                } else if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
+                    msg = "【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU"
+                } else if lowerLine.contains("port") && lowerLine.contains("in use") {
+                    msg = "【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口"
                 }
                 
-                if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
-                    problems.append("【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("connection reset by peer") || lowerLine.contains("connection closed") {
-                    problems.append("【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
-                    problems.append("【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
-                    problems.append("【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
-                    problems.append("【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                    problems.append("【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                    problems.append("【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
-                    problems.append("【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU")
-                    errorLines.append((index, line))
-                }
-                
-                if lowerLine.contains("port") && lowerLine.contains("in use") {
-                    problems.append("【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口")
-                    errorLines.append((index, line))
+                if let m = msg, !addedMessages.contains(m) {
+                    addedMessages.insert(m)
+                    problems.append(m)
                 }
             }
             

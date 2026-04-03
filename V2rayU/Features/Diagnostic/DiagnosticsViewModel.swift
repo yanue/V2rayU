@@ -42,71 +42,66 @@ final class DiagnosticsViewModel: ObservableObject {
         items.filter { $0.category == category }
     }
     
+    private var checkTask: Task<Void, Never>?
+    
+    func cancelChecks() {
+        checkTask?.cancel()
+        checkTask = nil
+        checking = false
+    }
+    
     // MARK: - 逐项诊断
 
     func runSequentialChecks() {
-        Task {
-            withAnimation {
-                self.checking = true
-                self.progressText = "准备开始诊断…"
-                self.items = DiagnosticStep.allCheckSteps.map { makePendingItem(for: $0) }
-            }
+        let currentItems = items
+        
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            self.checking = true
+            self.progressText = "准备开始诊断…"
+            self.items = DiagnosticStep.allCheckSteps.map { self.makePendingItem(for: $0) }
+            
+            try? await Task.sleep(nanoseconds: 16_000_000)
             
             // 文件检查
-            await step(.v2rayUToolInstall)  { await self.checkV2rayUToolInstall() }
-            await step(.uToolPermission)    { await self.checkUToolPermission() }
-            await step(.coreInstall)        { await self.checkCoreInstall() }
-            await step(.coreArch)           { await self.checkCoreArch() }
-            await step(.configFile)         { await self.checkConfigFile() }
-            await step(.configValidity)     { await self.checkConfigValidity() }
-            await step(.geoipFile)          { await self.checkGeoipFile() }
-            await step(.geositeFile)        { await self.checkGeositeFile() }
+            self.items[0] = await self.checkV2rayUToolInstall()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[1] = await self.checkUToolPermission()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[2] = await self.checkCoreInstall()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[3] = await self.checkCoreArch()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[4] = await self.checkConfigFile()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[5] = await self.checkConfigValidity()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[6] = await self.checkGeoipFile()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[7] = await self.checkGeositeFile()
+            try? await Task.sleep(nanoseconds: 16_000_000)
             // 运行状态
-            await step(.coreRunning)        { await self.checkCoreRunning() }
-            await step(.systemProxy)        { await self.checkSystemProxy() }
-            await step(.localPortConflict)  { await self.checkLocalPortConflict() }
+            self.items[8] = await self.checkCoreRunning()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[9] = await self.checkSystemProxy()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[10] = await self.checkLocalPortConflict()
+            try? await Task.sleep(nanoseconds: 16_000_000)
             // 网络检查
-            await step(.basicNetwork)       { await self.checkBasicNetwork() }
-            await step(.nodeConnectivity)   { await self.checkNodeConnectivity() }
-            await step(.proxyConnectivity)  { await self.checkProxyConnectivity() }
-            await step(.pingLatency)        { await self.checkPingLatency() }
+            self.items[11] = await self.checkBasicNetwork()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[12] = await self.checkNodeConnectivity()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[13] = await self.checkProxyConnectivity()
+            try? await Task.sleep(nanoseconds: 16_000_000)
+            self.items[14] = await self.checkPingLatency()
+            try? await Task.sleep(nanoseconds: 16_000_000)
             // 日志
-            await step(.logAnalysis)        { await self.checkLogAnalysis() }
+            self.items[15] = await self.checkLogAnalysis()
 
-            withAnimation {
-                self.progressText = "诊断完成"
-                self.checking = false
-            }
+            self.progressText = "诊断完成"
+            self.checking = false
         }
-    }
-    
-    /// 步骤执行包装
-    private func step(_ step: DiagnosticStep, action: () async -> DiagnosticItem) async {
-        if let idx = items.firstIndex(where: { $0.step == step }) {
-            withAnimation {
-                self.progressText = "正在检查：\(title(for: step))"
-                self.items[idx] = DiagnosticItem(
-                    step: step,
-                    title: items[idx].title,
-                    subtitle: "正在检查…",
-                    status: .checking,
-                    ok: false,
-                    problem: nil,
-                    actionTitle: nil,
-                    action: nil
-                )
-            }
-        }
-        
-        let result = await action()
-        
-        if let idx = items.firstIndex(where: { $0.step == step }) {
-            withAnimation {
-                self.items[idx] = result
-            }
-        }
-        
-        try? await Task.sleep(nanoseconds: 200_000_000)
     }
     
     // MARK: - Helpers
@@ -240,6 +235,18 @@ final class DiagnosticsViewModel: ObservableObject {
         let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
         
         let currentArch = isARM64() ? "arm64" : "amd64"
+        
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .coreArch,
+            title: String(localized: .DiagCoreArch),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
         let actualArch = executable ? await getFileArch(file: xrayCoreFile) : nil
         let ok = actualArch == currentArch
         
@@ -304,6 +311,17 @@ final class DiagnosticsViewModel: ObservableObject {
 
     /// 新增：配置文件 JSON 合法性 + 字段完整性检查
     private func checkConfigValidity() async -> DiagnosticItem {
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .configValidity,
+            title: String(localized: .DiagConfigValidity),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
         let (isValid, problems) = await ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
 
         let subtitle: String
@@ -539,6 +557,17 @@ final class DiagnosticsViewModel: ObservableObject {
 
     /// 新增：基础网络连通性（不走代理，测试 apple.com）
     private func checkBasicNetwork() async -> DiagnosticItem {
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .basicNetwork,
+            title: String(localized: .DiagBasicNetwork),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
         let reachable = await NetworkChecker.canResolve(host: "www.apple.com", timeout: 5)
 
         let subtitle: String
@@ -564,6 +593,17 @@ final class DiagnosticsViewModel: ObservableObject {
     }
     
     private func checkNodeConnectivity() async -> DiagnosticItem {
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .nodeConnectivity,
+            title: String(localized: .DiagNetworkConnectivity),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
         guard let host = nodeHostProvider() else {
             return DiagnosticItem(
                 step: .nodeConnectivity,
@@ -578,17 +618,29 @@ final class DiagnosticsViewModel: ObservableObject {
 
         let dnsOK = await NetworkChecker.canResolve(host: host)
 
-        guard let port = nodePortProvider() else {
+        guard !Task.isCancelled, let port = nodePortProvider() else {
             return DiagnosticItem(
                 step: .nodeConnectivity,
                 title: String(localized: .DiagNetworkConnectivity),
-                subtitle: String(localized: .DiagNodeNotSelected),
+                subtitle: "等待检查…",
+                status: .pending,
                 ok: false,
-                problem: String(localized: .DiagNodeNotSelected),
+                problem: nil,
                 actionTitle: nil,
                 action: nil
             )
         }
+
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .nodeConnectivity,
+            title: String(localized: .DiagNetworkConnectivity),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
 
         let portOK = dnsOK ? await TCPConnectivity.canConnect(host: host, port: port) : false
 
@@ -620,6 +672,17 @@ final class DiagnosticsViewModel: ObservableObject {
     
     /// 新增：通过本地代理端口访问外网
     private func checkProxyConnectivity() async -> DiagnosticItem {
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .proxyConnectivity,
+            title: String(localized: .DiagProxyConnectivity),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: String(localized: .DiagRestartCore),
+            action: { self.restartCore() }
+        ) }
+        
         let coreRunning = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
 
         if !coreRunning {
@@ -633,6 +696,17 @@ final class DiagnosticsViewModel: ObservableObject {
                 action: { self.toggleCoreOnOff() }
             )
         }
+
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .proxyConnectivity,
+            title: String(localized: .DiagProxyConnectivity),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: String(localized: .DiagRestartCore),
+            action: { self.restartCore() }
+        ) }
 
         // 通过本地 SOCKS 代理端口测试连通性
         let proxyOK = await testProxyConnectivity(socksPort: UInt16(localSocksPort))
@@ -660,7 +734,56 @@ final class DiagnosticsViewModel: ObservableObject {
     }
     
     private func checkPingLatency() async -> DiagnosticItem {
-        await PingAll.shared.run()
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .pingLatency,
+            title: String(localized: .DiagPingLatency),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: String(localized: .DiagReTest),
+            action: { self.doPingNow() }
+        ) }
+        
+        guard appState.v2rayTurnOn else {
+            return DiagnosticItem(
+                step: .pingLatency,
+                title: String(localized: .DiagPingLatency),
+                subtitle: String(localized: .DiagCoreStopped),
+                ok: false,
+                problem: String(localized: .DiagCoreStopped),
+                actionTitle: nil,
+                action: nil
+            )
+        }
+        
+        let runningUuid = appState.runningProfile
+        guard !runningUuid.isEmpty,
+              let item = ProfileStore.shared.fetchOne(uuid: runningUuid) else {
+            return DiagnosticItem(
+                step: .pingLatency,
+                title: String(localized: .DiagPingLatency),
+                subtitle: String(localized: .DiagNodeNotSelected),
+                ok: false,
+                problem: String(localized: .DiagNodeNotSelected),
+                actionTitle: nil,
+                action: nil
+            )
+        }
+        
+        await PingAll.shared.pingOne(item: item)
+        
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .pingLatency,
+            title: String(localized: .DiagPingLatency),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: String(localized: .DiagReTest),
+            action: { self.doPingNow() }
+        ) }
+        
         let latency = appState.latency
         
         let subtitle: String
@@ -695,9 +818,38 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: - 日志检查
 
     private func checkLogAnalysis() async -> DiagnosticItem {
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .logAnalysis,
+            title: String(localized: .DiagLogAnalysis),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
         let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
-        self.logContent = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
+        
+        guard !Task.isCancelled else { return DiagnosticItem(
+            step: .logAnalysis,
+            title: String(localized: .DiagLogAnalysis),
+            subtitle: "等待检查…",
+            status: .pending,
+            ok: false,
+            problem: nil,
+            actionTitle: nil,
+            action: nil
+        ) }
+        
+        let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
+        
         let ok = problems.isEmpty || (problems.count == 1 && problems[0] == "未发现明显错误")
+        
+        await MainActor.run {
+            self.logContent = log
+        }
+        
         return DiagnosticItem(
             step: .logAnalysis,
             title: String(localized: .DiagLogAnalysis),
@@ -725,52 +877,58 @@ final class DiagnosticsViewModel: ObservableObject {
     }
 
     private func fixInstallAll() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             await AppInstaller.shared.checkInstall()
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     
     private func fixV2rayUTool() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             await AppInstaller.shared.checkInstall()
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     
     private func fixGeoip() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             await AppInstaller.shared.checkInstall()
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     
     private func restartCore() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             await V2rayLaunch.shared.stop()
             try? await Task.sleep(nanoseconds: 300_000_000)
             await AppState.shared.turnOnCore()
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     
     private func toggleCoreOnOff() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             if appState.v2rayTurnOn {
                 await AppState.shared.turnOffCore()
             } else {
                 await AppState.shared.turnOnCore()
             }
             try? await Task.sleep(nanoseconds: 500_000_000)
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     
     private func doPingNow() {
-        Task {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
             await PingAll.shared.run()
             try? await Task.sleep(nanoseconds: 300_000_000)
-            await MainActor.run { self.runSequentialChecks() }
+            self.runSequentialChecks()
         }
     }
     

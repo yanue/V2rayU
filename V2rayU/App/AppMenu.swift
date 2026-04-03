@@ -590,6 +590,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func openLogFiles(_ sender: NSMenuItem) {
+        FileViewerManager.shared.selectFileType(.logs, preSelectPath: coreLogFilePath)
         FileViewerManager.shared.openFileViewer()
     }
 
@@ -713,8 +714,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func viewConfig(_ sender: Any) {
-        // 使用文件查看器查看配置文件
-        FileViewerManager.shared.selectFileType(.config)
+        FileViewerManager.shared.selectFileType(.config, preSelectPath: JsonConfigFilePath)
         FileViewerManager.shared.openFileViewer()
     }
 

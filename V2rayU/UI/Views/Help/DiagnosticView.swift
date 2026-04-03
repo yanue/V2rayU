@@ -18,6 +18,7 @@ struct DiagnosticsView: View {
         }
     )
     @State private var selectedTab: DiagnosticCategory = .files
+    @State private var hasAppeared = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -75,63 +76,75 @@ struct DiagnosticsView: View {
 
             Divider()
             
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(viewModel.itemsForCategory(selectedTab)) { item in
-                        statusRow(item: item)
-                    }
-                    
-                    if selectedTab == .logs && !viewModel.logContent.isEmpty {
-                        HStack {
-                            Text(String(localized: .ErrorLog))
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
-                        
-                        Divider()
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            ScrollView([.horizontal, .vertical], showsIndicators: true) {
-                                Text(viewModel.logContent)
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundColor(.primary)
-                                    .textSelection(.enabled)
-                                    .lineLimit(50)
-                            }
-                            .frame(maxHeight: 150)
-                            .padding(8)
-                        }
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(NSColor.textBackgroundColor).opacity(0.5))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray.opacity(0.1), lineWidth: 0.5)
-                        )
-                    }
-                }
-                .padding(10)
-            }
-            .background(.ultraThinMaterial)
-            .cornerRadius(8)
-            .onAppear { viewModel.runSequentialChecks() }
-            .alert(isPresented: $viewModel.showOpenSettingsAlert) {
-                Alert(
-                    title: Text(String(localized: .UnableToOpenSystemSettings)),
-                    message: Text(String(localized: .PleaseManuallyOpenBackgroundActivity)),
-                    dismissButton: .default(Text(String(localized: .Confirm)))
-                )
-            }
-            .sheet(isPresented: $viewModel.showFAQ) {
-                FAQSheetView() {
-                    viewModel.showFAQ = false
-                }
-            }
+            contentView
         }
         .padding(8)
+        .onDisappear {
+            viewModel.cancelChecks()
+        }
+    }
+    
+    @ViewBuilder
+    private var contentView: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                ForEach(viewModel.itemsForCategory(selectedTab)) { item in
+                    statusRow(item: item)
+                }
+                
+                if selectedTab == .logs && !viewModel.logContent.isEmpty {
+                    HStack {
+                        Text(String(localized: .ErrorLog))
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        ScrollView([.horizontal, .vertical], showsIndicators: true) {
+                            Text(viewModel.logContent)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(.primary)
+                                .textSelection(.enabled)
+                                .lineLimit(50)
+                        }
+                        .frame(maxHeight: 150)
+                        .padding(8)
+                    }
+                    .padding(10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(NSColor.textBackgroundColor).opacity(0.5))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray.opacity(0.1), lineWidth: 0.5)
+                    )
+                }
+            }
+            .padding(10)
+        }
+        .background(.ultraThinMaterial)
+        .cornerRadius(8)
+        .onAppear {
+            guard !hasAppeared else { return }
+            hasAppeared = true
+            viewModel.runSequentialChecks()
+        }
+        .alert(isPresented: $viewModel.showOpenSettingsAlert) {
+            Alert(
+                title: Text(String(localized: .UnableToOpenSystemSettings)),
+                message: Text(String(localized: .PleaseManuallyOpenBackgroundActivity)),
+                dismissButton: .default(Text(String(localized: .Confirm)))
+            )
+        }
+        .sheet(isPresented: $viewModel.showFAQ) {
+            FAQSheetView() {
+                viewModel.showFAQ = false
+            }
+        }
     }
     
     @ViewBuilder
