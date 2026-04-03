@@ -8,8 +8,6 @@
 import SwiftUI
 import AppKit
 
-// 使用全局常量和工具函数，不显式依赖额外模块
-
 enum FileType: String, CaseIterable, Identifiable {
     case logs = "日志"
     case config = "配置"
@@ -54,6 +52,18 @@ final class FileViewerManager: ObservableObject {
     @Published var files: [FileItem] = []
     @Published var fileContent: String = ""
     @Published var isLoading: Bool = false
+    @Published var searchText: String = ""
+    @Published var showCopiedToast: Bool = false
+    
+    var filteredFiles: [FileItem] {
+        guard !searchText.isEmpty else { return files }
+        return files.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+    
+    var selectedFileIndex: Int {
+        guard let selected = selectedFile else { return NSNotFound }
+        return filteredFiles.firstIndex(where: { $0.path == selected.path }) ?? NSNotFound
+    }
     
     private init() {
         refreshFiles()
@@ -81,7 +91,29 @@ final class FileViewerManager: ObservableObject {
     func selectFileType(_ type: FileType) {
         selectedFileType = type
         selectedFile = nil
+        fileContent = ""
         refreshFiles()
+    }
+    
+    func loadFileContent(path: String) {
+        isLoading = true
+        Task {
+            let content = await readFileAsync(path: path)
+            await MainActor.run {
+                fileContent = content
+                isLoading = false
+            }
+        }
+    }
+    
+    private func readFileAsync(path: String) async -> String {
+        return await Task.detached(priority: .userInitiated) {
+            do {
+                return try String(contentsOfFile: path, encoding: .utf8)
+            } catch {
+                return "无法读取文件内容: \(error.localizedDescription)"
+            }
+        }.value
     }
     
     private func getFiles(for type: FileType) -> [FileItem] {
@@ -127,12 +159,16 @@ final class FileViewerManager: ObservableObject {
             }
     }
     
-    func loadFileContent(path: String) {
-        guard let content = try? String(contentsOfFile: path, encoding: .utf8) else {
-            fileContent = "无法读取文件内容"
-            return
+    func copyContent() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(fileContent, forType: .string)
+        showCopiedToast = true
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            await MainActor.run {
+                showCopiedToast = false
+            }
         }
-        fileContent = content
     }
     
     func openFileViewer() {
@@ -159,9 +195,9 @@ final class FileViewerWindowController {
         
         let window = NSWindow(contentViewController: hostingController)
         window.title = String(localized: .ViewLogFiles)
-        window.setContentSize(NSSize(width: 900, height: 650))
+        window.setContentSize(NSSize(width: 1000, height: 680))
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.minSize = NSSize(width: 700, height: 500)
+        window.minSize = NSSize(width: 800, height: 520)
         window.center()
         window.makeKeyAndOrderFront(sender)
         
@@ -175,217 +211,175 @@ struct FileViewerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            fileTypePicker
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color(nsColor: .controlBackgroundColor))
+            ToolbarBar()
             
             Divider()
             
             HSplitView {
-                fileListSidebar
-                    .frame(minWidth: 220, maxWidth: 280)
+                FileListSidebar()
+                    .frame(minWidth: 240, idealWidth: 260, maxWidth: 320)
                 
-                fileContentView
-                    .frame(minWidth: 400)
+                FileContentArea()
+                    .frame(minWidth: 480)
             }
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .environmentObject(manager)
+        .frame(minWidth: 800, minHeight: 520)
     }
+}
+
+struct ToolbarBar: View {
+    @EnvironmentObject var manager: FileViewerManager
     
-    private var fileTypePicker: some View {
-        HStack(spacing: 12) {
-            ForEach(FileType.allCases) { type in
-                FileTypeButton(
-                    type: type,
-                    isSelected: manager.selectedFileType == type,
-                    action: { manager.selectFileType(type) }
-                )
+    var body: some View {
+        HStack(spacing: 16) {
+            Picker("", selection: $manager.selectedFileType) {
+                ForEach(FileType.allCases) { type in
+                    Label(type.rawValue, systemImage: type.icon)
+                        .tag(type)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 220)
+            .onChange(of: manager.selectedFileType) { _, newValue in
+                manager.selectFileType(newValue)
             }
             
-            Spacer()
-            
-            Button(action: { manager.refreshFiles() }) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 14, weight: .medium))
-            }
-            .buttonStyle(.bordered)
-            .help("刷新文件列表")
-            
-            Button(action: openInFinder) {
-                Image(systemName: "folder")
-                    .font(.system(size: 14, weight: .medium))
-            }
-            .buttonStyle(.bordered)
-            .help("在 Finder 中显示")
-        }
-    }
-    
-    private var fileListSidebar: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Image(systemName: manager.selectedFileType.icon)
-                    .foregroundColor(.secondary)
-                Text(manager.selectedFileType.rawValue + "文件")
-                    .font(.headline)
-                Spacer()
-                Text("\(manager.files.count)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(4)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(nsColor: .controlBackgroundColor))
-            
-            Divider()
-            
-            if manager.files.isEmpty {
-                VStack(spacing: 12) {
-                    Image(systemName: "folder")
-                        .font(.system(size: 32))
-                        .foregroundColor(.secondary.opacity(0.5))
-                    Text("暂无文件")
+            TextField("搜索文件...", text: $manager.searchText)
+                .textFieldStyle(.roundedBorder)
+                .frame(maxWidth: 200)
+                .overlay(
+                    Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List(manager.files, selection: Binding(
-                    get: { manager.selectedFile?.id },
-                    set: { id in
-                        if let file = manager.files.first(where: { $0.id == id }) {
-                            manager.selectFile(file)
-                        }
-                    }
-                )) { file in
-                    FileRowView(file: file, isSelected: manager.selectedFile?.id == file.id)
-                        .tag(file.id)
-                }
-                .listStyle(.sidebar)
-            }
-        }
-    }
-    
-    private var fileContentView: some View {
-        VStack(spacing: 0) {
-            if let selected = manager.selectedFile {
-                fileContentHeader(selected)
-                
-                Divider()
-                
-                if manager.isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ScrollView([.horizontal, .vertical]) {
-                        Text(manager.fileContent)
-                            .font(.system(.body, design: .monospaced))
-                            .textSelection(.enabled)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16)
-                    }
-                    .background(Color(nsColor: .textBackgroundColor))
-                }
-            } else {
-                emptyStateView
-            }
-        }
-    }
-    
-    private func fileContentHeader(_ file: FileItem) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: file.icon)
-                .font(.system(size: 16))
-                .foregroundColor(.accentColor)
-            
-            Text(file.name)
-                .font(.system(.headline, weight: .semibold))
-                .lineLimit(1)
+                        .padding(.leading, 8)
+                        .offset(x: 4),
+                    alignment: .leading
+                )
             
             Spacer()
             
             HStack(spacing: 8) {
-                Text(file.formattedSize)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                ToolbarButton(icon: "arrow.clockwise", tooltip: "刷新") {
+                    manager.refreshFiles()
+                }
                 
-                Text(file.path)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+                ToolbarButton(icon: "folder", tooltip: "在 Finder 中显示") {
+                    openInFinder()
+                }
             }
-            
-            Button(action: { copyFilePath(file.path) }) {
-                Image(systemName: "doc.on.clipboard")
-                    .font(.system(size: 12))
-            }
-            .buttonStyle(.borderless)
-            .help("复制文件路径")
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
         .padding(.vertical, 12)
-        .background(Color(nsColor: .controlBackgroundColor))
-    }
-    
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "doc.text.magnifyingglass")
-                .font(.system(size: 48))
-                .foregroundColor(.secondary.opacity(0.5))
-            Text("请选择文件")
-                .font(.title3)
-                .foregroundColor(.secondary)
-            Text("从左侧列表选择要查看的文件")
-                .font(.caption)
-                .foregroundColor(.secondary.opacity(0.7))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            Color(nsColor: .windowBackgroundColor)
+                .overlay(.ultraThinMaterial, in: Rectangle())
+        )
     }
     
     private func openInFinder() {
-        let basePath: String
-        switch manager.selectedFileType {
-        case .logs:
-            basePath = AppHomePath
-        case .config:
-            basePath = AppHomePath
-        case .pac:
-            basePath = AppHomePath
-        }
-        let url = URL(fileURLWithPath: basePath)
+        let url = URL(fileURLWithPath: AppHomePath)
         NSWorkspace.shared.activateFileViewerSelecting([url])
-    }
-    
-    private func copyFilePath(_ path: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(path, forType: .string)
     }
 }
 
-struct FileTypeButton: View {
-    let type: FileType
-    let isSelected: Bool
+struct ToolbarButton: View {
+    let icon: String
+    let tooltip: String
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: type.icon)
-                    .font(.system(size: 12))
-                Text(type.rawValue)
-                    .font(.system(size: 13, weight: .medium))
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.1))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(8)
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .medium))
+                .frame(width: 32, height: 28)
         }
         .buttonStyle(.plain)
+        .help(tooltip)
+    }
+}
+
+struct FileListSidebar: View {
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            SidebarHeader()
+                .environmentObject(manager)
+            
+            Divider()
+            
+            if manager.filteredFiles.isEmpty {
+                EmptyFileList()
+            } else {
+                FileList()
+                    .environmentObject(manager)
+            }
+        }
+        .background(Color(nsColor: .underPageBackgroundColor))
+    }
+}
+
+struct SidebarHeader: View {
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        HStack {
+            Label {
+                Text(manager.selectedFileType.rawValue)
+                    .font(.system(size: 13, weight: .semibold))
+            } icon: {
+                Image(systemName: manager.selectedFileType.icon)
+                    .font(.system(size: 14))
+            }
+            .foregroundColor(.primary)
+            
+            Spacer()
+            
+            Text("\(manager.files.count)")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.secondary.opacity(0.12))
+                .clipShape(Capsule())
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+    }
+}
+
+struct EmptyFileList: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "doc.text.magnifyingglass")
+                .font(.system(size: 28))
+                .foregroundColor(.secondary.opacity(0.4))
+            Text("暂无文件")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct FileList: View {
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        List(manager.filteredFiles, selection: Binding(
+            get: { manager.selectedFile?.id },
+            set: { id in
+                if let file = manager.filteredFiles.first(where: { $0.id == id }) {
+                    manager.selectFile(file)
+                }
+            }
+        )) { file in
+            FileRowView(file: file, isSelected: manager.selectedFile?.id == file.id)
+                .tag(file.id)
+                .listRowInsets(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
+                .listRowSeparator(.hidden)
+        }
+        .listStyle(.plain)
     }
 }
 
@@ -396,27 +390,197 @@ struct FileRowView: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: file.icon)
-                .font(.system(size: 14))
-                .foregroundColor(isSelected ? .white : .secondary)
-                .frame(width: 20)
+                .font(.system(size: 15))
+                .foregroundColor(isSelected ? .white : .accentColor)
+                .frame(width: 22, height: 22)
+                .background(
+                    isSelected ? Color.accentColor.opacity(0.15) : Color.accentColor.opacity(0.08),
+                    in: RoundedRectangle(cornerRadius: 6)
+                )
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(file.name)
-                    .font(.system(size: 13))
+                    .font(.system(size: 13, weight: .medium))
                     .lineLimit(1)
+                    .foregroundColor(isSelected ? .white : .primary)
                 
                 Text(file.formattedSize)
                     .font(.system(size: 11))
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                    .foregroundColor(isSelected ? .white.opacity(0.7) : .secondary)
             }
             
             Spacer()
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 8)
-        .background(isSelected ? Color.accentColor : Color.clear)
-        .cornerRadius(6)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .background(
+            isSelected ? Color.accentColor : Color.clear,
+            in: RoundedRectangle(cornerRadius: 8)
+        )
         .contentShape(Rectangle())
+    }
+}
+
+struct FileContentArea: View {
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            if let selected = manager.selectedFile {
+                ContentHeader(file: selected)
+                    .environmentObject(manager)
+                
+                Divider()
+                
+                if manager.isLoading {
+                    LoadingView()
+                } else {
+                    FileContentView()
+                        .environmentObject(manager)
+                }
+            } else {
+                EmptyContentView()
+            }
+        }
+        .background(Color(nsColor: .textBackgroundColor))
+    }
+}
+
+struct ContentHeader: View {
+    let file: FileItem
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(file.name)
+                    .font(.system(size: 14, weight: .semibold))
+                    .lineLimit(1)
+                
+                HStack(spacing: 12) {
+                    Label(file.formattedSize, systemImage: "arrow.up.arrow.down")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                    
+                    Text(file.path)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 6) {
+                HeaderButton(icon: "doc.on.clipboard", tooltip: "复制路径") {
+                    copyFilePath(file.path)
+                }
+                
+                HeaderButton(icon: "doc.on.doc", tooltip: "复制内容") {
+                    manager.copyContent()
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .overlay(alignment: .bottomTrailing) {
+            if manager.showCopiedToast {
+                CopiedToast()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+    }
+    
+    private func copyFilePath(_ path: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(path, forType: .string)
+    }
+}
+
+struct HeaderButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .frame(width: 30, height: 28)
+        }
+        .buttonStyle(.plain)
+        .help(tooltip)
+    }
+}
+
+struct CopiedToast: View {
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+            Text("已复制")
+                .font(.system(size: 12, weight: .medium))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+    }
+}
+
+struct LoadingView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .scaleEffect(1.2)
+            Text("正在加载...")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct FileContentView: View {
+    @EnvironmentObject var manager: FileViewerManager
+    
+    var body: some View {
+        ScrollView([.horizontal, .vertical]) {
+            Text(displayContent)
+                .font(.system(size: 13, design: .monospaced))
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+                .lineSpacing(4)
+        }
+    }
+    
+    private var displayContent: String {
+        let lines = manager.fileContent.components(separatedBy: .newlines)
+        if lines.count > 2000 {
+            return lines.prefix(2000).joined(separator: "\n") + "\n\n... (文件过大，仅显示前2000行)"
+        }
+        return manager.fileContent
+    }
+}
+
+struct EmptyContentView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "doc.text.viewfinder")
+                .font(.system(size: 56))
+                .foregroundColor(.secondary.opacity(0.3))
+            Text("选择文件查看内容")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.secondary)
+            Text("从左侧列表选择要查看的文件")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary.opacity(0.6))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

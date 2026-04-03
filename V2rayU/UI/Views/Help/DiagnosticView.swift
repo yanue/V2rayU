@@ -92,11 +92,12 @@ struct DiagnosticsView: View {
                         Divider()
 
                         VStack(alignment: .leading, spacing: 6) {
-                            ScrollView(.horizontal, showsIndicators: true) {
+                            ScrollView([.horizontal, .vertical], showsIndicators: true) {
                                 Text(viewModel.logContent)
                                     .font(.system(size: 10, design: .monospaced))
                                     .foregroundColor(.primary)
                                     .textSelection(.enabled)
+                                    .lineLimit(50)
                             }
                             .frame(maxHeight: 150)
                             .padding(8)

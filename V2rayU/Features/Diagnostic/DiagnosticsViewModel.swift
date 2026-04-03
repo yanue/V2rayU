@@ -9,7 +9,6 @@ import SwiftUI
 import AppKit
 
 @MainActor
-
 final class DiagnosticsViewModel: ObservableObject {
     @Published var items: [DiagnosticItem] = []
     @Published var checking: Bool = false
@@ -241,7 +240,7 @@ final class DiagnosticsViewModel: ObservableObject {
         let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
         
         let currentArch = isARM64() ? "arm64" : "amd64"
-        let actualArch = executable ? getFileArch(file: xrayCoreFile) : nil
+        let actualArch = executable ? await getFileArch(file: xrayCoreFile) : nil
         let ok = actualArch == currentArch
         
         let subtitle: String
@@ -305,7 +304,7 @@ final class DiagnosticsViewModel: ObservableObject {
 
     /// 新增：配置文件 JSON 合法性 + 字段完整性检查
     private func checkConfigValidity() async -> DiagnosticItem {
-        let (isValid, problems) = ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
+        let (isValid, problems) = await ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
 
         let subtitle: String
         let problem: String?
@@ -696,8 +695,8 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: - 日志检查
 
     private func checkLogAnalysis() async -> DiagnosticItem {
-        let problems = LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
-        self.logContent = LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
+        let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
+        self.logContent = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
         let ok = problems.isEmpty || (problems.count == 1 && problems[0] == "未发现明显错误")
         return DiagnosticItem(
             step: .logAnalysis,
@@ -880,38 +879,40 @@ final class DiagnosticsViewModel: ObservableObject {
         #endif
     }
     
-    private func getFileArch(file: String) -> String? {
-        do {
-            let data = try Data(contentsOf: URL(fileURLWithPath: file))
-            guard data.count >= 20 else { return nil }
-            
-            if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
-                let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
-                switch eMachine {
-                case 62: return "amd64"
-                case 183: return "arm64"
-                default: return "unknown"
+    private func getFileArch(file: String) async -> String? {
+        await Task.detached(priority: .userInitiated) {
+            do {
+                let data = try Data(contentsOf: URL(fileURLWithPath: file))
+                guard data.count >= 20 else { return nil }
+                
+                if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
+                    let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
+                    switch eMachine {
+                    case 62: return "amd64"
+                    case 183: return "arm64"
+                    default: return "unknown"
+                    }
                 }
-            }
-            else if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
-                let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
-                switch cpuType {
-                case 0x01000007: return "x86_64"
-                case 0x0100000C: return "arm64"
-                default: return "unknown"
+                else if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
+                    let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
+                    switch cpuType {
+                    case 0x01000007: return "x86_64"
+                    case 0x0100000C: return "arm64"
+                    default: return "unknown"
+                    }
                 }
+                
+                return nil
+            } catch {
+                return nil
             }
-            
-            return nil
-        } catch {
-            return nil
-        }
+        }.value
     }
     
     // MARK: - 提交诊断报告（精简版：事实 + 脱敏配置 + 原始错误日志）
 
     /// 生成精简诊断报告（只保留事实，不含推断建议）
-    func generateReport() -> String {
+    func generateReport() async -> String {
         let arch: String
         #if arch(arm64)
         arch = "arm64"
@@ -919,13 +920,11 @@ final class DiagnosticsViewModel: ObservableObject {
         arch = "x86_64"
         #endif
 
-        // === 环境信息 ===
         var report = "## Environment\n"
         report += "- V2rayU: \(appVersion) | macOS: \(osVersion) | Arch: \(arch)\n"
         report += "- Core: \(coreVersion) | Mode: \(appState.runMode.rawValue) | Status: \(appState.v2rayTurnOn ? "ON" : "OFF")\n"
         report += "- SOCKS: \(localSocksPort) | HTTP: \(localHTTPPort)\n\n"
 
-        // === 全部检查结果（每项只保留 ✅/❌ + 简短事实） ===
         report += "## Diagnostic Results\n"
         for category in DiagnosticCategory.allCases {
             let categoryItems = itemsForCategory(category)
@@ -939,7 +938,6 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "\n"
         }
 
-        // === 脱敏配置 ===
         if let server = appState.runningServer {
             report += "## Config (Sanitized)\n"
             report += "- Protocol: \(server.protocol.rawValue) | Network: \(server.network.rawValue) | Security: \(server.security.rawValue)\n"
@@ -950,10 +948,9 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "- Flow: \(server.flow.isEmpty ? "none" : server.flow) | ALPN: \(server.alpn.rawValue) | FP: \(server.fingerprint.rawValue)\n\n"
         }
 
-        // === 错误日志（只提取原始 error/warning 行） ===
         if !logContent.isEmpty && logContent != "无 INFO 及以上级别日志" {
             report += "## Error Logs\n```\n"
-            let rawErrorLines = extractRawErrorLines(from: logPath, maxLines: 30)
+            let rawErrorLines = await extractRawErrorLines(from: logPath, maxLines: 30)
             if !rawErrorLines.isEmpty {
                 report += rawErrorLines
             } else {
@@ -966,23 +963,25 @@ final class DiagnosticsViewModel: ObservableObject {
     }
 
     /// 提取原始 error/warning 日志行（不含推断，只要原始日志）
-    private func extractRawErrorLines(from logPath: String, maxLines: Int) -> String {
-        guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
-        let lines = content.components(separatedBy: .newlines)
-        let recentLines = Array(lines.suffix(500))
+    private func extractRawErrorLines(from logPath: String, maxLines: Int) async -> String {
+        await Task.detached(priority: .userInitiated) {
+            guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
+            let lines = content.components(separatedBy: .newlines)
+            let recentLines = Array(lines.suffix(500))
 
-        var errorLines: [String] = []
-        for line in recentLines {
-            let lower = line.lowercased()
-            if lower.contains("[error]") || lower.contains("[warning]") ||
-               lower.contains("failed") || lower.contains("timeout") ||
-               lower.contains("rejected") || lower.contains("denied") {
-                errorLines.append(line)
+            var errorLines: [String] = []
+            for line in recentLines {
+                let lower = line.lowercased()
+                if lower.contains("[error]") || lower.contains("[warning]") ||
+                   lower.contains("failed") || lower.contains("timeout") ||
+                   lower.contains("rejected") || lower.contains("denied") {
+                    errorLines.append(line)
+                }
+                if errorLines.count >= maxLines { break }
             }
-            if errorLines.count >= maxLines { break }
-        }
 
-        return errorLines.joined(separator: "\n")
+            return errorLines.joined(separator: "\n")
+        }.value
     }
 
     /// 地址脱敏：example.com → ***.example.com, IP → ***.***.***.123
@@ -1011,32 +1010,32 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: - 提交到 GitHub（带字符预算管理和剪贴板兜底）
 
     func submitToGitHub() {
-        let report = generateReport()
-        let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
-        let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedBody = report.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        Task {
+            let report = await generateReport()
+            let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
+            let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let encodedBody = report.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
 
-        let baseURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)&body="
-        let fullURL = baseURL + encodedBody
+            let baseURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)&body="
+            let fullURL = baseURL + encodedBody
 
-        // GitHub URL 限制约 8192 字符
-        let maxURLLength = 8000
+            let maxURLLength = 8000
 
-        if fullURL.count <= maxURLLength {
-            if let url = URL(string: fullURL) {
-                NSWorkspace.shared.open(url)
+            if fullURL.count <= maxURLLength {
+                if let url = URL(string: fullURL) {
+                    NSWorkspace.shared.open(url)
+                }
+            } else {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(report, forType: .string)
+
+                let fallbackURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)"
+                if let url = URL(string: fallbackURL) {
+                    NSWorkspace.shared.open(url)
+                }
+
+                makeToast(message: String(localized: .DiagReportCopied), displayDuration: 5)
             }
-        } else {
-            // 超出限制：复制到剪贴板 + 打开空 issue 页面
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(report, forType: .string)
-
-            let fallbackURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)"
-            if let url = URL(string: fallbackURL) {
-                NSWorkspace.shared.open(url)
-            }
-
-            makeToast(message: String(localized: .DiagReportCopied), displayDuration: 5)
         }
     }
 }

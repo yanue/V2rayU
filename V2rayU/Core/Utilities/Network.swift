@@ -212,103 +212,94 @@ struct TCPConnectivity {
 
 /// 配置文件解析检查（JSON 基本合法性）
 struct ConfigValidator {
-    static func isValidJSON(filePath: String) -> Bool {
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else { return false }
-        return (try? JSONSerialization.jsonObject(with: data)) != nil
+    static func isValidJSON(filePath: String) async -> Bool {
+        await Task.detached(priority: .userInitiated) {
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else { return false }
+            return (try? JSONSerialization.jsonObject(with: data)) != nil
+        }.value
     }
 
     /// 详细验证配置文件
     /// - Parameter filePath: 配置文件路径
     /// - Returns: (isValid: Bool, problems: [String]) - 是否有效及问题列表
-    static func validateConfig(filePath: String) -> (isValid: Bool, problems: [String]) {
-        var problems: [String] = []
-        
-        // 1. 文件是否存在
-        guard FileManager.default.fileExists(atPath: filePath) else {
-            return (false, ["配置文件不存在"])
-        }
-        
-        // 2. JSON 格式是否合法
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else {
-            return (false, ["配置文件无法读取，可能是权限问题"])
-        }
-        
-        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            return (false, ["配置文件格式错误，不是有效的 JSON"])
-        }
-        
-        // 3. 判断是 xray 还是 sing-box 配置
-        // Sing-box 有 dns 或 route 字段，优先判断
-        let isSingBox = json["route"] != nil || json["dns"] != nil
-        
-        if isSingBox {
-            // Sing-box 配置格式检查
-            let hasInbounds = json["inbounds"] != nil
-            let hasOutbounds = json["outbounds"] != nil
+    static func validateConfig(filePath: String) async -> (isValid: Bool, problems: [String]) {
+        await Task.detached(priority: .userInitiated) {
+            var problems: [String] = []
             
-            if !hasInbounds {
-                problems.append("缺少入站配置（inbounds）")
-            }
-            if !hasOutbounds {
-                problems.append("缺少出站配置（outbounds）")
+            guard FileManager.default.fileExists(atPath: filePath) else {
+                return (false, ["配置文件不存在"])
             }
             
-            // 检查 inbounds - 更宽松，tun 模式只需要 tun
-            if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
-                var foundSocks = false
-                var foundHttp = false
-                var foundTun = false
-                for inbound in inbounds {
-                    // Sing-box uses "type" and "listen_port"
-                    if let type = inbound["type"] as? String {
-                        if type == "socks" {
-                            foundSocks = true
-                        } else if type == "http" {
-                            foundHttp = true
-                        } else if type == "tun" {
-                            foundTun = true
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else {
+                return (false, ["配置文件无法读取，可能是权限问题"])
+            }
+            
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return (false, ["配置文件格式错误，不是有效的 JSON"])
+            }
+            
+            let isSingBox = json["route"] != nil || json["dns"] != nil
+            
+            if isSingBox {
+                let hasInbounds = json["inbounds"] != nil
+                let hasOutbounds = json["outbounds"] != nil
+                
+                if !hasInbounds {
+                    problems.append("缺少入站配置（inbounds）")
+                }
+                if !hasOutbounds {
+                    problems.append("缺少出站配置（outbounds）")
+                }
+                
+                if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
+                    var foundSocks = false
+                    var foundHttp = false
+                    var foundTun = false
+                    for inbound in inbounds {
+                        if let type = inbound["type"] as? String {
+                            if type == "socks" {
+                                foundSocks = true
+                            } else if type == "http" {
+                                foundHttp = true
+                            } else if type == "tun" {
+                                foundTun = true
+                            }
                         }
                     }
-                }
-                // Sing-box: 只要有任一入站就认为有效（socks/http/tun 都可以）
-                if !foundSocks && !foundHttp && !foundTun {
-                    // 不报错，可能配置了其他类型的入站
-                }
-            }
-        } else {
-            // Xray/V2Ray 配置格式检查
-            let hasInbounds = json["inbounds"] != nil
-            let hasOutbounds = json["outbounds"] != nil
-            
-            if !hasInbounds {
-                problems.append("缺少入站配置（inbounds）")
-            }
-            if !hasOutbounds {
-                problems.append("缺少出站配置（outbounds）")
-            }
-            
-            // 检查 inbounds - Xray 使用 "protocol" 字段
-            if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
-                var foundSocks = false
-                var foundHttp = false
-                for inbound in inbounds {
-                    // Xray uses "protocol"
-                    if let protocol_ = inbound["protocol"] as? String {
-                        if protocol_ == "socks" {
-                            foundSocks = true
-                        } else if protocol_ == "http" {
-                            foundHttp = true
-                        }
+                    if !foundSocks && !foundHttp && !foundTun {
                     }
                 }
-                // Xray 模式需要 SOCKS 或 HTTP
-                if !foundSocks && !foundHttp {
-                    problems.append("未配置 SOCKS 或 HTTP 入站代理")
+            } else {
+                let hasInbounds = json["inbounds"] != nil
+                let hasOutbounds = json["outbounds"] != nil
+                
+                if !hasInbounds {
+                    problems.append("缺少入站配置（inbounds）")
+                }
+                if !hasOutbounds {
+                    problems.append("缺少出站配置（outbounds）")
+                }
+                
+                if let inbounds = json["inbounds"] as? [[String: Any]], !inbounds.isEmpty {
+                    var foundSocks = false
+                    var foundHttp = false
+                    for inbound in inbounds {
+                        if let protocol_ = inbound["protocol"] as? String {
+                            if protocol_ == "socks" {
+                                foundSocks = true
+                            } else if protocol_ == "http" {
+                                foundHttp = true
+                            }
+                        }
+                    }
+                    if !foundSocks && !foundHttp {
+                        problems.append("未配置 SOCKS 或 HTTP 入站代理")
+                    }
                 }
             }
-        }
-        
-        return (problems.isEmpty, problems)
+            
+            return (problems.isEmpty, problems)
+        }.value
     }
 }
 
@@ -320,102 +311,106 @@ struct LogAnalyzer {
         let lineNumber: Int
     }
     
-    static func analyze(logPath: String, lastLines: Int = 500) -> [String] {
-        guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
-        let lines = content.components(separatedBy: .newlines)
-        let recentLines = Array(lines.suffix(lastLines))
-        
-        var problems: [String] = []
-        var errorLines: [(index: Int, line: String)] = []
-        
-        for (index, line) in recentLines.enumerated() {
-            let lowerLine = line.lowercased()
+    static func analyze(logPath: String, lastLines: Int = 500) async -> [String] {
+        await Task.detached(priority: .userInitiated) {
+            guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
+            let lines = content.components(separatedBy: .newlines)
+            let recentLines = Array(lines.suffix(lastLines))
             
-            if lowerLine.contains("failed to dial") || lowerLine.contains("connect: cannot assign requested address") {
-                problems.append("【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点")
-                errorLines.append((index, line))
+            var problems: [String] = []
+            var errorLines: [(index: Int, line: String)] = []
+            
+            for (index, line) in recentLines.enumerated() {
+                let lowerLine = line.lowercased()
+                
+                if lowerLine.contains("failed to dial") || lowerLine.contains("connect: cannot assign requested address") {
+                    problems.append("【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
+                    problems.append("【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("connection reset by peer") || lowerLine.contains("connection closed") {
+                    problems.append("【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
+                    problems.append("【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
+                    problems.append("【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
+                    problems.append("【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                    problems.append("【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                    problems.append("【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
+                    problems.append("【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU")
+                    errorLines.append((index, line))
+                }
+                
+                if lowerLine.contains("port") && lowerLine.contains("in use") {
+                    problems.append("【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口")
+                    errorLines.append((index, line))
+                }
             }
             
-            if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
-                problems.append("【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商")
-                errorLines.append((index, line))
+            if problems.isEmpty {
+                problems.append("未发现明显错误")
             }
             
-            if lowerLine.contains("connection reset by peer") || lowerLine.contains("connection closed") {
-                problems.append("【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
-                problems.append("【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
-                problems.append("【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
-                problems.append("【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                problems.append("【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                problems.append("【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
-                problems.append("【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU")
-                errorLines.append((index, line))
-            }
-            
-            if lowerLine.contains("port") && lowerLine.contains("in use") {
-                problems.append("【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口")
-                errorLines.append((index, line))
-            }
-        }
-        
-        if problems.isEmpty {
-            problems.append("未发现明显错误")
-        }
-        
-        return problems
+            return problems
+        }.value
     }
     
-    static func getSurroundingLog(logPath: String, lastLines: Int = 500, contextLines: Int = 3) -> String {
-        guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
-        let lines = content.components(separatedBy: .newlines)
-        let recentLines = Array(lines.suffix(lastLines))
-        
-        var relevantLogs: [String] = []
-        
-        for (index, line) in recentLines.enumerated() {
-            let lowerLine = line.lowercased()
+    static func getSurroundingLog(logPath: String, lastLines: Int = 500, contextLines: Int = 3) async -> String {
+        await Task.detached(priority: .userInitiated) {
+            guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
+            let lines = content.components(separatedBy: .newlines)
+            let recentLines = Array(lines.suffix(lastLines))
             
-            let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]") || lowerLine.contains("[info]")
-            let isErrorPattern = lowerLine.contains("failed") || lowerLine.contains("error") || 
-                                lowerLine.contains("timeout") || lowerLine.contains("reset") || 
-                                lowerLine.contains("denied") || lowerLine.contains("reject")
+            var relevantLogs: [String] = []
             
-            if hasError || isErrorPattern {
-                let start = max(0, index - contextLines)
-                let end = min(recentLines.count, index + contextLines + 1)
+            for (index, line) in recentLines.enumerated() {
+                let lowerLine = line.lowercased()
                 
-                for i in start..<end {
-                    let prefix = i == index ? ">>> " : "    "
-                    relevantLogs.append("\(prefix)\(recentLines[i])")
+                let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]") || lowerLine.contains("[info]")
+                let isErrorPattern = lowerLine.contains("failed") || lowerLine.contains("error") || 
+                                    lowerLine.contains("timeout") || lowerLine.contains("reset") || 
+                                    lowerLine.contains("denied") || lowerLine.contains("reject")
+                
+                if hasError || isErrorPattern {
+                    let start = max(0, index - contextLines)
+                    let end = min(recentLines.count, index + contextLines + 1)
+                    
+                    for i in start..<end {
+                        let prefix = i == index ? ">>> " : "    "
+                        relevantLogs.append("\(prefix)\(recentLines[i])")
+                    }
+                    relevantLogs.append("")
                 }
-                relevantLogs.append("")
             }
-        }
-        
-        return relevantLogs.isEmpty ? "无 INFO 及以上级别日志" : relevantLogs.joined(separator: "\n")
+            
+            return relevantLogs.isEmpty ? "无 INFO 及以上级别日志" : relevantLogs.joined(separator: "\n")
+        }.value
     }
 }
