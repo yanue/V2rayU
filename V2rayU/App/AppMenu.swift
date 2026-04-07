@@ -13,9 +13,9 @@ import KeyboardShortcuts
 @MainActor
 final class AppMenuManager: NSObject, NSMenuDelegate {
     static let shared = AppMenuManager()
-    
+
     let versionController = AppVersionController()
-    
+
     private var inited = false
     private var statusItem: NSStatusItem!
     private var hostingView: NSHostingView<StatusItemView>!
@@ -121,21 +121,21 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             ])
         }
     }
-    
+
     func refreshPingTip(pingTip: String) {
         pingTipSubject.send(pingTip)
     }
-    
+
     func refreshServerItems() {
         serverSubMenu = getServerSubMenus()
         serverItem.submenu = serverSubMenu
     }
-    
+
     func refreshRoutingItems() {
         routingSubMenu = getRoutingSubMenus()
         routingItem.submenu = routingSubMenu
     }
-    
+
     func refreshBasicMenus() {
         // 刷新模式状态
         toggleCoreItem?.title = coreTitle()
@@ -221,7 +221,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         return keyMap[keyCode] ?? String(format: "0x%02X", keyCode)
     }
-    
+
     func updateMenuTitles() {
         if !inited {
             return
@@ -264,6 +264,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 基本菜单项
         coreStatusItem = getCoreStatusItem()
         menu.addItem(coreStatusItem)
+        diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
 
         toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn), action: #selector(toggleRunning), keyEquivalent: "t")
         viewCoreConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewCoreConfig), keyEquivalent: "")
@@ -276,13 +277,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         viewFilesItem = getViewFilesMenu()
         // 配置查看
         menu.addItem(toggleCoreItem)
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(viewFilesItem)
+        menu.addItem(diagnosticsItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
-        pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
-        globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode), keyEquivalent: "")
-        manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode), keyEquivalent: "")
-        tunModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode), keyEquivalent: "")
+        pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode))
+        globalModeItem = getRunModeItem(mode: .global, title: String(localized: .GlobalMode))
+        manualModeItem = getRunModeItem(mode: .manual, title: String(localized: .ManualMode))
+        tunModeItem = getRunModeItem(mode: .tun, title: String(localized: .TunnelMode))
         menu.addItem(tunModeItem)
         menu.addItem(globalModeItem)
         menu.addItem(pacModeItem)
@@ -293,12 +296,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         serverItem = getServerItem()
         // 预先初始化一次
         pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
-        diagnosticsItem = NSMenuItem(title: String(localized: .Diagnostics), action: #selector(openDiagnostics), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
         menu.addItem(serverItem)
         menu.addItem(pingItem)
-        menu.addItem(diagnosticsItem)
         // 预先初始化一次
         goRoutingSettingItem = NSMenuItem(title: String(localized: .GoRoutingSettings), action: #selector(openRoutingTab), keyEquivalent: "")
         goSubscriptionsItem = NSMenuItem(title: String(localized: .GoSubscriptionSettings), action: #selector(openPreferenceSubscribe), keyEquivalent: "")
@@ -328,7 +329,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
-        
+
         quitItem = NSMenuItem(title: String(localized: .Quit), action: #selector(terminateApp), keyEquivalent: "q")
         menu.addItem(quitItem)
 
@@ -381,31 +382,28 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         item.submenu = viewFilesSubMenu
         return item
     }
-    
+
     func getRoutingItem() -> NSMenuItem {
-        // 获取子菜单
         routingSubMenu = getRoutingSubMenus()
-        // 返回菜单项
         let item = NSMenuItem(title: String(localized: .RoutingList), action: nil, keyEquivalent: "")
         item.submenu = routingSubMenu
         return item
     }
-    
-    func getRunModeItem(mode: RunMode,title: String, keyEquivalent: String = "") -> NSMenuItem {
+
+    func getRunModeItem(mode: RunMode, title: String) -> NSMenuItem {
         let menu = NSMenuItem()
         menu.title = title
         menu.action = #selector(switchRunMode)
-        menu.representedObject = mode.rawValue  // 可选：存储模式名称
+        menu.representedObject = mode.rawValue
         menu.isEnabled =  true
         menu.target = self
-        menu.keyEquivalent = keyEquivalent // todo 快捷键设置
         menu.state = (AppState.shared.v2rayTurnOn && mode == AppState.shared.runMode) ? .on : .off
         menu.toolTip = String(localized: mode.tip)
         return menu
     }
 
     func getRoutingSubMenus() -> NSMenu {
-        
+
         let menu = NSMenu()
 
         let routings = RoutingStore.shared.fetchAll()
@@ -415,35 +413,33 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         }
         return menu
     }
-    
+
     private func createRoutingMenuItem(routing: RoutingEntity) -> NSMenuItem {
         let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
-        item.representedObject = routing.uuid  // 可选：存储路由名称
+        item.representedObject = routing.uuid
         item.isEnabled =  true
         item.target = self
         item.state = (routing.uuid == AppState.shared.runningRouting) ? .on : .off
         return item
     }
-    
+
     func getServerItem() -> NSMenuItem {
-        // 获取子菜单
         serverSubMenu = getServerSubMenus()
-        // 返回菜单项
         let count = ProfileStore.shared.fetchAll().count
         let title = count > 0 ? "\(String(localized: .ServerList)) (\(count))" : String(localized: .ServerList)
         let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = serverSubMenu
         return item
     }
-    
+
     func getServerSubMenus() -> NSMenu {
 
         let menu = NSMenu()
-        
+
         // 直接拿有序数组
         let groupedServers = ProfileStore.shared.getGroupedProfiles()
         let useGrouping = groupedServers.count >= 2
-        
+
         if useGrouping {
             for (name, profiles) in groupedServers {
                 let count = profiles.count
@@ -454,7 +450,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
                 groupItem.submenu = subMenu
                 groupItem.image = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
                 groupItem.state = profiles.contains { $0.uuid == AppState.shared.runningProfile } ? .on : .off
-                
+
                 for profile in profiles {
                     let item = createServerMenuItem(profile: profile)
                     subMenu.addItem(item)
@@ -476,10 +472,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private func createServerMenuItem(profile: ProfileEntity) -> NSMenuItem {
         let speedText: String = "[\(profile.speed)ms]"
         let speedColor: NSColor = getSpeedColor(latency: Double(profile.speed))
-        
+
         // Ping值放前面
         let title = "\(speedText) \(profile.remark)"
-        
+
         let item = NSMenuItem()
         item.attributedTitle = createColoredAttributedTitle(
             title: title,
@@ -493,25 +489,25 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         item.target = self
         item.state = profile.uuid == AppState.shared.runningProfile ? .on : .off
         item.toolTip = "\(profile.`protocol`)-\(profile.address):\(profile.port)-\(profile.uuid)"
-        
+
         return item
     }
 
     private func createColoredAttributedTitle(title: String, speedRange: NSRange, speedColor: NSColor) -> NSAttributedString {
         let attributedString = NSMutableAttributedString(string: title)
-        
+
         // 设置整体字体
         attributedString.addAttributes([
             .font: NSFont.menuFont(ofSize: 0),
             .foregroundColor: NSColor.labelColor
         ], range: NSRange(location: 0, length: title.count))
-        
+
         // 为速度文本设置颜色
         attributedString.addAttributes([
             .foregroundColor: speedColor,
             .font: NSFont.boldSystemFont(ofSize: NSFont.labelFontSize)
         ], range: speedRange)
-        
+
         return attributedString
     }
 
@@ -526,7 +522,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         guard let url = URL(string: confUrl) else { return }
         NSWorkspace.shared.open(url)
     }
-    
+
     func openTunConfigFile() {
         let confUrl = getTunConfigUrl()
         guard let url = URL(string: confUrl) else { return }
@@ -588,7 +584,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 打开文件查看器并显示日志列表
         OpenLogs(logFilePath: coreLogFilePath)
     }
-    
+
     @objc private func openTunLogs(_ sender: NSMenuItem) {
         // 打开文件查看器并显示日志列表
         OpenLogs(logFilePath: tunLogFilePath)
@@ -605,7 +601,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         alert.alertStyle = .warning
         alert.addButton(withTitle: String(localized: .Confirm))
         alert.addButton(withTitle: String(localized: .Cancel))
-        
+
         if alert.runModal() == .alertFirstButtonReturn {
             LogRotation.clearAllLogs()
             noticeTip(title: String(localized: .ClearAllLogs), informativeText: "日志已清除")
@@ -638,17 +634,17 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         AppState.shared.settingTab = .pac
         MainWindowManager.shared.openMainWindow()
     }
-    
+
     @objc private func openRoutingTab(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .routing
         MainWindowManager.shared.openMainWindow()
     }
-    
+
     @objc private func openServerTab(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .server
         MainWindowManager.shared.openMainWindow()
     }
-    
+
     @objc private func openDiagnostics(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .diagnostic
         AppState.shared.helpTab = .qa
@@ -678,7 +674,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .diagnostic
+        AppState.shared.mainTab = .about
         MainWindowManager.shared.openMainWindow()
     }
 
@@ -712,7 +708,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     @objc private func ImportFromPasteboard(_ sender: NSMenuItem) {
         importFromPasteboard()
     }
-    
+
     @objc private func pingSpeed(_ sender: NSMenuItem) {
         pingSpeedTest()
     }
@@ -720,15 +716,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     @objc private func viewCoreConfig(_ sender: Any) {
         openConfigFile()
     }
-    
+
     @objc private func viewTunConfig(_ sender: Any) {
         openTunConfigFile()
     }
-    
+
     @objc private func viewPacFile(_ sender: Any) {
         openPacFile()
     }
-    
+
     @objc private func terminateApp() {
         NSApp.terminate(self)
     }
