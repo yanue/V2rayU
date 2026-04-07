@@ -99,6 +99,7 @@ struct CheckResult: Sendable {
     let problem: String?
     let actionId: DiagnosticAction?
 
+    @MainActor
     static func pass(_ step: DiagnosticStep, _ subtitle: String = "") -> CheckResult {
         CheckResult(step: step, ok: true,
                     subtitle: subtitle.isEmpty ? String(localized: .DiagPassed) : subtitle,

@@ -128,6 +128,7 @@ final class FileViewerManager: ObservableObject {
     }
     
     func selectFileType(_ type: FileType, preSelectPath: String? = nil) {
+        guard !isLoading else { return }
         selectedFileType = type
         selectedFile = nil
         fileContent = ""

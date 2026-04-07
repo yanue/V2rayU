@@ -28,6 +28,7 @@ struct DiagnosticsView: View {
             contentView
         }
         .padding(8)
+        .task { viewModel.ensureItemsInitialized() }
         .onDisappear { viewModel.cancelChecks() }
         .alert(isPresented: $viewModel.showOpenSettingsAlert) {
             Alert(

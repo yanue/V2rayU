@@ -20,10 +20,10 @@ final class DiagnosticsViewModel: ObservableObject {
     @Published var logContent = ""
     @Published var collapsedSections: Set<DiagnosticCategory> = []
 
-    var hasFailures: Bool { items.contains { !$0.ok } }
+    var hasFailures: Bool { ensureItemsInitialized(); return items.contains { !$0.ok } }
 
-    var passedCount: Int { items.filter { $0.status == .passed }.count }
-    var totalCount:  Int { items.count }
+    var passedCount: Int { ensureItemsInitialized(); return items.filter { $0.status == .passed }.count }
+    var totalCount:  Int { ensureItemsInitialized(); return items.count }
 
     // MARK: - Dependencies
 
@@ -38,16 +38,28 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: - Init
 
+    private var _hasInitialized = false
+
     init(nodeHostProvider: @escaping () -> String?, nodePortProvider: @escaping () -> UInt16?) {
         self.nodeHostProvider = nodeHostProvider
         self.nodePortProvider = nodePortProvider
-        self.items = DiagnosticStep.ordered.map { makePending($0) }
+    }
+
+    func ensureItemsInitialized() {
+        guard !_hasInitialized else { return }
+        _hasInitialized = true
+        items = DiagnosticStep.ordered.map { makePending($0) }
+    }
+
+    func resetForNewCheck() {
+        items = DiagnosticStep.ordered.map { makePending($0) }
     }
 
     // MARK: - Item helpers
 
     func itemsFor(_ category: DiagnosticCategory) -> [DiagnosticItem] {
-        items.filter { $0.category == category }
+        ensureItemsInitialized()
+        return items.filter { $0.category == category }
     }
 
     private func makePending(_ step: DiagnosticStep) -> DiagnosticItem {
@@ -121,6 +133,7 @@ final class DiagnosticsViewModel: ObservableObject {
     }
 
     func runSequentialChecks() {
+        guard !checking else { return }
         checkTask?.cancel()
         checkTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -494,7 +507,7 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: ── Process utilities (run off main) ──
 
     /// Read system proxy status synchronously (called from background)
-    private static func getSystemProxyStatusSync(type: String) -> (enabled: Bool, port: Int) {
+    nonisolated private static func getSystemProxyStatusSync(type: String) -> (enabled: Bool, port: Int) {
         let task = Process()
         task.launchPath = "/usr/sbin/networksetup"
         let svc = DiagnosticsViewModel.getActiveNetworkServiceSync() ?? "Wi-Fi"
@@ -521,7 +534,7 @@ final class DiagnosticsViewModel: ObservableObject {
         }
     }
 
-    private static func getActiveNetworkServiceSync() -> String? {
+    nonisolated private static func getActiveNetworkServiceSync() -> String? {
         let task = Process()
         task.launchPath = "/usr/sbin/networksetup"
         task.arguments = ["-listallnetworkservices"]
