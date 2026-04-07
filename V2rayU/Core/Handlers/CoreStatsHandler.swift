@@ -31,16 +31,20 @@ actor CoreTrafficStatsHandler {
             // 判断coreType
             switch coreType {
             case .SingBox:
+                // api stream 模式(更新流量统计)
                 ClashApiStreamHandler.shared.startTask()
+                // api request 模式(更新延迟)
+                await ClashApilatencyHandler.shared.startTask()
             case .XrayCore:
                 await XrayApiStatsHandler.shared.startTask()
             }
         }
     }
-    
+
     func stopTask() {
         Task {
             ClashApiStreamHandler.shared.stopTask()
+            await ClashApilatencyHandler.shared.stopTask()
             await XrayApiStatsHandler.shared.stopTask()
         }
     }
@@ -51,7 +55,7 @@ actor CoreTrafficStatsHandler {
             await AppState.shared.setTraffic(upSpeed: upLink/1024, downSpeed: downLink/1024 )
         }
     }
-    
+
     func setSpeed(latency: Double, directUpLink: Int, directDownLink: Int, proxyUpLink: Int, proxyDownLink: Int) {
         let now = Date()
         let timeInterval = now.timeIntervalSince(lastUpdate)
@@ -85,7 +89,7 @@ actor CoreTrafficStatsHandler {
 
 actor XrayApiStatsHandler: NSObject {
     static let shared = XrayApiStatsHandler()
-    
+
     private var timer: DispatchSourceTimer?
 
     func startTask(interval: TimeInterval = 2) {
@@ -99,7 +103,7 @@ actor XrayApiStatsHandler: NSObject {
         }
         timer?.resume()
     }
-    
+
     func stopTask() {
         timer?.cancel()
         timer = nil
@@ -111,15 +115,15 @@ actor XrayApiStatsHandler: NSObject {
             logger.error("Invalid URL")
             return
         }
-        
+
         do {
             let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
-            
+
             guard let httpResponse = response as? HTTPURLResponse else {
                 logger.error("Invalid response")
                 return
             }
-            
+
             if httpResponse.statusCode == 200 {
                 await parseV2RayStats(jsonData: data)
             } else {
@@ -129,13 +133,14 @@ actor XrayApiStatsHandler: NSObject {
             logger.warning("Request failed: \(error.localizedDescription)")
         }
     }
-    
+
     func parseV2RayStats(jsonData: Data) async {
         do {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601 // 解析日期
             // try decode data
             let vars: V2rayMetricsVars = try decoder.decode(V2rayMetricsVars.self, from: jsonData)
+            var latency = 0.0
             var directUpLink = 0
             var directDownLink = 0
             var proxyUpLink = 0
@@ -143,6 +148,9 @@ actor XrayApiStatsHandler: NSObject {
             guard let stats = vars.stats else {
                 logger.warning("Invalid V2Ray Stats")
                 return
+            }
+            if let latencyValue = vars.observatory?["proxy"] {
+                latency = latencyValue.delay // proxy的延迟
             }
             if let directUpLinkValue = stats.outbound["direct"] {
                 directUpLink = directUpLinkValue.uplink
@@ -152,7 +160,7 @@ actor XrayApiStatsHandler: NSObject {
                 proxyUpLink = proxyUpLinkValue.uplink
                 proxyDownLink = proxyUpLinkValue.downlink
             }
-            let latency = await AppState.shared.latency
+            // 这里设置后, 触发menu等更新
             await CoreTrafficStatsHandler.shared.setSpeed(latency: latency, directUpLink: directUpLink, directDownLink: directDownLink, proxyUpLink: proxyUpLink, proxyDownLink: proxyDownLink)
 //            logger.info("Parsed V2Ray Stats: \(stats)")
         } catch {
@@ -164,7 +172,7 @@ actor XrayApiStatsHandler: NSObject {
 actor ClashApilatencyHandler: NSObject {
     static let shared = ClashApilatencyHandler()
     private var timer: DispatchSourceTimer?
-    
+
     // MARK: - 延迟测试
     func startTask(interval: TimeInterval = 2) {
         let queue = DispatchQueue.global()
@@ -182,7 +190,7 @@ actor ClashApilatencyHandler: NSObject {
         timer?.cancel()
         timer = nil
     }
-    
+
     private func checkDelayByClashApi(proxyName: String) {
         guard let url = URL(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay?timeout=5000&url=http://www.gstatic.com/generate_204") else { return }
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
@@ -204,7 +212,7 @@ actor ClashApilatencyHandler: NSObject {
 final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     static let shared = ClashApiStreamHandler()
     
-    private var clashApiSession: URLSession!
+    private var clashApiSession: URLSession?
     private var clashApiTask: URLSessionDataTask?
     
     override init() {
@@ -219,7 +227,7 @@ final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked 
    func startTask() {
        guard let url = URL(string: "\(coreApiBaseUrl)/traffic") else { return }
        let request = URLRequest(url: url)
-       clashApiTask = clashApiSession.dataTask(with: request)
+       clashApiTask = clashApiSession?.dataTask(with: request)
        clashApiTask?.resume()
    }
 
