@@ -151,12 +151,6 @@ struct AboutView: View {
     }
     
     // MARK: - Actions
-    private func openInFinder(path: String) {
-        let expandedPath = (path as NSString).expandingTildeInPath
-        let url = URL(fileURLWithPath: expandedPath)
-        NSWorkspace.shared.activateFileViewerSelecting([url])
-    }
-    
     private func openLink(url: String) {
         if let url = URL(string: url) {
             NSWorkspace.shared.open(url)

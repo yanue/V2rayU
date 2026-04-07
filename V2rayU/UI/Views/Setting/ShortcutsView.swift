@@ -120,7 +120,7 @@ struct ShortcutsView: View {
                 )
 
                 shortcutRow(
-                    label: String(localized: .ViewLog),
+                    label: String(localized: .ViewCoreLog),
                     name: .viewLog,
                     icon: "list.bullet.rectangle"
                 )

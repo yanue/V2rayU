@@ -246,12 +246,16 @@
 "CoreOff" = "核心: 已停止";
 "TurnCoreOn" = "启动核心";
 "TurnCoreOff" = "停止核心";
-"ViewLog" = "查看核心日志";
+"ViewCoreLog" = "查看核心日志";
 "ViewErrorLog" = "查看错误日志";
+"ViewTunLog" = "查看 Tun 日志";
 "ViewLogFiles" = "查看日志文件...";
 "ClearAllLogs" = "清除所有日志";
+"ViewFiles" = "查看文件";
+"OpenHomeFolder" = "打开 ~/.V2rayU 目录";
 "Logs" = "日志";
 "ViewConfigJson" = "查看 config.json";
+"ViewTunJson" = "查看 tun.json";
 "ViewPacFile" = "查看 PAC 文件";
 "PacMode" = "PAC 模式";
 "TunnelMode" = "Tun 模式 (透明代理)";

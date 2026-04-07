@@ -25,6 +25,11 @@ func getConfigUrl() -> String {
     return configUrl
 }
 
+func getTunConfigUrl() -> String {
+    let configUrl = "http://127.0.0.1:" + String(getPacPort()) + "/tun.json"
+    return configUrl
+}
+
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
     let socksPort = String(getSocksProxyPort())

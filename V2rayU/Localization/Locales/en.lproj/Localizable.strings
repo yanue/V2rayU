@@ -245,12 +245,16 @@
 "CoreOff" = "Core: Stopped";
 "TurnCoreOn" = "Start Core";
 "TurnCoreOff" = "Stop Core";
-"ViewLog" = "View Core Log";
+"ViewCoreLog" = "View Core Log";
 "ViewErrorLog" = "View Error Log";
+"ViewTunLog" = "View Tun Log";
 "ViewLogFiles" = "View Log Files...";
 "ClearAllLogs" = "Clear All Logs";
+"ViewFiles" = "View Files";
+"OpenHomeFolder" = "open ~/.V2rayU folder";
 "Logs" = "Logs";
 "ViewConfigJson" = "View config.json";
+"ViewTunJson" = "View tun.json";
 "ViewPacFile" = "View PAC File";
 "PacMode" = "PAC Mode";
 "TunnelMode" = "Tun Mode";

@@ -59,7 +59,7 @@ enum PredefinedFile: String, CaseIterable {
     case tunLog = "tun.log"
     case errorLog = "error.log"
     case config = "config.json"
-    case tunConfig = "tun-config.json"
+    case tunConfig = "tun.json"
     case proxyJs = "proxy.js"
     
     var fileType: FileType {

@@ -22,14 +22,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     // menu items
     private var coreStatusItem: NSMenuItem!
     private var toggleCoreItem: NSMenuItem!
-    private var viewConfigItem: NSMenuItem!
+    private var viewCoreConfigItem: NSMenuItem!
+    private var viewTunConfigItem: NSMenuItem!
     private var viewPacItem: NSMenuItem!
-    private var viewLogItem: NSMenuItem!
-    private var viewErrorLogItem: NSMenuItem!
-    private var viewLogFilesItem: NSMenuItem!
-    private var clearLogsItem: NSMenuItem!
-    private var logsItem: NSMenuItem!
-    private var logsSubMenu: NSMenu!
+    private var viewCoreLogItem: NSMenuItem!
+    private var viewTunLogItem: NSMenuItem!
+    private var clearLogFilesItem: NSMenuItem!
+    private var viewFilesItem: NSMenuItem!
+    private var openHomeFolderItem: NSMenuItem!
+    private var viewFilesSubMenu: NSMenu!
     private var pacModeItem: NSMenuItem!
     private var tunModeItem: NSMenuItem!
     private var globalModeItem: NSMenuItem!
@@ -174,9 +175,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // PAC Mode
         setKeyEquivalent(for: .switchToPacMode, menuItem: pacModeItem)
         // View shortcuts
-        setKeyEquivalent(for: .viewConfigJson, menuItem: viewConfigItem)
+        setKeyEquivalent(for: .viewConfigJson, menuItem: viewCoreConfigItem)
         setKeyEquivalent(for: .viewPacFile, menuItem: viewPacItem)
-        setKeyEquivalent(for: .viewLog, menuItem: viewLogItem)
+        setKeyEquivalent(for: .viewLog, menuItem: viewCoreLogItem)
         // Tools shortcuts
         setKeyEquivalent(for: .pingSpeed, menuItem: pingItem)
         setKeyEquivalent(for: .importServers, menuItem: importServersItem)
@@ -229,13 +230,12 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         pingItem?.title = String(localized: .LatencyTest) + " \(self.pingTip)"
         diagnosticsItem?.title = String(localized: .Diagnostics)
         toggleCoreItem?.title = coreTitle()
-        viewConfigItem?.title = String(localized: .ViewConfigJson)
+        viewCoreConfigItem?.title = String(localized: .ViewConfigJson)
         viewPacItem?.title = String(localized: .ViewPacFile)
-        viewLogItem?.title = String(localized: .ViewLog)
-        viewErrorLogItem?.title = String(localized: .ViewErrorLog)
-        viewLogFilesItem?.title = String(localized: .ViewLogFiles)
-        clearLogsItem?.title = String(localized: .ClearAllLogs)
-        logsItem?.title = String(localized: .Logs)
+        viewCoreLogItem?.title = String(localized: .ViewCoreLog)
+        viewTunLogItem?.title = String(localized: .ViewTunLog)
+        clearLogFilesItem?.title = String(localized: .ClearAllLogs)
+        viewFilesItem?.title = String(localized: .ViewFiles)
         pacModeItem?.title = String(localized: .PacMode)
         globalModeItem?.title = String(localized: .GlobalMode)
         manualModeItem?.title = String(localized: .ManualMode)
@@ -266,18 +266,17 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         menu.addItem(coreStatusItem)
 
         toggleCoreItem = NSMenuItem(title: AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn), action: #selector(toggleRunning), keyEquivalent: "t")
-        viewConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewConfig), keyEquivalent: "")
+        viewCoreConfigItem = NSMenuItem(title: String(localized: .ViewConfigJson), action: #selector(viewCoreConfig), keyEquivalent: "")
+        viewTunConfigItem = NSMenuItem(title: String(localized: .ViewTunJson), action: #selector(viewTunConfig), keyEquivalent: "")
         viewPacItem = NSMenuItem(title: String(localized: .ViewPacFile), action: #selector(viewPacFile), keyEquivalent: "")
-        viewLogItem = NSMenuItem(title: String(localized: .ViewLog), action: #selector(openLogs), keyEquivalent: "")
-        viewErrorLogItem = NSMenuItem(title: String(localized: .ViewErrorLog), action: #selector(openErrorLogs), keyEquivalent: "")
-        viewLogFilesItem = NSMenuItem(title: String(localized: .ViewLogFiles), action: #selector(openLogFiles), keyEquivalent: "")
-        clearLogsItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
+        viewCoreLogItem = NSMenuItem(title: String(localized: .ViewCoreLog), action: #selector(openCoreLogs), keyEquivalent: "")
+        viewTunLogItem = NSMenuItem(title: String(localized: .ViewTunLog), action: #selector(openTunLogs), keyEquivalent: "")
+        clearLogFilesItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
+        openHomeFolderItem = NSMenuItem(title: String(localized: .OpenHomeFolder), action: #selector(openHomeFolder), keyEquivalent: "")
+        viewFilesItem = getViewFilesMenu()
         // 配置查看
         menu.addItem(toggleCoreItem)
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(viewConfigItem)
-        menu.addItem(viewPacItem)
-        menu.addItem(viewLogFilesItem)
+        menu.addItem(viewFilesItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode), keyEquivalent: "")
@@ -357,21 +356,29 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         return item
     }
 
-    func getLogsItem() -> NSMenuItem {
-        viewLogItem.target = self
-        viewErrorLogItem.target = self
-        viewLogFilesItem.target = self
-        clearLogsItem.target = self
+    func getViewFilesMenu() -> NSMenuItem {
+        viewCoreLogItem.target = self
+        viewTunLogItem.target = self
+        clearLogFilesItem.target = self
+        viewCoreConfigItem.target = self
+        viewTunConfigItem.target = self
+        viewPacItem.target = self
+        openHomeFolderItem.target = self
 
-        logsSubMenu = NSMenu()
-        logsSubMenu.addItem(viewLogItem)
-        logsSubMenu.addItem(viewErrorLogItem)
-        logsSubMenu.addItem(viewLogFilesItem)
-        logsSubMenu.addItem(NSMenuItem.separator())
-        logsSubMenu.addItem(clearLogsItem)
+        viewFilesSubMenu = NSMenu()
+        viewFilesSubMenu.addItem(openHomeFolderItem)
+        viewFilesSubMenu.addItem(NSMenuItem.separator())
+        viewFilesSubMenu.addItem(viewCoreConfigItem)
+        viewFilesSubMenu.addItem(viewTunConfigItem)
+        viewFilesSubMenu.addItem(viewPacItem)
+        viewFilesSubMenu.addItem(NSMenuItem.separator())
+        viewFilesSubMenu.addItem(viewCoreLogItem)
+        viewFilesSubMenu.addItem(viewTunLogItem)
+        viewFilesSubMenu.addItem(NSMenuItem.separator())
+        viewFilesSubMenu.addItem(clearLogFilesItem)
 
-        let item = NSMenuItem(title: String(localized: .Logs), action: nil, keyEquivalent: "")
-        item.submenu = logsSubMenu
+        let item = NSMenuItem(title: String(localized: .ViewFiles), action: nil, keyEquivalent: "")
+        item.submenu = viewFilesSubMenu
         return item
     }
     
@@ -519,6 +526,12 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         guard let url = URL(string: confUrl) else { return }
         NSWorkspace.shared.open(url)
     }
+    
+    func openTunConfigFile() {
+        let confUrl = getTunConfigUrl()
+        guard let url = URL(string: confUrl) else { return }
+        NSWorkspace.shared.open(url)
+    }
 
     func openPacFile() {
         let pacUrl = getPacUrl()
@@ -571,27 +584,18 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         noticeTip(title: "Copied", informativeText: "Proxy export command copied to clipboard")
     }
 
-    @objc private func openLogs(_ sender: NSMenuItem) {
+    @objc private func openCoreLogs(_ sender: NSMenuItem) {
         // 打开文件查看器并显示日志列表
-        FileViewerManager.shared.selectFileType(.logs)
-        FileViewerManager.shared.openFileViewer()
+        OpenLogs(logFilePath: coreLogFilePath)
+    }
+    
+    @objc private func openTunLogs(_ sender: NSMenuItem) {
+        // 打开文件查看器并显示日志列表
+        OpenLogs(logFilePath: tunLogFilePath)
     }
 
-    @objc private func openErrorLogs(_ sender: NSMenuItem) {
-        // 提取错误日志并在文件查看器中打开
-        LogRotation.extractErrors()
-        FileViewerManager.shared.selectFileType(.logs)
-        FileViewerManager.shared.refreshFiles()
-        // 尝试选中最近提取的错误日志文件
-        if let file = FileViewerManager.shared.files.first(where: { $0.path == LogRotation.recentErrorLogFilePath }) {
-            FileViewerManager.shared.selectFile(file)
-        }
-        FileViewerManager.shared.openFileViewer()
-    }
-
-    @objc private func openLogFiles(_ sender: NSMenuItem) {
-        FileViewerManager.shared.selectFileType(.logs, preSelectPath: coreLogFilePath)
-        FileViewerManager.shared.openFileViewer()
+    @objc private func openHomeFolder(_ sender: NSMenuItem) {
+        openInFinder(path: AppHomePath)
     }
 
     @objc private func clearLogs(_ sender: NSMenuItem) {
@@ -713,17 +717,18 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         pingSpeedTest()
     }
 
-    @objc private func viewConfig(_ sender: Any) {
-        FileViewerManager.shared.selectFileType(.config, preSelectPath: JsonConfigFilePath)
-        FileViewerManager.shared.openFileViewer()
+    @objc private func viewCoreConfig(_ sender: Any) {
+        openConfigFile()
     }
-
+    
+    @objc private func viewTunConfig(_ sender: Any) {
+        openTunConfigFile()
+    }
+    
     @objc private func viewPacFile(_ sender: Any) {
-        // 使用文件查看器查看 PAC 文件
-        FileViewerManager.shared.selectFileType(.pac)
-        FileViewerManager.shared.openFileViewer()
+        openPacFile()
     }
-
+    
     @objc private func terminateApp() {
         NSApp.terminate(self)
     }
