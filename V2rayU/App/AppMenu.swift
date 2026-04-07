@@ -674,8 +674,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func goHelp(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .about
-        MainWindowManager.shared.openMainWindow()
+        guard let url = URL(string: "https://github.com/yanue/v2rayu/issues") else {
+            return
+        }
+        NSWorkspace.shared.open(url)
     }
 
     @objc private func switchRunMode(_ sender: NSMenuItem) {
