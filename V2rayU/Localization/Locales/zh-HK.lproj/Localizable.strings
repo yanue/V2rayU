@@ -447,6 +447,11 @@
 "DiagFirewall" = "防火牆與安全軟體";
 "DiagCoreInstall" = "核心安裝與版本";
 "DiagCoreRunning" = "核心執行狀態";
+"DiagLaunchdProcess" = "Launchd 進程狀態";
+"DiagLaunchdNotLoaded" = "Launchd 代理未載入";
+"DiagLaunchdNotRunning" = "Launchd 代理已載入但進程未執行";
+"DiagLaunchdRunning" = "進程執行中 (PID: %@)";
+"DiagLaunchdReload" = "重新載入";
 "DiagUToolPermission" = "輔助工具權限";
 "DiagConfigValidity" = "設定檔有效性";
 "DiagDNSResolution" = "節點網域解析";

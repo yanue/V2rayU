@@ -436,6 +436,7 @@ enum LanguageLabel: String, CaseIterable {
     case DiagFirewall
     case DiagCoreInstall
     case DiagCoreRunning
+    case DiagLaunchdProcess
     case DiagUToolPermission
     case DiagConfigValidity
     case DiagDNSResolution
@@ -467,6 +468,10 @@ enum LanguageLabel: String, CaseIterable {
     case DiagCoreNotRunning
     case DiagCoreStopped
     case DiagCoreStartFailed
+    case DiagLaunchdNotLoaded
+    case DiagLaunchdNotRunning
+    case DiagLaunchdRunning
+    case DiagLaunchdReload
     case DiagToolMissing
     case DiagToolNoPermission
     case DiagConfigNotExist

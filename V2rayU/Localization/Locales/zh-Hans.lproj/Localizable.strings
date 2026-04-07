@@ -448,6 +448,11 @@
 "DiagFirewall" = "防火墙与安全软件";
 "DiagCoreInstall" = "核心安装与版本";
 "DiagCoreRunning" = "核心运行状态";
+"DiagLaunchdProcess" = "Launchd 进程状态";
+"DiagLaunchdNotLoaded" = "Launchd 代理未加载";
+"DiagLaunchdNotRunning" = "Launchd 代理已加载但进程未运行";
+"DiagLaunchdRunning" = "进程运行中 (PID: %@)";
+"DiagLaunchdReload" = "重新加载";
 "DiagUToolPermission" = "辅助工具权限";
 "DiagConfigValidity" = "配置文件有效性";
 "DiagDNSResolution" = "节点域名解析";

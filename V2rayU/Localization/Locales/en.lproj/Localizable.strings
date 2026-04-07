@@ -447,6 +447,11 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagFirewall" = "Firewall & Security Software";
 "DiagCoreInstall" = "Core Installation & Version";
 "DiagCoreRunning" = "Core Running Status";
+"DiagLaunchdProcess" = "Launchd Process Status";
+"DiagLaunchdNotLoaded" = "Launchd agent not loaded";
+"DiagLaunchdNotRunning" = "Launchd agent loaded but process not running";
+"DiagLaunchdRunning" = "Process running (PID: %@)";
+"DiagLaunchdReload" = "Reload";
 "DiagUToolPermission" = "Tool Permissions";
 "DiagConfigValidity" = "Configuration Validity";
 "DiagDNSResolution" = "Node Domain Resolution";

@@ -10,115 +10,69 @@ import AppKit
 
 @MainActor
 final class DiagnosticsViewModel: ObservableObject {
+    // MARK: - Published state
+
     @Published var items: [DiagnosticItem] = []
-    @Published var checking: Bool = false
-    @Published var showOpenSettingsAlert: Bool = false
-    @Published var showFAQ: Bool = false
-    @Published var progressText: String = ""
-    @Published var showSubmitSheet: Bool = false
-    @Published var logContent: String = ""
-    
-    var hasFailures: Bool {
-        items.contains { !$0.ok }
-    }
-    
-    // MARK: - 依赖（从实际配置读取端口）
+    @Published var checking = false
+    @Published var showOpenSettingsAlert = false
+    @Published var showFAQ = false
+    @Published var progressText = ""
+    @Published var logContent = ""
+    @Published var collapsedSections: Set<DiagnosticCategory> = []
+
+    var hasFailures: Bool { items.contains { !$0.ok } }
+
+    var passedCount: Int { items.filter { $0.status == .passed }.count }
+    var totalCount:  Int { items.count }
+
+    // MARK: - Dependencies
+
     private let appState = AppState.shared
-    private let v2rayUToolPath = v2rayUTool
-    private let logPath = coreLogFilePath
+    private let logPath  = coreLogFilePath
     private var localSocksPort: Int { Int(getSocksProxyPort()) }
-    private var localHTTPPort: Int { Int(getHttpProxyPort()) }
+    private var localHTTPPort:  Int { Int(getHttpProxyPort()) }
     private let nodeHostProvider: () -> String?
     private let nodePortProvider: () -> UInt16?
+
+    private var checkTask: Task<Void, Never>?
+
+    // MARK: - Init
 
     init(nodeHostProvider: @escaping () -> String?, nodePortProvider: @escaping () -> UInt16?) {
         self.nodeHostProvider = nodeHostProvider
         self.nodePortProvider = nodePortProvider
-        
-        self.items = DiagnosticStep.allCheckSteps.map { makePendingItem(for: $0) }
+        self.items = DiagnosticStep.ordered.map { makePending($0) }
     }
-    
-    func itemsForCategory(_ category: DiagnosticCategory) -> [DiagnosticItem] {
+
+    // MARK: - Item helpers
+
+    func itemsFor(_ category: DiagnosticCategory) -> [DiagnosticItem] {
         items.filter { $0.category == category }
     }
-    
-    private var checkTask: Task<Void, Never>?
-    
-    func cancelChecks() {
-        checkTask?.cancel()
-        checkTask = nil
-        checking = false
-    }
-    
-    // MARK: - 逐项诊断
 
-    func runSequentialChecks() {
-        let currentItems = items
-        
-        Task { @MainActor [weak self] in
-            guard let self = self else { return }
-            self.checking = true
-            self.progressText = "准备开始诊断…"
-            self.items = DiagnosticStep.allCheckSteps.map { self.makePendingItem(for: $0) }
-            
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            
-            // 文件检查
-            self.items[0] = await self.checkV2rayUToolInstall()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[1] = await self.checkUToolPermission()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[2] = await self.checkCoreInstall()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[3] = await self.checkCoreArch()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[4] = await self.checkConfigFile()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[5] = await self.checkConfigValidity()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[6] = await self.checkGeoipFile()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[7] = await self.checkGeositeFile()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            // 运行状态
-            self.items[8] = await self.checkCoreRunning()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[9] = await self.checkSystemProxy()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[10] = await self.checkLocalPortConflict()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            // 网络检查
-            self.items[11] = await self.checkBasicNetwork()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[12] = await self.checkNodeConnectivity()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[13] = await self.checkProxyConnectivity()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            self.items[14] = await self.checkPingLatency()
-            try? await Task.sleep(nanoseconds: 16_000_000)
-            // 日志
-            self.items[15] = await self.checkLogAnalysis()
-
-            self.progressText = "诊断完成"
-            self.checking = false
-        }
+    private func makePending(_ step: DiagnosticStep) -> DiagnosticItem {
+        DiagnosticItem(id: step.rawValue, step: step, title: title(for: step),
+                       subtitle: String(localized: .DiagPending), status: .pending,
+                       ok: false, problem: nil, actionTitle: nil, action: nil)
     }
-    
-    // MARK: - Helpers
-    
-    private func makePendingItem(for step: DiagnosticStep) -> DiagnosticItem {
-        DiagnosticItem(
-            step: step,
-            title: title(for: step),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
+
+    private func makeChecking(_ step: DiagnosticStep) -> DiagnosticItem {
+        DiagnosticItem(id: step.rawValue, step: step, title: title(for: step),
+                       subtitle: String(localized: .DiagChecking), status: .checking,
+                       ok: false, problem: nil, actionTitle: nil, action: nil)
+    }
+
+    /// Convert a CheckResult into a display item with resolved action closure
+    private func toItem(_ r: CheckResult) -> DiagnosticItem {
+        let (aTitle, aAction) = resolveAction(r.actionId)
+        return DiagnosticItem(
+            id: r.step.rawValue, step: r.step, title: title(for: r.step),
+            subtitle: r.subtitle, status: r.ok ? .passed : .failed,
+            ok: r.ok, problem: r.problem,
+            actionTitle: aTitle, action: aAction
         )
     }
-    
+
     private func title(for step: DiagnosticStep) -> String {
         switch step {
         case .v2rayUToolInstall:  return String(localized: .DiagV2rayUToolInstall)
@@ -130,6 +84,7 @@ final class DiagnosticsViewModel: ObservableObject {
         case .geoipFile:         return String(localized: .DiagGeoipFile)
         case .geositeFile:       return String(localized: .DiagGeositeFile)
         case .coreRunning:       return String(localized: .DiagCoreRunning)
+        case .launchdProcess:    return String(localized: .DiagLaunchdProcess)
         case .systemProxy:       return String(localized: .DiagSystemProxy)
         case .localPortConflict: return String(localized: .DiagLocalPortConflict)
         case .basicNetwork:      return String(localized: .DiagBasicNetwork)
@@ -140,814 +95,414 @@ final class DiagnosticsViewModel: ObservableObject {
         }
     }
 
-    // MARK: - 文件检查
+    // MARK: - Action resolution
 
-    private func checkV2rayUToolInstall() async -> DiagnosticItem {
-        let exists = FileManager.default.fileExists(atPath: v2rayUToolPath)
-        let executable = exists && FileManager.default.isExecutableFile(atPath: v2rayUToolPath)
-
-        let subtitle: String
-        let problem: String?
-
-        if executable {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if exists {
-            subtitle = String(localized: .DiagToolNoPermission)
-            problem = String(localized: .DiagToolNoPermission)
-        } else {
-            subtitle = String(localized: .DiagToolMissing)
-            problem = String(localized: .DiagToolMissing)
+    private func resolveAction(_ id: DiagnosticAction?) -> (String?, (() -> Void)?) {
+        guard let id else { return (nil, nil) }
+        switch id {
+        case .fixInstall:          return (String(localized: .DiagFixNow),             { self.doFixInstall() })
+        case .fixTool:             return (String(localized: .DiagFixNow),             { self.doFixTool() })
+        case .fixGeoip:            return (String(localized: .DiagFixNow),             { self.doFixGeoip() })
+        case .openConfig:          return (String(localized: .DiagViewConfig),         { self.openConfigFile() })
+        case .openNetworkSettings: return (String(localized: .DiagOpenNetworkSettings),{ self.openSystemNetworkSettings() })
+        case .startCore:           return (String(localized: .DiagStartCore),          { self.doToggleCore() })
+        case .restartCore:         return (String(localized: .DiagRestartCore),        { self.doRestartCore() })
+        case .rePing:              return (String(localized: .DiagReTest),             { self.doPingNow() })
+        case .reloadLaunchd:       return (String(localized: .DiagLaunchdReload),      { self.doRestartCore() })
         }
-
-        return DiagnosticItem(
-            step: .v2rayUToolInstall,
-            title: String(localized: .DiagV2rayUToolInstall),
-            subtitle: subtitle,
-            ok: executable,
-            problem: problem,
-            actionTitle: executable ? nil : String(localized: .DiagFixNow),
-            action: executable ? nil : { self.fixV2rayUTool() }
-        )
     }
 
-    private func checkUToolPermission() async -> DiagnosticItem {
-        let toolExists = FileManager.default.fileExists(atPath: v2rayUToolPath)
-        let hasPermission = toolExists && checkFileIsRootAdmin(file: v2rayUToolPath)
+    // MARK: - Run diagnostics
 
-        let subtitle: String
-        let problem: String?
-
-        if hasPermission {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if !toolExists {
-            subtitle = String(localized: .DiagToolMissing)
-            problem = String(localized: .DiagToolMissing)
-        } else {
-            subtitle = String(localized: .DiagToolNoPermission)
-            problem = String(localized: .DiagToolNoPermission)
-        }
-
-        return DiagnosticItem(
-            step: .uToolPermission,
-            title: String(localized: .DiagUToolPermission),
-            subtitle: subtitle,
-            ok: hasPermission,
-            problem: problem,
-            actionTitle: hasPermission ? nil : String(localized: .DiagFixNow),
-            action: hasPermission ? nil : { self.fixV2rayUTool() }
-        )
+    func cancelChecks() {
+        checkTask?.cancel()
+        checkTask = nil
+        checking = false
     }
 
-    private func checkCoreInstall() async -> DiagnosticItem {
-        let installed = FileManager.default.fileExists(atPath: xrayCoreFile)
-        let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
-        let version = executable ? getCoreVersion() : ""
-        
-        let subtitle: String
-        let problem: String?
-        
-        if executable {
-            subtitle = String(format: String(localized: .DiagPassed), version)
-            problem = nil
-        } else if installed {
-            subtitle = String(localized: .DiagCoreNotExecutable)
-            problem = String(localized: .DiagCoreNotExecutable)
-        } else {
-            subtitle = String(localized: .DiagCoreNotInstalled)
-            problem = String(localized: .DiagCoreNotInstalled)
-        }
-        
-        return DiagnosticItem(
-            step: .coreInstall,
-            title: String(localized: .DiagCoreInstall),
-            subtitle: subtitle,
-            ok: executable,
-            problem: problem,
-            actionTitle: executable ? nil : String(localized: .DiagFixNow),
-            action: executable ? nil : { self.fixInstallAll() }
-        )
-    }
-    
-    private func checkCoreArch() async -> DiagnosticItem {
-        let installed = FileManager.default.fileExists(atPath: xrayCoreFile)
-        let executable = installed && FileManager.default.isExecutableFile(atPath: xrayCoreFile)
-        
-        let currentArch = isARM64() ? "arm64" : "amd64"
-        
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .coreArch,
-            title: String(localized: .DiagCoreArch),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
-        let actualArch = executable ? await getFileArch(file: xrayCoreFile) : nil
-        let ok = actualArch == currentArch
-        
-        let subtitle: String
-        let problem: String?
-        
-        if !installed {
-            subtitle = String(localized: .DiagCoreNotInstalled)
-            problem = String(localized: .DiagCoreNotInstalled)
-        } else if !executable {
-            subtitle = String(localized: .DiagCoreNotExecutable)
-            problem = String(localized: .DiagCoreNotExecutable)
-        } else if ok {
-            subtitle = String(format: String(localized: .DiagCoreArchCorrect), actualArch ?? "unknown")
-            problem = nil
-        } else {
-            subtitle = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
-            problem = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
-        }
-        
-        return DiagnosticItem(
-            step: .coreArch,
-            title: String(localized: .DiagCoreArch),
-            subtitle: subtitle,
-            ok: ok,
-            problem: problem,
-            actionTitle: ok ? nil : String(localized: .DiagFixNow),
-            action: ok ? nil : { self.fixInstallAll() }
-        )
-    }
-    
-    private func checkConfigFile() async -> DiagnosticItem {
-        let exists = FileManager.default.fileExists(atPath: JsonConfigFilePath)
+    func runSequentialChecks() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.checking = true
+            self.progressText = ""
+            self.items = DiagnosticStep.ordered.map { self.makePending($0) }
 
-        let subtitle: String
-        let problem: String?
+            let steps = DiagnosticStep.ordered
 
-        if exists {
-            let fileSize = (try? FileManager.default.attributesOfItem(atPath: JsonConfigFilePath)[.size] as? Int) ?? 0
-            if fileSize > 0 {
-                subtitle = String(format: String(localized: .DiagConfigFileExists), fileSize)
-                problem = nil
-            } else {
-                subtitle = String(localized: .DiagConfigFileEmpty)
-                problem = String(localized: .DiagConfigFileEmpty)
+            for (i, step) in steps.enumerated() {
+                guard !Task.isCancelled else { break }
+
+                // Mark current step as checking
+                if let idx = self.items.firstIndex(where: { $0.step == step }) {
+                    self.items[idx] = self.makeChecking(step)
+                }
+                self.progressText = "\(i + 1)/\(steps.count) \(self.title(for: step))"
+
+                // Yield to let UI update
+                await Task.yield()
+
+                // Run the check (heavy work dispatched off main actor inside each method)
+                let result = await self.runCheck(step)
+
+                guard !Task.isCancelled else { break }
+
+                if let idx = self.items.firstIndex(where: { $0.step == step }) {
+                    self.items[idx] = self.toItem(result)
+                }
             }
-        } else {
-            subtitle = String(localized: .DiagConfigFileMissing)
-            problem = String(localized: .DiagConfigFileMissing)
-        }
 
-        return DiagnosticItem(
-            step: .configFile,
-            title: String(localized: .DiagConfigFile),
-            subtitle: subtitle,
-            ok: exists && ((try? FileManager.default.attributesOfItem(atPath: JsonConfigFilePath)[.size] as? Int) ?? 0) > 0,
-            problem: problem,
-            actionTitle: exists ? nil : String(localized: .DiagFixNow),
-            action: exists ? nil : { self.fixInstallAll() }
-        )
+            self.progressText = ""
+            self.checking = false
+        }
     }
 
-    /// 新增：配置文件 JSON 合法性 + 字段完整性检查
-    private func checkConfigValidity() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .configValidity,
-            title: String(localized: .DiagConfigValidity),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
-        let (isValid, problems) = await ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
-
-        let subtitle: String
-        let problem: String?
-
-        if isValid {
-            subtitle = String(localized: .DiagConfigValidOK)
-            problem = nil
-        } else {
-            let joined = problems.joined(separator: "; ")
-            subtitle = String(localized: .DiagFailed)
-            problem = String(format: String(localized: .DiagConfigValidProblems), joined)
+    /// Dispatch to appropriate checker
+    private func runCheck(_ step: DiagnosticStep) async -> CheckResult {
+        switch step {
+        case .v2rayUToolInstall:  return await checkV2rayUToolInstall()
+        case .uToolPermission:   return await checkUToolPermission()
+        case .coreInstall:       return await checkCoreInstall()
+        case .coreArch:          return await checkCoreArch()
+        case .configFile:        return await checkConfigFile()
+        case .configValidity:    return await checkConfigValidity()
+        case .geoipFile:         return checkGeoFile(name: "geoip.dat", step: .geoipFile, missingKey: .DiagGeoipMissing)
+        case .geositeFile:       return checkGeoFile(name: "geosite.dat", step: .geositeFile, missingKey: .DiagGeositeMissing)
+        case .coreRunning:       return await checkCoreRunning()
+        case .launchdProcess:    return await checkLaunchdProcess()
+        case .systemProxy:       return await checkSystemProxy()
+        case .localPortConflict: return await checkLocalPortConflict()
+        case .basicNetwork:      return await checkBasicNetwork()
+        case .nodeConnectivity:  return await checkNodeConnectivity()
+        case .proxyConnectivity: return await checkProxyConnectivity()
+        case .pingLatency:       return await checkPingLatency()
+        case .logAnalysis:       return await checkLogAnalysis()
         }
-
-        return DiagnosticItem(
-            step: .configValidity,
-            title: String(localized: .DiagConfigValidity),
-            subtitle: subtitle,
-            ok: isValid,
-            problem: problem,
-            actionTitle: isValid ? nil : String(localized: .DiagViewConfig),
-            action: isValid ? nil : { self.openConfigFile() }
-        )
     }
 
-    private func checkGeoipFile() async -> DiagnosticItem {
-        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat")
+    // MARK: ── File Checks ──
 
-        let subtitle: String
-        let problem: String?
+    private func checkV2rayUToolInstall() async -> CheckResult {
+        let path = v2rayUTool
+        let exists = FileManager.default.fileExists(atPath: path)
+        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
 
-        if exists {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else {
-            subtitle = String(localized: .DiagGeoipMissing)
-            problem = String(localized: .DiagGeoipMissing)
+        if exec {
+            return .pass(.v2rayUToolInstall)
         }
-
-        return DiagnosticItem(
-            step: .geoipFile,
-            title: String(localized: .DiagGeoipFile),
-            subtitle: subtitle,
-            ok: exists,
-            problem: problem,
-            actionTitle: exists ? nil : String(localized: .DiagFixNow),
-            action: exists ? nil : { self.fixGeoip() }
-        )
+        let msg = exists ? String(localized: .DiagToolNoPermission) : String(localized: .DiagToolMissing)
+        return .fail(.v2rayUToolInstall, subtitle: msg, problem: msg, action: .fixTool)
     }
 
-    private func checkGeositeFile() async -> DiagnosticItem {
-        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/geosite.dat")
-
-        let subtitle: String
-        let problem: String?
-
-        if exists {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else {
-            subtitle = String(localized: .DiagGeositeMissing)
-            problem = String(localized: .DiagGeositeMissing)
+    private func checkUToolPermission() async -> CheckResult {
+        let path = v2rayUTool
+        guard FileManager.default.fileExists(atPath: path) else {
+            return .fail(.uToolPermission,
+                         subtitle: String(localized: .DiagToolMissing),
+                         problem: String(localized: .DiagToolMissing), action: .fixTool)
         }
-
-        return DiagnosticItem(
-            step: .geositeFile,
-            title: String(localized: .DiagGeositeFile),
-            subtitle: subtitle,
-            ok: exists,
-            problem: problem,
-            actionTitle: exists ? nil : String(localized: .DiagFixNow),
-            action: exists ? nil : { self.fixGeoip() }
-        )
+        let ok = checkFileIsRootAdmin(file: path)
+        if ok { return .pass(.uToolPermission) }
+        return .fail(.uToolPermission,
+                     subtitle: String(localized: .DiagToolNoPermission),
+                     problem: String(localized: .DiagToolNoPermission), action: .fixTool)
     }
 
-    // MARK: - 运行状态检查
+    private func checkCoreInstall() async -> CheckResult {
+        let path = xrayCoreFile
+        let exists = FileManager.default.fileExists(atPath: path)
+        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
 
-    private func checkCoreRunning() async -> DiagnosticItem {
-        let running = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
-        
-        let subtitle: String
-        let problem: String?
-        
+        if exec {
+            let ver = getCoreVersion()
+            return .pass(.coreInstall, String(format: String(localized: .DiagPassed), ver))
+        }
+        let msg = exists ? String(localized: .DiagCoreNotExecutable) : String(localized: .DiagCoreNotInstalled)
+        return .fail(.coreInstall, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkCoreArch() async -> CheckResult {
+        let path = xrayCoreFile
+        guard FileManager.default.fileExists(atPath: path),
+              FileManager.default.isExecutableFile(atPath: path) else {
+            return .fail(.coreArch, subtitle: String(localized: .DiagCoreNotInstalled),
+                         problem: String(localized: .DiagCoreNotInstalled), action: .fixInstall)
+        }
+        let currentArch = isARM64() ? "arm64" : "amd64"
+        let actualArch = await getFileArch(file: path)
+        let ok = actualArch == currentArch
+        if ok {
+            return .pass(.coreArch, String(format: String(localized: .DiagCoreArchCorrect), actualArch ?? "unknown"))
+        }
+        let msg = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
+        return .fail(.coreArch, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkConfigFile() async -> CheckResult {
+        let path = JsonConfigFilePath
+        guard FileManager.default.fileExists(atPath: path) else {
+            return .fail(.configFile, subtitle: String(localized: .DiagConfigFileMissing),
+                         problem: String(localized: .DiagConfigFileMissing), action: .fixInstall)
+        }
+        let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int) ?? 0
+        if size > 0 {
+            return .pass(.configFile, String(format: String(localized: .DiagConfigFileExists), size))
+        }
+        return .fail(.configFile, subtitle: String(localized: .DiagConfigFileEmpty),
+                     problem: String(localized: .DiagConfigFileEmpty), action: .fixInstall)
+    }
+
+    private func checkConfigValidity() async -> CheckResult {
+        let (valid, problems) = await ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
+        if valid { return .pass(.configValidity, String(localized: .DiagConfigValidOK)) }
+        let joined = problems.joined(separator: "; ")
+        return .fail(.configValidity, subtitle: String(localized: .DiagFailed),
+                     problem: String(format: String(localized: .DiagConfigValidProblems), joined),
+                     action: .openConfig)
+    }
+
+    private func checkGeoFile(name: String, step: DiagnosticStep, missingKey: LanguageLabel) -> CheckResult {
+        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/\(name)")
+        if exists { return .pass(step) }
+        return .fail(step, subtitle: String(localized: missingKey),
+                     problem: String(localized: missingKey), action: .fixGeoip)
+    }
+
+    // MARK: ── Status Checks ──
+
+    private func checkCoreRunning() async -> CheckResult {
+        let running = await runInBackground { ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray") }
         if running {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if !appState.v2rayTurnOn {
-            subtitle = String(localized: .DiagCoreStopped)
-            problem = String(localized: .DiagCoreStopped)
-        } else {
-            subtitle = String(localized: .DiagCoreStartFailed)
-            problem = String(localized: .DiagCoreStartFailed)
+            return CheckResult(step: .coreRunning, ok: true, subtitle: String(localized: .DiagPassed),
+                               problem: nil, actionId: .restartCore)
         }
-        
-        return DiagnosticItem(
-            step: .coreRunning,
-            title: String(localized: .DiagCoreRunning),
-            subtitle: subtitle,
-            ok: running,
-            problem: problem,
-            actionTitle: running ? String(localized: .DiagRestartCore) : String(localized: .DiagStartCore),
-            action: running ? { self.restartCore() } : { self.toggleCoreOnOff() }
-        )
+        let msg = appState.v2rayTurnOn ? String(localized: .DiagCoreStartFailed) : String(localized: .DiagCoreStopped)
+        return CheckResult(step: .coreRunning, ok: false, subtitle: msg, problem: msg,
+                           actionId: appState.v2rayTurnOn ? .restartCore : .startCore)
     }
-    
-    /// 新增：系统代理状态检查
-    private func checkSystemProxy() async -> DiagnosticItem {
+
+    /// NEW: Check launchd agent status for sing-box / xray
+    private func checkLaunchdProcess() async -> CheckResult {
+        let result = await runInBackground { () -> (loaded: Bool, pid: String?) in
+            // Use launchctl list to check if agent is loaded and get PID
+            let agentNames = ["yanue.v2rayu.sing-box", "yanue.v2rayu.xray-core"]
+            for name in agentNames {
+                let task = Process()
+                task.launchPath = "/bin/launchctl"
+                task.arguments = ["list", name]
+                let pipe = Pipe()
+                task.standardOutput = pipe
+                task.standardError = Pipe()
+                do {
+                    try task.run()
+                    task.waitUntilExit()
+                    if task.terminationStatus == 0 {
+                        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                        let output = String(data: data, encoding: .utf8) ?? ""
+                        // Parse PID from launchctl list output
+                        // Format: { "LimitLoadToSessionType" = "Aqua"; "Label" = "..."; "PID" = 12345; ... }
+                        var pid: String? = nil
+                        for line in output.components(separatedBy: "\n") {
+                            let trimmed = line.trimmingCharacters(in: .whitespaces)
+                            if trimmed.hasPrefix("\"PID\"") {
+                                let parts = trimmed.components(separatedBy: "=")
+                                if parts.count >= 2 {
+                                    pid = parts[1].trimmingCharacters(in: CharacterSet.whitespaces.union(CharacterSet(charactersIn: "\";")))
+                                }
+                            }
+                        }
+                        return (true, pid)
+                    }
+                } catch { }
+            }
+            return (false, nil)
+        }
+
+        if !result.loaded {
+            return .fail(.launchdProcess,
+                         subtitle: String(localized: .DiagLaunchdNotLoaded),
+                         problem: String(localized: .DiagLaunchdNotLoaded),
+                         action: .reloadLaunchd)
+        }
+        if let pid = result.pid, !pid.isEmpty, pid != "0" {
+            return .pass(.launchdProcess,
+                         String(format: String(localized: .DiagLaunchdRunning), pid))
+        }
+        return .fail(.launchdProcess,
+                     subtitle: String(localized: .DiagLaunchdNotRunning),
+                     problem: String(localized: .DiagLaunchdNotRunning),
+                     action: .reloadLaunchd)
+    }
+
+    private func checkSystemProxy() async -> CheckResult {
         let runMode = appState.runMode
 
-        // TUN / Manual 模式不需要系统代理
         if runMode == .tun {
-            return DiagnosticItem(
-                step: .systemProxy,
-                title: String(localized: .DiagSystemProxy),
-                subtitle: String(localized: .DiagProxyNotNeededTunnel),
-                ok: true,
-                problem: nil,
-                actionTitle: nil,
-                action: nil
-            )
+            return .pass(.systemProxy, String(localized: .DiagProxyNotNeededTunnel))
         }
-
         if runMode == .manual {
-            return DiagnosticItem(
-                step: .systemProxy,
-                title: String(localized: .DiagSystemProxy),
-                subtitle: String(localized: .DiagProxyNotNeededManual),
-                ok: true,
-                problem: nil,
-                actionTitle: nil,
-                action: nil
-            )
+            return .pass(.systemProxy, String(localized: .DiagProxyNotNeededManual))
         }
-
         if !appState.v2rayTurnOn {
-            return DiagnosticItem(
-                step: .systemProxy,
-                title: String(localized: .DiagSystemProxy),
-                subtitle: String(localized: .DiagProxyNotNeededOff),
-                ok: true,
-                problem: nil,
-                actionTitle: nil,
-                action: nil
-            )
+            return .pass(.systemProxy, String(localized: .DiagProxyNotNeededOff))
         }
-        
-        // PAC / Global 模式需要系统代理
-        let (socksEnabled, socksPort) = getSystemProxyStatus(type: "socks")
-        let (httpEnabled, httpPort) = getSystemProxyStatus(type: "http")
 
         let expectedSocks = localSocksPort
-        let expectedHTTP = localHTTPPort
+        let expectedHTTP  = localHTTPPort
+
+        let (socksEnabled, socksPort, httpEnabled, httpPort) = await runInBackground {
+            let s = DiagnosticsViewModel.getSystemProxyStatusSync(type: "socks")
+            let h = DiagnosticsViewModel.getSystemProxyStatusSync(type: "http")
+            return (s.enabled, s.port, h.enabled, h.port)
+        }
 
         let socksOK = socksEnabled && socksPort == expectedSocks
-        let httpOK = httpEnabled && httpPort == expectedHTTP
+        let httpOK  = httpEnabled  && httpPort  == expectedHTTP
         let ok = socksOK || httpOK
 
-        let subtitle: String
-        let problem: String?
-        
         if ok {
             let port = socksOK ? expectedSocks : expectedHTTP
-            subtitle = String(format: String(localized: .DiagSystemProxyOK), port)
-            problem = nil
-        } else if !socksEnabled && !httpEnabled {
-            subtitle = String(localized: .DiagProxyNotEnabled)
-            problem = String(localized: .DiagProxyNotEnabled)
-        } else {
-            let currentPort = socksEnabled ? socksPort : httpPort
-            let expectedPort = socksEnabled ? expectedSocks : expectedHTTP
-            subtitle = String(format: String(localized: .DiagProxyPortMismatch), currentPort, expectedPort)
-            problem = String(format: String(localized: .DiagProxyPortMismatch), currentPort, expectedPort)
+            return .pass(.systemProxy, String(format: String(localized: .DiagSystemProxyOK), port))
         }
-        
-        return DiagnosticItem(
-            step: .systemProxy,
-            title: String(localized: .DiagSystemProxy),
-            subtitle: subtitle,
-            ok: ok,
-            problem: problem,
-            actionTitle: ok ? nil : String(localized: .DiagOpenNetworkSettings),
-            action: ok ? nil : { self.openSystemNetworkSettings() }
-        )
+        if !socksEnabled && !httpEnabled {
+            return .fail(.systemProxy, subtitle: String(localized: .DiagProxyNotEnabled),
+                         problem: String(localized: .DiagProxyNotEnabled), action: .openNetworkSettings)
+        }
+        let curPort = socksEnabled ? socksPort : httpPort
+        let expPort = socksEnabled ? expectedSocks : expectedHTTP
+        let msg = String(format: String(localized: .DiagProxyPortMismatch), curPort, expPort)
+        return .fail(.systemProxy, subtitle: msg, problem: msg, action: .openNetworkSettings)
     }
 
-    private func checkLocalPortConflict() async -> DiagnosticItem {
+    private func checkLocalPortConflict() async -> CheckResult {
         let socksPort = localSocksPort
-        let httpPort = localHTTPPort
-        let socksListening = ProcessChecker.isPortListening(socksPort)
-        let httpListening = ProcessChecker.isPortListening(httpPort)
-        let coreRunning = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
-        
+        let httpPort  = localHTTPPort
+
+        let (socksListening, httpListening, coreRunning, ownerSocks, ownerHTTP) = await runInBackground {
+            let sl = ProcessChecker.isPortListening(socksPort)
+            let hl = ProcessChecker.isPortListening(httpPort)
+            let cr = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
+            let os = ProcessChecker.portOwner(socksPort) ?? "未知"
+            let oh = ProcessChecker.portOwner(httpPort) ?? "未知"
+            return (sl, hl, cr, os, oh)
+        }
+
         let conflictSocks = socksListening && !coreRunning
-        let conflictHTTP = httpListening && !coreRunning
+        let conflictHTTP  = httpListening  && !coreRunning
         let ok = !(conflictSocks || conflictHTTP)
-        
-        let ownerSocks = ProcessChecker.portOwner(socksPort) ?? "未知"
-        let ownerHTTP = ProcessChecker.portOwner(httpPort) ?? "未知"
 
-        let subtitle: String
-        let problem: String?
-        
-        if !socksListening && !httpListening {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if coreRunning {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if conflictSocks || conflictHTTP {
-            subtitle = String(localized: .DiagPortOccupied)
-            if conflictSocks {
-                problem = String(format: String(localized: .DiagPortOccupied), socksPort, ownerSocks)
-            } else {
-                problem = String(format: String(localized: .DiagPortOccupied), httpPort, ownerHTTP)
-            }
+        if ok { return .pass(.localPortConflict) }
+
+        let msg: String
+        if conflictSocks {
+            msg = String(format: String(localized: .DiagPortOccupied), socksPort, ownerSocks)
         } else {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
+            msg = String(format: String(localized: .DiagPortOccupied), httpPort, ownerHTTP)
         }
-        
-        return DiagnosticItem(
-            step: .localPortConflict,
-            title: String(localized: .DiagLocalPortConflict),
-            subtitle: subtitle,
-            ok: ok,
-            problem: problem,
-            actionTitle: ok ? nil : String(localized: .DiagFixNow),
-            action: ok ? nil : { self.restartCore() }
-        )
+        return .fail(.localPortConflict, subtitle: String(localized: .DiagPortOccupied),
+                     problem: msg, action: .restartCore)
     }
-    
-    // MARK: - 网络检查
 
-    /// 新增：基础网络连通性（不走代理，测试 apple.com）
-    private func checkBasicNetwork() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .basicNetwork,
-            title: String(localized: .DiagBasicNetwork),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
-        let reachable = await NetworkChecker.canResolve(host: "www.apple.com", timeout: 5)
+    // MARK: ── Network Checks ──
 
-        let subtitle: String
-        let problem: String?
-        
-        if reachable {
-            subtitle = String(localized: .DiagBasicNetworkOK)
-            problem = nil
-        } else {
-            subtitle = String(localized: .DiagBasicNetworkFailed)
-            problem = String(localized: .DiagBasicNetworkFailed)
-        }
-        
-        return DiagnosticItem(
-            step: .basicNetwork,
-            title: String(localized: .DiagBasicNetwork),
-            subtitle: subtitle,
-            ok: reachable,
-            problem: problem,
-            actionTitle: reachable ? nil : String(localized: .DiagCheckNetwork),
-            action: reachable ? nil : { self.openSystemNetworkSettings() }
-        )
+    private func checkBasicNetwork() async -> CheckResult {
+        let ok = await NetworkChecker.canResolve(host: "www.apple.com", timeout: 5)
+        if ok { return .pass(.basicNetwork, String(localized: .DiagBasicNetworkOK)) }
+        return .fail(.basicNetwork, subtitle: String(localized: .DiagBasicNetworkFailed),
+                     problem: String(localized: .DiagBasicNetworkFailed), action: .openNetworkSettings)
     }
-    
-    private func checkNodeConnectivity() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .nodeConnectivity,
-            title: String(localized: .DiagNetworkConnectivity),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
+
+    private func checkNodeConnectivity() async -> CheckResult {
         guard let host = nodeHostProvider() else {
-            return DiagnosticItem(
-                step: .nodeConnectivity,
-                title: String(localized: .DiagNetworkConnectivity),
-                subtitle: String(localized: .DiagNodeNotSelected),
-                ok: false,
-                problem: String(localized: .DiagNodeNotSelected),
-                actionTitle: nil,
-                action: nil
-            )
+            return .fail(.nodeConnectivity, subtitle: String(localized: .DiagNodeNotSelected),
+                         problem: String(localized: .DiagNodeNotSelected))
         }
-
         let dnsOK = await NetworkChecker.canResolve(host: host)
-
-        guard !Task.isCancelled, let port = nodePortProvider() else {
-            return DiagnosticItem(
-                step: .nodeConnectivity,
-                title: String(localized: .DiagNetworkConnectivity),
-                subtitle: "等待检查…",
-                status: .pending,
-                ok: false,
-                problem: nil,
-                actionTitle: nil,
-                action: nil
-            )
+        guard dnsOK else {
+            let msg = String(format: String(localized: .DiagDNSResolveFailed), host)
+            return .fail(.nodeConnectivity, subtitle: msg, problem: msg)
         }
-
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .nodeConnectivity,
-            title: String(localized: .DiagNetworkConnectivity),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-
-        let portOK = dnsOK ? await TCPConnectivity.canConnect(host: host, port: port) : false
-
-        let ok = dnsOK && portOK
-        let subtitle: String
-        let problem: String?
-        
-        if dnsOK && portOK {
-            subtitle = String(localized: .DiagPassed)
-            problem = nil
-        } else if !dnsOK {
-            subtitle = String(format: String(localized: .DiagDNSResolveFailed), host)
-            problem = String(format: String(localized: .DiagDNSResolveFailed), host)
-        } else {
-            subtitle = String(format: String(localized: .DiagPortConnectFailed), host, port)
-            problem = String(format: String(localized: .DiagPortConnectFailed), host, port)
+        guard let port = nodePortProvider() else {
+            return .fail(.nodeConnectivity, subtitle: String(localized: .DiagNodeNotSelected),
+                         problem: String(localized: .DiagNodeNotSelected))
         }
-        
-        return DiagnosticItem(
-            step: .nodeConnectivity,
-            title: String(localized: .DiagNetworkConnectivity),
-            subtitle: subtitle,
-            ok: ok,
-            problem: problem,
-            actionTitle: nil,
-            action: nil
-        )
+        let portOK = await TCPConnectivity.canConnect(host: host, port: port)
+        if portOK { return .pass(.nodeConnectivity) }
+        let msg = String(format: String(localized: .DiagPortConnectFailed), host, port)
+        return .fail(.nodeConnectivity, subtitle: msg, problem: msg)
     }
-    
-    /// 新增：通过本地代理端口访问外网
-    private func checkProxyConnectivity() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .proxyConnectivity,
-            title: String(localized: .DiagProxyConnectivity),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: String(localized: .DiagRestartCore),
-            action: { self.restartCore() }
-        ) }
-        
-        let coreRunning = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
 
-        if !coreRunning {
-            return DiagnosticItem(
-                step: .proxyConnectivity,
-                title: String(localized: .DiagProxyConnectivity),
-                subtitle: String(localized: .DiagCoreNotRunning),
-                ok: false,
-                problem: String(localized: .DiagCoreNotRunning),
-                actionTitle: String(localized: .DiagStartCore),
-                action: { self.toggleCoreOnOff() }
-            )
+    private func checkProxyConnectivity() async -> CheckResult {
+        let coreRunning = await runInBackground {
+            ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
         }
-
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .proxyConnectivity,
-            title: String(localized: .DiagProxyConnectivity),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: String(localized: .DiagRestartCore),
-            action: { self.restartCore() }
-        ) }
-
-        // 通过本地 SOCKS 代理端口测试连通性
-        let proxyOK = await testProxyConnectivity(socksPort: UInt16(localSocksPort))
-
-        let subtitle: String
-        let problem: String?
-        
-        if proxyOK {
-            subtitle = String(localized: .DiagProxyConnectOK)
-            problem = nil
-        } else {
-            subtitle = String(localized: .DiagProxyConnectFailed)
-            problem = String(localized: .DiagProxyConnectFailed)
+        guard coreRunning else {
+            return .fail(.proxyConnectivity, subtitle: String(localized: .DiagCoreNotRunning),
+                         problem: String(localized: .DiagCoreNotRunning), action: .startCore)
         }
-        
-        return DiagnosticItem(
-            step: .proxyConnectivity,
-            title: String(localized: .DiagProxyConnectivity),
-            subtitle: subtitle,
-            ok: proxyOK,
-            problem: problem,
-            actionTitle: proxyOK ? nil : String(localized: .DiagRestartCore),
-            action: proxyOK ? nil : { self.restartCore() }
-        )
+        let ok = await testProxyConnectivity(socksPort: UInt16(localSocksPort))
+        if ok { return .pass(.proxyConnectivity, String(localized: .DiagProxyConnectOK)) }
+        return .fail(.proxyConnectivity, subtitle: String(localized: .DiagProxyConnectFailed),
+                     problem: String(localized: .DiagProxyConnectFailed), action: .restartCore)
     }
-    
-    private func checkPingLatency() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .pingLatency,
-            title: String(localized: .DiagPingLatency),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: String(localized: .DiagReTest),
-            action: { self.doPingNow() }
-        ) }
-        
+
+    private func checkPingLatency() async -> CheckResult {
         guard appState.v2rayTurnOn else {
-            return DiagnosticItem(
-                step: .pingLatency,
-                title: String(localized: .DiagPingLatency),
-                subtitle: String(localized: .DiagCoreStopped),
-                ok: false,
-                problem: String(localized: .DiagCoreStopped),
-                actionTitle: nil,
-                action: nil
-            )
+            return .fail(.pingLatency, subtitle: String(localized: .DiagCoreStopped),
+                         problem: String(localized: .DiagCoreStopped))
         }
-        
-        let runningUuid = appState.runningProfile
-        guard !runningUuid.isEmpty,
-              let item = ProfileStore.shared.fetchOne(uuid: runningUuid) else {
-            return DiagnosticItem(
-                step: .pingLatency,
-                title: String(localized: .DiagPingLatency),
-                subtitle: String(localized: .DiagNodeNotSelected),
-                ok: false,
-                problem: String(localized: .DiagNodeNotSelected),
-                actionTitle: nil,
-                action: nil
-            )
+        let uuid = appState.runningProfile
+        guard !uuid.isEmpty, let item = ProfileStore.shared.fetchOne(uuid: uuid) else {
+            return .fail(.pingLatency, subtitle: String(localized: .DiagNodeNotSelected),
+                         problem: String(localized: .DiagNodeNotSelected))
         }
-        
+
         await PingAll.shared.pingOne(item: item)
-        
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .pingLatency,
-            title: String(localized: .DiagPingLatency),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: String(localized: .DiagReTest),
-            action: { self.doPingNow() }
-        ) }
-        
         let latency = appState.latency
-        
-        let subtitle: String
-        let problem: String?
-        let ok: Bool
-        
+
         if latency > 0 {
-            ok = true
-            if latency < 300 {
-                subtitle = "\(Int(latency))ms"
-            } else {
-                subtitle = String(format: String(localized: .DiagLatencyHigh), Int(latency))
-            }
-            problem = nil
-        } else {
-            ok = false
-            subtitle = String(localized: .DiagLatencyFailed)
-            problem = String(localized: .DiagLatencyFailed)
+            let sub = latency < 300 ? "\(Int(latency))ms"
+                : String(format: String(localized: .DiagLatencyHigh), Int(latency))
+            return CheckResult(step: .pingLatency, ok: true, subtitle: sub, problem: nil, actionId: .rePing)
         }
-        
-        return DiagnosticItem(
-            step: .pingLatency,
-            title: String(localized: .DiagPingLatency),
-            subtitle: subtitle,
-            ok: ok,
-            problem: problem,
-            actionTitle: String(localized: .DiagReTest),
-            action: { self.doPingNow() }
-        )
+        return CheckResult(step: .pingLatency, ok: false,
+                           subtitle: String(localized: .DiagLatencyFailed),
+                           problem: String(localized: .DiagLatencyFailed), actionId: .rePing)
     }
-    
-    // MARK: - 日志检查
 
-    private func checkLogAnalysis() async -> DiagnosticItem {
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .logAnalysis,
-            title: String(localized: .DiagLogAnalysis),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
+    // MARK: ── Log Check ──
+
+    private func checkLogAnalysis() async -> CheckResult {
         let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
-        
-        guard !Task.isCancelled else { return DiagnosticItem(
-            step: .logAnalysis,
-            title: String(localized: .DiagLogAnalysis),
-            subtitle: "等待检查…",
-            status: .pending,
-            ok: false,
-            problem: nil,
-            actionTitle: nil,
-            action: nil
-        ) }
-        
         let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
-        
+
         let ok = problems.isEmpty || (problems.count == 1 && problems[0] == "未发现明显错误")
-        
-        await MainActor.run {
-            self.logContent = log
-        }
-        
-        return DiagnosticItem(
-            step: .logAnalysis,
-            title: String(localized: .DiagLogAnalysis),
-            subtitle: ok ? String(localized: .DiagPassed) : String(localized: .DiagFailed),
-            ok: ok,
-            problem: ok ? nil : problems.joined(separator: "\n"),
-            actionTitle: nil,
-            action: nil
-        )
-    }
-    
-    // MARK: - 操作项
+        self.logContent = log
 
-    private func openConfigFile() {
-        let url = URL(fileURLWithPath: JsonConfigFilePath)
-        NSWorkspace.shared.open(url)
-    }
-    
-    private func openSystemNetworkSettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.network") {
-            NSWorkspace.shared.open(url)
-        } else {
-            showOpenSettingsAlert = true
-        }
+        if ok { return .pass(.logAnalysis) }
+        return .fail(.logAnalysis, subtitle: String(localized: .DiagFailed),
+                     problem: problems.joined(separator: "\n"))
     }
 
-    private func fixInstallAll() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            await AppInstaller.shared.checkInstall()
-            self.runSequentialChecks()
-        }
-    }
-    
-    private func fixV2rayUTool() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            await AppInstaller.shared.checkInstall()
-            self.runSequentialChecks()
-        }
-    }
-    
-    private func fixGeoip() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            await AppInstaller.shared.checkInstall()
-            self.runSequentialChecks()
-        }
-    }
-    
-    private func restartCore() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            await V2rayLaunch.shared.stop()
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            await AppState.shared.turnOnCore()
-            self.runSequentialChecks()
-        }
-    }
-    
-    private func toggleCoreOnOff() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            if appState.v2rayTurnOn {
-                await AppState.shared.turnOffCore()
-            } else {
-                await AppState.shared.turnOnCore()
-            }
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            self.runSequentialChecks()
-        }
-    }
-    
-    private func doPingNow() {
-        checkTask?.cancel()
-        checkTask = Task { @MainActor in
-            await PingAll.shared.run()
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            self.runSequentialChecks()
-        }
-    }
-    
-    // MARK: - 系统代理状态读取
+    // MARK: ── Background helper ──
 
-    /// 读取系统代理状态（支持 socks / http）
-    private func getSystemProxyStatus(type: String) -> (enabled: Bool, port: Int) {
+    /// Run a synchronous closure off the main actor to avoid blocking UI
+    private func runInBackground<T: Sendable>(_ work: @escaping @Sendable () -> T) async -> T {
+        await Task.detached(priority: .userInitiated) { work() }.value
+    }
+
+    // MARK: ── Process utilities (run off main) ──
+
+    /// Read system proxy status synchronously (called from background)
+    private static func getSystemProxyStatusSync(type: String) -> (enabled: Bool, port: Int) {
         let task = Process()
         task.launchPath = "/usr/sbin/networksetup"
-
-        let networkService = getActiveNetworkService() ?? "Wi-Fi"
+        let svc = DiagnosticsViewModel.getActiveNetworkServiceSync() ?? "Wi-Fi"
 
         switch type {
-        case "socks":
-            task.arguments = ["-getsocksfirewallproxy", networkService]
-        case "http":
-            task.arguments = ["-getwebproxy", networkService]
-        default:
-            return (false, 0)
+        case "socks": task.arguments = ["-getsocksfirewallproxy", svc]
+        case "http":  task.arguments = ["-getwebproxy", svc]
+        default:      return (false, 0)
         }
 
         let pipe = Pipe()
@@ -965,9 +520,8 @@ final class DiagnosticsViewModel: ObservableObject {
             return (false, 0)
         }
     }
-    
-    /// 获取当前活跃的网络服务名称
-    private func getActiveNetworkService() -> String? {
+
+    private static func getActiveNetworkServiceSync() -> String? {
         let task = Process()
         task.launchPath = "/usr/sbin/networksetup"
         task.arguments = ["-listallnetworkservices"]
@@ -991,40 +545,35 @@ final class DiagnosticsViewModel: ObservableObject {
                 let s = String(service).trimmingCharacters(in: .whitespaces)
                 if !s.hasPrefix("*") { return s }
             }
-            return nil
-        } catch {
-            return nil
-        }
+        } catch {}
+        return nil
     }
 
-    /// 通过 SOCKS 代理测试连通性（连接 google.com generate_204）
     private func testProxyConnectivity(socksPort: UInt16) async -> Bool {
-        let portOK = ProcessChecker.isPortListening(Int(socksPort))
+        let portOK = await runInBackground { ProcessChecker.isPortListening(Int(socksPort)) }
         guard portOK else { return false }
 
-        return await withCheckedContinuation { cont in
+        return await runInBackground {
             let task = Process()
             task.launchPath = "/usr/bin/curl"
             task.arguments = [
                 "--socks5", "127.0.0.1:\(socksPort)",
-                "--connect-timeout", "5",
-                "--max-time", "8",
+                "--connect-timeout", "5", "--max-time", "8",
                 "-s", "-o", "/dev/null", "-w", "%{http_code}",
                 "https://www.google.com/generate_204"
             ]
             let pipe = Pipe()
             task.standardOutput = pipe
             task.standardError = Pipe()
-
             do {
                 try task.run()
                 task.waitUntilExit()
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 let code = Int(output) ?? 0
-                cont.resume(returning: code == 204 || code == 200)
+                return code == 204 || code == 200
             } catch {
-                cont.resume(returning: false)
+                return false
             }
         }
     }
@@ -1036,40 +585,105 @@ final class DiagnosticsViewModel: ObservableObject {
         return false
         #endif
     }
-    
+
     private func getFileArch(file: String) async -> String? {
         await Task.detached(priority: .userInitiated) {
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: file))
-                guard data.count >= 20 else { return nil }
-                
-                if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
-                    let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
-                    switch eMachine {
-                    case 62: return "amd64"
-                    case 183: return "arm64"
-                    default: return "unknown"
-                    }
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)),
+                  data.count >= 20 else { return nil }
+            // Mach-O
+            if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
+                let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
+                switch cpuType {
+                case 0x01000007: return "x86_64"
+                case 0x0100000C: return "arm64"
+                default:         return "unknown"
                 }
-                else if data[0] == 0xCF && data[1] == 0xFA && data[2] == 0xED && data[3] == 0xFE {
-                    let cpuType = data.withUnsafeBytes { $0.load(fromByteOffset: 4, as: Int32.self) }
-                    switch cpuType {
-                    case 0x01000007: return "x86_64"
-                    case 0x0100000C: return "arm64"
-                    default: return "unknown"
-                    }
-                }
-                
-                return nil
-            } catch {
-                return nil
             }
+            // ELF
+            if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
+                let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
+                switch eMachine {
+                case 62:  return "amd64"
+                case 183: return "arm64"
+                default:  return "unknown"
+                }
+            }
+            return nil
         }.value
     }
-    
-    // MARK: - 提交诊断报告（精简版：事实 + 脱敏配置 + 原始错误日志）
 
-    /// 生成精简诊断报告（只保留事实，不含推断建议）
+    // MARK: ── User Actions ──
+
+    private func doFixInstall() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            await AppInstaller.shared.checkInstall()
+            self.runSequentialChecks()
+        }
+    }
+
+    private func doFixTool() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            await AppInstaller.shared.checkInstall()
+            self.runSequentialChecks()
+        }
+    }
+
+    private func doFixGeoip() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            await AppInstaller.shared.checkInstall()
+            self.runSequentialChecks()
+        }
+    }
+
+    private func doRestartCore() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            await V2rayLaunch.shared.stop()
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            await AppState.shared.turnOnCore()
+            self.runSequentialChecks()
+        }
+    }
+
+    private func doToggleCore() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            if appState.v2rayTurnOn {
+                await AppState.shared.turnOffCore()
+            } else {
+                await AppState.shared.turnOnCore()
+            }
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            self.runSequentialChecks()
+        }
+    }
+
+    private func doPingNow() {
+        checkTask?.cancel()
+        checkTask = Task { @MainActor in
+            await PingAll.shared.run()
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            self.runSequentialChecks()
+        }
+    }
+
+    private func openConfigFile() {
+        NSWorkspace.shared.open(URL(fileURLWithPath: JsonConfigFilePath))
+    }
+
+    private func openSystemNetworkSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.network") {
+            NSWorkspace.shared.open(url)
+        } else {
+            showOpenSettingsAlert = true
+        }
+    }
+
+    // MARK: ── Report & Submit ──
+
     func generateReport() async -> String {
         let arch: String
         #if arch(arm64)
@@ -1085,13 +699,12 @@ final class DiagnosticsViewModel: ObservableObject {
 
         report += "## Diagnostic Results\n"
         for category in DiagnosticCategory.allCases {
-            let categoryItems = itemsForCategory(category)
-            if categoryItems.isEmpty { continue }
+            let catItems = itemsFor(category)
+            guard !catItems.isEmpty else { continue }
             report += "### \(category.rawValue)\n"
-            for item in categoryItems {
+            for item in catItems {
                 let icon = item.ok ? "✅" : "❌"
-                let detail = item.subtitle ?? item.defaultSubtitle
-                report += "\(icon) \(item.title): \(detail)\n"
+                report += "\(icon) \(item.title): \(item.subtitle)\n"
             }
             report += "\n"
         }
@@ -1100,72 +713,47 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "## Config (Sanitized)\n"
             report += "- Protocol: \(server.protocol.rawValue) | Network: \(server.network.rawValue) | Security: \(server.security.rawValue)\n"
             report += "- Port: \(server.port) | Addr: \(maskAddress(server.address))\n"
-            if !server.sni.isEmpty {
-                report += "- SNI: \(maskAddress(server.sni))\n"
-            }
+            if !server.sni.isEmpty { report += "- SNI: \(maskAddress(server.sni))\n" }
             report += "- Flow: \(server.flow.isEmpty ? "none" : server.flow) | ALPN: \(server.alpn.rawValue) | FP: \(server.fingerprint.rawValue)\n\n"
         }
 
         if !logContent.isEmpty && logContent != "无 INFO 及以上级别日志" {
             report += "## Error Logs\n```\n"
-            let rawErrorLines = await extractRawErrorLines(from: logPath, maxLines: 30)
-            if !rawErrorLines.isEmpty {
-                report += rawErrorLines
-            } else {
-                report += String(logContent.prefix(3000))
-            }
+            let rawErr = await extractRawErrorLines(from: logPath, maxLines: 30)
+            report += rawErr.isEmpty ? String(logContent.prefix(3000)) : rawErr
             report += "\n```\n"
         }
-
         return report
     }
 
-    /// 提取原始 error/warning 日志行（不含推断，只要原始日志）
     private func extractRawErrorLines(from logPath: String, maxLines: Int) async -> String {
-        await Task.detached(priority: .userInitiated) {
+        await runInBackground {
             guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
-            let lines = content.components(separatedBy: .newlines)
-            let recentLines = Array(lines.suffix(500))
-
-            var errorLines: [String] = []
-            for line in recentLines {
+            let lines = content.components(separatedBy: .newlines).suffix(500)
+            var errors: [String] = []
+            for line in lines {
                 let lower = line.lowercased()
                 if lower.contains("[error]") || lower.contains("[warning]") ||
                    lower.contains("failed") || lower.contains("timeout") ||
                    lower.contains("rejected") || lower.contains("denied") {
-                    errorLines.append(line)
+                    errors.append(line)
+                    if errors.count >= maxLines { break }
                 }
-                if errorLines.count >= maxLines { break }
             }
-
-            return errorLines.joined(separator: "\n")
-        }.value
+            return errors.joined(separator: "\n")
+        }
     }
 
-    /// 地址脱敏：example.com → ***.example.com, IP → ***.***.***.123
     private func maskAddress(_ addr: String) -> String {
         if addr.isEmpty { return "N/A" }
-
-        // IP 地址脱敏
-        let ipPattern = #"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"#
-        if addr.range(of: ipPattern, options: .regularExpression) != nil {
+        if addr.range(of: #"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"#, options: .regularExpression) != nil {
             let parts = addr.split(separator: ".")
-            if parts.count == 4 {
-                return "***.***.***.\(parts[3])"
-            }
+            if parts.count == 4 { return "***.***.***.\(parts[3])" }
         }
-
-        // 域名脱敏：保留最后两级
-        let components = addr.split(separator: ".")
-        if components.count >= 2 {
-            let lastTwo = components.suffix(2).joined(separator: ".")
-            return "***.\(lastTwo)"
-        }
-
+        let comps = addr.split(separator: ".")
+        if comps.count >= 2 { return "***.\(comps.suffix(2).joined(separator: "."))" }
         return "***"
     }
-
-    // MARK: - 提交到 GitHub（带字符预算管理和剪贴板兜底）
 
     func submitToGitHub() {
         Task {
@@ -1173,25 +761,17 @@ final class DiagnosticsViewModel: ObservableObject {
             let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
             let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             let encodedBody = report.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-
             let baseURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)&body="
             let fullURL = baseURL + encodedBody
 
-            let maxURLLength = 8000
-
-            if fullURL.count <= maxURLLength {
-                if let url = URL(string: fullURL) {
-                    NSWorkspace.shared.open(url)
-                }
+            if fullURL.count <= 8000, let url = URL(string: fullURL) {
+                NSWorkspace.shared.open(url)
             } else {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(report, forType: .string)
-
-                let fallbackURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)"
-                if let url = URL(string: fallbackURL) {
+                if let url = URL(string: "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)") {
                     NSWorkspace.shared.open(url)
                 }
-
                 makeToast(message: String(localized: .DiagReportCopied), displayDuration: 5)
             }
         }
