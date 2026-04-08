@@ -17,7 +17,6 @@ struct DiagnosticsView: View {
             AppState.shared.runningServer.flatMap { UInt16($0.port) }
         }
     )
-    @State private var hasAppeared = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -109,9 +108,7 @@ struct DiagnosticsView: View {
         .background(.ultraThinMaterial)
         .cornerRadius(8)
         .onAppear {
-            guard !hasAppeared else { return }
-            hasAppeared = true
-            viewModel.runSequentialChecks()
+            viewModel.runChecksIfNeeded()
         }
     }
 
@@ -120,7 +117,9 @@ struct DiagnosticsView: View {
     private var summaryCard: some View {
         let passed = viewModel.passedCount
         let total  = viewModel.totalCount
+        let checkedCount = viewModel.checkedCount
         let ratio  = total > 0 ? Double(passed) / Double(total) : 0
+        let progressRatio = total > 0 ? Double(checkedCount) / Double(total) : 0
         let allOK  = passed == total && !viewModel.checking
 
         return HStack(spacing: 16) {
@@ -128,18 +127,41 @@ struct DiagnosticsView: View {
             ZStack {
                 Circle()
                     .stroke(Color.gray.opacity(0.15), lineWidth: 6)
-                Circle()
-                    .trim(from: 0, to: viewModel.checking ? 0 : ratio)
-                    .stroke(
-                        allOK ? Color.green : Color.orange,
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.5), value: ratio)
 
                 if viewModel.checking {
-                    ProgressView()
-                        .scaleEffect(0.8)
+                    // Show progress arc during checking
+                    Circle()
+                        .trim(from: 0, to: progressRatio)
+                        .stroke(
+                            Color.accentColor.opacity(0.5),
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.3), value: progressRatio)
+                    // Overlay passed portion
+                    Circle()
+                        .trim(from: 0, to: ratio)
+                        .stroke(
+                            Color.green,
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.3), value: ratio)
+                } else {
+                    Circle()
+                        .trim(from: 0, to: ratio)
+                        .stroke(
+                            allOK ? Color.green : Color.orange,
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.5), value: ratio)
+                }
+
+                if viewModel.checking {
+                    Text("\(checkedCount)/\(total)")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(.accentColor)
                 } else {
                     Text("\(passed)/\(total)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
@@ -167,10 +189,16 @@ struct DiagnosticsView: View {
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.gray.opacity(0.15))
+                        if viewModel.checking {
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color.accentColor.opacity(0.3))
+                                .frame(width: geo.size.width * progressRatio)
+                                .animation(.easeInOut(duration: 0.3), value: progressRatio)
+                        }
                         RoundedRectangle(cornerRadius: 3)
                             .fill(allOK ? Color.green : Color.orange)
-                            .frame(width: geo.size.width * (viewModel.checking ? 0 : ratio))
-                            .animation(.easeInOut(duration: 0.5), value: ratio)
+                            .frame(width: geo.size.width * ratio)
+                            .animation(.easeInOut(duration: 0.3), value: ratio)
                     }
                 }
                 .frame(height: 6)
