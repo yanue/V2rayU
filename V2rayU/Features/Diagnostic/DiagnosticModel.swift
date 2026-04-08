@@ -34,7 +34,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
         case .status:
             return [.coreRunning, .launchdProcess, .systemProxy, .localPortConflict]
         case .network:
-            return [.basicNetwork, .nodeConnectivity, .proxyConnectivity, .pingLatency]
+            return [.basicNetwork, .nodeConnectivity, .pingLatency]
         case .logs:
             return [.logAnalysis]
         }
@@ -58,7 +58,6 @@ enum DiagnosticStep: String, CaseIterable {
     case localPortConflict
     case basicNetwork
     case nodeConnectivity
-    case proxyConnectivity
     case pingLatency
     case logAnalysis
 
@@ -73,7 +72,7 @@ enum DiagnosticStep: String, CaseIterable {
             return .files
         case .coreRunning, .launchdProcess, .systemProxy, .localPortConflict:
             return .status
-        case .basicNetwork, .nodeConnectivity, .proxyConnectivity, .pingLatency:
+        case .basicNetwork, .nodeConnectivity, .pingLatency:
             return .network
         case .logAnalysis:
             return .logs

@@ -111,7 +111,6 @@ final class DiagnosticsViewModel: ObservableObject {
         case .localPortConflict: return String(localized: .DiagLocalPortConflict)
         case .basicNetwork:      return String(localized: .DiagBasicNetwork)
         case .nodeConnectivity:  return String(localized: .DiagNetworkConnectivity)
-        case .proxyConnectivity: return String(localized: .DiagProxyConnectivity)
         case .pingLatency:       return String(localized: .DiagPingLatency)
         case .logAnalysis:       return String(localized: .DiagLogAnalysis)
         }
@@ -197,7 +196,7 @@ final class DiagnosticsViewModel: ObservableObject {
         case .localPortConflict: return await checkLocalPortConflict()
         case .basicNetwork:      return await checkBasicNetwork()
         case .nodeConnectivity:  return await checkNodeConnectivity()
-        case .proxyConnectivity: return await checkProxyConnectivity()
+//        case .proxyConnectivity: return await checkProxyConnectivity()
         case .pingLatency:       return await checkPingLatency()
         case .logAnalysis:       return await checkLogAnalysis()
         }
@@ -460,20 +459,6 @@ final class DiagnosticsViewModel: ObservableObject {
         return .fail(.nodeConnectivity, subtitle: msg, problem: msg)
     }
 
-    private func checkProxyConnectivity() async -> CheckResult {
-        let coreRunning = await runInBackground {
-            ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
-        }
-        guard coreRunning else {
-            return .fail(.proxyConnectivity, subtitle: String(localized: .DiagCoreNotRunning),
-                         problem: String(localized: .DiagCoreNotRunning), action: .startCore)
-        }
-        let ok = await testProxyConnectivity(socksPort: UInt16(localSocksPort))
-        if ok { return .pass(.proxyConnectivity, String(localized: .DiagProxyConnectOK)) }
-        return .fail(.proxyConnectivity, subtitle: String(localized: .DiagProxyConnectFailed),
-                     problem: String(localized: .DiagProxyConnectFailed), action: .restartCore)
-    }
-
     private func checkPingLatency() async -> CheckResult {
         guard appState.v2rayTurnOn else {
             return .fail(.pingLatency, subtitle: String(localized: .DiagCoreStopped),
@@ -712,47 +697,6 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: ── Report & Submit ──
 
-    func generateReport() async -> String {
-        let arch: String
-        #if arch(arm64)
-        arch = "arm64"
-        #else
-        arch = "x86_64"
-        #endif
-
-        var report = "## Environment\n"
-        report += "- V2rayU: \(appVersion) | macOS: \(osVersion) | Arch: \(arch)\n"
-        report += "- Core: \(coreVersion) | Mode: \(appState.runMode.rawValue) | Status: \(appState.v2rayTurnOn ? "ON" : "OFF")\n"
-        report += "- SOCKS: \(localSocksPort) | HTTP: \(localHTTPPort)\n\n"
-
-        report += "## Diagnostic Results\n"
-        for category in DiagnosticCategory.allCases {
-            let catItems = itemsFor(category)
-            guard !catItems.isEmpty else { continue }
-            report += "### \(category.rawValue)\n"
-            for item in catItems {
-                let icon = item.ok ? "✅" : "❌"
-                report += "\(icon) \(item.title): \(item.subtitle)\n"
-            }
-            report += "\n"
-        }
-
-        if let server = appState.runningServer {
-            report += "## Config (Sanitized)\n"
-            report += "- Protocol: \(server.protocol.rawValue) | Network: \(server.network.rawValue) | Security: \(server.security.rawValue)\n"
-            report += "- Port: \(server.port) | Addr: \(maskAddress(server.address))\n"
-            if !server.sni.isEmpty { report += "- SNI: \(maskAddress(server.sni))\n" }
-            report += "- Flow: \(server.flow.isEmpty ? "none" : server.flow) | ALPN: \(server.alpn.rawValue) | FP: \(server.fingerprint.rawValue)\n\n"
-        }
-
-        if !logContent.isEmpty && logContent != "无 INFO 及以上级别日志" {
-            report += "## Error Logs\n```\n"
-            let rawErr = await extractRawErrorLines(from: logPath, maxLines: 30)
-            report += rawErr.isEmpty ? String(logContent.prefix(3000)) : rawErr
-            report += "\n```\n"
-        }
-        return report
-    }
 
     private func extractRawErrorLines(from logPath: String, maxLines: Int) async -> String {
         await runInBackground {
@@ -773,22 +717,75 @@ final class DiagnosticsViewModel: ObservableObject {
     }
 
     private func maskAddress(_ addr: String) -> String {
-        if addr.isEmpty { return "N/A" }
-        if addr.range(of: #"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"#, options: .regularExpression) != nil {
-            let parts = addr.split(separator: ".")
-            if parts.count == 4 { return "***.***.***.\(parts[3])" }
-        }
-        let comps = addr.split(separator: ".")
-        if comps.count >= 2 { return "***.\(comps.suffix(2).joined(separator: "."))" }
         return "***"
     }
 
+    // MARK: ── Report & Submit ──
+    func generateReport() -> String {
+        let arch: String
+        #if arch(arm64)
+        arch = "arm64"
+        #else
+        arch = "x86_64"
+        #endif
+
+        var report = ""
+
+        // ── 1. Environment ──
+        report += "## Environment\n"
+        report += "- V2rayU: \(appVersion) | macOS: \(osVersion) | Arch: \(arch)\n"
+        report += "- Core: \(coreVersion) | Mode: \(appState.runMode.rawValue) | Status: \(appState.v2rayTurnOn ? "ON" : "OFF")\n"
+        report += "- SOCKS: \(localSocksPort) | HTTP: \(localHTTPPort)"
+        if appState.latency > 0 { report += " | Latency: \(Int(appState.latency))ms" }
+        report += "\n\n"
+
+        // ── 2. Diagnostic Results ──
+        report += "## Diagnostic Results (\(passedCount)/\(totalCount) passed)\n"
+        for item in items {
+            report += "\(item.ok ? "✅" : "❌") \(item.title)\n"
+        }
+        report += "\n"
+
+        // ── 3. Node Config ──
+        if let s = appState.runningServer {
+            report += "## Config\n"
+            report += "- Protocol: \(s.protocol.rawValue) | Network: \(s.network.rawValue) | Security: \(s.security.rawValue)\n"
+            report += "- Address: \(maskAddress(s.address)):\(s.port)"
+            if !s.sni.isEmpty { report += " | SNI: \(maskAddress(s.sni))" }
+            if !s.flow.isEmpty { report += " | Flow: \(s.flow)" }
+            report += "\n"
+            if !s.fingerprint.rawValue.isEmpty {
+                report += "- FP: \(s.fingerprint.rawValue) | ALPN: \(s.alpn.rawValue)\n"
+            }
+            report += "\n"
+        }
+
+        // ── 4. Error Logs ──
+        if !logContent.isEmpty {
+            report += "## Error Logs\n```\n"
+            report += String(logContent.prefix(3000))
+            if logContent.count > 3000 { report += "\n... (truncated)" }
+            report += "\n```\n"
+        }
+
+        return report
+    }
+
+    /// URL query 参数值的安全字符集
+    /// .urlQueryAllowed 不会编码 &、#、+、= 等字符，但这些字符在 query string 中有特殊含义
+    /// 作为单个参数的值，必须把它们全部编码
+    private static let queryValueAllowed: CharacterSet = {
+        var cs = CharacterSet.urlQueryAllowed
+        cs.remove(charactersIn: "&#+=")
+        return cs
+    }()
+
     func submitToGitHub() {
         Task {
-            let report = await generateReport()
+            let report = generateReport()
             let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
-            let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-            let encodedBody = report.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? title
+            let encodedBody = report.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? ""
             let baseURL = "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)&body="
             let fullURL = baseURL + encodedBody
 
@@ -800,6 +797,7 @@ final class DiagnosticsViewModel: ObservableObject {
                 if let url = URL(string: "https://github.com/yanue/V2rayU/issues/new?title=\(encodedTitle)") {
                     NSWorkspace.shared.open(url)
                 }
+                // 提示用户粘贴
                 makeToast(message: String(localized: .DiagReportCopied), displayDuration: 5)
             }
         }
