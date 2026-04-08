@@ -306,9 +306,14 @@ final class DiagnosticsViewModel: ObservableObject {
 
     /// NEW: Check launchd agent status for sing-box / xray
     private func checkLaunchdProcess() async -> CheckResult {
+        let runMode = appState.runMode
         let result = await runInBackground { () -> (loaded: Bool, pid: String?) in
             // Use launchctl list to check if agent is loaded and get PID
-            let agentNames = ["yanue.v2rayu.sing-box", "yanue.v2rayu.xray-core"]
+            var agentNames = [LaunchAgent.shared.singBoxAgentName, LaunchAgent.shared.xrayCoreAgentName]
+            // 判断是否启动tun
+            if runMode == .tun {
+                agentNames.append(LaunchAgent.shared.tunHelperDaemon)
+            }
             for name in agentNames {
                 let task = Process()
                 task.launchPath = "/bin/launchctl"

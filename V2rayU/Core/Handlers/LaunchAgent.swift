@@ -11,9 +11,9 @@ import Cocoa
 actor LaunchAgent: NSObject {
     static let shared = LaunchAgent()
 
-    private let singBoxAgentName = "yanue.v2rayu.sing-box"
-    private let xrayCoreAgentName = "yanue.v2rayu.xray-core"
-    private let tunHelperDaemon = "yanue.v2rayu.tun-helper" // 位于 `/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist`, 由 install.sh 安装
+    let singBoxAgentName = "yanue.v2rayu.sing-box"
+    let xrayCoreAgentName = "yanue.v2rayu.xray-core"
+    let tunHelperDaemon = "yanue.v2rayu.tun-helper" // 位于 `/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist`, 由 install.sh 安装
 
     let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/" 
     var lastCoreFile = getCoreFile()
