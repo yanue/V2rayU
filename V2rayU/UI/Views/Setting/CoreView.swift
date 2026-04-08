@@ -14,18 +14,9 @@ struct CoreView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "crown")
-                    .resizable()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(String(localized: .CoreSettingsTitle))
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text(String(localized: .CoreSettingsSubtitle))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+                Text(String(localized: .CoreSettingsTitle))
+                    .font(.headline)
+                    .foregroundColor(.secondary)
                 Spacer()
                 Button(action: { vm.checkVersions() }) {
                     Label(String(localized: .CheckLatestVersion),
@@ -66,19 +57,32 @@ struct CoreView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(String(localized: .GithubLatestVersion))
                         .font(.headline)
-                    ForEach(vm.versions, id: \.self) { version in
-                        HStack {
-                            Text(version.tagName)
-                                .font(.title3)
-                            Text("\(version.formattedPublishedAt)")
-                                .font(.callout)
-                            Spacer()
-                            Button(action: {
-                                vm.downloadAndReplace(version: version)
-                            }) {
-                                Text(String(localized: .DownloadAndReplace))
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 6) {
+                            ForEach(vm.versions.prefix(10), id: \.self) { version in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(version.tagName)
+                                            .font(.title3)
+                                            .fontWeight(.medium)
+                                        Text(version.formattedPublishedAt)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                    Button(action: {
+                                        vm.downloadAndReplace(version: version)
+                                    }) {
+                                        Text(String(localized: .DownloadAndReplace))
+                                    }
+                                    .disabled(vm.isLoading)
+                                    .buttonStyle(.bordered)
+                                }
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(Color.secondary.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
                             }
-                            .disabled(vm.isLoading)
                         }
                     }
                 }

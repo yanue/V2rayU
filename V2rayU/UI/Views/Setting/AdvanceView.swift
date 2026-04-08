@@ -16,6 +16,9 @@ struct AdvanceView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text(String(localized: .Advanced))
+                .font(.headline)
+                .foregroundColor(.secondary)
             HStack {
                 getTextLabel(label: .LocalSocksListenPort, labelWidth: labelWidth)
                 TextField(String(localized: .LocalSocksListenPort), value: $settings.socksPort, formatter: NumberFormatter())

@@ -83,7 +83,7 @@ tool="./V2rayUTool"
 sudo chown root:admin "$tool"
 sudo chmod a+rxs ${tool}
 
-# sudoers 条目 (只需要 tun-helper)
+# sudoers 条目 (tun-helper + core 更新权限)
 ENTRY="# generate by V2rayU install.sh
 ${USERNAME} ALL=(root) NOPASSWD: /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh *
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
@@ -92,6 +92,14 @@ ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.tun-helper
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.tun-helper
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
 ${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
+# mv 重命名
+${USERNAME} ALL=(root) NOPASSWD: /bin/mv ${APP_HOME_DIR}/bin/xray-core/xray ${APP_HOME_DIR}/bin/xray-core/xray-64
+${USERNAME} ALL=(root) NOPASSWD: /bin/mv ${APP_HOME_DIR}/bin/xray-core/xray ${APP_HOME_DIR}/bin/xray-core/xray-arm64
+# chmod root
+${USERNAME} ALL=(root) NOPASSWD: /bin/chown -R root:wheel "$APP_HOME_DIR/bin/*"
+${USERNAME} ALL=(root) NOPASSWD: /bin/chmod -R 777 "$APP_HOME_DIR/bin/*"
+# xattr 去除 quarantine
+${USERNAME} ALL=(root) NOPASSWD: /usr/bin/xattr -rd com.apple.quarantine ${APP_HOME_DIR}/*
 # end by V2rayU"
 
 TARGET="/private/etc/sudoers.d/v2rayu-helper"

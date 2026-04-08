@@ -17,7 +17,7 @@ struct SettingView: View {
         case advance
         case dns
         case pac
-//        case core
+        case core
     }
 
     var body: some View {
@@ -35,6 +35,7 @@ struct SettingView: View {
                 localized(.Shortcuts).tag(SettingTab.shortcuts)
                 localized(.DNS).tag(SettingTab.dns)
                 localized(.PAC).tag(SettingTab.pac)
+                localized(.Core).tag(SettingTab.core)
             }
             .pickerStyle(.segmented)
             .focusable(false)
@@ -53,6 +54,8 @@ struct SettingView: View {
                     DnsView()
                 case .pac:
                     PacView()
+                case .core:
+                    CoreView()
                 }
             }
             .background(.ultraThinMaterial)
