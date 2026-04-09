@@ -257,8 +257,8 @@
 "ViewConfigJson" = "查看 config.json";
 "ViewTunJson" = "查看 tun.json";
 "ViewPacFile" = "查看 PAC 文件";
-"PacMode" = "PAC 模式";
-"TunnelMode" = "Tun 模式 (透明代理)";
+"PacMode" = "PAC 模式 (pac规则代理)";
+"TunMode" = "Tun 模式 (透明代理)";
 "GlobalMode" = "全局模式 (设置系统代理)";
 "ManualMode" = "手动模式 (清除系统代理)";
 "RoutingList" = "选择路由";

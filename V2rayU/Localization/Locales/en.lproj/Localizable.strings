@@ -256,8 +256,8 @@
 "ViewConfigJson" = "View config.json";
 "ViewTunJson" = "View tun.json";
 "ViewPacFile" = "View PAC File";
-"PacMode" = "PAC Mode";
-"TunnelMode" = "Tun Mode";
+"PacMode" = "PAC Mode (pac rule Proxy)";
+"TunMode" = "Tun Mode (transparent Proxy)";
 "GlobalMode" = "Global Mode (set system proxies)";
 "ManualMode" = "Manual Mode (clear system proxies)";
 "RoutingList" = "Select Routing";
