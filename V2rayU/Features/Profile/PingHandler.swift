@@ -14,7 +14,7 @@ actor PingAll {
 
     private(set) var inPing: Bool = false
     
-    private let maxConcurrentTasks = 30
+    private let maxConcurrentTasks = 10
     private var cancellables = Set<AnyCancellable>()
     private var totalCount = 0
     private var finishedCount = 0
@@ -50,7 +50,7 @@ actor PingAll {
     private func pingTaskGroup(items: [ProfileEntity]) {
         items.publisher
             .flatMap(maxPublishers: .max(self.maxConcurrentTasks)) { item in
-                Future<Void, Error> { promise in
+                Future<Void, Never> { promise in
                     Task {
                         do {
                             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-start: \(item.remark)")
@@ -58,7 +58,7 @@ actor PingAll {
                             promise(.success(()))
                         } catch {
                             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-fail: \(item.remark) - \(error.localizedDescription)")
-                            promise(.failure(error))
+                            promise(.success(())) // 不要让单个失败导致整个stream终止
                         }
                     }
                 }
@@ -72,18 +72,14 @@ actor PingAll {
                     Task {
                         await AppMenuManager.shared.refreshServerItems() // 刷新servers
                     }
-                case let .failure(error):
-                    NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-some-failed: \(error.localizedDescription)")
-                    logger.info("Ping Error: \(error)")
-                    Task {
-                        await AppMenuManager.shared.refreshServerItems() // 刷新servers
-                    }
+                case .failure:
+                    break
                 }
-                killAllPing()
-                
+
                 // 在actor中,可以内部用 Task.sleep 2秒后设置为空
                 Task { [weak self] in
                     try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                    killAllPing()
                     await AppMenuManager.shared.refreshPingTip(pingTip: "")
                     // 不能直接设置,只能调用函数
                     await self?.setInPingFalse()
@@ -93,20 +89,22 @@ actor PingAll {
     }
     
     private func setInPingFalse() {
+        logger.info("setInPingFalse")
         inPing = false
     }
     
     private func pingEachServer(item: ProfileEntity) async throws {
         let ping = PingServer(uuid: item.uuid)
-        try await ping.doPing()
-        let speed = await ping.getSpeed()
-
-        // 更新进度
+        
+        // 更新进度 - 放在开始时,确保无论成功失败都计数
         finishedCount += 1
         
         Task {
             await AppMenuManager.shared.refreshPingTip(pingTip: " - " + String(localized: .Testing) + "(\(finishedCount)/\(totalCount))")
         }
+        
+        try await ping.doPing()
+        let speed = await ping.getSpeed()
 
         NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-done: \(item.remark) - \(speed) ms")
     }

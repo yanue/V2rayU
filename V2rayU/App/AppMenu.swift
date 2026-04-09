@@ -60,8 +60,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     override private init() {
         super.init()
-        pingTipSubject // 1000毫秒刷新一下,避免很多时一直刷新UI
-            .throttle(for: .milliseconds(1000), scheduler: DispatchQueue.main, latest: true)
+        pingTipSubject
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] tip in
                 self?.pingItem?.title = String(localized: .LatencyTest) + " \(tip)"
             }
