@@ -323,8 +323,9 @@ enum CoreType: String {
     case XrayCore
 }
 
-func openInFinder(path: String) {
+@MainActor func openInFinder(path: String) {
     let expandedPath = (path as NSString).expandingTildeInPath
     let url = URL(fileURLWithPath: expandedPath)
+    NSApp.activate(ignoringOtherApps: true)
     NSWorkspace.shared.activateFileViewerSelecting([url])
 }
