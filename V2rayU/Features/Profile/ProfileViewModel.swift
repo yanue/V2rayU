@@ -62,4 +62,25 @@ final class ProfileViewModel: ObservableObject {
         store.updateSortOrder(list)
         getList()
     }
+
+    func removeDuplicates() -> Int {
+        var seen = Set<String>()
+        var toDelete: [String] = []
+
+        for item in list {
+            let key = "\(item.protocol):\(item.address):\(item.password):\(item.port):\(item.network):\(item.host):\(item.path)"
+            if seen.contains(key) {
+                toDelete.append(item.uuid)
+            } else {
+                seen.insert(key)
+            }
+        }
+
+        for uuid in toDelete {
+            store.delete(uuid: uuid)
+        }
+
+        getList()
+        return toDelete.count
+    }
 }

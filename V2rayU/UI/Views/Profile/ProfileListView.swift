@@ -128,6 +128,24 @@ struct ProfileListView: View {
                         }) {
                             Label(String(localized: .ImportLegacyData), systemImage: "square.and.arrow.down.on.square")
                         }
+
+                        Divider()
+
+                        Button(action: {
+                            if showConfirmAlertSync(
+                                title: String(localized: .RemoveDuplicateServers),
+                                message: String(localized: .RemoveDuplicateConfirmTip)
+                            ) {
+                                let count = viewModel.removeDuplicates()
+                                alertDialog(
+                                    title: String(localized: .RemoveDuplicateServers),
+                                    message: String(localized: .RemoveDuplicateConfirm, arguments: count)
+                                )
+                            }
+                        }) {
+                            Label(String(localized: .RemoveDuplicateServers), systemImage: "doc.on.doc")
+                        }
+                        .disabled(viewModel.list.isEmpty)
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }

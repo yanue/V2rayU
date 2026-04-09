@@ -565,3 +565,6 @@
 "ImportLegacyV2raySubList" = "v2raySubList: ";
 "ImportLegacySuccessServers" = "成功导入 %d 个服务器";
 "ImportLegacySuccessSubscriptions" = "成功导入 %d 个订阅";
+"RemoveDuplicateServers" = "删除重复服务器";
+"RemoveDuplicateConfirm" = "已删除 %d 个重复服务器";
+"RemoveDuplicateConfirmTip" = "即将删除重复服务器，此操作不可撤销。";
