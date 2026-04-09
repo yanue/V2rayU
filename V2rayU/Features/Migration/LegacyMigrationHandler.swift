@@ -355,16 +355,37 @@ actor LegacyMigrationHandler {
                     continue
                 }
 
+                // 使用 subName（UserDefaults 列表中的 key）作为订阅的 uuid
+                // 例如: "subscribe.95E19B5D-FCED-4DED-BB39-810AF7409FFB" -> "95E19B5D-FCED-4DED-BB39-810AF7409FFB"
+                let subUuid: String
+                if subName.hasPrefix("subscribe.") {
+                    let potentialUuid = String(subName.dropFirst("subscribe.".count))
+                    if let _ = UUID(uuidString: potentialUuid) {
+                        subUuid = potentialUuid
+                    } else {
+                        logger.warning("Legacy migration: subName '\(subName)' is not valid UUID, generating new uuid")
+                        subUuid = UUID().uuidString
+                    }
+                } else {
+                    subUuid = UUID().uuidString
+                }
+
+                // 检查是否已存在该 uuid 的订阅，避免重复导入
+                if await subscriptionExists(uuid: subUuid) {
+                    logger.info("Legacy migration: Subscription with uuid '\(subUuid)' already exists, skipping")
+                    continue
+                }
+
                 // 创建新的订阅实体
                 let newSub = SubscriptionEntity(
-                    uuid: UUID().uuidString,
+                    uuid: subUuid,
                     remark: legacySub.remark,
                     url: legacySub.url,
                     enable: legacySub.isValid,
                     sort: subCount
                 )
 
-                logger.debug("Legacy migration: Creating subscription '\(legacySub.remark)' with url '\(legacySub.url)'")
+                logger.debug("Legacy migration: Creating subscription '\(legacySub.remark)' with uuid '\(subUuid)'")
 
                 // 插入数据库
                 try await insertSubscription(newSub)
@@ -392,8 +413,35 @@ actor LegacyMigrationHandler {
                 // 调试：检查 url 和 json 是否有效
                 logger.debug("Legacy migration: url.isEmpty=\(legacyServer.url.isEmpty), json.isEmpty=\(legacyServer.json.isEmpty)")
 
+                // 使用 serverName（UserDefaults 列表中的 key）作为 profile 的 uuid
+                // 例如: "config.97B333FD-18C1-4AD9-A1B5-EF2C4F8E7BA1" -> "97B333FD-18C1-4AD9-A1B5-EF2C4F8E7BA1"
+                let profileUuid: String
+                if serverName.hasPrefix("config.") {
+                    let potentialUuid = String(serverName.dropFirst("config.".count))
+                    if let _ = UUID(uuidString: potentialUuid) {
+                        profileUuid = potentialUuid
+                    } else {
+                        logger.warning("Legacy migration: serverName '\(serverName)' is not valid UUID, generating new uuid")
+                        profileUuid = UUID().uuidString
+                    }
+                } else {
+                    profileUuid = UUID().uuidString
+                }
+
+                logger.debug("Legacy migration: Checking if profile uuid '\(profileUuid)' exists...")
+
+                // 检查是否已存在该 uuid 的 profile，避免重复导入
+                let exists = await profileExists(uuid: profileUuid)
+                logger.debug("Legacy migration: profileExists result: \(exists)")
+                if exists {
+                    logger.info("Legacy migration: Profile with uuid '\(profileUuid)' already exists, skipping")
+                    continue
+                }
+
+                logger.debug("Legacy migration: Profile uuid '\(profileUuid)' does not exist, proceeding with migration")
+
                 // 解析为新的 ProfileEntity
-                if let profile = await parseToProfile(legacyServer: legacyServer, subidMapping: subidMapping) {
+                if let profile = await parseToProfile(legacyServer: legacyServer, profileUuid: profileUuid, subidMapping: subidMapping) {
                     logger.debug("Legacy migration: Parsed profile '\(profile.remark)'")
 
                     // 插入数据库
@@ -429,13 +477,14 @@ actor LegacyMigrationHandler {
     ///
     /// - Parameters:
     ///   - legacyServer: 旧版服务器配置
+    ///   - profileUuid: 已计算好的 profile uuid（从 serverName 解析）
     ///   - subidMapping: 订阅 ID 映射表
     /// - Returns: 解析后的 ProfileEntity，失败返回 nil
-    private func parseToProfile(legacyServer: LegacyV2rayItem, subidMapping: [String: String]) async -> ProfileEntity? {
+    private func parseToProfile(legacyServer: LegacyV2rayItem, profileUuid: String, subidMapping: [String: String]) async -> ProfileEntity? {
         var profile = ProfileEntity()
 
-        // 生成新 UUID
-        profile.uuid = UUID().uuidString
+        // 使用传入的 profileUuid
+        profile.uuid = profileUuid
 
         // 设置基本信息
         profile.remark = legacyServer.remark
@@ -451,9 +500,9 @@ actor LegacyMigrationHandler {
 
         // 关联订阅
         let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
-        if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
-            profile.subid = newSubId
-            logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)' -> '\(newSubId)'")
+        if !legacySubId.isEmpty {
+            profile.subid = legacySubId
+            logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)'")
         }
 
         // 如果有 name 字段，尝试从 name 中提取 JSON（某些 v4 版本可能将 JSON 存储在 name 中）
@@ -466,10 +515,16 @@ actor LegacyMigrationHandler {
         if !legacyServer.url.isEmpty {
             logger.debug("LegacyMigration: Attempting to parse from URI, url.prefix(50)=\(legacyServer.url.prefix(50))")
             if let importedProfile = importFromUri(uri: legacyServer.url) {
-                // 覆盖基本信息，保留从 legacyServer 获取的 subid 和 speed
+                // 覆盖基本信息，保留从 legacyServer 获取的 uuid、subid 和 speed
                 var profile = importedProfile
+                profile.uuid = profileUuid  // 使用传入的 profileUuid
                 profile.remark = legacyServer.remark
                 profile.shareUri = legacyServer.url
+                // subid 从 legacyServer.subscribe 解析
+                let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+                if !legacySubId.isEmpty {
+                    profile.subid = legacySubId
+                }
                 logger.debug("LegacyMigration: URI parsed successfully for '\(legacyServer.remark)'")
                 return profile
             } else {
@@ -481,10 +536,16 @@ actor LegacyMigrationHandler {
         if !legacyServer.json.isEmpty {
             logger.debug("LegacyMigration: Attempting to parse from JSON, length=\(legacyServer.json.count)")
             if let parsedProfile = parseFromJson(json: legacyServer.json) {
-                // 覆盖基本信息
+                // 覆盖基本信息，保留从 legacyServer 获取的 uuid、subid 和 speed
                 var profile = parsedProfile
+                profile.uuid = profileUuid  // 使用传入的 profileUuid
                 profile.remark = legacyServer.remark
                 profile.shareUri = legacyServer.url
+                // subid 从 legacyServer.subscribe 解析
+                let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+                if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
+                    profile.subid = newSubId
+                }
                 logger.debug("LegacyMigration: JSON parsed successfully for '\(legacyServer.remark)'")
                 return profile
             } else {
@@ -499,9 +560,20 @@ actor LegacyMigrationHandler {
                legacyServer.remark.hasPrefix("ssr://") {
                 logger.debug("LegacyMigration: Trying to parse from remark (URI format)")
                 if let importedProfile = importFromUri(uri: legacyServer.remark) {
+                    // 覆盖基本信息，保留从 legacyServer 获取的 uuid、subid 和 speed
                     var profile = importedProfile
+                    profile.uuid = profileUuid  // 使用传入的 profileUuid
                     profile.remark = legacyServer.remark
                     profile.shareUri = legacyServer.remark
+                    // subid 从 legacyServer.subscribe 解析
+                    let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+                    if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
+                        profile.subid = newSubId
+                    }
+                    // speed 从 legacyServer.speed 解析
+                    if let speedStr = Int(legacyServer.speed.replacingOccurrences(of: "ms", with: "")) {
+                        profile.speed = speedStr > 0 ? speedStr : -1
+                    }
                     logger.debug("LegacyMigration: Parsed from remark successfully")
                     return profile
                 }
@@ -695,6 +767,42 @@ actor LegacyMigrationHandler {
     }
 
     // MARK: - 数据库操作
+
+    /// 检查指定 uuid 的 profile 是否已存在
+    /// - Parameter uuid: profile uuid
+    /// - Returns: 是否存在
+    private func profileExists(uuid: String) async -> Bool {
+        logger.debug("LegacyMigration: profileExists checking uuid '\(uuid)'")
+        return await withCheckedContinuation { continuation in
+            do {
+                try AppDatabase.shared.dbWriter.read { db in
+                    let count = try ProfileEntity.filter(Column("uuid") == uuid).fetchCount(db)
+                    logger.debug("LegacyMigration: profileExists found \(count) records for uuid '\(uuid)'")
+                    continuation.resume(returning: count > 0)
+                }
+            } catch {
+                logger.error("LegacyMigration: profileExists error: \(error)")
+                continuation.resume(returning: false)
+            }
+        }
+    }
+
+    /// 检查指定 uuid 的订阅是否已存在
+    /// - Parameter uuid: 订阅 uuid
+    /// - Returns: 是否存在
+    private func subscriptionExists(uuid: String) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            do {
+                try AppDatabase.shared.dbWriter.read { db in
+                    let count = try SubscriptionEntity.filter(Column("uuid") == uuid).fetchCount(db)
+                    continuation.resume(returning: count > 0)
+                }
+            } catch {
+                logger.error("LegacyMigration: subscriptionExists error: \(error)")
+                continuation.resume(returning: false)
+            }
+        }
+    }
 
     /// 插入 ProfileEntity 到数据库
     /// - Parameter profile: 要插入的配置

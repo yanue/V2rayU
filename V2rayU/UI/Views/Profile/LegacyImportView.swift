@@ -36,7 +36,7 @@ struct LegacyImportView: View {
             Divider()
             footerSection
         }
-        .frame(width: 500, height: 400)
+        .frame(width: 500)
         .onAppear {
             checkLegacyData()
         }
@@ -302,21 +302,15 @@ struct LegacyImportView: View {
 
                 if !serverList.isEmpty {
                     info += "\n\n" + String(localized: .ImportLegacyServerList) + "\n"
-                    for (index, item) in serverList.prefix(3).enumerated() {
+                    for (index, item) in serverList.enumerated() {
                         info += "  \(index + 1). \(item)\n"
-                    }
-                    if serverList.count > 3 {
-                        info += "  " + String(localized: .ImportLegacyItemsRemaining, arguments: serverList.count - 3)
                     }
                 }
 
                 if !subList.isEmpty {
                     info += "\n\n" + String(localized: .ImportLegacySubList) + "\n"
-                    for (index, item) in subList.prefix(3).enumerated() {
+                    for (index, item) in subList.enumerated() {
                         info += "  \(index + 1). \(item)\n"
-                    }
-                    if subList.count > 3 {
-                        info += "  " + String(localized: .ImportLegacyItemsRemaining, arguments: subList.count - 3)
                     }
                 }
 
