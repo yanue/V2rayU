@@ -74,7 +74,13 @@ enum PredefinedFile: String, CaseIterable {
     }
     
     func fileItem() -> FileItem? {
-        let path = AppHomePath + "/" + rawValue
+        let path: String
+        switch self {
+        case .tunLog:
+            path = tunLogFilePath  // /var/log/v2rayu/tun.log
+        default:
+            path = AppHomePath + "/" + rawValue
+        }
         guard FileManager.default.fileExists(atPath: path),
               let attrs = try? FileManager.default.attributesOfItem(atPath: path),
               let size = attrs[.size] as? Int64 else { return nil }

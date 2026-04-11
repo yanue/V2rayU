@@ -11,7 +11,9 @@ import AppCenterCrashes
 let AppResourcesPath = Bundle.main.bundlePath + "/Contents/Resources"
 let AppHomePath = NSHomeDirectory() + "/.V2rayU"
 let databasePath = NSHomeDirectory() + "/.V2rayU/.V2rayU.db"
-let v2rayUTool = AppHomePath + "/V2rayUTool"
+// 系统级目录：存放需要 root 权限的二进制和工具（与用户数据分离）
+let AppBinRoot = "/usr/local/v2rayu"
+let v2rayUTool = AppBinRoot + "/V2rayUTool"
 let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let TunConfigFilePath = AppHomePath + "/tun.json"
@@ -26,8 +28,9 @@ let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 let coreLogFilePath = AppHomePath + "/core.log"
-let tunLogFilePath = AppHomePath + "/tun.log"
-let xrayCorePath = AppHomePath + "/bin/xray-core"
+// tun.log 由 LaunchDaemon (root) 写入，放到 /var/log 下避免权限冲突
+let tunLogFilePath = "/var/log/v2rayu/tun.log"
+let xrayCorePath = AppBinRoot + "/bin/xray-core"
 #if arch(arm64)
 let xrayCoreFile = xrayCorePath + "/xray-arm64"
 #else

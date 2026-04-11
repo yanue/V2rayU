@@ -70,15 +70,15 @@ func getCoreFile(mode: CoreType = .SingBox) -> String {
     var coreFile: String
 #if arch(arm64)
     if mode == .SingBox {
-        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-arm64"
+        coreFile = "\(AppBinRoot)/bin/sing-box/sing-box-arm64"
     } else {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-arm64"
+        coreFile = "\(AppBinRoot)/bin/xray-core/xray-arm64"
     }
 #else
     if mode == .SingBox {
-        coreFile = "\(AppHomePath)/bin/sing-box/sing-box-64"
+        coreFile = "\(AppBinRoot)/bin/sing-box/sing-box-64"
     } else {
-        coreFile = "\(AppHomePath)/bin/xray-core/xray-64"
+        coreFile = "\(AppBinRoot)/bin/xray-core/xray-64"
     }
 #endif
     return coreFile

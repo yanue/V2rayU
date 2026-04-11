@@ -79,8 +79,9 @@ actor V2rayLaunch {
         // Clear log files on start
         truncateLogFile(appLogFilePath)
         truncateLogFile(coreLogFilePath)
-        truncateLogFile(tunLogFilePath)
-        
+        // tun.log is root-owned in /var/log/v2rayu/, skip truncation here
+        // (sing-box will overwrite on start via log.output config)
+
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreType: item.AdaptCore())
         if !started {

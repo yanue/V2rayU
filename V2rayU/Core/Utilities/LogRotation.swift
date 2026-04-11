@@ -127,13 +127,19 @@ struct LogRotation {
     }
     
     static func clearAllLogs() {
-        let paths = [coreLogFilePath, tunLogFilePath, recentErrorLogFilePath]
-        for path in paths {
+        // 用户可写的日志文件
+        let userPaths = [coreLogFilePath, recentErrorLogFilePath]
+        for path in userPaths {
             if FileManager.default.fileExists(atPath: path) {
                 try? "".write(toFile: path, atomically: true, encoding: .utf8)
             }
         }
         
+        // tun.log 由 root daemon 拥有，需要 sudo 清空
+        if FileManager.default.fileExists(atPath: tunLogFilePath) {
+            _ = try? runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/cp", "/dev/null", tunLogFilePath])
+        }
+
         for i in 1...maxBackupCount {
             let backupPath = "\(coreLogFilePath).\(i)"
             try? FileManager.default.removeItem(atPath: backupPath)

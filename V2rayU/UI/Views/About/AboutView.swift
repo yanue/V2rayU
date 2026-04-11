@@ -15,17 +15,27 @@ struct AboutView: View {
     @State private var coreVersion: String = ""
     @State private var year: Int = Calendar.current.component(.year, from: Date())
     
-    // 相关文件路径列表
-    private let fileLocations: [String] = [
-        "~/.V2rayU/",
-        "~/Library/LaunchAgents/yanue.v2rayu.sing-box.plist",
-        "/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist",
-        "/Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh",
-        "/private/etc/sudoers.d/v2rayu-helper",
-        "~/Library/Preferences/net.yanue.V2rayU.plist",
-        "~/Library/Application Support/net.yanue.V2rayU/",
-        "~/Library/Caches/net.yanue.V2rayU/",
-        "~/Library/HTTPStorages/net.yanue.V2rayU/"
+    // 相关文件路径列表: (路径, 说明)
+    private let fileLocations: [(path: String, desc: String)] = [
+        // 用户数据
+        ("~/.V2rayU/", "config, logs, database"),
+        // 系统二进制 (root:wheel)
+        ("/usr/local/v2rayu/", "xray-core, sing-box, V2rayUTool"),
+        // root daemon 日志
+        ("/var/log/v2rayu/", "tun daemon log"),
+        // LaunchAgent (用户进程)
+        ("~/Library/LaunchAgents/yanue.v2rayu.sing-box.plist", "sing-box agent"),
+        ("~/Library/LaunchAgents/yanue.v2rayu.xray-core.plist", "xray-core agent"),
+        // LaunchDaemon (root 进程)
+        ("/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist", "tun daemon"),
+        ("/Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh", "tun helper script"),
+        // 权限配置
+        ("/private/etc/sudoers.d/v2rayu-helper", "sudoers rules"),
+        // App 偏好设置与缓存
+        ("~/Library/Preferences/net.yanue.V2rayU.plist", "preferences"),
+        ("~/Library/Application Support/net.yanue.V2rayU/", "app support"),
+        ("~/Library/Caches/net.yanue.V2rayU/", "caches"),
+        ("~/Library/HTTPStorages/net.yanue.V2rayU/", "http storages"),
     ]
     
     // 开源库 链接
@@ -71,13 +81,16 @@ struct AboutView: View {
                         // 相关文件位置
                         sectionHeader(title: String(localized: .RelatedFileLocations), subtitle: String(localized: .ClickAndOpenInFinder))
                         LazyVStack(alignment: .leading, spacing: 8) {
-                            ForEach(fileLocations, id: \.self) { path in
-                                Button(action: { openInFinder(path: path) }) {
+                            ForEach(fileLocations, id: \.path) { item in
+                                Button(action: { openInFinder(path: item.path) }) {
                                     HStack(spacing: 6) {
                                         Image(systemName: "folder")
                                             .foregroundColor(.gray)
-                                        Text(path)
+                                        Text(item.path)
                                             .foregroundColor(.blue)
+                                        Text("(\(item.desc))")
+                                            .foregroundColor(.secondary)
+                                            .font(.caption)
                                     }
                                 }
                                 .buttonStyle(PlainButtonStyle())

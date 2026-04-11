@@ -11,7 +11,9 @@ import Cocoa
 actor AppInstaller: NSObject {
     static let shared = AppInstaller()
     var installReason: String = ""
-    let doSh = "cd '\(AppResourcesPath)' && sudo chown root:admin ./install.sh && sudo chmod a+rsx ./install.sh && ./install.sh"
+    // 从 Swift 传入 USERNAME — NSUserName() 在 App 进程中一定是真实用户，
+    // 解决 install.sh 在 osascript root 环境下无法可靠获取用户名的问题
+    let doSh = "cd '\(AppResourcesPath)' && sudo chown root:admin ./install.sh && sudo chmod a+rsx ./install.sh && USERNAME='\(NSUserName())' ./install.sh"
 
     func checkInstall() async {
         logger.info("source path: \(AppResourcesPath)")
@@ -61,6 +63,13 @@ actor AppInstaller: NSObject {
         if !needRunInstall && isFileQuarantined(at: xrayCoreFile) {
             logger.info("\(xrayCoreFile) is quarantined")
             installReason = "File quarantined"
+            needRunInstall = true
+        }
+
+        // 检查旧版残留（从 ~/.V2rayU/bin 迁移到 /usr/local/v2rayu/bin）
+        if !needRunInstall && (fileMgr.fileExists(atPath: AppHomePath + "/bin") || fileMgr.fileExists(atPath: AppHomePath + "/V2rayUTool")) {
+            logger.info("Legacy bin/V2rayUTool found in \(AppHomePath), need re-install to migrate")
+            installReason = "Migrate binaries to system directory"
             needRunInstall = true
         }
 
