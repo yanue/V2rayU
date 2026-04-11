@@ -500,9 +500,9 @@ actor LegacyMigrationHandler {
 
         // 关联订阅
         let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
-        if !legacySubId.isEmpty {
-            profile.subid = legacySubId
-            logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)'")
+        if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
+            profile.subid = newSubId
+            logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)' -> '\(newSubId)'")
         }
 
         // 如果有 name 字段，尝试从 name 中提取 JSON（某些 v4 版本可能将 JSON 存储在 name 中）
@@ -522,8 +522,8 @@ actor LegacyMigrationHandler {
                 profile.shareUri = legacyServer.url
                 // subid 从 legacyServer.subscribe 解析
                 let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
-                if !legacySubId.isEmpty {
-                    profile.subid = legacySubId
+                if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
+                    profile.subid = newSubId
                 }
                 logger.debug("LegacyMigration: URI parsed successfully for '\(legacyServer.remark)'")
                 return profile
@@ -739,7 +739,7 @@ actor LegacyMigrationHandler {
                 profile.security = .tls
                 if let tlsSettings = streamSettings["tlsSettings"] as? [String: Any] {
                     profile.sni = tlsSettings["serverName"] as? String ?? ""
-                    profile.allowInsecure = !(tlsSettings["allowInsecure"] as? Bool ?? true)
+                    profile.allowInsecure = tlsSettings["allowInsecure"] as? Bool ?? true
                     if let alpn = tlsSettings["alpn"] as? [String] {
                         profile.alpn = V2rayStreamAlpn(rawValue: alpn.first ?? "h2,http/1.1") ?? .h2h1
                     }

@@ -65,6 +65,10 @@ extension clashProxy {
         profile.sni = self.sni ?? self.server
         profile.allowInsecure = self.skipCERTVerify ?? true
         profile.security = self.security.flatMap { V2rayStreamSecurity(rawValue: $0) } ?? .none
+        // Many clash configs use `tls: true` (bool) instead of `security: "tls"` (string)
+        if self.tls == true && profile.security == .none {
+            profile.security = .tls
+        }
         profile.flow = self.flow ?? ""
         
         // Set type-specific fields
@@ -73,12 +77,17 @@ extension clashProxy {
             profile.protocol = .trojan
             profile.password = self.password ?? ""
             profile.fingerprint = self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
+            // trojan 默认使用 TLS
+            if profile.security == .none {
+                profile.security = .tls
+            }
 
         case "vmess":
             profile.protocol = .vmess
             profile.password = self.uuid ?? ""
             profile.alterId = self.alterId ?? 0
             profile.encryption = self.cipher ?? "auto"
+            profile.fingerprint = self.fingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .none
             profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
             
             if profile.network == .ws {
@@ -95,11 +104,14 @@ extension clashProxy {
             profile.protocol = .vless
             profile.password = self.uuid ?? ""
             profile.encryption = self.cipher ?? "none"
+            profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
             profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
             
+            if let servername = self.servername, !servername.isEmpty {
+                profile.sni = servername
+            }
+
             if self.security == "reality" {
-                profile.sni = self.servername ?? self.server
-                profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
                 profile.publicKey = self.realityOpts?.publicKey ?? ""
                 profile.shortId = self.realityOpts?.shortId ?? ""
             }

@@ -16,7 +16,7 @@ struct VmessShare: Codable {
     var type: String = "none" // 伪装类型(none\http\srtp\utp\wechat-video) *tcp or kcp or QUIC
     var host: String = "" // host: 1)http(tcp)->host中间逗号(,)隔开,2)ws->host,3)h2->host,4)QUIC->securty
     var path: String = "" // path: 1)ws->path,2)h2->path,3)QUIC->key/Kcp->seed,4)grpc->serviceName
-    var tls: String = "tls"
+    var tls: String = ""
     var security: String = "auto" // 加密方式(security),没有时值默认auto
     var scy: String = "auto" // 同security
     var alpn: String = "" // h2,http/1.1
@@ -61,7 +61,7 @@ struct VmessShare: Codable {
         type = try container.decodeIfPresent(String.self, forKey: .type) ?? "none"
         host = try container.decodeIfPresent(String.self, forKey: .host) ?? ""
         path = try container.decodeIfPresent(String.self, forKey: .path) ?? ""
-        tls  = try container.decodeIfPresent(String.self, forKey: .tls) ?? "tls"
+        tls  = try container.decodeIfPresent(String.self, forKey: .tls) ?? ""
         alpn = try container.decodeIfPresent(String.self, forKey: .alpn) ?? ""
         sni  = try container.decodeIfPresent(String.self, forKey: .sni) ?? ""
         scy  = try container.decodeIfPresent(String.self, forKey: .scy) ?? "auto"
@@ -192,7 +192,15 @@ class VmessUri: BaseShareUri {
         // params
         let query = url.queryParams()
         profile.network = query.getEnum(forKey: "network", type: V2rayStreamNetwork.self, defaultValue: .tcp)
-        profile.security = query.getEnum(forKey: "tls", type: V2rayStreamSecurity.self, defaultValue: .tls)
+        // vmess type1 tls 参数: "1" 表示 tls, 其他值表示 none
+        let tlsStr = query.getString(forKey: "tls")
+        if tlsStr == "1" {
+            profile.security = .tls
+        } else if !tlsStr.isEmpty {
+            profile.security = V2rayStreamSecurity(rawValue: tlsStr) ?? .none
+        } else {
+            profile.security = .none
+        }
         profile.sni = query.getString(forKey: "tlsServer", defaultValue:  query.getString(forKey: "sni", defaultValue: profile.address))
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .none)
         profile.allowInsecure = query.getString(forKey: "allowInsecure", defaultValue: "1") == "1" ? true : false

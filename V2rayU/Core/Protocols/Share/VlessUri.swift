@@ -165,7 +165,15 @@ class VlessUri: BaseShareUri {
         if query.getString(forKey: "type") == "http" {
             self.profile.network = .h2
         }
-        self.profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
+        // 只有当 URL 没有 security 参数时，才默认为 tls
+        // 如果用户明确设置了 security=none，应当尊重该值
+        let securityStr = query.getString(forKey: "security")
+        if securityStr.isEmpty {
+            // security 参数缺失，默认为 tls（大多数 vless 使用 TLS）
+            self.profile.security = .tls
+        } else {
+            self.profile.security = V2rayStreamSecurity(rawValue: securityStr) ?? .tls
+        }
         self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)
         self.profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
@@ -214,9 +222,6 @@ class VlessUri: BaseShareUri {
             break
         }
 
-        if self.profile.security == .none {
-            self.profile.security = .tls
-        }
 
         if self.profile.sni.count == 0 {
             self.profile.sni = host
@@ -234,6 +239,48 @@ class VlessUri: BaseShareUri {
 
         // 以下是 shadowrocket 的分享参数:
         // remarks=yanue-test11&tls=1&peer=sni.domain&xtls=2&pbk=nQhM0Ahmm1WPrUFPxE9_qFxXSQ7weIf7yOeMrZU5gRs&sid=5443
+
+        // shadowrocket: tls=1 表示 tls
+        let tlsParam = query.getString(forKey: "tls")
+        let xtlsParam = query.getString(forKey: "xtls")
+        if !xtlsParam.isEmpty {
+            if xtlsParam == "1" {
+                self.profile.security = .xtls
+                if self.profile.flow.isEmpty {
+                    self.profile.flow = "xtls-rprx-origin"
+                }
+            } else if xtlsParam == "2" {
+                self.profile.security = .reality
+                if self.profile.flow.isEmpty {
+                    self.profile.flow = "xtls-rprx-vision"
+                }
+                // reality 需要 pbk 和 sid（可能在之前的 switch 中未被解析到）
+                if self.profile.publicKey.isEmpty {
+                    self.profile.publicKey = query.getString(forKey: "pbk", defaultValue: "")
+                }
+                if self.profile.shortId.isEmpty {
+                    self.profile.shortId = query.getString(forKey: "sid", defaultValue: "")
+                }
+            }
+        } else if !tlsParam.isEmpty && securityStr.isEmpty {
+            // 只在没有 security 参数时才使用 tls 参数
+            if tlsParam == "1" {
+                self.profile.security = .tls
+            }
+        }
+
+        // shadowrocket: peer 参数优先于 sni
+        let peer = query.getString(forKey: "peer")
+        if !peer.isEmpty {
+            self.profile.sni = peer
+        }
+
+        // shadowrocket: remarks
+        let remarksParam = query.getString(forKey: "remarks")
+        if !remarksParam.isEmpty {
+            self.profile.remark = remarksParam.urlDecoded()
+        }
+
         let obfs = query.getString(forKey: "obfs")
         if !obfs.isEmpty {
             let v = obfs.lowercased()
