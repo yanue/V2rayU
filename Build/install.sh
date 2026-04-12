@@ -98,7 +98,7 @@ else
 fi
 
 # 安装 tun-helper plist (LaunchDaemon - root权限)
-sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
+sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g; s#__APP_LOG_DIR__#$APP_LOG_DIR#g" \
     ./plist/yanue.v2rayu.tun-helper.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist > /dev/null
 
 sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
