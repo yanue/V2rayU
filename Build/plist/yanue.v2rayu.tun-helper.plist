@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>yanue.v2rayu.tun-helper</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__SINGBOX_BIN__</string>
+		<string>run</string>
+		<string>-c</string>
+		<string>__APP_HOME_DIR__/tun.json</string>
+	</array>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>KeepAlive</key>
+	<false/>
+	<key>StandardOutPath</key>
+	<string>__APP_LOG_DIR__/run-tun.log</string>
+	<key>StandardErrorPath</key>
+	<string>__APP_LOG_DIR__/run-tun.log</string>
+</dict>
+</plist>
