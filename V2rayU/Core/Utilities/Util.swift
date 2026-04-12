@@ -13,7 +13,7 @@ func getArch() -> String {
     #if arch(arm64)
         return "arm64"
     #else
-        return "amd64"
+        return "x86_64"
     #endif
 }
 

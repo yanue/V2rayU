@@ -529,6 +529,16 @@
 
 // MARK: - 诊断 - 基础文件
 "DiagV2rayUToolInstall" = "V2rayUTool 安装状态";
+"DiagSingBoxInstall" = "sing-box 安装状态";
+"DiagSingBoxNotExecutable" = "sing-box 二进制文件不可执行";
+"DiagSingBoxNotInstalled" = "sing-box 二进制文件未安装";
+"DiagUpdateScript" = "更新脚本";
+"DiagUpdateScriptMissing" = "update-xray.sh 缺失，需要重新安装";
+"DiagSudoersCheck" = "Sudoers 权限规则";
+"DiagSudoersFileMissing" = "Sudoers 文件缺失，需要重新安装";
+"DiagSudoersNotEffective" = "Sudoers NOPASSWD 规则未生效，需要重新安装";
+"DiagTunDaemon" = "TUN 守护进程";
+"DiagTunDaemonMissing" = "tun-helper LaunchDaemon 配置缺失，需要重新安装";
 "DiagConfigFile" = "配置文件";
 "DiagConfigFileExists" = "配置文件存在 (%d 字节)";
 "DiagConfigFileMissing" = "配置文件缺失";

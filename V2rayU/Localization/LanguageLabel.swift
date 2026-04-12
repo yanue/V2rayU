@@ -517,6 +517,16 @@ enum LanguageLabel: String, CaseIterable {
 
     // MARK: - Diagnostics - Files
     case DiagV2rayUToolInstall
+    case DiagSingBoxInstall
+    case DiagSingBoxNotExecutable
+    case DiagSingBoxNotInstalled
+    case DiagUpdateScript
+    case DiagUpdateScriptMissing
+    case DiagSudoersCheck
+    case DiagSudoersFileMissing
+    case DiagSudoersNotEffective
+    case DiagTunDaemon
+    case DiagTunDaemonMissing
     case DiagConfigFile
     case DiagConfigFileExists
     case DiagConfigFileMissing

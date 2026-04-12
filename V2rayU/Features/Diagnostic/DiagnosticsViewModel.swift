@@ -101,6 +101,10 @@ final class DiagnosticsViewModel: ObservableObject {
         case .uToolPermission:   return String(localized: .DiagUToolPermission)
         case .coreInstall:       return String(localized: .DiagCoreInstall)
         case .coreArch:          return String(localized: .DiagCoreArch)
+        case .singBoxInstall:    return String(localized: .DiagSingBoxInstall)
+        case .updateScript:      return String(localized: .DiagUpdateScript)
+        case .sudoersCheck:      return String(localized: .DiagSudoersCheck)
+        case .tunDaemon:         return String(localized: .DiagTunDaemon)
         case .configFile:        return String(localized: .DiagConfigFile)
         case .configValidity:    return String(localized: .DiagConfigValidity)
         case .geoipFile:         return String(localized: .DiagGeoipFile)
@@ -186,6 +190,10 @@ final class DiagnosticsViewModel: ObservableObject {
         case .uToolPermission:   return await checkUToolPermission()
         case .coreInstall:       return await checkCoreInstall()
         case .coreArch:          return await checkCoreArch()
+        case .singBoxInstall:    return await checkSingBoxInstall()
+        case .updateScript:      return await checkUpdateScript()
+        case .sudoersCheck:      return await checkSudoers()
+        case .tunDaemon:         return await checkTunDaemon()
         case .configFile:        return await checkConfigFile()
         case .configValidity:    return await checkConfigValidity()
         case .geoipFile:         return checkGeoFile(name: "geoip.dat", step: .geoipFile, missingKey: .DiagGeoipMissing)
@@ -250,7 +258,7 @@ final class DiagnosticsViewModel: ObservableObject {
             return .fail(.coreArch, subtitle: String(localized: .DiagCoreNotInstalled),
                          problem: String(localized: .DiagCoreNotInstalled), action: .fixInstall)
         }
-        let currentArch = isARM64() ? "arm64" : "amd64"
+        let currentArch = getArch()
         let actualArch = await getFileArch(file: path)
         let ok = actualArch == currentArch
         if ok {
@@ -258,6 +266,58 @@ final class DiagnosticsViewModel: ObservableObject {
         }
         let msg = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
         return .fail(.coreArch, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkSingBoxInstall() async -> CheckResult {
+        let path = getCoreFile(mode: .SingBox)
+        let exists = FileManager.default.fileExists(atPath: path)
+        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
+        if exec { return .pass(.singBoxInstall) }
+        let msg = exists ? String(localized: .DiagSingBoxNotExecutable) : String(localized: .DiagSingBoxNotInstalled)
+        return .fail(.singBoxInstall, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkUpdateScript() async -> CheckResult {
+        let path = AppBinRoot + "/update-xray.sh"
+        if FileManager.default.fileExists(atPath: path) { return .pass(.updateScript) }
+        let msg = String(localized: .DiagUpdateScriptMissing)
+        return .fail(.updateScript, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkSudoers() async -> CheckResult {
+        let sudoerFile = "/private/etc/sudoers.d/v2rayu-sudoer"
+        guard FileManager.default.fileExists(atPath: sudoerFile) else {
+            let msg = String(localized: .DiagSudoersFileMissing)
+            return .fail(.sudoersCheck, subtitle: msg, problem: msg, action: .fixInstall)
+        }
+        // 验证 NOPASSWD 规则实际可用
+        let ok = await runInBackground {
+            let task = Process()
+            task.launchPath = "/usr/bin/sudo"
+            task.arguments = ["-n", "-l"]
+            let pipe = Pipe()
+            task.standardOutput = pipe
+            task.standardError = Pipe()
+            do {
+                try task.run()
+                task.waitUntilExit()
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                let output = String(data: data, encoding: .utf8) ?? ""
+                return output.contains("NOPASSWD")
+            } catch {
+                return false
+            }
+        }
+        if ok { return .pass(.sudoersCheck) }
+        let msg = String(localized: .DiagSudoersNotEffective)
+        return .fail(.sudoersCheck, subtitle: msg, problem: msg, action: .fixInstall)
+    }
+
+    private func checkTunDaemon() async -> CheckResult {
+        let plist = "/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist"
+        if FileManager.default.fileExists(atPath: plist) { return .pass(.tunDaemon) }
+        let msg = String(localized: .DiagTunDaemonMissing)
+        return .fail(.tunDaemon, subtitle: msg, problem: msg, action: .fixInstall)
     }
 
     private func checkConfigFile() async -> CheckResult {
@@ -591,14 +651,6 @@ final class DiagnosticsViewModel: ObservableObject {
         }
     }
 
-    private func isARM64() -> Bool {
-        #if arch(arm64)
-        return true
-        #else
-        return false
-        #endif
-    }
-
     private func getFileArch(file: String) async -> String? {
         await Task.detached(priority: .userInitiated) {
             guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)),
@@ -616,7 +668,7 @@ final class DiagnosticsViewModel: ObservableObject {
             if data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46 {
                 let eMachine = data.withUnsafeBytes { $0.load(fromByteOffset: 18, as: UInt16.self) }
                 switch eMachine {
-                case 62:  return "amd64"
+                case 62:  return "x86_64"
                 case 183: return "arm64"
                 default:  return "unknown"
                 }
@@ -722,12 +774,7 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: ── Report & Submit ──
     func generateReport() -> String {
-        let arch: String
-        #if arch(arm64)
-        arch = "arm64"
-        #else
-        arch = "x86_64"
-        #endif
+        let arch = getArch()
 
         var report = ""
 

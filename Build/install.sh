@@ -75,6 +75,11 @@ mkdir -p "$APP_LOG_DIR"
 sudo rm -rf "$APP_BIN_ROOT/V2rayUTool"
 sudo cp -f ./V2rayUTool "$APP_BIN_ROOT/"
 
+# update-xray.sh (xray-core 更新脚本，以 root 权限运行)
+sudo cp -f ./update-xray.sh "$APP_BIN_ROOT/"
+sudo chown root:wheel "$APP_BIN_ROOT/update-xray.sh"
+sudo chmod 755 "$APP_BIN_ROOT/update-xray.sh"
+
 # bin 文件 (xray-core, sing-box)
 sudo rm -rf "$APP_BIN_ROOT/bin/"
 sudo cp -rf ./bin/ "$APP_BIN_ROOT/bin/"
@@ -134,42 +139,36 @@ sudo /usr/bin/xattr -rd com.apple.quarantine "$APP_BIN_ROOT/"
 sudo /usr/bin/xattr -rd com.apple.quarantine "$APP_HOME_DIR/"
 
 # sudoers 条目 (tun-helper + core 更新权限)
-ENTRY="# generate by V2rayU install.sh
-${USERNAME} ALL=(root) NOPASSWD: /Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh *
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl unload /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl enable yanue.v2rayu.tun-helper
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl disable yanue.v2rayu.tun-helper
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
-${USERNAME} ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
-# mv 重命名 (core 更新时)
-${USERNAME} ALL=(root) NOPASSWD: /bin/mv ${APP_BIN_ROOT}/bin/xray-core/xray ${APP_BIN_ROOT}/bin/xray-core/xray-64
-${USERNAME} ALL=(root) NOPASSWD: /bin/mv ${APP_BIN_ROOT}/bin/xray-core/xray ${APP_BIN_ROOT}/bin/xray-core/xray-arm64
-# 设置核心文件权限 (core 更新后)
-${USERNAME} ALL=(root) NOPASSWD: /bin/chown -R root\:wheel ${APP_BIN_ROOT}/bin
-${USERNAME} ALL=(root) NOPASSWD: /bin/chown -R root\:wheel ${APP_BIN_ROOT}/bin/*
-${USERNAME} ALL=(root) NOPASSWD: /bin/chmod -R 755 ${APP_BIN_ROOT}/bin
-${USERNAME} ALL=(root) NOPASSWD: /bin/chmod -R 755 ${APP_BIN_ROOT}/bin/*
-# 备份/恢复核心文件 (core 更新时)
-${USERNAME} ALL=(root) NOPASSWD: /bin/rm -rf ${APP_BIN_ROOT}/bin/xray-core.bak
-${USERNAME} ALL=(root) NOPASSWD: /bin/rm -rf ${APP_BIN_ROOT}/bin/xray-core
-${USERNAME} ALL=(root) NOPASSWD: /bin/cp -rf ${APP_BIN_ROOT}/bin/xray-core ${APP_BIN_ROOT}/bin/xray-core.bak
-${USERNAME} ALL=(root) NOPASSWD: /bin/cp -rf ${APP_BIN_ROOT}/bin/xray-core.bak ${APP_BIN_ROOT}/bin/xray-core
-# unzip 解压到 bin 目录 (core 更新时)
-${USERNAME} ALL=(root) NOPASSWD: /usr/bin/unzip -o * -d ${APP_BIN_ROOT}/bin/xray-core
-# xattr 去除 quarantine
-${USERNAME} ALL=(root) NOPASSWD: /usr/bin/xattr -rd com.apple.quarantine ${APP_BIN_ROOT}
-${USERNAME} ALL=(root) NOPASSWD: /usr/bin/xattr -rd com.apple.quarantine ${APP_BIN_ROOT}/*
-${USERNAME} ALL=(root) NOPASSWD: /usr/bin/xattr -rd com.apple.quarantine ${APP_HOME_DIR}
-${USERNAME} ALL=(root) NOPASSWD: /usr/bin/xattr -rd com.apple.quarantine ${APP_HOME_DIR}/*
-# 清空 tun.log (root 所有)
-${USERNAME} ALL=(root) NOPASSWD: /bin/cp /dev/null ${APP_LOG_DIR}/tun.log
-# end by V2rayU"
-
-TARGET="/private/etc/sudoers.d/v2rayu-helper"
+# 使用 quoted heredoc (<<'SUDOERS_EOF') 禁止 shell 解释任何特殊字符
+# 再用 sed 替换占位符，彻底避免 \: 和 * 的转义问题
+TARGET="/private/etc/sudoers.d/v2rayu-sudoer"
 TMPFILE=$(mktemp)
 
-echo "$ENTRY" > "$TMPFILE"
+# 清理旧版 sudoers 文件（从 v2rayu-helper 重命名为 v2rayu-sudoer）
+if [ -f "/private/etc/sudoers.d/v2rayu-helper" ]; then
+    sudo rm -f "/private/etc/sudoers.d/v2rayu-helper"
+fi
+
+cat > "$TMPFILE" << 'SUDOERS_EOF'
+# generate by V2rayU install.sh
+# tun-helper daemon 控制 (LaunchAgent.swift: startTunHelper / stopTunHelper)
+__USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
+__USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
+# xray-core 更新脚本 (CoreViewModel.swift: onDownloadSuccess)
+__USERNAME__ ALL=(root) NOPASSWD: __APP_BIN_ROOT__/update-xray.sh *
+# 清空 tun.log (root 所有)
+__USERNAME__ ALL=(root) NOPASSWD: /bin/cp /dev/null __APP_LOG_DIR__/tun.log
+# end by V2rayU
+SUDOERS_EOF
+
+# 替换占位符为实际值
+sed -i '' \
+    -e "s|__USERNAME__|${USERNAME}|g" \
+    -e "s|__APP_BIN_ROOT__|${APP_BIN_ROOT}|g" \
+    -e "s|__APP_HOME_DIR__|${APP_HOME_DIR}|g" \
+    -e "s|__APP_LOG_DIR__|${APP_LOG_DIR}|g" \
+    "$TMPFILE"
+
 chmod 440 "$TMPFILE"
 chown root:wheel "$TMPFILE"
 
@@ -180,6 +179,7 @@ if sudo visudo -c -f "$TMPFILE"; then
     sudo chown root:wheel "$TARGET"
 else
     echo "ERROR: sudoers syntax check failed. Not installing."
+    cat "$TMPFILE"  # 输出内容方便调试
     rm -f "$TMPFILE"
     exit 1
 fi

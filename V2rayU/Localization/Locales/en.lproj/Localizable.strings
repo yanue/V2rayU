@@ -528,6 +528,16 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 
 // MARK: - Diagnostics - Files
 "DiagV2rayUToolInstall" = "V2rayUTool Installation";
+"DiagSingBoxInstall" = "sing-box Installation";
+"DiagSingBoxNotExecutable" = "sing-box binary is not executable";
+"DiagSingBoxNotInstalled" = "sing-box binary is not installed";
+"DiagUpdateScript" = "Update Script";
+"DiagUpdateScriptMissing" = "update-xray.sh is missing, reinstall required";
+"DiagSudoersCheck" = "Sudoers Rules";
+"DiagSudoersFileMissing" = "Sudoers file is missing, reinstall required";
+"DiagSudoersNotEffective" = "Sudoers NOPASSWD rules are not effective, reinstall required";
+"DiagTunDaemon" = "TUN Daemon";
+"DiagTunDaemonMissing" = "tun-helper LaunchDaemon plist is missing, reinstall required";
 "DiagConfigFile" = "Configuration File";
 "DiagConfigFileExists" = "Config file exists (%d bytes)";
 "DiagConfigFileMissing" = "Configuration file is missing";

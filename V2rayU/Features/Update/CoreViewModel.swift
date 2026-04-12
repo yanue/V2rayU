@@ -19,7 +19,6 @@ final class CoreViewModel: ObservableObject {
     @Published var showAlert = false
     
     private let service: GithubServiceProtocol
-    private let coreManager = CoreManager()
 
     init(service: GithubServiceProtocol = GithubService()) {
         self.service = service
@@ -52,7 +51,9 @@ final class CoreViewModel: ObservableObject {
 
     func onDownloadSuccess(filePath: String) {
         do {
-            let msg = try coreManager.replaceWithDownloaded(zipFile: filePath)
+            let script = AppBinRoot + "/update-xray.sh"
+            let msg = try runCommand(at: "/usr/bin/sudo", with: ["-n", script, filePath])
+            Task { await V2rayLaunch.shared.restart() }
             errorMsg = String(localized: .ReplaceSuccess) + "\n" + msg
         } catch {
             errorMsg = error.localizedDescription

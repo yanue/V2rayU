@@ -28,9 +28,8 @@ struct AboutView: View {
         ("~/Library/LaunchAgents/yanue.v2rayu.xray-core.plist", "xray-core agent"),
         // LaunchDaemon (root 进程)
         ("/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist", "tun daemon"),
-        ("/Library/PrivilegedHelperTools/yanue.v2rayu.tun-helper.sh", "tun helper script"),
         // 权限配置
-        ("/private/etc/sudoers.d/v2rayu-helper", "sudoers rules"),
+        ("/private/etc/sudoers.d/v2rayu-sudoer", "sudoers rules"),
         // App 偏好设置与缓存
         ("~/Library/Preferences/net.yanue.V2rayU.plist", "preferences"),
         ("~/Library/Application Support/net.yanue.V2rayU/", "app support"),

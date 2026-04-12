@@ -21,76 +21,149 @@ actor AppInstaller: NSObject {
         let fileMgr = FileManager.default
         var needRunInstall = false
 
-        // 确保目录存在
-        if !fileMgr.fileExists(atPath: AppHomePath) {
-            logger.info("app home dir \(AppHomePath) not exists, need install")
-            do {
-                try fileMgr.createDirectory(atPath: AppHomePath, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                logger.error("createDirectory failed: \(error)")
+        // ====== 版本检查：每个新版本都执行一次 install ======
+        let markerFile = AppHomePath + "/.installed_version"
+        if !needRunInstall {
+            let installedVer = (try? String(contentsOfFile: markerFile, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if installedVer != appVersion {
+                logger.info("version mismatch: installed=\(installedVer), current=\(appVersion)")
+                installReason = "App updated to \(appVersion)"
                 needRunInstall = true
             }
         }
 
-        // 检查核心文件是否可执行
+        // ====== 目录检查 ======
+
+        // 用户数据目录
+        if !needRunInstall && !fileMgr.fileExists(atPath: AppHomePath) {
+            logger.info("app home dir \(AppHomePath) not exists")
+            installReason = "App home directory missing"
+            needRunInstall = true
+        }
+
+        // root daemon 日志目录
+        if !needRunInstall && !fileMgr.fileExists(atPath: "/var/log/v2rayu") {
+            logger.info("/var/log/v2rayu not exists")
+            installReason = "Log directory missing"
+            needRunInstall = true
+        }
+
+        // ====== 二进制检查 ======
+
+        // xray-core 可执行
         if !needRunInstall && !fileMgr.isExecutableFile(atPath: xrayCoreFile) {
             logger.info("\(xrayCoreFile) not executable")
-            installReason = "Core file not executable"
+            installReason = "xray-core not executable"
             needRunInstall = true
         }
 
-        // 检查架构
+        // xray-core 架构匹配
         if !needRunInstall && !checkFileIsCurrentArch(file: xrayCoreFile) {
             logger.info("\(xrayCoreFile) not current arch")
-            installReason = "Core file arch mismatch"
+            installReason = "xray-core arch mismatch"
             needRunInstall = true
         }
 
-        // 检查 root 权限
-        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
-            installReason = "v2rayUTool not root admin"
+        // sing-box 可执行
+        let singBoxFile = getCoreFile(mode: .SingBox)
+        if !needRunInstall && !fileMgr.isExecutableFile(atPath: singBoxFile) {
+            logger.info("\(singBoxFile) not executable")
+            installReason = "sing-box not executable"
             needRunInstall = true
         }
 
-        // 检查 geoip.dat
+        // geoip.dat
         if !needRunInstall && !fileMgr.fileExists(atPath: xrayCorePath + "/geoip.dat") {
             logger.info("geoip.dat missing")
             installReason = "geoip.dat missing"
             needRunInstall = true
         }
 
-        // 检查 quarantine
-        if !needRunInstall && isFileQuarantined(at: xrayCoreFile) {
-            logger.info("\(xrayCoreFile) is quarantined")
-            installReason = "File quarantined"
-            needRunInstall = true
-        }
-
-        // 检查旧版残留（从 ~/.V2rayU/bin 迁移到 /usr/local/v2rayu/bin）
-        if !needRunInstall && (fileMgr.fileExists(atPath: AppHomePath + "/bin") || fileMgr.fileExists(atPath: AppHomePath + "/V2rayUTool")) {
-            logger.info("Legacy bin/V2rayUTool found in \(AppHomePath), need re-install to migrate")
-            installReason = "Migrate binaries to system directory"
-            needRunInstall = true
-        }
-
-        // 检查工具版本
-        if !needRunInstall {
-            let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
-            if let version = toolVersion {
-                if version.contains("Usage:") {
-                    installReason = "Old tool version"
-                    needRunInstall = true
-                } else if version.compare("4.0.0", options: .numeric) == .orderedAscending {
-                    installReason = "Tool version too old"
-                    needRunInstall = true
-                }
-            } else {
-                installReason = "Tool not exists"
+        // ====== 隔离标记 ======
+        let quarantineFiles = [
+            (xrayCoreFile, "xray-core"),
+            (singBoxFile, "sing-box"),
+            (v2rayUTool, "V2rayUTool"),
+        ]
+        for (path, name) in quarantineFiles {
+            if !needRunInstall && isFileQuarantined(at: path) {
+                logger.info("\(path) is quarantined")
+                installReason = "\(name) quarantined"
                 needRunInstall = true
             }
         }
 
-        logger.info("launchedBefore, needRunInstall=\(needRunInstall)")
+        // ====== 工具 & 权限检查 ======
+
+        // V2rayUTool root:admin + setuid
+        if !needRunInstall && !checkFileIsRootAdmin(file: v2rayUTool) {
+            installReason = "V2rayUTool not root:admin"
+            needRunInstall = true
+        }
+
+        // V2rayUTool 版本
+        if !needRunInstall {
+            let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
+            if let version = toolVersion {
+                if version.contains("Usage:") || version.compare("4.0.0", options: .numeric) == .orderedAscending {
+                    installReason = "V2rayUTool version too old"
+                    needRunInstall = true
+                }
+            } else {
+                installReason = "V2rayUTool not exists"
+                needRunInstall = true
+            }
+        }
+
+        // update-xray.sh 存在
+        let updateScript = AppBinRoot + "/update-xray.sh"
+        if !needRunInstall && !fileMgr.fileExists(atPath: updateScript) {
+            logger.info("\(updateScript) not exists")
+            installReason = "update-xray.sh missing"
+            needRunInstall = true
+        }
+
+        // sudoers 文件存在
+        let sudoerFile = "/private/etc/sudoers.d/v2rayu-sudoer"
+        if !needRunInstall && !fileMgr.fileExists(atPath: sudoerFile) {
+            logger.info("\(sudoerFile) not exists")
+            installReason = "sudoers rules missing"
+            needRunInstall = true
+        }
+
+        // sudoers 实际可用（sudo -n 能否无密码执行 launchctl）
+        if !needRunInstall {
+            let testResult = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l"])
+            if testResult == nil || !testResult!.contains("NOPASSWD") {
+                logger.info("sudoers NOPASSWD not effective")
+                installReason = "sudoers rules incorrect"
+                needRunInstall = true
+            }
+        }
+
+        // tun-helper LaunchDaemon plist 存在
+        let tunPlist = "/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist"
+        if !needRunInstall && !fileMgr.fileExists(atPath: tunPlist) {
+            logger.info("\(tunPlist) not exists")
+            installReason = "tun-helper daemon not installed"
+            needRunInstall = true
+        }
+
+        // ====== 旧版残留迁移 ======
+        if !needRunInstall && (fileMgr.fileExists(atPath: AppHomePath + "/bin") || fileMgr.fileExists(atPath: AppHomePath + "/V2rayUTool")) {
+            logger.info("Legacy bin/V2rayUTool found in \(AppHomePath)")
+            installReason = "Migrate binaries to system directory"
+            needRunInstall = true
+        }
+
+        // 清理旧版 sudoers 文件
+        if !needRunInstall && fileMgr.fileExists(atPath: "/private/etc/sudoers.d/v2rayu-helper") {
+            logger.info("Old sudoers file v2rayu-helper found")
+            installReason = "Cleanup old sudoers file"
+            needRunInstall = true
+        }
+
+        logger.info("checkInstall: needRunInstall=\(needRunInstall), reason=\(installReason)")
         if needRunInstall {
             await showInstallAlert()
         } else {
@@ -127,8 +200,10 @@ actor AppInstaller: NSObject {
     }
 
     func install() async {
-        // Create authorization reference for the user
         await executeAppleScriptWithOsascript(script: doSh)
+        // 安装成功后写入版本标记，下次启动时跳过安装
+        let markerFile = AppHomePath + "/.installed_version"
+        try? appVersion.write(toFile: markerFile, atomically: true, encoding: .utf8)
     }
 
     // 高版本macos执行NSAppleScript会出现授权失败

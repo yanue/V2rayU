@@ -89,6 +89,7 @@
 		665FDDEB2E7556C400BF7AA8 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */; };
 		66638BD32F2B8C1B003E7CBC /* DnsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66638BD22F2B8BFB003E7CBC /* DnsResolver.swift */; };
 		666A61072F1933A0003654D3 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61062F1933A0003654D3 /* install.sh */; };
+		666A61082F1933A1003654D3 /* update-xray.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61092F1933A1003654D3 /* update-xray.sh */; };
 		666A610C2F193A5C003654D3 /* plist in Resources */ = {isa = PBXBuildFile; fileRef = 666A610B2F193A56003654D3 /* plist */; };
 		667028E42F0D467E008F27D8 /* pac in Resources */ = {isa = PBXBuildFile; fileRef = 667028E32F0D4678008F27D8 /* pac */; };
 		667028F52F0D46E0008F27D8 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 667028F42F0D46DA008F27D8 /* bin */; };
@@ -100,7 +101,6 @@
 		66764BCB2EB3BA4E002F330B /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BCA2EB3BA48002F330B /* DownloadView.swift */; };
 		66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BD92EB4EF8A002F330B /* CoreViewModel.swift */; };
 		66764BDF2EB4F031002F330B /* GithubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BDE2EB4F030002F330B /* GithubService.swift */; };
-		66764BE12EB4F049002F330B /* CoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE02EB4F045002F330B /* CoreManager.swift */; };
 		66764BE62EB4F461002F330B /* AppVersionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE52EB4F460002F330B /* AppVersionController.swift */; };
 		66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */; };
 		66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE92EB4F735002F330B /* AppVersionView.swift */; };
@@ -254,6 +254,7 @@
 		665FDDEA2E7556C400BF7AA8 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
 		66638BD22F2B8BFB003E7CBC /* DnsResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsResolver.swift; sourceTree = "<group>"; };
 		666A61062F1933A0003654D3 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		666A61092F1933A1003654D3 /* update-xray.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = update-xray.sh; sourceTree = "<group>"; };
 		666A610B2F193A56003654D3 /* plist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plist; sourceTree = "<group>"; };
 		667028E32F0D4678008F27D8 /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pac; sourceTree = "<group>"; };
 		667028F42F0D46DA008F27D8 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
@@ -265,7 +266,6 @@
 		66764BCA2EB3BA48002F330B /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		66764BD92EB4EF8A002F330B /* CoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreViewModel.swift; sourceTree = "<group>"; };
 		66764BDE2EB4F030002F330B /* GithubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubService.swift; sourceTree = "<group>"; };
-		66764BE02EB4F045002F330B /* CoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreManager.swift; sourceTree = "<group>"; };
 		66764BE52EB4F460002F330B /* AppVersionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionController.swift; sourceTree = "<group>"; };
 		66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
 		66764BE92EB4F735002F330B /* AppVersionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionView.swift; sourceTree = "<group>"; };
@@ -719,7 +719,6 @@
 			isa = PBXGroup;
 			children = (
 				66764BEB2EB50FC5002F330B /* DownloadDelegate.swift */,
-				66764BE02EB4F045002F330B /* CoreManager.swift */,
 				66764BDE2EB4F030002F330B /* GithubService.swift */,
 				66EB6C162E37C83C00A12DB3 /* HttpServer.swift */,
 			);
@@ -749,6 +748,7 @@
 			isa = PBXGroup;
 			children = (
 				666A61062F1933A0003654D3 /* install.sh */,
+				666A61092F1933A1003654D3 /* update-xray.sh */,
 				666A610B2F193A56003654D3 /* plist */,
 				667028F42F0D46DA008F27D8 /* bin */,
 				667028E32F0D4678008F27D8 /* pac */,
@@ -934,6 +934,7 @@
 				666A610C2F193A5C003654D3 /* plist in Resources */,
 				667028F52F0D46E0008F27D8 /* bin in Resources */,
 				666A61072F1933A0003654D3 /* install.sh in Resources */,
+				666A61082F1933A1003654D3 /* update-xray.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
 				6632EF502EC4B9E100CED47B /* GoogleService-Info.plist in Resources */,
@@ -1000,7 +1001,6 @@
 				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,
 				669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */,
 				6632EF3F2EC3720100CED47B /* SubscriptionStore.swift in Sources */,
-				66764BE12EB4F049002F330B /* CoreManager.swift in Sources */,
 				66764BDA2EB4EF8F002F330B /* CoreViewModel.swift in Sources */,
 				6632EF212EBF381200CED47B /* StatusItemView.swift in Sources */,
 				662CC4062D1BED9B006E8450 /* UserDefaults.swift in Sources */,

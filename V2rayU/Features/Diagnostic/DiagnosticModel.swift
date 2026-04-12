@@ -30,6 +30,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
         switch self {
         case .files:
             return [.v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch,
+                    .singBoxInstall, .updateScript, .sudoersCheck, .tunDaemon,
                     .configFile, .configValidity, .geoipFile, .geositeFile]
         case .status:
             return [.coreRunning, .launchdProcess, .systemProxy, .localPortConflict]
@@ -48,6 +49,10 @@ enum DiagnosticStep: String, CaseIterable {
     case uToolPermission
     case coreInstall
     case coreArch
+    case singBoxInstall
+    case updateScript
+    case sudoersCheck
+    case tunDaemon
     case configFile
     case configValidity
     case geoipFile
@@ -68,6 +73,7 @@ enum DiagnosticStep: String, CaseIterable {
     var category: DiagnosticCategory {
         switch self {
         case .v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch,
+             .singBoxInstall, .updateScript, .sudoersCheck, .tunDaemon,
              .configFile, .configValidity, .geoipFile, .geositeFile:
             return .files
         case .coreRunning, .launchdProcess, .systemProxy, .localPortConflict:
