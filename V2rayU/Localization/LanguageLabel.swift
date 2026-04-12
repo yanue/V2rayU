@@ -377,12 +377,15 @@ enum LanguageLabel: String, CaseIterable {
     // MARK: - Core Update Management
     case CoreSettingsTitle
     case CoreSettingsSubtitle
-    case CheckLatestVersion
+    case CoreCheckLatestVersion
     case LocalCoreDirectory
     case FileDirectory
     case LocalCoreVersionDetail
-    case GithubLatestVersion
+    case CoreVersionList
     case DownloadAndReplace
+    case PreviousPage
+    case NextPage
+    case PageInfo
     case Downloading
     case DownloadedStatus
     case CancelDownload

@@ -22,7 +22,11 @@ struct DiagnosticsView: View {
         VStack(spacing: 0) {
             // Header
             headerView
-            Divider()
+            // Summary card
+            summaryCard
+            
+            Spacer()
+
             // Content
             contentView
         }
@@ -95,8 +99,6 @@ struct DiagnosticsView: View {
     private var contentView: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Summary card
-                summaryCard
 
                 // Category sections
                 ForEach(DiagnosticCategory.allCases) { category in

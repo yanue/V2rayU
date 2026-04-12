@@ -9,7 +9,6 @@ final class AppState: ObservableObject {
     // UI 绑定状态
     @Published var mainTab: ContentView.Tab = .server
     @Published var settingTab: SettingView.SettingTab = .general
-    @Published var helpTab: HelpPageView.HelpTab = .qa
 
     @Published var v2rayTurnOn: Bool = UserDefaults.getBool(forKey: .v2rayTurnOn) {
         didSet { 

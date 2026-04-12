@@ -13,53 +13,53 @@ struct CoreView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(String(localized: .CoreSettingsTitle))
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Button(action: { vm.checkVersions() }) {
-                    Label(String(localized: .CheckLatestVersion),
-                          systemImage: "arrow.triangle.2.circlepath")
-                }
-                .buttonStyle(.borderedProminent)
-                .focusable(false)
-                .disabled(vm.isLoading)
-            }
-
-            Divider()
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(String(localized: .LocalCoreDirectory))
-                    .font(.headline)
-                HStack {
-                    Text(String(localized: .FileDirectory))
-                    Text("\(vm.xrayCorePath)")
-                    Spacer()
-                }
-            }
-
-            Divider()
-
             VStack(alignment: .leading, spacing: 8) {
                 Text(String(localized: .LocalCoreVersionDetail))
                     .font(.headline)
-                HStack {
-                    Text(getArch())
-                    Text(vm.xrayCoreVersion)
-                    Spacer()
-                }
+                LocalCoreFilesView()
             }
 
             Divider()
 
-            if !vm.versions.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: .GithubLatestVersion))
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(String(localized: .CoreVersionList))
                         .font(.headline)
+                    Spacer()
+                    
+                    Button(action: { vm.checkVersions(reset: true) }) {
+                        Label(String(localized: .CoreCheckLatestVersion),
+                              systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .focusable(false)
+                    .disabled(vm.isLoading)
+                    
+                    if vm.versions.count >= vm.perPage {
+                        Button(action: { vm.loadPreviousPage() }) {
+                            Image(systemName: "chevron.left")
+                        }
+                        .disabled(vm.currentPage <= 1 || vm.isLoading)
+                        
+                        
+                        Button(action: { vm.loadNextPage() }) {
+                            Image(systemName: "chevron.right")
+                        }
+                        .disabled(!vm.hasMorePages || vm.isLoading)
+                    }
+                }
+                
+                if vm.isLoading && vm.versions.isEmpty {
+                    HStack {
+                        Spacer()
+                        ProgressView(String(localized: .CheckingForUpdates))
+                        Spacer()
+                    }
+                    .padding()
+                } else {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 6) {
-                            ForEach(vm.versions.prefix(10), id: \.self) { version in
+                            ForEach(vm.versions, id: \.self) { version in
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(version.tagName)
@@ -85,8 +85,11 @@ struct CoreView: View {
                             }
                         }
                     }
+                    .frame(minHeight: 100, maxHeight: 300)
                 }
             }
+
+            Divider()
 
             if vm.showDownloadDialog, let version = vm.selectedVersion {
                 DownloadView(
@@ -111,7 +114,7 @@ struct CoreView: View {
         .padding()
         .onAppear {
             vm.loadCoreVersions()
-            vm.checkVersions()
+            vm.checkVersions(reset: true)
         }
         .alert(isPresented: $vm.showAlert) {
             Alert(
@@ -120,5 +123,42 @@ struct CoreView: View {
                 dismissButton: .default(Text(String(localized: .Confirm)))
             )
         }
+    }
+}
+
+struct LocalCoreFilesView: View {
+    private let corePath = V2rayU.xrayCorePath
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "terminal")
+                .foregroundColor(.accentColor)
+            Text(displayName)
+                .font(.system(.body, design: .monospaced))
+            Spacer()
+            Button(action: { openDirectory() }) {
+                Image(systemName: "folder")
+            }
+            .buttonStyle(.borderless)
+        }
+        .padding(.vertical, 4)
+    }
+    
+    private var displayName: String {
+        let fileName = xrayFileName
+        let version = getCoreShortVersion()
+        return "\(fileName) (v\(version))"
+    }
+    
+    private var xrayFileName: String {
+        #if arch(arm64)
+        return "xray-arm64"
+        #else
+        return "xray-64"
+        #endif
+    }
+    
+    private func openDirectory() {
+        NSWorkspace.shared.open(URL(fileURLWithPath: corePath))
     }
 }
