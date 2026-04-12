@@ -249,8 +249,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         scanQRCodeItem?.title = String(localized: .ScanQRCodeFromScreen)
         shareQRCodeItem?.title = String(localized: .ShareQrCode)
         copyHttpProxyItem?.title = String(localized: .CopyHttpProxyShellExportLine)
-        checkForUpdatesItem?.title = String(localized: .CheckForUpdates)
-        helpItem?.title = String(localized: .Help)
+        checkForUpdatesItem?.title = String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))"
+        helpItem?.title = String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))"
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
         let serverCount = ProfileStore.shared.fetchAll().count

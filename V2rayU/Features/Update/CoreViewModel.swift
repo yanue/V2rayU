@@ -20,7 +20,7 @@ final class CoreViewModel: ObservableObject {
     @Published var currentPage: Int = 1
     @Published var hasMorePages: Bool = true
 
-    let perPage: Int = 5
+    let perPage: Int = 20
 
     private let service: GithubServiceProtocol
 
@@ -35,6 +35,7 @@ final class CoreViewModel: ObservableObject {
     func fetchPage(_ page: Int) {
         guard !isLoading else { return }
         isLoading = true
+        let service = service
         Task {
             do {
                 let releases = try await service.fetchReleases(repo: "XTLS/Xray-core", page: page, perPage: perPage)
@@ -47,6 +48,11 @@ final class CoreViewModel: ObservableObject {
             }
             self.isLoading = false
         }
+    }
+
+    func refresh() {
+        guard currentPage > 1 else { return }
+        fetchPage(currentPage)
     }
 
     func goToPreviousPage() {
@@ -69,6 +75,10 @@ final class CoreViewModel: ObservableObject {
             let script = AppBinRoot + "/update-xray.sh"
             let msg = try runCommand(at: "/usr/bin/sudo", with: ["-n", script, filePath])
             Task { await V2rayLaunch.shared.restart() }
+            // 更新当前core版本
+            xrayCoreVersion = getCoreVersion()
+            // 更新 AppMenu 菜单栏中显示的 Xray-core 版本
+            AppMenuManager.shared.refreshAllMenus()
             errorMsg = String(localized: .ReplaceSuccess) + "\n" + msg
         } catch {
             errorMsg = error.localizedDescription
