@@ -17,11 +17,38 @@ final class CoreViewModel: ObservableObject {
     @Published var errorMsg: String = ""
     @Published var showDownloadDialog = false
     @Published var showAlert = false
-    
+    @Published var currentPage: Int = 0
+
+    let pageSize: Int = 5
+
     private let service: GithubServiceProtocol
 
     init(service: GithubServiceProtocol = GithubService()) {
         self.service = service
+    }
+
+    var totalPages: Int {
+        guard !versions.isEmpty else { return 1 }
+        return max(1, (versions.count + pageSize - 1) / pageSize)
+    }
+
+    var pagedVersions: [GithubRelease] {
+        let start = currentPage * pageSize
+        let end = min(start + pageSize, versions.count)
+        guard start < versions.count else { return [] }
+        return Array(versions[start..<end])
+    }
+
+    func goToPreviousPage() {
+        if currentPage > 0 {
+            currentPage -= 1
+        }
+    }
+
+    func goToNextPage() {
+        if currentPage < totalPages - 1 {
+            currentPage += 1
+        }
     }
 
     func loadCoreVersions() {
@@ -34,6 +61,7 @@ final class CoreViewModel: ObservableObject {
                 let releases = try await service.fetchReleases(repo: "XTLS/Xray-core")
                 await MainActor.run {
                     self.versions = releases
+                    self.currentPage = 0
                 }
             } catch {
                 await MainActor.run {

@@ -372,6 +372,15 @@
 "CoreSettingsTitle" = "Core Settings";
 "CoreSettingsSubtitle" = "Manage your core versions";
 "CheckLatestVersion" = "Check Latest Version";
+"FetchReleases" = "Fetch Releases";
+"CoreInfo" = "Core Info";
+"Architecture" = "Architecture";
+"CurrentVersion" = "Current Version";
+"PreviousPage" = "Previous";
+"NextPage" = "Next";
+"PageIndicator" = "Page %d / %d";
+"AvailableVersions" = "Available Versions";
+"UpdateCore" = "Update";
 "LocalCoreDirectory" = "Local Xray Core Directory";
 "FileDirectory" = "File Directory:";
 "LocalCoreVersionDetail" = "Local Xray Core Version Detail";

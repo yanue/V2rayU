@@ -373,6 +373,15 @@
 "CoreSettingsTitle" = "核心设置";
 "CoreSettingsSubtitle" = "管理核心版本";
 "CheckLatestVersion" = "检查最新版本";
+"FetchReleases" = "获取版本列表";
+"CoreInfo" = "核心信息";
+"Architecture" = "系统架构";
+"CurrentVersion" = "当前版本";
+"PreviousPage" = "上一页";
+"NextPage" = "下一页";
+"PageIndicator" = "第 %d / %d 页";
+"AvailableVersions" = "可用版本";
+"UpdateCore" = "更新";
 "LocalCoreDirectory" = "本地 Xray Core 目录";
 "FileDirectory" = "文件目录:";
 "LocalCoreVersionDetail" = "本地 Xray Core 版本详情";

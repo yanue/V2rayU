@@ -372,6 +372,15 @@
 "CoreSettingsTitle" = "核心設定";
 "CoreSettingsSubtitle" = "管理核心版本";
 "CheckLatestVersion" = "檢查最新版本";
+"FetchReleases" = "獲取版本列表";
+"CoreInfo" = "核心資訊";
+"Architecture" = "系統架構";
+"CurrentVersion" = "當前版本";
+"PreviousPage" = "上一頁";
+"NextPage" = "下一頁";
+"PageIndicator" = "第 %d / %d 頁";
+"AvailableVersions" = "可用版本";
+"UpdateCore" = "更新";
 "LocalCoreDirectory" = "本機 Xray Core 目錄";
 "FileDirectory" = "檔案目錄:";
 "LocalCoreVersionDetail" = "本機 Xray Core 版本詳情";

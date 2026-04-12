@@ -378,6 +378,15 @@ enum LanguageLabel: String, CaseIterable {
     case CoreSettingsTitle
     case CoreSettingsSubtitle
     case CheckLatestVersion
+    case FetchReleases
+    case CoreInfo
+    case Architecture
+    case CurrentVersion
+    case PreviousPage
+    case NextPage
+    case PageIndicator
+    case AvailableVersions
+    case UpdateCore
     case LocalCoreDirectory
     case FileDirectory
     case LocalCoreVersionDetail
