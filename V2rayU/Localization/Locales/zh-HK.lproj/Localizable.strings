@@ -378,7 +378,7 @@
 "CurrentVersion" = "當前版本";
 "PreviousPage" = "上一頁";
 "NextPage" = "下一頁";
-"PageIndicator" = "第 %d / %d 頁";
+"PageIndicator" = "第 %d 頁";
 "AvailableVersions" = "可用版本";
 "UpdateCore" = "更新";
 "LocalCoreDirectory" = "本機 Xray Core 目錄";

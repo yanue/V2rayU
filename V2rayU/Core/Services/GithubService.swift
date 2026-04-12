@@ -12,6 +12,13 @@ protocol GithubServiceProtocol {
     func downloadReleaseAsset(url: URL, to destination: URL) async throws -> URL
 }
 
+extension GithubServiceProtocol {
+    /// 便捷方法：不传 page/perPage 时使用默认值
+    func fetchReleases(repo: String) async throws -> [GithubRelease] {
+        try await fetchReleases(repo: repo, page: 1, perPage: 20)
+    }
+}
+
 final class GithubService: GithubServiceProtocol {
     
     func fetchReleases(repo: String, page: Int = 1, perPage: Int = 20) async throws -> [GithubRelease] {

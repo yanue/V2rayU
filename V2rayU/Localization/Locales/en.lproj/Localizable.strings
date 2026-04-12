@@ -378,7 +378,7 @@
 "CurrentVersion" = "Current Version";
 "PreviousPage" = "Previous";
 "NextPage" = "Next";
-"PageIndicator" = "Page %d / %d";
+"PageIndicator" = "Page %d";
 "AvailableVersions" = "Available Versions";
 "UpdateCore" = "Update";
 "LocalCoreDirectory" = "Local Xray Core Directory";

@@ -13,7 +13,7 @@ struct CoreView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // MARK: - Header
+            // MARK: - Header (固定)
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(String(localized: .CoreSettingsTitle))
@@ -24,7 +24,7 @@ struct CoreView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Button(action: { vm.checkVersions() }) {
+                Button(action: { vm.fetchPage(1) }) {
                     Label(String(localized: .FetchReleases),
                           systemImage: "arrow.triangle.2.circlepath")
                 }
@@ -35,7 +35,7 @@ struct CoreView: View {
 
             Divider()
 
-            // MARK: - Core Info
+            // MARK: - Core Info (固定)
             GroupBox(label: Label(String(localized: .CoreInfo), systemImage: "info.circle")) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
@@ -63,96 +63,108 @@ struct CoreView: View {
                 .padding(.vertical, 4)
             }
 
-            // MARK: - Download Dialog (placed before version list to keep it visible)
-            if vm.showDownloadDialog, let version = vm.selectedVersion {
-                DownloadView(
-                    version: version,
-                    downloadedBtn: String(localized: .ReplaceCore),
-                    onDownloadSuccess: { filePath in
-                        vm.onDownloadSuccess(filePath: filePath)
-                    },
-                    onDownloadFail: { err in
-                        vm.onDownloadFail(err: err)
-                    }
-                )
-                .padding()
-                .background()
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-            }
-
-            // MARK: - Available Versions
-            if !vm.versions.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: .AvailableVersions))
-                        .font(.headline)
-
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 6) {
-                            ForEach(vm.pagedVersions, id: \.self) { version in
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(version.tagName)
-                                            .font(.title3)
-                                            .fontWeight(.medium)
-                                        Text(version.formattedPublishedAt)
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Spacer()
-                                    Button(action: {
-                                        vm.downloadAndReplace(version: version)
-                                    }) {
-                                        Label(String(localized: .UpdateCore), systemImage: "arrow.down.circle")
-                                    }
-                                    .disabled(vm.isLoading)
-                                    .buttonStyle(.bordered)
+            // MARK: - 可滚动区域（下载 + 版本列表）
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // MARK: - Download Dialog
+                    if vm.showDownloadDialog, let version = vm.selectedVersion {
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack {
+                                Spacer()
+                                Button(action: { vm.closeDownloadDialog() }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
                                 }
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background(Color.secondary.opacity(0.08))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .buttonStyle(.plain)
+                                .focusable(false)
                             }
+                            DownloadView(
+                                version: version,
+                                downloadedBtn: String(localized: .ReplaceCore),
+                                onDownloadSuccess: { filePath in
+                                    vm.onDownloadSuccess(filePath: filePath)
+                                },
+                                onDownloadFail: { err in
+                                    vm.onDownloadFail(err: err)
+                                }
+                            )
+                        }
+                        .padding()
+                        .background()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        )
+                    }
+
+                    // MARK: - Available Versions
+                    if !vm.versions.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(String(localized: .AvailableVersions))
+                                .font(.headline)
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                ForEach(vm.versions, id: \.self) { version in
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(version.tagName)
+                                                .font(.title3)
+                                                .fontWeight(.medium)
+                                            Text(version.formattedPublishedAt)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            vm.downloadAndReplace(version: version)
+                                        }) {
+                                            Label(String(localized: .UpdateCore), systemImage: "arrow.down.circle")
+                                        }
+                                        .disabled(vm.isLoading || vm.showDownloadDialog)
+                                        .buttonStyle(.bordered)
+                                    }
+                                    .padding(.vertical, 4)
+                                    .padding(.horizontal, 8)
+                                    .background(Color.secondary.opacity(0.08))
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+
+                            // MARK: - Pagination Controls
+                            HStack {
+                                Spacer()
+                                Button(action: { vm.goToPreviousPage() }) {
+                                    Label(String(localized: .PreviousPage), systemImage: "chevron.left")
+                                }
+                                .disabled(vm.currentPage <= 1 || vm.isLoading)
+                                .buttonStyle(.bordered)
+                                .focusable(false)
+
+                                Text(String(localized: .PageIndicator, arguments: vm.currentPage))
+                                    .font(.callout)
+                                    .foregroundColor(.secondary)
+                                    .frame(minWidth: 60, alignment: .center)
+
+                                Button(action: { vm.goToNextPage() }) {
+                                    Label(String(localized: .NextPage), systemImage: "chevron.right")
+                                }
+                                .disabled(!vm.hasMorePages || vm.isLoading)
+                                .buttonStyle(.bordered)
+                                .focusable(false)
+
+                                Spacer()
+                            }
+                            .padding(.top, 4)
                         }
                     }
-                    .frame(maxHeight: 240)
-
-                    // MARK: - Pagination Controls
-                    HStack {
-                        Spacer()
-                        Button(action: { vm.goToPreviousPage() }) {
-                            Label(String(localized: .PreviousPage), systemImage: "chevron.left")
-                        }
-                        .disabled(vm.currentPage <= 0)
-                        .buttonStyle(.bordered)
-                        .focusable(false)
-
-                        Text(String(localized: .PageIndicator,
-                                    arguments: vm.currentPage + 1, vm.totalPages))
-                            .font(.callout)
-                            .foregroundColor(.secondary)
-                            .frame(minWidth: 80, alignment: .center)
-
-                        Button(action: { vm.goToNextPage() }) {
-                            Label(String(localized: .NextPage), systemImage: "chevron.right")
-                        }
-                        .disabled(vm.currentPage >= vm.totalPages - 1)
-                        .buttonStyle(.bordered)
-                        .focusable(false)
-
-                        Spacer()
-                    }
-                    .padding(.top, 4)
                 }
             }
         }
         .padding()
         .onAppear {
             vm.loadCoreVersions()
-            vm.checkVersions()
+            vm.fetchPage(1)
         }
         .alert(isPresented: $vm.showAlert) {
             Alert(

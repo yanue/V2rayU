@@ -1,5 +1,5 @@
 //
-//  CoreView.swift
+//  CoreViewModel.swift
 //  V2rayU
 //
 //  Created by yanue on 2025/10/31.
@@ -17,9 +17,10 @@ final class CoreViewModel: ObservableObject {
     @Published var errorMsg: String = ""
     @Published var showDownloadDialog = false
     @Published var showAlert = false
-    @Published var currentPage: Int = 0
+    @Published var currentPage: Int = 1
+    @Published var hasMorePages: Bool = true
 
-    let pageSize: Int = 5
+    let perPage: Int = 5
 
     private let service: GithubServiceProtocol
 
@@ -27,54 +28,40 @@ final class CoreViewModel: ObservableObject {
         self.service = service
     }
 
-    var totalPages: Int {
-        guard !versions.isEmpty else { return 1 }
-        return max(1, (versions.count + pageSize - 1) / pageSize)
-    }
-
-    var pagedVersions: [GithubRelease] {
-        let start = currentPage * pageSize
-        let end = min(start + pageSize, versions.count)
-        guard start < versions.count else { return [] }
-        return Array(versions[start..<end])
-    }
-
-    func goToPreviousPage() {
-        if currentPage > 0 {
-            currentPage -= 1
-        }
-    }
-
-    func goToNextPage() {
-        if currentPage < totalPages - 1 {
-            currentPage += 1
-        }
-    }
-
     func loadCoreVersions() {
         xrayCoreVersion = getCoreVersion()
     }
-    
-    func checkVersions() {
-        Task { [service] in
+
+    func fetchPage(_ page: Int) {
+        guard !isLoading else { return }
+        isLoading = true
+        Task {
             do {
-                let releases = try await service.fetchReleases(repo: "XTLS/Xray-core")
-                await MainActor.run {
-                    self.versions = releases
-                    self.currentPage = 0
-                }
+                let releases = try await service.fetchReleases(repo: "XTLS/Xray-core", page: page, perPage: perPage)
+                self.versions = releases
+                self.currentPage = page
+                self.hasMorePages = releases.count >= perPage
             } catch {
-                await MainActor.run {
-                    self.errorMsg = "Check failed: \(error.localizedDescription)"
-                }
+                self.errorMsg = String(localized: .OperationFailed, arguments: error.localizedDescription)
+                self.showAlert = true
             }
+            self.isLoading = false
         }
+    }
+
+    func goToPreviousPage() {
+        guard currentPage > 1 else { return }
+        fetchPage(currentPage - 1)
+    }
+
+    func goToNextPage() {
+        guard hasMorePages else { return }
+        fetchPage(currentPage + 1)
     }
 
     func downloadAndReplace(version: GithubRelease) {
         selectedVersion = version
         showDownloadDialog = true
-        isLoading = true
     }
 
     func onDownloadSuccess(filePath: String) {
@@ -87,14 +74,12 @@ final class CoreViewModel: ObservableObject {
             errorMsg = error.localizedDescription
         }
         showAlert = true
-        isLoading = false
         showDownloadDialog = false
     }
 
     func onDownloadFail(err: String) {
         errorMsg = err
         showAlert = true
-        isLoading = false
         showDownloadDialog = false
     }
 
