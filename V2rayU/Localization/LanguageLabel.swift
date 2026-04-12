@@ -184,7 +184,9 @@ enum LanguageLabel: String, CaseIterable {
     case ProfileSettingsSubHead
     case `Protocol`
     case Address
+    case Username
     case Password
+    case OptionalFieldTip
     case Method
     case Port
     case ID

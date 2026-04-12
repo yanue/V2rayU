@@ -117,7 +117,15 @@ class V2rayOutboundHandler {
             serverSocks5 = V2rayOutboundSockServer()
             serverSocks5.address = self.profile.address
             serverSocks5.port = self.profile.port
-            serverSocks5.users = nil
+            if !self.profile.host.isEmpty {
+                var user = V2rayOutboundSockUser()
+                // 用 host 来存储 socks username
+                user.user = self.profile.host
+                user.pass = self.profile.password
+                serverSocks5.users = [user]
+            } else {
+                serverSocks5.users = nil
+            }
             var socks = V2rayOutboundSocks()
             socks.servers = [serverSocks5]
             outbound.settings = socks

@@ -179,7 +179,9 @@
 "ProfileSettingsSubHead" = "管理节点配置详情";
 "Protocol" = "协议";
 "Address" = "地址";
+"Username" = "用户名";
 "Password" = "密码";
+"OptionalFieldTip" = "可选";
 "Method" = "加密方式";
 "Port" = "端口";
 "ID" = "ID";

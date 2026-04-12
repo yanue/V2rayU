@@ -66,6 +66,19 @@ struct ConfigServerView: View {
                 if item.protocol == .socks {
                     getTextFieldWithLabel(label: .Address, text: $item.address)
                     getNumFieldWithLabel(label: .Port, num: $item.port)
+                    HStack {
+                        Rectangle()
+                            .fill(Color.secondary.opacity(0.3))
+                            .frame(height: 1)
+                        Text(String(localized: .OptionalFieldTip))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Rectangle()
+                            .fill(Color.secondary.opacity(0.3))
+                            .frame(height: 1)
+                    }
+                    getTextFieldWithLabel(label: .Username, text: $item.host) // 用 host 存储 socks username
+                    getTextFieldWithLabel(label: .Password, text: $item.password)
                 }
             }
             .padding() // 1. 内边距

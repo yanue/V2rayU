@@ -94,7 +94,9 @@ class SingboxOutboundHandler {
             type: "socks",
             tag: "proxy",
             server: profile.address,
-            server_port: profile.port
+            server_port: profile.port,
+            password: profile.password,
+            username: profile.host
         )
     }
 

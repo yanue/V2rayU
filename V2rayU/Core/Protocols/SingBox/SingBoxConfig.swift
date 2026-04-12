@@ -87,6 +87,7 @@ struct SingboxOutbound: Codable {
     var global_padding: Bool? // vmess
     var authenticated_length: Bool? // vmess
     var flow: String? // 新增支持 vless flow
+    var username: String? // socks5|http
     var domain_resolver: String?
     var multiplex: SingboxMultiplexConfig?
     var tls: TLSConfig?
@@ -105,6 +106,7 @@ struct SingboxOutbound: Codable {
         global_padding: Bool? = nil,
         authenticated_length: Bool? = nil,
         flow: String? = nil,
+        username: String? = nil,
         domain_resolver: String? = nil,
         multiplex: SingboxMultiplexConfig? = nil,
         tls: TLSConfig? = nil,
@@ -122,6 +124,7 @@ struct SingboxOutbound: Codable {
         self.global_padding = global_padding
         self.authenticated_length = authenticated_length
         self.flow = flow
+        self.username = username
         self.domain_resolver = domain_resolver
         self.multiplex = multiplex
         self.tls = tls

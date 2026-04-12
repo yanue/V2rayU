@@ -178,7 +178,9 @@
 "ProfileSettingsSubHead" = "Manage profile details";
 "Protocol" = "Protocol";
 "Address" = "Address";
+"Username" = "Username";
 "Password" = "Password";
+"OptionalFieldTip" = "Optional";
 "Method" = "Method";
 "Port" = "Port";
 "ID" = "ID";
