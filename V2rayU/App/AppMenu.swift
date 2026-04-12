@@ -651,7 +651,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     @objc private func openDiagnostics(_ sender: NSMenuItem) {
         AppState.shared.mainTab = .diagnostic
-        AppState.shared.helpTab = .qa
         MainWindowManager.shared.openMainWindow()
     }
 

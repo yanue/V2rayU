@@ -8,14 +8,14 @@
 import Foundation
 
 protocol GithubServiceProtocol {
-    func fetchReleases(repo: String) async throws -> [GithubRelease]
+    func fetchReleases(repo: String, page: Int, perPage: Int) async throws -> [GithubRelease]
     func downloadReleaseAsset(url: URL, to destination: URL) async throws -> URL
 }
 
 final class GithubService: GithubServiceProtocol {
     
-    func fetchReleases(repo: String) async throws -> [GithubRelease] {
-        let url = URL(string: "https://api.github.com/repos/\(repo)/releases?per_page=20")!
+    func fetchReleases(repo: String, page: Int = 1, perPage: Int = 20) async throws -> [GithubRelease] {
+        let url = URL(string: "https://api.github.com/repos/\(repo)/releases?page=\(page)&per_page=\(perPage)")!
         logger.info("fetchReleases: \(url)")
 
         let (data, _) = try await URLSession.shared.data(from: url)

@@ -163,7 +163,7 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
-        logger.info("checkInstall: needRunInstall=\(needRunInstall), reason=\(installReason)")
+        logger.info("checkInstall: needRunInstall=\(needRunInstall), reason=\(self.installReason)")
         if needRunInstall {
             await showInstallAlert()
         } else {
