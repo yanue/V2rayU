@@ -456,30 +456,66 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagNetworkConnectivity" = "Network Connection";
 "DiagSystemProxy" = "System Proxy Settings";
 "DiagFirewall" = "Firewall & Security Software";
-"DiagCoreInstall" = "Core Installation & Version";
 "DiagCoreRunning" = "Core Running Status";
 "DiagLaunchdProcess" = "Launchd Process Status";
 "DiagLaunchdNotLoaded" = "Launchd agent not loaded";
 "DiagLaunchdNotRunning" = "Launchd agent loaded but process not running";
 "DiagLaunchdRunning" = "Process running (PID: %@)";
 "DiagLaunchdReload" = "Reload";
-"DiagUToolPermission" = "Tool Permissions";
-"DiagConfigValidity" = "Configuration Validity";
-"DiagDNSResolution" = "Node Domain Resolution";
-"DiagPortConnectivity" = "Remote Port Connectivity";
 "DiagLocalPortConflict" = "Local Port Conflict";
-"DiagGeoipFile" = "GeoIP Database";
 "DiagPingLatency" = "Latency & Availability";
 "DiagLogAnalysis" = "Log Analysis";
 "DiagVPNConflict" = "VPN Conflict Detection";
 "DiagBasicNetwork" = "Basic Network";
 "DiagProxyConnectivity" = "Proxy Connectivity";
 
+// MARK: - Diagnostics - Merged File Check Titles
+"DiagAppDataDir" = "Data Directory Check";
+"DiagV2rayUTool" = "V2rayUTool Check";
+"DiagXrayCore" = "Xray Core Check";
+"DiagSingBox" = "sing-box Check";
+"DiagUpdateScript" = "Update Script Check";
+"DiagSudoersCheck" = "Sudoers Rules";
+"DiagTunDaemon" = "TUN Daemon";
+"DiagConfigCheck" = "Configuration Check";
+"DiagGeoDataFiles" = "GeoData Files";
+
 // MARK: - Diagnostics - Status
 "DiagPending" = "Pending...";
 "DiagChecking" = "Checking...";
 "DiagPassed" = "Passed";
 "DiagFailed" = "Failed";
+
+// MARK: - Diagnostics - Sub-check Labels
+"DiagSubFileExists" = "File exists";
+"DiagSubExecutable" = "Executable";
+"DiagSubNotExecutable" = "Not executable";
+"DiagSubRootAdmin" = "root:admin ownership correct";
+"DiagSubNotRootAdmin" = "Not root:admin ownership";
+"DiagSubSetuid" = "setuid(+s) permission correct";
+"DiagSubNoSetuid" = "Missing setuid(+s) permission";
+"DiagSubNoQuarantine" = "No quarantine flag";
+"DiagSubQuarantined" = "File is quarantined";
+"DiagSubVersionTooOld" = "Version too old";
+"DiagSubVersionUnknown" = "Cannot determine version";
+"DiagToolVersionOld" = "V2rayUTool version is too old, reinstall required.";
+"DiagToolNoSetuid" = "V2rayUTool is missing setuid(+s) permission, cannot perform privileged operations. Click 'Fix Now'.";
+"DiagFileQuarantined" = "File is quarantined by macOS and cannot execute normally. Click 'Fix Now' to remove quarantine flag.";
+"DiagSingBoxArchMismatch" = "sing-box architecture mismatch (file: %@, system: %@)";
+"DiagUpdateScriptNoPermission" = "update-xray.sh is not executable, reinstall required";
+"DiagSubDirExists" = "Directory exists";
+"DiagSubDirWritable" = "Directory writable";
+"DiagSubDirNotWritable" = "Directory not writable";
+"DiagSubDirOwnerOK" = "Directory owned by current user";
+"DiagSubDirOwnerWrong" = "Directory not owned by current user";
+"DiagSubDbExists" = "Database file exists";
+"DiagSubDbNotExists" = "Database file not found (will be created on first launch)";
+"DiagSubDbWritable" = "Database writable";
+"DiagSubDbReadonly" = "Database is read-only";
+"DiagAppDataDirMissing" = "Data directory ~/.V2rayU does not exist. Reinstall required.";
+"DiagAppDataDirNotWritable" = "Data directory ~/.V2rayU is not writable. Permissions may have been changed. Click 'Fix Now' to repair.";
+"DiagAppDataDirOwnerWrong" = "Data directory ~/.V2rayU is not owned by the current user, which may cause read/write failures. Click 'Fix Now' to repair.";
+"DiagDbReadonly" = "Database file .V2rayU.db is read-only and cannot save data. Possible causes:\n1. Directory permissions changed (e.g. owned by root)\n2. Disk space is full\n3. File system mounted read-only\n\nClick 'Fix Now' to repair permissions.";
 
 // MARK: - Diagnostics - Problem Descriptions
 "DiagNetUnavailable" = "Computer cannot access the internet. Please check:\n1. Router/broadband is working\n2. Wi-Fi is connected\n3. Ethernet cable is plugged in";
@@ -504,6 +540,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagPortConnectFailed" = "Cannot connect to remote server (%@:%d). Possible reasons:\n1. Node server is offline\n2. Port is blocked (common ports like 443, 8388 are easily blocked)\n3. Current network has overseas connection limits\n\nTry switching nodes or ports";
 "DiagPortOccupied" = "Local port %d is occupied by '%@'. Close that program or change port in settings";
 "DiagGeoipMissing" = "GeoIP database file is not installed. This will prevent routing rules from working (domestic direct, overseas proxy). Click 'Fix Now' to auto-download";
+"DiagGeositeMissing" = "missing, click 'Fix Now' to auto-download";
 "DiagLatencyHigh" = "High latency (%dms), may affect browsing experience. Try switching to a node with lower latency";
 "DiagLatencyFailed" = "Cannot connect to node for latency test. Node may be unavailable or blocked. Try switching nodes";
 "DiagBasicNetworkFailed" = "Cannot access the internet (apple.com unreachable). Check your network connection";
@@ -512,10 +549,21 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagBasicNetworkOK" = "Internet accessible";
 "DiagConfigValidOK" = "Configuration is valid JSON with required fields";
 "DiagConfigValidProblems" = "Configuration issues: %@";
+"DiagConfigFileExists" = "Config file exists (%d bytes)";
+"DiagConfigFileMissing" = "Configuration file is missing";
+"DiagConfigFileEmpty" = "Configuration file is empty";
 "DiagSystemProxyOK" = "System proxy correctly configured (port %d)";
 "DiagSystemProxyNotNeeded" = "System proxy not needed in current mode";
 "DiagReportCopied" = "Report copied to clipboard. Please paste into the GitHub issue.";
 "DiagReportTooLong" = "Report too long for URL, copied to clipboard instead";
+"DiagCoreArchCorrect" = "Architecture matches system (%@)";
+"DiagCoreArchMismatch" = "Architecture mismatch (file: %@, system: %@)";
+"DiagSingBoxNotExecutable" = "sing-box binary is not executable";
+"DiagSingBoxNotInstalled" = "sing-box binary is not installed";
+"DiagUpdateScriptMissing" = "update-xray.sh is missing, reinstall required";
+"DiagSudoersFileMissing" = "Sudoers file is missing, reinstall required";
+"DiagSudoersNotEffective" = "Sudoers NOPASSWD rules are not effective, reinstall required";
+"DiagTunDaemonMissing" = "tun-helper LaunchDaemon plist is missing, reinstall required";
 
 // MARK: - Diagnostics - Actions
 "DiagOpenNetworkSettings" = "Open Network Settings";
@@ -532,29 +580,6 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagProxyNotNeededOff" = "Proxy is disabled";
 "DiagProxyRequired" = "System proxy required (PAC/Global mode)";
 
-// MARK: - Diagnostics - Core Architecture
-"DiagCoreArch" = "Core Architecture";
-"DiagCoreArchCorrect" = "Architecture matches system (%@)";
-"DiagCoreArchMismatch" = "Architecture mismatch (file: %@, system: %@)";
-
-// MARK: - Diagnostics - Files
-"DiagV2rayUToolInstall" = "V2rayUTool Installation";
-"DiagSingBoxInstall" = "sing-box Installation";
-"DiagSingBoxNotExecutable" = "sing-box binary is not executable";
-"DiagSingBoxNotInstalled" = "sing-box binary is not installed";
-"DiagUpdateScript" = "Update Script";
-"DiagUpdateScriptMissing" = "update-xray.sh is missing, reinstall required";
-"DiagSudoersCheck" = "Sudoers Rules";
-"DiagSudoersFileMissing" = "Sudoers file is missing, reinstall required";
-"DiagSudoersNotEffective" = "Sudoers NOPASSWD rules are not effective, reinstall required";
-"DiagTunDaemon" = "TUN Daemon";
-"DiagTunDaemonMissing" = "tun-helper LaunchDaemon plist is missing, reinstall required";
-"DiagConfigFile" = "Configuration File";
-"DiagConfigFileExists" = "Config file exists (%d bytes)";
-"DiagConfigFileMissing" = "Configuration file is missing";
-"DiagConfigFileEmpty" = "Configuration file is empty";
-"DiagGeositeFile" = "GeoSite Database";
-"DiagGeositeMissing" = "GeoSite database file is not installed. Click 'Fix Now' to auto-download";
 
 // MARK: - Legacy Migration
 "ImportLegacyData" = "Import from v4";

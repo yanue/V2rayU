@@ -41,6 +41,51 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
+        // 用户数据目录可写
+        if !needRunInstall && !fileMgr.isWritableFile(atPath: AppHomePath) {
+            logger.info("app home dir \(AppHomePath) not writable")
+            installReason = "App home directory not writable"
+            needRunInstall = true
+        }
+
+        // 用户数据目录 owner 是当前用户
+        if !needRunInstall {
+            do {
+                let attrs = try fileMgr.attributesOfItem(atPath: AppHomePath)
+                let owner = attrs[.ownerAccountName] as? String ?? ""
+                if owner != NSUserName() {
+                    logger.info("app home dir owner=\(owner), expected=\(NSUserName())")
+                    installReason = "App home directory owner mismatch"
+                    needRunInstall = true
+                }
+            } catch {
+                logger.info("failed to get app home dir attributes: \(error)")
+                installReason = "App home directory attributes error"
+                needRunInstall = true
+            }
+        }
+
+        // 数据库文件可写（readonly 问题诊断）
+        if !needRunInstall && fileMgr.fileExists(atPath: databasePath) {
+            if !fileMgr.isWritableFile(atPath: databasePath) {
+                logger.info("database file \(databasePath) is readonly")
+                installReason = "Database file is readonly"
+                needRunInstall = true
+            }
+            // SQLite WAL/SHM 文件可写
+            if !needRunInstall {
+                for ext in ["-wal", "-shm"] {
+                    let walPath = databasePath + ext
+                    if fileMgr.fileExists(atPath: walPath) && !fileMgr.isWritableFile(atPath: walPath) {
+                        logger.info("database \(ext) file is readonly")
+                        installReason = "Database \(ext) file is readonly"
+                        needRunInstall = true
+                        break
+                    }
+                }
+            }
+        }
+
         // root daemon 日志目录
         if !needRunInstall && !fileMgr.fileExists(atPath: "/var/log/v2rayu") {
             logger.info("/var/log/v2rayu not exists")
@@ -69,6 +114,13 @@ actor AppInstaller: NSObject {
         if !needRunInstall && !fileMgr.isExecutableFile(atPath: singBoxFile) {
             logger.info("\(singBoxFile) not executable")
             installReason = "sing-box not executable"
+            needRunInstall = true
+        }
+
+        // sing-box 架构匹配
+        if !needRunInstall && !checkFileIsCurrentArch(file: singBoxFile) {
+            logger.info("\(singBoxFile) not current arch")
+            installReason = "sing-box arch mismatch"
             needRunInstall = true
         }
 
@@ -101,6 +153,24 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
+        // V2rayUTool setuid(+s) 权限
+        if !needRunInstall {
+            do {
+                let attrs = try fileMgr.attributesOfItem(atPath: v2rayUTool)
+                if let perms = attrs[.posixPermissions] as? Int {
+                    if (perms & 0o4000) == 0 {  // S_ISUID
+                        logger.info("V2rayUTool missing setuid(+s) permission")
+                        installReason = "V2rayUTool missing setuid"
+                        needRunInstall = true
+                    }
+                }
+            } catch {
+                logger.info("failed to check V2rayUTool permissions: \(error)")
+                installReason = "V2rayUTool permission check failed"
+                needRunInstall = true
+            }
+        }
+
         // V2rayUTool 版本
         if !needRunInstall {
             let toolVersion = shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
@@ -115,11 +185,16 @@ actor AppInstaller: NSObject {
             }
         }
 
-        // update-xray.sh 存在
+        // update-xray.sh 存在 + 可执行
         let updateScript = AppBinRoot + "/update-xray.sh"
         if !needRunInstall && !fileMgr.fileExists(atPath: updateScript) {
             logger.info("\(updateScript) not exists")
             installReason = "update-xray.sh missing"
+            needRunInstall = true
+        }
+        if !needRunInstall && !fileMgr.isExecutableFile(atPath: updateScript) {
+            logger.info("\(updateScript) not executable")
+            installReason = "update-xray.sh not executable"
             needRunInstall = true
         }
 

@@ -97,18 +97,15 @@ final class DiagnosticsViewModel: ObservableObject {
 
     private func title(for step: DiagnosticStep) -> String {
         switch step {
-        case .v2rayUToolInstall:  return String(localized: .DiagV2rayUToolInstall)
-        case .uToolPermission:   return String(localized: .DiagUToolPermission)
-        case .coreInstall:       return String(localized: .DiagCoreInstall)
-        case .coreArch:          return String(localized: .DiagCoreArch)
-        case .singBoxInstall:    return String(localized: .DiagSingBoxInstall)
+        case .appDataDir:        return String(localized: .DiagAppDataDir)
+        case .v2rayUTool:        return String(localized: .DiagV2rayUTool)
+        case .xrayCore:          return String(localized: .DiagXrayCore)
+        case .singBox:           return String(localized: .DiagSingBox)
         case .updateScript:      return String(localized: .DiagUpdateScript)
         case .sudoersCheck:      return String(localized: .DiagSudoersCheck)
         case .tunDaemon:         return String(localized: .DiagTunDaemon)
-        case .configFile:        return String(localized: .DiagConfigFile)
-        case .configValidity:    return String(localized: .DiagConfigValidity)
-        case .geoipFile:         return String(localized: .DiagGeoipFile)
-        case .geositeFile:       return String(localized: .DiagGeositeFile)
+        case .configCheck:       return String(localized: .DiagConfigCheck)
+        case .geoDataFiles:      return String(localized: .DiagGeoDataFiles)
         case .coreRunning:       return String(localized: .DiagCoreRunning)
         case .launchdProcess:    return String(localized: .DiagLaunchdProcess)
         case .systemProxy:       return String(localized: .DiagSystemProxy)
@@ -186,25 +183,21 @@ final class DiagnosticsViewModel: ObservableObject {
     /// Dispatch to appropriate checker
     private func runCheck(_ step: DiagnosticStep) async -> CheckResult {
         switch step {
-        case .v2rayUToolInstall:  return await checkV2rayUToolInstall()
-        case .uToolPermission:   return await checkUToolPermission()
-        case .coreInstall:       return await checkCoreInstall()
-        case .coreArch:          return await checkCoreArch()
-        case .singBoxInstall:    return await checkSingBoxInstall()
+        case .appDataDir:        return await checkAppDataDir()
+        case .v2rayUTool:        return await checkV2rayUTool()
+        case .xrayCore:          return await checkXrayCore()
+        case .singBox:           return await checkSingBox()
         case .updateScript:      return await checkUpdateScript()
         case .sudoersCheck:      return await checkSudoers()
         case .tunDaemon:         return await checkTunDaemon()
-        case .configFile:        return await checkConfigFile()
-        case .configValidity:    return await checkConfigValidity()
-        case .geoipFile:         return checkGeoFile(name: "geoip.dat", step: .geoipFile, missingKey: .DiagGeoipMissing)
-        case .geositeFile:       return checkGeoFile(name: "geosite.dat", step: .geositeFile, missingKey: .DiagGeositeMissing)
+        case .configCheck:       return await checkConfig()
+        case .geoDataFiles:      return await checkGeoDataFiles()
         case .coreRunning:       return await checkCoreRunning()
         case .launchdProcess:    return await checkLaunchdProcess()
         case .systemProxy:       return await checkSystemProxy()
         case .localPortConflict: return await checkLocalPortConflict()
         case .basicNetwork:      return await checkBasicNetwork()
         case .nodeConnectivity:  return await checkNodeConnectivity()
-//        case .proxyConnectivity: return await checkProxyConnectivity()
         case .pingLatency:       return await checkPingLatency()
         case .logAnalysis:       return await checkLogAnalysis()
         }
@@ -212,76 +205,261 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: ── File Checks ──
 
-    private func checkV2rayUToolInstall() async -> CheckResult {
-        let path = v2rayUTool
-        let exists = FileManager.default.fileExists(atPath: path)
-        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
+    /// ~/.V2rayU 目录: 存在 → 可写 → owner → .V2rayU.db 存在 → db可写
+    private func checkAppDataDir() async -> CheckResult {
+        let dirPath = AppHomePath
+        let dbPath = databasePath
+        let fm = FileManager.default
+        var details: [String] = []
 
-        if exec {
-            return .pass(.v2rayUToolInstall)
+        // ① 目录存在
+        var isDir: ObjCBool = false
+        guard fm.fileExists(atPath: dirPath, isDirectory: &isDir), isDir.boolValue else {
+            return .fail(.appDataDir, subtitle: String(localized: .DiagAppDataDirMissing),
+                         problem: String(localized: .DiagAppDataDirMissing), action: .fixInstall)
         }
-        let msg = exists ? String(localized: .DiagToolNoPermission) : String(localized: .DiagToolMissing)
-        return .fail(.v2rayUToolInstall, subtitle: msg, problem: msg, action: .fixTool)
+        details.append("✓ \(String(localized: .DiagSubDirExists))")
+
+        // ② 目录可写
+        guard fm.isWritableFile(atPath: dirPath) else {
+            details.append("✗ \(String(localized: .DiagSubDirNotWritable))")
+            return .fail(.appDataDir, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagAppDataDirNotWritable), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubDirWritable))")
+
+        // ③ 目录 owner 是当前用户
+        let ownerOk = await runInBackground {
+            do {
+                let attrs = try FileManager.default.attributesOfItem(atPath: dirPath)
+                let owner = attrs[.ownerAccountName] as? String ?? ""
+                return owner == NSUserName()
+            } catch {
+                return false
+            }
+        }
+        if !ownerOk {
+            details.append("✗ \(String(localized: .DiagSubDirOwnerWrong))")
+            return .fail(.appDataDir, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagAppDataDirOwnerWrong), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubDirOwnerOK))")
+
+        // ④ 数据库文件存在
+        guard fm.fileExists(atPath: dbPath) else {
+            // db 不存在不一定是错误（首次启动会自动创建），但标记为信息
+            details.append("⚠ \(String(localized: .DiagSubDbNotExists))")
+            return .pass(.appDataDir, details.joined(separator: "\n"))
+        }
+        details.append("✓ \(String(localized: .DiagSubDbExists))")
+
+        // ⑤ 数据库文件可写（readonly 问题诊断关键）
+        guard fm.isWritableFile(atPath: dbPath) else {
+            details.append("✗ \(String(localized: .DiagSubDbReadonly))")
+            return .fail(.appDataDir, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagDbReadonly), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubDbWritable))")
+
+        // ⑥ 数据库 WAL/SHM 文件可写（SQLite WAL 模式需要）
+        let walPath = dbPath + "-wal"
+        let shmPath = dbPath + "-shm"
+        for (path, name) in [(walPath, "WAL"), (shmPath, "SHM")] {
+            if fm.fileExists(atPath: path) && !fm.isWritableFile(atPath: path) {
+                details.append("✗ \(name) \(String(localized: .DiagSubDbReadonly))")
+                return .fail(.appDataDir, subtitle: details.joined(separator: "\n"),
+                             problem: String(localized: .DiagDbReadonly), action: .fixInstall)
+            }
+        }
+
+        return .pass(.appDataDir, details.joined(separator: "\n"))
     }
 
-    private func checkUToolPermission() async -> CheckResult {
+    /// V2rayUTool: 存在 → 可执行 → root:admin → setuid(+s) → 隔离标记 → 版本
+    private func checkV2rayUTool() async -> CheckResult {
         let path = v2rayUTool
+        var details: [String] = []
+
+        // ① 文件存在
         guard FileManager.default.fileExists(atPath: path) else {
-            return .fail(.uToolPermission,
-                         subtitle: String(localized: .DiagToolMissing),
+            return .fail(.v2rayUTool, subtitle: String(localized: .DiagToolMissing),
                          problem: String(localized: .DiagToolMissing), action: .fixTool)
         }
-        let ok = checkFileIsRootAdmin(file: path)
-        if ok { return .pass(.uToolPermission) }
-        return .fail(.uToolPermission,
-                     subtitle: String(localized: .DiagToolNoPermission),
-                     problem: String(localized: .DiagToolNoPermission), action: .fixTool)
-    }
+        details.append("✓ \(String(localized: .DiagSubFileExists))")
 
-    private func checkCoreInstall() async -> CheckResult {
-        let path = xrayCoreFile
-        let exists = FileManager.default.fileExists(atPath: path)
-        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
-
-        if exec {
-            let ver = getCoreVersion()
-            return .pass(.coreInstall, String(format: String(localized: .DiagPassed), ver))
+        // ② 可执行
+        guard FileManager.default.isExecutableFile(atPath: path) else {
+            details.append("✗ \(String(localized: .DiagSubNotExecutable))")
+            return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagToolNoPermission), action: .fixTool)
         }
-        let msg = exists ? String(localized: .DiagCoreNotExecutable) : String(localized: .DiagCoreNotInstalled)
-        return .fail(.coreInstall, subtitle: msg, problem: msg, action: .fixInstall)
+        details.append("✓ \(String(localized: .DiagSubExecutable))")
+
+        // ③ root:admin 权限
+        let isRootAdmin = checkFileIsRootAdmin(file: path)
+        if !isRootAdmin {
+            details.append("✗ \(String(localized: .DiagSubNotRootAdmin))")
+            return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagToolNoPermission), action: .fixTool)
+        }
+        details.append("✓ \(String(localized: .DiagSubRootAdmin))")
+
+        // ④ setuid(+s) 权限
+        let hasSetuid = await runInBackground {
+            do {
+                let attrs = try FileManager.default.attributesOfItem(atPath: path)
+                if let perms = attrs[.posixPermissions] as? Int {
+                    return (perms & 0o4000) != 0  // S_ISUID
+                }
+            } catch {}
+            return false
+        }
+        if !hasSetuid {
+            details.append("✗ \(String(localized: .DiagSubNoSetuid))")
+            return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagToolNoSetuid), action: .fixTool)
+        }
+        details.append("✓ \(String(localized: .DiagSubSetuid))")
+
+        // ⑤ 隔离标记
+        if isFileQuarantined(at: path) {
+            details.append("✗ \(String(localized: .DiagSubQuarantined))")
+            return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagFileQuarantined), action: .fixTool)
+        }
+        details.append("✓ \(String(localized: .DiagSubNoQuarantine))")
+
+        // ⑥ 版本检查
+        let toolVersion = await runInBackground {
+            shell(launchPath: "/bin/bash", arguments: ["-c", "\(v2rayUTool) version"])
+        }
+        if let version = toolVersion {
+            if version.contains("Usage:") || version.compare("4.0.0", options: .numeric) == .orderedAscending {
+                details.append("✗ \(String(localized: .DiagSubVersionTooOld))")
+                return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                             problem: String(localized: .DiagToolVersionOld), action: .fixTool)
+            }
+            details.append("✓ v\(version.trimmingCharacters(in: .whitespacesAndNewlines))")
+        } else {
+            details.append("✗ \(String(localized: .DiagSubVersionUnknown))")
+            return .fail(.v2rayUTool, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagToolVersionOld), action: .fixTool)
+        }
+
+        return .pass(.v2rayUTool, details.joined(separator: "\n"))
     }
 
-    private func checkCoreArch() async -> CheckResult {
+    /// Xray Core: 存在 → 可执行 → 架构匹配 → 版本号 → 隔离标记
+    private func checkXrayCore() async -> CheckResult {
         let path = xrayCoreFile
-        guard FileManager.default.fileExists(atPath: path),
-              FileManager.default.isExecutableFile(atPath: path) else {
-            return .fail(.coreArch, subtitle: String(localized: .DiagCoreNotInstalled),
+        var details: [String] = []
+
+        // ① 文件存在
+        guard FileManager.default.fileExists(atPath: path) else {
+            return .fail(.xrayCore, subtitle: String(localized: .DiagCoreNotInstalled),
                          problem: String(localized: .DiagCoreNotInstalled), action: .fixInstall)
         }
+        details.append("✓ \(String(localized: .DiagSubFileExists))")
+
+        // ② 可执行
+        guard FileManager.default.isExecutableFile(atPath: path) else {
+            details.append("✗ \(String(localized: .DiagSubNotExecutable))")
+            return .fail(.xrayCore, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagCoreNotExecutable), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubExecutable))")
+
+        // ③ 架构匹配
         let currentArch = getArch()
         let actualArch = await getFileArch(file: path)
-        let ok = actualArch == currentArch
-        if ok {
-            return .pass(.coreArch, String(format: String(localized: .DiagCoreArchCorrect), actualArch ?? "unknown"))
+        if actualArch != currentArch {
+            let msg = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
+            details.append("✗ \(msg)")
+            return .fail(.xrayCore, subtitle: details.joined(separator: "\n"),
+                         problem: msg, action: .fixInstall)
         }
-        let msg = String(format: String(localized: .DiagCoreArchMismatch), actualArch ?? "unknown", currentArch)
-        return .fail(.coreArch, subtitle: msg, problem: msg, action: .fixInstall)
+        details.append("✓ \(String(format: String(localized: .DiagCoreArchCorrect), currentArch))")
+
+        // ④ 版本号
+        let ver = getCoreVersion()
+        if !ver.isEmpty {
+            details.append("✓ v\(ver)")
+        }
+
+        // ⑤ 隔离标记
+        if isFileQuarantined(at: path) {
+            details.append("✗ \(String(localized: .DiagSubQuarantined))")
+            return .fail(.xrayCore, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagFileQuarantined), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubNoQuarantine))")
+
+        return .pass(.xrayCore, details.joined(separator: "\n"))
     }
 
-    private func checkSingBoxInstall() async -> CheckResult {
+    /// SingBox: 存在 → 可执行 → 架构匹配 → 隔离标记
+    private func checkSingBox() async -> CheckResult {
         let path = getCoreFile(mode: .SingBox)
-        let exists = FileManager.default.fileExists(atPath: path)
-        let exec   = exists && FileManager.default.isExecutableFile(atPath: path)
-        if exec { return .pass(.singBoxInstall) }
-        let msg = exists ? String(localized: .DiagSingBoxNotExecutable) : String(localized: .DiagSingBoxNotInstalled)
-        return .fail(.singBoxInstall, subtitle: msg, problem: msg, action: .fixInstall)
+        var details: [String] = []
+
+        // ① 文件存在
+        guard FileManager.default.fileExists(atPath: path) else {
+            return .fail(.singBox, subtitle: String(localized: .DiagSingBoxNotInstalled),
+                         problem: String(localized: .DiagSingBoxNotInstalled), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubFileExists))")
+
+        // ② 可执行
+        guard FileManager.default.isExecutableFile(atPath: path) else {
+            details.append("✗ \(String(localized: .DiagSubNotExecutable))")
+            return .fail(.singBox, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagSingBoxNotExecutable), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubExecutable))")
+
+        // ③ 架构匹配
+        let currentArch = getArch()
+        let actualArch = await getFileArch(file: path)
+        if actualArch != currentArch {
+            let msg = String(format: String(localized: .DiagSingBoxArchMismatch), actualArch ?? "unknown", currentArch)
+            details.append("✗ \(msg)")
+            return .fail(.singBox, subtitle: details.joined(separator: "\n"),
+                         problem: msg, action: .fixInstall)
+        }
+        details.append("✓ \(String(format: String(localized: .DiagCoreArchCorrect), currentArch))")
+
+        // ④ 隔离标记
+        if isFileQuarantined(at: path) {
+            details.append("✗ \(String(localized: .DiagSubQuarantined))")
+            return .fail(.singBox, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagFileQuarantined), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubNoQuarantine))")
+
+        return .pass(.singBox, details.joined(separator: "\n"))
     }
 
+    /// 更新脚本: 存在 → 可执行权限
     private func checkUpdateScript() async -> CheckResult {
         let path = AppBinRoot + "/update-xray.sh"
-        if FileManager.default.fileExists(atPath: path) { return .pass(.updateScript) }
-        let msg = String(localized: .DiagUpdateScriptMissing)
-        return .fail(.updateScript, subtitle: msg, problem: msg, action: .fixInstall)
+        var details: [String] = []
+
+        // ① 文件存在
+        guard FileManager.default.fileExists(atPath: path) else {
+            return .fail(.updateScript, subtitle: String(localized: .DiagUpdateScriptMissing),
+                         problem: String(localized: .DiagUpdateScriptMissing), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubFileExists))")
+
+        // ② 可执行
+        guard FileManager.default.isExecutableFile(atPath: path) else {
+            details.append("✗ \(String(localized: .DiagSubNotExecutable))")
+            return .fail(.updateScript, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagUpdateScriptNoPermission), action: .fixInstall)
+        }
+        details.append("✓ \(String(localized: .DiagSubExecutable))")
+
+        return .pass(.updateScript, details.joined(separator: "\n"))
     }
 
     private func checkSudoers() async -> CheckResult {
@@ -320,34 +498,68 @@ final class DiagnosticsViewModel: ObservableObject {
         return .fail(.tunDaemon, subtitle: msg, problem: msg, action: .fixInstall)
     }
 
-    private func checkConfigFile() async -> CheckResult {
+    /// 配置文件: 存在 → 非空 → JSON合法性
+    private func checkConfig() async -> CheckResult {
         let path = JsonConfigFilePath
+        var details: [String] = []
+
+        // ① 文件存在
         guard FileManager.default.fileExists(atPath: path) else {
-            return .fail(.configFile, subtitle: String(localized: .DiagConfigFileMissing),
+            return .fail(.configCheck, subtitle: String(localized: .DiagConfigFileMissing),
                          problem: String(localized: .DiagConfigFileMissing), action: .fixInstall)
         }
+        details.append("✓ \(String(localized: .DiagSubFileExists))")
+
+        // ② 非空
         let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int) ?? 0
-        if size > 0 {
-            return .pass(.configFile, String(format: String(localized: .DiagConfigFileExists), size))
+        if size == 0 {
+            details.append("✗ \(String(localized: .DiagConfigFileEmpty))")
+            return .fail(.configCheck, subtitle: details.joined(separator: "\n"),
+                         problem: String(localized: .DiagConfigFileEmpty), action: .fixInstall)
         }
-        return .fail(.configFile, subtitle: String(localized: .DiagConfigFileEmpty),
-                     problem: String(localized: .DiagConfigFileEmpty), action: .fixInstall)
+        details.append("✓ \(String(format: String(localized: .DiagConfigFileExists), size))")
+
+        // ③ JSON 合法性
+        let (valid, problems) = await ConfigValidator.validateConfig(filePath: path)
+        if !valid {
+            let joined = problems.joined(separator: "; ")
+            details.append("✗ \(String(localized: .DiagFailed))")
+            return .fail(.configCheck, subtitle: details.joined(separator: "\n"),
+                         problem: String(format: String(localized: .DiagConfigValidProblems), joined),
+                         action: .openConfig)
+        }
+        details.append("✓ \(String(localized: .DiagConfigValidOK))")
+
+        return .pass(.configCheck, details.joined(separator: "\n"))
     }
 
-    private func checkConfigValidity() async -> CheckResult {
-        let (valid, problems) = await ConfigValidator.validateConfig(filePath: JsonConfigFilePath)
-        if valid { return .pass(.configValidity, String(localized: .DiagConfigValidOK)) }
-        let joined = problems.joined(separator: "; ")
-        return .fail(.configValidity, subtitle: String(localized: .DiagFailed),
-                     problem: String(format: String(localized: .DiagConfigValidProblems), joined),
-                     action: .openConfig)
-    }
+    /// GeoData: geoip.dat + geosite.dat
+    private func checkGeoDataFiles() async -> CheckResult {
+        var details: [String] = []
+        var allOk = true
 
-    private func checkGeoFile(name: String, step: DiagnosticStep, missingKey: LanguageLabel) -> CheckResult {
-        let exists = FileManager.default.fileExists(atPath: xrayCorePath + "/\(name)")
-        if exists { return .pass(step) }
-        return .fail(step, subtitle: String(localized: missingKey),
-                     problem: String(localized: missingKey), action: .fixGeoip)
+        let geoipExists = FileManager.default.fileExists(atPath: xrayCorePath + "/geoip.dat")
+        if geoipExists {
+            details.append("✓ geoip.dat")
+        } else {
+            details.append("✗ geoip.dat \(String(localized: .DiagGeoipMissing))")
+            allOk = false
+        }
+
+        let geositeExists = FileManager.default.fileExists(atPath: xrayCorePath + "/geosite.dat")
+        if geositeExists {
+            details.append("✓ geosite.dat")
+        } else {
+            details.append("✗ geosite.dat \(String(localized: .DiagGeositeMissing))")
+            allOk = false
+        }
+
+        if allOk {
+            return .pass(.geoDataFiles, details.joined(separator: "\n"))
+        }
+        return .fail(.geoDataFiles, subtitle: details.joined(separator: "\n"),
+                     problem: details.filter { $0.hasPrefix("✗") }.joined(separator: "\n"),
+                     action: .fixGeoip)
     }
 
     // MARK: ── Status Checks ──

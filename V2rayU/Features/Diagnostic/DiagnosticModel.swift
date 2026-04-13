@@ -29,9 +29,8 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
     var steps: [DiagnosticStep] {
         switch self {
         case .files:
-            return [.v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch,
-                    .singBoxInstall, .updateScript, .sudoersCheck, .tunDaemon,
-                    .configFile, .configValidity, .geoipFile, .geositeFile]
+            return [.appDataDir, .v2rayUTool, .xrayCore, .singBox, .updateScript,
+                    .sudoersCheck, .tunDaemon, .configCheck, .geoDataFiles]
         case .status:
             return [.coreRunning, .launchdProcess, .systemProxy, .localPortConflict]
         case .network:
@@ -45,25 +44,26 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
 // MARK: - Step
 
 enum DiagnosticStep: String, CaseIterable {
-    case v2rayUToolInstall
-    case uToolPermission
-    case coreInstall
-    case coreArch
-    case singBoxInstall
+    // Files
+    case appDataDir
+    case v2rayUTool
+    case xrayCore
+    case singBox
     case updateScript
     case sudoersCheck
     case tunDaemon
-    case configFile
-    case configValidity
-    case geoipFile
-    case geositeFile
+    case configCheck
+    case geoDataFiles
+    // Status
     case coreRunning
     case launchdProcess
     case systemProxy
     case localPortConflict
+    // Network
     case basicNetwork
     case nodeConnectivity
     case pingLatency
+    // Logs
     case logAnalysis
 
     static var ordered: [DiagnosticStep] {
@@ -72,9 +72,8 @@ enum DiagnosticStep: String, CaseIterable {
 
     var category: DiagnosticCategory {
         switch self {
-        case .v2rayUToolInstall, .uToolPermission, .coreInstall, .coreArch,
-             .singBoxInstall, .updateScript, .sudoersCheck, .tunDaemon,
-             .configFile, .configValidity, .geoipFile, .geositeFile:
+        case .appDataDir, .v2rayUTool, .xrayCore, .singBox, .updateScript,
+             .sudoersCheck, .tunDaemon, .configCheck, .geoDataFiles:
             return .files
         case .coreRunning, .launchdProcess, .systemProxy, .localPortConflict:
             return .status

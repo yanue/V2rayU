@@ -456,30 +456,66 @@
 "DiagNetworkConnectivity" = "網路連線";
 "DiagSystemProxy" = "系統代理設定";
 "DiagFirewall" = "防火牆與安全軟體";
-"DiagCoreInstall" = "核心安裝與版本";
 "DiagCoreRunning" = "核心執行狀態";
 "DiagLaunchdProcess" = "Launchd 進程狀態";
 "DiagLaunchdNotLoaded" = "Launchd 代理未載入";
 "DiagLaunchdNotRunning" = "Launchd 代理已載入但進程未執行";
 "DiagLaunchdRunning" = "進程執行中 (PID: %@)";
 "DiagLaunchdReload" = "重新載入";
-"DiagUToolPermission" = "輔助工具權限";
-"DiagConfigValidity" = "設定檔有效性";
-"DiagDNSResolution" = "節點網域解析";
-"DiagPortConnectivity" = "遠端連接埠連線性";
 "DiagLocalPortConflict" = "本機連接埠衝突";
-"DiagGeoipFile" = "GeoIP 資料庫";
 "DiagPingLatency" = "延遲與可用性";
 "DiagLogAnalysis" = "日誌分析";
 "DiagVPNConflict" = "VPN 衝突檢測";
 "DiagBasicNetwork" = "基礎網路";
 "DiagProxyConnectivity" = "代理連線性";
 
+// MARK: - 診斷 - 合併後的檔案檢查項標題
+"DiagAppDataDir" = "資料目錄檢查";
+"DiagV2rayUTool" = "V2rayUTool 檢查";
+"DiagXrayCore" = "Xray Core 檢查";
+"DiagSingBox" = "sing-box 檢查";
+"DiagUpdateScript" = "更新腳本檢查";
+"DiagSudoersCheck" = "Sudoers 權限規則";
+"DiagTunDaemon" = "TUN 守護程序";
+"DiagConfigCheck" = "設定檔檢查";
+"DiagGeoDataFiles" = "GeoData 資料檔案";
+
 // MARK: - 診斷 - 狀態描述
 "DiagPending" = "等待檢查…";
 "DiagChecking" = "正在檢查…";
 "DiagPassed" = "檢查通過";
 "DiagFailed" = "檢查失敗";
+
+// MARK: - 診斷 - 子檢查描述
+"DiagSubFileExists" = "檔案存在";
+"DiagSubExecutable" = "可執行";
+"DiagSubNotExecutable" = "不可執行";
+"DiagSubRootAdmin" = "root:admin 權限正確";
+"DiagSubNotRootAdmin" = "非 root:admin 權限";
+"DiagSubSetuid" = "setuid(+s) 權限正確";
+"DiagSubNoSetuid" = "缺少 setuid(+s) 權限";
+"DiagSubNoQuarantine" = "無隔離標記";
+"DiagSubQuarantined" = "檔案被系統隔離";
+"DiagSubVersionTooOld" = "版本過舊";
+"DiagSubVersionUnknown" = "無法取得版本";
+"DiagToolVersionOld" = "V2rayUTool 版本過舊，需要重新安裝。";
+"DiagToolNoSetuid" = "V2rayUTool 缺少 setuid(+s) 權限，無法執行特權操作。請點擊「一鍵修復」。";
+"DiagFileQuarantined" = "檔案被 macOS 隔離（Quarantine），無法正常執行。請點擊「一鍵修復」去除隔離標記。";
+"DiagSingBoxArchMismatch" = "sing-box 架構不匹配（檔案: %@，系統: %@）";
+"DiagUpdateScriptNoPermission" = "update-xray.sh 無可執行權限，需要重新安裝";
+"DiagSubDirExists" = "目錄存在";
+"DiagSubDirWritable" = "目錄可寫";
+"DiagSubDirNotWritable" = "目錄不可寫";
+"DiagSubDirOwnerOK" = "目錄歸屬目前使用者";
+"DiagSubDirOwnerWrong" = "目錄歸屬非目前使用者";
+"DiagSubDbExists" = "資料庫檔案存在";
+"DiagSubDbNotExists" = "資料庫檔案不存在（首次啟動將自動建立）";
+"DiagSubDbWritable" = "資料庫可寫";
+"DiagSubDbReadonly" = "資料庫唯讀";
+"DiagAppDataDirMissing" = "資料目錄 ~/.V2rayU 不存在，需要重新安裝。";
+"DiagAppDataDirNotWritable" = "資料目錄 ~/.V2rayU 不可寫。可能是權限被修改，請點擊「一鍵修復」修復權限。";
+"DiagAppDataDirOwnerWrong" = "資料目錄 ~/.V2rayU 不屬於目前使用者，可能導致讀寫失敗。請點擊「一鍵修復」修復權限。";
+"DiagDbReadonly" = "資料庫檔案 .V2rayU.db 為唯讀狀態，無法儲存資料。可能原因：\n1. 目錄權限被修改（如被 root 佔用）\n2. 磁碟空間不足\n3. 檔案系統唯讀掛載\n\n請點擊「一鍵修復」修復權限。";
 
 // MARK: - 診斷 - 詳細問題描述
 "DiagNetUnavailable" = "電腦無法存取網際網路。請檢查：\n1. 路由器/寬頻是否正常\n2. Wi-Fi 是否已連線\n3. 網路線是否插好";
@@ -504,6 +540,7 @@
 "DiagPortConnectFailed" = "無法連線到遠端伺服器（%@:%d）。可能原因：\n1. 節點伺服器已下線\n2. 連接埠被封（443、8388 等常用連接埠容易被封）\n3. 目前網路限制海外連線\n\n請嘗試更換節點或連接埠。";
 "DiagPortOccupied" = "本機連接埠 %d 被「%@」佔用。請關閉該程式或在設定中修改連接埠。";
 "DiagGeoipMissing" = "GeoIP 資料庫檔案未安裝，無法使用分流規則（國內直連、國外代理）。請點擊「一鍵修復」自動下載。";
+"DiagGeositeMissing" = "缺失，點擊「一鍵修復」自動下載";
 "DiagLatencyHigh" = "延遲較高（%dms），可能影響上網體驗。建議更換延遲更低的節點。";
 "DiagLatencyFailed" = "無法連線到節點進行測速。節點可能不可用或網路被阻擋，請嘗試更換節點。";
 "DiagBasicNetworkFailed" = "無法存取網際網路（apple.com 不可達），請檢查網路連線。";
@@ -512,10 +549,21 @@
 "DiagBasicNetworkOK" = "網際網路可存取";
 "DiagConfigValidOK" = "設定檔 JSON 合法且包含必要欄位";
 "DiagConfigValidProblems" = "設定問題：%@";
+"DiagConfigFileExists" = "設定檔存在 (%d 位元組)";
+"DiagConfigFileMissing" = "設定檔缺失";
+"DiagConfigFileEmpty" = "設定檔為空";
 "DiagSystemProxyOK" = "系統代理已正確設定（連接埠 %d）";
 "DiagSystemProxyNotNeeded" = "目前模式不需要系統代理";
 "DiagReportCopied" = "報告已複製到剪貼簿，請貼到 GitHub Issue 中。";
 "DiagReportTooLong" = "報告超出 URL 長度限制，已複製到剪貼簿";
+"DiagCoreArchCorrect" = "架構與系統匹配 (%@)";
+"DiagCoreArchMismatch" = "架構不匹配（檔案: %@，系統: %@）";
+"DiagSingBoxNotExecutable" = "sing-box 二進位檔案不可執行";
+"DiagSingBoxNotInstalled" = "sing-box 二進位檔案未安裝";
+"DiagUpdateScriptMissing" = "update-xray.sh 缺失，需要重新安裝";
+"DiagSudoersFileMissing" = "Sudoers 檔案缺失，需要重新安裝";
+"DiagSudoersNotEffective" = "Sudoers NOPASSWD 規則未生效，需要重新安裝";
+"DiagTunDaemonMissing" = "tun-helper LaunchDaemon 配置缺失，需要重新安裝";
 
 // MARK: - 診斷 - 動作按鈕
 "DiagOpenNetworkSettings" = "開啟網路設定";
@@ -532,31 +580,6 @@
 "DiagProxyNotNeededOff" = "代理已關閉";
 "DiagProxyRequired" = "需要開啟系統代理（PAC/全域模式）";
 
-// MARK: - 診斷 - 核心架構
-"DiagCoreArch" = "核心架構檢查";
-"DiagCoreArchCorrect" = "架構與系統匹配 (%@)";
-"DiagCoreArchMismatch" = "架構不匹配（檔案: %@，系統: %@）";
-
-// MARK: - 診斷 - 基礎檔案
-"DiagV2rayUToolInstall" = "V2rayUTool 安裝狀態";
-"DiagSingBoxInstall" = "sing-box 安裝狀態";
-"DiagSingBoxNotExecutable" = "sing-box 二進位檔案不可執行";
-"DiagSingBoxNotInstalled" = "sing-box 二進位檔案未安裝";
-"DiagUpdateScript" = "更新腳本";
-"DiagUpdateScriptMissing" = "update-xray.sh 缺失，需要重新安裝";
-"DiagSudoersCheck" = "Sudoers 權限規則";
-"DiagSudoersFileMissing" = "Sudoers 檔案缺失，需要重新安裝";
-"DiagSudoersNotEffective" = "Sudoers NOPASSWD 規則未生效，需要重新安裝";
-"DiagTunDaemon" = "TUN 守護程序";
-"DiagTunDaemonMissing" = "tun-helper LaunchDaemon 配置缺失，需要重新安裝";
-"DiagConfigFile" = "設定檔";
-"DiagConfigFileExists" = "設定檔存在 (%d 位元組)";
-"DiagConfigFileMissing" = "設定檔缺失";
-"DiagConfigFileEmpty" = "設定檔為空";
-
-// MARK: - 診斷 - Geo 檔案
-"DiagGeositeFile" = "GeoSite 資料庫";
-"DiagGeositeMissing" = "GeoSite 資料庫檔案未安裝。點擊「一鍵修復」自動下載。";
 
 // MARK: - 舊版資料遷移
 "ImportLegacyData" = "匯入 v4 資料";

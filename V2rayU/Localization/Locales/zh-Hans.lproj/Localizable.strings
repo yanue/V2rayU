@@ -457,30 +457,66 @@
 "DiagNetworkConnectivity" = "网络连接";
 "DiagSystemProxy" = "系统代理设置";
 "DiagFirewall" = "防火墙与安全软件";
-"DiagCoreInstall" = "核心安装与版本";
 "DiagCoreRunning" = "核心运行状态";
 "DiagLaunchdProcess" = "Launchd 进程状态";
 "DiagLaunchdNotLoaded" = "Launchd 代理未加载";
 "DiagLaunchdNotRunning" = "Launchd 代理已加载但进程未运行";
 "DiagLaunchdRunning" = "进程运行中 (PID: %@)";
 "DiagLaunchdReload" = "重新加载";
-"DiagUToolPermission" = "辅助工具权限";
-"DiagConfigValidity" = "配置文件有效性";
-"DiagDNSResolution" = "节点域名解析";
-"DiagPortConnectivity" = "远端端口连通性";
 "DiagLocalPortConflict" = "本地端口冲突";
-"DiagGeoipFile" = "GeoIP 数据库";
 "DiagPingLatency" = "延迟与可用性";
 "DiagLogAnalysis" = "日志分析";
 "DiagVPNConflict" = "VPN 冲突检测";
 "DiagBasicNetwork" = "基础网络";
 "DiagProxyConnectivity" = "代理连通性";
 
+// MARK: - 诊断 - 合并后的文件检查项标题
+"DiagAppDataDir" = "数据目录检查";
+"DiagV2rayUTool" = "V2rayUTool 检查";
+"DiagXrayCore" = "Xray Core 检查";
+"DiagSingBox" = "sing-box 检查";
+"DiagUpdateScript" = "更新脚本检查";
+"DiagSudoersCheck" = "Sudoers 权限规则";
+"DiagTunDaemon" = "TUN 守护进程";
+"DiagConfigCheck" = "配置文件检查";
+"DiagGeoDataFiles" = "GeoData 数据文件";
+
 // MARK: - 诊断 - 状态描述
 "DiagPending" = "等待检查…";
 "DiagChecking" = "正在检查…";
 "DiagPassed" = "检查通过";
 "DiagFailed" = "检查失败";
+
+// MARK: - 诊断 - 子检查描述
+"DiagSubFileExists" = "文件存在";
+"DiagSubExecutable" = "可执行";
+"DiagSubNotExecutable" = "不可执行";
+"DiagSubRootAdmin" = "root:admin 权限正确";
+"DiagSubNotRootAdmin" = "非 root:admin 权限";
+"DiagSubSetuid" = "setuid(+s) 权限正确";
+"DiagSubNoSetuid" = "缺少 setuid(+s) 权限";
+"DiagSubNoQuarantine" = "无隔离标记";
+"DiagSubQuarantined" = "文件被系统隔离";
+"DiagSubVersionTooOld" = "版本过旧";
+"DiagSubVersionUnknown" = "无法获取版本";
+"DiagToolVersionOld" = "V2rayUTool 版本过旧，需要重新安装。";
+"DiagToolNoSetuid" = "V2rayUTool 缺少 setuid(+s) 权限，无法执行特权操作。请点击「一键修复」。";
+"DiagFileQuarantined" = "文件被 macOS 隔离（Quarantine），无法正常执行。请点击「一键修复」去除隔离标记。";
+"DiagSingBoxArchMismatch" = "sing-box 架构不匹配（文件: %@，系统: %@）";
+"DiagUpdateScriptNoPermission" = "update-xray.sh 无可执行权限，需要重新安装";
+"DiagSubDirExists" = "目录存在";
+"DiagSubDirWritable" = "目录可写";
+"DiagSubDirNotWritable" = "目录不可写";
+"DiagSubDirOwnerOK" = "目录归属当前用户";
+"DiagSubDirOwnerWrong" = "目录归属非当前用户";
+"DiagSubDbExists" = "数据库文件存在";
+"DiagSubDbNotExists" = "数据库文件不存在（首次启动将自动创建）";
+"DiagSubDbWritable" = "数据库可写";
+"DiagSubDbReadonly" = "数据库只读";
+"DiagAppDataDirMissing" = "数据目录 ~/.V2rayU 不存在，需要重新安装。";
+"DiagAppDataDirNotWritable" = "数据目录 ~/.V2rayU 不可写。可能是权限被修改，请点击「一键修复」修复权限。";
+"DiagAppDataDirOwnerWrong" = "数据目录 ~/.V2rayU 不属于当前用户，可能导致读写失败。请点击「一键修复」修复权限。";
+"DiagDbReadonly" = "数据库文件 .V2rayU.db 为只读状态，无法保存数据。可能原因：\n1. 目录权限被修改（如被 root 占用）\n2. 磁盘空间不足\n3. 文件系统只读挂载\n\n请点击「一键修复」修复权限。";
 
 // MARK: - 诊断 - 详细问题描述
 "DiagNetUnavailable" = "电脑无法访问互联网。请检查：\n1. 路由器/宽带是否正常\n2. Wi-Fi 是否已连接\n3. 网线是否插好";
@@ -505,6 +541,7 @@
 "DiagPortConnectFailed" = "无法连接到远程服务器（%@:%d）。可能原因：\n1. 节点服务器已下线\n2. 端口被封（443、8388 等常用端口容易被封）\n3. 当前网络限制海外连接\n\n请尝试更换节点或端口。";
 "DiagPortOccupied" = "本地端口 %d 被「%@」占用。请关闭该程序或在设置中修改端口。";
 "DiagGeoipMissing" = "GeoIP 数据库文件未安装，无法使用分流规则（国内直连、国外代理）。请点击「一键修复」自动下载。";
+"DiagGeositeMissing" = "缺失，点击「一键修复」自动下载";
 "DiagLatencyHigh" = "延迟较高（%dms），可能影响上网体验。建议更换延迟更低的节点。";
 "DiagLatencyFailed" = "无法连接到节点进行测速。节点可能不可用或网络被阻断，请尝试更换节点。";
 "DiagBasicNetworkFailed" = "无法访问互联网（apple.com 不可达），请检查网络连接。";
@@ -513,10 +550,21 @@
 "DiagBasicNetworkOK" = "互联网可访问";
 "DiagConfigValidOK" = "配置文件 JSON 合法且包含必要字段";
 "DiagConfigValidProblems" = "配置问题：%@";
+"DiagConfigFileExists" = "配置文件存在 (%d 字节)";
+"DiagConfigFileMissing" = "配置文件缺失";
+"DiagConfigFileEmpty" = "配置文件为空";
 "DiagSystemProxyOK" = "系统代理已正确配置（端口 %d）";
 "DiagSystemProxyNotNeeded" = "当前模式不需要系统代理";
 "DiagReportCopied" = "报告已复制到剪贴板，请粘贴到 GitHub Issue 中。";
 "DiagReportTooLong" = "报告超出 URL 长度限制，已复制到剪贴板";
+"DiagCoreArchCorrect" = "架构与系统匹配 (%@)";
+"DiagCoreArchMismatch" = "架构不匹配（文件: %@，系统: %@）";
+"DiagSingBoxNotExecutable" = "sing-box 二进制文件不可执行";
+"DiagSingBoxNotInstalled" = "sing-box 二进制文件未安装";
+"DiagUpdateScriptMissing" = "update-xray.sh 缺失，需要重新安装";
+"DiagSudoersFileMissing" = "Sudoers 文件缺失，需要重新安装";
+"DiagSudoersNotEffective" = "Sudoers NOPASSWD 规则未生效，需要重新安装";
+"DiagTunDaemonMissing" = "tun-helper LaunchDaemon 配置缺失，需要重新安装";
 
 // MARK: - 诊断 - 操作按钮
 "DiagOpenNetworkSettings" = "打开网络设置";
@@ -533,31 +581,6 @@
 "DiagProxyNotNeededOff" = "代理已关闭";
 "DiagProxyRequired" = "需要开启系统代理（PAC/全局模式）";
 
-// MARK: - 诊断 - 核心架构
-"DiagCoreArch" = "核心架构检查";
-"DiagCoreArchCorrect" = "架构与系统匹配 (%@)";
-"DiagCoreArchMismatch" = "架构不匹配（文件: %@，系统: %@）";
-
-// MARK: - 诊断 - 基础文件
-"DiagV2rayUToolInstall" = "V2rayUTool 安装状态";
-"DiagSingBoxInstall" = "sing-box 安装状态";
-"DiagSingBoxNotExecutable" = "sing-box 二进制文件不可执行";
-"DiagSingBoxNotInstalled" = "sing-box 二进制文件未安装";
-"DiagUpdateScript" = "更新脚本";
-"DiagUpdateScriptMissing" = "update-xray.sh 缺失，需要重新安装";
-"DiagSudoersCheck" = "Sudoers 权限规则";
-"DiagSudoersFileMissing" = "Sudoers 文件缺失，需要重新安装";
-"DiagSudoersNotEffective" = "Sudoers NOPASSWD 规则未生效，需要重新安装";
-"DiagTunDaemon" = "TUN 守护进程";
-"DiagTunDaemonMissing" = "tun-helper LaunchDaemon 配置缺失，需要重新安装";
-"DiagConfigFile" = "配置文件";
-"DiagConfigFileExists" = "配置文件存在 (%d 字节)";
-"DiagConfigFileMissing" = "配置文件缺失";
-"DiagConfigFileEmpty" = "配置文件为空";
-
-// MARK: - 诊断 - Geo 文件
-"DiagGeositeFile" = "GeoSite 数据库";
-"DiagGeositeMissing" = "GeoSite 数据库文件未安装。点击「一键修复」自动下载。";
 
 // MARK: - 旧版数据迁移
 "ImportLegacyData" = "导入 v4 数据";

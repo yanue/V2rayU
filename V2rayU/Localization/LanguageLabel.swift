@@ -445,20 +445,25 @@ enum LanguageLabel: String, CaseIterable {
     case DiagNetworkConnectivity
     case DiagSystemProxy
     case DiagFirewall
-    case DiagCoreInstall
     case DiagCoreRunning
     case DiagLaunchdProcess
-    case DiagUToolPermission
-    case DiagConfigValidity
-    case DiagDNSResolution
-    case DiagPortConnectivity
     case DiagLocalPortConflict
-    case DiagGeoipFile
     case DiagPingLatency
     case DiagLogAnalysis
     case DiagVPNConflict
     case DiagBasicNetwork
     case DiagProxyConnectivity
+
+    // MARK: - Diagnostics - Merged File Check Titles
+    case DiagAppDataDir
+    case DiagV2rayUTool
+    case DiagXrayCore
+    case DiagSingBox
+    case DiagUpdateScript
+    case DiagSudoersCheck
+    case DiagTunDaemon
+    case DiagConfigCheck
+    case DiagGeoDataFiles
 
     // MARK: - Diagnostics - Status
     case DiagPending
@@ -522,28 +527,53 @@ enum LanguageLabel: String, CaseIterable {
     case DiagProxyRequired
 
     // MARK: - Diagnostics - Core Architecture
-    case DiagCoreArch
     case DiagCoreArchCorrect
     case DiagCoreArchMismatch
 
-    // MARK: - Diagnostics - Files
-    case DiagV2rayUToolInstall
-    case DiagSingBoxInstall
+    // MARK: - Diagnostics - Files (merged items)
     case DiagSingBoxNotExecutable
     case DiagSingBoxNotInstalled
-    case DiagUpdateScript
+    case DiagSingBoxArchMismatch
     case DiagUpdateScriptMissing
-    case DiagSudoersCheck
+    case DiagUpdateScriptNoPermission
     case DiagSudoersFileMissing
     case DiagSudoersNotEffective
-    case DiagTunDaemon
     case DiagTunDaemonMissing
-    case DiagConfigFile
     case DiagConfigFileExists
     case DiagConfigFileMissing
     case DiagConfigFileEmpty
-    case DiagGeositeFile
     case DiagGeositeMissing
+
+    // MARK: - Diagnostics - Sub-check labels
+    case DiagSubFileExists
+    case DiagSubExecutable
+    case DiagSubNotExecutable
+    case DiagSubRootAdmin
+    case DiagSubNotRootAdmin
+    case DiagSubSetuid
+    case DiagSubNoSetuid
+    case DiagSubNoQuarantine
+    case DiagSubQuarantined
+    case DiagSubVersionTooOld
+    case DiagSubVersionUnknown
+    case DiagToolVersionOld
+    case DiagToolNoSetuid
+    case DiagFileQuarantined
+    case DiagSubDirExists
+    case DiagSubDirWritable
+    case DiagSubDirNotWritable
+    case DiagSubDirOwnerOK
+    case DiagSubDirOwnerWrong
+    case DiagSubDbExists
+    case DiagSubDbNotExists
+    case DiagSubDbWritable
+    case DiagSubDbReadonly
+
+    // MARK: - Diagnostics - AppDataDir Problems
+    case DiagAppDataDirMissing
+    case DiagAppDataDirNotWritable
+    case DiagAppDataDirOwnerWrong
+    case DiagDbReadonly
 
     // MARK: - Legacy Migration
     case ImportLegacyData
