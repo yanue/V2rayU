@@ -275,7 +275,7 @@
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
 		66B1B55E2D297B590032DD09 /* appdmg.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = appdmg.sh; sourceTree = "<group>"; };
-		66B1B5642D297B590032DD09 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
+		66B1B5642D297B590032DD09 /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		66B1B5652D297B590032DD09 /* bg.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg.sketch; sourceTree = "<group>"; };
 		66B1B5662D297B590032DD09 /* icns.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icns.sketch; sourceTree = "<group>"; };
 		66B1B5672D297B590032DD09 /* icon.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icon.sketch; sourceTree = "<group>"; };
@@ -746,7 +746,7 @@
 				667028E32F0D4678008F27D8 /* pac */,
 				66B1B55D2D297B590032DD09 /* appdmg.json */,
 				66B1B55E2D297B590032DD09 /* appdmg.sh */,
-				66B1B5642D297B590032DD09 /* release.sh */,
+				66B1B5642D297B590032DD09 /* build.sh */,
 				66B1B5682D297B590032DD09 /* sketch */,
 				66B1B56F2D297B590032DD09 /* V2rayU.icns */,
 				66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */,

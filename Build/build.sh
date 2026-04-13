@@ -17,7 +17,7 @@ function build() {
     sleep 3
 
     echo "Cleaning up old archive & app..."
-    rm -rf ${V2rayU_ARCHIVE} ${V2rayU_RELEASE}
+    rm -rf ${V2rayU_ARCHIVE} ${V2rayU_RELEASE} ${V2rayU_64_dmg} ${V2rayU_arm64_dmg}
     if [ $? -ne 0 ]; then
         echo "Error: Failed to clean up old archive & app"
         exit 1
