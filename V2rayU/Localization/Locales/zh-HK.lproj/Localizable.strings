@@ -470,15 +470,15 @@
 "DiagProxyConnectivity" = "代理連線性";
 
 // MARK: - 診斷 - 合併後的檔案檢查項標題
-"DiagAppDataDir" = "資料目錄檢查";
-"DiagV2rayUTool" = "V2rayUTool 檢查";
-"DiagXrayCore" = "Xray Core 檢查";
-"DiagSingBox" = "sing-box 檢查";
-"DiagUpdateScript" = "更新腳本檢查";
-"DiagSudoersCheck" = "Sudoers 權限規則";
-"DiagTunDaemon" = "TUN 守護程序";
-"DiagConfigCheck" = "設定檔檢查";
-"DiagGeoDataFiles" = "GeoData 資料檔案";
+"DiagAppDataDir" = "~/.V2rayU 目錄檢查";
+"DiagV2rayUTool" = "V2rayUTool 文件檢查";
+"DiagXrayCore" = "xray-core 核心檢查";
+"DiagSingBox" = "sing-box 核心檢查";
+"DiagUpdateScript" = "update-xray.sh 腳本檢查";
+"DiagSudoersCheck" = "v2rayu-sudoer 權限規則";
+"DiagTunDaemon" = "tun-helper.plist 守護程序";
+"DiagConfigCheck" = "~/.V2rayU/config.json 檢查";
+"DiagGeoDataFiles" = "geoip.dat & geosite.dat 資料檔案";
 
 // MARK: - 診斷 - 狀態描述
 "DiagPending" = "等待檢查…";

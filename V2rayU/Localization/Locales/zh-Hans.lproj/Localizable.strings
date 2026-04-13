@@ -471,15 +471,15 @@
 "DiagProxyConnectivity" = "代理连通性";
 
 // MARK: - 诊断 - 合并后的文件检查项标题
-"DiagAppDataDir" = "数据目录检查";
-"DiagV2rayUTool" = "V2rayUTool 检查";
-"DiagXrayCore" = "Xray Core 检查";
-"DiagSingBox" = "sing-box 检查";
-"DiagUpdateScript" = "更新脚本检查";
-"DiagSudoersCheck" = "Sudoers 权限规则";
-"DiagTunDaemon" = "TUN 守护进程";
-"DiagConfigCheck" = "配置文件检查";
-"DiagGeoDataFiles" = "GeoData 数据文件";
+"DiagAppDataDir" = "~/.V2rayU 目录检查";
+"DiagV2rayUTool" = "V2rayUTool 文件检查";
+"DiagXrayCore" = "xray-core 内核检查";
+"DiagSingBox" = "sing-box 内核检查";
+"DiagUpdateScript" = "update-xray.sh 脚本检查";
+"DiagSudoersCheck" = "v2rayu-sudoer 权限规则";
+"DiagTunDaemon" = "tun-helper.plist 守护进程";
+"DiagConfigCheck" = "~/.V2rayU/config.json 检查";
+"DiagGeoDataFiles" = "geoip.dat & geosite.dat 数据文件";
 
 // MARK: - 诊断 - 状态描述
 "DiagPending" = "等待检查…";

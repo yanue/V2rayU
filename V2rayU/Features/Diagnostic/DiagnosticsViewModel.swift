@@ -1001,7 +1001,12 @@ final class DiagnosticsViewModel: ObservableObject {
         // ── 2. Diagnostic Results ──
         report += "## Diagnostic Results (\(passedCount)/\(totalCount) passed)\n"
         for item in items {
-            report += "\(item.ok ? "✅" : "❌") \(item.title)\n"
+            if !item.ok && item.category == .files {
+                let detail = item.subtitle.split(separator: "\n").joined(separator: " | ")
+                report += "❌ \(item.title): \(detail)\n"
+            } else {
+                report += "\(item.ok ? "✅" : "❌") \(item.title)\n"
+            }
         }
         report += "\n"
 

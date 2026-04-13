@@ -470,15 +470,15 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagProxyConnectivity" = "Proxy Connectivity";
 
 // MARK: - Diagnostics - Merged File Check Titles
-"DiagAppDataDir" = "Data Directory Check";
-"DiagV2rayUTool" = "V2rayUTool Check";
-"DiagXrayCore" = "Xray Core Check";
-"DiagSingBox" = "sing-box Check";
-"DiagUpdateScript" = "Update Script Check";
-"DiagSudoersCheck" = "Sudoers Rules";
-"DiagTunDaemon" = "TUN Daemon";
-"DiagConfigCheck" = "Configuration Check";
-"DiagGeoDataFiles" = "GeoData Files";
+"DiagAppDataDir" = "~/.V2rayU Directory Check";
+"DiagV2rayUTool" = "V2rayUTool Binary Check";
+"DiagXrayCore" = "xray-core Binary Check";
+"DiagSingBox" = "sing-box Binary Check";
+"DiagUpdateScript" = "update-xray.sh Script Check";
+"DiagSudoersCheck" = "v2rayu-sudoer Rules";
+"DiagTunDaemon" = "tun-helper.plist Daemon";
+"DiagConfigCheck" = "~/.V2rayU/config.json Check";
+"DiagGeoDataFiles" = "geoip.dat & geosite.dat Files";
 
 // MARK: - Diagnostics - Status
 "DiagPending" = "Pending...";
