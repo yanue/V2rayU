@@ -21,8 +21,6 @@ struct AboutView: View {
         ("~/.V2rayU/", "config, logs, database"),
         // 系统二进制 (root:wheel)
         ("/usr/local/v2rayu/", "xray-core, sing-box, V2rayUTool"),
-        // root daemon 日志
-        ("/var/log/v2rayu/", "tun daemon log"),
         // LaunchAgent (用户进程)
         ("~/Library/LaunchAgents/yanue.v2rayu.sing-box.plist", "sing-box agent"),
         ("~/Library/LaunchAgents/yanue.v2rayu.xray-core.plist", "xray-core agent"),

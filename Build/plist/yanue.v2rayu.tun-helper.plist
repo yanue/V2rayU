@@ -16,8 +16,8 @@
 	<key>KeepAlive</key>
 	<false/>
 	<key>StandardOutPath</key>
-	<string>__APP_LOG_DIR__/run-tun.log</string>
+	<string>__APP_HOME_DIR__/run-tun.log</string>
 	<key>StandardErrorPath</key>
-	<string>__APP_LOG_DIR__/run-tun.log</string>
+	<string>__APP_HOME_DIR__/run-tun.log</string>
 </dict>
 </plist>

@@ -86,12 +86,6 @@ actor AppInstaller: NSObject {
             }
         }
 
-        // root daemon 日志目录
-        if !needRunInstall && !fileMgr.fileExists(atPath: "/var/log/v2rayu") {
-            logger.info("/var/log/v2rayu not exists")
-            installReason = "Log directory missing"
-            needRunInstall = true
-        }
 
         // ====== 二进制检查 ======
 

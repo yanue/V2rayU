@@ -61,14 +61,11 @@ fi
 APP_HOME_DIR="/Users/$USERNAME/.V2rayU"
 # 系统二进制目录：核心、工具（root 所有，用户只读+执行）
 APP_BIN_ROOT="/usr/local/v2rayu"
-# root daemon 日志目录
-APP_LOG_DIR="/var/log/v2rayu"
 
 # ====== 创建目录 ======
 # install.sh 以 root 运行(后续会统一设置 owner 和 权限)
 mkdir -p "$APP_HOME_DIR"
 mkdir -p "$APP_BIN_ROOT/bin"
-mkdir -p "$APP_LOG_DIR"
 
 # ====== 复制二进制到系统目录 ======
 # V2rayUTool
@@ -87,7 +84,6 @@ sudo cp -rf ./bin/ "$APP_BIN_ROOT/bin/"
 # ====== 清理旧版残留（从 ~/.V2rayU 迁移到 /usr/local/v2rayu）======
 rm -rf "$APP_HOME_DIR/V2rayUTool"
 rm -rf "$APP_HOME_DIR/bin/"
-rm -f "$APP_HOME_DIR/run-tun-helper.log"
 
 ARCH=$(uname -m)
 if [ "$ARCH" = "arm64" ]; then
@@ -97,7 +93,7 @@ else
 fi
 
 # 安装 tun-helper plist (LaunchDaemon - root权限)
-sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g; s#__APP_LOG_DIR__#$APP_LOG_DIR#g" \
+sed "s#__SINGBOX_BIN__#$SINGBOX_BIN#g; s#__APP_HOME_DIR__#$APP_HOME_DIR#g" \
     ./plist/yanue.v2rayu.tun-helper.plist | sudo tee /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist > /dev/null
 
 sudo chown root:wheel /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
@@ -125,11 +121,7 @@ sudo chmod -R 755 "$APP_BIN_ROOT"
 sudo chown root:admin "$APP_BIN_ROOT/V2rayUTool"
 sudo chmod a+rxs "$APP_BIN_ROOT/V2rayUTool"
 
-# 4. root daemon 日志（tun-helper LaunchDaemon 以 root 运行）
-sudo chown root:wheel "$APP_LOG_DIR/" # root 所有
-sudo chmod 644 "$APP_LOG_DIR"   # root 可写, 用户可读
-
-# 5. 去除隔离标记
+# 4. 去除隔离标记
 sudo /usr/bin/xattr -rd com.apple.quarantine "$APP_BIN_ROOT/"
 sudo /usr/bin/xattr -rd com.apple.quarantine "$APP_HOME_DIR/"
 
@@ -151,8 +143,6 @@ __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
 __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
 # xray-core 更新脚本 (CoreViewModel.swift: onDownloadSuccess)
 __USERNAME__ ALL=(root) NOPASSWD: __APP_BIN_ROOT__/update-xray.sh *
-# 清空 tun.log (root 所有)
-__USERNAME__ ALL=(root) NOPASSWD: /bin/cp /dev/null __APP_LOG_DIR__/tun.log
 # end by V2rayU
 SUDOERS_EOF
 
@@ -161,7 +151,6 @@ sed -i '' \
     -e "s|__USERNAME__|${USERNAME}|g" \
     -e "s|__APP_BIN_ROOT__|${APP_BIN_ROOT}|g" \
     -e "s|__APP_HOME_DIR__|${APP_HOME_DIR}|g" \
-    -e "s|__APP_LOG_DIR__|${APP_LOG_DIR}|g" \
     "$TMPFILE"
 
 chmod 440 "$TMPFILE"

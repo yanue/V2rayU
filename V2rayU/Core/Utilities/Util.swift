@@ -23,7 +23,9 @@ func getCoreShortVersion() -> String {
     // Xray 1.8.20 (Xray, Penetrates Everything.) 8deb953 (go1.22.5 darwin/arm64)
     // 正则提取类似 1.8.20 ,1.8 等
     let pattern = #"(\d+\.\d+(\.\d+)?)"#
-    let regex = try! NSRegularExpression(pattern: pattern, options: [])
+    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+        return version
+    }
     let nsString = version as NSString
     let results = regex.matches(in: version, options: [], range: NSRange(location: 0, length: nsString.length))
     if let match = results.first {
@@ -65,10 +67,10 @@ func checkFileIsRootAdmin(file: String) -> Bool {
         var groupUser = ""
         for attr in fileAttrs {
             if attr.key.rawValue == "NSFileOwnerAccountName" {
-                ownerUser = attr.value as! String
+                ownerUser = attr.value as? String ?? ""
             }
             if attr.key.rawValue == "NSFileGroupOwnerAccountName" {
-                groupUser = attr.value as! String
+                groupUser = attr.value as? String ?? ""
             }
         }
         logger.info("checkFileIsRootAdmin: file=\(file),owner=\(ownerUser),group=\(groupUser)")
@@ -264,8 +266,13 @@ func getPacAddress() -> String {
 
 func OpenLogs(logFilePath: String) {
     if !FileManager.default.fileExists(atPath: logFilePath) {
-        let txt = ""
-        try! txt.write(to: URL(fileURLWithPath: logFilePath), atomically: true, encoding: String.Encoding.utf8)
+        do {
+            try "".write(to: URL(fileURLWithPath: logFilePath), atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Cannot create log file: \(logFilePath), error: \(error.localizedDescription)")
+            noticeTip(title: "Cannot open log", informativeText: "Log file does not exist: \(logFilePath)")
+            return
+        }
     }
 
     let task = Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [logFilePath])

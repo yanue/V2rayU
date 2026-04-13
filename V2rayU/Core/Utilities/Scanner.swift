@@ -39,13 +39,15 @@ class Scanner {
             return ""
         }
 
-        let detector: CIDetector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])!
+        guard let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]) else {
+            return ""
+        }
         let ciImage: CIImage = CIImage(cgImage: qrcodeImg)
         let features = detector.features(in: ciImage)
 
         var qrCodeLink = ""
 
-        for feature in features as! [CIQRCodeFeature] {
+        for feature in features.compactMap({ $0 as? CIQRCodeFeature }) {
             qrCodeLink += feature.messageString ?? ""
         }
 

@@ -127,17 +127,12 @@ struct LogRotation {
     }
     
     static func clearAllLogs() {
-        // 用户可写的日志文件
-        let userPaths = [coreLogFilePath, recentErrorLogFilePath]
+        // 所有日志文件现在都在用户目录下，直接清空
+        let userPaths = [coreLogFilePath, recentErrorLogFilePath, tunLogFilePath]
         for path in userPaths {
             if FileManager.default.fileExists(atPath: path) {
                 try? "".write(toFile: path, atomically: true, encoding: .utf8)
             }
-        }
-        
-        // tun.log 由 root daemon 拥有，需要 sudo 清空
-        if FileManager.default.fileExists(atPath: tunLogFilePath) {
-            _ = try? runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/cp", "/dev/null", tunLogFilePath])
         }
 
         for i in 1...maxBackupCount {

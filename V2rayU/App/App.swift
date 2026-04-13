@@ -28,8 +28,9 @@ let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
 let langStr = Locale.current.identifier
 let isMainland = langStr == "zh-CN" || langStr == "zh" || langStr == "zh-Hans" || langStr == "zh-Hant"
 let coreLogFilePath = AppHomePath + "/core.log"
-// tun.log 由 LaunchDaemon (root) 写入，放到 /var/log 下避免权限冲突
-let tunLogFilePath = "/var/log/v2rayu/tun.log"
+// tun.log 也放在用户目录下，root daemon 以 root 运行同样可以写入用户目录
+// 避免 /var/log 下的权限问题导致 App 无法读取日志
+let tunLogFilePath = AppHomePath + "/tun.log"
 let xrayCorePath = AppBinRoot + "/bin/xray-core"
 #if arch(arm64)
 let xrayCoreFile = xrayCorePath + "/xray-arm64"
