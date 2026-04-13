@@ -81,7 +81,7 @@ struct DiagnosticsView: View {
                 Text(String(localized: .SubmitIssue))
             }
             .buttonStyle(.bordered).focusable(false)
-            .disabled(viewModel.checking || !viewModel.hasFailures)
+            .disabled(viewModel.checking || (!viewModel.hasFailures) || AppState.shared.latency > 0)
 
             Button {
                 viewModel.showFAQ = true

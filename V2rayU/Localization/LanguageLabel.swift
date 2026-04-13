@@ -410,9 +410,7 @@ enum LanguageLabel: String, CaseIterable {
     case PortInUseTip
     case Install
     case InstallTitle
-    case InstallPermissionTip
     case InstallFailed
-    case InstallFailedTip
     case InstallFailedManual
     case ReplaceCore
     case ReleaseNotesTitle

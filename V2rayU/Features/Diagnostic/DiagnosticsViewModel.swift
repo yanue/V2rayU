@@ -1014,7 +1014,7 @@ final class DiagnosticsViewModel: ObservableObject {
         if let s = appState.runningServer {
             report += "## Config\n"
             report += "- Protocol: \(s.protocol.rawValue) | Network: \(s.network.rawValue) | Security: \(s.security.rawValue)\n"
-            report += "- Address: \(maskAddress(s.address)):\(s.port)"
+            report += "- Address: \(maskAddress(s.address)), Port: \(s.port)"
             if !s.sni.isEmpty { report += " | SNI: \(maskAddress(s.sni))" }
             if !s.flow.isEmpty { report += " | Flow: \(s.flow)" }
             report += "\n"
@@ -1045,6 +1045,7 @@ final class DiagnosticsViewModel: ObservableObject {
     }()
 
     func submitToGitHub() {
+        if appState.latency > 0 { return }
         Task {
             let report = generateReport()
             let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"

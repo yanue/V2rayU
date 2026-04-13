@@ -403,10 +403,8 @@
 "PortInUse" = "Port is already in use";
 "PortInUseTip" = "The port is already in use, please choose another port number.";
 "Install" = "Install";
-"InstallTitle" = "Install V2rayUTool";
-"InstallPermissionTip" = "V2rayU requires administrator privileges to install V2rayUTool to ~/.V2rayU/V2rayUTool";
+"InstallTitle" = "Install & Authorize";
 "InstallFailed" = "Installation Failed";
-"InstallFailedTip" = "Failed to install V2rayUTool: %@";
 "InstallFailedManual" = "Please run the installation script manually.";
 "ReplaceCore" = "Replace Core";
 "ReleaseNotesTitle" = "Release Notes";

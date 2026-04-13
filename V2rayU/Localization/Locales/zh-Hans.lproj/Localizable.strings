@@ -68,7 +68,7 @@
 "Advanced" = "高级设置";
 "PAC" = "PAC 设置";
 "DNS" = "DNS 设置";
-"Core" = "核心管理";
+"Core" = "xray-core管理";
 
 // MARK: - 通用设置
 "LaunchAtLogin" = "开机启动";
@@ -404,10 +404,8 @@
 "PortInUse" = "端口已被占用";
 "PortInUseTip" = "端口已被占用，请更换其他端口号。";
 "Install" = "安装";
-"InstallTitle" = "安装 V2rayUTool 工具";
-"InstallPermissionTip" = "V2rayU 需要管理员权限安装 V2rayUTool 到 ~/.V2rayU/V2rayUTool";
+"InstallTitle" = "安装与授权";
 "InstallFailed" = "安装失败";
-"InstallFailedTip" = "安装 V2rayUTool 失败: %@";
 "InstallFailedManual" = "请手动运行安装脚本进行安装。";
 "ReplaceCore" = "替换核心";
 "ReleaseNotesTitle" = "更新日志";

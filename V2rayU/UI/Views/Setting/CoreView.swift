@@ -28,6 +28,14 @@ struct CoreView: View {
                     .font(.headline)
 
                 Spacer()
+ 
+                Button(action: { vm.refresh() }) {
+                    Label(String(localized: .Refresh),
+                          systemImage: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.borderedProminent)
+                .focusable(false)
+                .disabled(vm.isLoading)
 
                 Button(action: { vm.goToPreviousPage() }) {
                     Label(String(localized: .PreviousPage), systemImage: "chevron.left")
@@ -35,11 +43,6 @@ struct CoreView: View {
                 .disabled(vm.currentPage <= 1 || vm.isLoading)
                 .buttonStyle(.bordered)
                 .focusable(false)
-
-                Text(String(localized: .PageIndicator, arguments: vm.currentPage))
-                    .font(.callout)
-                    .foregroundColor(.secondary)
-                    .frame(minWidth: 60, alignment: .center)
 
                 Button(action: { vm.goToNextPage() }) {
                     Label(String(localized: .NextPage), systemImage: "chevron.right")
