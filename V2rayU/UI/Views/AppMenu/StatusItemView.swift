@@ -14,12 +14,13 @@ struct StatusItemView: View {
     @ObservedObject var settings = AppSettings.shared // 显式使用 ObservedObject
 
     var body: some View {
-        HStack() {
+        HStack(alignment: .center, spacing: 4) {
             // 应用图标
             Image(appState.icon)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 20, height: 20)
+                .frame(width: 18, height: 18)
+                .frame(height: 22, alignment: .center) // 确保图标垂直居中
             if settings.showLatencyOnTray {
                 HStack(spacing: 4) {
                     Text("●")
@@ -33,17 +34,16 @@ struct StatusItemView: View {
             }
             if settings.showSpeedOnTray {
                 // 速度信息（两行显示）
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
                     Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
                 }
                 .font(.system(size: 9))
                 .foregroundColor(.primary)
             }
-            Spacer()
         }
+        .frame(height: 22, alignment: .center) // 固定高度确保居中
         .padding(.horizontal, 4)
-        .padding(.vertical, 2)
         .fixedSize()   // StatusBar自适应关键点: 需要 StatusItemView 设置 fixedSize 配合 statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     }
 }

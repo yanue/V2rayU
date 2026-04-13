@@ -30,28 +30,31 @@ struct ConfigFormView: View {
             .padding(.vertical, 18)
             .padding(.leading, 24)
             Divider()
-            HStack {
-                VStack {
-                    VStack{
-                        ConfigServerView(item: item)
-                        Spacer(minLength: 12)
-                        if item.protocol != .socks {
-                            ConfigStreamView(item: item)
+            ScrollView(.vertical, showsIndicators: true) {
+                HStack(alignment: .top) {
+                    VStack {
+                        VStack{
+                            ConfigServerView(item: item)
                             Spacer(minLength: 12)
-                            ConfigTransportView(item: item)
+                            if item.protocol != .socks {
+                                ConfigStreamView(item: item)
+                                Spacer(minLength: 12)
+                                ConfigTransportView(item: item)
+                            }
                         }
-                    }
-                    .padding(.all, 12)
-                    .padding(.leading, 8)
-                }
-                .frame(width: 360)
-                Divider()
-                VStack{
-                    ConfigShowView(item: item)
                         .padding(.all, 12)
-                        .padding(.trailing, 8)
+                        .padding(.leading, 8)
+                    }
+                    .frame(width: 360)
+                    Divider()
+                    VStack{
+                        ConfigShowView(item: item)
+                            .padding(.all, 12)
+                            .padding(.trailing, 8)
+                    }
                 }
             }
+            .frame(maxHeight: 500) // 限制最大高度，防止超出屏幕
             Divider()
             HStack {
                 Spacer()
