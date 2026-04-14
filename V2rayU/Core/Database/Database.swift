@@ -31,8 +31,48 @@ extension AppDatabase {
     /// The database for the application
     static let shared = makeShared()
 
+    /// Ensure the database directory exists and is writable by the current user.
+    private static func ensureDatabaseDirectory() throws {
+        let dbDir = (databasePath as NSString).deletingLastPathComponent
+        let fm = FileManager.default
+
+        if !fm.fileExists(atPath: dbDir) {
+            try fm.createDirectory(atPath: dbDir, withIntermediateDirectories: true, attributes: nil)
+        }
+
+        // Make sure the directory is writable; fix permissions if needed.
+        if !fm.isWritableFile(atPath: dbDir) {
+            try fm.setAttributes(
+                [.posixPermissions: 0o755],
+                ofItemAtPath: dbDir
+            )
+        }
+    }
+
+    /// Remove the database file together with its WAL / SHM side-cars.
+    private static func removeDatabase(backup: Bool) {
+        let fm = FileManager.default
+        let extensions = ["", "-wal", "-shm"]
+
+        for ext in extensions {
+            let filePath = databasePath + ext
+            guard fm.fileExists(atPath: filePath) else { continue }
+
+            if backup && ext.isEmpty {
+                let backupPath = databasePath + ".bak"
+                try? fm.removeItem(atPath: backupPath)
+                try? fm.moveItem(atPath: filePath, toPath: backupPath)
+            } else {
+                try? fm.removeItem(atPath: filePath)
+            }
+        }
+    }
+
     private static func makeShared() -> AppDatabase {
         do {
+            // Ensure the database directory exists
+            try ensureDatabaseDirectory()
+
             // Apply recommendations from
             // <https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databaseconnections>
 
@@ -48,13 +88,11 @@ extension AppDatabase {
             // 尝试删除损坏的数据库文件并重建
             logger.error("Database init failed: \(error). Attempting to recreate database.")
             do {
-                let fm = FileManager.default
-                if fm.fileExists(atPath: databasePath) {
-                    // 备份旧数据库
-                    let backupPath = databasePath + ".bak"
-                    try? fm.removeItem(atPath: backupPath)
-                    try? fm.moveItem(atPath: databasePath, toPath: backupPath)
-                }
+                try ensureDatabaseDirectory()
+
+                // Backup the main db file and remove WAL/SHM side-cars
+                removeDatabase(backup: true)
+
                 // 重新创建
                 let config = AppDatabase.makeConfiguration()
                 let db = try DatabaseQueue(path: databasePath, configuration: config)
@@ -62,7 +100,18 @@ extension AppDatabase {
                 logger.info("Database recreated successfully after corruption.")
                 return appDatabase
             } catch {
-                fatalError("Failed to recreate database after corruption: \(error)")
+                // Last resort: fall back to an in-memory database so the app
+                // can still launch (data will not persist across restarts).
+                logger.error("Failed to recreate database on disk: \(error). Falling back to in-memory database.")
+                do {
+                    let config = AppDatabase.makeConfiguration()
+                    let db = try DatabaseQueue(configuration: config)
+                    let appDatabase = try AppDatabase(db)
+                    logger.warning("Running with in-memory database – settings will NOT be persisted.")
+                    return appDatabase
+                } catch {
+                    fatalError("Failed to create even an in-memory database: \(error)")
+                }
             }
         }
     }
@@ -72,7 +121,7 @@ extension AppDatabase {
 
 extension AppDatabase {
     // Uncomment for enabling SQL logging
-    private static let sqlLogger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "SQL")
+    private static let sqlLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "net.yanue.V2rayU", category: "SQL")
 
     /// Returns a database configuration suited for `AppDatabase`.
     ///

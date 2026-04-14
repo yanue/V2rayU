@@ -244,20 +244,29 @@ struct ProfileListView: View {
 
     @ViewBuilder
     private func contextMenuProvider(item: ProfileEntity) -> some View {
-        let resolvedItems = resolveSelectedItems(for: item)
-        let isMultiSelect = resolvedItems.count > 1
-        let singleModel = ProfileModel(from: item)
+        // NOTE: Avoid creating ObservableObject (ProfileModel) or doing heavy
+        // computation in the contextMenu view builder — SwiftUI may re-evaluate
+        // it during AttributeGraph updates, which causes crashes when new
+        // ObservableObject instances are created each time.  Defer all such
+        // work into the Button actions instead.
+        let isMultiSelect = selection.contains(item.uuid) && selection.count > 1
 
         Group {
             Button {
-                chooseItem(item: singleModel)
+                let model = ProfileModel(from: item)
+                chooseItem(item: model)
             } label: {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
             .focusable(false)
 
             Button {
-                activeSheet = isMultiSelect ? .pingMultiple(resolvedItems) : .ping(singleModel)
+                if isMultiSelect {
+                    let resolved = resolveSelectedItems(for: item)
+                    activeSheet = .pingMultiple(resolved)
+                } else {
+                    activeSheet = .ping(ProfileModel(from: item))
+                }
             } label: {
                 Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
             }
@@ -266,7 +275,7 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                activeSheet = .share(singleModel)
+                activeSheet = .share(ProfileModel(from: item))
             } label: {
                 Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
@@ -274,7 +283,8 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
-                activeSheet = .export(resolvedItems)
+                let resolved = resolveSelectedItems(for: item)
+                activeSheet = .export(resolved)
             } label: {
                 Label(String(localized: .Export), systemImage: "square.and.arrow.up")
             }
@@ -309,7 +319,7 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                duplicateItem(item: singleModel)
+                duplicateItem(item: ProfileModel(from: item))
             } label: {
                 Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
             }
@@ -317,7 +327,7 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
-                activeSheet = .edit(singleModel)
+                activeSheet = .edit(ProfileModel(from: item))
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
             }

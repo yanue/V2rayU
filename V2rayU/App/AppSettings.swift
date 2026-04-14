@@ -36,8 +36,8 @@ final class AppSettings: ObservableObject {
     @Published var logLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
     @Published var dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
-    @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204")!
-    
+    @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204") ?? URL(fileURLWithPath: "/")
+
     init() {
         if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
            let theme = Theme(rawValue: savedTheme) {

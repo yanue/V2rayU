@@ -55,10 +55,10 @@ func getCoreVersion() -> String {
 }
 
 func getAppVersion() -> String {
-    return "\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] ?? "")"
+    return "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] ?? "0.0.0")"
 }
 func getAppBuild() -> String {
-    return "\(Bundle.main.infoDictionary!["CFBundleVersion"] ?? "")"
+    return "\(Bundle.main.infoDictionary?["CFBundleVersion"] ?? "0")"
 }
 func checkFileIsRootAdmin(file: String) -> Bool {
     do {

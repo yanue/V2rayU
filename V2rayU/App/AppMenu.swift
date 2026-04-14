@@ -155,6 +155,19 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         updateMenuTitles()
     }
 
+    /// Populate server & routing menus from database.
+    /// Must be called AFTER AppInstaller.checkInstall() so that the
+    /// database directory exists and has correct permissions.
+    func loadDatabaseMenus() {
+        refreshServerItems()
+        refreshRoutingItems()
+        // Update server count in title
+        let count = ProfileStore.shared.fetchAll().count
+        if count > 0 {
+            serverItem.title = "\(String(localized: .ServerList)) (\(count))"
+        }
+    }
+
     private func coreTitle() -> String {
         let onOff = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
@@ -291,9 +304,12 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         menu.addItem(pacModeItem)
         menu.addItem(manualModeItem)
         menu.addItem(NSMenuItem.separator())
-        // 路由与服务器
-        routingItem = getRoutingItem()
-        serverItem = getServerItem()
+        // 路由与服务器 — use placeholder items to avoid triggering
+        // AppDatabase.shared before AppInstaller.checkInstall() has run.
+        routingItem = NSMenuItem(title: String(localized: .RoutingList), action: nil, keyEquivalent: "")
+        routingItem.submenu = NSMenu()
+        serverItem = NSMenuItem(title: String(localized: .ServerList), action: nil, keyEquivalent: "")
+        serverItem.submenu = NSMenu()
         // 预先初始化一次
         pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())

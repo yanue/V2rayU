@@ -63,8 +63,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 初始化状态栏项目
         AppMenuManager.shared.setupStatusItem()
         Task{
-            // 初始化helper
+            // 初始化helper（创建目录、修权限等）
             await AppInstaller.shared.checkInstall()
+            // install 完成后再从数据库加载菜单数据
+            AppMenuManager.shared.loadDatabaseMenus()
             // 初始化睡眠管理器
             await SystemSleepManager.shared.setup()
             // 启动设置

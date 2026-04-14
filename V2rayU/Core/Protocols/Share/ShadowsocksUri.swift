@@ -22,7 +22,7 @@ class ShadowsocksUri: BaseShareUri {
 
     // ss://bf-cfb:test@192.168.100.1:8888#remark
     func encode() -> String {
-        let base64 = self.profile.encryption + ":" + self.profile.password + "@" + self.profile.host + ":" + String(self.profile.port)
+        let base64 = self.profile.encryption + ":" + self.profile.password + "@" + self.profile.address + ":" + String(self.profile.port)
         let ss = base64.base64Encoded()
         if ss != nil {
             return "ss://" + ss! + "#" + self.profile.remark.urlEncoded()

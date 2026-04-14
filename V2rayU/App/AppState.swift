@@ -33,7 +33,7 @@ final class AppState: ObservableObject {
     @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "") {
         didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
     }
-    @Published var runningServer: ProfileEntity? = ProfileStore.shared.getRunning()
+    @Published var runningServer: ProfileEntity? = nil
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
@@ -44,6 +44,10 @@ final class AppState: ObservableObject {
     init() {
         self.icon = v2rayTurnOn ? runMode.icon : "IconOff"
         
+        // NOTE: runningServer is loaded later in appDidLaunch() to avoid
+        // triggering nested singleton initialization (AppState → ProfileStore → AppDatabase)
+        // during AppState.shared dispatch_once, which causes a crash.
+
         // 注册键盘快捷键处理
         KeyboardShortcuts.onKeyDown(for: .toggleV2rayOnOff) { [weak self] in
             Task { @MainActor in

@@ -61,7 +61,6 @@ extension clashProxy {
         profile.remark = self.name
         profile.address = self.server
         profile.port = self.port
-        profile.uuid = self.uuid ?? ""
         profile.sni = self.sni ?? self.server
         profile.allowInsecure = self.skipCERTVerify ?? true
         profile.security = self.security.flatMap { V2rayStreamSecurity(rawValue: $0) } ?? .none

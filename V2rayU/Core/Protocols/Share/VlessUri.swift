@@ -48,7 +48,7 @@ class VlessUri: BaseShareUri {
     func encode() -> String {
         var uri = URLComponents()
         uri.scheme = "vless"
-        uri.user = self.profile.id
+        uri.user = self.profile.password
         uri.host = self.profile.address
         uri.port = self.profile.port
         var queryItems = [
