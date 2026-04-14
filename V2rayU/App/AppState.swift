@@ -247,7 +247,8 @@ final class AppState: ObservableObject {
             await setCoreRunning(v2rayTurnOn)
         }
     
-        AppMenuManager.shared.refreshBasicMenus()
+        // 一次性刷新所有菜单(路由、服务器、模式状态、标题等)
+        AppMenuManager.shared.refreshAllMenus()
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             Task {
                 await SubscriptionScheduler.shared.runAtStart()

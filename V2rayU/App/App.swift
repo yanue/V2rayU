@@ -65,11 +65,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Task{
             // 初始化helper（创建目录、修权限等）
             await AppInstaller.shared.checkInstall()
-            // install 完成后再从数据库加载菜单数据
-            AppMenuManager.shared.loadDatabaseMenus()
             // 初始化睡眠管理器
             await SystemSleepManager.shared.setup()
-            // 启动设置
+            // 启动设置(内部会初始化默认路由、同步状态并一次性刷新所有菜单)
             AppState.shared.appDidLaunch()
 
             // 检查并迁移旧版数据（首次启动时）
