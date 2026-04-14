@@ -32,6 +32,7 @@ actor PingAll {
         let items = ProfileStore.shared.fetchAll()
         guard !items.isEmpty else {
             logger.info("No items to ping.")
+            inPing = false
             NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "没有可 Ping 的节点")
             return
         }

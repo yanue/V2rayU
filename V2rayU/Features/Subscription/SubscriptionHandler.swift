@@ -105,11 +105,15 @@ actor SubscriptionHandler {
         Task {
             await AppMenuManager.shared.refreshServerItems()
         }
-        // 使用 Task.sleep 替代 sleep() 避免阻塞 actor
-        Task {
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
-            // do ping
-            await PingAll.shared.run()
+        // 仅在有节点时才触发 ping，避免在无节点时将 inPing 卡住
+        let hasProfiles = !ProfileStore.shared.fetchAll().isEmpty
+        if hasProfiles {
+            // 使用 Task.sleep 替代 sleep() 避免阻塞 actor
+            Task {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                // do ping
+                await PingAll.shared.run()
+            }
         }
     }
 
