@@ -610,3 +610,19 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "RemoveDuplicateConfirm" = "Removed %d duplicate servers";
 "RemoveDuplicateConfirmTip" = "This will remove duplicate servers. This action cannot be undone.";
 
+// Import Servers
+"ImportServers" = "Import";
+"ImportServersTitle" = "Import Servers";
+"ImportSourceUrl" = "URL";
+"ImportSourceJson" = "JSON";
+"ImportSourceSubscription" = "Subscription";
+"ImportUrlPlaceholder" = "vmess:// or ss:// or ssr:// or vless:// or trojan://";
+"ImportJsonPlaceholder" = "Paste v2ray/xray JSON config here";
+"ImportSubscriptionPlaceholder" = "https://subscription-url";
+"ImportButton" = "Import";
+"ImportSuccessCount" = "Successfully imported %d servers";
+"ImportFailed" = "Import failed";
+"ImportFailedDetail" = "Import failed: %@";
+"ImportParsing" = "Parsing...";
+"ImportFromFile" = "Import from file";
+

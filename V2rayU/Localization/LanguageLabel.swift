@@ -603,4 +603,20 @@ enum LanguageLabel: String, CaseIterable {
     case RemoveDuplicateServers
     case RemoveDuplicateConfirm
     case RemoveDuplicateConfirmTip
+
+    // MARK: - Import Servers
+    case ImportServers
+    case ImportServersTitle
+    case ImportSourceUrl
+    case ImportSourceJson
+    case ImportSourceSubscription
+    case ImportUrlPlaceholder
+    case ImportJsonPlaceholder
+    case ImportSubscriptionPlaceholder
+    case ImportButton
+    case ImportSuccessCount
+    case ImportFailed
+    case ImportFailedDetail
+    case ImportParsing
+    case ImportFromFile
 }

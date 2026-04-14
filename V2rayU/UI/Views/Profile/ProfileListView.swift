@@ -15,6 +15,7 @@ private enum ActiveSheet: Identifiable {
     case export([ProfileEntity])
     case pingAll
     case importLegacy
+    case importServers
 
     var id: String {
         switch self {
@@ -31,6 +32,7 @@ private enum ActiveSheet: Identifiable {
             return "export-\(items.count)-\(head)-\(tail)"
         case .pingAll:           return "pingAll"
         case .importLegacy:      return "importLegacy"
+        case .importServers:     return "importServers"
         }
     }
 }
@@ -104,7 +106,15 @@ struct ProfileListView: View {
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
-                    
+
+                    Button(action: {
+                        activeSheet = .importServers
+                    }) {
+                        Label(String(localized: .ImportServers), systemImage: "square.and.arrow.down")
+                    }
+                    .buttonStyle(.bordered)
+                    .focusable(false)
+
                     Divider()
                         .frame(height: 20)
                     
@@ -222,6 +232,11 @@ struct ProfileListView: View {
                 }
             case .importLegacy:
                 LegacyImportView {
+                    activeSheet = nil
+                    loadData()
+                }
+            case .importServers:
+                ImportView {
                     activeSheet = nil
                     loadData()
                 }

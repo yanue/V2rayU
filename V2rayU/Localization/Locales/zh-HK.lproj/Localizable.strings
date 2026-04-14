@@ -609,3 +609,20 @@
 "RemoveDuplicateServers" = "刪除重複伺服器";
 "RemoveDuplicateConfirm" = "已刪除 %d 個重複伺服器";
 "RemoveDuplicateConfirmTip" = "即将删除重複伺服器，此操作不可撤销。";
+
+// Import Servers
+"ImportServers" = "匯入";
+"ImportServersTitle" = "匯入伺服器";
+"ImportSourceUrl" = "連結";
+"ImportSourceJson" = "JSON";
+"ImportSourceSubscription" = "訂閱";
+"ImportUrlPlaceholder" = "vmess:// 或 ss:// 或 ssr:// 或 vless:// 或 trojan://";
+"ImportJsonPlaceholder" = "貼上 v2ray/xray JSON 設定";
+"ImportSubscriptionPlaceholder" = "https://訂閱連結";
+"ImportButton" = "匯入";
+"ImportSuccessCount" = "成功匯入 %d 個伺服器";
+"ImportFailed" = "匯入失敗";
+"ImportFailedDetail" = "匯入失敗: %@";
+"ImportParsing" = "解析中...";
+"ImportFromFile" = "從檔案匯入";
+
