@@ -229,7 +229,9 @@ final class AppState: ObservableObject {
             runningProfile = ""
             runningServer = nil
             latency = 0
-            logger.info("appDidLaunch: no available server")
+            // 没有可用服务器时，强制关闭启动状态
+            v2rayTurnOn = false
+            logger.info("appDidLaunch: no available server, force v2rayTurnOn=false")
         }
         
         // 同步运行中的路由配置
@@ -245,10 +247,10 @@ final class AppState: ObservableObject {
         Task {
             // 根据启动状态
             await setCoreRunning(v2rayTurnOn)
+            // 刷新菜单必须在 setCoreRunning 之后,确保菜单反映实际状态
+            AppMenuManager.shared.refreshAllMenus()
         }
-    
-        // 一次性刷新所有菜单(路由、服务器、模式状态、标题等)
-        AppMenuManager.shared.refreshAllMenus()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             Task {
                 await SubscriptionScheduler.shared.runAtStart()
