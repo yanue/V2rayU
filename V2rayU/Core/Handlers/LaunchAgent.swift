@@ -139,24 +139,19 @@ actor LaunchAgent: NSObject {
             logger.info("startTunHelper done: \(output)")
             return true
         } catch let error {
-            let errorStr = String(describing: error)
-            logger.info("startTunHelper failed: \(errorStr)")
-            if errorStr.contains("password is required") {
-                // sudo 权限未配置，直接触发安装授权流程
-                await AppInstaller.shared.checkInstall()
-                // 安装后重试
-                do {
-                    let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
-                    logger.info("startTunHelper retry done: \(output)")
-                    return true
-                } catch {
-                    logger.info("startTunHelper retry failed: \(error)")
-                    return false
-                }
-            } else {
-                alertDialog(title: "startTunHelper failed.", message: error.localizedDescription)
+            logger.info("startTunHelper failed: \(error), trigger install")
+            // 任何失败（sudo 权限、daemon 未 load 等）都直接弹出安装授权
+            // install.sh 会重新配置 sudoers 并 load daemon plist
+            await AppInstaller.shared.forceInstall(reason: "startTunHelper failed: \(error)")
+            // 安装后重试
+            do {
+                let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
+                logger.info("startTunHelper retry done: \(output)")
+                return true
+            } catch {
+                logger.info("startTunHelper retry failed: \(error)")
+                return false
             }
-            return false
         }
     }
 

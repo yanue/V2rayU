@@ -278,6 +278,14 @@ actor AppInstaller: NSObject {
         }
     }
 
+    /// 强制安装（跳过条件检查，直接弹出安装授权）
+    /// 用于运行时检测到关键组件异常（如 daemon 被 unload、sudoers 失效等）
+    func forceInstall(reason: String) async {
+        installReason = reason
+        logger.info("forceInstall: \(reason)")
+        await showInstallAlert()
+    }
+
     @discardableResult
     func install() async -> Bool {
         let success = await executeAppleScriptWithOsascript(script: doSh)
