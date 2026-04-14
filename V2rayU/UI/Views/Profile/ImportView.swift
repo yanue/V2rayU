@@ -10,18 +10,21 @@
 //
 
 import SwiftUI
+import Yams
 
 /// 导入来源类型
 private enum ImportSource: String, CaseIterable {
     case url
     case json
     case subscription
+    case clash
 
     var label: LanguageLabel {
         switch self {
         case .url: return .ImportSourceUrl
         case .json: return .ImportSourceJson
         case .subscription: return .ImportSourceSubscription
+        case .clash: return .ImportSourceClash
         }
     }
 
@@ -30,6 +33,7 @@ private enum ImportSource: String, CaseIterable {
         case .url: return .ImportUrlPlaceholder
         case .json: return .ImportJsonPlaceholder
         case .subscription: return .ImportSubscriptionPlaceholder
+        case .clash: return .ImportClashPlaceholder
         }
     }
 }
@@ -79,23 +83,15 @@ struct ImportView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 240)
-                    .onChange(of: importSource) { _ in
+                    .frame(width: 300)
+                    .focusable(false)
+                    .onChange(of: importSource) { _,_ in
                         inputText = ""
                         resultMessage = ""
                         resultIsError = false
                     }
 
                     Spacer()
-
-                    // JSON 模式下的文件导入按钮
-                    if importSource == .json {
-                        Button(action: importFromFile) {
-                            Label(String(localized: .ImportFromFile), systemImage: "doc")
-                        }
-                        .buttonStyle(.bordered)
-                        .focusable(false)
-                    }
                 }
 
                 // 输入区域
@@ -108,7 +104,7 @@ struct ImportView: View {
                         importButton
                     }
                 } else {
-                    // URL / JSON 用多行输入
+                    // URL / JSON / Clash 用多行输入
                     VStack(spacing: 8) {
                         TextEditor(text: $inputText)
                             .font(.system(.body, design: .monospaced))
@@ -131,6 +127,13 @@ struct ImportView: View {
                             }
 
                         HStack {
+                            if importSource == .json || importSource == .clash {
+                                Button(action: importFromFile) {
+                                    Label(String(localized: .ImportFromFile), systemImage: "doc")
+                                }
+                                .buttonStyle(.bordered)
+                                .focusable(false)
+                            }
                             Spacer()
                             importButton
                         }
@@ -156,7 +159,7 @@ struct ImportView: View {
 
             Spacer(minLength: 0)
         }
-        .frame(width: 520, minHeight: importSource == .subscription ? 190 : 280)
+        .frame(width: 520)
     }
 
     // MARK: - 导入按钮
@@ -196,6 +199,42 @@ struct ImportView: View {
             importFromJsonText(text: text)
         case .subscription:
             importFromSubscription(url: text)
+        case .clash:
+            importFromClash(text: text)
+        }
+    }
+
+    /// 从 Clash YAML 配置导入
+    private func importFromClash(text: String) {
+        do {
+            let decoder = YAMLDecoder()
+            let decoded = try decoder.decode(Clash.self, from: text)
+            if decoded.proxies.isEmpty {
+                isImporting = false
+                resultMessage = String(localized: .ImportFailedDetail, arguments: "No proxies found in Clash config")
+                resultIsError = true
+                return
+            }
+            var successCount = 0
+            for clash in decoded.proxies {
+                if let item = clash.toProfile() {
+                    ProfileStore.shared.insert(item)
+                    successCount += 1
+                }
+            }
+            isImporting = false
+            if successCount > 0 {
+                resultMessage = String(localized: .ImportSuccessCount, arguments: successCount)
+                resultIsError = false
+                inputText = ""
+            } else {
+                resultMessage = String(localized: .ImportFailedDetail, arguments: "No valid servers found")
+                resultIsError = true
+            }
+        } catch {
+            isImporting = false
+            resultMessage = String(localized: .ImportFailedDetail, arguments: "Invalid Clash YAML format")
+            resultIsError = true
         }
     }
 
@@ -305,10 +344,16 @@ struct ImportView: View {
         }
     }
 
-    /// 从文件导入 JSON 配置
+    /// 从文件导入 JSON/Clash 配置
     private func importFromFile() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.json, .plainText]
+        
+        if importSource == .clash {
+            panel.allowedContentTypes = [.yaml, .plainText]
+        } else {
+            panel.allowedContentTypes = [.json, .plainText]
+        }
+        
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
 

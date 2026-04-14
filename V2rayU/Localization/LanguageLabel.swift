@@ -610,9 +610,11 @@ enum LanguageLabel: String, CaseIterable {
     case ImportSourceUrl
     case ImportSourceJson
     case ImportSourceSubscription
+    case ImportSourceClash
     case ImportUrlPlaceholder
     case ImportJsonPlaceholder
     case ImportSubscriptionPlaceholder
+    case ImportClashPlaceholder
     case ImportButton
     case ImportSuccessCount
     case ImportFailed

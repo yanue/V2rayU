@@ -104,6 +104,7 @@
 		66764BE82EB4F70E002F330B /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */; };
 		66764BEA2EB4F736002F330B /* AppVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BE92EB4F735002F330B /* AppVersionView.swift */; };
 		66764BEC2EB50FD5002F330B /* DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66764BEB2EB50FC5002F330B /* DownloadDelegate.swift */; };
+		667F4B932F8E85F600F7E5CF /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667F4B922F8E85F600F7E5CF /* ImportView.swift */; };
 		668C4AC82E6F0CEC00DB2FFC /* DiagnosticView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668C4AC72E6F0CE900DB2FFC /* DiagnosticView.swift */; };
 		669209DE2E755C0E00A7E52D /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669209DD2E755C0900A7E52D /* FAQView.swift */; };
 		669DCEA32E3D90760085278B /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA22E3D90760085278B /* ToastWindow.swift */; };
@@ -265,6 +266,7 @@
 		66764BE72EB4F70D002F330B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
 		66764BE92EB4F735002F330B /* AppVersionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionView.swift; sourceTree = "<group>"; };
 		66764BEB2EB50FC5002F330B /* DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadDelegate.swift; sourceTree = "<group>"; };
+		667F4B922F8E85F600F7E5CF /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		668C4AC72E6F0CE900DB2FFC /* DiagnosticView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticView.swift; sourceTree = "<group>"; };
 		669209DD2E755C0900A7E52D /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
 		669DCEA12E3D90760085278B /* GithubModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubModel.swift; sourceTree = "<group>"; };
@@ -418,6 +420,7 @@
 				663814B42E0448DB00F5FCF3 /* ProfilePing.swift */,
 				66D27AE42E098E3A004C600D /* ShareQrCode.swift */,
 				66D27AE72E098E3A004C600E /* ExportView.swift */,
+				667F4B922F8E85F600F7E5CF /* ImportView.swift */,
 				67A1B2C22D2F000000000002 /* LegacyImportView.swift */,
 			);
 			path = Profile;
@@ -1012,6 +1015,7 @@
 				667464222F0E895300D3D1E9 /* CoreConfigHandler.swift in Sources */,
 				6632EF352EC3670C00CED47B /* RoutingStore.swift in Sources */,
 				662CC4122D1BED9B006E8450 /* GeneralView.swift in Sources */,
+				667F4B932F8E85F600F7E5CF /* ImportView.swift in Sources */,
 				662CC41322D1BED9B006E8450 /* ShortcutsView.swift in Sources */,
 				662CC4132D1BED9B006E8450 /* V2rayStruct.swift in Sources */,
 				66F66F862D1E7D6A00E77C64 /* Clash.swift in Sources */,

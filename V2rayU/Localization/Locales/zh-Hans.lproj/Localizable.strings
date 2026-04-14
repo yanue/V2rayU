@@ -617,9 +617,11 @@
 "ImportSourceUrl" = "链接";
 "ImportSourceJson" = "JSON";
 "ImportSourceSubscription" = "订阅";
+"ImportSourceClash" = "Clash";
 "ImportUrlPlaceholder" = "vmess:// 或 ss:// 或 ssr:// 或 vless:// 或 trojan://";
 "ImportJsonPlaceholder" = "粘贴 v2ray/xray JSON 配置";
 "ImportSubscriptionPlaceholder" = "https://订阅链接";
+"ImportClashPlaceholder" = "粘贴 Clash YAML 配置";
 "ImportButton" = "导入";
 "ImportSuccessCount" = "成功导入 %d 个服务器";
 "ImportFailed" = "导入失败";

@@ -89,13 +89,6 @@ struct ProfileListView: View {
                 subtitle: String(localized: .ServerSubHead)
             ) {
                 HStack(spacing: 8) {
-                    Button(action: { activeSheet = .pingAll }) {
-                        Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .focusable(false)
-                    .disabled(viewModel.list.isEmpty)
-
                     Button(action: {
                         withAnimation {
                             let newProxy = ProfileModel(from: ProfileEntity())
@@ -119,6 +112,13 @@ struct ProfileListView: View {
                         .frame(height: 20)
                     
                     Menu {
+                        Button(action: { activeSheet = .pingAll }) {
+                            Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .focusable(false)
+                        .disabled(viewModel.list.isEmpty)
+
                         Button(action: {
                             withAnimation(.easeOut(duration: 0.15)) {
                                 tableOpacity = 0
