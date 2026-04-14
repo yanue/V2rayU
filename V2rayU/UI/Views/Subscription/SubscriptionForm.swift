@@ -16,6 +16,7 @@ struct SubscriptionFormView: View {
     
     @State private var intervalUnit: IntervalUnit = .minute
     
+    var showHeader: Bool = true
     var onClose: () -> Void
     var onSaveAndSync: (() -> Void)?
     
@@ -42,24 +43,26 @@ struct SubscriptionFormView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "personalhotspot")
-                    .resizable()
-                    .frame(width: 32, height: 32)
-                    .foregroundColor(.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    localized(.SubscriptionSettings)
-                        .font(.headline)
-                    localized(.SubscriptionSettingsSubHead)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+            if showHeader {
+                HStack(alignment: .center, spacing: 12) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .resizable()
+                        .frame(width: 32, height: 32)
+                        .foregroundColor(.accentColor)
+                    VStack(alignment: .leading, spacing: 2) {
+                        localized(.SubscriptionSettings)
+                            .font(.headline)
+                        localized(.SubscriptionSettingsSubHead)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding(.vertical, 18)
+                .padding(.leading, 24)
+                
+                Divider()
             }
-            .padding(.vertical, 18)
-            .padding(.leading, 24)
-            
-            Divider()
             Spacer()
             
             // Form fields

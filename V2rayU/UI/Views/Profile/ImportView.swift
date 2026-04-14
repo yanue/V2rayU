@@ -14,36 +14,40 @@ import Yams
 
 /// 导入来源类型
 private enum ImportSource: String, CaseIterable {
-    case url
+    case legacy
+    case uri
     case json
     case subscription
     case clash
 
     var label: LanguageLabel {
         switch self {
-        case .url: return .ImportSourceUrl
+        case .legacy: return .ImportSourceLegacy
+        case .uri: return .ImportSourceUri
         case .json: return .ImportSourceJson
         case .subscription: return .ImportSourceSubscription
         case .clash: return .ImportSourceClash
         }
     }
 
-    var placeholder: LanguageLabel {
+    var placeholder: LanguageLabel? {
         switch self {
-        case .url: return .ImportUrlPlaceholder
+        case .uri: return .ImportUriPlaceholder
         case .json: return .ImportJsonPlaceholder
         case .subscription: return .ImportSubscriptionPlaceholder
         case .clash: return .ImportClashPlaceholder
+        case .legacy: return nil
         }
     }
 }
 
 struct ImportView: View {
-    @State private var importSource: ImportSource = .url
+    @State private var importSource: ImportSource = .legacy
     @State private var inputText: String = ""
     @State private var isImporting: Bool = false
     @State private var resultMessage: String = ""
     @State private var resultIsError: Bool = false
+    @State private var newSubscription: SubscriptionModel?
     let onDismiss: () -> Void
 
     var body: some View {
@@ -85,10 +89,14 @@ struct ImportView: View {
                     .pickerStyle(.segmented)
                     .frame(width: 300)
                     .focusable(false)
-                    .onChange(of: importSource) { _,_ in
+                    .onChange(of: importSource) { _, newValue in
                         inputText = ""
                         resultMessage = ""
                         resultIsError = false
+                        if newValue == .subscription && newSubscription == nil {
+                            let entity = SubscriptionEntity()
+                            newSubscription = SubscriptionModel(from: entity)
+                        }
                     }
 
                     Spacer()
@@ -96,13 +104,16 @@ struct ImportView: View {
 
                 // 输入区域
                 if importSource == .subscription {
-                    // 订阅链接用单行输入
-                    HStack(spacing: 8) {
-                        TextField(String(localized: importSource.placeholder), text: $inputText)
-                            .textFieldStyle(.roundedBorder)
-
-                        importButton
+                    if let subscription = newSubscription {
+                        SubscriptionFormView(item: subscription, showHeader: false) {
+                            onDismiss()
+                        } onSaveAndSync: {
+                            onDismiss()
+                        }
                     }
+                } else if importSource == .legacy {
+                    // 旧版导入
+                    legacyImportContent
                 } else {
                     // URL / JSON / Clash 用多行输入
                     VStack(spacing: 8) {
@@ -117,8 +128,8 @@ struct ImportView: View {
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
                             .overlay(alignment: .topLeading) {
-                                if inputText.isEmpty {
-                                    Text(String(localized: importSource.placeholder))
+                                if let placeholder = importSource.placeholder, inputText.isEmpty {
+                                    Text(String(localized: placeholder))
                                         .foregroundColor(.secondary.opacity(0.5))
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 10)
@@ -193,15 +204,334 @@ struct ImportView: View {
         isImporting = true
 
         switch importSource {
-        case .url:
-            importFromUrl(text: text)
+        case .uri:
+            importFromUri(text: text)
         case .json:
             importFromJsonText(text: text)
         case .subscription:
-            importFromSubscription(url: text)
+            break
         case .clash:
             importFromClash(text: text)
+        case .legacy:
+            break
         }
+    }
+
+    // MARK: - 旧版导入内容
+
+    @State private var legacyServerCount: Int = 0
+    @State private var legacySubCount: Int = 0
+    @State private var showConfirmDialog = false
+    @State private var legacyDebugInfo: String = ""
+    @State private var migrationResult: LegacyMigrationResult?
+    @State private var showResult = false
+
+    private var legacyImportContent: some View {
+        VStack(spacing: 20) {
+            if isImporting {
+                migratingView
+            } else if showResult, let result = migrationResult {
+                legacyResultView(result: result)
+            } else {
+                legacyDataContent
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .alert(String(localized: .ImportLegacyConfirmTitle), isPresented: $showConfirmDialog) {
+            Button(String(localized: .Cancel), role: .cancel) { }
+            Button(String(localized: .ImportLegacyData)) {
+                performLegacyMigration()
+            }
+        } message: {
+            Text(String(localized: .ImportLegacyConfirmMessage, arguments: legacyServerCount, legacySubCount))
+        }
+        .onAppear {
+            checkLegacyData()
+        }
+    }
+
+    private var legacyDataContent: some View {
+        VStack(spacing: 16) {
+            if legacyServerCount > 0 || legacySubCount > 0 {
+                legacyDataCard
+            } else {
+                legacyNoDataCard
+            }
+
+            if !legacyDebugInfo.isEmpty {
+                legacyDebugCard
+            }
+        }
+    }
+
+    private var legacyDataCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.orange)
+                Text(String(localized: .ImportLegacyDataDetected))
+                    .font(.headline)
+                Spacer()
+            }
+
+            HStack(spacing: 24) {
+                legacyDataItem(
+                    icon: "server.rack",
+                    title: String(localized: .ImportLegacyDataServerCount, arguments: legacyServerCount),
+                    color: .blue
+                )
+
+                legacyDataItem(
+                    icon: "list.bullet.rectangle",
+                    title: String(localized: .ImportLegacyDataSubCount, arguments: legacySubCount),
+                    color: .purple
+                )
+            }
+
+            Button(action: { showConfirmDialog = true }) {
+                HStack {
+                    Image(systemName: "square.and.arrow.down.on.square")
+                    Text(String(localized: .ImportLegacyData))
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+        .padding(16)
+        .background(Color.orange.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func legacyDataItem(icon: String, title: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var legacyNoDataCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+            Text(String(localized: .ImportLegacyDataNoData))
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(32)
+        .background(Color.green.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var legacyDebugCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Debug Info")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+
+            ScrollView {
+                Text(legacyDebugInfo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: 100)
+        }
+        .padding(12)
+        .background(Color.gray.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var migratingView: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            ProgressView()
+                .scaleEffect(1.5)
+            Text(String(localized: .ImportLegacyDataMigrating))
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            if !legacyDebugInfo.isEmpty {
+                Text(legacyDebugInfo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: 300)
+                    .multilineTextAlignment(.center)
+            }
+
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func legacyResultView(result: LegacyMigrationResult) -> some View {
+        switch result {
+        case .success(let profiles, let subscriptions):
+            VStack(spacing: 16) {
+                Spacer()
+
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.green)
+                Text(String(localized: .LegacyDataMigrationSuccess, arguments: profiles, subscriptions))
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+
+                if !legacyDebugInfo.isEmpty {
+                    Text(legacyDebugInfo)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 300)
+                        .multilineTextAlignment(.center)
+                }
+
+                Spacer()
+
+                Button(String(localized: .Close)) {
+                    onDismiss()
+                }
+                .focusable(false)
+            }
+            .padding()
+
+        case .noData:
+            VStack(spacing: 12) {
+                Spacer()
+                Image(systemName: "tray")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
+                Text(String(localized: .LegacyDataMigrationNoData))
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+            .padding()
+
+        case .error(let message):
+            VStack(spacing: 16) {
+                Spacer()
+
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.orange)
+                Text(String(localized: .LegacyDataMigrationFailed, arguments: message))
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+
+                if !legacyDebugInfo.isEmpty {
+                    Text(legacyDebugInfo)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: 300)
+                        .multilineTextAlignment(.center)
+                }
+
+                Spacer()
+            }
+            .padding()
+        }
+    }
+
+    private func checkLegacyData() {
+        Task {
+            let defaults = UserDefaults(suiteName: "net.yanue.V2rayU") ?? .standard
+            let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
+            let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
+
+            await MainActor.run {
+                legacyServerCount = serverList.count
+                legacySubCount = subList.count
+
+                var info = String(localized: .ImportLegacyDetectedKeys) + "\n"
+                info += String(localized: .ImportLegacyV2rayServerList) + "\(serverList.count)\n"
+                info += String(localized: .ImportLegacyV2raySubList) + "\(subList.count)"
+
+                if !serverList.isEmpty {
+                    info += "\n\n" + String(localized: .ImportLegacyServerList) + "\n"
+                    for (index, item) in serverList.enumerated() {
+                        info += "  \(index + 1). \(item)\n"
+                    }
+                }
+
+                if !subList.isEmpty {
+                    info += "\n\n" + String(localized: .ImportLegacySubList) + "\n"
+                    for (index, item) in subList.enumerated() {
+                        info += "  \(index + 1). \(item)\n"
+                    }
+                }
+
+                legacyDebugInfo = info
+            }
+        }
+    }
+
+    private func performLegacyMigration() {
+        isImporting = true
+        legacyDebugInfo = String(localized: .ImportLegacyMigratingStart) + "\n"
+
+        Task {
+            let result = await LegacyMigrationHandler.shared.migrate()
+
+            await MainActor.run {
+                isImporting = false
+                migrationResult = result
+                showResult = true
+
+                switch result {
+                case .success(let profiles, let subscriptions):
+                    legacyDebugInfo = String(localized: .ImportLegacyMigratingComplete) + "\n\n"
+                    legacyDebugInfo += String(localized: .ImportLegacySuccessServers, arguments: profiles) + "\n"
+                    legacyDebugInfo += String(localized: .ImportLegacySuccessSubscriptions, arguments: subscriptions)
+                case .noData:
+                    legacyDebugInfo = String(localized: .ImportLegacyNoDataFound)
+                case .error(let message):
+                    legacyDebugInfo = String(localized: .ImportLegacyMigrationFailed) + message
+                }
+            }
+        }
+    }
+
+    /// 从旧版导入 (保留旧的简单版本供兼容)
+    private func importFromLegacy() {
+        isImporting = true
+        Task {
+            let result = await LegacyMigrationHandler.shared.migrate()
+            await MainActor.run {
+                isImporting = false
+                switch result {
+                case .success(let profiles, let subs):
+                    resultMessage = String(localized: .ImportSuccessCount, arguments: profiles)
+                    resultIsError = false
+                    legacyServerCount = 0
+                    legacySubCount = 0
+                case .noData:
+                    resultMessage = String(localized: .ImportLegacyNoDataFound)
+                    resultIsError = true
+                case .error(let msg):
+                    resultMessage = String(localized: .ImportLegacyMigrationFailed, arguments: msg)
+                    resultIsError = true
+                }
+            }
+        }
+    }
+
+    /// 跳过旧版导入
+    private func skipLegacy() {
+        LegacyMigrationHandler.shared.markAsMigrated()
+        LegacyMigrationHandler.shared.markAsAsked()
+        legacyServerCount = 0
+        legacySubCount = 0
     }
 
     /// 从 Clash YAML 配置导入
@@ -238,8 +568,8 @@ struct ImportView: View {
         }
     }
 
-    /// 从 URL 分享链接导入 (支持多行)
-    private func importFromUrl(text: String) {
+    /// 从 URI 分享链接导入 (支持多行)
+    private func importFromUri(text: String) {
         let lines = text.components(separatedBy: CharacterSet.newlines)
         var successCount = 0
         var errors: [String] = []

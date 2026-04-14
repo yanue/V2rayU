@@ -613,14 +613,18 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 // Import Servers
 "ImportServers" = "Import";
 "ImportServersTitle" = "Import Servers";
-"ImportSourceUrl" = "URL";
+"ImportSourceUri" = "URI";
 "ImportSourceJson" = "JSON";
 "ImportSourceSubscription" = "Subscription";
 "ImportSourceClash" = "Clash";
-"ImportUrlPlaceholder" = "vmess:// or ss:// or ssr:// or vless:// or trojan://";
+"ImportSourceLegacy" = "Legacy";
+"ImportUriPlaceholder" = "vmess:// or ss:// or ssr:// or vless:// or trojan://";
 "ImportJsonPlaceholder" = "Paste v2ray/xray JSON config here";
 "ImportSubscriptionPlaceholder" = "https://subscription-url";
 "ImportClashPlaceholder" = "Paste Clash YAML config here";
+"ImportLegacyInfo" = "Found %d servers and %d subscriptions from legacy version. Import now?";
+"ImportLegacyButton" = "Import";
+"ImportLegacySkip" = "Skip";
 "ImportButton" = "Import";
 "ImportSuccessCount" = "Successfully imported %d servers";
 "ImportFailed" = "Import failed";

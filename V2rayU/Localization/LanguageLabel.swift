@@ -607,14 +607,18 @@ enum LanguageLabel: String, CaseIterable {
     // MARK: - Import Servers
     case ImportServers
     case ImportServersTitle
-    case ImportSourceUrl
+    case ImportSourceUri
     case ImportSourceJson
     case ImportSourceSubscription
     case ImportSourceClash
-    case ImportUrlPlaceholder
+    case ImportSourceLegacy
+    case ImportUriPlaceholder
     case ImportJsonPlaceholder
     case ImportSubscriptionPlaceholder
     case ImportClashPlaceholder
+    case ImportLegacyInfo
+    case ImportLegacyButton
+    case ImportLegacySkip
     case ImportButton
     case ImportSuccessCount
     case ImportFailed

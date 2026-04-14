@@ -136,7 +136,6 @@
 		66F66F882D1E7D8800E77C64 /* SubscriptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */; };
 		66F66F8B2D1E7DE300E77C64 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 66F66F8A2D1E7DE300E77C64 /* Yams */; };
 		67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */; };
-		67A1B2C42D2F000000000002 /* LegacyImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A1B2C22D2F000000000002 /* LegacyImportView.swift */; };
 		afe3cb16bd1b48cba200bdf16bba3fa0 /* LogRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664b3bd4b2d847108fa8dd99adbadeba /* LogRotation.swift */; };
 /* End PBXBuildFile section */
 
@@ -303,7 +302,6 @@
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
 		67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyMigrationHandler.swift; sourceTree = "<group>"; };
-		67A1B2C22D2F000000000002 /* LegacyImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -421,7 +419,6 @@
 				66D27AE42E098E3A004C600D /* ShareQrCode.swift */,
 				66D27AE72E098E3A004C600E /* ExportView.swift */,
 				667F4B922F8E85F600F7E5CF /* ImportView.swift */,
-				67A1B2C22D2F000000000002 /* LegacyImportView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -1058,7 +1055,6 @@
 				669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */,
 				66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */,
 				67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */,
-				67A1B2C42D2F000000000002 /* LegacyImportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

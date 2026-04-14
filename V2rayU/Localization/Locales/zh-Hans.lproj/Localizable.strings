@@ -614,14 +614,18 @@
 // Import Servers
 "ImportServers" = "导入";
 "ImportServersTitle" = "导入服务器";
-"ImportSourceUrl" = "链接";
+"ImportSourceUri" = "URI";
 "ImportSourceJson" = "JSON";
 "ImportSourceSubscription" = "订阅";
 "ImportSourceClash" = "Clash";
-"ImportUrlPlaceholder" = "vmess:// 或 ss:// 或 ssr:// 或 vless:// 或 trojan://";
+"ImportSourceLegacy" = "旧版";
+"ImportUriPlaceholder" = "vmess:// 或 ss:// 或 ssr:// 或 vless:// 或 trojan://";
 "ImportJsonPlaceholder" = "粘贴 v2ray/xray JSON 配置";
 "ImportSubscriptionPlaceholder" = "https://订阅链接";
 "ImportClashPlaceholder" = "粘贴 Clash YAML 配置";
+"ImportLegacyInfo" = "发现旧版数据：%d 个服务器和 %d 个订阅。是否导入？";
+"ImportLegacyButton" = "导入";
+"ImportLegacySkip" = "跳过";
 "ImportButton" = "导入";
 "ImportSuccessCount" = "成功导入 %d 个服务器";
 "ImportFailed" = "导入失败";
