@@ -133,26 +133,33 @@ actor LaunchAgent: NSObject {
     }
 
     // 启动tun-helper (sing-box based)
-    func startTunHelper() -> Bool {
+    func startTunHelper() async -> Bool {
         do {
             let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
             logger.info("startTunHelper done: \(output)")
             return true
         } catch let error {
             let errorStr = String(describing: error)
+            logger.info("startTunHelper failed: \(errorStr)")
             if errorStr.contains("password is required") {
-                logger.info("startTunHelper failed: sudo not configured, please run install first")
-                alertDialog(title: "需要安装", message: "请先运行 V2rayU 安装程序来配置权限")
-                Task {
-                    await AppInstaller.shared.checkInstall()
+                // sudo 权限未配置，直接触发安装授权流程
+                await AppInstaller.shared.checkInstall()
+                // 安装后重试
+                do {
+                    let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
+                    logger.info("startTunHelper retry done: \(output)")
+                    return true
+                } catch {
+                    logger.info("startTunHelper retry failed: \(error)")
+                    return false
                 }
             } else {
-                logger.info("startTunHelper failed: \(error)")
                 alertDialog(title: "startTunHelper failed.", message: error.localizedDescription)
             }
             return false
         }
     }
+
 
     // 停止tun-helper
     func stopTunHelper() {

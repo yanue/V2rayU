@@ -468,23 +468,31 @@ final class DiagnosticsViewModel: ObservableObject {
             let msg = String(localized: .DiagSudoersFileMissing)
             return .fail(.sudoersCheck, subtitle: msg, problem: msg, action: .fixInstall)
         }
-        // 验证 NOPASSWD 规则实际可用
+        // 验证具体命令是否被 NOPASSWD 授权（而非泛泛检查 NOPASSWD 文本）
         let ok = await runInBackground {
-            let task = Process()
-            task.launchPath = "/usr/bin/sudo"
-            task.arguments = ["-n", "-l"]
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = Pipe()
-            do {
-                try task.run()
-                task.waitUntilExit()
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let output = String(data: data, encoding: .utf8) ?? ""
-                return output.contains("NOPASSWD")
-            } catch {
-                return false
+            // sudo -n -l <command> 会检查用户是否有权限执行该具体命令
+            for args in [
+                ["-n", "-l", "/bin/launchctl", "start", "yanue.v2rayu.tun-helper"],
+                ["-n", "-l", "/bin/launchctl", "stop", "yanue.v2rayu.tun-helper"],
+            ] {
+                let task = Process()
+                task.launchPath = "/usr/bin/sudo"
+                task.arguments = args
+                let pipe = Pipe()
+                task.standardOutput = pipe
+                task.standardError = Pipe()
+                do {
+                    try task.run()
+                    task.waitUntilExit()
+                    if task.terminationStatus != 0 { return false }
+                    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                    let output = String(data: data, encoding: .utf8) ?? ""
+                    if !output.contains("/bin/launchctl") { return false }
+                } catch {
+                    return false
+                }
             }
+            return true
         }
         if ok { return .pass(.sudoersCheck) }
         let msg = String(localized: .DiagSudoersNotEffective)

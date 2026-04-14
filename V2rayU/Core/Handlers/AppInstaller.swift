@@ -200,11 +200,15 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
-        // sudoers 实际可用（sudo -n 能否无密码执行 launchctl）
+        // sudoers 实际可用（验证具体命令能否无密码执行）
         if !needRunInstall {
-            let testResult = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l"])
-            if testResult == nil || !testResult!.contains("NOPASSWD") {
-                logger.info("sudoers NOPASSWD not effective")
+            // 使用 sudo -n -l <command> 验证具体命令是否被 NOPASSWD 授权
+            let testStart = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", "/bin/launchctl", "start", "yanue.v2rayu.tun-helper"])
+            let testStop = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", "/bin/launchctl", "stop", "yanue.v2rayu.tun-helper"])
+            let startOk = testStart != nil && testStart!.contains("/bin/launchctl")
+            let stopOk = testStop != nil && testStop!.contains("/bin/launchctl")
+            if !startOk || !stopOk {
+                logger.info("sudoers NOPASSWD not effective for launchctl: start=\(startOk), stop=\(stopOk)")
                 installReason = "sudoers rules incorrect"
                 needRunInstall = true
             }
@@ -257,8 +261,14 @@ actor AppInstaller: NSObject {
                 let response = alert.runModal()
                 if response == .alertFirstButtonReturn {
                     Task {
-                        await self.install()
-                        continuation.resume() // Resume after install completes
+                        let success = await self.install()
+                        if success {
+                            continuation.resume()
+                        } else {
+                            // 安装失败，重新弹出安装提示
+                            await self.showInstallAlert()
+                            continuation.resume()
+                        }
                     }
                 } else {
                     NSApp.terminate(self)
@@ -268,15 +278,22 @@ actor AppInstaller: NSObject {
         }
     }
 
-    func install() async {
-        await executeAppleScriptWithOsascript(script: doSh)
+    @discardableResult
+    func install() async -> Bool {
+        let success = await executeAppleScriptWithOsascript(script: doSh)
+        guard success else {
+            logger.info("install failed, skip writing version marker")
+            return false
+        }
         // 安装成功后写入版本标记，下次启动时跳过安装
         let markerFile = AppHomePath + "/.installed_version"
         try? appVersion.write(toFile: markerFile, atomically: true, encoding: .utf8)
+        return true
     }
 
     // 高版本macos执行NSAppleScript会出现授权失败
-    func executeAppleScriptWithOsascript(script: String) async {
+    @discardableResult
+    func executeAppleScriptWithOsascript(script: String) async -> Bool {
         do {
             // Assuming runCommand is sync; wrap in continuation for async
             let output = try await withCheckedThrowingContinuation { continuation in
@@ -292,6 +309,7 @@ actor AppInstaller: NSObject {
                 }
             }
             logger.info("executeAppleScript-Output: \(output)")
+            return true
         } catch {
             logger.info("executeAppleScript-Error: \(error)")
             DispatchQueue.main.sync {
@@ -299,6 +317,7 @@ actor AppInstaller: NSObject {
                 let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
                 alertDialog(title: title, message: toast)
             }
+            return false
         }
     }
 }
