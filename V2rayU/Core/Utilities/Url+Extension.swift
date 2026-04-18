@@ -137,6 +137,6 @@ func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfigurati
     ]
     configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
     configuration.urlCache = nil
-    configuration.timeoutIntervalForRequest = 2 // Set your desired timeout interval in seconds
+    configuration.timeoutIntervalForRequest = 5 // Set your desired timeout interval in seconds
     return configuration
 }

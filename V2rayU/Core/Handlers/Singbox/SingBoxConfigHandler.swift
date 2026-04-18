@@ -137,7 +137,7 @@ class SingboxConfigHandler {
                 auto_detect_interface: true,
                 default_domain_resolver: "default-dns",
                 rules: [
-                    RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]),
+                    RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-64", "sing-box-arm64"]),
                 ]
             )
             

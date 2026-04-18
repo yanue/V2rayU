@@ -7,7 +7,8 @@
 
 import Foundation
 
-protocol GithubServiceProtocol {
+@MainActor
+protocol GithubServiceProtocol: Sendable {
     func fetchReleases(repo: String, page: Int, perPage: Int) async throws -> [GithubRelease]
     func downloadReleaseAsset(url: URL, to destination: URL) async throws -> URL
 }
@@ -19,6 +20,7 @@ extension GithubServiceProtocol {
     }
 }
 
+@MainActor
 final class GithubService: GithubServiceProtocol {
     
     func fetchReleases(repo: String, page: Int = 1, perPage: Int = 20) async throws -> [GithubRelease] {
