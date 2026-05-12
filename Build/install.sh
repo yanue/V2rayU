@@ -103,9 +103,12 @@ sudo /bin/launchctl unload -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.pl
 sudo /bin/launchctl load -wF /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
 
 # pac 文件（以用户身份复制，保证 owner 正确）
-if [ ! -d "$APP_HOME_DIR/pac" ]; then
-    sudo -u "$USERNAME" cp -rf ./pac "$APP_HOME_DIR/"
-fi
+mkdir -p "$APP_HOME_DIR/pac"
+for f in abp.js gfwlist.txt user-rule.txt; do
+    if [ ! -f "$APP_HOME_DIR/pac/$f" ]; then
+        sudo -u "$USERNAME" cp -f "./pac/$f" "$APP_HOME_DIR/pac/"
+    fi
+done
 
 # ====== 权限设置 ======
 
