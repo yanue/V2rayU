@@ -90,6 +90,7 @@
 		666A61072F1933A0003654D3 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61062F1933A0003654D3 /* install.sh */; };
 		666A61082F1933A1003654D3 /* update-xray.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61092F1933A1003654D3 /* update-xray.sh */; };
 		666A610C2F193A5C003654D3 /* plist in Resources */ = {isa = PBXBuildFile; fileRef = 666A610B2F193A56003654D3 /* plist */; };
+		666BD1E62FB374DA009FC480 /* TunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666BD1E52FB374DA009FC480 /* TunView.swift */; };
 		667028E42F0D467E008F27D8 /* pac in Resources */ = {isa = PBXBuildFile; fileRef = 667028E32F0D4678008F27D8 /* pac */; };
 		667028F52F0D46E0008F27D8 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 667028F42F0D46DA008F27D8 /* bin */; };
 		667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */; };
@@ -251,6 +252,7 @@
 		666A61062F1933A0003654D3 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		666A61092F1933A1003654D3 /* update-xray.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "update-xray.sh"; sourceTree = "<group>"; };
 		666A610B2F193A56003654D3 /* plist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plist; sourceTree = "<group>"; };
+		666BD1E52FB374DA009FC480 /* TunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunView.swift; sourceTree = "<group>"; };
 		667028E32F0D4678008F27D8 /* pac */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pac; sourceTree = "<group>"; };
 		667028F42F0D46DA008F27D8 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
 		667464182F0E7FE800D3D1E9 /* SingBoxConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingBoxConfigHandler.swift; sourceTree = "<group>"; };
@@ -433,6 +435,7 @@
 				660A63AF2E2CF9B700D84D5D /* PacView.swift */,
 				660A63AD2E2CF9AD00D84D5D /* DnsView.swift */,
 				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
+				666BD1E52FB374DA009FC480 /* TunView.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1045,6 +1048,7 @@
 				6632EF2B2EC35F6500CED47B /* ProfileModel.swift in Sources */,
 				662CC44C2D1C4D38006E8450 /* ProfileViewModel.swift in Sources */,
 				66F66F832D1E450000E77C64 /* AppState.swift in Sources */,
+				666BD1E62FB374DA009FC480 /* TunView.swift in Sources */,
 				662CC44D2D1C4D38006E8450 /* RoutingViewModel.swift in Sources */,
 				662CC44E2D1C4D38006E8450 /* SubscriptionViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,

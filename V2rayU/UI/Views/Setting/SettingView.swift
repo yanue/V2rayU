@@ -18,6 +18,7 @@ struct SettingView: View {
         case dns
         case pac
         case core
+        case tun
     }
 
     var body: some View {
@@ -32,6 +33,7 @@ struct SettingView: View {
             Picker("", selection: $appState.settingTab) {
                 localized(.General).tag(SettingTab.general)
                 localized(.Advanced).tag(SettingTab.advance)
+                localized(.Tun).tag(SettingTab.tun)
                 localized(.Shortcuts).tag(SettingTab.shortcuts)
                 localized(.DNS).tag(SettingTab.dns)
                 localized(.PAC).tag(SettingTab.pac)
@@ -56,6 +58,8 @@ struct SettingView: View {
                     PacView()
                 case .core:
                     CoreView()
+                case .tun:
+                    TunView()
                 }
             }
             .background(.ultraThinMaterial)

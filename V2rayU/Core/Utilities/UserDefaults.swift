@@ -64,6 +64,20 @@ extension UserDefaults {
         case runningRouting
         // selected profile uuid
         case runningProfile
+
+        // MARK: - TUN settings
+        // tun interface address
+        case tunAddress
+        // tun mtu
+        case tunMtu
+        // tun stack (system/gvisor/mixed)
+        case tunStack
+        // tun default dns server
+        case tunDnsDefault
+        // tun china dns server
+        case tunDnsChina
+        // tun fakeip range
+        case tunFakeipRange
     }
 
     static func del(forKey key: KEY) {

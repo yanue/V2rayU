@@ -97,14 +97,17 @@ class SingboxConfigHandler {
                "sniff_override_destination": true
              }
              */
+            let tunAddr = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+            let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
+            let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
             let tunInbound = SingboxInbound(
                 type: "tun",
                 tag: "tun-in",
-                address: ["10.0.0.1/30"],
+                address: [tunAddr],
                 auto_route: true,
                 strict_route: true,
-                mtu: 1500,
-                stack: "system", // system 需要 root 权限
+                mtu: tunMtu,
+                stack: tunStack.rawValue,
                 sniff: true,
                 sniff_override_destination: true // 很重要
             )
@@ -122,10 +125,13 @@ class SingboxConfigHandler {
             self.singbox.outbounds = [socksOutbound, directOutbound]
             
             // DNS配置
+            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
+            let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+            let fakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
             self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+                DNSServer(type: "udp", tag: "default-dns", server: dnsDefault),
+                DNSServer(type: "udp", tag: "china-dns", server: dnsChina),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: fakeipRange, inet6_range: "fc00::/18")
             ]
             self.singbox.dns.rules = [
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),

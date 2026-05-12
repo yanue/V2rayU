@@ -74,6 +74,7 @@ enum LanguageLabel: String, CaseIterable {
     case PAC
     case DNS
     case Core
+    case Tun
 
     // MARK: - General Settings
     case LaunchAtLogin
@@ -107,6 +108,15 @@ enum LanguageLabel: String, CaseIterable {
     case Mux
     case EnableTrafficStatistics
     case V2rayCoreLogLevel
+
+    // MARK: - TUN Settings
+    case TunSettings
+    case TunAddress
+    case TunMtu
+    case TunStack
+    case TunDefaultDns
+    case TunChinaDns
+    case TunFakeipRange
 
     // MARK: - PAC Settings
     case PacSettings

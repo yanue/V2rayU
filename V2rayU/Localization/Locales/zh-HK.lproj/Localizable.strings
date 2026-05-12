@@ -68,6 +68,7 @@
 "PAC" = "PAC 設定";
 "DNS" = "DNS 設定";
 "Core" = "xray-core管理";
+"Tun" = "TUN 設定";
 
 // MARK: - 一般設定
 "LaunchAtLogin" = "開機時自動啟動";
@@ -634,4 +635,13 @@
 "ImportFailedDetail" = "匯入失敗: %@";
 "ImportParsing" = "解析中...";
 "ImportFromFile" = "從檔案匯入";
+
+// MARK: - TUN 設置
+"TunSettings" = "TUN 設置";
+"TunAddress" = "TUN 地址";
+"TunMtu" = "TUN MTU";
+"TunStack" = "TUN 協議棧";
+"TunDefaultDns" = "默認 DNS";
+"TunChinaDns" = "國內 DNS";
+"TunFakeipRange" = "FakeIP 範圍";
 

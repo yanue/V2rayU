@@ -206,6 +206,13 @@ struct DNSRule: Codable {
     var domain: [String]?
 }
 
+// TUN stack type
+enum TunStack: String, Codable, CaseIterable {
+    case system
+    case gvisor
+    case mixed
+}
+
 // Route
 struct RouteConfig: Codable {
     var auto_detect_interface: Bool = true

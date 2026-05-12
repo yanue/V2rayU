@@ -39,6 +39,14 @@ final class AppSettings: ObservableObject {
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
     @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204") ?? URL(fileURLWithPath: "/")
 
+    // MARK: - TUN settings
+    @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+    @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
+    @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
+    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
+    @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+    @Published var tunFakeipRange: String = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
+
     init() {
         if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
            let theme = Theme(rawValue: savedTheme) {
@@ -94,6 +102,12 @@ final class AppSettings: ObservableObject {
         dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
         gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
         launchAtLogin = SMAppService.mainApp.status == .enabled
+        tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+        tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
+        tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
+        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
+        tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+        tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
     }
 
     func saveSettings() {
@@ -140,6 +154,12 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .v2rayLogLevel, value: logLevel.rawValue)
         UserDefaults.set(forKey: .dnsServers, value: dnsJson)
         UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
+        UserDefaults.set(forKey: .tunAddress, value: tunAddress)
+        UserDefaults.setInt(forKey: .tunMtu, value: tunMtu)
+        UserDefaults.set(forKey: .tunStack, value: tunStack.rawValue)
+        UserDefaults.set(forKey: .tunDnsDefault, value: tunDnsDefault)
+        UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
+        UserDefaults.set(forKey: .tunFakeipRange, value: tunFakeipRange)
     }
 
     func handleChange(old: AppSettings) {
@@ -155,7 +175,13 @@ final class AppSettings: ObservableObject {
             old.mux != mux ||
             old.enableStat != enableStat ||
             old.logLevel != logLevel ||
-            old.dnsJson != dnsJson {
+            old.dnsJson != dnsJson ||
+            old.tunAddress != tunAddress ||
+            old.tunMtu != tunMtu ||
+            old.tunStack != tunStack ||
+            old.tunDnsDefault != tunDnsDefault ||
+            old.tunDnsChina != tunDnsChina ||
+            old.tunFakeipRange != tunFakeipRange {
             needRestartV2ray = true
         }
 

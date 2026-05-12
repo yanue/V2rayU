@@ -68,6 +68,7 @@
 "PAC" = "PAC";
 "DNS" = "DNS";
 "Core" = "Core";
+"Tun" = "TUN";
 
 // MARK: - General Settings
 "LaunchAtLogin" = "Launch at login";
@@ -634,4 +635,13 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "ImportFailedDetail" = "Import failed: %@";
 "ImportParsing" = "Parsing...";
 "ImportFromFile" = "Import from file";
+
+// MARK: - TUN Settings
+"TunSettings" = "TUN Settings";
+"TunAddress" = "TUN Address";
+"TunMtu" = "TUN MTU";
+"TunStack" = "TUN Stack";
+"TunDefaultDns" = "Default DNS";
+"TunChinaDns" = "China DNS";
+"TunFakeipRange" = "FakeIP Range";
 
