@@ -77,6 +77,7 @@
 "AutomaticallySelectFastestServer" = "自动选择最快服务器";
 "ShowProxySpeedOnTrayIcon" = "托盘图标显示代理速度";
 "ShowLatencyOnTrayIcon" = "托盘图标显示延迟值";
+"ShowCountryFlagIcon" = "菜单栏显示国家旗帜";
 "EnableProxyStatistics" = "启用代理统计";
 "KeyboardShortcuts" = "快捷键";
 "Toggle" = "开关";

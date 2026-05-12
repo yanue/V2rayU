@@ -38,6 +38,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var spiderX: String = "" // spiderX(reality): reality
     var extra: String = "" // xhttp额外字段extra
     var shareUri: String = "" // 原始分享链接(判断订阅是否更新)
+    var serverIp: String = "" // 服务器IP
+    var serverRegion: String = "" // 服务器IP归宿(国家代码)
     // 统计
     var totalUp: Int64 = 0 // 总上传
     var totalDown: Int64 = 0 // 总下载
@@ -59,7 +61,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, totalUp, totalDown, todayUp, todayDown, lastUpdate
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
     // 提供默认值的初始化器
@@ -89,7 +91,9 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         shortId: String = "",
         spiderX: String = "",
         extra: String = "",
-        shareUri: String = ""
+        shareUri: String = "",
+        serverIp: String = "",
+        serverRegion: String = ""
     ) {
         self.uuid = uuid
         self.speed = speed
@@ -117,6 +121,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.spiderX = spiderX
         self.extra = extra
         self.shareUri = shareUri
+        self.serverIp = serverIp
+        self.serverRegion = serverRegion
         self.totalUp = 0
         self.totalDown = 0
         self.todayUp = 0
@@ -156,6 +162,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let spiderX = Column(CodingKeys.spiderX)
         static let extra = Column(CodingKeys.extra)
         static let shareUri = Column(CodingKeys.shareUri)
+        static let serverIp = Column(CodingKeys.serverIp)
+        static let serverRegion = Column(CodingKeys.serverRegion)
         // 统计
         static let totalUp = Column(CodingKeys.totalUp)
         static let totalDown = Column(CodingKeys.totalDown)
@@ -195,6 +203,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 t.column(Columns.spiderX.name, .text)
                 t.column(Columns.extra.name, .text)
                 t.column(Columns.shareUri.name, .text)
+                t.column(Columns.serverIp.name, .text).notNull().defaults(to: "")
+                t.column(Columns.serverRegion.name, .text).notNull().defaults(to: "")
                 // 统计
                 t.column(Columns.totalUp.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.totalDown.name, .integer).notNull().defaults(to: 0)

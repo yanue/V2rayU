@@ -297,6 +297,19 @@ func getSpeedColor(latency: Double) -> NSColor {
     }
 }
 
+// 国家代码转 emoji
+func countryCodeToEmoji(_ code: String) -> String {
+    guard code.count == 2 else { return "" }
+    let base: UInt32 = 127397
+    var emoji = ""
+    for scalar in code.uppercased().unicodeScalars {
+        if let unicode = UnicodeScalar(base + scalar.value) {
+            emoji.append(String(unicode))
+        }
+    }
+    return emoji
+}
+
 extension Int64 {
     var humanSize: String {
         let units = ["B", "KB", "MB", "GB", "TB"]

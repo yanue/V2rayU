@@ -76,6 +76,7 @@
 "AutomaticallySelectFastestServer" = "自動選擇最快伺服器";
 "ShowProxySpeedOnTrayIcon" = "狀態列圖示顯示代理速度";
 "ShowLatencyOnTrayIcon" = "狀態列圖示顯示延遲值";
+"ShowCountryFlagIcon" = "菜單欄顯示國家旗幟";
 "EnableProxyStatistics" = "啟用代理統計";
 "KeyboardShortcuts" = "快捷鍵";
 "Toggle" = "切換";

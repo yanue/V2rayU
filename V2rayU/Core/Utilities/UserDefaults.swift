@@ -36,6 +36,8 @@ extension UserDefaults {
         case showSpeedOnTray
         // show latency in menu bar
         case showLatencyOnTray
+        // show country flag icon
+        case showCountryFlag
         // base settings
         // allowLAN
         case allowLAN
@@ -86,6 +88,13 @@ extension UserDefaults {
 
     static func getBool(forKey key: KEY) -> Bool {
         return UserDefaults.standard.bool(forKey: key.rawValue)
+    }
+
+    static func getBool(forKey key: KEY, default defaultValue: Bool) -> Bool {
+            guard UserDefaults.standard.object(forKey: key.rawValue) != nil else {
+                return defaultValue
+            }
+            return UserDefaults.standard.bool(forKey: key.rawValue)
     }
 
     static func set(forKey key: KEY, value: String) {

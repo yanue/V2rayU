@@ -415,10 +415,15 @@ struct ProfileListView: View {
                 .width(min: 150, max: 300)
 
                 TableColumn(String(localized: .TableFieldLatency)) { (row: ProfileEntity) in
-                    Text("\(row.speed)")
-                        .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
+                    HStack(spacing: 2) {
+                        if !row.serverRegion.isEmpty {
+                            Text(countryCodeToEmoji(row.serverRegion))
+                        }
+                        Text("\(row.speed)")
+                            .foregroundColor(Color(getSpeedColor(latency: Double(row.speed))))
+                    }
                 }
-                .width(40)
+                .width(60)
 
                 TableColumn(String(localized: .TableFieldType)) { row in
                     Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)

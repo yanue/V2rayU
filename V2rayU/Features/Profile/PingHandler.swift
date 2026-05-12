@@ -142,6 +142,8 @@ actor PingServer {
     private var jsonFile: String = ""
     private var bindPort: UInt16 = 0
 
+    private var serverIpCache: [String: String] = [:]
+
     init(uuid: String) {
         self.uuid = uuid
     }
@@ -172,6 +174,18 @@ actor PingServer {
         do {
             let pingTime = try await testLatencyByProxyPort(port: bindPort)
             item.speed = pingTime
+
+            if let serverIp = await fetchServerIp(port: bindPort), !serverIp.isEmpty {
+                item.serverIp = serverIp
+                ProfileStore.shared.updateServerIp(uuid: self.item.uuid, serverIp: serverIp)
+
+                if let serverRegion = await fetchServerLocation(ip: serverIp), !serverRegion.isEmpty {
+                    item.serverRegion = serverRegion
+                    ProfileStore.shared.updateServerRegion(uuid: self.item.uuid, serverRegion: serverRegion)
+                    logger.info("Server IP location: \(self.item.remark), \(serverIp) -> \(serverRegion)")
+                }
+            }
+
             let runningProfile = await AppState.shared.runningProfile
             if item.uuid == runningProfile {
                 await AppState.shared.setLatency(latency: Double(pingTime))
@@ -184,8 +198,74 @@ actor PingServer {
             if item.uuid == runningProfile {
                 await AppState.shared.setLatency(latency: -1)
             }
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-error: \(item.remark) - \(error)")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-error: \(self.item.remark) - \(error)")
             logger.info("Ping error: \(self.item.remark), \(self.item.uuid) \(error)")
+        }
+    }
+
+    private func fetchServerIp(port: UInt16) async -> String? {
+        return await withCheckedContinuation { continuation in
+            let url = URL(string: "https://api.ipify.org?format=json")!
+            let configuration = getProxyUrlSessionConfigure(httpProxyPort: port)
+            let session = URLSession(configuration: configuration)
+
+            final class ResumableHolder: @unchecked Sendable {
+                var done = false
+            }
+            let holder = ResumableHolder()
+
+            let finish: @Sendable (String?) -> Void = { result in
+                guard !holder.done else { return }
+                holder.done = true
+                session.invalidateAndCancel()
+                continuation.resume(returning: result)
+            }
+
+            let task = session.dataTask(with: url) { data, _, error in
+                guard error == nil, let data = data,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let ip = json["ip"] as? String else {
+                    finish(nil)
+                    return
+                }
+                finish(ip)
+            }
+            task.resume()
+
+            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                finish(nil)
+            }
+        }
+    }
+
+    private func fetchServerLocation(ip: String) async -> String? {
+        if let cached = serverIpCache[ip] {
+            return cached
+        }
+
+        guard let url = URL(string: "http://ip-api.com/json/\(ip)?fields=countryCode") else {
+            return nil
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return nil
+            }
+
+            if let status = json["status"] as? String, status == "fail" {
+                return nil
+            }
+
+            if let countryCode = json["countryCode"] as? String, !countryCode.isEmpty {
+                serverIpCache[ip] = countryCode
+                return countryCode
+            }
+
+            return nil
+        } catch {
+            logger.error("fetchServerLocation error: \(error)")
+            return nil
         }
     }
 

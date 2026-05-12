@@ -28,6 +28,9 @@ struct GeneralView: View {
         .onDisappear {
             AppSettings.shared.saveSettings()
         }
+        .onChange(of: settings.showCountryFlag) { _ in
+            Task { await AppMenuManager.shared.refreshServerItems() }
+        }
     }
 
     private var generalSection: some View {
@@ -42,6 +45,7 @@ struct GeneralView: View {
             Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
             Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
             Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
+            Toggle(String(localized: .ShowCountryFlagIcon), isOn: $settings.showCountryFlag)
             Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
         }
     }

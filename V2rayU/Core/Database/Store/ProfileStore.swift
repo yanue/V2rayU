@@ -113,6 +113,36 @@ struct ProfileStore: StoreProtocol {
     }
 
     @discardableResult
+    func updateServerIp(uuid: String, serverIp: String) -> Bool {
+        do {
+            _ = try dbWriter.write { db in
+                try ProfileEntity
+                    .filter(ProfileEntity.Columns.uuid == uuid)
+                    .updateAll(db, [ProfileEntity.Columns.serverIp.set(to: serverIp)])
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.updateServerIp error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func updateServerRegion(uuid: String, serverRegion: String) -> Bool {
+        do {
+            _ = try dbWriter.write { db in
+                try ProfileEntity
+                    .filter(ProfileEntity.Columns.uuid == uuid)
+                    .updateAll(db, [ProfileEntity.Columns.serverRegion.set(to: serverRegion)])
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.updateServerRegion error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
     func updateSortOrder(_ entities: [ProfileEntity]) -> Bool {
         do {
             try dbWriter.write { db in

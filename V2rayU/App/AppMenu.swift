@@ -489,8 +489,13 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         let speedText: String = "[\(profile.speed)ms]"
         let speedColor: NSColor = getSpeedColor(latency: Double(profile.speed))
 
+        var prefix = ""
+        if AppSettings.shared.showCountryFlag && !profile.serverRegion.isEmpty {
+            prefix = countryCodeToEmoji(profile.serverRegion) + " "
+        }
+
         // Ping值放前面
-        let title = "\(speedText) \(profile.remark)"
+        let title = "\(speedText) \(prefix)\(profile.remark)"
 
         let item = NSMenuItem()
         item.attributedTitle = createColoredAttributedTitle(

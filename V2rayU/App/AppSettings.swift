@@ -24,6 +24,7 @@ final class AppSettings: ObservableObject {
     @Published var selectFastestServer: Bool = UserDefaults.getBool(forKey: .autoSelectFastestServer)
     @Published var showSpeedOnTray: Bool = UserDefaults.getBool(forKey: .showSpeedOnTray)
     @Published var showLatencyOnTray: Bool = UserDefaults.getBool(forKey: .showLatencyOnTray)
+    @Published var showCountryFlag: Bool = UserDefaults.getBool(forKey: .showCountryFlag, default: true)
     @Published var socksPort: Int = Int(getSocksProxyPort())
     @Published var httpPort: Int = Int(getHttpProxyPort())
     @Published var pacPort: Int = Int(getPacPort())
@@ -79,6 +80,7 @@ final class AppSettings: ObservableObject {
         selectFastestServer = UserDefaults.getBool(forKey: .autoSelectFastestServer)
         showSpeedOnTray = UserDefaults.getBool(forKey: .showSpeedOnTray)
         showLatencyOnTray = UserDefaults.getBool(forKey: .showLatencyOnTray)
+        showCountryFlag = UserDefaults.getBool(forKey: .showCountryFlag, default: true)
         socksPort = Int(getSocksProxyPort())
         httpPort = Int(getHttpProxyPort())
         pacPort = Int(getPacPort())
@@ -125,6 +127,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.setBool(forKey: .autoSelectFastestServer, value: selectFastestServer)
         UserDefaults.setBool(forKey: .showSpeedOnTray, value: showSpeedOnTray)
         UserDefaults.setBool(forKey: .showLatencyOnTray, value: showLatencyOnTray)
+        UserDefaults.setBool(forKey: .showCountryFlag, value: showCountryFlag)
         UserDefaults.setBool(forKey: .enableStat, value: enableStat)
         UserDefaults.setInt(forKey: .localSockPort, value: socksPort)
         UserDefaults.setInt(forKey: .localHttpPort, value: httpPort)
@@ -154,6 +157,10 @@ final class AppSettings: ObservableObject {
             old.logLevel != logLevel ||
             old.dnsJson != dnsJson {
             needRestartV2ray = true
+        }
+
+        if old.showCountryFlag != showCountryFlag {
+            Task { await AppMenuManager.shared.refreshServerItems() }
         }
         // 需要重新生成PAC文件的情况
         let needGeneratePAC = old.socksPort != socksPort || old.allowLAN != allowLAN || old.gfwPacListUrl != gfwPacListUrl

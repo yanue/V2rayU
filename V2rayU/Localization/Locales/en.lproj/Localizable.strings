@@ -76,6 +76,7 @@
 "AutomaticallySelectFastestServer" = "Auto-select the fastest server";
 "ShowProxySpeedOnTrayIcon" = "Show proxy speed on tray icon";
 "ShowLatencyOnTrayIcon" = "Show latency on tray icon";
+"ShowCountryFlagIcon" = "Show country flag in menu";
 "EnableProxyStatistics" = "Enable proxy statistics";
 "KeyboardShortcuts" = "Keyboard Shortcuts";
 "Toggle" = "Toggle";
