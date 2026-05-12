@@ -366,26 +366,40 @@ struct LogAnalyzer {
             let lines = content.components(separatedBy: .newlines)
             let recentLines = Array(lines.suffix(lastLines))
             
-            var relevantLogs: [String] = []
-            
+            // collect all matching line indices
+            var matchIndices = Set<Int>()
             for (index, line) in recentLines.enumerated() {
                 let lowerLine = line.lowercased()
-                
                 let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]") || lowerLine.contains("[info]")
                 let isErrorPattern = lowerLine.contains("failed") || lowerLine.contains("error") || 
                                     lowerLine.contains("timeout") || lowerLine.contains("reset") || 
                                     lowerLine.contains("denied") || lowerLine.contains("reject")
-                
                 if hasError || isErrorPattern {
-                    let start = max(0, index - contextLines)
-                    let end = min(recentLines.count, index + contextLines + 1)
-                    
-                    for i in start..<end {
-                        let prefix = i == index ? ">>> " : "    "
-                        relevantLogs.append("\(prefix)\(recentLines[i])")
-                    }
+                    matchIndices.insert(index)
+                }
+            }
+            
+            // collect all context line indices (deduplicated)
+            var contextIndices = Set<Int>()
+            for idx in matchIndices {
+                let start = max(0, idx - contextLines)
+                let end = min(recentLines.count, idx + contextLines + 1)
+                for i in start..<end {
+                    contextIndices.insert(i)
+                }
+            }
+            
+            // sort and render
+            let sortedIndices = contextIndices.sorted()
+            var relevantLogs: [String] = []
+            var prevIdx = -2  // track gaps to insert blank lines between blocks
+            for i in sortedIndices {
+                if i > prevIdx + 1 {
                     relevantLogs.append("")
                 }
+                let prefix = matchIndices.contains(i) ? ">>> " : "    "
+                relevantLogs.append("\(prefix)\(recentLines[i])")
+                prevIdx = i
             }
             
             return relevantLogs.isEmpty ? "无 INFO 及以上级别日志" : relevantLogs.joined(separator: "\n")
