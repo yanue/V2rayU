@@ -60,6 +60,14 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     override private init() {
         super.init()
+        // 监听窗口失去焦点时重置状态栏高亮（修复多显示器下高亮状态卡住问题 #1636）
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(resetHighlight),
+            name: NSApplication.didResignActiveNotification,
+            object: nil
+        )
+
         pingTipSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tip in
@@ -358,6 +366,16 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         statusItem.menu = menu
         statusMenu = menu
         self.inited = true
+    }
+
+    // MARK: - NSMenuDelegate
+
+    func menuDidClose(_ menu: NSMenu) {
+        statusItem.button?.isHighlighted = false
+    }
+
+    @objc private func resetHighlight() {
+        statusItem.button?.isHighlighted = false
     }
 
     func getCoreStatusItem() -> NSMenuItem {
