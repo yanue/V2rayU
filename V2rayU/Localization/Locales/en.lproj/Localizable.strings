@@ -137,6 +137,8 @@
 "DnsFormatEncodingFail" = "Error: Formatted content cannot be encoded to string.";
 "DnsSaveSuccess" = "DNS configuration saved successfully.";
 "DnsSaveFail" = "Error: Failed to save DNS configuration - %@";
+"DnsClear" = "Clear";
+"DnsDefault" = "Default";
 
 // MARK: - Subscription Settings
 "SubscriptionSettings" = "Subscription Settings";

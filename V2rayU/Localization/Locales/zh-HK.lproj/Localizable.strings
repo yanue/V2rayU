@@ -137,6 +137,8 @@
 "DnsFormatEncodingFail" = "錯誤：格式化後內容無法編碼為字串。";
 "DnsSaveSuccess" = "DNS 設定已成功儲存。";
 "DnsSaveFail" = "儲存 DNS 設定失敗: %@";
+"DnsClear" = "清空";
+"DnsDefault" = "推薦";
 
 // MARK: - 訂閱設定
 "SubscriptionSettings" = "訂閱設定";

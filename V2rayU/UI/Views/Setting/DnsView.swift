@@ -30,6 +30,12 @@ struct DnsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .focusable(false)
+                 Button(action: { goHelp(self) }) {
+                                    Label(String(localized: .Help), systemImage: "questionmark.circle")
+                                }
+                                .buttonStyle(.bordered)
+                                .focusable(false)
+
             }
 
             TextEditor(text: $dnsJson)
@@ -41,8 +47,14 @@ struct DnsView: View {
                 )
 
             HStack {
-                Button(action: { goHelp(self) }) {
-                    Label(String(localized: .Help), systemImage: "questionmark.circle")
+                Button(action: { dnsJson = "{}" }) {
+                    Label(String(localized: .DnsClear), systemImage: "trash")
+                }
+                .buttonStyle(.bordered)
+                .focusable(false)
+
+                Button(action: { dnsJson = defaultDns }) {
+                    Label(String(localized: .DnsDefault), systemImage: "checkmark.circle")
                 }
                 .buttonStyle(.bordered)
                 .focusable(false)

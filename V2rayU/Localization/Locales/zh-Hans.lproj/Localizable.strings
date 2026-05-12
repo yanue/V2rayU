@@ -138,6 +138,8 @@
 "DnsFormatEncodingFail" = "错误: 格式化后的内容无法编码为字符串。";
 "DnsSaveSuccess" = "DNS 配置保存成功。";
 "DnsSaveFail" = "保存 DNS 配置失败: %@";
+"DnsClear" = "清空";
+"DnsDefault" = "推荐";
 
 // MARK: - 订阅设置
 "SubscriptionSettings" = "订阅设置";
