@@ -191,7 +191,7 @@ final class AppSettings: ObservableObject {
         // 需要重新生成PAC文件的情况
         let needGeneratePAC = old.socksPort != socksPort || old.allowLAN != allowLAN || old.gfwPacListUrl != gfwPacListUrl
         // pac端口改变后, 需要重启HTTP服务器
-        let needRestartHttpServer = pacPort != old.pacPort
+        let needRestartHttpServer = pacPort != old.pacPort || old.allowLAN != allowLAN
         if needGeneratePAC {
             _ = GeneratePACFile(rewrite: true)
         }

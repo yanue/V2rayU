@@ -16,17 +16,17 @@ let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwli
 
 
 func getPacUrl() -> String {
-    let pacUrl = "http://127.0.0.1:" + String(getPacPort()) + "/proxy.js"
+    let pacUrl = "http://" + getPacAddress() + ":" + String(getPacPort()) + "/proxy.js"
     return pacUrl
 }
 
 func getConfigUrl() -> String {
-    let configUrl = "http://127.0.0.1:" + String(getPacPort()) + "/config.json"
+    let configUrl = "http://" + getPacAddress() + ":" +  String(getPacPort()) + "/config.json"
     return configUrl
 }
 
 func getTunConfigUrl() -> String {
-    let configUrl = "http://127.0.0.1:" + String(getPacPort()) + "/tun.json"
+    let configUrl = "http://" + getPacAddress() + ":" + String(getPacPort()) + "/tun.json"
     return configUrl
 }
 

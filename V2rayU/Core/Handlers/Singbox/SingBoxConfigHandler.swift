@@ -29,6 +29,9 @@ class SingboxConfigHandler {
         self.httpPort = String(getHttpProxyPort())
         self.socksPort = String(getSocksProxyPort())
         self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+
+        self.socksHost = getListenAddress()
+        self.httpHost = getListenAddress()
     }
     
     // ping配置

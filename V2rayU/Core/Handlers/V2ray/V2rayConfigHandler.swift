@@ -55,6 +55,9 @@ class V2rayConfigHandler {
         self.enableTun = enableTun
 
         self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+
+        self.socksHost = getListenAddress()
+        self.httpHost = getListenAddress()
     }
 
     // ping配置

@@ -72,7 +72,22 @@ class RoutingManager {
         if UserDefaults.get(forKey: .runningRouting) != entity.uuid {
             UserDefaults.set(forKey: .runningRouting, value: entity.uuid)
         }
-        return handler.getRouting()
+        var routing = handler.getRouting()
+
+        // allowLAN: route private IPs direct to prevent LAN traffic loop
+        if UserDefaults.getBool(forKey: .allowLAN) {
+            let hasPrivateRule = routing.rules.contains { $0.outboundTag == "direct" && ($0.ip?.contains("geoip:private") == true) }
+            if !hasPrivateRule {
+                var rule = V2rayRoutingRule()
+                rule.type = "field"
+                rule.ip = ["geoip:private"]
+                rule.domain = nil
+                rule.outboundTag = "direct"
+                routing.rules.append(rule)
+            }
+        }
+
+        return routing
     }
     
     // 确保默认路由存在
@@ -144,7 +159,17 @@ class RoutingManager {
         default:
             break
         }
-        
+
+        // allowLAN: route private IPs direct to prevent LAN traffic loop
+        if UserDefaults.getBool(forKey: .allowLAN) {
+            if !directIps.contains("geoip:private") {
+                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+            }
+            if !directDomains.contains("localhost") {
+                rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
+            }
+        }
+
         return rules
     }
     

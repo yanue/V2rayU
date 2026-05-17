@@ -19,17 +19,13 @@ actor LocalHttpServer {
 
     private var httpServer: HTTPServer?
 
-    func restart() {
+    func restart() async {
         logger.info("Restarting LocalHttpServer")
-        Task {
-            await stop()
-            await start()
-        }
+        await stop()
+        await start()
     }
     
     func start() async {
-        // 停止已有服务
-        await stop()
         let pacPort = getPacPort()
         logger.info("pacPort: \(pacPort)")
 
@@ -85,8 +81,7 @@ actor LocalHttpServer {
                 try await server.run()
                 logger.info("FlyingFox HTTPServer started at port: \(pacPort)")
             } catch {
-                alertDialog(title: "启动 http 失败", message: "\(error)")
-                logger.info("FlyingFox HTTPServer start error: \(error)")
+                logger.info("FlyingFox HTTPServer run error: \(error)")
             }
         }
     }
