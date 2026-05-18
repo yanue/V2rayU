@@ -41,6 +41,8 @@ extension ProfileEntity {
         if self.network == .grpc || self.network == .h2 || self.network == .ws {
             mode = .SingBox
         }
+        // Xray supports Hysteria2 (protocol "hysteria" with version 2) since 2026
+        // Sing-box also supports it - both cores work, leave default decision up
          logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(mode.rawValue)")
         return mode
     }

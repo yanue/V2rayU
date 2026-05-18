@@ -66,6 +66,15 @@ class V2rayOutboundHandler {
     private func updateServerSettings() {
         outbound.protocol = self.profile.protocol
         outbound.tag = "proxy"
+        // For hysteria2, network is always hysteria
+        if self.profile.protocol == .hysteria2 {
+            var hysteriaOutbound = V2rayOutboundHysteria2()
+            hysteriaOutbound.address = self.profile.address
+            hysteriaOutbound.port = self.profile.port
+            outbound.settings = hysteriaOutbound
+            outbound.streamSettings = buildHysteria2StreamSettings()
+            return
+        }
         switch self.profile.protocol {
         case .vmess:
             // user
@@ -145,8 +154,7 @@ class V2rayOutboundHandler {
     }
 
     private func updateStreamSettings() {
-        if self.profile.protocol == .socks {
-            outbound.streamSettings = nil
+        if self.profile.protocol == .socks || self.profile.protocol == .hysteria2 {
             return
         }
 
@@ -227,7 +235,49 @@ class V2rayOutboundHandler {
             }
 
             settings.xhttpSettings = streamXhttp
+        
+        case .hysteria:
+            // Handled in buildHysteria2StreamSettings, should not reach here
+            break
         }
+    }
+
+    // Build Hysteria2 stream settings (Xray-core format)
+    private func buildHysteria2StreamSettings() -> V2rayStreamSettings {
+        let hyConfig = profile.getHysteria2Config()
+
+        var settings = V2rayStreamSettings()
+        settings.network = .hysteria
+
+        var hys = HysteriaSettings()
+        hys.auth = (hyConfig.authType == "password" || hyConfig.authType == "token") ? hyConfig.authPassword : profile.password
+        // masquerade
+        if !hyConfig.masqueradeType.isEmpty {
+            var masq = MasqObject()
+            masq.type = hyConfig.masqueradeType
+            if hyConfig.masqueradeType == "proxy" {
+                masq.url = hyConfig.masqueradeUrl
+            }
+            hys.masquerade = masq
+        }
+        settings.hysteriaSettings = hys
+
+        settings.security = .tls
+        settings.tlsSettings = TlsSettings(
+            serverName: profile.sni.isEmpty ? profile.address : profile.sni,
+            allowInsecure: hyConfig.insecure,
+            alpn: ["h3"],
+            fingerprint: profile.fingerprint.rawValue
+        )
+
+        if !hyConfig.obfsType.isEmpty {
+            var obfsSettings = HysteriaUdpmaskSettings()
+            obfsSettings.password = hyConfig.obfsPassword
+            let mask = HysteriaUdpmask(type: hyConfig.obfsType, settings: hyConfig.obfsPassword.isEmpty ? nil : obfsSettings)
+            settings.udpmasks = [mask]
+        }
+
+        return settings
     }
 
     // 提取安全配置

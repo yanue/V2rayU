@@ -73,6 +73,15 @@ struct ConfigStreamView: View {
                         getTextFieldWithLabel(label: .XhttpPath, text: $item.path)
                         getTextEditorWithLabel(label: .Extra, text: $item.extra)
                     }
+
+                    if item.network == .hysteria {
+                        getTextFieldWithLabel(label: .AuthPassword, text: $item.hysteria2AuthPassword)
+                        getTextFieldWithLabel(label: .ObfsType, text: $item.hysteria2ObfsType)
+                        if !item.hysteria2ObfsType.isEmpty {
+                            getTextFieldWithLabel(label: .ObfsPassword, text: $item.hysteria2ObfsPassword)
+                        }
+                        getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.hysteria2Insecure)
+                    }
                 }
                 .id(item.network) // Force full subtree recreation on network change
             }

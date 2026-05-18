@@ -18,6 +18,7 @@ enum V2rayStreamNetwork: String, Codable, CaseIterable, Identifiable {
     case kcp
     case domainsocket
     case xhttp
+    case hysteria
     var id: Self { self }
 }
 
@@ -75,10 +76,42 @@ struct V2rayStreamSettings: Codable {
     var quicSettings: QuicSettings?
     var grpcSettings: GrpcSettings?
     var xhttpSettings: XhttpSettings?
+    // hysteria
+    var hysteriaSettings: HysteriaSettings?
+    var udpmasks: [HysteriaUdpmask]?
     // security
     var tlsSettings: TlsSettings?
     var xtlsSettings: TlsSettings?
     var realitySettings: RealitySettings?
+}
+
+// MARK: - Hysteria2 Transport Settings (Xray-core)
+
+struct HysteriaSettings: Codable {
+    var version: Int = 2
+    var auth: String = ""
+    var udpIdleTimeout: Int = 60
+    var masquerade: MasqObject?
+}
+
+struct MasqObject: Codable {
+    var type: String = ""
+    var dir: String = ""
+    var url: String = ""
+    var rewriteHost: Bool = false
+    var insecure: Bool = false
+    var content: String = ""
+    var headers: [String: String]?
+    var statusCode: Int = 0
+}
+
+struct HysteriaUdpmask: Codable {
+    var type: String = ""
+    var settings: HysteriaUdpmaskSettings?
+}
+
+struct HysteriaUdpmaskSettings: Codable {
+    var password: String = ""
 }
 
 struct TlsSettings: Codable {

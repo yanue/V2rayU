@@ -79,7 +79,7 @@ struct SingboxOutbound: Codable {
     var tag: String?
     var server: String?
     var server_port: Int?
-    var password: String? // trojan
+    var password: String? // trojan, hysteria2
     var method: String? // 仅ss
     var uuid: String? // vmess|vless
     var security: String? // vmess
@@ -92,6 +92,11 @@ struct SingboxOutbound: Codable {
     var multiplex: SingboxMultiplexConfig?
     var tls: TLSConfig?
     var transport: TransportConfig?
+    // hysteria2
+    var up_mbps: Int?
+    var down_mbps: Int?
+    var obfs: Hysteria2ObfsConfig?
+    var hop_interval: Int?
 
     init(
         type: String,
@@ -110,7 +115,11 @@ struct SingboxOutbound: Codable {
         domain_resolver: String? = nil,
         multiplex: SingboxMultiplexConfig? = nil,
         tls: TLSConfig? = nil,
-        transport: TransportConfig? = nil
+        transport: TransportConfig? = nil,
+        up_mbps: Int? = nil,
+        down_mbps: Int? = nil,
+        obfs: Hysteria2ObfsConfig? = nil,
+        hop_interval: Int? = nil
     ) {
         self.type = type
         self.tag = tag
@@ -129,7 +138,16 @@ struct SingboxOutbound: Codable {
         self.multiplex = multiplex
         self.tls = tls
         self.transport = transport
+        self.up_mbps = up_mbps
+        self.down_mbps = down_mbps
+        self.obfs = obfs
+        self.hop_interval = hop_interval
     }
+}
+
+struct Hysteria2ObfsConfig: Codable {
+    var type: String
+    var password: String?
 }
 
 struct SingboxMultiplexConfig: Codable {

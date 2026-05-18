@@ -36,7 +36,9 @@ struct ConfigFormView: View {
                         VStack{
                             ConfigServerView(item: item)
                             Spacer(minLength: 12)
-                            if item.protocol != .socks {
+                            if item.protocol == .hysteria2 {
+                                Hysteria2ConfigView(item: item)
+                            } else if item.protocol != .socks {
                                 ConfigStreamView(item: item)
                                 Spacer(minLength: 12)
                                 ConfigTransportView(item: item)

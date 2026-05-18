@@ -34,6 +34,8 @@ class SingboxOutboundHandler {
         case .http, .dns:
             // http 和 dns 不支持作为 outbound 使用，返回一个默认的 direct 出站
             return SingboxOutbound(type: "direct", tag: "direct")
+        case .hysteria2:
+            return buildHysteria2()
         }
     }
 
@@ -174,7 +176,43 @@ class SingboxOutboundHandler {
             
         case .domainsocket:
             return TransportConfig(type: "domainsocket")
+
+        case .hysteria:
+            // Hysteria2 has its own transport, not configured here
+            return nil
         }
+    }
+
+    private func buildHysteria2() -> SingboxOutbound {
+        let hyConfig = profile.getHysteria2Config()
+
+        var obfs: Hysteria2ObfsConfig?
+        if !hyConfig.obfsType.isEmpty {
+            obfs = Hysteria2ObfsConfig(
+                type: hyConfig.obfsType,
+                password: hyConfig.obfsPassword.isEmpty ? nil : hyConfig.obfsPassword
+            )
+        }
+
+        let upMbps = Int(hyConfig.bandwidthUp.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression))
+        let downMbps = Int(hyConfig.bandwidthDown.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression))
+
+        return SingboxOutbound(
+            type: "hysteria2",
+            tag: "proxy",
+            server: profile.address,
+            server_port: profile.port,
+            password: hyConfig.authType == "password" ? hyConfig.authPassword : profile.password,
+            tls: TLSConfig(
+                enabled: true,
+                server_name: profile.sni.isEmpty ? profile.address : profile.sni,
+                insecure: hyConfig.insecure
+            ),
+            up_mbps: upMbps,
+            down_mbps: downMbps,
+            obfs: obfs,
+            hop_interval: hyConfig.hopInterval > 0 ? hyConfig.hopInterval : nil
+        )
     }
 
 }

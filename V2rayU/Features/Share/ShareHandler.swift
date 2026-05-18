@@ -16,6 +16,8 @@ class ShareUri {
             handler.uri = VlessUri(from: item).encode()
         case .shadowsocks:
             handler.uri = ShadowsocksUri(from: item).encode()
+        case .hysteria2:
+            handler.uri = Hysteria2Uri(from: item).encode()
         default:
             handler.error = "Protocol not supported"
             return ""

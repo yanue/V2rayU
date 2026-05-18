@@ -139,6 +139,11 @@ extension clashProxy {
             profile.password = self.password ?? ""
             profile.host = self.servername ?? self.server
 
+        case "hysteria2":
+            profile.protocol = .hysteria2
+            profile.password = self.password ?? ""
+            profile.sni = self.servername ?? self.server
+
         default:
             return nil
         }

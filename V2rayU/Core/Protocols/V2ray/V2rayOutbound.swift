@@ -13,6 +13,7 @@ protocol V2rayOutboundSettings: Codable {}
 // MARK: - Protocol Definitions
 enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
     case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom
+    case hysteria2 = "hysteria"
     var id: Self { self }
     
     func showInEditor () -> Bool {
@@ -64,6 +65,7 @@ final class V2rayOutbound: Codable {
         case .http: settings = try? container.decode(V2rayOutboundHttp.self, forKey: .settings)
         case .vless: settings = try? container.decode(V2rayOutboundVLess.self, forKey: .settings)
         case .trojan: settings = try? container.decode(V2rayOutboundTrojan.self, forKey: .settings)
+        case .hysteria2: settings = try? container.decode(V2rayOutboundHysteria2.self, forKey: .settings)
         }
     }
 
@@ -89,6 +91,7 @@ final class V2rayOutbound: Codable {
         case let value as V2rayOutboundHttp: try container.encode(value, forKey: .settings)
         case let value as V2rayOutboundVLess: try container.encode(value, forKey: .settings)
         case let value as V2rayOutboundTrojan: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundHysteria2: try container.encode(value, forKey: .settings)
         default: break
         }
     }
@@ -236,4 +239,11 @@ struct V2rayOutboundTrojanServer: Codable {
     var password: String = ""
     var email: String? // 选填
     var level: Int? // 选填,默认 0
+}
+
+// Hysteria2 (protocol name is "hysteria" with version 2 in Xray-core)
+struct V2rayOutboundHysteria2: V2rayOutboundSettings {
+    var version: Int = 2
+    var address: String = ""
+    var port: Int = 0
 }

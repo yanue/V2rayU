@@ -84,6 +84,12 @@ struct ConfigServerView: View {
                         getTextFieldWithLabel(label: .Username, text: $item.host) // 用 host 存储 socks username
                         getTextFieldWithLabel(label: .Password, text: $item.password)
                     }
+
+                    if item.protocol == .hysteria2 {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
+                    }
                 }
                 .id(item.protocol) // Force full subtree recreation on protocol change
             }

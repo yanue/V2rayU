@@ -31,7 +31,7 @@ func importUri(url: String) {
 }
 
 func supportProtocol(uri: String) -> Bool {
-    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") {
         return true
     }
     return false
@@ -55,7 +55,7 @@ func importFromJson(json: String) -> ProfileEntity? {
         }
 
         // 找到第一个代理协议的 outbound（跳过 freedom/blackhole/dns 等）
-        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks"])
+        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2"])
         guard let proxyOutbound = outbounds.first(where: {
             guard let proto = $0["protocol"] as? String else { return false }
             return proxyProtocols.contains(proto.lowercased())
@@ -125,6 +125,15 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
             profile.port = first["port"] as? Int ?? 0
             profile.password = first["password"] as? String ?? ""
             profile.encryption = first["method"] as? String ?? ""
+        }
+
+    case "hysteria2":
+        profile.protocol = .hysteria2
+        profile.address = outbound["address"] as? String ?? outbound["server"] as? String ?? ""
+        profile.port = outbound["port"] as? Int ?? 0
+        profile.password = outbound["password"] as? String ?? ""
+        if let settings = outbound["settings"] as? [String: Any] {
+            profile.password = settings["password"] as? String ?? profile.password
         }
 
     default:
@@ -231,6 +240,8 @@ class ImportUri {
             uriHandler = ShadowsocksUri()
         } else if share_uri.hasPrefix("ssr://") {
             uriHandler = ShadowsocksRUri()
+        } else if share_uri.hasPrefix("hysteria2://") {
+            uriHandler = Hysteria2Uri()
         }
 
         // 解析 URI

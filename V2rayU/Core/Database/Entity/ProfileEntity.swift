@@ -172,6 +172,28 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let lastUpdate = Column(CodingKeys.lastUpdate)
     }
 
+    // MARK: - Hysteria2 Config
+    struct Hysteria2Config: Codable {
+        var obfsType: String = ""
+        var obfsPassword: String = ""
+        var authType: String = ""
+        var authPassword: String = ""
+        var masqueradeType: String = ""
+        var masqueradeUrl: String = ""
+        var bandwidthUp: String = ""
+        var bandwidthDown: String = ""
+        var hopInterval: Int = 0
+        var insecure: Bool = false
+    }
+
+    func getHysteria2Config() -> Hysteria2Config {
+        guard let data = extra.data(using: .utf8),
+              let config = try? JSONDecoder().decode(Hysteria2Config.self, from: data) else {
+            return Hysteria2Config()
+        }
+        return config
+    }
+
     // 定义迁移
     static func registerMigrations(in migrator: inout DatabaseMigrator) {
         // 创建表
