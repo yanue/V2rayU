@@ -11,20 +11,50 @@ import SwiftUI
 
 // MARK: - Alert 对话框
 
+@MainActor
+func presentAlert(_ alert: NSAlert, attachedTo window: NSWindow? = NSApp.mainWindow ?? NSApp.windows.first) async -> NSApplication.ModalResponse {
+    await withCheckedContinuation { continuation in
+        if let window {
+            alert.beginSheetModal(for: window) { response in
+                continuation.resume(returning: response)
+            }
+        } else {
+            continuation.resume(returning: alert.runModal())
+        }
+    }
+}
+
+@MainActor
+func presentOpenPanel(_ panel: NSOpenPanel, attachedTo window: NSWindow? = NSApp.mainWindow ?? NSApp.windows.first) async -> NSApplication.ModalResponse {
+    await withCheckedContinuation { continuation in
+        if let window {
+            panel.beginSheetModal(for: window) { response in
+                continuation.resume(returning: response)
+            }
+        } else {
+            continuation.resume(returning: panel.runModal())
+        }
+    }
+}
+
 /// 显示一个模态警告对话框
 /// - Parameters:
 ///   - title: 对话框标题
 ///   - message: 对话框内容
 func alertDialog(title: String, message: String) {
     DispatchQueue.main.async {
-        // 优先使用主窗口显示对话框
-        if (NSApp.mainWindow ?? NSApp.windows.first) != nil {
+        // Prefer a non-blocking sheet when a window is available. This avoids
+        // nested modal run loops that can interfere with SwiftUI updates.
+        if let window = NSApp.mainWindow ?? NSApp.windows.first {
             let alert = NSAlert()
             alert.messageText = title
             alert.informativeText = message
             alert.alertStyle = .warning
             alert.addButton(withTitle: "OK")
-            alert.runModal()
+            if let icon = NSImage(named: "V2rayU") {
+                alert.icon = icon
+            }
+            alert.beginSheetModal(for: window) { _ in }
         } else {
             // 如果没有可用窗口，回退到 Toast 显示
             Task {
@@ -36,11 +66,11 @@ func alertDialog(title: String, message: String) {
     }
 }
 
-// MARK: - Alert 同步对话框
+// MARK: - Alert 异步对话框
 
-/// 显示一个同步警告对话框（阻塞调用）
+/// 显示一个异步警告对话框
 @MainActor
-func showAlertSync(title: String, message: String, confirmTitle: String = String(localized: .OK)) {
+func showAlert(title: String, message: String, confirmTitle: String = String(localized: .OK)) async {
     let alert = NSAlert()
     if let icon = NSImage(named: "V2rayU") {
         alert.icon = icon
@@ -49,12 +79,13 @@ func showAlertSync(title: String, message: String, confirmTitle: String = String
     alert.informativeText = message
     alert.alertStyle = .warning
     alert.addButton(withTitle: confirmTitle)
+    _ = await presentAlert(alert)
 }
 
-/// 显示一个带确认/取消按钮的同步对话框
+/// 显示一个带确认/取消按钮的异步对话框
 /// - Returns: 用户点击确认返回 true，取消返回 false
 @MainActor
-func showConfirmAlertSync(title: String, message: String, confirmTitle: String = String(localized: .OK), cancelTitle: String = String(localized: .Cancel)) -> Bool {
+func showConfirmAlert(title: String, message: String, confirmTitle: String = String(localized: .OK), cancelTitle: String = String(localized: .Cancel)) async -> Bool {
     let alert = NSAlert()
     if let icon = NSImage(named: "V2rayU") {
         alert.icon = icon
@@ -64,7 +95,7 @@ func showConfirmAlertSync(title: String, message: String, confirmTitle: String =
     alert.alertStyle = .warning
     alert.addButton(withTitle: confirmTitle)
     alert.addButton(withTitle: cancelTitle)
-    return alert.runModal() == .alertFirstButtonReturn
+    return await presentAlert(alert) == .alertFirstButtonReturn
 }
 
 // MARK: - Toast 通知

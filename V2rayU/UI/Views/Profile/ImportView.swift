@@ -139,7 +139,11 @@ struct ImportView: View {
 
                         HStack {
                             if importSource == .json || importSource == .clash {
-                                Button(action: importFromFile) {
+                                Button(action: {
+                                    Task {
+                                        await importFromFile()
+                                    }
+                                }) {
                                     Label(String(localized: .ImportFromFile), systemImage: "doc")
                                 }
                                 .buttonStyle(.bordered)
@@ -675,7 +679,8 @@ struct ImportView: View {
     }
 
     /// 从文件导入 JSON/Clash 配置
-    private func importFromFile() {
+    @MainActor
+    private func importFromFile() async {
         let panel = NSOpenPanel()
         
         if importSource == .clash {
@@ -687,7 +692,7 @@ struct ImportView: View {
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
 
-        if panel.runModal() == .OK, let url = panel.url {
+        if await presentOpenPanel(panel) == .OK, let url = panel.url {
             do {
                 let content = try String(contentsOf: url, encoding: .utf8)
                 inputText = content

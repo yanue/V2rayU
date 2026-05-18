@@ -44,6 +44,9 @@ struct ProfileListView: View {
     @State private var selectAll: Bool = false
     @State private var activeSheet: ActiveSheet? = nil
     @State private var tableOpacity: Double = 1.0
+    @State private var showDeleteConfirm = false
+    @State private var pendingDeleteUUIDs: [String] = []
+    @State private var showRemoveDuplicatesConfirm = false
 
     private var isRunningRow: (ProfileEntity) -> Bool {
         { $0.uuid == AppState.shared.runningProfile }
@@ -79,6 +82,18 @@ struct ProfileListView: View {
         return [item]
     }
 
+    private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
+        // Avoid mutating SwiftUI state while AppKit menus/context menus are
+        // still dismissing. Doing so can trigger AttributeGraph crashes.
+        DispatchQueue.main.async(execute: action)
+    }
+
+    private var deleteConfirmMessage: String {
+        pendingDeleteUUIDs.count > 1
+            ? String(localized: .DeleteMultipleConfirm, arguments: pendingDeleteUUIDs.count)
+            : String(localized: .DeleteTip)
+    }
+
     var body: some View {
         VStack {
             PageHeader(
@@ -88,10 +103,8 @@ struct ProfileListView: View {
             ) {
                 HStack(spacing: 8) {
                     Button(action: {
-                        withAnimation {
-                            let newProxy = ProfileModel(from: ProfileEntity())
-                            activeSheet = .edit(newProxy)
-                        }
+                        let newProxy = ProfileModel(from: ProfileEntity())
+                        activeSheet = .edit(newProxy)
                     }) {
                         Label(String(localized: .Add), systemImage: "plus")
                     }
@@ -110,7 +123,11 @@ struct ProfileListView: View {
                         .frame(height: 20)
                     
                     Menu {
-                        Button(action: { activeSheet = .pingAll }) {
+                        Button(action: {
+                            performAfterMenuDismiss {
+                                activeSheet = .pingAll
+                            }
+                        }) {
                             Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
                         }
                         .buttonStyle(.borderedProminent)
@@ -118,12 +135,10 @@ struct ProfileListView: View {
                         .disabled(viewModel.list.isEmpty)
 
                         Button(action: {
-                            withAnimation(.easeOut(duration: 0.15)) {
+                            performAfterMenuDismiss {
                                 tableOpacity = 0
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                loadData()
-                                withAnimation(.easeIn(duration: 0.2)) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    loadData()
                                     tableOpacity = 1
                                 }
                             }
@@ -134,15 +149,8 @@ struct ProfileListView: View {
                         Divider()
 
                         Button(action: {
-                            if showConfirmAlertSync(
-                                title: String(localized: .RemoveDuplicateServers),
-                                message: String(localized: .RemoveDuplicateConfirmTip)
-                            ) {
-                                let count = viewModel.removeDuplicates()
-                                alertDialog(
-                                    title: String(localized: .RemoveDuplicateServers),
-                                    message: String(localized: .RemoveDuplicateConfirm, arguments: count)
-                                )
+                            performAfterMenuDismiss {
+                                showRemoveDuplicatesConfirm = true
                             }
                         }) {
                             Label(String(localized: .RemoveDuplicateServers), systemImage: "doc.on.doc")
@@ -229,6 +237,32 @@ struct ProfileListView: View {
                 }
             }
         }
+        .alert(String(localized: .DeleteSelectedConfirm), isPresented: $showDeleteConfirm) {
+            Button(String(localized: .Delete), role: .destructive) {
+                let uuids = pendingDeleteUUIDs
+                pendingDeleteUUIDs = []
+                for uuid in uuids {
+                    viewModel.delete(uuid: uuid)
+                }
+            }
+            Button(String(localized: .Cancel), role: .cancel) {
+                pendingDeleteUUIDs = []
+            }
+        } message: {
+            Text(deleteConfirmMessage)
+        }
+        .alert(String(localized: .RemoveDuplicateServers), isPresented: $showRemoveDuplicatesConfirm) {
+            Button(String(localized: .RemoveDuplicateServers), role: .destructive) {
+                let count = viewModel.removeDuplicates()
+                alertDialog(
+                    title: String(localized: .RemoveDuplicateServers),
+                    message: String(localized: .RemoveDuplicateConfirm, arguments: count)
+                )
+            }
+            Button(String(localized: .Cancel), role: .cancel) {}
+        } message: {
+            Text(String(localized: .RemoveDuplicateConfirmTip))
+        }
         .task { loadData() }
     }
 
@@ -255,19 +289,23 @@ struct ProfileListView: View {
 
         Group {
             Button {
-                let model = ProfileModel(from: item)
-                chooseItem(item: model)
+                performAfterMenuDismiss {
+                    let model = ProfileModel(from: item)
+                    chooseItem(item: model)
+                }
             } label: {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
             .focusable(false)
 
             Button {
-                if isMultiSelect {
-                    let resolved = resolveSelectedItems(for: item)
-                    activeSheet = .pingMultiple(resolved)
-                } else {
-                    activeSheet = .ping(ProfileModel(from: item))
+                performAfterMenuDismiss {
+                    if isMultiSelect {
+                        let resolved = resolveSelectedItems(for: item)
+                        activeSheet = .pingMultiple(resolved)
+                    } else {
+                        activeSheet = .ping(ProfileModel(from: item))
+                    }
                 }
             } label: {
                 Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
@@ -277,7 +315,9 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                activeSheet = .share(ProfileModel(from: item))
+                performAfterMenuDismiss {
+                    activeSheet = .share(ProfileModel(from: item))
+                }
             } label: {
                 Label(String(localized: .ShareQrCode), systemImage: "qrcode")
             }
@@ -285,8 +325,10 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
-                let resolved = resolveSelectedItems(for: item)
-                activeSheet = .export(resolved)
+                performAfterMenuDismiss {
+                    let resolved = resolveSelectedItems(for: item)
+                    activeSheet = .export(resolved)
+                }
             } label: {
                 Label(String(localized: .Export), systemImage: "square.and.arrow.up")
             }
@@ -294,25 +336,41 @@ struct ProfileListView: View {
 
             Divider()
 
-            Button { moveToTop(item: item) } label: {
+            Button {
+                performAfterMenuDismiss {
+                    moveToTop(item: item)
+                }
+            } label: {
                 Label(String(localized: .MoveToTop), systemImage: "arrow.up.to.line")
             }
             .focusable(false)
             .disabled(isMultiSelect)
 
-            Button { moveToBottom(item: item) } label: {
+            Button {
+                performAfterMenuDismiss {
+                    moveToBottom(item: item)
+                }
+            } label: {
                 Label(String(localized: .MoveToBottom), systemImage: "arrow.down.to.line")
             }
             .focusable(false)
             .disabled(isMultiSelect)
 
-            Button { moveUp(item: item) } label: {
+            Button {
+                performAfterMenuDismiss {
+                    moveUp(item: item)
+                }
+            } label: {
                 Label(String(localized: .MoveUp), systemImage: "chevron.up")
             }
             .focusable(false)
             .disabled(isMultiSelect)
 
-            Button { moveDown(item: item) } label: {
+            Button {
+                performAfterMenuDismiss {
+                    moveDown(item: item)
+                }
+            } label: {
                 Label(String(localized: .MoveDown), systemImage: "chevron.down")
             }
             .focusable(false)
@@ -321,7 +379,9 @@ struct ProfileListView: View {
             Divider()
 
             Button {
-                duplicateItem(item: ProfileModel(from: item))
+                performAfterMenuDismiss {
+                    duplicateItem(item: ProfileModel(from: item))
+                }
             } label: {
                 Label(String(localized: .Duplicate), systemImage: "plus.square.on.square")
             }
@@ -329,7 +389,9 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
-                activeSheet = .edit(ProfileModel(from: item))
+                performAfterMenuDismiss {
+                    activeSheet = .edit(ProfileModel(from: item))
+                }
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
             }
@@ -337,16 +399,9 @@ struct ProfileListView: View {
             .disabled(isMultiSelect)
 
             Button {
-                let itemsToDelete = resolveSelectedItems(for: item)
-                if showConfirmAlertSync(
-                    title: String(localized: .DeleteSelectedConfirm),
-                    message: itemsToDelete.count > 1 
-                        ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count)
-                        : String(localized: .DeleteTip)
-                ) {
-                    for entity in itemsToDelete {
-                        viewModel.delete(uuid: entity.uuid)
-                    }
+                performAfterMenuDismiss {
+                    pendingDeleteUUIDs = resolveSelectedItems(for: item).map(\.uuid)
+                    showDeleteConfirm = true
                 }
             } label: {
                 Label(String(localized: .Delete), systemImage: "trash")
@@ -492,10 +547,8 @@ struct ProfileListView: View {
         newItem.uuid = UUID().uuidString // 新的 UUID
         newItem.entity.subid = "" // 清除分组信息
         // 显示编辑界面
-        withAnimation {
-            let newProxy = ProfileModel(from: newItem.entity)
-            activeSheet = .edit(newProxy)
-        }
+        let newProxy = ProfileModel(from: newItem.entity)
+        activeSheet = .edit(newProxy)
     }
 
     private func copyItem(item: ProfileEntity) {

@@ -16,12 +16,10 @@ struct FAQView: View {
                 ForEach(Array(faqItems.enumerated()), id: \.offset) { idx, item in
                     VStack(spacing: 0) {
                         Button(action: {
-                            withAnimation(.interactiveSpring(response: 0.32, dampingFraction: 0.78, blendDuration: 0)) {
-                                if expandedIndices.contains(idx) {
-                                    expandedIndices.remove(idx)
-                                } else {
-                                    expandedIndices.insert(idx)
-                                }
+                            if expandedIndices.contains(idx) {
+                                expandedIndices.remove(idx)
+                            } else {
+                                expandedIndices.insert(idx)
                             }
                         }) {
                             HStack(alignment: .top, spacing: 12) {
@@ -68,7 +66,6 @@ struct FAQView: View {
                                     .textSelection(.enabled)
                             }
                             .padding([.horizontal, .bottom])
-                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
                     }
                     .background(RoundedRectangle(cornerRadius: 10).fill(Color(NSColor.windowBackgroundColor)))
@@ -79,7 +76,7 @@ struct FAQView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
-            withAnimation { expandedIndices.removeAll() }
+            expandedIndices.removeAll()
         }
     }
 
@@ -136,5 +133,6 @@ struct FAQSheetView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
+        .frame(width: 760, height: 560, alignment: .topLeading)
     }
 }

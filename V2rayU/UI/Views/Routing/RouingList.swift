@@ -16,6 +16,8 @@ struct RoutingListView: View {
     @State private var selectedRow: RoutingModel? = nil
     @State private var draggedRow: RoutingModel?
     @State private var tableOpacity: Double = 1.0
+    @State private var showDeleteConfirm = false
+    @State private var pendingDeleteUUIDs: [String] = []
 
     private var isRunningRow: (RoutingEntity) -> Bool {
         { $0.uuid == AppState.shared.runningRouting }
@@ -31,7 +33,18 @@ struct RoutingListView: View {
         }
         return [item]
     }
-    
+
+    private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
+        // Avoid mutating SwiftUI view state while AppKit context menu is dismissing.
+        DispatchQueue.main.async(execute: action)
+    }
+
+    private var deleteConfirmMessage: String {
+        pendingDeleteUUIDs.count > 1
+            ? String(localized: .DeleteMultipleConfirm, arguments: pendingDeleteUUIDs.count)
+            : String(localized: .DeleteTip)
+    }
+
     var body: some View {
         VStack {
             PageHeader(
@@ -40,24 +53,20 @@ struct RoutingListView: View {
                 subtitle: localizedString(.RoutingSubHead)
             ) {
                 HStack(spacing: 8) {
-                    Button(action: { withAnimation {
+                    Button(action: {
                         let newProxy = RoutingModel(from: RoutingEntity())
                         self.selectedRow = newProxy
-                    } }) {
+                    }) {
                         Label(String(localized: .Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
 
                     Button(action: {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            tableOpacity = 0
-                        }
+                        tableOpacity = 0
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             loadData()
-                            withAnimation(.easeIn(duration: 0.2)) {
-                                tableOpacity = 1
-                            }
+                            tableOpacity = 1
                         }
                     }) {
                         Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
@@ -77,6 +86,20 @@ struct RoutingListView: View {
                 selectedRow = nil
                 loadData()
             })
+        }
+        .alert(String(localized: .DeleteSelectedConfirm), isPresented: $showDeleteConfirm) {
+            Button(String(localized: .Delete), role: .destructive) {
+                let uuids = pendingDeleteUUIDs
+                pendingDeleteUUIDs = []
+                for uuid in uuids {
+                    viewModel.delete(uuid: uuid)
+                }
+            }
+            Button(String(localized: .Cancel), role: .cancel) {
+                pendingDeleteUUIDs = []
+            }
+        } message: {
+            Text(deleteConfirmMessage)
         }
         .task {
             loadData()
@@ -106,43 +129,40 @@ struct RoutingListView: View {
     private func contextMenuProvider(item: RoutingEntity) -> some View {
         Group {
             Button {
-                Task {
-                    await AppState.shared.switchRouting(uuid: item.uuid)
-                    loadData()
+                performAfterMenuDismiss {
+                    Task {
+                        await AppState.shared.switchRouting(uuid: item.uuid)
+                        loadData()
+                    }
                 }
             } label: {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
-            .focusable(false)
 
             Divider()
 
             Button {
-                self.selectedRow = RoutingModel(from: item)
+                performAfterMenuDismiss {
+                    self.selectedRow = RoutingModel(from: item)
+                }
             } label: {
                 Label(String(localized: .Edit), systemImage: "pencil")
             }
-            .focusable(false)
 
             Button {
-                let itemsToDelete = resolveSelectedItems(for: item)
-                if showConfirmAlertSync(title: String(localized: .DeleteSelectedConfirm), message: itemsToDelete.count > 1 ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count) : String(localized: .DeleteTip)) {
-                    for entity in itemsToDelete {
-                        viewModel.delete(uuid: entity.uuid)
-                    }
+                performAfterMenuDismiss {
+                    pendingDeleteUUIDs = resolveSelectedItems(for: item).map(\.uuid)
+                    showDeleteConfirm = true
                 }
             } label: {
                 Label(String(localized: .Delete), systemImage: "trash")
                     .foregroundColor(.red)
             }
-            .focusable(false)
         }
     }
     
     private func loadData() {
-        withAnimation {
-            viewModel.getList()
-        }
+        viewModel.getList()
     }
     
     // 提取的 Table 子视图，减少主视图表达式复杂度

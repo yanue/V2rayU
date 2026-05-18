@@ -246,34 +246,31 @@ actor AppInstaller: NSObject {
     }
 
     func showInstallAlert() async {
+        // 在 actor 上下文中捕获所需值，避免在 @MainActor 闭包中跨隔离访问 actor 隔离属性
         let reason = installReason
+        let sh = doSh
 
-        // Use a continuation to bridge the sync NSAlert.runModal() with async
-        await withCheckedContinuation { continuation in
-            DispatchQueue.main.async { // Async dispatch to avoid strict mode warnings
-                let alert = NSAlert()
-                alert.alertStyle = .warning
-                alert.messageText = String(localized: .InstallTitle) + "\n\n" + reason
-                alert.informativeText = self.doSh
-                alert.addButton(withTitle: String(localized: .Install))
-                alert.addButton(withTitle: String(localized: .Quit))
+        // MainActor.run 的 body 必须是同步的，不能是 async。
+        // 这里需要 await NSAlert 的 sheet 回调，因此使用 Task { @MainActor in ... }.value
+        let response: NSApplication.ModalResponse = await Task { @MainActor in
+            let alert = NSAlert()
+            alert.alertStyle = .warning
+            alert.messageText = String(localized: .InstallTitle) + "\n\n" + reason
+            alert.informativeText = sh
+            alert.addButton(withTitle: String(localized: .Install))
+            alert.addButton(withTitle: String(localized: .Quit))
+            return await presentAlert(alert)
+        }.value
 
-                let response = alert.runModal()
-                if response == .alertFirstButtonReturn {
-                    Task {
-                        let success = await self.install()
-                        if success {
-                            continuation.resume()
-                        } else {
-                            // 安装失败，重新弹出安装提示
-                            await self.showInstallAlert()
-                            continuation.resume()
-                        }
-                    }
-                } else {
-                    NSApp.terminate(self)
-                    continuation.resume() // Optional: resume on quit, though app terminates
-                }
+        if response == .alertFirstButtonReturn {
+            let success = await self.install()
+            if !success {
+                // 安装失败，重新弹出安装提示
+                await self.showInstallAlert()
+            }
+        } else {
+            await MainActor.run {
+                NSApp.terminate(nil)
             }
         }
     }

@@ -6,18 +6,8 @@
 //
 import SwiftUI
 struct ContentView: View {
-    @ObservedObject var appState = AppState.shared // 引用单例
+    @StateObject private var navigationState = NavigationState.shared
     @State private var version = getAppVersion() // 控制设置页面的显示
-
-    // 定义 Tab 枚举
-    enum Tab: String, CaseIterable {
-        case server
-        case subscription
-        case routing
-        case setting
-        case diagnostic
-        case about
-    }
 
     var body: some View {
         HStack {
@@ -48,7 +38,7 @@ struct ContentView: View {
 
             // 右侧内容区，根据选中状态切换
             VStack {
-                switch appState.mainTab {
+                switch navigationState.mainTab {
                 case .server:
                     ProfileListView()
                 case .subscription:
@@ -75,12 +65,13 @@ struct ContentView: View {
             .padding(.all, 16) // 5. 外边距
             .frame(minWidth: 640) // 设置右侧内容区的宽度
         }
+        .frame(minWidth: 760, minHeight: 600, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
   
-    func SidebarButton(tab: Tab, title: LanguageLabel, icon: String) -> some View {
-        let isSelected = appState.mainTab == tab
+    func SidebarButton(tab: MainTab, title: LanguageLabel, icon: String) -> some View {
+        let isSelected = navigationState.mainTab == tab
         return Button(action: {
-            appState.mainTab = tab
+            navigationState.mainTab = tab
         }) {
             HStack(spacing: 10) { // Adjust spacing between icon and text
                 Image(systemName: icon)
@@ -94,8 +85,6 @@ struct ContentView: View {
             .background(isSelected ? Color.accentColor.opacity(0.4) : Color.clear)
             .cornerRadius(6) // Rounded corners for a smoother look
             .contentShape(Rectangle()) // Ensures full area is tappable
-            .scaleEffect(isSelected ? 1.05 : 1.0) // Slight scaling effect on selection
-            .animation(.easeInOut(duration: 0.2), value: isSelected) // Smooth animation on tap
         }
         .buttonStyle(.plain) // Remove default button styling
         .focusable(false)

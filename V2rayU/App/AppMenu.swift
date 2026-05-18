@@ -551,8 +551,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func openAdvanceSetting() {
-        AppState.shared.mainTab = .setting
-        AppState.shared.settingTab = .general
+        NavigationState.shared.mainTab = .setting
+        NavigationState.shared.settingTab = .general
         MainWindowManager.shared.openMainWindow()
     }
 
@@ -638,16 +638,23 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func clearLogs(_ sender: NSMenuItem) {
-        let alert = NSAlert()
-        alert.messageText = String(localized: .ClearAllLogs)
-        alert.informativeText = "确定要清除所有日志文件吗？此操作不可撤销。"
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: String(localized: .Confirm))
-        alert.addButton(withTitle: String(localized: .Cancel))
+        // Defer the alert until the menu has fully dismissed. Showing a modal
+        // alert during menu action processing can create nested AppKit modal
+        // loops that interfere with SwiftUI / AttributeGraph updates.
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                let alert = NSAlert()
+                alert.messageText = String(localized: .ClearAllLogs)
+                alert.informativeText = "确定要清除所有日志文件吗？此操作不可撤销。"
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: String(localized: .Confirm))
+                alert.addButton(withTitle: String(localized: .Cancel))
 
-        if alert.runModal() == .alertFirstButtonReturn {
-            LogRotation.clearAllLogs()
-            noticeTip(title: String(localized: .ClearAllLogs), informativeText: "日志已清除")
+                if await presentAlert(alert) == .alertFirstButtonReturn {
+                    LogRotation.clearAllLogs()
+                    noticeTip(title: String(localized: .ClearAllLogs), informativeText: "日志已清除")
+                }
+            }
         }
     }
 
@@ -662,34 +669,34 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func openPreferenceGeneral(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .setting
-        AppState.shared.settingTab = .general
+        NavigationState.shared.mainTab = .setting
+        NavigationState.shared.settingTab = .general
         MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openPreferenceSubscribe(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .subscription
+        NavigationState.shared.mainTab = .subscription
         MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openPreferencePac(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .setting
-        AppState.shared.settingTab = .pac
+        NavigationState.shared.mainTab = .setting
+        NavigationState.shared.settingTab = .pac
         MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openRoutingTab(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .routing
+        NavigationState.shared.mainTab = .routing
         MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openServerTab(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .server
+        NavigationState.shared.mainTab = .server
         MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func openDiagnostics(_ sender: NSMenuItem) {
-        AppState.shared.mainTab = .diagnostic
+        NavigationState.shared.mainTab = .diagnostic
         MainWindowManager.shared.openMainWindow()
     }
 

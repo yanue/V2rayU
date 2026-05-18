@@ -110,7 +110,7 @@ struct ProfilePingView: View {
                     .onChange(of: logs) { _,_ in
                         if let last = logs.indices.last {
                             DispatchQueue.main.async {
-                                withAnimation { proxy.scrollTo(last, anchor: .bottom) }
+                                proxy.scrollTo(last, anchor: .bottom)
                             }
                         }
                     }

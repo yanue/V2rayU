@@ -288,7 +288,7 @@ actor LegacyMigrationHandler {
         alert.addButton(withTitle: "导入")
         alert.addButton(withTitle: "跳过")
 
-        let response = alert.runModal()
+        let response = await presentAlert(alert)
 
         if response == .alertFirstButtonReturn {
             logger.info("Legacy migration: User chose to migrate")

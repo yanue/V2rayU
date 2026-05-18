@@ -20,19 +20,25 @@ enum UpdateStage {
 }
 
 class AppVersionController: NSWindowController {
-    private var hostingView: NSHostingView<AppVersionView>!
+    private var hostingController: NSHostingController<AppVersionView>!
     private var vm = AppVersionViewModel()
     private let service = GithubService()
 
     override init(window: NSWindow?) {
         let view = AppVersionView(vm: vm)
-        hostingView = NSHostingView(rootView: view)
+        hostingController = NSHostingController(rootView: view)
+        if #available(macOS 13.0, *) {
+            hostingController.sizingOptions = []
+        }
 
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 300),
-                              styleMask: [.titled, .closable, .resizable],
+                              styleMask: [.titled, .closable],
                               backing: .buffered, defer: false)
         window.title = "V2rayU Update"
-        window.contentView = hostingView
+        window.contentViewController = hostingController
+        window.contentMinSize = NSSize(width: 500, height: 300)
+        window.contentMaxSize = NSSize(width: 500, height: 300)
+        window.animationBehavior = .none
 
         super.init(window: window)
 

@@ -75,9 +75,14 @@ struct SubscriptionFormView: View {
                     LocalizedTextLabelView(label: .UpdateInterval)
                         .frame(width: 100, alignment: .trailing)
                     Spacer()
+                    // .id(intervalUnit) forces the TextField to be fully recreated
+                    // when the unit changes. The computed displayedInterval binding
+                    // produces a new Binding identity on every render, which confuses
+                    // the AttributeGraph focus tracking and can cause crashes.
                     TextField("", value: displayedInterval, formatter: NumberFormatter())
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.leading, 7)
+                        .id(intervalUnit)
 
                     Picker("", selection: $intervalUnit) {
                         Text(String(localized: .Minute)).tag(IntervalUnit.minute)
@@ -116,5 +121,6 @@ struct SubscriptionFormView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
+        .frame(width: 520, minHeight: showHeader ? 340 : 220, alignment: .topLeading)
     }
 }

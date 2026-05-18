@@ -10,8 +10,8 @@ import SwiftUI
 // MARK: - 状态栏视图
 
 struct StatusItemView: View {
-    @ObservedObject var appState = AppState.shared // 显式使用 ObservedObject
-    @ObservedObject var settings = AppSettings.shared // 显式使用 ObservedObject
+    @StateObject private var appState = AppState.shared
+    @StateObject private var settings = AppSettings.shared
 
     var body: some View {
         HStack(alignment: .center, spacing: 4) {
@@ -49,7 +49,7 @@ struct StatusItemView: View {
 }
 
 struct CoreStatusItemView: View {
-    @ObservedObject var appState = AppState.shared
+    @StateObject private var appState = AppState.shared
 
     var body: some View {
         HStack() {

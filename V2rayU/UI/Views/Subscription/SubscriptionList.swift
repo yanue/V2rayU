@@ -18,7 +18,9 @@ struct SubscriptionListView: View {
     @State private var syncingRow: SubscriptionModel? = nil
     @State private var syncingAll: Bool = false
     @State private var tableOpacity: Double = 1.0
-    
+    @State private var showDeleteConfirm = false
+    @State private var pendingDeleteUUIDs: [String] = []
+
     private var filteredAndSortedItems: [SubscriptionEntity] {
         viewModel.list
     }
@@ -29,7 +31,19 @@ struct SubscriptionListView: View {
         }
         return [item]
     }
-    
+
+    private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
+        // Avoid mutating SwiftUI state while AppKit context menus are still
+        // dismissing. Doing so can trigger AttributeGraph crashes.
+        DispatchQueue.main.async(execute: action)
+    }
+
+    private var deleteConfirmMessage: String {
+        pendingDeleteUUIDs.count > 1
+            ? String(localized: .DeleteMultipleConfirm, arguments: pendingDeleteUUIDs.count)
+            : localizedString(.DeleteTip)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
@@ -45,7 +59,7 @@ struct SubscriptionListView: View {
                     .focusable(false)
                     .disabled(viewModel.list.isEmpty)
 
-                    Button(action: { withAnimation { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) } }) {
+                    Button(action: { self.selectedRow = SubscriptionModel(from: SubscriptionEntity()) }) {
                         Label(localizedString(.Add), systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
@@ -55,14 +69,10 @@ struct SubscriptionListView: View {
                         .frame(height: 20)
 
                     Button(action: {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            tableOpacity = 0
-                        }
+                        tableOpacity = 0
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             loadData()
-                            withAnimation(.easeIn(duration: 0.2)) {
-                                tableOpacity = 1
-                            }
+                            tableOpacity = 1
                         }
                     }) {
                         Label(String(localized: .Refresh), systemImage: "arrow.clockwise")
@@ -98,6 +108,20 @@ struct SubscriptionListView: View {
         .sheet(isPresented: $syncingAll) {
             SubscriptionSyncView(subscription: nil, isAll: true) { syncingAll = false }
         }
+        .alert(localizedString(.DeleteConfirm), isPresented: $showDeleteConfirm) {
+            Button(String(localized: .Delete), role: .destructive) {
+                let uuids = pendingDeleteUUIDs
+                pendingDeleteUUIDs = []
+                for uuid in uuids {
+                    viewModel.delete(uuid: uuid)
+                }
+            }
+            Button(String(localized: .Cancel), role: .cancel) {
+                pendingDeleteUUIDs = []
+            }
+        } message: {
+            Text(deleteConfirmMessage)
+        }
         .task { loadData() }
     }
 
@@ -125,14 +149,18 @@ struct SubscriptionListView: View {
     private func contextMenuProvider(item: SubscriptionEntity) -> some View {
         Group {
             Button {
-                self.selectedRow = SubscriptionModel(from: item)
+                performAfterMenuDismiss {
+                    self.selectedRow = SubscriptionModel(from: item)
+                }
             } label: {
                 Label(localizedString(.Edit), systemImage: "pencil")
             }
             .focusable(false)
 
             Button {
-                self.syncingRow = SubscriptionModel(from: item)
+                performAfterMenuDismiss {
+                    self.syncingRow = SubscriptionModel(from: item)
+                }
             } label: {
                 Label(localizedString(.SyncSubscriptionNow), systemImage: "arrow.triangle.2.circlepath")
             }
@@ -140,11 +168,9 @@ struct SubscriptionListView: View {
 
             Divider()
             Button {
-                let itemsToDelete = resolveSelectedItems(for: item)
-                if showConfirmAlertSync(title: localizedString(.DeleteConfirm), message: itemsToDelete.count > 1 ? String(localized: .DeleteMultipleConfirm, arguments: itemsToDelete.count) : localizedString(.DeleteTip)) {
-                    for entity in itemsToDelete {
-                        viewModel.delete(uuid: entity.uuid)
-                    }
+                performAfterMenuDismiss {
+                    pendingDeleteUUIDs = resolveSelectedItems(for: item).map(\.uuid)
+                    showDeleteConfirm = true
                 }
             } label: {
                 Label(localizedString(.Delete), systemImage: "trash")
@@ -155,9 +181,7 @@ struct SubscriptionListView: View {
     }
 
     private func loadData() {
-        withAnimation {
-            viewModel.getList()
-        }
+        viewModel.getList()
     }
 
     // 提取的 Table 子视图，减少主视图表达式复杂度

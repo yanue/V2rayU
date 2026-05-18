@@ -23,51 +23,58 @@ struct ConfigStreamView: View {
             
             VStack {
                 getPickerWithLabel(label: .Network, selection: $item.network)
-                if item.network == .tcp  {
-                    if item.network == .tcp {
-                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+
+                // Use .id(item.network) so SwiftUI fully tears down and recreates
+                // this subtree (including all TextField focus state) when the
+                // network type changes, preventing AttributeGraph / UpdateViewFocusItem crashes.
+                Group {
+                    if item.network == .tcp  {
+                        if item.network == .tcp {
+                            getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                        }
+                        if item.headerType == .http {
+                            getTextFieldWithLabel(label: .HttpHost, text: $item.host)
+                            getTextFieldWithLabel(label: .HttpPath, text: $item.path)
+                        }
                     }
-                    if item.headerType == .http {
+
+                    if item.network == .ws {
+                        getTextFieldWithLabel(label: .WsHost, text: $item.host)
+                        getTextFieldWithLabel(label: .WsPath, text: $item.path)
+                    }
+
+                    if item.network == .h2 {
                         getTextFieldWithLabel(label: .HttpHost, text: $item.host)
                         getTextFieldWithLabel(label: .HttpPath, text: $item.path)
                     }
+
+                    if item.network == .grpc {
+                        getTextFieldWithLabel(label: .ServerName, text: $item.path)
+                    }
+
+                    if item.network == .quic {
+                        getTextFieldWithLabel(label: .Key, text: $item.path)
+                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                        getPickerWithLabel(label: .Security, selection: $item.security)
+                    }
+
+                    if item.network == .domainsocket {
+                        getTextFieldWithLabel(label: .DsPath, text: $item.path)
+                    }
+
+                    if item.network == .kcp {
+                        getTextFieldWithLabel(label: .Seed, text: $item.path)
+                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                        getBoolFieldWithLabel(label: .Congestion, isOn: $item.allowInsecure)
+                    }
+
+                    if item.network == .xhttp {
+                        getTextFieldWithLabel(label: .XhttpHost, text: $item.host)
+                        getTextFieldWithLabel(label: .XhttpPath, text: $item.path)
+                        getTextEditorWithLabel(label: .Extra, text: $item.extra)
+                    }
                 }
-                
-                if item.network == .ws {
-                    getTextFieldWithLabel(label: .WsHost, text: $item.host)
-                    getTextFieldWithLabel(label: .WsPath, text: $item.path)
-                }
-                
-                if item.network == .h2 {
-                    getTextFieldWithLabel(label: .HttpHost, text: $item.host)
-                    getTextFieldWithLabel(label: .HttpPath, text: $item.path)
-                }
-                
-                if item.network == .grpc {
-                    getTextFieldWithLabel(label: .ServerName, text: $item.path)
-                }
-                
-                if item.network == .quic {
-                    getTextFieldWithLabel(label: .Key, text: $item.path)
-                    getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
-                    getPickerWithLabel(label: .Security, selection: $item.security)
-                }
-                
-                if item.network == .domainsocket {
-                    getTextFieldWithLabel(label: .DsPath, text: $item.path)
-                }
-                
-                if item.network == .kcp {
-                    getTextFieldWithLabel(label: .Seed, text: $item.path)
-                    getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
-                    getBoolFieldWithLabel(label: .Congestion, isOn: $item.allowInsecure)
-                }
-                
-                if item.network == .xhttp {
-                    getTextFieldWithLabel(label: .XhttpHost, text: $item.host)
-                    getTextFieldWithLabel(label: .XhttpPath, text: $item.path)
-                    getTextEditorWithLabel(label: .Extra, text: $item.extra)
-                }
+                .id(item.network) // Force full subtree recreation on network change
             }
             .padding() // 1. 内边距
             .background() // 2. 然后背景

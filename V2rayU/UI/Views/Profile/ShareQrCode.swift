@@ -29,6 +29,7 @@ struct ShareQrCodeView: View {
                         LocalizedTextLabelView(label: .Regenerate)
                     }
                 }
+                .frame(minWidth: 110)
                 .focusable(false)
 
                 
@@ -39,11 +40,13 @@ struct ShareQrCodeView: View {
                         LocalizedTextLabelView(label: .Copy)
                     }
                 }
+                .frame(minWidth: 90)
                 .focusable(false)
 
                 Button(action: onClose) {
                     LocalizedTextLabelView(label: .Close)
                 }
+                .frame(minWidth: 80)
                 .focusable(false)
             }
 
@@ -81,7 +84,7 @@ struct ShareQrCodeView: View {
                 }
             }
         }
-        .frame(width: 560)
+        .frame(width: 560, height: 360, alignment: .top)
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 14)

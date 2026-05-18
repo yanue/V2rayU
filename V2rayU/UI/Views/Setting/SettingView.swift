@@ -8,18 +8,7 @@
 import SwiftUI
 
 struct SettingView: View {
-    @ObservedObject var appState = AppState.shared // 引用单例
-
-    // Enum for Tabs
-    enum SettingTab {
-        case general
-        case shortcuts
-        case advance
-        case dns
-        case pac
-        case core
-        case tun
-    }
+    @StateObject private var navigationState = NavigationState.shared
 
     var body: some View {
         VStack {
@@ -30,14 +19,14 @@ struct SettingView: View {
             )
 
             // Segmented Picker (Tabs)
-            Picker("", selection: $appState.settingTab) {
-                localized(.General).tag(SettingTab.general)
-                localized(.Advanced).tag(SettingTab.advance)
-                localized(.Tun).tag(SettingTab.tun)
-                localized(.Shortcuts).tag(SettingTab.shortcuts)
-                localized(.DNS).tag(SettingTab.dns)
-                localized(.PAC).tag(SettingTab.pac)
-                localized(.Core).tag(SettingTab.core)
+            Picker("", selection: $navigationState.settingTab) {
+                localized(.General).tag(SettingsTab.general)
+                localized(.Advanced).tag(SettingsTab.advance)
+                localized(.Tun).tag(SettingsTab.tun)
+                localized(.Shortcuts).tag(SettingsTab.shortcuts)
+                localized(.DNS).tag(SettingsTab.dns)
+                localized(.PAC).tag(SettingsTab.pac)
+                localized(.Core).tag(SettingsTab.core)
             }
             .pickerStyle(.segmented)
             .focusable(false)
@@ -45,7 +34,7 @@ struct SettingView: View {
 
             VStack {
                 // Content based on Selected Tab
-                switch appState.settingTab {
+                switch navigationState.settingTab {
                 case .general:
                     GeneralView()
                 case .advance:

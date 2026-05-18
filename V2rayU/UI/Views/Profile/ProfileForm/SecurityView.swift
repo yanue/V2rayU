@@ -25,11 +25,17 @@ struct ConfigTransportView: View {
                 getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.allowInsecure)
                 getTextFieldWithLabel(label: .Sni, text: $item.sni)
                 getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
-                if item.security == .reality {
-                    getTextFieldWithLabel(label: .PublicKey, text: $item.publicKey)
-                    getTextFieldWithLabel(label: .ShortID, text: $item.shortId)
-                    getTextFieldWithLabel(label: .SpiderX, text: $item.spiderX)
+                // Use .id(item.security) so SwiftUI fully tears down and recreates
+                // this Group (including TextField focus state) when security changes,
+                // preventing AttributeGraph / UpdateViewFocusItem crashes.
+                Group {
+                    if item.security == .reality {
+                        getTextFieldWithLabel(label: .PublicKey, text: $item.publicKey)
+                        getTextFieldWithLabel(label: .ShortID, text: $item.shortId)
+                        getTextFieldWithLabel(label: .SpiderX, text: $item.spiderX)
+                    }
                 }
+                .id(item.security) // Force full subtree recreation on security change
                 getPickerWithLabel(label: .Alpn, selection: $item.alpn)
             }
             .padding() // 1. 内边距

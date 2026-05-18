@@ -27,59 +27,65 @@ struct ConfigServerView: View {
                 // 需要禁用显示: dns, http, blackhole, freedom
                 getPickerWithLabel(label: .`Protocol`, selection: $item.protocol,ignore: [.dns, .http, .blackhole, .freedom])
 
-                if item.protocol == .trojan {
-                    getTextFieldWithLabel(label: .Address, text: $item.address)
-                    getNumFieldWithLabel(label: .Port, num: $item.port)
-                    getTextFieldWithLabel(label: .Password, text: $item.password)
-                }
+                // Use .id(item.protocol) so SwiftUI fully tears down and recreates
+                // this subtree (including all TextField focus state) when the
+                // protocol changes, preventing AttributeGraph / UpdateViewFocusItem crashes.
+                Group {
+                    if item.protocol == .trojan {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
+                    }
 
-                if item.protocol == .vmess {
-                    getTextFieldWithLabel(label: .Address, text: $item.address)
-                    getNumFieldWithLabel(label: .Port, num: $item.port)
-                    getTextFieldWithLabel(label: .ID, text: $item.password)
-                    getNumFieldWithLabel(label: .AlterID, num: $item.alterId)
-                    getTextFieldWithLabel(label: .Encryption, text: $item.encryption)
-                }
+                    if item.protocol == .vmess {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .ID, text: $item.password)
+                        getNumFieldWithLabel(label: .AlterID, num: $item.alterId)
+                        getTextFieldWithLabel(label: .Encryption, text: $item.encryption)
+                    }
 
-                if item.protocol == .vless {
-                    getTextFieldWithLabel(label: .Address, text: $item.address)
-                    getNumFieldWithLabel(label: .Port, num: $item.port)
-                    getTextFieldWithLabel(label: .ID, text: $item.password)
-                    getTextFieldWithLabel(label: .Flow, text: $item.flow)
-                    getTextFieldWithLabel(label: .Encryption, text: $item.encryption)
-                }
+                    if item.protocol == .vless {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .ID, text: $item.password)
+                        getTextFieldWithLabel(label: .Flow, text: $item.flow)
+                        getTextFieldWithLabel(label: .Encryption, text: $item.encryption)
+                    }
 
-                if item.protocol == .shadowsocks {
-                    getTextFieldWithLabel(label: .Address, text: $item.address)
-                    getNumFieldWithLabel(label: .Port, num: $item.port)
-                    getTextFieldWithLabel(label: .Password, text: $item.password)
-                    HStack {
-                        getTextLabel(label: .Method)
-                        Picker("", selection: $item.encryption) {
-                            ForEach(V2rayOutboundShadowsockMethod, id: \.self) { pick in
-                                Text(pick)
+                    if item.protocol == .shadowsocks {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
+                        HStack {
+                            getTextLabel(label: .Method)
+                            Picker("", selection: $item.encryption) {
+                                ForEach(V2rayOutboundShadowsockMethod, id: \.self) { pick in
+                                    Text(pick)
+                                }
                             }
                         }
                     }
-                }
 
-                if item.protocol == .socks {
-                    getTextFieldWithLabel(label: .Address, text: $item.address)
-                    getNumFieldWithLabel(label: .Port, num: $item.port)
-                    HStack {
-                        Rectangle()
-                            .fill(Color.secondary.opacity(0.3))
-                            .frame(height: 1)
-                        Text(String(localized: .OptionalFieldTip))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Rectangle()
-                            .fill(Color.secondary.opacity(0.3))
-                            .frame(height: 1)
+                    if item.protocol == .socks {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        HStack {
+                            Rectangle()
+                                .fill(Color.secondary.opacity(0.3))
+                                .frame(height: 1)
+                            Text(String(localized: .OptionalFieldTip))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Rectangle()
+                                .fill(Color.secondary.opacity(0.3))
+                                .frame(height: 1)
+                        }
+                        getTextFieldWithLabel(label: .Username, text: $item.host) // 用 host 存储 socks username
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
                     }
-                    getTextFieldWithLabel(label: .Username, text: $item.host) // 用 host 存储 socks username
-                    getTextFieldWithLabel(label: .Password, text: $item.password)
                 }
+                .id(item.protocol) // Force full subtree recreation on protocol change
             }
             .padding() // 1. 内边距
             .background() // 2. 然后背景

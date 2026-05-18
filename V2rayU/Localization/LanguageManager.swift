@@ -137,8 +137,8 @@ struct LocalizedTextView: View {
     let key: String
     var arguments: [CVarArg] = []
     
-    @ObservedObject var languageManager = LanguageManager.shared
-    
+    @StateObject private var languageManager = LanguageManager.shared
+
     var body: some View {
         let localizedString = languageManager.localizedString(key)
         let finalString = arguments.isEmpty ? localizedString : String(format: localizedString, arguments: arguments)
@@ -150,8 +150,8 @@ struct LocalizedTextView: View {
 struct LocalizedTextLabelView: View {
     let label: LanguageLabel
     
-    @ObservedObject var languageManager = LanguageManager.shared
-    
+    @StateObject private var languageManager = LanguageManager.shared
+
     var body: some View {
         let localizedString = languageManager.localizedString(label.rawValue)
         Text(localizedString)

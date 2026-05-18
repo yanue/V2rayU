@@ -12,7 +12,7 @@ struct AdvanceView: View {
     @State private var v2rayShortcut: String = ""
     @State private var proxyModeShortcut: String = ""
     private var labelWidth: CGFloat = 240
-    @ObservedObject var settings = AppSettings.shared
+    @StateObject private var settings = AppSettings.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

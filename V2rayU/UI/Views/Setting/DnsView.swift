@@ -12,7 +12,6 @@ struct DnsView: View {
     @State private var dnsJson: String = ""
     @State private var tips: String = ""
     @State private var showAlert: Bool = false
-    @ObservedObject var settings = AppSettings()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -66,7 +65,6 @@ struct DnsView: View {
                         .foregroundColor(tips.hasPrefix("Error") ? .red : .green)
                         .font(.callout)
                         .padding(.horizontal, 20)
-                        .transition(.opacity)
                 }
 
                 Spacer()

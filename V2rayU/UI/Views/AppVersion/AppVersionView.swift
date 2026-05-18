@@ -11,116 +11,117 @@ struct AppVersionView: View {
     @ObservedObject var vm: AppVersionViewModel
 
     var body: some View {
-        switch vm.stage {
-        case .checking:
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 10) {
-                    Image("V2rayU")
-                        .resizable()
-                        .frame(width: 64, height: 64)
-                        .cornerRadius(8)
+        Group {
+            switch vm.stage {
+            case .checking:
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image("V2rayU")
+                            .resizable()
+                            .frame(width: 64, height: 64)
+                            .cornerRadius(8)
 
-                    Spacer()
+                        Spacer()
 
-                    VStack {
-                        HStack {
-                            ProgressView(String(localized: .CheckingForUpdates))
-                                .progressViewStyle(LinearProgressViewStyle())
-                                .padding(.horizontal)
-                        }
-
-                        HStack {
-                            if vm.checkError != "" {
-                                Text(vm.checkError ?? "")
-                                    .foregroundColor(.red)
+                        VStack {
+                            HStack {
+                                ProgressView(String(localized: .CheckingForUpdates))
+                                    .progressViewStyle(LinearProgressViewStyle())
+                                    .padding(.horizontal)
                             }
-                            Spacer()
-                            Button(String(localized: .Cancel)) {
-                                vm.onClose?()
+
+                            HStack {
+                                if vm.checkError != "" {
+                                    Text(vm.checkError ?? "")
+                                        .foregroundColor(.red)
+                                }
+                                Spacer()
+                                Button(String(localized: .Cancel)) {
+                                    vm.onClose?()
+                                }
+                                .focusable(false)
                             }
-                            .focusable(false)
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
+                    }
+                    .padding()
+                }
+
+            case .versionAvailable:
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image("V2rayU")
+                            .resizable()
+                            .frame(width: 64, height: 64)
+                            .padding(.top, 20)
+                            .padding(.leading, 20)
+
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(vm.title)
+                                .font(.headline)
+                                .padding(.top, 20)
+
+                            Text(vm.description)
+                                .padding(.trailing, 20)
+
+                            Text(String(localized: .ReleaseNotesTitle))
+                                .font(.headline)
+                                .bold()
+                                .padding(.top, 20)
+
+                            HStack {
+                                TextEditor(text: $vm.releaseNotes)
+                                    .lineSpacing(6)
+                                    .frame(height: 120)
+                                    .border(Color.gray, width: 1)
+                                Spacer(minLength: 20)
+                            }
+
+                            HStack {
+                                Button(String(localized: .SkipVersion)) {
+                                    vm.onSkip?()
+                                }
+                                .focusable(false)
+
+                                Spacer()
+
+                                Button(String(localized: .InstallUpdate)) {
+                                    vm.onDownload?()
+                                }
+                                .focusable(false)
+                                .padding(.trailing, 20)
+                                .keyboardShortcut(.defaultAction)
+                            }
+                            .padding(.top, 20)
+                            .padding(.bottom, 20)
+                        }
                     }
                 }
-                .padding()
-            }
 
-        case .versionAvailable:
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 10) {
-                    Image("V2rayU")
-                        .resizable()
-                        .frame(width: 64, height: 64)
-                        .padding(.top, 20)
-                        .padding(.leading, 20)
-
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(vm.title)
-                            .font(.headline)
-                            .padding(.top, 20)
-
-                        Text(vm.description)
-                            .padding(.trailing, 20)
-
-                        Text(String(localized: .ReleaseNotesTitle))
-                            .font(.headline)
-                            .bold()
-                            .padding(.top, 20)
-
-                        HStack {
-                            TextEditor(text: $vm.releaseNotes)
-                                .lineSpacing(6)
-                                .frame(height: 120)
-                                .border(Color.gray, width: 1)
-                                .fixedSize(horizontal: false, vertical: true)
-                            Spacer(minLength: 20)
+            case .downloading:
+                if let release = vm.selectedRelease {
+                    DownloadView(
+                        version: release,
+                        downloadedBtn : String(localized: .InstallV2rayU),
+                        onDownloadSuccess: { filePath in
+                            vm.onInstall?(filePath)
+                        },
+                        onDownloadFail: { err in
+                            vm.checkError = err
+                            vm.onClose?()
                         }
-
-                        HStack {
-                            Button(String(localized: .SkipVersion)) {
-                                vm.onSkip?()
-                            }
-                            .focusable(false)
-                            
-                            Spacer()
-
-                            Button(String(localized: .InstallUpdate)) {
-                                vm.onDownload?()
-                            }
-                            .focusable(false)
-                            .padding(.trailing, 20)
-                            .keyboardShortcut(.defaultAction)
-                        }
-                        .padding(.top, 20)
-                        .padding(.bottom, 20)
-                    }
+                    )
+                    .padding(.all, 20)
+                    .background()
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                            .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
+                    )
                 }
-            }
-            .frame(width: 500, height: 300)
-
-        case .downloading:
-            if let release = vm.selectedRelease {
-                DownloadView(
-                    version: release,
-                    downloadedBtn : String(localized: .InstallV2rayU),
-                    onDownloadSuccess: { filePath in
-                        vm.onInstall?(filePath)
-                    },
-                    onDownloadFail: { err in
-                        vm.checkError = err
-                        vm.onClose?()
-                    }
-                )
-                .padding(.all, 20)
-                .background()
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-                )
             }
         }
+        .frame(width: 500, height: 300, alignment: .topLeading)
     }
 }

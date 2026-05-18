@@ -25,8 +25,12 @@ class MainWindowManager {
             // 3.1 构建 SwiftUI 内容视图
             let contentView = ContentView()
                 .environment(\.locale, LanguageManager.shared.currentLocale)
-                .environmentObject(AppState.shared)
             let hostingVC = NSHostingController(rootView: contentView)
+            if #available(macOS 13.0, *) {
+                // Prevent SwiftUI from animating/resizing the NSWindow in
+                // response to transient content-size changes during layout.
+                hostingVC.sizingOptions = []
+            }
 
             // 3.2 初始化自定义窗口
             let window = BaseWindow(
@@ -40,16 +44,15 @@ class MainWindowManager {
             window.delegate = window
 
             // 3.4 配置窗口内容和大小
-            window.contentView = hostingVC.view
+            window.contentViewController = hostingVC
             window.setContentSize(NSSize(width: 760, height: 600))
+            window.contentMinSize = NSSize(width: 760, height: 600)
+            window.animationBehavior = .none
             window.title = "V2rayU"
             window.center()
             window.isReleasedWhenClosed = false
 
-            // 3.5 关键：把焦点给 SwiftUI 视图，让 performKeyEquivalent 生效
-            window.makeFirstResponder(hostingVC.view)
-
-            // 3.6 包装成 NSWindowController
+            // 3.5 包装成 NSWindowController
             windowController = NSWindowController(window: window)
         }
 
@@ -57,9 +60,6 @@ class MainWindowManager {
         windowController?.showWindow(nil)
         if let win = windowController?.window {
             win.makeKeyAndOrderFront(nil)
-            DispatchQueue.main.async {
-                win.orderFrontRegardless()
-            }
         }
     }
 }
