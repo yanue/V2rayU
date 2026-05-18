@@ -31,7 +31,6 @@ struct DiagnosticsView: View {
             contentView
         }
         .padding(8)
-        .task { viewModel.ensureItemsInitialized() }
         .onDisappear { viewModel.cancelChecks() }
         .alert(isPresented: $viewModel.showOpenSettingsAlert) {
             Alert(
@@ -139,6 +138,7 @@ struct DiagnosticsView: View {
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.3), value: progressRatio)
                     // Overlay passed portion
                     Circle()
                         .trim(from: 0, to: ratio)
@@ -147,6 +147,7 @@ struct DiagnosticsView: View {
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.3), value: ratio)
                 } else {
                     Circle()
                         .trim(from: 0, to: ratio)
@@ -155,6 +156,7 @@ struct DiagnosticsView: View {
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.5), value: ratio)
                 }
 
                 if viewModel.checking {
@@ -192,10 +194,12 @@ struct DiagnosticsView: View {
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(Color.accentColor.opacity(0.3))
                                 .frame(width: geo.size.width * progressRatio)
+                                .animation(.easeInOut(duration: 0.3), value: progressRatio)
                         }
                         RoundedRectangle(cornerRadius: 3)
                             .fill(allOK ? Color.green : Color.orange)
                             .frame(width: geo.size.width * ratio)
+                            .animation(.easeInOut(duration: 0.3), value: ratio)
                     }
                 }
                 .frame(height: 6)

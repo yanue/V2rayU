@@ -133,6 +133,5 @@ struct FAQSheetView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
-        .frame(width: 760, height: 560, alignment: .topLeading)
     }
 }

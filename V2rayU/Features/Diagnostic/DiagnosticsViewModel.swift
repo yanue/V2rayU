@@ -20,11 +20,11 @@ final class DiagnosticsViewModel: ObservableObject {
     @Published var logContent = ""
     @Published var collapsedSections: Set<DiagnosticCategory> = []
 
-    var hasFailures: Bool { ensureItemsInitialized(); return items.contains { !$0.ok } }
+    var hasFailures: Bool { items.contains { !$0.ok } }
 
-    var passedCount: Int { ensureItemsInitialized(); return items.filter { $0.status == .passed }.count }
-    var checkedCount: Int { ensureItemsInitialized(); return items.filter { $0.status == .passed || $0.status == .failed }.count }
-    var totalCount:  Int { ensureItemsInitialized(); return items.count }
+    var passedCount: Int { items.filter { $0.status == .passed }.count }
+    var checkedCount: Int { items.filter { $0.status == .passed || $0.status == .failed }.count }
+    var totalCount:  Int { items.count }
 
     // MARK: - Dependencies
 
@@ -39,23 +39,16 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: - Init
 
-    private var _hasInitialized = false
     private var _hasRun = false
 
     init(nodeHostProvider: @escaping () -> String?, nodePortProvider: @escaping () -> UInt16?) {
         self.nodeHostProvider = nodeHostProvider
         self.nodePortProvider = nodePortProvider
-    }
-
-    func ensureItemsInitialized() {
-        guard !_hasInitialized else { return }
-        _hasInitialized = true
-        items = DiagnosticStep.ordered.map { makePending($0) }
+        self.items = DiagnosticStep.ordered.map { makePending($0) }
     }
 
     /// Only run checks on first appearance; subsequent returns preserve last results
     func runChecksIfNeeded() {
-        ensureItemsInitialized()
         guard !_hasRun else { return }
         _hasRun = true
         runSequentialChecks()
@@ -68,8 +61,7 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: - Item helpers
 
     func itemsFor(_ category: DiagnosticCategory) -> [DiagnosticItem] {
-        ensureItemsInitialized()
-        return items.filter { $0.category == category }
+        items.filter { $0.category == category }
     }
 
     private func makePending(_ step: DiagnosticStep) -> DiagnosticItem {

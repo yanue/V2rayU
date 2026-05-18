@@ -186,7 +186,7 @@ final class AppSettings: ObservableObject {
         }
 
         if old.showCountryFlag != showCountryFlag {
-            Task { await AppMenuManager.shared.refreshServerItems() }
+            Task { AppMenuManager.shared.refreshServerItems() }
         }
         // 需要重新生成PAC文件的情况
         let needGeneratePAC = old.socksPort != socksPort || old.allowLAN != allowLAN || old.gfwPacListUrl != gfwPacListUrl

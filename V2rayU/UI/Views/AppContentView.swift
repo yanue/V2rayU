@@ -65,7 +65,6 @@ struct ContentView: View {
             .padding(.all, 16) // 5. 外边距
             .frame(minWidth: 640) // 设置右侧内容区的宽度
         }
-        .frame(minWidth: 760, minHeight: 600, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
   
     func SidebarButton(tab: MainTab, title: LanguageLabel, icon: String) -> some View {
@@ -85,6 +84,8 @@ struct ContentView: View {
             .background(isSelected ? Color.accentColor.opacity(0.4) : Color.clear)
             .cornerRadius(6) // Rounded corners for a smoother look
             .contentShape(Rectangle()) // Ensures full area is tappable
+            .scaleEffect(isSelected ? 1.05 : 1.0) // Slight scaling effect on selection
+            .animation(.easeInOut(duration: 0.2), value: isSelected) // Smooth animation on tap
         }
         .buttonStyle(.plain) // Remove default button styling
         .focusable(false)

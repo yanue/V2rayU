@@ -36,9 +36,7 @@ class AppVersionController: NSWindowController {
                               backing: .buffered, defer: false)
         window.title = "V2rayU Update"
         window.contentViewController = hostingController
-        window.contentMinSize = NSSize(width: 500, height: 300)
-        window.contentMaxSize = NSSize(width: 500, height: 300)
-        window.animationBehavior = .none
+        window.setContentSize(NSSize(width: 500, height: 300))
 
         super.init(window: window)
 

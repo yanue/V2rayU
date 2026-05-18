@@ -121,6 +121,5 @@ struct SubscriptionFormView: View {
             .padding(.vertical, 12)
             .padding(.horizontal, 24)
         }
-        .frame(width: 520, minHeight: showHeader ? 340 : 220, alignment: .topLeading)
     }
 }

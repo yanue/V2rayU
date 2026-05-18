@@ -136,6 +136,5 @@ struct RoutingFormView: View {
             .padding(.horizontal, 8)
         }
         .padding(8)
-        .frame(width: 760, height: 560, alignment: .topLeading)
     }
 }

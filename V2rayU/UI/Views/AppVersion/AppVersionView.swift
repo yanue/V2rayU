@@ -122,6 +122,5 @@ struct AppVersionView: View {
                 }
             }
         }
-        .frame(width: 500, height: 300, alignment: .topLeading)
     }
 }
