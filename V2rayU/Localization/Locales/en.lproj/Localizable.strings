@@ -235,6 +235,11 @@
 "ObfuscationSettings" = "Obfuscation Settings";
 "ObfsType" = "Obfs Type";
 "ObfsPassword" = "Obfs Password";
+"HopPortRange" = "Hop Port Range";
+"HopPortRangeTip" = "Overrides port, separate multiple groups with comma (,)";
+"HopInterval" = "Hop Interval (seconds)";
+"Masquerade" = "Masquerade";
+"FinalMask" = "FinalMask";
 "AuthenticationSettings" = "Authentication Settings";
 "AuthType" = "Auth Type";
 "None" = "None";
@@ -244,7 +249,6 @@
 "UploadBandwidth" = "Upload Bandwidth";
 "DownloadBandwidth" = "Download Bandwidth";
 "AdvancedSettings" = "Advanced Settings";
-"HopInterval" = "Hop Interval (seconds)";
 
 // MARK: - Menu Operations
 "CoreOn" = "Core: Running";

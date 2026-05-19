@@ -18,7 +18,7 @@ enum V2rayStreamNetwork: String, Codable, CaseIterable, Identifiable {
     case kcp
     case domainsocket
     case xhttp
-    case hysteria
+    case hysteria2 = "hysteria"
     var id: Self { self }
 }
 

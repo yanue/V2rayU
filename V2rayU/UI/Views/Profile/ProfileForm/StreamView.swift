@@ -74,13 +74,32 @@ struct ConfigStreamView: View {
                         getTextEditorWithLabel(label: .Extra, text: $item.extra)
                     }
 
-                    if item.network == .hysteria {
-                        getTextFieldWithLabel(label: .AuthPassword, text: $item.hysteria2AuthPassword)
-                        getTextFieldWithLabel(label: .ObfsType, text: $item.hysteria2ObfsType)
-                        if !item.hysteria2ObfsType.isEmpty {
-                            getTextFieldWithLabel(label: .ObfsPassword, text: $item.hysteria2ObfsPassword)
+                    if item.network == .hysteria2 {
+                        getTextFieldWithLabel(label: .ObfsPassword, text: $item.hysteria2ObfsPassword)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                LocalizedTextLabelView(label: .HopPortRange).frame(width: 100, alignment: .trailing)
+                                TextField("1000-2000,3000,4000", text: $item.hysteria2HopPortRange)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                            }
+                            HStack {
+                                Spacer().frame(width: 100)
+                                Text(String(localized: .HopPortRangeTip))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
-                        getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.hysteria2Insecure)
+
+                        getNumFieldWithLabel(label: .HopInterval, num: $item.hysteria2HopInterval)
+
+                        getTextFieldWithLabel(label: .UploadBandwidth, text: $item.hysteria2BandwidthUp)
+                        getTextFieldWithLabel(label: .DownloadBandwidth, text: $item.hysteria2BandwidthDown)
+
+                        Divider()
+
+                        getTextEditorWithLabel(label: .Masquerade, text: $item.hysteria2MasqueradeJson)
+                        getTextEditorWithLabel(label: .FinalMask, text: $item.hysteria2FinalMaskJson)
                     }
                 }
                 .id(item.network) // Force full subtree recreation on network change

@@ -36,9 +36,7 @@ struct ConfigFormView: View {
                         VStack{
                             ConfigServerView(item: item)
                             Spacer(minLength: 12)
-                            if item.protocol == .hysteria2 {
-                                Hysteria2ConfigView(item: item)
-                            } else if item.protocol != .socks {
+                            if item.protocol != .socks {
                                 ConfigStreamView(item: item)
                                 Spacer(minLength: 12)
                                 ConfigTransportView(item: item)
@@ -90,6 +88,19 @@ struct ConfigFormView: View {
         )
         .onAppear {
             logger.info("ProfileFormView appeared with item: \(item.id)")
+            // ensure hysteria2 defaults
+            if item.selectedProtocol == .hysteria2 {
+                if item.security == .none { item.security = .tls }
+                if item.alpn == .h2h1 { item.alpn = .h3 }
+                if item.network != .hysteria2 { item.network = .hysteria2 }
+            }
+        }
+        .onChange(of: item.selectedProtocol) { _, newProtocol in
+            if newProtocol == .hysteria2 {
+                if item.security == .none { item.security = .tls }
+                if item.alpn == .h2h1 { item.alpn = .h3 }
+                if item.network != .hysteria2 { item.network = .hysteria2 }
+            }
         }
     }
 }

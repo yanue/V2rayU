@@ -177,7 +177,7 @@ class SingboxOutboundHandler {
         case .domainsocket:
             return TransportConfig(type: "domainsocket")
 
-        case .hysteria:
+        case .hysteria2:
             // Hysteria2 has its own transport, not configured here
             return nil
         }
@@ -187,10 +187,10 @@ class SingboxOutboundHandler {
         let hyConfig = profile.getHysteria2Config()
 
         var obfs: Hysteria2ObfsConfig?
-        if !hyConfig.obfsType.isEmpty {
+        if !hyConfig.obfsPassword.isEmpty {
             obfs = Hysteria2ObfsConfig(
-                type: hyConfig.obfsType,
-                password: hyConfig.obfsPassword.isEmpty ? nil : hyConfig.obfsPassword
+                type: "salamander",
+                password: hyConfig.obfsPassword
             )
         }
 
@@ -202,11 +202,11 @@ class SingboxOutboundHandler {
             tag: "proxy",
             server: profile.address,
             server_port: profile.port,
-            password: hyConfig.authType == "password" ? hyConfig.authPassword : profile.password,
+            password: profile.password,
             tls: TLSConfig(
                 enabled: true,
                 server_name: profile.sni.isEmpty ? profile.address : profile.sni,
-                insecure: hyConfig.insecure
+                insecure: profile.allowInsecure
             ),
             up_mbps: upMbps,
             down_mbps: downMbps,

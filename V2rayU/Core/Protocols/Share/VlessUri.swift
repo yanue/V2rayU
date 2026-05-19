@@ -90,7 +90,7 @@ class VlessUri: BaseShareUri {
         case .quic:
             queryItems.append(URLQueryItem(name: "path", value: self.profile.path))
             break
-        case .hysteria:
+        case .hysteria2:
             break
         }
         uri.queryItems = queryItems
@@ -222,7 +222,7 @@ class VlessUri: BaseShareUri {
         case .quic:
             self.profile.path = query.getString(forKey: "path", defaultValue: "/")
             break
-        case .hysteria:
+        case .hysteria2:
             break
         }
 

@@ -127,6 +127,13 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.totalDown = 0
         self.todayUp = 0
         self.todayDown = 0
+
+        // hysteria2 defaults: TLS + h3 + hysteria network
+        if `protocol` == .hysteria2 {
+            if security == .none { self.security = .tls }
+            if alpn == .h2h1 { self.alpn = .h3 }
+            self.network = .hysteria2
+        }
     }
 
     // 自定义表名
@@ -174,16 +181,13 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // MARK: - Hysteria2 Config
     struct Hysteria2Config: Codable {
-        var obfsType: String = ""
         var obfsPassword: String = ""
-        var authType: String = ""
-        var authPassword: String = ""
-        var masqueradeType: String = ""
-        var masqueradeUrl: String = ""
+        var hopPortRange: String = ""
+        var hopInterval: Int = 30
         var bandwidthUp: String = ""
         var bandwidthDown: String = ""
-        var hopInterval: Int = 0
-        var insecure: Bool = false
+        var masqueradeJson: String = ""
+        var finalMaskJson: String = ""
     }
 
     func getHysteria2Config() -> Hysteria2Config {

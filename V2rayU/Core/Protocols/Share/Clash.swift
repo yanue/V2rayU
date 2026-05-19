@@ -141,6 +141,7 @@ extension clashProxy {
 
         case "hysteria2":
             profile.protocol = .hysteria2
+            profile.network = .hysteria2
             profile.password = self.password ?? ""
             profile.sni = self.servername ?? self.server
 

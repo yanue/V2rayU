@@ -45,26 +45,26 @@ class Hysteria2Uri: BaseShareUri {
         ]
         
         // Hysteria 2 特定参数
-        if !hyConfig.obfsType.isEmpty {
-            queryItems.append(URLQueryItem(name: "obfs", value: hyConfig.obfsType))
-        }
         if !hyConfig.obfsPassword.isEmpty {
             queryItems.append(URLQueryItem(name: "obfs-password", value: hyConfig.obfsPassword))
         }
-        if !hyConfig.authType.isEmpty {
-            queryItems.append(URLQueryItem(name: "auth", value: hyConfig.authType))
+        if !hyConfig.hopPortRange.isEmpty {
+            queryItems.append(URLQueryItem(name: "mport", value: hyConfig.hopPortRange))
         }
-        if !hyConfig.authPassword.isEmpty {
-            queryItems.append(URLQueryItem(name: "auth-password", value: hyConfig.authPassword))
+        if hyConfig.hopInterval > 0 {
+            queryItems.append(URLQueryItem(name: "hop", value: String(hyConfig.hopInterval)))
         }
-        if !hyConfig.masqueradeType.isEmpty {
-            queryItems.append(URLQueryItem(name: "masquerade", value: hyConfig.masqueradeType))
+        if !hyConfig.bandwidthUp.isEmpty {
+            queryItems.append(URLQueryItem(name: "up", value: hyConfig.bandwidthUp))
         }
-        if !hyConfig.masqueradeUrl.isEmpty {
-            queryItems.append(URLQueryItem(name: "masquerade-url", value: hyConfig.masqueradeUrl))
+        if !hyConfig.bandwidthDown.isEmpty {
+            queryItems.append(URLQueryItem(name: "down", value: hyConfig.bandwidthDown))
         }
-        if hyConfig.insecure {
-            queryItems.append(URLQueryItem(name: "insecure", value: "1"))
+        if !hyConfig.masqueradeJson.isEmpty {
+            queryItems.append(URLQueryItem(name: "masquerade", value: hyConfig.masqueradeJson))
+        }
+        if !hyConfig.finalMaskJson.isEmpty {
+            queryItems.append(URLQueryItem(name: "finalmask", value: hyConfig.finalMaskJson))
         }
         if !hyConfig.bandwidthUp.isEmpty {
             queryItems.append(URLQueryItem(name: "up", value: hyConfig.bandwidthUp))
@@ -106,16 +106,13 @@ class Hysteria2Uri: BaseShareUri {
         
         // Hysteria 2 特定参数 - 获取现有配置并更新
         var config = profile.getHysteria2Config()
-        config.obfsType = query.getString(forKey: "obfs", defaultValue: "")
         config.obfsPassword = query.getString(forKey: "obfs-password", defaultValue: "")
-        config.authType = query.getString(forKey: "auth", defaultValue: "")
-        config.authPassword = query.getString(forKey: "auth-password", defaultValue: "")
-        config.masqueradeType = query.getString(forKey: "masquerade", defaultValue: "")
-        config.masqueradeUrl = query.getString(forKey: "masquerade-url", defaultValue: "")
-        config.insecure = query.getBool(forKey: "insecure", defaultValue: false)
+        config.hopPortRange = query.getString(forKey: "mport", defaultValue: "")
+        config.hopInterval = query.getInt(forKey: "hop", defaultValue: 0)
         config.bandwidthUp = query.getString(forKey: "up", defaultValue: "")
         config.bandwidthDown = query.getString(forKey: "down", defaultValue: "")
-        config.hopInterval = query.getInt(forKey: "hop", defaultValue: 0)
+        config.masqueradeJson = query.getString(forKey: "masquerade", defaultValue: "")
+        config.finalMaskJson = query.getString(forKey: "finalmask", defaultValue: "")
         
         // 保存配置到 extra 字段
         if let data = try? JSONEncoder().encode(config),

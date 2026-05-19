@@ -235,17 +235,15 @@
 "Hysteria2Configuration" = "Hysteria 2 配置";
 "ObfuscationSettings" = "混淆设置";
 "ObfsType" = "混淆类型";
-"ObfsPassword" = "混淆密码";
-"AuthenticationSettings" = "认证设置";
-"AuthType" = "认证类型";
-"None" = "无";
-"Token" = "令牌";
-"AuthPassword" = "认证密码";
-"BandwidthSettings" = "带宽设置";
-"UploadBandwidth" = "上传带宽";
-"DownloadBandwidth" = "下载带宽";
-"AdvancedSettings" = "高级设置";
+"ObfsPassword" = "混淆密码 (obfs password)";
+"HopPortRange" = "跳跃端口范围";
+"HopPortRangeTip" = "会覆盖端口，多组时用逗号 (,) 隔开";
 "HopInterval" = "端口跳跃间隔 (秒)";
+"Masquerade" = "Masquerade";
+"FinalMask" = "FinalMask";
+"UploadBandwidth" = "上行带宽 (up)";
+"DownloadBandwidth" = "下行带宽 (down)";
+"AdvancedSettings" = "高级设置";
 
 // MARK: - 菜单操作
 "CoreOn" = "核心: 运行中";

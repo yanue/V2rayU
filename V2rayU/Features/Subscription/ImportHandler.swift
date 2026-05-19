@@ -129,6 +129,7 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
 
     case "hysteria2":
         profile.protocol = .hysteria2
+        profile.network = .hysteria2
         profile.address = outbound["address"] as? String ?? outbound["server"] as? String ?? ""
         profile.port = outbound["port"] as? Int ?? 0
         profile.password = outbound["password"] as? String ?? ""

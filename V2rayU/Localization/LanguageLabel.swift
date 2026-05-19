@@ -250,6 +250,11 @@ enum LanguageLabel: String, CaseIterable {
     case ObfuscationSettings
     case ObfsType
     case ObfsPassword
+    case HopPortRange
+    case HopPortRangeTip
+    case HopInterval
+    case Masquerade
+    case FinalMask
     case AuthenticationSettings
     case AuthType
     case None
@@ -259,7 +264,6 @@ enum LanguageLabel: String, CaseIterable {
     case UploadBandwidth
     case DownloadBandwidth
     case AdvancedSettings
-    case HopInterval
 
     // MARK: - Menu Operations
     case CoreOn
