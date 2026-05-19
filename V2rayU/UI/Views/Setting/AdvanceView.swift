@@ -19,21 +19,23 @@ struct AdvanceView: View {
             Text(String(localized: .Advanced))
                 .font(.headline)
                 .foregroundColor(.secondary)
-            HStack {
-                getTextLabel(label: .LocalSocksListenPort, labelWidth: labelWidth)
-                TextField(String(localized: .LocalSocksListenPort), value: $settings.socksPort, formatter: NumberFormatter())
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.leading, 7)
-                Spacer()
-                getTextLabel(label: .EnableUDP, labelWidth: 100)
-                Toggle("", isOn: $settings.enableUdp).frame(alignment: .leading)
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                    .frame(alignment: .leading)
-            }
-            getNumFieldWithLabel(label: .LocalHttpListenPort, num: $settings.httpPort, labelWidth: labelWidth)
             getBoolFieldWithLabel(label: .EnableMixedPort, isOn: $settings.enableMixedPort, labelWidth: labelWidth)
             if settings.enableMixedPort {
                 getNumFieldWithLabel(label: .MixedProxyPort, num: $settings.mixedPort, labelWidth: labelWidth)
+            }
+            if !settings.enableMixedPort {
+                HStack {
+                    getTextLabel(label: .LocalSocksListenPort, labelWidth: labelWidth)
+                    TextField(String(localized: .LocalSocksListenPort), value: $settings.socksPort, formatter: NumberFormatter())
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.leading, 7)
+                    Spacer()
+                    getTextLabel(label: .EnableUDP, labelWidth: 100)
+                    Toggle("", isOn: $settings.enableUdp).frame(alignment: .leading)
+                        .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        .frame(alignment: .leading)
+                }
+                getNumFieldWithLabel(label: .LocalHttpListenPort, num: $settings.httpPort, labelWidth: labelWidth)
             }
             getNumFieldWithLabel(label: .LocalPacListenPort, num: $settings.pacPort, labelWidth: labelWidth)
             getBoolFieldWithLabel(label: .AllowLAN, isOn: $settings.allowLAN, labelWidth: labelWidth)
