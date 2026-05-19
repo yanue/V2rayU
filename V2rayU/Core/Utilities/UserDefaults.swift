@@ -45,6 +45,10 @@ extension UserDefaults {
         case localHttpPort
         // sock port
         case localSockPort
+        // mixed http+socks port
+        case mixedPort
+        // enable mixed http+socks port
+        case enableMixedPort
         // pac Port
         case localPacPort
         // dns servers

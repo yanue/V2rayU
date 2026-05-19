@@ -19,6 +19,8 @@ class SingboxConfigHandler {
     var socksHost = "127.0.0.1"
     var httpPort = "1087"
     var httpHost = "127.0.0.1"
+    var enableMixedPort = false
+    var mixedPort = "1080"
     var enableTun = false
     var forPing = false
     var domain_resolver = "default-dns"
@@ -28,6 +30,8 @@ class SingboxConfigHandler {
         self.enableTun = enableTun
         self.httpPort = String(getHttpProxyPort())
         self.socksPort = String(getSocksProxyPort())
+        self.enableMixedPort = isMixedProxyPortEnabled()
+        self.mixedPort = String(getMixedProxyPort())
         self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
 
         self.socksHost = getListenAddress()
@@ -121,7 +125,7 @@ class SingboxConfigHandler {
                 type: "socks",
                 tag: "proxy",
                 server: "127.0.0.1",
-                server_port: Int(getSocksProxyPort())
+                server_port: Int(getEffectiveSocksProxyPort())
             )
             let directOutbound = SingboxOutbound(type: "direct", tag: "direct")
 
@@ -156,26 +160,38 @@ class SingboxConfigHandler {
         
         // 非TUN模式配置
         // 默认 inbound: socks + http
-        if self.httpPort == self.socksPort {
+        if !self.enableMixedPort && self.httpPort == self.socksPort {
             self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
         }
-        
-        let httpInbound = SingboxInbound(
-            type: "http",
-            tag: "http-in",
-            listen: self.httpHost,
-            listen_port: Int(self.httpPort),
-        )
-        inbounds.append(httpInbound)
+
+        if !self.forPing && self.enableMixedPort {
+            let mixedInbound = SingboxInbound(
+                type: "mixed",
+                tag: "mixed-in",
+                listen: self.httpHost,
+                listen_port: Int(self.mixedPort)
+            )
+            inbounds.append(mixedInbound)
+        } else {
+            let httpInbound = SingboxInbound(
+                type: "http",
+                tag: "http-in",
+                listen: self.httpHost,
+                listen_port: Int(self.httpPort),
+            )
+            inbounds.append(httpInbound)
+        }
 
         if !self.forPing {
-            let socksInbound = SingboxInbound(
-                type: "socks",
-                tag: "socks-in",
-                listen: self.socksHost,
-                listen_port: Int(self.socksPort),
-            )
-            inbounds.append(socksInbound)
+            if !self.enableMixedPort {
+                let socksInbound = SingboxInbound(
+                    type: "socks",
+                    tag: "socks-in",
+                    listen: self.socksHost,
+                    listen_port: Int(self.socksPort),
+                )
+                inbounds.append(socksInbound)
+            }
 
             let clashConfig = ExperimentalConfig(
                 clash_api: ClashAPIConfig(

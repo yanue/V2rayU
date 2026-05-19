@@ -30,8 +30,8 @@ final class DiagnosticsViewModel: ObservableObject {
 
     private let appState = AppState.shared
     private let logPath  = coreLogFilePath
-    private var localSocksPort: Int { Int(getSocksProxyPort()) }
-    private var localHTTPPort:  Int { Int(getHttpProxyPort()) }
+    private var localSocksPort: Int { Int(getEffectiveSocksProxyPort()) }
+    private var localHTTPPort:  Int { Int(getEffectiveHttpProxyPort()) }
     private let nodeHostProvider: () -> String?
     private let nodePortProvider: () -> UInt16?
 

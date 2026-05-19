@@ -27,6 +27,8 @@ final class AppSettings: ObservableObject {
     @Published var showCountryFlag: Bool = UserDefaults.getBool(forKey: .showCountryFlag, default: true)
     @Published var socksPort: Int = Int(getSocksProxyPort())
     @Published var httpPort: Int = Int(getHttpProxyPort())
+    @Published var enableMixedPort: Bool = UserDefaults.getBool(forKey: .enableMixedPort)
+    @Published var mixedPort: Int = UserDefaults.getInt(forKey: .mixedPort, defaultValue: Int(getSocksProxyPort()))
     @Published var pacPort: Int = Int(getPacPort())
     @Published var allowLAN: Bool = UserDefaults.getBool(forKey: .allowLAN)
     @Published var enableUdp: Bool = UserDefaults.getBool(forKey: .enableUdp)
@@ -91,6 +93,8 @@ final class AppSettings: ObservableObject {
         showCountryFlag = UserDefaults.getBool(forKey: .showCountryFlag, default: true)
         socksPort = Int(getSocksProxyPort())
         httpPort = Int(getHttpProxyPort())
+        enableMixedPort = UserDefaults.getBool(forKey: .enableMixedPort)
+        mixedPort = UserDefaults.getInt(forKey: .mixedPort, defaultValue: Int(getSocksProxyPort()))
         pacPort = Int(getPacPort())
         allowLAN = UserDefaults.getBool(forKey: .allowLAN)
         enableUdp = UserDefaults.getBool(forKey: .enableUdp)
@@ -145,6 +149,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.setBool(forKey: .enableStat, value: enableStat)
         UserDefaults.setInt(forKey: .localSockPort, value: socksPort)
         UserDefaults.setInt(forKey: .localHttpPort, value: httpPort)
+        UserDefaults.setBool(forKey: .enableMixedPort, value: enableMixedPort)
+        UserDefaults.setInt(forKey: .mixedPort, value: mixedPort)
         UserDefaults.setInt(forKey: .localPacPort, value: pacPort)
         UserDefaults.setBool(forKey: .allowLAN, value: allowLAN)
         UserDefaults.setBool(forKey: .enableUdp, value: enableUdp)
@@ -165,9 +171,14 @@ final class AppSettings: ObservableObject {
     func handleChange(old: AppSettings) {
         // 处理设置变更逻辑
         var needRestartV2ray = false
+        let oldEffectiveHttpPort = old.effectiveHttpPort
+        let newEffectiveHttpPort = effectiveHttpPort
+        let oldEffectiveSocksPort = old.effectiveSocksPort
+        let newEffectiveSocksPort = effectiveSocksPort
         // 需要重启v2ray的情况
-        if old.httpPort != httpPort ||
-            old.socksPort != socksPort ||
+        if old.enableMixedPort != enableMixedPort ||
+            oldEffectiveHttpPort != newEffectiveHttpPort ||
+            oldEffectiveSocksPort != newEffectiveSocksPort ||
             old.allowLAN != allowLAN ||
             old.enableUdp != enableUdp ||
             old.enableSniffing != enableSniffing ||
@@ -189,7 +200,7 @@ final class AppSettings: ObservableObject {
             Task { AppMenuManager.shared.refreshServerItems() }
         }
         // 需要重新生成PAC文件的情况
-        let needGeneratePAC = old.socksPort != socksPort || old.allowLAN != allowLAN || old.gfwPacListUrl != gfwPacListUrl
+        let needGeneratePAC = oldEffectiveSocksPort != newEffectiveSocksPort || old.allowLAN != allowLAN || old.gfwPacListUrl != gfwPacListUrl
         // pac端口改变后, 需要重启HTTP服务器
         let needRestartHttpServer = pacPort != old.pacPort || old.allowLAN != allowLAN
         if needGeneratePAC {
@@ -210,5 +221,20 @@ final class AppSettings: ObservableObject {
                 await SubscriptionScheduler.shared.refreshAll()
             }
         }
+    }
+
+    var effectiveHttpPort: Int {
+        effectivePort(enableMixedPort: enableMixedPort, mixedPort: mixedPort, fallbackPort: httpPort)
+    }
+
+    var effectiveSocksPort: Int {
+        effectivePort(enableMixedPort: enableMixedPort, mixedPort: mixedPort, fallbackPort: socksPort)
+    }
+
+    private func effectivePort(enableMixedPort: Bool, mixedPort: Int, fallbackPort: Int) -> Int {
+        if enableMixedPort, mixedPort > 0 {
+            return mixedPort
+        }
+        return fallbackPort
     }
 }

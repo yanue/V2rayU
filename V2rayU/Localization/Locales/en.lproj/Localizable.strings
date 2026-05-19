@@ -95,6 +95,8 @@
 "LocalSocksListenPort" = "Local SOCKS listen port";
 "EnableUDP" = "Enable UDP";
 "LocalHttpListenPort" = "Local HTTP listen port";
+"EnableMixedPort" = "Enable mixed proxy port";
+"MixedProxyPort" = "Mixed proxy port";
 "LocalPacListenPort" = "Local PAC listen port";
 "AllowLAN" = "Allow LAN connections";
 "EnableSniffing" = "Enable sniffing";

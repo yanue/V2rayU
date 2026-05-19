@@ -101,6 +101,8 @@ enum LanguageLabel: String, CaseIterable {
     case LocalSocksListenPort
     case EnableUDP
     case LocalHttpListenPort
+    case EnableMixedPort
+    case MixedProxyPort
     case LocalPacListenPort
     case AllowLAN
     case EnableSniffing

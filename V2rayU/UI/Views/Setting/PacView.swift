@@ -184,7 +184,7 @@ struct PacView: View {
     }
 
     func tryDownloadByShell(gfwPacListUrl: String) {
-        let sockPort = getSocksProxyPort()
+        let sockPort = getEffectiveSocksProxyPort()
         let curlCmd = "cd \(PACRulesDirPath) && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
         logger.info("curlCmd: \(curlCmd)")
 

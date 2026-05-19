@@ -96,6 +96,8 @@
 "LocalSocksListenPort" = "本地 SOCKS 监听端口";
 "EnableUDP" = "启用 UDP";
 "LocalHttpListenPort" = "本地 HTTP 监听端口";
+"EnableMixedPort" = "启用混合代理端口";
+"MixedProxyPort" = "混合代理端口";
 "LocalPacListenPort" = "本地 PAC 监听端口";
 "AllowLAN" = "允许局域网访问";
 "EnableSniffing" = "启用流量嗅探";

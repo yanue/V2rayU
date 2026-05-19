@@ -160,8 +160,8 @@ actor V2rayLaunch {
         var sockPort = ""
         var pacUrl = ""
         if mode == .global {
-            httpPort = String(getHttpProxyPort())
-            sockPort = String(getSocksProxyPort())
+            httpPort = String(getEffectiveHttpProxyPort())
+            sockPort = String(getEffectiveSocksProxyPort())
         }
         if mode == .pac {
             if !GeneratePACFile(rewrite: false) {

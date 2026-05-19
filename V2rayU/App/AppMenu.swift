@@ -615,9 +615,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             noticeTip(title: String(localized: .TunMode), informativeText: "Tun mode does not support HTTP/SOCKS proxy export")
             return
         }
-        let httpPort = AppSettings.shared.httpPort
-        let socksPort = AppSettings.shared.socksPort
-        let command = "export http_proxy=socks5://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);export ALL_PROXY=socks5://127.0.0.1:\(socksPort)"
+        let httpPort = Int(getEffectiveHttpProxyPort())
+        let socksPort = Int(getEffectiveSocksProxyPort())
+        let command = "export http_proxy=http://127.0.0.1:\(httpPort);export https_proxy=http://127.0.0.1:\(httpPort);export ALL_PROXY=socks5://127.0.0.1:\(socksPort)"
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(command, forType: NSPasteboard.PasteboardType.string)
         noticeTip(title: "Copied", informativeText: "Proxy export command copied to clipboard")

@@ -31,6 +31,10 @@ struct AdvanceView: View {
                     .frame(alignment: .leading)
             }
             getNumFieldWithLabel(label: .LocalHttpListenPort, num: $settings.httpPort, labelWidth: labelWidth)
+            getBoolFieldWithLabel(label: .EnableMixedPort, isOn: $settings.enableMixedPort, labelWidth: labelWidth)
+            if settings.enableMixedPort {
+                getNumFieldWithLabel(label: .MixedProxyPort, num: $settings.mixedPort, labelWidth: labelWidth)
+            }
             getNumFieldWithLabel(label: .LocalPacListenPort, num: $settings.pacPort, labelWidth: labelWidth)
             getBoolFieldWithLabel(label: .AllowLAN, isOn: $settings.allowLAN, labelWidth: labelWidth)
             getBoolFieldWithLabel(label: .EnableSniffing, isOn: $settings.enableSniffing, labelWidth: labelWidth)

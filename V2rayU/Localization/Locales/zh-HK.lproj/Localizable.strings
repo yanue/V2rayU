@@ -95,6 +95,8 @@
 "LocalSocksListenPort" = "本機 SOCKS 監聽埠";
 "EnableUDP" = "啟用 UDP";
 "LocalHttpListenPort" = "本機 HTTP 監聽埠";
+"EnableMixedPort" = "啟用混合代理埠";
+"MixedProxyPort" = "混合代理埠";
 "LocalPacListenPort" = "本機 PAC 監聽埠";
 "AllowLAN" = "允許區域網路連線";
 "EnableSniffing" = "啟用流量嗅探";

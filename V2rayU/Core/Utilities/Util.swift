@@ -240,6 +240,29 @@ func getSocksProxyPort() -> UInt16 {
     return UInt16(port)
 }
 
+func isMixedProxyPortEnabled() -> Bool {
+    UserDefaults.getBool(forKey: .enableMixedPort)
+}
+
+func getMixedProxyPort() -> UInt16 {
+    let port = UserDefaults.getInt(forKey: .mixedPort, defaultValue: Int(getSocksProxyPort()))
+    return port > 0 ? UInt16(port) : getSocksProxyPort()
+}
+
+func getEffectiveHttpProxyPort() -> UInt16 {
+    if isMixedProxyPortEnabled() {
+        return getMixedProxyPort()
+    }
+    return getHttpProxyPort()
+}
+
+func getEffectiveSocksProxyPort() -> UInt16 {
+    if isMixedProxyPortEnabled() {
+        return getMixedProxyPort()
+    }
+    return getSocksProxyPort()
+}
+
 func getPacPort() -> UInt16 {
     let port = UserDefaults.getInt(forKey: .localPacPort, defaultValue: 11085)
     return UInt16(port)

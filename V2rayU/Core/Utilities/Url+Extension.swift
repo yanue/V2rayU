@@ -103,7 +103,7 @@ func getProxyUrlSessionConfigure() -> URLSessionConfiguration {
     // v2ray is running
     if UserDefaults.getBool(forKey: .v2rayTurnOn) {
         let proxyHost = "127.0.0.1"
-        let proxyPort = getHttpProxyPort()
+        let proxyPort = getEffectiveHttpProxyPort()
         // set proxies
         configuration.connectionProxyDictionary = [
             kCFNetworkProxiesHTTPEnable as AnyHashable: true,

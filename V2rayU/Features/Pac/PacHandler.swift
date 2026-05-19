@@ -32,7 +32,7 @@ func getTunConfigUrl() -> String {
 
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
-    let socksPort = String(getSocksProxyPort())
+    let socksPort = String(getEffectiveSocksProxyPort())
     let pacAddress = getPacAddress()
     let fileMgr = FileManager.default
 

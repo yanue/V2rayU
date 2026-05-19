@@ -362,7 +362,7 @@ actor PingRunning {
 
         var retries = 0
         var success = false
-        let port = getHttpProxyPort()
+        let port = getEffectiveHttpProxyPort()
         while retries < maxRetries && !success {
             do {
                 let pingTime = try await testLatencyByProxyPort(port: port)
