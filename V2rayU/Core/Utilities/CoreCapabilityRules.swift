@@ -211,19 +211,19 @@ enum CapabilityRulesLoader {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         for candidate in candidateURLs(for: core) {
-            guard FileManager.default.fileExists(atPath: candidate.path) else {
+            guard FileManager.default.fileExists(atPath: candidate.url.path) else {
                 continue
             }
             do {
-                let data = try Data(contentsOf: candidate)
+                let data = try Data(contentsOf: candidate.url)
                 let document = try decoder.decode(CapabilityRulesDocument.self, from: data)
                 guard supportedSchemaVersions.contains(document.schemaVersion), document.core == core, !document.capabilities.isEmpty else {
-                    logger.warning("capability rules invalid: \(candidate.path)")
+                    logger.warning("capability rules invalid: \(candidate.url.path)")
                     continue
                 }
                 return (document, candidate.url, candidate.sourceKind)
             } catch {
-                logger.warning("capability rules load failed: \(candidate.path) error=\(error.localizedDescription)")
+                logger.warning("capability rules load failed: \(candidate.url.path) error=\(error.localizedDescription)")
             }
         }
         return nil
@@ -554,6 +554,8 @@ enum XraySupportCatalog {
             return capability(forKey: "outbound.vless")
         case .trojan:
             return capability(forKey: "outbound.trojan")
+        case .hysteria2:
+            return capability(forKey: "outbound.hysteria2")
         }
     }
 
@@ -575,6 +577,8 @@ enum XraySupportCatalog {
             return capability(forKey: "transport.grpc")
         case .xhttp:
             return capability(forKey: "transport.xhttp")
+        case .hysteria2:
+            return capability(forKey: "transport.hysteria2")
         }
     }
 
@@ -656,7 +660,7 @@ enum SingboxFallbackResolver {
             reasons.append("Sing-Box 功能支持规则未声明 [\(requirement.kind.rawValue)] \(requirement.displayName)，无法安全自动回退。")
             return
         }
-        reasons.append(contentsOf: reasons(for: capability, version: version))
+        reasons.append(contentsOf: Self.reasons(for: capability, version: version))
     }
 
     private static func reasons(for capability: CapabilityPayload, version: SingboxVersion?) -> [String] {
@@ -724,6 +728,8 @@ enum SingboxFallbackResolver {
             return RequiredCapability(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol)
         case .trojan:
             return RequiredCapability(key: "outbound.trojan", displayName: "Trojan outbound", kind: .outboundProtocol)
+        case .hysteria2:
+            return RequiredCapability(key: "outbound.hysteria2", displayName: "Hysteria2 outbound", kind: .outboundProtocol)
         }
     }
 
@@ -745,6 +751,8 @@ enum SingboxFallbackResolver {
             return RequiredCapability(key: "transport.grpc", displayName: "gRPC transport", kind: .transportMethod)
         case .xhttp:
             return RequiredCapability(key: "transport.xhttp", displayName: "XHTTP transport", kind: .transportMethod)
+        case .hysteria2:
+            return RequiredCapability(key: "transport.hysteria2", displayName: "Hysteria2 transport", kind: .transportMethod)
         }
     }
 

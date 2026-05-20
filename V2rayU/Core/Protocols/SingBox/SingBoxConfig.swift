@@ -211,14 +211,18 @@ struct DNSConfig: Codable {
     var rules: [DNSRule] = []
 }
 
+struct DNSRule: Codable {
+    var server: String
+    var domain: [String]?
+    var disable_cache: Bool?
+}
+
 struct DNSServer: Codable {
     var type: String
     var tag: String?
     var server: String?
     var inet4_range: String?
     var inet6_range: String?
-}
-
 }
 
 // TUN stack type
