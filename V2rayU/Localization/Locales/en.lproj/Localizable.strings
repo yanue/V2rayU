@@ -405,6 +405,22 @@
 "DownloadCanceled" = "Download Canceled";
 "DownloadURLInvalid" = "Invalid download URL: %@";
 "ReplaceSuccess" = "Replace Successful!";
+"CapabilityRulesSettingsTitle" = "Capability Rules";
+"CapabilityRulesRemoteBaseURL" = "Remote Base URL";
+"CapabilityRulesRemoteBaseURLHint" = "Default: https://raw.githubusercontent.com/yanue/V2rayU/main/Build/capability-rules";
+"UpdateCapabilityRules" = "Update Capability Rules";
+"OpenCapabilityRulesDirectory" = "Open Rules Directory";
+"CapabilityRulesUpdateSuccess" = "Capability rules updated successfully.";
+"CapabilityRulesBaseURLRequired" = "Please enter the remote capability-rules base URL first.";
+"XrayCapabilityRulesStatus" = "Xray Rules";
+"SingboxCapabilityRulesStatus" = "Sing-Box Rules";
+"CapabilityRulesSourceOverride" = "Remote cache";
+"CapabilityRulesSourceBundle" = "Bundled default";
+"CapabilityRulesSourceSwift" = "Swift fallback";
+"CapabilityRulesSourceUnavailable" = "Unavailable";
+"CapabilityRulesSource" = "Source";
+"CapabilityRulesReviewedVersion" = "Reviewed Version";
+"CapabilityRulesCapabilities" = "Capabilities";
 "OperationFailed" = "Operation Failed: %@";
 "DownloadTimeoutError" = "Download timed out";
 "DownloadSaveFailed" = "Failed to save file";
@@ -650,4 +666,3 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunDefaultDns" = "Default DNS";
 "TunChinaDns" = "China DNS";
 "TunFakeipRange" = "FakeIP Range";
-

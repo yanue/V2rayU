@@ -420,7 +420,13 @@ final class DiagnosticsViewModel: ObservableObject {
         }
         details.append("✓ \(String(format: String(localized: .DiagCoreArchCorrect), currentArch))")
 
-        // ④ 隔离标记
+        // ④ 版本号
+        let ver = getSingboxVersion()
+        if !ver.isEmpty {
+            details.append("✓ v\(ver)")
+        }
+
+        // ⑤ 隔离标记
         if isFileQuarantined(at: path) {
             details.append("✗ \(String(localized: .DiagSubQuarantined))")
             return .fail(.singBox, subtitle: details.joined(separator: "\n"),

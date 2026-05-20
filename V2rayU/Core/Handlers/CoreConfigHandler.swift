@@ -8,7 +8,7 @@
 import Foundation
 
 class CoreConfigHandler {
-        
+
     public func toJSON(item: ProfileEntity) -> String {
         // 目前架构: sing-box的tun服务(daemon) -> socks(sing-box|xray-core) ,因此这里agent端不需要内部的tun功能了
         switch item.AdaptCore() {
@@ -20,7 +20,7 @@ class CoreConfigHandler {
             return vCfg.toJSON(item: item)
         }
     }
-    
+
     public func toJSON(item: ProfileEntity, httpPort: String) -> String {
         switch item.AdaptCore() {
         case .SingBox:
@@ -35,28 +35,21 @@ class CoreConfigHandler {
 
 extension ProfileEntity {
     func AdaptCore() -> CoreType {
-        var mode: CoreType = .XrayCore
-        // 这里是因为xray新版v25版本后,开始禁止支持这些类型了
-        // [Warning] common/errors: This feature gRPC transport (with unnecessary costs, etc.) is deprecated and being migrated to XHTTP stream-up H2.
-        if self.network == .grpc || self.network == .h2 || self.network == .ws {
-            mode = .SingBox
-        }
-        // Xray supports Hysteria2 (protocol "hysteria" with version 2) since 2026
-        // Sing-box also supports it - both cores work, leave default decision up
-         logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(mode.rawValue)")
-        return mode
+        let decision = resolveCoreCompatibility()
+        logger.info("AdaptCore: \(self.protocol.rawValue)/\(self.network.rawValue) -> \(decision.coreType.rawValue)")
+        return decision.coreType
     }
-    
+
     // 是否需要使用oldCore
     func getCoreFile() -> String {
         return  V2rayU.getCoreFile(mode: AdaptCore())
     }
-    
+
     // 是否需要使用oldCore
     func getCoreName() -> String {
         return  V2rayU.getCoreFile(mode: AdaptCore())
     }
-    
+
     func getAlpn() -> [String] {
         var alpn: [String] = []
         if self.network == .h2 || self.network == .grpc {

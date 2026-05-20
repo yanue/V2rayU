@@ -63,6 +63,8 @@ extension UserDefaults {
         case muxConcurrent
         // gfwPacListUrl
         case gfwPacListUrl
+        // capability rules remote base url
+        case capabilityRulesBaseURL
 
         // selected routing uuid
         case runningRouting
@@ -87,7 +89,7 @@ extension UserDefaults {
     static func del(forKey key: KEY) {
         UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
-    
+
     static func setInt(forKey key: KEY, value: Int) {
         UserDefaults.standard.set(value, forKey: key.rawValue)
     }

@@ -21,6 +21,50 @@ struct CoreView: View {
 
             Divider()
 
+            VStack(alignment: .leading, spacing: 10) {
+                Text(String(localized: .CapabilityRulesSettingsTitle))
+                    .font(.headline)
+
+                Text(String(localized: .CapabilityRulesRemoteBaseURL))
+                    .font(.subheadline)
+
+                TextField(defaultCapabilityRulesBaseURL, text: $vm.capabilityRulesBaseURL)
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit {
+                        vm.saveCapabilityRulesBaseURL()
+                    }
+
+                HStack {
+                    Button(action: { vm.updateCapabilityRules() }) {
+                        Label(String(localized: .UpdateCapabilityRules), systemImage: "arrow.clockwise.circle")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(vm.isUpdatingCapabilityRules)
+
+                    Button(action: { vm.openCapabilityRulesDirectory() }) {
+                        Label(String(localized: .OpenCapabilityRulesDirectory), systemImage: "folder")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Spacer()
+
+                    if vm.isUpdatingCapabilityRules {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+
+                if let xrayStatus = vm.xrayCapabilityRulesStatus {
+                    CapabilityRulesStatusCard(item: xrayStatus)
+                }
+
+                if let singboxStatus = vm.singboxCapabilityRulesStatus {
+                    CapabilityRulesStatusCard(item: singboxStatus)
+                }
+            }
+
+            Divider()
+
             // MARK: - Pagination Controls
 
             HStack {
@@ -28,7 +72,7 @@ struct CoreView: View {
                     .font(.headline)
 
                 Spacer()
- 
+
                 Button(action: { vm.refresh() }) {
                     Label(String(localized: .Refresh),
                           systemImage: "arrow.triangle.2.circlepath")
@@ -132,6 +176,9 @@ struct CoreView: View {
             vm.loadCoreVersions()
             vm.fetchPage(1)
         }
+        .onDisappear {
+            vm.saveCapabilityRulesBaseURL()
+        }
         .alert(isPresented: $vm.showAlert) {
             Alert(
                 title: Text(String(localized: .DownloadHint)),
@@ -139,6 +186,37 @@ struct CoreView: View {
                 dismissButton: .default(Text(String(localized: .Confirm)))
             )
         }
+    }
+}
+
+struct CapabilityRulesStatusCard: View {
+    let item: CoreViewModel.CapabilityRulesDisplayItem
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(item.title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Text("\(String(localized: .CapabilityRulesSource)): \(item.source)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("\(String(localized: .CapabilityRulesReviewedVersion)): \(item.reviewedVersion)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("\(String(localized: .CapabilityRulesCapabilities)): \(item.capabilityCount)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            if let path = item.path {
+                Text(path)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .textSelection(.enabled)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.secondary.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 

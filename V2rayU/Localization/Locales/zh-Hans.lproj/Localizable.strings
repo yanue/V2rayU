@@ -400,6 +400,22 @@
 "DownloadCanceled" = "下载已取消";
 "DownloadURLInvalid" = "下载地址无效: %@";
 "ReplaceSuccess" = "替换成功！";
+"CapabilityRulesSettingsTitle" = "功能支持规则";
+"CapabilityRulesRemoteBaseURL" = "远程基地址";
+"CapabilityRulesRemoteBaseURLHint" = "默认：https://raw.githubusercontent.com/yanue/V2rayU/main/Build/capability-rules";
+"UpdateCapabilityRules" = "更新功能支持规则";
+"OpenCapabilityRulesDirectory" = "打开规则目录";
+"CapabilityRulesUpdateSuccess" = "功能支持规则更新成功。";
+"CapabilityRulesBaseURLRequired" = "请先填写远程功能支持规则基地址。";
+"XrayCapabilityRulesStatus" = "Xray 功能支持";
+"SingboxCapabilityRulesStatus" = "Sing-Box 功能支持";
+"CapabilityRulesSourceOverride" = "远程缓存";
+"CapabilityRulesSourceBundle" = "内置默认值";
+"CapabilityRulesSourceSwift" = "Swift 回退";
+"CapabilityRulesSourceUnavailable" = "不可用";
+"CapabilityRulesSource" = "来源";
+"CapabilityRulesReviewedVersion" = "核对版本";
+"CapabilityRulesCapabilities" = "功能项";
 "OperationFailed" = "操作失败: %@";
 "DownloadTimeoutError" = "下载超时";
 "DownloadSaveFailed" = "保存文件失败";
@@ -645,4 +661,3 @@
 "TunDefaultDns" = "默认 DNS";
 "TunChinaDns" = "国内 DNS";
 "TunFakeipRange" = "FakeIP 范围";
-

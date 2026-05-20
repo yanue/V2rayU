@@ -420,6 +420,22 @@ enum LanguageLabel: String, CaseIterable {
     case DownloadCanceled
     case DownloadURLInvalid
     case ReplaceSuccess
+    case CapabilityRulesSettingsTitle
+    case CapabilityRulesRemoteBaseURL
+    case CapabilityRulesRemoteBaseURLHint
+    case UpdateCapabilityRules
+    case OpenCapabilityRulesDirectory
+    case CapabilityRulesUpdateSuccess
+    case CapabilityRulesBaseURLRequired
+    case XrayCapabilityRulesStatus
+    case SingboxCapabilityRulesStatus
+    case CapabilityRulesSourceOverride
+    case CapabilityRulesSourceBundle
+    case CapabilityRulesSourceSwift
+    case CapabilityRulesSourceUnavailable
+    case CapabilityRulesSource
+    case CapabilityRulesReviewedVersion
+    case CapabilityRulesCapabilities
     case OperationFailed
     case DownloadTimeoutError
     case DownloadSaveFailed

@@ -61,6 +61,14 @@ actor V2rayLaunch {
             }
             return false
         }
+        let coreDecision = item.resolveCoreCompatibility()
+        if let warningMessage = coreDecision.warningMessage {
+            await showAlert(title: "Xray 版本兼容性提醒", message: warningMessage)
+        }
+        if !coreDecision.canLaunch {
+            logger.error("start aborted: profile is incompatible with current Xray-core and cannot fallback to Sing-Box")
+            return false
+        }
         // 同步 AppState 与实际使用的服务器
         await MainActor.run {
             if AppState.shared.runningProfile != item.uuid {
@@ -75,14 +83,14 @@ actor V2rayLaunch {
         await LaunchAgent.shared.stopAgent()
 
         createJsonFile(item: item)
-        
+
         // Clear log files on start
         truncateLogFile(appLogFilePath)
         truncateLogFile(coreLogFilePath)
         truncateLogFile(tunLogFilePath)
 
         // 启动
-        let started = await LaunchAgent.shared.startAgent(coreType: item.AdaptCore())
+        let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
         if !started {
             noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
             return false
@@ -91,7 +99,7 @@ actor V2rayLaunch {
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
         Task {
-            await CoreTrafficStatsHandler.shared.startTask(coreType: item.AdaptCore())
+            await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
             do {
                 try await PingRunning.shared.startPing()
             } catch {
@@ -110,13 +118,13 @@ actor V2rayLaunch {
             }
             logger.info("start tun-helper ok")
         }
-        self.lastCore = item.AdaptCore()
-        
+        self.lastCore = coreDecision.coreType
+
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
             LogRotation.rotateIfNeeded()
             LogRotation.extractErrors()
         }
-        
+
         return true
     }
 

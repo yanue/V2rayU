@@ -10,10 +10,10 @@ import Foundation
 class SingboxConfigHandler {
     var singbox: SingboxStruct = SingboxStruct()
     var isValid = false
-    
+
     var error = ""
     var errors: [String] = []
-    
+
     // base
     var socksPort = "1080"
     var socksHost = "127.0.0.1"
@@ -23,6 +23,7 @@ class SingboxConfigHandler {
     var mixedPort = "1080"
     var enableTun = false
     var forPing = false
+    var domain_resolver = "default-dns"
     var domain_resolver = "default-dns"
     var logLevel: V2rayLogLevel = .info
 
@@ -37,9 +38,10 @@ class SingboxConfigHandler {
         self.socksHost = getListenAddress()
         self.httpHost = getListenAddress()
     }
-    
+
     // ping配置
-    func toJSON(item: ProfileEntity, httpPort: String) -> String {
+        var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
+        outbound.domain_resolver = domain_resolver
         self.forPing = true
         self.httpPort = httpPort
         var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
@@ -47,11 +49,12 @@ class SingboxConfigHandler {
         // outbound Freedom
         let outboundDirect = SingboxOutbound(type: "direct", tag: "direct")
         // outbound Blackhole
-        let outboundBlock = SingboxOutbound(type: "block", tag: "block")
+        var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
+        outbound.domain_resolver = domain_resolver
         self.combine(_outbounds: [outbound, outboundDirect, outboundBlock])
         return self.singbox.toJSON()
     }
-    
+
     // 单个配置
     func toJSON(item: ProfileEntity) -> String {
         var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
@@ -63,7 +66,7 @@ class SingboxConfigHandler {
         self.combine(_outbounds: [outbound, outboundDirect, outboundBlock])
         return self.singbox.toJSON()
     }
-    
+
     // 多个配置
     func toJSON(items: [ProfileEntity]) -> String {
         var _outbounds: [SingboxOutbound] = []
@@ -74,7 +77,7 @@ class SingboxConfigHandler {
         self.combine(_outbounds: _outbounds)
         return self.singbox.toJSON()
     }
-    
+
     func combine(_outbounds: [SingboxOutbound]) {
         // base
         applyLogConfig(level: V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info)
@@ -83,7 +86,7 @@ class SingboxConfigHandler {
             self.singbox.log.output = coreLogFilePath
         }
         var inbounds: [SingboxInbound] = []
-        
+
         // TUN模式配置
         if enableTun {
             // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
@@ -119,7 +122,7 @@ class SingboxConfigHandler {
                 sniff_override_destination: true // 很重要
             )
             inbounds.append(tunInbound)
-            
+
             // TUN模式: outbound使用socks代理到本地
             let socksOutbound = SingboxOutbound(
                 type: "socks",
@@ -130,7 +133,7 @@ class SingboxConfigHandler {
             let directOutbound = SingboxOutbound(type: "direct", tag: "direct")
 
             self.singbox.outbounds = [socksOutbound, directOutbound]
-            
+
             // DNS配置
             let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
             let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
@@ -144,7 +147,7 @@ class SingboxConfigHandler {
                 DNSRule(server: "china-dns", domain: ["geosite:cn"]),
                 DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
             ]
-            
+
             // TUN模式路由配置 - 所有流量转发到SOCKS，由SOCKS端处理路由
             self.singbox.route = RouteConfig(
                 auto_detect_interface: true,
@@ -153,11 +156,11 @@ class SingboxConfigHandler {
                     RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]),
                 ]
             )
-            
+
             self.singbox.inbounds = inbounds
             return
         }
-        
+
         // 非TUN模式配置
         // 默认 inbound: socks + http
         if !self.enableMixedPort && self.httpPort == self.socksPort {
@@ -202,11 +205,11 @@ class SingboxConfigHandler {
 
             singbox.experimental = clashConfig
         }
-        
+
         self.singbox.inbounds = inbounds
-    
+
         self.singbox.outbounds = _outbounds
-        
+
         if self.forPing {
             // 默认 DNS
             self.singbox.dns.servers = [

@@ -219,9 +219,6 @@ struct DNSServer: Codable {
     var inet6_range: String?
 }
 
-struct DNSRule: Codable {
-    var server: String
-    var domain: [String]?
 }
 
 // TUN stack type

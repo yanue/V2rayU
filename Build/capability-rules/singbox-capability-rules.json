@@ -1,0 +1,342 @@
+{
+  "schema_version": 4,
+  "core": "sing-box",
+  "capabilities": [
+    {
+      "key": "outbound.freedom",
+      "display_name": "Direct outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "V2rayU 当前将 freedom 映射为 sing-box direct 出站。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器直接输出 direct。"
+      }
+    },
+    {
+      "key": "outbound.blackhole",
+      "display_name": "Block outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "V2rayU 当前将 blackhole 映射为 sing-box block 出站。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器直接输出 block。"
+      }
+    },
+    {
+      "key": "outbound.socks",
+      "display_name": "SOCKS outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 SOCKS 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 socks 出站。"
+      }
+    },
+    {
+      "key": "outbound.shadowsocks",
+      "display_name": "Shadowsocks outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 Shadowsocks 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 shadowsocks 出站。"
+      }
+    },
+    {
+      "key": "outbound.vmess",
+      "display_name": "VMess outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 VMess 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 vmess 出站。"
+      }
+    },
+    {
+      "key": "outbound.vless",
+      "display_name": "VLESS outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 VLESS 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 vless 出站。"
+      }
+    },
+    {
+      "key": "outbound.trojan",
+      "display_name": "Trojan outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 Trojan 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 trojan 出站。"
+      }
+    },
+    {
+      "key": "outbound.http",
+      "display_name": "HTTP outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "仅用于自动回退判定，不把 Xray HTTP outbound 直接视为可无损切换。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前 Sing-Box 回退生成器不会为 Xray HTTP outbound 生成等价配置。"
+      }
+    },
+    {
+      "key": "outbound.dns",
+      "display_name": "DNS outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "仅用于自动回退判定，不把 Xray DNS outbound 直接视为可无损切换。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前 Sing-Box 回退生成器不会为 Xray DNS outbound 生成等价配置。"
+      }
+    },
+    {
+      "key": "transport.tcpAlias",
+      "display_name": "TCP transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "当前 V2rayU 对普通 TCP 传输不额外生成 sing-box transport 块。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "普通 TCP 传输可直接工作。"
+      }
+    },
+    {
+      "key": "transport.websocket",
+      "display_name": "WebSocket transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 WebSocket transport 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 ws transport。"
+      }
+    },
+    {
+      "key": "transport.h2",
+      "display_name": "HTTP transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box HTTP transport 处理 h2 模型。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器会把 h2 模型映射为 sing-box http transport。"
+      }
+    },
+    {
+      "key": "transport.grpc",
+      "display_name": "gRPC transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 gRPC transport 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 grpc transport。"
+      }
+    },
+    {
+      "key": "transport.kcp",
+      "display_name": "KCP transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 KCP transport 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 kcp transport。"
+      }
+    },
+    {
+      "key": "transport.quic",
+      "display_name": "QUIC transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 QUIC transport 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 quic transport。"
+      }
+    },
+    {
+      "key": "transport.domainsocket",
+      "display_name": "Domain Socket transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "当前回退功能支持规则按 sing-box unix/domain socket transport 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 domainsocket transport。"
+      }
+    },
+    {
+      "key": "transport.xhttp",
+      "display_name": "XHTTP transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "xhttp 的核心支持与字段边界需要独立核对，默认不把它视为自动回退安全项。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前生成器虽然会写入 type=xhttp，但还没有版本保障与完整字段映射校验。"
+      }
+    },
+    {
+      "key": "security.none",
+      "display_name": "No extra transport security",
+      "kind": "Security",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "无 TLS/REALITY 时的默认情况。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器可直接输出。"
+      }
+    },
+    {
+      "key": "security.tls",
+      "display_name": "TLS",
+      "kind": "Security",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 TLS 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 TLS 配置。"
+      }
+    },
+    {
+      "key": "security.reality",
+      "display_name": "REALITY",
+      "kind": "Security",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box 常规 REALITY 处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 REALITY 配置。"
+      }
+    },
+    {
+      "key": "security.xtls",
+      "display_name": "XTLS",
+      "kind": "Security",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "XTLS 不能仅凭 transport security 名称推断 sing-box 可无损接管。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前回退生成器未实现 XTLS 对应的 sing-box 配置转换。"
+      }
+    },
+    {
+      "key": "flow.xtls-rprx-vision",
+      "display_name": "xtls-rprx-vision flow",
+      "kind": "Flow",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "vision flow 需要结合 security/transport 组合功能一起核对。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前自动回退链路还没有把 vision flow 的可用性验证到可以默认接管。"
+      }
+    },
+    {
+      "key": "flow.xtls-rprx-vision-udp443",
+      "display_name": "xtls-rprx-vision-udp443 flow",
+      "kind": "Flow",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "vision flow 需要结合 security/transport 组合功能一起核对。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前自动回退链路还没有把 vision flow 的可用性验证到可以默认接管。"
+      }
+    },
+    {
+      "key": "additional.tcphttpheader",
+      "display_name": "TCP + HTTP header disguise",
+      "kind": "Additional",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "Xray 的 TCP + HTTP 伪装不能直接等价推断为 sing-box 可自动切换。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前回退生成器未实现 TCP + HTTP 伪装的等价转换。"
+      }
+    }
+  ]
+}

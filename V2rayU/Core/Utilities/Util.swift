@@ -9,6 +9,11 @@ import Foundation
 import Cocoa
 import Network
 
+private let coreVersionCacheLock = NSLock()
+private var cachedCoreVersion: String?
+private let singboxVersionCacheLock = NSLock()
+private var cachedSingboxVersion: String?
+
 func getArch() -> String {
     #if arch(arm64)
         return "arm64"
@@ -17,20 +22,23 @@ func getArch() -> String {
     #endif
 }
 
-func getCoreShortVersion() -> String {
-    let version = getCoreVersion()
+func clearCoreVersionCache() {
+    coreVersionCacheLock.lock()
+    cachedCoreVersion = nil
+    coreVersionCacheLock.unlock()
+}
+
+func clearSingboxVersionCache() {
+    singboxVersionCacheLock.lock()
+    cachedSingboxVersion = nil
+    singboxVersionCacheLock.unlock()
+}
+
+func getCoreShortVersion(refresh: Bool = false) -> String {
+    let version = getCoreVersion(refresh: refresh)
     logger.debug("getCoreShortVersion: \(version)")
-    // Xray 1.8.20 (Xray, Penetrates Everything.) 8deb953 (go1.22.5 darwin/arm64)
-    // 正则提取类似 1.8.20 ,1.8 等
-    let pattern = #"(\d+\.\d+(\.\d+)?)"#
-    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
-        return version
-    }
-    let nsString = version as NSString
-    let results = regex.matches(in: version, options: [], range: NSRange(location: 0, length: nsString.length))
-    if let match = results.first {
-        let shortVersion = nsString.substring(with: match.range(at: 1))
-        return shortVersion
+    if let parsed = XrayVersion(version) {
+        return parsed.description
     }
     // 按照空格分割，取第2个
     let components = version.split(separator: " ")
@@ -40,18 +48,84 @@ func getCoreShortVersion() -> String {
     return version
 }
 
-func getCoreVersion() -> String {
+func getCoreVersion(refresh: Bool = false) -> String {
+    coreVersionCacheLock.lock()
+    if !refresh, let cachedCoreVersion {
+        coreVersionCacheLock.unlock()
+        return cachedCoreVersion
+    }
+    coreVersionCacheLock.unlock()
+
+    let resolvedVersion: String
     guard FileManager.default.fileExists(atPath: xrayCoreFile) else {
-        return "Not Found"
+        resolvedVersion = "Not Found"
+        coreVersionCacheLock.lock()
+        cachedCoreVersion = resolvedVersion
+        coreVersionCacheLock.unlock()
+        return resolvedVersion
     }
     if let output = shell(launchPath: xrayCoreFile, arguments: ["version"]) {
         let lines = output.split(separator: "\n")
         if let firstLine = lines.first {
-            return String(firstLine)
+            resolvedVersion = String(firstLine)
+        } else {
+            resolvedVersion = output
         }
-        return output
+    } else {
+        resolvedVersion = "Unknown"
     }
-    return "Unknown"
+
+    coreVersionCacheLock.lock()
+    cachedCoreVersion = resolvedVersion
+    coreVersionCacheLock.unlock()
+    return resolvedVersion
+}
+
+func getSingboxShortVersion(refresh: Bool = false) -> String {
+    let version = getSingboxVersion(refresh: refresh)
+    logger.debug("getSingboxShortVersion: \(version)")
+    if let parsed = SingboxVersion(version) {
+        return parsed.description
+    }
+    let components = version.split(separator: " ")
+    if components.count >= 2 {
+        return String(components[1])
+    }
+    return version
+}
+
+func getSingboxVersion(refresh: Bool = false) -> String {
+    singboxVersionCacheLock.lock()
+    if !refresh, let cachedSingboxVersion {
+        singboxVersionCacheLock.unlock()
+        return cachedSingboxVersion
+    }
+    singboxVersionCacheLock.unlock()
+
+    let singboxFile = getCoreFile(mode: .SingBox)
+    let resolvedVersion: String
+    guard FileManager.default.fileExists(atPath: singboxFile) else {
+        resolvedVersion = "Not Found"
+        singboxVersionCacheLock.lock()
+        cachedSingboxVersion = resolvedVersion
+        singboxVersionCacheLock.unlock()
+        return resolvedVersion
+    }
+    if let output = shell(launchPath: singboxFile, arguments: ["version"]) {
+        let lines = output.split(separator: "\n")
+        if let firstLine = lines.first {
+            resolvedVersion = String(firstLine)
+        } else {
+            resolvedVersion = output
+        }
+    } else {
+        resolvedVersion = "Unknown"
+    }
+
+    singboxVersionCacheLock.lock()
+    cachedSingboxVersion = resolvedVersion
+    singboxVersionCacheLock.unlock()
+    return resolvedVersion
 }
 
 func getAppVersion() -> String {
@@ -360,11 +434,123 @@ enum CoreVersion: String {
     case latest
 }
 
+struct XrayVersion: Comparable, CustomStringConvertible {
+    let major: Int
+    let minor: Int
+    let patch: Int
+
+    init(_ major: Int, _ minor: Int, _ patch: Int = 0) {
+        self.major = major
+        self.minor = minor
+        self.patch = patch
+    }
+
+    init?(_ rawValue: String) {
+        let pattern = #"(\d+)(?:\.(\d+))?(?:\.(\d+))?"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+        let nsString = rawValue as NSString
+        let range = NSRange(location: 0, length: nsString.length)
+        guard let match = regex.firstMatch(in: rawValue, options: [], range: range) else {
+            return nil
+        }
+
+        let major = Int(nsString.substring(with: match.range(at: 1))) ?? 0
+        let minor: Int
+        if match.range(at: 2).location != NSNotFound {
+            minor = Int(nsString.substring(with: match.range(at: 2))) ?? 0
+        } else {
+            minor = 0
+        }
+        let patch: Int
+        if match.range(at: 3).location != NSNotFound {
+            patch = Int(nsString.substring(with: match.range(at: 3))) ?? 0
+        } else {
+            patch = 0
+        }
+
+        self.init(major, minor, patch)
+    }
+
+    var description: String {
+        "\(major).\(minor).\(patch)"
+    }
+
+    var isCalendarStyle: Bool {
+        major >= 20
+    }
+
+    static func < (lhs: XrayVersion, rhs: XrayVersion) -> Bool {
+        if lhs.major != rhs.major {
+            return lhs.major < rhs.major
+        }
+        if lhs.minor != rhs.minor {
+            return lhs.minor < rhs.minor
+        }
+        return lhs.patch < rhs.patch
+    }
+}
+
+struct SingboxVersion: Comparable, CustomStringConvertible {
+    let major: Int
+    let minor: Int
+    let patch: Int
+
+    init(_ major: Int, _ minor: Int, _ patch: Int = 0) {
+        self.major = major
+        self.minor = minor
+        self.patch = patch
+    }
+
+    init?(_ rawValue: String) {
+        let pattern = #"(\d+)(?:\.(\d+))?(?:\.(\d+))?"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+        let nsString = rawValue as NSString
+        let range = NSRange(location: 0, length: nsString.length)
+        guard let match = regex.firstMatch(in: rawValue, options: [], range: range) else {
+            return nil
+        }
+
+        let major = Int(nsString.substring(with: match.range(at: 1))) ?? 0
+        let minor: Int
+        if match.range(at: 2).location != NSNotFound {
+            minor = Int(nsString.substring(with: match.range(at: 2))) ?? 0
+        } else {
+            minor = 0
+        }
+        let patch: Int
+        if match.range(at: 3).location != NSNotFound {
+            patch = Int(nsString.substring(with: match.range(at: 3))) ?? 0
+        } else {
+            patch = 0
+        }
+
+        self.init(major, minor, patch)
+    }
+
+    var description: String {
+        "\(major).\(minor).\(patch)"
+    }
+
+    static func < (lhs: SingboxVersion, rhs: SingboxVersion) -> Bool {
+        if lhs.major != rhs.major {
+            return lhs.major < rhs.major
+        }
+        if lhs.minor != rhs.minor {
+            return lhs.minor < rhs.minor
+        }
+        return lhs.patch < rhs.patch
+    }
+}
 
 enum CoreType: String {
     case SingBox
     case XrayCore
 }
+
 
 @MainActor func openInFinder(path: String) {
     let expandedPath = (path as NSString).expandingTildeInPath

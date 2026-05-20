@@ -17,6 +17,7 @@ let v2rayUTool = AppBinRoot + "/V2rayUTool"
 let appLogFilePath = AppHomePath + "/V2rayU.log"
 let JsonConfigFilePath = AppHomePath + "/config.json"
 let TunConfigFilePath = AppHomePath + "/tun.json"
+let defaultCapabilityRulesBaseURL = "https://raw.githubusercontent.com/yanue/V2rayU/main/Build/capability-rules"
 let coreApiPort = "11111"
 let coreApiBaseUrl = "http://127.0.0.1:\(coreApiPort)"
 let userHomeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
@@ -74,13 +75,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             _ = await LegacyMigrationHandler.shared.checkAndPromptForMigration()
         }
     }
-    
+
     // 日志重定向，建议在 App 启动时调用
      static func redirectStdoutToFile() {
          freopen(appLogFilePath, "a+", stdout)
          freopen(appLogFilePath, "a+", stderr)
      }
-    
+
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         logger.info("applicationShouldTerminate")
 
@@ -98,7 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         logger.info("applicationShouldTerminate end")
         return .terminateNow
     }
-    
+
     func applicationWillTerminate(_ aNotification: Notification) {
         logger.info("Application will terminate.")
         Task {

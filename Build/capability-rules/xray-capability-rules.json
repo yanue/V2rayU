@@ -1,0 +1,423 @@
+{
+  "schema_version": 4,
+  "core": "xray",
+  "latest_reviewed_version": "26.3.27",
+  "capabilities": [
+    {
+      "key": "inbound.tunnel",
+      "display_name": "Tunnel (dokodemo-door) inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/tunnel.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.http",
+      "display_name": "HTTP inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/http.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.shadowsocks",
+      "display_name": "Shadowsocks inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/shadowsocks.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.socks",
+      "display_name": "SOCKS inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/socks.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.trojan",
+      "display_name": "Trojan inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/trojan.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.vless",
+      "display_name": "VLESS inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/vless.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.vmess",
+      "display_name": "VMess inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/vmess.html",
+      "rule": {
+        "type": "supported",
+        "note": "官方入站协议列表可见。"
+      }
+    },
+    {
+      "key": "inbound.wireguard",
+      "display_name": "WireGuard inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/wireguard.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方入站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "inbound.hysteria",
+      "display_name": "Hysteria inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/hysteria.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方入站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "inbound.tun",
+      "display_name": "TUN inbound",
+      "kind": "Inbound",
+      "docs_path": "/config/inbounds/tun.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方入站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "outbound.blackhole",
+      "display_name": "Blackhole outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/blackhole.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.dns",
+      "display_name": "DNS outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/dns.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.freedom",
+      "display_name": "Freedom outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/freedom.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.http",
+      "display_name": "HTTP outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/http.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.loopback",
+      "display_name": "Loopback outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/loopback.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "outbound.shadowsocks",
+      "display_name": "Shadowsocks outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/shadowsocks.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.socks",
+      "display_name": "SOCKS outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/socks.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.trojan",
+      "display_name": "Trojan outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/trojan.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.vless",
+      "display_name": "VLESS outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/vless.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.vmess",
+      "display_name": "VMess outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/vmess.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表可见。"
+      }
+    },
+    {
+      "key": "outbound.wireguard",
+      "display_name": "WireGuard outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/wireguard.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "outbound.hysteria",
+      "display_name": "Hysteria outbound",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/hysteria.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方出站协议列表明确列出。"
+      }
+    },
+    {
+      "key": "transport.raw",
+      "display_name": "RAW transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/raw.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表可见；RAW 为曾经 TCP transport 的新名称。"
+      }
+    },
+    {
+      "key": "transport.tcpAlias",
+      "display_name": "TCP (RAW alias)",
+      "kind": "Transport",
+      "docs_path": "/config/transports/raw.html",
+      "rule": {
+        "type": "compatibility",
+        "note": "V2rayU 当前节点模型仍以 tcp 表示 RAW；官方当前文档使用 RAW 命名。"
+      }
+    },
+    {
+      "key": "transport.xhttp",
+      "display_name": "XHTTP transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/xhttp.html",
+      "rule": {
+        "type": "supported",
+        "legacy_min": "1.8.24",
+        "calendar_min": "24.9.30",
+        "note": "官方当前 transport 主列表可见；这里保留 V2rayU 现有的 XHTTP 最低版本兼容阈值。"
+      },
+      "evidence": [
+        {
+          "id": "release-v25.4.30-xhttp-default-mode",
+          "kind": "releaseNote",
+          "statement": "Xray-core v25.4.30 的 release note 已明确讨论 XHTTP 的默认行为变化，可确认 XHTTP 在新历版本线中已是实际存在且持续维护的 transport；这条证据用于支持功能存在与持续演进，不单独声明精确首发版本。",
+          "source_title": "Xray-core v25.4.30 release notes",
+          "source_url": "https://github.com/XTLS/Xray-core/releases/tag/v25.4.30",
+          "source_version": "25.4.30",
+          "source_date": "2025-04-30",
+          "quote": "XHTTP TLS 默认改为 packet-up，XHTTP REALITY 默认仍为 stream-one",
+          "reviewed_at": "2026-05-18",
+          "note": "来源线索整理自仓库内 Docs/XrayReleaseFeatureAnalysis.md，对应原始证据为该 GitHub release 页面。"
+        }
+      ]
+    },
+    {
+      "key": "transport.mkcp",
+      "display_name": "mKCP transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/mkcp.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表可见。"
+      }
+    },
+    {
+      "key": "transport.grpc",
+      "display_name": "gRPC transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/grpc.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"
+      }
+    },
+    {
+      "key": "transport.websocket",
+      "display_name": "WebSocket transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/websocket.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"
+      }
+    },
+    {
+      "key": "transport.httpupgrade",
+      "display_name": "HTTPUpgrade transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/httpupgrade.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表明确列出。"
+      }
+    },
+    {
+      "key": "transport.hysteria",
+      "display_name": "Hysteria transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/hysteria.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport 主列表明确列出。"
+      }
+    },
+    {
+      "key": "transport.h2",
+      "display_name": "HTTP/2 transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/h2.html",
+      "rule": {
+        "type": "legacy",
+        "note": "HTTP/2 不在当前官方 transport 主列表中，但站点仍保留历史页面/兼容痕迹；V2rayU 对导入的旧节点保留兼容，不再直接假定其已在所有新版本中下架。"
+      }
+    },
+    {
+      "key": "transport.quic",
+      "display_name": "QUIC transport",
+      "kind": "Transport",
+      "docs_path": "/config/transports/quic.html",
+      "rule": {
+        "type": "legacy",
+        "note": "QUIC 不在当前官方 transport 主列表中，但站点仍保留历史页面；V2rayU 仅作历史兼容映射。"
+      }
+    },
+    {
+      "key": "transport.domainsocket",
+      "display_name": "Domain Socket transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "当前官方 transport 主列表未单列 Domain Socket；V2rayU 仅按现有模型做兼容保留。"
+      }
+    },
+    {
+      "key": "security.none",
+      "display_name": "No extra transport security",
+      "kind": "Security",
+      "docs_path": null,
+      "rule": {
+        "type": "compatibility",
+        "note": "无 TLS/REALITY 时的默认情况，不在官方 transport security 主列表单列。"
+      }
+    },
+    {
+      "key": "security.reality",
+      "display_name": "REALITY",
+      "kind": "Security",
+      "docs_path": "/config/transports/reality.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport security 主列表明确列出。"
+      }
+    },
+    {
+      "key": "security.tls",
+      "display_name": "TLS",
+      "kind": "Security",
+      "docs_path": "/config/transports/tls.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 transport security 主列表明确列出。"
+      }
+    },
+    {
+      "key": "additional.finalmask",
+      "display_name": "FinalMask",
+      "kind": "Additional",
+      "docs_path": "/config/transports/finalmask.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 additional config 主列表明确列出。"
+      }
+    },
+    {
+      "key": "additional.sockopt",
+      "display_name": "Sockopt",
+      "kind": "Additional",
+      "docs_path": "/config/transports/sockopt.html",
+      "rule": {
+        "type": "supported",
+        "note": "当前官方 additional config 主列表明确列出。"
+      }
+    },
+    {
+      "key": "flow.xtls-rprx-vision",
+      "display_name": "xtls-rprx-vision flow",
+      "kind": "Flow",
+      "docs_path": "/config/inbounds/vless.html",
+      "rule": {
+        "type": "compatibility",
+        "note": "Flow 属 VLESS/XTLS 细分配置，当前并不在官方 transport 列表单列，V2rayU 暂不基于 docs 对其做硬版本校验。"
+      }
+    },
+    {
+      "key": "flow.xtls-rprx-vision-udp443",
+      "display_name": "xtls-rprx-vision-udp443 flow",
+      "kind": "Flow",
+      "docs_path": "/config/inbounds/vless.html",
+      "rule": {
+        "type": "compatibility",
+        "note": "Flow 属 VLESS/XTLS 细分配置，当前并不在官方 transport 列表单列，V2rayU 暂不基于 docs 对其做硬版本校验。"
+      }
+    }
+  ]
+}

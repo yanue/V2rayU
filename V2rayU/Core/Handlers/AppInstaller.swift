@@ -192,6 +192,18 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
+        let updateRulesScript = AppBinRoot + "/update-capability-rules.sh"
+        if !needRunInstall && !fileMgr.fileExists(atPath: updateRulesScript) {
+            logger.info("\(updateRulesScript) not exists")
+            installReason = "update-capability-rules.sh missing"
+            needRunInstall = true
+        }
+        if !needRunInstall && !fileMgr.isExecutableFile(atPath: updateRulesScript) {
+            logger.info("\(updateRulesScript) not executable")
+            installReason = "update-capability-rules.sh not executable"
+            needRunInstall = true
+        }
+
         // sudoers 文件存在
         let sudoerFile = "/private/etc/sudoers.d/v2rayu-sudoer"
         if !needRunInstall && !fileMgr.fileExists(atPath: sudoerFile) {
