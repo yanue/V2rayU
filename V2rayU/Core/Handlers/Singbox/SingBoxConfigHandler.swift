@@ -24,7 +24,6 @@ class SingboxConfigHandler {
     var enableTun = false
     var forPing = false
     var domain_resolver = "default-dns"
-    var domain_resolver = "default-dns"
     var logLevel: V2rayLogLevel = .info
 
     init(enableTun: Bool = false) {
@@ -40,18 +39,12 @@ class SingboxConfigHandler {
     }
 
     // ping配置
-        var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
-        outbound.domain_resolver = domain_resolver
+    func toJSON(item: ProfileEntity, httpPort: String) -> String {
         self.forPing = true
         self.httpPort = httpPort
         var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         outbound.domain_resolver = domain_resolver
-        // outbound Freedom
-        let outboundDirect = SingboxOutbound(type: "direct", tag: "direct")
-        // outbound Blackhole
-        var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
-        outbound.domain_resolver = domain_resolver
-        self.combine(_outbounds: [outbound, outboundDirect, outboundBlock])
+        self.combine(_outbounds: [outbound])
         return self.singbox.toJSON()
     }
 

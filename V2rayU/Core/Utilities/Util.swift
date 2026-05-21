@@ -10,9 +10,9 @@ import Cocoa
 import Network
 
 private let coreVersionCacheLock = NSLock()
-private var cachedCoreVersion: String?
+private nonisolated(unsafe) var cachedCoreVersion: String?
 private let singboxVersionCacheLock = NSLock()
-private var cachedSingboxVersion: String?
+private nonisolated(unsafe) var cachedSingboxVersion: String?
 
 func getArch() -> String {
     #if arch(arm64)
