@@ -546,9 +546,75 @@ struct SingboxVersion: Comparable, CustomStringConvertible {
     }
 }
 
-enum CoreType: String {
+enum CoreType: String, Codable, CaseIterable, Identifiable {
     case SingBox
     case XrayCore
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .SingBox:
+            return "Sing-Box"
+        case .XrayCore:
+            return "Xray"
+        }
+    }
+}
+
+enum ProfileCoreSelection: String, Codable, CaseIterable, Identifiable {
+    case auto
+    case xray
+    case singbox = "sing-box"
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .auto:
+            return "Auto"
+        case .xray:
+            return "Xray"
+        case .singbox:
+            return "Sing-Box"
+        }
+    }
+
+    var forcedCoreType: CoreType? {
+        switch self {
+        case .auto:
+            return nil
+        case .xray:
+            return .XrayCore
+        case .singbox:
+            return .SingBox
+        }
+    }
+}
+
+enum CoreSelectionDefaults {
+    static let editableProtocols: [V2rayProtocolOutbound] = [.vmess, .shadowsocks, .socks, .vless, .trojan, .hysteria2, .anytls]
+
+    static func selection(for protocol: V2rayProtocolOutbound) -> ProfileCoreSelection {
+        let key = storageKey(for: `protocol`)
+        guard let rawValue = UserDefaults.standard.string(forKey: key),
+              let selection = ProfileCoreSelection(rawValue: rawValue) else {
+            return .auto
+        }
+        return selection
+    }
+
+    static func setSelection(_ selection: ProfileCoreSelection, for protocol: V2rayProtocolOutbound) {
+        UserDefaults.standard.set(selection.rawValue, forKey: storageKey(for: `protocol`))
+    }
+
+    static func loadAll() -> [V2rayProtocolOutbound: ProfileCoreSelection] {
+        Dictionary(uniqueKeysWithValues: editableProtocols.map { ($0, selection(for: $0)) })
+    }
+
+    private static func storageKey(for protocol: V2rayProtocolOutbound) -> String {
+        "coreSelection.default.\(`protocol`.rawValue)"
+    }
 }
 
 

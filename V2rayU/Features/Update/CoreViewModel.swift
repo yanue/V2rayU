@@ -31,8 +31,10 @@ final class CoreViewModel: ObservableObject {
     @Published var capabilityRulesBaseURL: String = UserDefaults.get(forKey: .capabilityRulesBaseURL, defaultValue: defaultCapabilityRulesBaseURL)
     @Published var xrayCapabilityRulesStatus: CapabilityRulesDisplayItem?
     @Published var singboxCapabilityRulesStatus: CapabilityRulesDisplayItem?
+    @Published var coreSelections: [V2rayProtocolOutbound: ProfileCoreSelection] = CoreSelectionDefaults.loadAll()
 
     let perPage: Int = 20
+    let coreSelectionProtocols = CoreSelectionDefaults.editableProtocols
 
     private let service: GithubServiceProtocol
 
@@ -55,6 +57,15 @@ final class CoreViewModel: ObservableObject {
     func loadCapabilityRulesStatus() {
         xrayCapabilityRulesStatus = makeDisplayItem(from: CapabilityRulesLoader.status(core: .xray), title: String(localized: .XrayCapabilityRulesStatus))
         singboxCapabilityRulesStatus = makeDisplayItem(from: CapabilityRulesLoader.status(core: .singbox), title: String(localized: .SingboxCapabilityRulesStatus))
+    }
+
+    func coreSelection(for protocol: V2rayProtocolOutbound) -> ProfileCoreSelection {
+        coreSelections[`protocol`] ?? .auto
+    }
+
+    func setCoreSelection(_ selection: ProfileCoreSelection, for protocol: V2rayProtocolOutbound) {
+        coreSelections[`protocol`] = selection
+        CoreSelectionDefaults.setSelection(selection, for: `protocol`)
     }
 
     func updateCapabilityRules() {

@@ -11,11 +11,22 @@ import SwiftUI
 final class ProfileModel: ObservableObject, Identifiable {
     @Published var entity: ProfileEntity
     @Published var selectedProtocol: V2rayProtocolOutbound
+    @Published var selectedCore: ProfileCoreSelection
     var id: String { entity.uuid }
 
     init(from entity: ProfileEntity) {
         self.entity = entity
         self.selectedProtocol = entity.protocol
+        self.selectedCore = entity.coreType ?? .auto
+    }
+
+    var coreSelection: ProfileCoreSelection {
+        get { entity.coreType ?? .auto }
+        set {
+            entity.coreType = newValue
+            selectedCore = newValue
+            objectWillChange.send()
+        }
     }
 
     subscript<T>(dynamicMember keyPath: KeyPath<ProfileEntity, T>) -> T {
@@ -28,6 +39,9 @@ final class ProfileModel: ObservableObject, Identifiable {
             entity[keyPath: keyPath] = newValue
             if keyPath == \ProfileEntity.protocol {
                 selectedProtocol = entity.protocol
+            }
+            if keyPath == \ProfileEntity.coreType {
+                selectedCore = entity.coreType ?? .auto
             }
             objectWillChange.send()
         }

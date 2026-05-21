@@ -40,6 +40,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var shareUri: String = "" // 原始分享链接(判断订阅是否更新)
     var serverIp: String = "" // 服务器IP
     var serverRegion: String = "" // 服务器IP归宿(国家代码)
+    var coreType: ProfileCoreSelection? = .auto // 核心选择: auto/xray/sing-box
     // 统计
     var totalUp: Int64 = 0 // 总上传
     var totalDown: Int64 = 0 // 总下载
@@ -61,7 +62,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, totalUp, totalDown, todayUp, todayDown, lastUpdate
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
     // 提供默认值的初始化器
@@ -93,7 +94,8 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         extra: String = "",
         shareUri: String = "",
         serverIp: String = "",
-        serverRegion: String = ""
+        serverRegion: String = "",
+        coreType: ProfileCoreSelection? = .auto
     ) {
         self.uuid = uuid
         self.speed = speed
@@ -123,6 +125,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.shareUri = shareUri
         self.serverIp = serverIp
         self.serverRegion = serverRegion
+        self.coreType = coreType
         self.totalUp = 0
         self.totalDown = 0
         self.todayUp = 0
@@ -174,6 +177,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let shareUri = Column(CodingKeys.shareUri)
         static let serverIp = Column(CodingKeys.serverIp)
         static let serverRegion = Column(CodingKeys.serverRegion)
+        static let coreType = Column(CodingKeys.coreType)
         // 统计
         static let totalUp = Column(CodingKeys.totalUp)
         static let totalDown = Column(CodingKeys.totalDown)
@@ -240,6 +244,14 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 t.column(Columns.todayUp.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.todayDown.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.lastUpdate.name, .datetime).defaults(to: "CURRENT_DATETIME")
+            }
+        }
+
+        migrator.registerMigration("addProfileCoreType") { db in
+            let hasCoreTypeColumn = try db.columns(in: databaseTableName).contains { $0.name == Columns.coreType.name }
+            guard !hasCoreTypeColumn else { return }
+            try db.alter(table: databaseTableName) { t in
+                t.add(column: Columns.coreType.name, .text).defaults(to: ProfileCoreSelection.auto.rawValue)
             }
         }
     }

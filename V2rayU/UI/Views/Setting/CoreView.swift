@@ -13,6 +13,33 @@ struct CoreView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Core 类型设置")
+                    .font(.headline)
+                Text("Profile 选择 Auto 时会使用这里的默认核心；启动前仍会按 CoreCapabilityRules 校验。")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                LazyVGrid(columns: [GridItem(.fixed(170), alignment: .leading), GridItem(.fixed(260), alignment: .leading)], alignment: .leading, spacing: 10) {
+                    ForEach(vm.coreSelectionProtocols, id: \.self) { proto in
+                        Text(proto.rawValue)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Picker("", selection: Binding(
+                            get: { vm.coreSelection(for: proto) },
+                            set: { vm.setCoreSelection($0, for: proto) }
+                        )) {
+                            ForEach(ProfileCoreSelection.allCases) { selection in
+                                Text(selection.displayName).tag(selection)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 220, alignment: .leading)
+                    }
+                }
+            }
+
+            Divider()
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(String(localized: .LocalCoreVersionDetail))
                     .font(.headline)

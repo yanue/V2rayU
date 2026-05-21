@@ -5,6 +5,7 @@
 //  Created by yanue on 2024/11/24.
 //
 
+import Foundation
 import SwiftUI
 
 struct ConfigServerView: View {
@@ -26,6 +27,31 @@ struct ConfigServerView: View {
                 
                 // 需要禁用显示: dns, http, blackhole, freedom
                 getPickerWithLabel(label: .`Protocol`, selection: $item.protocol,ignore: [.dns, .http, .blackhole, .freedom])
+
+                HStack {
+                    LocalizedTextLabelView(label: .Core).frame(width: 100, alignment: .trailing)
+                    Spacer()
+                    Picker("", selection: $item.coreSelection) {
+                        ForEach(ProfileCoreSelection.allCases) { selection in
+                            Text(selection.displayName).tag(selection)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.leading, 7)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(coreSelectionHint)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if let warning = coreCompatibilityWarning {
+                        Text(warning)
+                            .font(.caption)
+                            .foregroundColor(coreCompatibilityDecision.canLaunch ? .orange : .red)
+                            .lineLimit(4)
+                    }
+                }
+                .padding(.leading, 107)
 
                 // Use .id(item.protocol) so SwiftUI fully tears down and recreates
                 // this subtree (including all TextField focus state) when the
@@ -108,5 +134,26 @@ struct ConfigServerView: View {
                     .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
             ) // 4. 添加边框和阴影
         }
+    }
+
+    private var coreCompatibilityDecision: XrayCoreCompatibilityDecision {
+        item.entity.resolveCoreCompatibility()
+    }
+
+    private var coreSelectionHint: String {
+        let selection = item.coreSelection
+        if selection == .auto {
+            let defaultSelection = CoreSelectionDefaults.selection(for: item.protocol)
+            if defaultSelection == .auto {
+                return "Auto：按 CoreCapabilityRules 自动选择，优先 Xray，必要时回退 Sing-Box。"
+            }
+            return "Auto：当前协议默认使用 \(defaultSelection.displayName)，启动前仍会校验 CoreCapabilityRules。"
+        }
+        return "已选择 \(selection.displayName)，启动前会按 CoreCapabilityRules 校验当前节点是否兼容。"
+    }
+
+    private var coreCompatibilityWarning: String? {
+        guard let message = coreCompatibilityDecision.warningMessage else { return nil }
+        return message.components(separatedBy: "\n").first { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
 }

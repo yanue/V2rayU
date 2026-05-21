@@ -588,7 +588,7 @@ enum XraySupportCatalog {
         case .xhttp:
             return capability(forKey: "transport.xhttp")
         case .hysteria2:
-            return capability(forKey: "transport.hysteria2")
+            return capability(forKey: "transport.hysteria")
         }
     }
 
@@ -860,31 +860,21 @@ enum XrayCompatibilityResolver {
     }
 
     static func decision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {
+        switch profile.resolvedCoreSelection {
+        case .auto:
+            return automaticDecision(for: profile)
+        case .xray:
+            return xrayDecision(for: profile)
+        case .singbox:
+            return singboxDecision(for: profile)
+        }
+    }
+
+    private static func automaticDecision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {
         let version = currentVersion()
         let shortVersion = getCoreShortVersion()
         let forwardNotice = forwardCompatibilityNotice(for: version)
-        var issues: [XrayCompatibilityIssue] = []
-
-        if let definition = XraySupportCatalog.definition(forOutbound: profile.protocol),
-           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
-            issues.append(issue)
-        }
-
-        if let definition = XraySupportCatalog.definition(forTransport: profile.network),
-           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
-            issues.append(issue)
-        }
-
-        if let definition = XraySupportCatalog.definition(forSecurity: profile.security),
-           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
-            issues.append(issue)
-        }
-
-        if !profile.flow.isEmpty,
-           let definition = XraySupportCatalog.definition(forFlow: profile.flow),
-           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
-            issues.append(issue)
-        }
+        let issues = xrayIssues(for: profile, version: version)
 
         if issues.isEmpty {
             return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: nil, issues: [], canLaunch: true)
@@ -909,9 +899,78 @@ enum XrayCompatibilityResolver {
         let warningMessage = "当前节点与已安装的 Xray-core \(shortVersion) 存在以下不兼容项：\n\n\(issueText)\n\n系统已自动切换为 Sing-Box 以避免启动失败。\n\n\(capabilityRulesNotice)\(futureVersionText)"
         return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: warningMessage, issues: issues, canLaunch: true)
     }
+
+    private static func xrayDecision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {
+        let version = currentVersion()
+        let shortVersion = getCoreShortVersion()
+        let forwardNotice = forwardCompatibilityNotice(for: version)
+        let issues = xrayIssues(for: profile, version: version)
+
+        guard !issues.isEmpty else {
+            return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: nil, issues: [], canLaunch: true)
+        }
+
+        let issueText = issues.map(\.message).joined(separator: "\n")
+        let futureVersionText = forwardNotice.map { "\n\n\($0)" } ?? ""
+        let blockingIssues = issues.filter(\.isBlocking)
+
+        if blockingIssues.isEmpty {
+            let warningMessage = "当前节点已手动选择 Xray-core；与已安装的 Xray-core \(shortVersion) 存在以下兼容性提示：\n\n\(issueText)\n\n本次仍继续使用 Xray-core 启动。\n\n\(capabilityRulesNotice)\(futureVersionText)"
+            return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: true)
+        }
+
+        let warningMessage = "当前节点已手动选择 Xray-core，但与已安装的 Xray-core \(shortVersion) 存在以下不兼容项：\n\n\(issueText)\n\n请切换为 Auto/Sing-Box，升级 Xray-core，或调整节点配置后重试。\n\n\(capabilityRulesNotice)\(futureVersionText)"
+        return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: false)
+    }
+
+    private static func singboxDecision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {
+        let fallbackReasons = SingboxFallbackCompatibility.incompatibilityReasons(for: profile)
+        guard fallbackReasons.isEmpty else {
+            let fallbackText = fallbackReasons.map { "• [不兼容] \($0)" }.joined(separator: "\n")
+            let warningMessage = "当前节点已手动选择 Sing-Box，但依据功能支持规则检测到以下不兼容项：\n\n\(fallbackText)\n\n请切换为 Auto/Xray，更新 Sing-Box 功能支持规则，或调整节点配置后重试。\n\n\(capabilityRulesNotice)"
+            return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: warningMessage, issues: [], canLaunch: false)
+        }
+
+        return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: nil, issues: [], canLaunch: true)
+    }
+
+    private static func xrayIssues(for profile: ProfileEntity, version: XrayVersion?) -> [XrayCompatibilityIssue] {
+        var issues: [XrayCompatibilityIssue] = []
+
+        if let definition = XraySupportCatalog.definition(forOutbound: profile.protocol),
+           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
+            issues.append(issue)
+        }
+
+        if let definition = XraySupportCatalog.definition(forTransport: profile.network),
+           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
+            issues.append(issue)
+        }
+
+
+        if let definition = XraySupportCatalog.definition(forSecurity: profile.security),
+           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
+            issues.append(issue)
+        }
+
+        if !profile.flow.isEmpty,
+           let definition = XraySupportCatalog.definition(forFlow: profile.flow),
+           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
+            issues.append(issue)
+        }
+
+        return issues
+    }
 }
 
 extension ProfileEntity {
+    var resolvedCoreSelection: ProfileCoreSelection {
+        if let coreType, coreType != .auto {
+            return coreType
+        }
+        return CoreSelectionDefaults.selection(for: self.protocol)
+    }
+
     func resolveCoreCompatibility() -> XrayCoreCompatibilityDecision {
         XrayCompatibilityResolver.decision(for: self)
     }
