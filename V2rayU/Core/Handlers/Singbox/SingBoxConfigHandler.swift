@@ -128,8 +128,8 @@ class SingboxConfigHandler {
             self.singbox.outbounds = [socksOutbound, directOutbound]
 
             // DNS配置
-            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
-            let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
+            let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
             let fakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
             self.singbox.dns.servers = [
                 DNSServer(type: "udp", tag: "default-dns", server: dnsDefault),
@@ -206,13 +206,13 @@ class SingboxConfigHandler {
         if self.forPing {
             // 默认 DNS
             self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
+                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
             ]
         } else {
             // dns
             self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: "1.1.1.1"),
-                DNSServer(type: "udp", tag: "china-dns", server: "119.29.29.29"),
+                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
+                DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
                 DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
             ]
             self.singbox.dns.rules = [

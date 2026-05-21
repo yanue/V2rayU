@@ -104,6 +104,11 @@
 "Mux" = "Mux";
 "EnableTrafficStatistics" = "Enable traffic statistics";
 "V2rayCoreLogLevel" = "V2Ray core log level";
+"TestSettings" = "Test Settings";
+"LatencyTestConcurrency" = "Concurrent latency tests";
+"PingTestURL" = "Direct connection test URL";
+"UDPTestURL" = "UDP test address";
+"CurrentConnectionTestURL" = "Current connection info test URL";
 
 // MARK: - PAC Settings
 "PacSettings" = "PAC Settings";

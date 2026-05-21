@@ -7,19 +7,59 @@
 
 import Foundation
 
+let defaultDomesticDns = "119.29.29.29"
+let secondaryDomesticDns = "223.5.5.5"
+
 let defaultDns = """
 {
     "servers": [
-      "8.8.8.8",
-      "1.1.1.1",
       {
         "address": "119.29.29.29",
         "domains": ["geosite:cn"]  
-      }
+      },
+      "119.29.29.29",
+      "223.5.5.5",
+      "1.1.1.1"
     ],
-    "queryStrategy": "UseIPv4"
+    "queryStrategy": "UseIPv4",
+    "disableFallbackIfMatch": true
   }
 """
+
+func getDefaultDnsSetting() -> String {
+    let dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
+    return isLegacyBuiltinDns(dnsJson) ? defaultDns : dnsJson
+}
+
+func getLatencyTestURLString() -> String {
+    let url = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+    return URL(string: url) == nil ? defaultPingTestURL : url
+}
+
+private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
+    guard let data = dnsJson.data(using: .utf8),
+          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let servers = json["servers"] as? [Any] else {
+        return false
+    }
+
+    var hasGoogle = false
+    var hasCloudflare = false
+    var hasTencentForCN = false
+
+    for server in servers {
+        if let server = server as? String {
+            hasGoogle = hasGoogle || server == "8.8.8.8"
+            hasCloudflare = hasCloudflare || server == "1.1.1.1"
+        } else if let server = server as? [String: Any],
+                  let address = server["address"] as? String,
+                  let domains = server["domains"] as? [String] {
+            hasTencentForCN = hasTencentForCN || (address == defaultDomesticDns && domains.contains("geosite:cn"))
+        }
+    }
+
+    return servers.count == 3 && hasGoogle && hasCloudflare && hasTencentForCN
+}
 
 class V2rayConfigHandler {
     var v2ray: V2rayStruct = V2rayStruct()
@@ -151,20 +191,22 @@ class V2rayConfigHandler {
         }
 
         self.v2ray.outbounds = outbounds
+        self.v2ray.dns = self.getDns() // dns：ping 配置也需要，避免默认海外 DNS 拖慢节点/测速域名解析
         // ------------------------------------- routing start --------------------------------------------
         if !self.forPing {
             self.v2ray.routing = RoutingManager().getRunning() // 路由
             self.v2ray.stats = V2rayStats() // 开启统计
             self.v2ray.metrics = v2rayMetrics() // 启用 metrics,用于请求统计数据
             self.v2ray.policy = V2rayPolicy() // 统计规则
-            self.v2ray.observatory = V2rayObservatory() // 观察者
-            self.v2ray.dns = self.getDns() // dns
+            var observatory = V2rayObservatory() // 观察者
+            observatory.probeUrl = getLatencyTestURLString()
+            self.v2ray.observatory = observatory
         }
         // ------------------------------------- routing end ----------------------------------------------
     }
     
     func getDns() -> V2rayDns {
-        let dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
+        let dnsJson = getDefaultDnsSetting()
         if let jsonData = dnsJson.data(using: .utf8) {
             do {
                 let decoder = JSONDecoder()

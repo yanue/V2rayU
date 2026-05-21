@@ -66,6 +66,12 @@ extension UserDefaults {
         // capability rules remote base url
         case capabilityRulesBaseURL
 
+        // MARK: - Test settings
+        case latencyTestConcurrency
+        case pingTestURL
+        case udpTestURL
+        case currentConnectionTestURL
+
         // selected routing uuid
         case runningRouting
         // selected profile uuid

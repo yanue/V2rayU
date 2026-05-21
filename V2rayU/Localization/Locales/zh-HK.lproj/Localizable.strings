@@ -104,6 +104,11 @@
 "Mux" = "Mux";
 "EnableTrafficStatistics" = "啟用流量統計";
 "V2rayCoreLogLevel" = "核心日誌等級";
+"TestSettings" = "測速設定";
+"LatencyTestConcurrency" = "多執行緒測試時的並發數量";
+"PingTestURL" = "直連接測試地址";
+"UDPTestURL" = "UDP 測試地址";
+"CurrentConnectionTestURL" = "目前連線資訊測試地址";
 
 // MARK: - PAC 設定
 "PacSettings" = "PAC 設定";

@@ -845,13 +845,15 @@ final class DiagnosticsViewModel: ObservableObject {
         guard portOK else { return false }
 
         return await runInBackground {
+            let timeout = String(defaultLatencyTestTimeout)
+            let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
             let task = Process()
             task.launchPath = "/usr/bin/curl"
             task.arguments = [
                 "--socks5", "127.0.0.1:\(socksPort)",
-                "--connect-timeout", "5", "--max-time", "8",
+                "--connect-timeout", timeout, "--max-time", timeout,
                 "-s", "-o", "/dev/null", "-w", "%{http_code}",
-                "https://www.google.com/generate_204"
+                testURL
             ]
             let pipe = Pipe()
             task.standardOutput = pipe

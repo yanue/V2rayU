@@ -1,6 +1,16 @@
 import ServiceManagement
 import SwiftUI
 
+let defaultLatencyTestConcurrency = 5
+let defaultLatencyTestTimeout = 5
+// 选用 gstatic 的原因:
+// 1) 始终直接返回 204, 不会 301/302
+// 2) HTTP 即可, 避免 TLS 握手把延迟数字撑大
+// 3) 国内代理出口后访问普遍稳定
+let defaultPingTestURL = "http://www.gstatic.com/generate_204"
+let defaultUDPTestURL = "ntp.pool.ntp.org"
+let defaultCurrentConnectionTestURL = ""
+
 // app 设置项
 enum Theme: String, CaseIterable {
     case System = "FollowSystem"
@@ -37,16 +47,27 @@ final class AppSettings: ObservableObject {
     @Published var mux: Int = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
     @Published var enableStat: Bool = UserDefaults.getBool(forKey: .enableStat)
     @Published var logLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
-    @Published var dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
+    @Published var dnsJson = getDefaultDnsSetting()
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
-    @Published var pingURL: URL = URL(string: "http://www.gstatic.com/generate_204") ?? URL(fileURLWithPath: "/")
+    @Published var latencyTestConcurrency: Int = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
+    @Published var pingTestURL: String = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+    @Published var udpTestURL: String = UserDefaults.get(forKey: .udpTestURL, defaultValue: defaultUDPTestURL)
+    @Published var currentConnectionTestURL: String = UserDefaults.get(forKey: .currentConnectionTestURL, defaultValue: defaultCurrentConnectionTestURL)
+
+    var pingURL: URL {
+        URL(string: pingTestURL) ?? URL(string: defaultPingTestURL) ?? URL(fileURLWithPath: "/")
+    }
+
+    var safeLatencyTestConcurrency: Int {
+        min(max(latencyTestConcurrency, 1), 20)
+    }
 
     // MARK: - TUN settings
     @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
     @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
-    @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
+    @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
     @Published var tunFakeipRange: String = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
 
     init() {
@@ -103,14 +124,18 @@ final class AppSettings: ObservableObject {
         mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
         enableStat = UserDefaults.getBool(forKey: .enableStat)
         logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
-        dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
+        dnsJson = getDefaultDnsSetting()
         gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
+        latencyTestConcurrency = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
+        pingTestURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+        udpTestURL = UserDefaults.get(forKey: .udpTestURL, defaultValue: defaultUDPTestURL)
+        currentConnectionTestURL = UserDefaults.get(forKey: .currentConnectionTestURL, defaultValue: defaultCurrentConnectionTestURL)
         launchAtLogin = SMAppService.mainApp.status == .enabled
         tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
         tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: "1.1.1.1")
-        tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: "119.29.29.29")
+        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
+        tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
         tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
     }
 
@@ -160,6 +185,11 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .v2rayLogLevel, value: logLevel.rawValue)
         UserDefaults.set(forKey: .dnsServers, value: dnsJson)
         UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
+        latencyTestConcurrency = safeLatencyTestConcurrency
+        UserDefaults.setInt(forKey: .latencyTestConcurrency, value: latencyTestConcurrency)
+        UserDefaults.set(forKey: .pingTestURL, value: pingTestURL)
+        UserDefaults.set(forKey: .udpTestURL, value: udpTestURL)
+        UserDefaults.set(forKey: .currentConnectionTestURL, value: currentConnectionTestURL)
         UserDefaults.set(forKey: .tunAddress, value: tunAddress)
         UserDefaults.setInt(forKey: .tunMtu, value: tunMtu)
         UserDefaults.set(forKey: .tunStack, value: tunStack.rawValue)
@@ -187,6 +217,7 @@ final class AppSettings: ObservableObject {
             old.enableStat != enableStat ||
             old.logLevel != logLevel ||
             old.dnsJson != dnsJson ||
+            old.pingTestURL != pingTestURL ||
             old.tunAddress != tunAddress ||
             old.tunMtu != tunMtu ||
             old.tunStack != tunStack ||

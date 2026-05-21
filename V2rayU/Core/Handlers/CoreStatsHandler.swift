@@ -192,7 +192,14 @@ actor ClashApilatencyHandler: NSObject {
     }
 
     private func checkDelayByClashApi(proxyName: String) {
-        guard let url = URL(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay?timeout=5000&url=http://www.gstatic.com/generate_204") else { return }
+        let timeoutMs = defaultLatencyTestTimeout * 1000
+        let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+        var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay")
+        components?.queryItems = [
+            URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
+            URLQueryItem(name: "url", value: testURL)
+        ]
+        guard let url = components?.url else { return }
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data,
                let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

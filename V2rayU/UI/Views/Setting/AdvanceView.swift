@@ -58,6 +58,16 @@ struct AdvanceView: View {
 
             Divider()
 
+            Text(String(localized: .TestSettings))
+                .font(.headline)
+                .foregroundColor(.secondary)
+            getNumFieldWithLabel(label: .LatencyTestConcurrency, num: $settings.latencyTestConcurrency, labelWidth: labelWidth)
+            getTextFieldWithLabel(label: .PingTestURL, text: $settings.pingTestURL, labelWidth: labelWidth)
+            getTextFieldWithLabel(label: .UDPTestURL, text: $settings.udpTestURL, labelWidth: labelWidth)
+            getTextFieldWithLabel(label: .CurrentConnectionTestURL, text: $settings.currentConnectionTestURL, labelWidth: labelWidth)
+
+            Divider()
+
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Button(String(localized: .Save)) {

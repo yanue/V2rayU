@@ -110,6 +110,11 @@ enum LanguageLabel: String, CaseIterable {
     case Mux
     case EnableTrafficStatistics
     case V2rayCoreLogLevel
+    case TestSettings
+    case LatencyTestConcurrency
+    case PingTestURL
+    case UDPTestURL
+    case CurrentConnectionTestURL
 
     // MARK: - TUN Settings
     case TunSettings

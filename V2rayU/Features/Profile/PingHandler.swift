@@ -14,7 +14,6 @@ actor PingAll {
 
     private(set) var inPing: Bool = false
 
-    private let maxConcurrentTasks = 10
     private var cancellables = Set<AnyCancellable>()
     private var totalCount = 0
     private var finishedCount = 0
@@ -53,7 +52,7 @@ actor PingAll {
     private func pingTaskGroup(items: [ProfileEntity]) async {
         // MARK: - Fix 6: pingOne 也需要设置 inPing，统一通过此函数
 
-        let maxPublishers = maxConcurrentTasks
+        let maxPublishers = await AppSettings.shared.safeLatencyTestConcurrency
 
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             items.publisher
@@ -205,7 +204,10 @@ actor PingServer {
 
     private func fetchServerIp(port: UInt16) async -> String? {
         return await withCheckedContinuation { continuation in
-            let url = URL(string: "https://api.ipify.org?format=json")!
+            let currentConnectionTestURL = UserDefaults.get(forKey: .currentConnectionTestURL, defaultValue: defaultCurrentConnectionTestURL)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let url = URL(string: currentConnectionTestURL.isEmpty ? "https://api.ipify.org?format=json" : currentConnectionTestURL)
+                ?? URL(string: "https://api.ipify.org?format=json")!
             let configuration = getProxyUrlSessionConfigure(httpProxyPort: port)
             let session = URLSession(configuration: configuration)
 
@@ -223,8 +225,7 @@ actor PingServer {
 
             let task = session.dataTask(with: url) { data, _, error in
                 guard error == nil, let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let ip = json["ip"] as? String else {
+                      let ip = self.parseIPFromConnectionInfo(data: data) else {
                     finish(nil)
                     return
                 }
@@ -236,6 +237,32 @@ actor PingServer {
                 finish(nil)
             }
         }
+    }
+
+    private nonisolated func parseIPFromConnectionInfo(data: Data) -> String? {
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            for key in ["ip", "origin", "query"] {
+                if let value = json[key] as? String,
+                   let ip = extractFirstIP(from: value) {
+                    return ip
+                }
+            }
+        }
+
+        guard let text = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        return extractFirstIP(from: text)
+    }
+
+    private nonisolated func extractFirstIP(from text: String) -> String? {
+        let pattern = #"\b(?:\d{1,3}\.){3}\d{1,3}\b"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              let range = Range(match.range, in: text) else {
+            return nil
+        }
+        return String(text[range])
     }
 
     private func fetchServerLocation(ip: String) async -> String? {
@@ -459,9 +486,16 @@ actor PingRunning {
 func testLatencyByProxyPort(port: UInt16) async throws -> Int {
     logger.info("testLatencyByProxyPort: \(port)")
     let configuration = getProxyUrlSessionConfigure(httpProxyPort: port)
+    let timeoutInterval = TimeInterval(defaultLatencyTestTimeout)
+    configuration.timeoutIntervalForRequest = timeoutInterval
+    configuration.timeoutIntervalForResource = timeoutInterval
+    configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
     // 预热：用同一个 session 暖化连接池
-    let warmupSession = URLSession(configuration: configuration, delegate: nil, delegateQueue: nil)
+    // 用 NoRedirectSessionDelegate 阻断 3xx，避免:
+    // 1) 跟随 301/302 让 latency 数字虚高
+    // 2) HSTS/区域跳转后 statusCode 不再是 204 导致校验失败
+    let warmupSession = URLSession(configuration: configuration, delegate: NoRedirectSessionDelegate(), delegateQueue: nil)
     defer { warmupSession.finishTasksAndInvalidate() }
     _ = try await performLatencyRequest(session: warmupSession)
 
@@ -477,12 +511,21 @@ func testLatencyByProxyPort(port: UInt16) async throws -> Int {
     return pingTime
 }
 
+private func makeLatencyRequest(timeout: TimeInterval) async -> URLRequest {
+    let url = await AppSettings.shared.pingURL
+    var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeout)
+    request.httpMethod = "GET"
+    return request
+}
+
 private func performLatencyRequest(session: URLSession) async throws -> HTTPURLResponse {
-    let (_, response) = try await session.data(for: URLRequest(url: AppSettings.shared.pingURL))
+    let request = await makeLatencyRequest(timeout: TimeInterval(defaultLatencyTestTimeout))
+    let (_, response) = try await session.data(for: request)
 
     guard let httpResponse = response as? HTTPURLResponse else {
         throw URLError(.badServerResponse)
     }
+    // 测速 URL 必须直接返回 204；遇到 200 / 3xx 一律视为非法（可能是被劫持或被跳转）
     guard httpResponse.statusCode == 204 else {
         throw URLError(.badServerResponse)
     }
@@ -492,7 +535,8 @@ private func performLatencyRequest(session: URLSession) async throws -> HTTPURLR
 // MARK: - Fix 7: 接收 configuration 而非 session，内部自行创建带 delegate 的 session
 
 private func performLatencyRequestWithMetrics(configuration: URLSessionConfiguration) async throws -> Int {
-    let url = await AppSettings.shared.pingURL
+    let timeoutInterval = TimeInterval(defaultLatencyTestTimeout)
+    let request = await makeLatencyRequest(timeout: timeoutInterval)
 
     return try await withCheckedThrowingContinuation { continuation in
         let delegate = LatencyMetricsDelegate(continuation: continuation)
@@ -500,12 +544,12 @@ private func performLatencyRequestWithMetrics(configuration: URLSessionConfigura
         let metricsSession = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
         delegate.session = metricsSession // 弱持有 session 以便超时时主动 invalidate
 
-        let task = metricsSession.dataTask(with: url)
+        let task = metricsSession.dataTask(with: request)
         task.resume()
 
         // MARK: - Fix 4: 超时后 cancel task 并 invalidateAndCancel session，防止泄漏
 
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + timeoutInterval) {
             guard !delegate.hasResumed else { return }
             task.cancel()
             metricsSession.invalidateAndCancel()
@@ -513,6 +557,28 @@ private func performLatencyRequestWithMetrics(configuration: URLSessionConfigura
             delegate.resumeWithError(NSError(domain: "Timeout", code: -1, userInfo: [NSLocalizedDescriptionKey: "Ping timeout"]))
         }
     }
+}
+
+private func intervalMs(from start: Date?, to end: Date?) -> Int? {
+    guard let start = start, let end = end else { return nil }
+    return max(0, Int(end.timeIntervalSince(start) * 1000))
+}
+
+private func formatMetric(_ name: String, _ value: Int?) -> String {
+    guard let value = value else { return "\(name)=-" }
+    return "\(name)=\(value)ms"
+}
+
+private func latencyMetricBreakdown(_ metrics: URLSessionTaskMetrics) -> String {
+    metrics.transactionMetrics.enumerated().map { index, metric in
+        let dns = intervalMs(from: metric.domainLookupStartDate, to: metric.domainLookupEndDate)
+        let connect = intervalMs(from: metric.connectStartDate, to: metric.connectEndDate)
+        let tls = intervalMs(from: metric.secureConnectionStartDate, to: metric.secureConnectionEndDate)
+        let request = intervalMs(from: metric.requestStartDate, to: metric.requestEndDate)
+        let response = intervalMs(from: metric.responseStartDate, to: metric.responseEndDate)
+        let total = intervalMs(from: metric.fetchStartDate, to: metric.responseEndDate)
+        return "#\(index) \(formatMetric("total", total)) \(formatMetric("dns", dns)) \(formatMetric("connect", connect)) \(formatMetric("tls", tls)) \(formatMetric("request", request)) \(formatMetric("response", response)) reused=\(metric.isReusedConnection) proto=\(metric.networkProtocolName ?? "-")"
+    }.joined(separator: "; ")
 }
 
 // MARK: - Fix 3 & 4: 用 os_unfair_lock 保护 hasResumed，消除数据竞争；Fix 4: 持有 session 以便超时 invalidate
@@ -567,7 +633,14 @@ final class LatencyMetricsDelegate: NSObject, URLSessionDataDelegate, @unchecked
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        guard let transactionMetrics = metrics.transactionMetrics.first,
+        logger.info("LatencyMetricsBreakdown: \(latencyMetricBreakdown(metrics))")
+        // 校验最终响应必须是 204; 拒绝跟随重定向时这里会拿到 3xx, 视为失败避免上报伪造延迟
+        if let http = task.response as? HTTPURLResponse, http.statusCode != 204 {
+            resumeWithError(NSError(domain: "LatencyMetrics", code: http.statusCode,
+                                    userInfo: [NSLocalizedDescriptionKey: "Unexpected status \(http.statusCode)"]))
+            return
+        }
+        guard let transactionMetrics = metrics.transactionMetrics.last(where: { $0.responseEndDate != nil }) ?? metrics.transactionMetrics.first,
               let fetchStart = transactionMetrics.fetchStartDate,
               let responseEnd = transactionMetrics.responseEndDate else {
             // metrics 数据不完整时用错误兜底，避免 continuation 泄漏
@@ -580,5 +653,26 @@ final class LatencyMetricsDelegate: NSObject, URLSessionDataDelegate, @unchecked
         latencyMs = latency
         logger.info("LatencyMetrics: \(latency)ms")
         resumeWithLatency(latency)
+    }
+
+    // MARK: - 禁止跟随 3xx 跳转，避免测速被 301/302 拉长
+    func urlSession(_ session: URLSession,
+                    task: URLSessionTask,
+                    willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping (URLRequest?) -> Void) {
+        logger.info("LatencyMetrics: refuse redirect status=\(response.statusCode) -> \(request.url?.absoluteString ?? "-")")
+        completionHandler(nil)
+    }
+}
+
+/// 用于 warmup session：阻断任何 3xx 跳转，让 generate_204 类目标必须直返 204
+final class NoRedirectSessionDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(_ session: URLSession,
+                    task: URLSessionTask,
+                    willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(nil)
     }
 }
