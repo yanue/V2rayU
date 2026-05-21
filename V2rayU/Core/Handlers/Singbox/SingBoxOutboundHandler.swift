@@ -36,6 +36,8 @@ class SingboxOutboundHandler {
             return SingboxOutbound(type: "direct", tag: "direct")
         case .hysteria2:
             return buildHysteria2()
+        case .anytls:
+            return buildAnyTLS()
         }
     }
 
@@ -212,6 +214,26 @@ class SingboxOutboundHandler {
             down_mbps: downMbps,
             obfs: obfs,
             hop_interval: hyConfig.hopInterval > 0 ? hyConfig.hopInterval : nil
+        )
+    }
+
+    private func buildAnyTLS() -> SingboxOutbound {
+        return SingboxOutbound(
+            type: "anytls",
+            tag: "proxy",
+            server: profile.address,
+            server_port: profile.port,
+            password: profile.password,
+            tls: TLSConfig(
+                enabled: true,
+                server_name: profile.sni.isEmpty ? profile.address : profile.sni,
+                insecure: profile.allowInsecure,
+                alpn: profile.entity.getAlpn(),
+                utls: UTLSConfig(
+                    enabled: true,
+                    fingerprint: profile.fingerprint.rawValue
+                )
+            )
         )
     }
 

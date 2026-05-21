@@ -101,6 +101,20 @@
       }
     },
     {
+      "key": "outbound.anytls",
+      "display_name": "AnyTLS outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "当前回退功能支持规则按 sing-box AnyTLS 出站功能处理。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 anytls 出站。"
+      }
+    },
+    {
       "key": "outbound.http",
       "display_name": "HTTP outbound",
       "kind": "Outbound",

@@ -145,6 +145,16 @@ extension clashProxy {
             profile.password = self.password ?? ""
             profile.sni = self.servername ?? self.server
 
+        case "anytls":
+            profile.protocol = .anytls
+            profile.network = .tcp
+            profile.security = .tls
+            profile.password = self.password ?? ""
+            profile.sni = self.servername ?? self.sni ?? self.server
+            profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) }
+                ?? self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) }
+                ?? .chrome
+
         default:
             return nil
         }

@@ -12,7 +12,7 @@ protocol V2rayOutboundSettings: Codable {}
 
 // MARK: - Protocol Definitions
 enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
-    case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom
+    case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom, anytls
     case hysteria2 = "hysteria"
     var id: Self { self }
     
@@ -66,6 +66,7 @@ final class V2rayOutbound: Codable {
         case .vless: settings = try? container.decode(V2rayOutboundVLess.self, forKey: .settings)
         case .trojan: settings = try? container.decode(V2rayOutboundTrojan.self, forKey: .settings)
         case .hysteria2: settings = try? container.decode(V2rayOutboundHysteria2.self, forKey: .settings)
+        case .anytls: settings = nil
         }
     }
 

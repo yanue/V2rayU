@@ -18,6 +18,8 @@ class ShareUri {
             handler.uri = ShadowsocksUri(from: item).encode()
         case .hysteria2:
             handler.uri = Hysteria2Uri(from: item).encode()
+        case .anytls:
+            handler.uri = AnyTlsUri(from: item).encode()
         default:
             handler.error = "Protocol not supported"
             return ""

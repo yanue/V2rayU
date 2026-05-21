@@ -31,7 +31,7 @@ func importUri(url: String) {
 }
 
 func supportProtocol(uri: String) -> Bool {
-    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") {
         return true
     }
     return false
@@ -55,7 +55,7 @@ func importFromJson(json: String) -> ProfileEntity? {
         }
 
         // 找到第一个代理协议的 outbound（跳过 freedom/blackhole/dns 等）
-        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2"])
+        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2", "anytls"])
         guard let proxyOutbound = outbounds.first(where: {
             guard let proto = $0["protocol"] as? String else { return false }
             return proxyProtocols.contains(proto.lowercased())
@@ -135,6 +135,26 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
         profile.password = outbound["password"] as? String ?? ""
         if let settings = outbound["settings"] as? [String: Any] {
             profile.password = settings["password"] as? String ?? profile.password
+        }
+
+    case "anytls":
+        profile.protocol = .anytls
+        profile.network = .tcp
+        profile.security = .tls
+        profile.address = outbound["address"] as? String ?? outbound["server"] as? String ?? ""
+        profile.port = outbound["port"] as? Int ?? outbound["server_port"] as? Int ?? 0
+        profile.password = outbound["password"] as? String ?? ""
+        if let settings = outbound["settings"] as? [String: Any] {
+            profile.address = settings["address"] as? String ?? settings["server"] as? String ?? profile.address
+            profile.port = settings["port"] as? Int ?? settings["server_port"] as? Int ?? profile.port
+            profile.password = settings["password"] as? String ?? profile.password
+        }
+        if let tls = outbound["tls"] as? [String: Any] {
+            profile.sni = tls["server_name"] as? String ?? tls["serverName"] as? String ?? profile.address
+            profile.allowInsecure = tls["insecure"] as? Bool ?? tls["allowInsecure"] as? Bool ?? false
+            if let alpn = tls["alpn"] as? [String] {
+                profile.alpn = V2rayStreamAlpn(rawValue: alpn.joined(separator: ",")) ?? .h2h1
+            }
         }
 
     default:
@@ -243,6 +263,8 @@ class ImportUri {
             uriHandler = ShadowsocksRUri()
         } else if share_uri.hasPrefix("hysteria2://") {
             uriHandler = Hysteria2Uri()
+        } else if share_uri.hasPrefix("anytls://") {
+            uriHandler = AnyTlsUri()
         }
 
         // 解析 URI

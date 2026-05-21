@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		660330042D0D5504009FEB56 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 660330032D0D5504009FEB56 /* GRDB */; };
+		66A7B0022FA2000100A00002 /* AnyTlsUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0012FA2000100A00001 /* AnyTlsUri.swift */; };
 		66F77A122F00000100A00002 /* Hysteria2Uri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F77A112F00000100A00001 /* Hysteria2Uri.swift */; };
 		66F77A142F00000100A00004 /* Hysteria2Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F77A132F00000100A00003 /* Hysteria2Config.swift */; };
 		660330092D0D5540009FEB56 /* GRDBSQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 660330082D0D5540009FEB56 /* GRDBSQLite */; };
@@ -314,6 +315,7 @@
 		66F66F852D1E7D6A00E77C64 /* Clash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clash.swift; sourceTree = "<group>"; };
 		66F66F872D1E7D8800E77C64 /* SubscriptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionHandler.swift; sourceTree = "<group>"; };
 		67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyMigrationHandler.swift; sourceTree = "<group>"; };
+		66A7B0012FA2000100A00001 /* AnyTlsUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyTlsUri.swift; sourceTree = "<group>"; };
 		66F77A112F00000100A00001 /* Hysteria2Uri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hysteria2Uri.swift; sourceTree = "<group>"; };
 		66F77A132F00000100A00003 /* Hysteria2Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hysteria2Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -480,6 +482,7 @@
 				662CC4382D1C4CE9006E8450 /* TrojanUri.swift */,
 				662CC4392D1C4CE9006E8450 /* VlessUri.swift */,
 				662CC43A2D1C4CE9006E8450 /* VmessUri.swift */,
+				66A7B0012FA2000100A00001 /* AnyTlsUri.swift */,
 				66F77A112F00000100A00001 /* Hysteria2Uri.swift */,
 			);
 			path = Share;
@@ -970,6 +973,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66A7B0022FA2000100A00002 /* AnyTlsUri.swift in Sources */,
 				66F77A122F00000100A00002 /* Hysteria2Uri.swift in Sources */,
 				66F77A142F00000100A00004 /* Hysteria2Config.swift in Sources */,
 				667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */,

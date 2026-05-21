@@ -133,6 +133,9 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
             if security == .none { self.security = .tls }
             if alpn == .h2h1 { self.alpn = .h3 }
             self.network = .hysteria2
+        } else if `protocol` == .anytls {
+            if security == .none { self.security = .tls }
+            self.network = .tcp
         }
     }
 

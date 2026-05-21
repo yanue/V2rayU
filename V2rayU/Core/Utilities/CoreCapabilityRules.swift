@@ -27,6 +27,7 @@ enum CapabilityRuleStatus: String, Codable {
     case supported
     case legacy
     case compatibility
+    case unsupported
     case removed
     case pendingReview
 }
@@ -211,19 +212,19 @@ enum CapabilityRulesLoader {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         for candidate in candidateURLs(for: core) {
-            guard FileManager.default.fileExists(atPath: candidate.path) else {
+            guard FileManager.default.fileExists(atPath: candidate.url.path) else {
                 continue
             }
             do {
-                let data = try Data(contentsOf: candidate)
+                let data = try Data(contentsOf: candidate.url)
                 let document = try decoder.decode(CapabilityRulesDocument.self, from: data)
                 guard supportedSchemaVersions.contains(document.schemaVersion), document.core == core, !document.capabilities.isEmpty else {
-                    logger.warning("capability rules invalid: \(candidate.path)")
+                    logger.warning("capability rules invalid: \(candidate.url.path)")
                     continue
                 }
                 return (document, candidate.url, candidate.sourceKind)
             } catch {
-                logger.warning("capability rules load failed: \(candidate.path) error=\(error.localizedDescription)")
+                logger.warning("capability rules load failed: \(candidate.url.path) error=\(error.localizedDescription)")
             }
         }
         return nil
@@ -290,6 +291,8 @@ struct XraySupportRule {
             statusText = "历史/兼容功能"
         case .compatibility:
             statusText = "兼容映射功能"
+        case .unsupported:
+            statusText = "当前应用/核心组合不支持功能"
         case .removed:
             statusText = "已移除功能"
         case .pendingReview:
@@ -319,6 +322,8 @@ struct XraySupportRule {
             return .supported
         case .legacy:
             return .advisory(reason: note)
+        case .unsupported:
+            return .unsupported(reason: note)
         case .removed:
             if let version, let removedAt {
                 return .advisory(reason: "\(featureName) 在较新版本已被标记为 removed（>= \(removedAt.description)）；当前版本 \(version.description) 仍可能可用。\(note)")
@@ -381,6 +386,8 @@ extension XraySupportRule {
             self = .legacy(note: payload.note, legacyMin: legacyMin, calendarMin: calendarMin, removedAt: removedAt)
         case .compatibility:
             self = .compatibility(note: payload.note, legacyMin: legacyMin, calendarMin: calendarMin, removedAt: removedAt)
+        case .unsupported:
+            self = XraySupportRule(status: .unsupported, legacyMin: legacyMin, calendarMin: calendarMin, removedAt: removedAt, note: payload.note)
         case .removed:
             self = .removed(note: payload.note, legacyMin: legacyMin, calendarMin: calendarMin, removedAt: removedAt)
         case .pendingReview:
@@ -470,6 +477,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.trojan", displayName: "Trojan outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/trojan.html"),
         XrayCapabilityDefinition(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vless.html"),
         XrayCapabilityDefinition(key: "outbound.vmess", displayName: "VMess outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vmess.html"),
+        XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
         XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/hysteria.html"),
 
@@ -554,6 +562,10 @@ enum XraySupportCatalog {
             return capability(forKey: "outbound.vless")
         case .trojan:
             return capability(forKey: "outbound.trojan")
+        case .hysteria2:
+            return capability(forKey: "outbound.hysteria")
+        case .anytls:
+            return capability(forKey: "outbound.anytls")
         }
     }
 
@@ -697,6 +709,8 @@ enum SingboxFallbackResolver {
         switch capability.rule.type {
         case .supported, .legacy, .compatibility:
             return nil
+        case .unsupported:
+            return "Sing-Box [\(capability.kind.rawValue)] \(capability.displayName)：当前状态为 unsupported，不能作为安全自动回退目标。\(capability.rule.note)"
         case .removed:
             return "Sing-Box [\(capability.kind.rawValue)] \(capability.displayName)：当前状态为 removed，不作为安全自动回退目标。\(capability.rule.note)"
         case .pendingReview:
@@ -724,6 +738,10 @@ enum SingboxFallbackResolver {
             return RequiredCapability(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol)
         case .trojan:
             return RequiredCapability(key: "outbound.trojan", displayName: "Trojan outbound", kind: .outboundProtocol)
+        case .hysteria2:
+            return RequiredCapability(key: "outbound.hysteria2", displayName: "Hysteria2 outbound", kind: .outboundProtocol)
+        case .anytls:
+            return RequiredCapability(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol)
         }
     }
 
