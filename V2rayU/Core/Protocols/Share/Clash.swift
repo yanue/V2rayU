@@ -155,6 +155,17 @@ extension clashProxy {
                 ?? self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) }
                 ?? .chrome
 
+        case "naive":
+            profile.protocol = .naive
+            profile.network = .tcp
+            profile.security = .tls
+            profile.host = self.username ?? ""
+            profile.password = self.password ?? ""
+            profile.sni = self.servername ?? self.sni ?? self.server
+            profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) }
+                ?? self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) }
+                ?? .chrome
+
         default:
             return nil
         }

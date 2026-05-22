@@ -31,7 +31,7 @@ func importUri(url: String) {
 }
 
 func supportProtocol(uri: String) -> Bool {
-    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") || uri.hasPrefix("naive://") {
         return true
     }
     return false
@@ -55,12 +55,12 @@ func importFromJson(json: String) -> ProfileEntity? {
         }
 
         // 找到第一个代理协议的 outbound（跳过 freedom/blackhole/dns 等）
-        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2", "anytls"])
+        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2", "anytls", "naive"])
         guard let proxyOutbound = outbounds.first(where: {
-            guard let proto = $0["protocol"] as? String else { return false }
-            return proxyProtocols.contains(proto.lowercased())
+            let proto = ($0["protocol"] as? String) ?? ($0["type"] as? String)
+            return proto.map { proxyProtocols.contains($0.lowercased()) } ?? false
         }),
-        let protocolStr = proxyOutbound["protocol"] as? String else {
+        let protocolStr = (proxyOutbound["protocol"] as? String) ?? (proxyOutbound["type"] as? String) else {
             return nil
         }
 
@@ -147,6 +147,28 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
         if let settings = outbound["settings"] as? [String: Any] {
             profile.address = settings["address"] as? String ?? settings["server"] as? String ?? profile.address
             profile.port = settings["port"] as? Int ?? settings["server_port"] as? Int ?? profile.port
+            profile.password = settings["password"] as? String ?? profile.password
+        }
+        if let tls = outbound["tls"] as? [String: Any] {
+            profile.sni = tls["server_name"] as? String ?? tls["serverName"] as? String ?? profile.address
+            profile.allowInsecure = tls["insecure"] as? Bool ?? tls["allowInsecure"] as? Bool ?? false
+            if let alpn = tls["alpn"] as? [String] {
+                profile.alpn = V2rayStreamAlpn(rawValue: alpn.joined(separator: ",")) ?? .h2h1
+            }
+        }
+
+    case "naive":
+        profile.protocol = .naive
+        profile.network = .tcp
+        profile.security = .tls
+        profile.address = outbound["address"] as? String ?? outbound["server"] as? String ?? ""
+        profile.port = outbound["port"] as? Int ?? outbound["server_port"] as? Int ?? 0
+        profile.host = outbound["username"] as? String ?? ""
+        profile.password = outbound["password"] as? String ?? ""
+        if let settings = outbound["settings"] as? [String: Any] {
+            profile.address = settings["address"] as? String ?? settings["server"] as? String ?? profile.address
+            profile.port = settings["port"] as? Int ?? settings["server_port"] as? Int ?? profile.port
+            profile.host = settings["username"] as? String ?? profile.host
             profile.password = settings["password"] as? String ?? profile.password
         }
         if let tls = outbound["tls"] as? [String: Any] {
@@ -265,6 +287,8 @@ class ImportUri {
             uriHandler = Hysteria2Uri()
         } else if share_uri.hasPrefix("anytls://") {
             uriHandler = AnyTlsUri()
+        } else if share_uri.hasPrefix("naive://") {
+            uriHandler = NaiveUri()
         }
 
         // 解析 URI

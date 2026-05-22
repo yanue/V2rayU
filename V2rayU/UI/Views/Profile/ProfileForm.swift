@@ -36,7 +36,7 @@ struct ConfigFormView: View {
                         VStack{
                             ConfigServerView(item: item)
                             Spacer(minLength: 12)
-                            if item.protocol != .socks && item.protocol != .anytls {
+                            if item.protocol != .socks && item.protocol != .anytls && item.protocol != .naive {
                                 ConfigStreamView(item: item)
                                 Spacer(minLength: 12)
                             }
@@ -95,7 +95,7 @@ struct ConfigFormView: View {
                 if item.security == .none { item.security = .tls }
                 if item.alpn == .h2h1 { item.alpn = .h3 }
                 if item.network != .hysteria2 { item.network = .hysteria2 }
-            } else if item.selectedProtocol == .anytls {
+            } else if item.selectedProtocol == .anytls || item.selectedProtocol == .naive {
                 if item.security == .none { item.security = .tls }
                 if item.network != .tcp { item.network = .tcp }
             }
@@ -105,7 +105,7 @@ struct ConfigFormView: View {
                 if item.security == .none { item.security = .tls }
                 if item.alpn == .h2h1 { item.alpn = .h3 }
                 if item.network != .hysteria2 { item.network = .hysteria2 }
-            } else if newProtocol == .anytls {
+            } else if newProtocol == .anytls || newProtocol == .naive {
                 if item.security == .none { item.security = .tls }
                 if item.network != .tcp { item.network = .tcp }
             }

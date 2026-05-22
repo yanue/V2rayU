@@ -91,3 +91,91 @@ class AnyTlsUri: BaseShareUri {
     }
 }
 
+// NaiveProxy over HTTPS (Sing-Box naive outbound)
+class NaiveUri: BaseShareUri {
+    private var profile: ProfileEntity
+
+    init() {
+        profile = ProfileEntity(protocol: .naive)
+    }
+
+    required init(from model: ProfileEntity) {
+        profile = model
+    }
+
+    func getProfile() -> ProfileEntity {
+        return profile
+    }
+
+    // naive://username:password@host:port?sni=example.com&insecure=1&alpn=h2,http/1.1&fp=chrome#remark
+    // 无 username 时退化为 naive://password@host:port
+    func encode() -> String {
+        var uri = URLComponents()
+        uri.scheme = "naive"
+        if profile.host.isEmpty {
+            uri.user = profile.password
+        } else {
+            uri.user = profile.host
+            uri.password = profile.password
+        }
+        uri.host = profile.address
+        uri.port = profile.port
+
+        uri.queryItems = [
+            URLQueryItem(name: "sni", value: profile.sni),
+            URLQueryItem(name: "insecure", value: profile.allowInsecure ? "1" : "0"),
+            URLQueryItem(name: "alpn", value: profile.alpn.rawValue),
+            URLQueryItem(name: "fp", value: profile.fingerprint.rawValue),
+        ]
+
+        return (uri.url?.absoluteString ?? "") + "#" + profile.remark.urlEncoded()
+    }
+
+    func parse(url: URL) -> Error? {
+        guard let host = url.host else {
+            return NSError(domain: "NaiveUriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Missing host"])
+        }
+        guard let port = url.port else {
+            return NSError(domain: "NaiveUriError", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Missing port"])
+        }
+        guard let password = url.password ?? url.user, !password.isEmpty else {
+            return NSError(domain: "NaiveUriError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Missing password"])
+        }
+
+        logger.info("Parsed Naive URI: \(url)")
+
+        let query = url.queryParams()
+        profile.protocol = .naive
+        profile.address = host
+        profile.port = port
+        // 仅当 URI 形态是 user:password@host 时把 user 当 username 存入 profile.host
+        if let pwd = url.password, !pwd.isEmpty, let user = url.user, !user.isEmpty {
+            profile.host = user
+        } else {
+            profile.host = ""
+        }
+        profile.password = password
+        profile.network = .tcp
+        profile.security = .tls
+        profile.sni = query.getString(forKey: "sni", defaultValue: query.getString(forKey: "peer", defaultValue: host))
+        profile.allowInsecure = query.getBool(forKey: "insecure", defaultValue: query.getBool(forKey: "allowInsecure", defaultValue: false))
+        profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+
+        let alpnString = query.getString(forKey: "alpn", defaultValue: "")
+        if let alpn = V2rayStreamAlpn(rawValue: alpnString) {
+            profile.alpn = alpn
+        } else {
+            profile.alpn = .h2h1
+        }
+
+        if let fragment = url.fragment, !fragment.isEmpty {
+            profile.remark = fragment.urlDecoded()
+        }
+        if profile.remark.isEmpty {
+            profile.remark = "naive"
+        }
+
+        return nil
+    }
+}
+

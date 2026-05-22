@@ -38,6 +38,8 @@ class SingboxOutboundHandler {
             return buildHysteria2()
         case .anytls:
             return buildAnyTLS()
+        case .naive:
+            return buildNaive()
         }
     }
 
@@ -224,6 +226,27 @@ class SingboxOutboundHandler {
             server: profile.address,
             server_port: profile.port,
             password: profile.password,
+            tls: TLSConfig(
+                enabled: true,
+                server_name: profile.sni.isEmpty ? profile.address : profile.sni,
+                insecure: profile.allowInsecure,
+                alpn: profile.entity.getAlpn(),
+                utls: UTLSConfig(
+                    enabled: true,
+                    fingerprint: profile.fingerprint.rawValue
+                )
+            )
+        )
+    }
+
+    private func buildNaive() -> SingboxOutbound {
+        return SingboxOutbound(
+            type: "naive",
+            tag: "proxy",
+            server: profile.address,
+            server_port: profile.port,
+            password: profile.password,
+            username: profile.host.isEmpty ? nil : profile.host,
             tls: TLSConfig(
                 enabled: true,
                 server_name: profile.sni.isEmpty ? profile.address : profile.sni,

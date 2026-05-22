@@ -20,6 +20,8 @@ class ShareUri {
             handler.uri = Hysteria2Uri(from: item).encode()
         case .anytls:
             handler.uri = AnyTlsUri(from: item).encode()
+        case .naive:
+            handler.uri = NaiveUri(from: item).encode()
         default:
             handler.error = "Protocol not supported"
             return ""

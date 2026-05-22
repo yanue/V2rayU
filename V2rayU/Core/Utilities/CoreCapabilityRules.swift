@@ -478,6 +478,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vless.html"),
         XrayCapabilityDefinition(key: "outbound.vmess", displayName: "VMess outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vmess.html"),
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
+        XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
         XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/hysteria.html"),
 
@@ -566,6 +567,8 @@ enum XraySupportCatalog {
             return capability(forKey: "outbound.hysteria")
         case .anytls:
             return capability(forKey: "outbound.anytls")
+        case .naive:
+            return capability(forKey: "outbound.naive")
         }
     }
 
@@ -617,7 +620,7 @@ enum XraySupportCatalog {
     }
 
     static func capability(forKey key: String) -> XrayCapabilityDefinition? {
-        allCapabilities().first { $0.key == key }
+        allCapabilities().first { $0.key == key } ?? builtInCapabilities.first { $0.key == key }
     }
 
     static func evaluate(definition: XrayCapabilityDefinition, version: XrayVersion?) -> XrayCompatibilityIssue? {
@@ -744,6 +747,8 @@ enum SingboxFallbackResolver {
             return RequiredCapability(key: "outbound.hysteria2", displayName: "Hysteria2 outbound", kind: .outboundProtocol)
         case .anytls:
             return RequiredCapability(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol)
+        case .naive:
+            return RequiredCapability(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol)
         }
     }
 

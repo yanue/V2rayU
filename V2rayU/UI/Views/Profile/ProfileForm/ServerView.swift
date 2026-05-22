@@ -122,6 +122,13 @@ struct ConfigServerView: View {
                         getNumFieldWithLabel(label: .Port, num: $item.port)
                         getTextFieldWithLabel(label: .Password, text: $item.password)
                     }
+
+                    if item.protocol == .naive {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .Username, text: $item.host)
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
+                    }
                 }
                 .id(item.protocol) // Force full subtree recreation on protocol change
             }
