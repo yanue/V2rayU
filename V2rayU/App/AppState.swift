@@ -8,7 +8,7 @@ final class AppState: ObservableObject {
 
 
     @Published var v2rayTurnOn: Bool = UserDefaults.getBool(forKey: .v2rayTurnOn) {
-        didSet { 
+        didSet {
             UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn)
             icon = v2rayTurnOn ? runMode.icon : "IconOff"
         }
@@ -30,6 +30,9 @@ final class AppState: ObservableObject {
     @Published var runningRouting: String = UserDefaults.get(forKey: .runningRouting, defaultValue: "") {
         didSet { UserDefaults.set(forKey: .runningRouting, value: runningRouting) }
     }
+    @Published var runningCombination: String = UserDefaults.get(forKey: .runningCombination, defaultValue: "") {
+        didSet { UserDefaults.set(forKey: .runningCombination, value: runningCombination) }
+    }
     @Published var runningServer: ProfileEntity? = nil
 
     @Published var latency = 0.0
@@ -37,10 +40,10 @@ final class AppState: ObservableObject {
     @Published var directDownSpeed = 0.0
     @Published var proxyUpSpeed = 0.0
     @Published var proxyDownSpeed = 0.0
-    
+
     init() {
         self.icon = v2rayTurnOn ? runMode.icon : "IconOff"
-        
+
         // NOTE: runningServer is loaded later in appDidLaunch() to avoid
         // triggering nested singleton initialization (AppState → ProfileStore → AppDatabase)
         // during AppState.shared dispatch_once, which causes a crash.
@@ -51,7 +54,7 @@ final class AppState: ObservableObject {
                 await self?.toggleCore()
             }
         }
-        
+
         KeyboardShortcuts.onKeyDown(for: .switchProxyMode) { [weak self] in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -65,25 +68,25 @@ final class AppState: ObservableObject {
                 }
             }
         }
-        
+
         KeyboardShortcuts.onKeyDown(for: .switchToTunnelMode) { [weak self] in
             Task { @MainActor in
                 await self?.switchRunMode(mode: .tun)
             }
         }
-        
+
         KeyboardShortcuts.onKeyDown(for: .switchToGlobalMode) { [weak self] in
             Task { @MainActor in
                 await self?.switchRunMode(mode: .global)
             }
         }
-        
+
         KeyboardShortcuts.onKeyDown(for: .switchToManualMode) { [weak self] in
             Task { @MainActor in
                 await self?.switchRunMode(mode: .manual)
             }
         }
-        
+
         KeyboardShortcuts.onKeyDown(for: .switchToPacMode) { [weak self] in
             Task { @MainActor in
                 await self?.switchRunMode(mode: .pac)
@@ -122,7 +125,7 @@ final class AppState: ObservableObject {
             AppMenuManager.shared.copyProxyExportCommand()
         }
     }
-    
+
     private var isCoreOperationInProgress = false
 
     // MARK: - 更新速度
@@ -135,12 +138,12 @@ final class AppState: ObservableObject {
         self.proxyDownSpeed = proxyDownSpeed
         ProfileStore.shared.updateSpeed(uuid: self.runningProfile, speed: Int(latency))
     }
-    
+
     func setTraffic(upSpeed: Double, downSpeed: Double) {
         self.proxyUpSpeed = upSpeed
         self.proxyDownSpeed = downSpeed
     }
-    
+
     func setLatency(latency: Double) {
         self.latency = latency
     }
@@ -152,7 +155,7 @@ final class AppState: ObservableObject {
         self.proxyUpSpeed = 0
         self.proxyDownSpeed = 0
     }
-    
+
     // MARK: - 启动/停止核心
     func setCoreRunning(_ running: Bool) async {
         guard !isCoreOperationInProgress else {
@@ -196,8 +199,31 @@ final class AppState: ObservableObject {
         AppMenuManager.shared.refreshRoutingItems()
     }
 
+    // MARK: - 切换组合配置
+    func switchCombination(uuid: String) async {
+        guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
+            runningCombination = ""
+            noticeTip(title: "组合配置无效", informativeText: "请检查端口、出站配置和关联的服务器是否仍然存在")
+            AppMenuManager.shared.refreshCombinedConfigItems()
+            return
+        }
+        runningCombination = uuid
+        logger.info("switchCombination: \(self.runningCombination)")
+        // 选择组合内第一个有效 profile 作为入口 server, 以便单核心也能跑起来
+        if let firstProfileId = combo.groups.flatMap({ $0.outboundProfileUUIDs }).first,
+           let profile = ProfileStore.shared.fetchOne(uuid: firstProfileId) {
+            runningProfile = profile.uuid
+            runningServer = profile
+        }
+        v2rayTurnOn = true
+        await setCoreRunning(v2rayTurnOn)
+        AppMenuManager.shared.refreshCombinedConfigItems()
+        AppMenuManager.shared.refreshServerItems()
+    }
+
     // MARK: - 切换配置
     func switchServer(uuid: String) async {
+        runningCombination = ""
         runningProfile = uuid
         v2rayTurnOn = true
         await setCoreRunning(v2rayTurnOn)
@@ -213,7 +239,7 @@ final class AppState: ObservableObject {
         LogRotation.rotateIfNeeded()
         LogRotation.extractErrors()
         startHttpServer()
-        
+
         // 同步运行中的服务器配置
         if let running = ProfileStore.shared.getRunning() {
             if runningProfile != running.uuid {
@@ -230,7 +256,7 @@ final class AppState: ObservableObject {
             v2rayTurnOn = false
             logger.info("appDidLaunch: no available server, force v2rayTurnOn=false")
         }
-        
+
         // 同步运行中的路由配置
         let routingManager = RoutingManager()
         let runningRoutingEntity = routingManager.getRunningEntity()
@@ -238,7 +264,13 @@ final class AppState: ObservableObject {
             runningRouting = runningRoutingEntity.uuid
             logger.info("appDidLaunch: sync routing to \(runningRoutingEntity.remark)")
         }
-        
+
+        if !runningCombination.isEmpty,
+           CombinedConfigStore.shared.getValidCombination(uuid: runningCombination) == nil {
+            logger.info("appDidLaunch: invalid runningCombination, clear")
+            runningCombination = ""
+        }
+
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
 
         Task {
@@ -267,13 +299,13 @@ final class AppState: ObservableObject {
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
-    
+
     func turnOnCore() async {
         v2rayTurnOn = true
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
-    
+
     func turnOffCore() async {
         v2rayTurnOn = false
         await setCoreRunning(v2rayTurnOn)

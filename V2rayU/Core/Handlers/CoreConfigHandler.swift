@@ -7,6 +7,23 @@
 
 import Foundation
 
+struct CombinedConfigResolvedGroup {
+    let group: CombinedInboundOutboundGroup
+    let profiles: [ProfileEntity]
+}
+
+struct CombinedConfigResolved {
+    let combination: CombinedConfigEntity
+    let groups: [CombinedConfigResolvedGroup]
+    let coreType: CoreType
+    let warningMessage: String?
+    let canLaunch: Bool
+
+    var firstProfile: ProfileEntity? {
+        groups.flatMap { $0.profiles }.first
+    }
+}
+
 class CoreConfigHandler {
 
     public func toJSON(item: ProfileEntity) -> String {
@@ -29,6 +46,61 @@ class CoreConfigHandler {
         case .XrayCore:
             let vCfg = V2rayConfigHandler()
             return vCfg.toJSON(item: item, httpPort: httpPort)
+        }
+    }
+
+    public func resolveCombination(_ combination: CombinedConfigEntity) -> CombinedConfigResolved? {
+        guard let validCombination = CombinedConfigStore.shared.getValidCombination(uuid: combination.uuid) else { return nil }
+        let profilesByUUID = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
+        var resolvedGroups: [CombinedConfigResolvedGroup] = []
+        var allProfiles: [ProfileEntity] = []
+
+        for group in validCombination.groups {
+            let profiles = group.outboundProfileUUIDs.compactMap { profilesByUUID[$0] }
+            guard profiles.count == group.outboundProfileUUIDs.count, !profiles.isEmpty else { return nil }
+            resolvedGroups.append(CombinedConfigResolvedGroup(group: group, profiles: profiles))
+            allProfiles.append(contentsOf: profiles)
+        }
+
+        guard !resolvedGroups.isEmpty else { return nil }
+
+        let forcedCore = validCombination.coreType?.forcedCoreType
+        let checkedProfiles = allProfiles.map { profile -> ProfileEntity in
+            guard let forcedCore else { return profile }
+            var copy = profile
+            copy.coreType = forcedCore == .XrayCore ? .xray : .singbox
+            return copy
+        }
+        let decisions = checkedProfiles.map { $0.resolveCoreCompatibility() }
+        let warningMessage = decisions.compactMap { $0.warningMessage }.joined(separator: "\n\n")
+        let canLaunch = decisions.allSatisfy { $0.canLaunch }
+        let coreType: CoreType
+
+        if let forcedCore {
+            coreType = forcedCore
+        } else if decisions.contains(where: { $0.coreType == .SingBox }) {
+            coreType = .SingBox
+        } else {
+            coreType = .XrayCore
+        }
+
+        return CombinedConfigResolved(
+            combination: validCombination,
+            groups: resolvedGroups,
+            coreType: coreType,
+            warningMessage: warningMessage.isEmpty ? nil : warningMessage,
+            canLaunch: canLaunch
+        )
+    }
+
+    public func toJSON(combination resolved: CombinedConfigResolved) -> String {
+        switch resolved.coreType {
+        case .SingBox:
+            let cfg = SingboxConfigHandler(enableTun: false)
+            return cfg.toJSON(combination: resolved)
+        case .XrayCore:
+            let cfg = V2rayConfigHandler(enableTun: false)
+            return cfg.toJSON(combination: resolved)
         }
     }
 }

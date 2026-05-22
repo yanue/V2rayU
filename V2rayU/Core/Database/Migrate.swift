@@ -20,6 +20,7 @@ extension AppDatabase {
       
         // 注册所有模型的迁移逻辑
         ProfileEntity.registerMigrations(in: &migrator)
+        CombinedConfigEntity.registerMigrations(in: &migrator)
         SubscriptionEntity.registerMigrations(in: &migrator)
         RoutingEntity.registerMigrations(in: &migrator)
         

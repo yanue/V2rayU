@@ -53,6 +53,11 @@ actor V2rayLaunch {
 
     func start() async -> Bool {
         logger.info("start v2ray-core begin")
+        let runningCombination = await MainActor.run { AppState.shared.runningCombination }
+        if !runningCombination.isEmpty {
+            return await startCombination(uuid: runningCombination)
+        }
+
         guard let item = ProfileStore.shared.getRunning() else {
             noticeTip(title: "启动失败", informativeText: "无可用服务器配置，请先添加服务器或订阅")
             await MainActor.run {
@@ -128,6 +133,84 @@ actor V2rayLaunch {
         return true
     }
 
+    private func startCombination(uuid: String) async -> Bool {
+        guard let combination = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
+            noticeTip(title: "启动失败", informativeText: "组合配置无效，请检查端口和出站服务器")
+            await MainActor.run {
+                AppState.shared.runningCombination = ""
+            }
+            return false
+        }
+
+        let cfg = CoreConfigHandler()
+        guard let resolved = cfg.resolveCombination(combination), let firstProfile = resolved.firstProfile else {
+            noticeTip(title: "启动失败", informativeText: "组合配置没有可用的出站服务器")
+            return false
+        }
+
+        if let warningMessage = resolved.warningMessage {
+            await showAlert(title: "核心兼容性提醒", message: warningMessage)
+        }
+        if !resolved.canLaunch {
+            logger.error("start combination aborted: combined config is incompatible with selected core")
+            return false
+        }
+
+        await MainActor.run {
+            AppState.shared.runningProfile = firstProfile.uuid
+            AppState.shared.runningServer = firstProfile
+            AppMenuManager.shared.refreshCombinedConfigItems()
+            AppMenuManager.shared.refreshServerItems()
+        }
+        await AppState.shared.resetSpeed()
+        await CoreTrafficStatsHandler.shared.resetData()
+        await LaunchAgent.shared.stopAgent()
+
+        createJsonFile(combination: resolved)
+
+        truncateLogFile(appLogFilePath)
+        truncateLogFile(coreLogFilePath)
+        truncateLogFile(tunLogFilePath)
+
+        let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
+        if !started {
+            noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
+            return false
+        }
+        let mode = await AppState.shared.runMode
+        setSystemProxy(mode: mode)
+        logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
+        Task {
+            await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
+            do {
+                try await PingRunning.shared.startPing()
+            } catch {
+                logger.error("PingRunning.startPing failed: \(error)")
+            }
+        }
+
+        if mode == .tun {
+            createTunJsonFile(item: firstProfile)
+            logger.info("create tun config ok, path: \(TunConfigFilePath)")
+
+            let tunStarted = await LaunchAgent.shared.startTunHelper()
+            if !tunStarted {
+                noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                return false
+            }
+            logger.info("start tun-helper ok")
+        }
+
+        self.lastCore = resolved.coreType
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            LogRotation.rotateIfNeeded()
+            LogRotation.extractErrors()
+        }
+
+        return true
+    }
+
     func stop() async {
         await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
@@ -144,6 +227,18 @@ actor V2rayLaunch {
         } catch {
             logger.info("Failed to write JSON file: \(error)")
             noticeTip(title: "Failed to write JSON file: \(error)")
+        }
+    }
+
+    private func createJsonFile(combination resolved: CombinedConfigResolved) {
+        let cfg = CoreConfigHandler()
+        let jsonText = cfg.toJSON(combination: resolved)
+        do {
+            try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
+            logger.info("createCombinedJsonFile: \(jsonText)")
+        } catch {
+            logger.info("Failed to write combined JSON file: \(error)")
+            noticeTip(title: "Failed to write combined JSON file: \(error)")
         }
     }
 

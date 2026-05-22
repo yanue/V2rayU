@@ -16,7 +16,7 @@ final class ProfileViewModel: ObservableObject {
 
     private let store = ProfileStore.shared
     private let subscriptionStore = SubscriptionStore.shared
-    
+
     init() {
         getList()
     }
@@ -31,11 +31,11 @@ final class ProfileViewModel: ObservableObject {
     private func computeGroups() {
         let subscriptions = subscriptionStore.fetchAll()
         var groupNames: [String: String] = [:]
-        
+
         for sub in subscriptions {
             groupNames[sub.uuid] = sub.remark.isEmpty ? sub.url : sub.remark
         }
-        
+
         var uniqueGroups: Set<String> = []
         for profile in list {
             if profile.subid.isEmpty {
@@ -44,13 +44,43 @@ final class ProfileViewModel: ObservableObject {
                 uniqueGroups.insert(name)
             }
         }
-        
+
         groups = Array(uniqueGroups).sorted()
     }
 
     func delete(uuid: String) {
         store.delete(uuid: uuid)
+        removeProfileFromCombinedConfigs(uuid: uuid)
         getList()
+    }
+
+    private func removeProfileFromCombinedConfigs(uuid: String) {
+        let combinedStore = CombinedConfigStore.shared
+        for var combo in combinedStore.fetchAll() {
+            var changed = false
+            var groups = combo.groups
+
+            for index in groups.indices {
+                let originalCount = groups[index].outboundProfileUUIDs.count
+                groups[index].outboundProfileUUIDs.removeAll { $0 == uuid }
+                changed = changed || groups[index].outboundProfileUUIDs.count != originalCount
+            }
+
+            guard changed else { continue }
+            groups.removeAll { $0.outboundProfileUUIDs.isEmpty }
+
+            if groups.isEmpty {
+                combinedStore.delete(uuid: combo.uuid)
+                if AppState.shared.runningCombination == combo.uuid {
+                    AppState.shared.runningCombination = ""
+                }
+            } else {
+                combo.groups = groups
+                combo.lastUpdate = Date()
+                combinedStore.upsert(combo)
+            }
+        }
+        AppMenuManager.shared.refreshCombinedConfigItems()
     }
 
     func upsert(item: ProfileEntity) {
@@ -82,5 +112,45 @@ final class ProfileViewModel: ObservableObject {
 
         getList()
         return toDelete.count
+    }
+}
+
+@MainActor
+final class CombinedConfigViewModel: ObservableObject {
+    @Published var list: [CombinedConfigEntity] = []
+    @Published var profiles: [ProfileEntity] = []
+
+    private let store = CombinedConfigStore.shared
+
+    init() {
+        getList()
+    }
+
+    func getList() {
+        list = store.fetchAll()
+        profiles = ProfileStore.shared.fetchAll()
+    }
+
+    func upsert(item: CombinedConfigEntity) {
+        var item = item
+        item.lastUpdate = Date()
+        store.upsert(item)
+        getList()
+        AppMenuManager.shared.refreshCombinedConfigItems()
+    }
+
+    func delete(uuid: String) {
+        store.delete(uuid: uuid)
+        if AppState.shared.runningCombination == uuid {
+            AppState.shared.runningCombination = ""
+        }
+        getList()
+        AppMenuManager.shared.refreshCombinedConfigItems()
+    }
+
+    func updateSortOrderInDB() {
+        store.updateSortOrder(list)
+        getList()
+        AppMenuManager.shared.refreshCombinedConfigItems()
     }
 }

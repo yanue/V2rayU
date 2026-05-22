@@ -57,6 +57,8 @@ enum LanguageLabel: String, CaseIterable {
     case ActivitySubHead
     case Servers
     case ServerSubHead
+    case Combinations
+    case CombinationSubHead
     case Subscriptions
     case SubscriptionSubHead
     case Routings
@@ -294,9 +296,11 @@ enum LanguageLabel: String, CaseIterable {
     case TunMode
     case RoutingList
     case ServerList
+    case CombinationList
     case GoSubscriptionSettings
     case GoRoutingSettings
     case GoServerSettings
+    case GoCombinationSettings
     case GoPreferences
     case LatencyTest
     case Testing

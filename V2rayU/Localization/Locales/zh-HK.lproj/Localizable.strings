@@ -51,6 +51,8 @@
 "ActivitySubHead" = "檢視最近活動與日誌";
 "Servers" = "伺服器";
 "ServerSubHead" = "管理與設定伺服器";
+"Combinations" = "組合設定";
+"CombinationSubHead" = "多入站到多出站的代理組合";
 "Subscriptions" = "訂閱";
 "SubscriptionSubHead" = "管理訂閱來源";
 "Routings" = "路由";
@@ -275,9 +277,11 @@
 "ManualMode" = "手動模式 (清除系統代理)";
 "RoutingList" = "選擇路由";
 "ServerList" = "選擇伺服器";
+"CombinationList" = "選擇組合設定";
 "GoSubscriptionSettings" = "訂閱設定...";
 "GoRoutingSettings" = "路由設定...";
 "GoServerSettings" = "伺服器設定...";
+"GoCombinationSettings" = "組合設定...";
 "GoPreferences" = "偏好設定...";
 "LatencyTest" = "延遲測試";
 "Testing" = "測試中";

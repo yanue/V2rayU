@@ -76,6 +76,8 @@ extension UserDefaults {
         case runningRouting
         // selected profile uuid
         case runningProfile
+        // selected combined config uuid
+        case runningCombination
 
         // MARK: - TUN settings
         // tun interface address

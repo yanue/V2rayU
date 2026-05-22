@@ -26,6 +26,7 @@ struct ContentView: View {
 
                 SidebarButton(tab: .subscription, title: .Subscriptions, icon: "link.circle")
                 SidebarButton(tab: .server, title: .Servers, icon: "globe")
+                SidebarButton(tab: .combination, title: .Combinations, icon: "rectangle.stack.badge.person.crop")
                 SidebarButton(tab: .routing, title: .Routings, icon: "arrow.triangle.branch")
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
                 SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "antenna.radiowaves.left.and.right")
@@ -41,6 +42,8 @@ struct ContentView: View {
                 switch navigationState.mainTab {
                 case .server:
                     ProfileListView()
+                case .combination:
+                    CombinedConfigListView()
                 case .subscription:
                     SubscriptionListView()
                 case .routing:

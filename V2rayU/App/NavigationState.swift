@@ -3,6 +3,7 @@ import SwiftUI
 @MainActor
 enum MainTab: String, CaseIterable {
     case server
+    case combination
     case subscription
     case routing
     case setting

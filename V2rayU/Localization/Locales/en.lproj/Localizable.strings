@@ -51,6 +51,8 @@
 "ActivitySubHead" = "View recent activity and logs";
 "Servers" = "Servers";
 "ServerSubHead" = "Manage and configure servers";
+"Combinations" = "Combinations";
+"CombinationSubHead" = "Multi-inbound to outbound profile groups";
 "Subscriptions" = "Subscriptions";
 "SubscriptionSubHead" = "Manage subscription sources";
 "Routings" = "Routings";
@@ -279,9 +281,11 @@
 "ManualMode" = "Manual Mode (clear system proxies)";
 "RoutingList" = "Select Routing";
 "ServerList" = "Select Server";
+"CombinationList" = "Select Combination";
 "GoSubscriptionSettings" = "Subscription Settings...";
 "GoRoutingSettings" = "Routing Settings...";
 "GoServerSettings" = "Server Settings...";
+"GoCombinationSettings" = "Combination Settings...";
 "GoPreferences" = "Preferences...";
 "LatencyTest" = "Latency Test";
 "Testing" = "Testing";

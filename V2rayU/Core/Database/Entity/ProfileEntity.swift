@@ -255,5 +255,146 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
             }
         }
     }
-    
+
+}
+
+enum CombinedInboundType: String, Codable, CaseIterable, Identifiable {
+    case http
+    case socks
+
+    var id: Self { self }
+
+    var v2rayProtocol: V2rayProtocolInbound {
+        switch self {
+        case .http: return .http
+        case .socks: return .socks
+        }
+    }
+}
+
+struct CombinedInboundOutboundGroup: Codable, Identifiable, Equatable, Hashable {
+    var id: String = UUID().uuidString
+    var inboundType: CombinedInboundType = .socks
+    var port: Int = 1080
+    var outboundProfileUUIDs: [String] = []
+}
+
+struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
+    var uuid: String
+    var remark: String
+    var sort: Int
+    var groupsJson: String
+    var coreType: ProfileCoreSelection?
+    var lastUpdate: Date
+
+    var id: String { uuid }
+    static var idColumn: Column { CombinedConfigEntity.Columns.uuid }
+    static var databaseTableName: String { "combined_config" }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid, remark, sort, groupsJson, coreType, lastUpdate
+    }
+
+    enum Columns {
+        static let uuid = Column(CodingKeys.uuid)
+        static let remark = Column(CodingKeys.remark)
+        static let sort = Column(CodingKeys.sort)
+        static let groupsJson = Column(CodingKeys.groupsJson)
+        static let coreType = Column(CodingKeys.coreType)
+        static let lastUpdate = Column(CodingKeys.lastUpdate)
+    }
+
+    init(
+        uuid: String = UUID().uuidString,
+        remark: String = "",
+        sort: Int = 0,
+        groups: [CombinedInboundOutboundGroup] = [CombinedInboundOutboundGroup()],
+        coreType: ProfileCoreSelection? = .auto,
+        lastUpdate: Date = Date()
+    ) {
+        self.uuid = uuid
+        self.remark = remark
+        self.sort = sort
+        self.coreType = coreType
+        self.lastUpdate = lastUpdate
+        self.groupsJson = CombinedConfigEntity.encodeGroups(groups)
+    }
+
+    var groups: [CombinedInboundOutboundGroup] {
+        get { CombinedConfigEntity.decodeGroups(groupsJson) }
+        set { groupsJson = CombinedConfigEntity.encodeGroups(newValue) }
+    }
+
+    var displayName: String {
+        remark.isEmpty ? "组合配置" : remark
+    }
+
+    static func encodeGroups(_ groups: [CombinedInboundOutboundGroup]) -> String {
+        guard let data = try? JSONEncoder().encode(groups),
+              let text = String(data: data, encoding: .utf8) else {
+            return "[]"
+        }
+        return text
+    }
+
+    static func decodeGroups(_ text: String) -> [CombinedInboundOutboundGroup] {
+        guard let data = text.data(using: .utf8),
+              let groups = try? JSONDecoder().decode([CombinedInboundOutboundGroup].self, from: data) else {
+            return []
+        }
+        return groups
+    }
+
+    static func registerMigrations(in migrator: inout DatabaseMigrator) {
+        migrator.registerMigration("createCombinedConfigTable") { db in
+            try db.create(table: databaseTableName, ifNotExists: true) { t in
+                t.column(Columns.uuid.name, .text).notNull().primaryKey()
+                t.column(Columns.remark.name, .text).notNull().defaults(to: "")
+                t.column(Columns.sort.name, .integer).notNull().defaults(to: 0)
+                t.column(Columns.groupsJson.name, .text).notNull().defaults(to: "[]")
+                t.column(Columns.coreType.name, .text).defaults(to: ProfileCoreSelection.auto.rawValue)
+                t.column(Columns.lastUpdate.name, .datetime).defaults(to: "CURRENT_DATETIME")
+            }
+        }
+    }
+}
+
+struct CombinedConfigStore: StoreProtocol {
+    typealias Entity = CombinedConfigEntity
+
+    static let shared = CombinedConfigStore()
+
+    let dbReader: DatabaseReader = AppDatabase.shared.reader
+    let dbWriter: DatabaseWriter = AppDatabase.shared.dbWriter
+
+    @discardableResult
+    func updateSortOrder(_ entities: [CombinedConfigEntity]) -> Bool {
+        do {
+            try dbWriter.write { db in
+                for (index, var entity) in entities.enumerated() {
+                    entity.sort = index
+                    entity.lastUpdate = Date()
+                    try entity.update(db, columns: [CombinedConfigEntity.Columns.sort, CombinedConfigEntity.Columns.lastUpdate])
+                }
+            }
+            return true
+        } catch {
+            logger.error("CombinedConfigStore.updateSortOrder error: \(error)")
+            return false
+        }
+    }
+
+    func getValidCombination(uuid: String) -> CombinedConfigEntity? {
+        guard let item = fetchOne(uuid: uuid), !item.groups.isEmpty else { return nil }
+        let profiles = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
+        var usedPorts = Set<Int>()
+
+        for group in item.groups {
+            guard (1...65535).contains(group.port), !usedPorts.contains(group.port) else { return nil }
+            guard !group.outboundProfileUUIDs.isEmpty else { return nil }
+            guard group.outboundProfileUUIDs.allSatisfy({ profiles[$0] != nil }) else { return nil }
+            usedPorts.insert(group.port)
+        }
+        return item
+    }
 }

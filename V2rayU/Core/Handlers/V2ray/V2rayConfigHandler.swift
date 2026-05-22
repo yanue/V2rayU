@@ -204,7 +204,112 @@ class V2rayConfigHandler {
         }
         // ------------------------------------- routing end ----------------------------------------------
     }
-    
+
+    func toJSON(combination resolved: CombinedConfigResolved) -> String {
+        self.v2ray.log.loglevel = V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info
+        self.v2ray.log.access = coreLogFilePath
+        self.v2ray.log.error = coreLogFilePath
+
+        let listenAddress = getListenAddress()
+        let enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
+        var inbounds: [V2rayInbound] = []
+        var outbounds: [V2rayOutbound] = []
+        var comboRules: [V2rayRoutingRule] = []
+        var balancers: [V2rayRoutingBalancer] = []
+        var subjectSelector: [String] = []
+
+        for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
+            let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
+            let inbound = getInbound(
+                protocol: resolvedGroup.group.inboundType.v2rayProtocol,
+                listen: listenAddress,
+                port: String(resolvedGroup.group.port),
+                enableSniffing: enableSniffing,
+                tag: inboundTag
+            )
+            inbounds.append(inbound)
+
+            var outboundTags: [String] = []
+            for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
+                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(profile.uuid)"
+                let outbound = V2rayOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
+                outbound.tag = outboundTag
+                outbounds.append(outbound)
+                outboundTags.append(outboundTag)
+                subjectSelector.append(outboundTag)
+            }
+
+            var rule = V2rayRoutingRule()
+            rule.type = "field"
+            rule.inboundTag = [inboundTag]
+            rule.domain = nil
+            rule.ip = nil
+
+            if outboundTags.count == 1 {
+                rule.outboundTag = outboundTags[0]
+            } else {
+                let balancerTag = "combo-balancer-\(groupIndex)"
+                rule.outboundTag = nil
+                rule.balancerTag = balancerTag
+                balancers.append(V2rayRoutingBalancer(
+                    selector: outboundTags,
+                    strategy: V2rayRoutingBalancerStrategy(type: "roundRobin"),
+                    tag: balancerTag,
+                    fallbackTag: outboundTags.first
+                ))
+            }
+            comboRules.append(rule)
+        }
+
+        if let firstProfile = resolved.firstProfile {
+            let proxyFallback = V2rayOutboundHandler(from: ProfileModel(from: firstProfile)).getOutbound()
+            proxyFallback.tag = "proxy"
+            outbounds.append(proxyFallback)
+        }
+
+        let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
+        inbounds.append(inApi)
+
+        let outboundFreedom = V2rayOutbound()
+        outboundFreedom.protocol = .freedom
+        outboundFreedom.tag = "direct"
+        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
+
+        let outboundBlackhole = V2rayOutbound()
+        outboundBlackhole.protocol = .blackhole
+        outboundBlackhole.tag = "block"
+        outboundBlackhole.settings = V2rayOutboundBlackhole()
+
+        outbounds.append(outboundFreedom)
+        outbounds.append(outboundBlackhole)
+
+        self.v2ray.inbounds = inbounds
+        self.v2ray.outbounds = outbounds
+        self.v2ray.dns = self.getDns()
+
+        var routing = RoutingManager().getRunning()
+        let existingRules = routing.rules.filter { $0.inboundTag != ["metrics_in"] }
+        var apiRule = V2rayRoutingRule()
+        apiRule.type = "field"
+        apiRule.inboundTag = ["metrics_in"]
+        apiRule.outboundTag = "metrics_out"
+        apiRule.domain = nil
+        apiRule.ip = nil
+        routing.rules = [apiRule] + comboRules + existingRules
+        routing.balancers = balancers.isEmpty ? routing.balancers : (routing.balancers ?? []) + balancers
+        self.v2ray.routing = routing
+
+        self.v2ray.stats = V2rayStats()
+        self.v2ray.metrics = v2rayMetrics()
+        self.v2ray.policy = V2rayPolicy()
+        var observatory = V2rayObservatory()
+        observatory.subjectSelector = subjectSelector.isEmpty ? ["proxy"] : subjectSelector
+        observatory.probeUrl = getLatencyTestURLString()
+        self.v2ray.observatory = observatory
+
+        return self.v2ray.toJSON()
+    }
+
     func getDns() -> V2rayDns {
         let dnsJson = getDefaultDnsSetting()
         if let jsonData = dnsJson.data(using: .utf8) {

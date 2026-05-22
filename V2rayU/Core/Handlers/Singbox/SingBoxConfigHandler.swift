@@ -71,6 +71,84 @@ class SingboxConfigHandler {
         return self.singbox.toJSON()
     }
 
+    func toJSON(combination resolved: CombinedConfigResolved) -> String {
+        applyLogConfig(level: V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info)
+        self.singbox.log.timestamp = true
+        if self.singbox.log.disabled != true {
+            self.singbox.log.output = coreLogFilePath
+        }
+
+        let listenAddress = getListenAddress()
+        var inbounds: [SingboxInbound] = []
+        var outbounds: [SingboxOutbound] = []
+        var comboRules: [RouteRule] = []
+
+        for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
+            let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
+            inbounds.append(SingboxInbound(
+                type: resolvedGroup.group.inboundType.rawValue,
+                tag: inboundTag,
+                listen: listenAddress,
+                listen_port: resolvedGroup.group.port
+            ))
+
+            var outboundTags: [String] = []
+            for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
+                var outbound = SingboxOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
+                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(profile.uuid)"
+                outbound.tag = outboundTag
+                outbound.domain_resolver = domain_resolver
+                outbounds.append(outbound)
+                outboundTags.append(outboundTag)
+            }
+
+            let routeOutbound: String
+            if outboundTags.count == 1 {
+                routeOutbound = outboundTags[0]
+            } else {
+                routeOutbound = "combo-selector-\(groupIndex)"
+                outbounds.append(SingboxOutbound(
+                    type: "selector",
+                    tag: routeOutbound,
+                    outbounds: outboundTags,
+                    default: outboundTags.first
+                ))
+            }
+            comboRules.append(RouteRule(outbound: routeOutbound, domain: nil, process_name: nil, inbound: [inboundTag]))
+        }
+
+        if let firstProfile = resolved.firstProfile {
+            var proxyFallback = SingboxOutboundHandler(from: ProfileModel(from: firstProfile)).getOutbound()
+            proxyFallback.tag = "proxy"
+            proxyFallback.domain_resolver = domain_resolver
+            outbounds.append(proxyFallback)
+        }
+
+        outbounds.append(SingboxOutbound(type: "direct", tag: "direct"))
+        outbounds.append(SingboxOutbound(type: "block", tag: "block"))
+
+        self.singbox.inbounds = inbounds
+        self.singbox.outbounds = outbounds
+        self.singbox.dns.servers = [
+            DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
+            DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
+            DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+        ]
+        self.singbox.dns.rules = [
+            DNSRule(server: "china-dns", domain: ["geosite:cn"]),
+            DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
+        ]
+        self.singbox.route.rules = comboRules + RoutingManager().getSingboxRoutingRules()
+        self.singbox.experimental = ExperimentalConfig(
+            clash_api: ClashAPIConfig(
+                external_controller: "127.0.0.1:\(coreApiPort)",
+                secret: ""
+            )
+        )
+
+        return self.singbox.toJSON()
+    }
+
     func combine(_outbounds: [SingboxOutbound]) {
         // base
         applyLogConfig(level: V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info)

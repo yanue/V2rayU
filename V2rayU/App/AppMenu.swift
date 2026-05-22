@@ -38,6 +38,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var routingItem: NSMenuItem!
     private var routingSubMenu: NSMenu!
     private var goRoutingSettingItem: NSMenuItem!
+    private var combinationItem: NSMenuItem!
+    private var combinationSubMenu: NSMenu!
+    private var goCombinationSettingItem: NSMenuItem!
     private var serverItem: NSMenuItem!
     private var serverSubMenu: NSMenu!
     private var goServerSettingItem: NSMenuItem!
@@ -144,6 +147,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         routingItem.submenu = routingSubMenu
     }
 
+    func refreshCombinedConfigItems() {
+        combinationSubMenu = getCombinedConfigSubMenus()
+        combinationItem.submenu = combinationSubMenu
+        let count = CombinedConfigStore.shared.fetchAll().count
+        combinationItem.title = count > 0
+            ? "\(String(localized: .CombinationList)) (\(count))"
+            : String(localized: .CombinationList)
+    }
+
     func refreshBasicMenus() {
         // 刷新模式状态
         toggleCoreItem?.title = coreTitle()
@@ -160,6 +172,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         refreshBasicMenus()
         refreshServerItems()
         refreshRoutingItems()
+        refreshCombinedConfigItems()
         updateMenuTitles()
     }
 
@@ -169,6 +182,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     func loadDatabaseMenus() {
         refreshServerItems()
         refreshRoutingItems()
+        refreshCombinedConfigItems()
         // Update server count in title
         let count = ProfileStore.shared.fetchAll().count
         if count > 0 {
@@ -264,6 +278,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         goSubscriptionsItem?.title = String(localized: .GoSubscriptionSettings)
         goRoutingSettingItem?.title = String(localized: .GoRoutingSettings)
         goServerSettingItem?.title = String(localized: .GoServerSettings)
+        goCombinationSettingItem?.title = String(localized: .GoCombinationSettings)
         goPreferencesItem?.title = String(localized: .GoPreferences)
         pacSettingsItem?.title = String(localized: .PAC)
         importServersItem?.title = String(localized: .ImportServersFromClipboard)
@@ -274,6 +289,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         helpItem?.title = String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))"
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
+        let combinationCount = CombinedConfigStore.shared.fetchAll().count
+        combinationItem?.title = combinationCount > 0
+            ? "\(String(localized: .CombinationList)) (\(combinationCount))"
+            : String(localized: .CombinationList)
         let serverCount = ProfileStore.shared.fetchAll().count
         serverItem?.title = serverCount > 0 ? "\(String(localized: .ServerList)) (\(serverCount))" : String(localized: .ServerList)
     }
@@ -316,22 +335,27 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // AppDatabase.shared before AppInstaller.checkInstall() has run.
         routingItem = NSMenuItem(title: String(localized: .RoutingList), action: nil, keyEquivalent: "")
         routingItem.submenu = NSMenu()
+        combinationItem = NSMenuItem(title: String(localized: .CombinationList), action: nil, keyEquivalent: "")
+        combinationItem.submenu = NSMenu()
         serverItem = NSMenuItem(title: String(localized: .ServerList), action: nil, keyEquivalent: "")
         serverItem.submenu = NSMenu()
         // 预先初始化一次
         pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
+        menu.addItem(combinationItem)
         menu.addItem(serverItem)
         menu.addItem(pingItem)
         // 预先初始化一次
         goRoutingSettingItem = NSMenuItem(title: String(localized: .GoRoutingSettings), action: #selector(openRoutingTab), keyEquivalent: "")
         goSubscriptionsItem = NSMenuItem(title: String(localized: .GoSubscriptionSettings), action: #selector(openPreferenceSubscribe), keyEquivalent: "")
         goServerSettingItem = NSMenuItem(title: String(localized: .GoServerSettings), action: #selector(openServerTab), keyEquivalent: "")
+        goCombinationSettingItem = NSMenuItem(title: String(localized: .GoCombinationSettings), action: #selector(openCombinationTab), keyEquivalent: "")
         goPreferencesItem = NSMenuItem(title: String(localized: .GoPreferences), action: #selector(openPreferenceGeneral), keyEquivalent: ",")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(goSubscriptionsItem)
         menu.addItem(goServerSettingItem)
+        menu.addItem(goCombinationSettingItem)
         menu.addItem(goRoutingSettingItem)
         menu.addItem(goPreferencesItem)
         menu.addItem(NSMenuItem.separator())
@@ -455,6 +479,23 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         item.target = self
         item.state = (routing.uuid == AppState.shared.runningRouting) ? .on : .off
         return item
+    }
+
+    func getCombinedConfigSubMenus() -> NSMenu {
+        let menu = NSMenu()
+        let combos = CombinedConfigStore.shared.fetchAll()
+        for combo in combos {
+            let item = NSMenuItem(title: combo.displayName, action: #selector(switchCombination), keyEquivalent: "")
+            item.representedObject = combo.uuid
+            item.isEnabled = true
+            item.target = self
+            item.state = (combo.uuid == AppState.shared.runningCombination) ? .on : .off
+            let groupCount = combo.groups.count
+            let profileCount = combo.groups.reduce(0) { $0 + $1.outboundProfileUUIDs.count }
+            item.toolTip = "groups: \(groupCount), profiles: \(profileCount)"
+            menu.addItem(item)
+        }
+        return menu
     }
 
     func getServerItem() -> NSMenuItem {
@@ -693,6 +734,22 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     @objc private func openServerTab(_ sender: NSMenuItem) {
         NavigationState.shared.mainTab = .server
         MainWindowManager.shared.openMainWindow()
+    }
+
+    @objc private func openCombinationTab(_ sender: NSMenuItem) {
+        NavigationState.shared.mainTab = .combination
+        MainWindowManager.shared.openMainWindow()
+    }
+
+    @objc private func switchCombination(_ sender: NSMenuItem) {
+        guard let uuid = sender.representedObject as? String else {
+            logger.info("switchCombination err")
+            return
+        }
+        logger.info("switchCombination: \(uuid)")
+        Task {
+            await AppState.shared.switchCombination(uuid: uuid)
+        }
     }
 
     @objc private func openDiagnostics(_ sender: NSMenuItem) {

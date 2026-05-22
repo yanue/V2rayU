@@ -97,6 +97,8 @@ struct SingboxOutbound: Codable {
     var down_mbps: Int?
     var obfs: Hysteria2ObfsConfig?
     var hop_interval: Int?
+    var outbounds: [String]?
+    var `default`: String?
 
     init(
         type: String,
@@ -119,7 +121,9 @@ struct SingboxOutbound: Codable {
         up_mbps: Int? = nil,
         down_mbps: Int? = nil,
         obfs: Hysteria2ObfsConfig? = nil,
-        hop_interval: Int? = nil
+        hop_interval: Int? = nil,
+        outbounds: [String]? = nil,
+        default: String? = nil
     ) {
         self.type = type
         self.tag = tag
@@ -142,6 +146,8 @@ struct SingboxOutbound: Codable {
         self.down_mbps = down_mbps
         self.obfs = obfs
         self.hop_interval = hop_interval
+        self.outbounds = outbounds
+        self.`default` = `default`
     }
 }
 
@@ -243,4 +249,5 @@ struct RouteRule: Codable {
     var outbound: String
     var domain: [String]?
     var process_name: [String]?
+    var inbound: [String]?
 }
