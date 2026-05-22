@@ -267,6 +267,16 @@ class V2rayConfigHandler {
             outbounds.append(proxyFallback)
         }
 
+        // Add default SOCKS/HTTP proxy inbounds
+        let useMixedInbound = self.enableMixedPort
+        if !useMixedInbound && self.httpPort == self.socksPort {
+            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        }
+        let httpInboundPort = useMixedInbound ? self.mixedPort : self.httpPort
+        let socksInboundPort = useMixedInbound ? self.mixedPort : self.socksPort
+        inbounds.append(getInbound(protocol: .http, listen: self.httpHost, port: httpInboundPort, enableSniffing: enableSniffing, tag: "http-in"))
+        inbounds.append(getInbound(protocol: .socks, listen: self.socksHost, port: socksInboundPort, enableSniffing: enableSniffing, tag: "socks-in"))
+
         let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
         inbounds.append(inApi)
 

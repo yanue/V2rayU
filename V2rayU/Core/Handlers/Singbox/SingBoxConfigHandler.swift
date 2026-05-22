@@ -127,6 +127,17 @@ class SingboxConfigHandler {
         outbounds.append(SingboxOutbound(type: "direct", tag: "direct"))
         outbounds.append(SingboxOutbound(type: "block", tag: "block"))
 
+        // Add default SOCKS/HTTP proxy inbounds
+        if !self.enableMixedPort && self.httpPort == self.socksPort {
+            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        }
+        if self.enableMixedPort {
+            inbounds.append(SingboxInbound(type: "mixed", tag: "mixed-in", listen: self.httpHost, listen_port: Int(self.mixedPort)))
+        } else {
+            inbounds.append(SingboxInbound(type: "http", tag: "http-in", listen: self.httpHost, listen_port: Int(self.httpPort)))
+            inbounds.append(SingboxInbound(type: "socks", tag: "socks-in", listen: self.socksHost, listen_port: Int(self.socksPort)))
+        }
+
         self.singbox.inbounds = inbounds
         self.singbox.outbounds = outbounds
         self.singbox.dns.servers = [
