@@ -41,6 +41,10 @@ struct CombinedConfigFormView: View {
             guard !ports.contains(group.port) else {
                 return "Duplicate inbound ports are not allowed."
             }
+            guard !conflictPorts.contains(group.port) else {
+                let conflictDesc = conflictPorts.sorted().map(String.init).joined(separator: ", ")
+                return "Port \(group.port) conflicts with default proxy port (\(conflictDesc))."
+            }
             guard !group.outboundProfileUUIDs.isEmpty else {
                 return "Each inbound group must select at least one outbound profile."
             }
@@ -175,6 +179,17 @@ struct CombinedConfigFormView: View {
                 TextField("port", value: binding.port, formatter: NumberFormatter())
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 90)
+
+                if conflictPorts.contains(groups[idx].port) || groups.contains(where: { $0.id != groups[idx].id && $0.port == groups[idx].port }) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                    Button("+1") {
+                        let otherPorts = Set(groups.map { $0.port }).subtracting([groups[idx].port])
+                        groups[idx].port = nextAvailablePort(from: groups[idx].port + 1, usedPorts: otherPorts)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
 
                 Spacer()
 

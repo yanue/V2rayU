@@ -10,6 +10,20 @@ import Foundation
 let defaultDomesticDns = "119.29.29.29"
 let secondaryDomesticDns = "223.5.5.5"
 
+let defaultSingboxDns = """
+{
+    "servers": [
+        {"type": "udp", "tag": "default-dns", "server": "119.29.29.29"},
+        {"type": "udp", "tag": "china-dns", "server": "223.5.5.5"},
+        {"type": "fakeip", "tag": "fakedns", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}
+    ],
+    "rules": [
+        {"server": "china-dns", "domain": ["geosite:cn"]},
+        {"server": "fakedns", "domain": ["geosite:geolocation-!cn"]}
+    ]
+}
+"""
+
 let defaultDns = """
 {
     "servers": [

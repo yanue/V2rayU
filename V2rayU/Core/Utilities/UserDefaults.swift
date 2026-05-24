@@ -92,6 +92,9 @@ extension UserDefaults {
         case tunDnsChina
         // tun fakeip range
         case tunFakeipRange
+
+        // sing-box dns json config
+        case dnsJsonSingbox
     }
 
     static func del(forKey key: KEY) {

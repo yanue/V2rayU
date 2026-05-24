@@ -48,6 +48,7 @@ final class AppSettings: ObservableObject {
     @Published var enableStat: Bool = UserDefaults.getBool(forKey: .enableStat)
     @Published var logLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
     @Published var dnsJson = getDefaultDnsSetting()
+    @Published var dnsJsonSingbox: String = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
     @Published var latencyTestConcurrency: Int = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
     @Published var pingTestURL: String = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -125,6 +126,7 @@ final class AppSettings: ObservableObject {
         enableStat = UserDefaults.getBool(forKey: .enableStat)
         logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
         dnsJson = getDefaultDnsSetting()
+        dnsJsonSingbox = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
         gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
         latencyTestConcurrency = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
         pingTestURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -184,6 +186,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.setInt(forKey: .muxConcurrent, value: mux)
         UserDefaults.set(forKey: .v2rayLogLevel, value: logLevel.rawValue)
         UserDefaults.set(forKey: .dnsServers, value: dnsJson)
+        UserDefaults.set(forKey: .dnsJsonSingbox, value: dnsJsonSingbox)
         UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
         latencyTestConcurrency = safeLatencyTestConcurrency
         UserDefaults.setInt(forKey: .latencyTestConcurrency, value: latencyTestConcurrency)
@@ -217,6 +220,7 @@ final class AppSettings: ObservableObject {
             old.enableStat != enableStat ||
             old.logLevel != logLevel ||
             old.dnsJson != dnsJson ||
+            old.dnsJsonSingbox != dnsJsonSingbox ||
             old.pingTestURL != pingTestURL ||
             old.tunAddress != tunAddress ||
             old.tunMtu != tunMtu ||

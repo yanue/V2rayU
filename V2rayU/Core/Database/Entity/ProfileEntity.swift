@@ -254,6 +254,20 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 t.add(column: Columns.coreType.name, .text).defaults(to: ProfileCoreSelection.auto.rawValue)
             }
         }
+
+        migrator.registerMigration("addProfileServerIpAndRegion") { db in
+            let cols = Set(try db.columns(in: databaseTableName).map(\.name))
+            if !cols.contains(Columns.serverIp.name) {
+                try db.alter(table: databaseTableName) { t in
+                    t.add(column: Columns.serverIp.name, .text).notNull().defaults(to: "")
+                }
+            }
+            if !cols.contains(Columns.serverRegion.name) {
+                try db.alter(table: databaseTableName) { t in
+                    t.add(column: Columns.serverRegion.name, .text).notNull().defaults(to: "")
+                }
+            }
+        }
     }
 
 }

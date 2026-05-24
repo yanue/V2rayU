@@ -150,6 +150,8 @@
 "DnsSaveFail" = "保存 DNS 配置失败: %@";
 "DnsClear" = "清空";
 "DnsDefault" = "推荐";
+"DnsXray" = "Xray";
+"DnsSingbox" = "Sing-Box";
 
 // MARK: - 订阅设置
 "SubscriptionSettings" = "订阅设置";

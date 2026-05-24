@@ -149,6 +149,8 @@
 "DnsSaveFail" = "Error: Failed to save DNS configuration - %@";
 "DnsClear" = "Clear";
 "DnsDefault" = "Default";
+"DnsXray" = "Xray";
+"DnsSingbox" = "Sing-Box";
 
 // MARK: - Subscription Settings
 "SubscriptionSettings" = "Subscription Settings";

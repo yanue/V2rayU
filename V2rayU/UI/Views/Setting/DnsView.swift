@@ -1,17 +1,16 @@
-//
-//  DnsView.swift
-//  V2rayU
-//
-//  Created by yanue on 2025/7/20.
-//
-
 import JavaScriptCore
 import SwiftUI
+
+enum DnsCoreTab: String, CaseIterable {
+    case xray
+    case singbox
+}
 
 struct DnsView: View {
     @State private var dnsJson: String = ""
     @State private var tips: String = ""
     @State private var showAlert: Bool = false
+    @State private var selectedTab: DnsCoreTab = .xray
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -29,13 +28,19 @@ struct DnsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .focusable(false)
-                 Button(action: { goHelp(self) }) {
-                                    Label(String(localized: .Help), systemImage: "questionmark.circle")
-                                }
-                                .buttonStyle(.bordered)
-                                .focusable(false)
-
+                Button(action: { goHelp(self) }) {
+                    Label(String(localized: .Help), systemImage: "questionmark.circle")
+                }
+                .buttonStyle(.bordered)
+                .focusable(false)
             }
+
+            Picker("", selection: $selectedTab) {
+                localized(.DnsXray).tag(DnsCoreTab.xray)
+                localized(.DnsSingbox).tag(DnsCoreTab.singbox)
+            }
+            .pickerStyle(.segmented)
+            .focusable(false)
 
             TextEditor(text: $dnsJson)
                 .font(.system(.body, design: .monospaced))
@@ -52,7 +57,7 @@ struct DnsView: View {
                 .buttonStyle(.bordered)
                 .focusable(false)
 
-                Button(action: { dnsJson = defaultDns }) {
+                Button(action: { loadDefault() }) {
                     Label(String(localized: .DnsDefault), systemImage: "checkmark.circle")
                 }
                 .buttonStyle(.bordered)
@@ -69,7 +74,7 @@ struct DnsView: View {
 
                 Spacer()
 
-                Button(action: { saveDnsServers() }) {
+                Button(action: { saveDns() }) {
                     Label(String(localized: .Save), systemImage: "tray.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
@@ -77,17 +82,32 @@ struct DnsView: View {
             }
         }
         .padding()
-        .onAppear { loadDnsServers() }
+        .onAppear { loadDns() }
+        .onChange(of: selectedTab) { _, _ in loadDns() }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text(String(localized: .Notification)), message: Text(tips), dismissButton: .default(Text(String(localized: .Confirm))) )
+            Alert(title: Text(String(localized: .Notification)), message: Text(tips), dismissButton: .default(Text(String(localized: .Confirm))))
         }
     }
 
-    private func loadDnsServers() {
-        dnsJson = AppSettings.shared.dnsJson
+    private func loadDefault() {
+        switch selectedTab {
+        case .xray:
+            dnsJson = defaultDns
+        case .singbox:
+            dnsJson = defaultSingboxDns
+        }
     }
 
-    private func saveDnsServers() {
+    private func loadDns() {
+        switch selectedTab {
+        case .xray:
+            dnsJson = AppSettings.shared.dnsJson
+        case .singbox:
+            dnsJson = AppSettings.shared.dnsJsonSingbox
+        }
+    }
+
+    private func saveDns() {
         let str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard let data = str.data(using: .utf8) else {
@@ -106,7 +126,8 @@ struct DnsView: View {
             return
         }
 
-        if let dict = jsonObj as? [String: Any], let dnsConfig = dict["dns"] {
+        // unwrap {"dns": {...}} for xray
+        if selectedTab == .xray, let dict = jsonObj as? [String: Any], let dnsConfig = dict["dns"] {
             jsonObj = dnsConfig
         }
 
@@ -117,7 +138,12 @@ struct DnsView: View {
             let formattedData = try encoder.encode(AnyCodable(jsonObj))
 
             if let formattedStr = String(data: formattedData, encoding: .utf8) {
-                AppSettings.shared.dnsJson = formattedStr
+                switch selectedTab {
+                case .xray:
+                    AppSettings.shared.dnsJson = formattedStr
+                case .singbox:
+                    AppSettings.shared.dnsJsonSingbox = formattedStr
+                }
                 AppSettings.shared.saveSettings()
                 tips = String(localized: .DnsSaveSuccess)
             } else {
@@ -137,9 +163,14 @@ struct DnsView: View {
     }
 
     func goHelp(_ sender: Any) {
-        if let url = URL(string: "https://xtls.github.io/config/dns.html#dnsobject") {
-            NSWorkspace.shared.open(url)
+        let url: URL
+        switch selectedTab {
+        case .xray:
+            url = URL(string: "https://xtls.github.io/config/dns.html#dnsobject")!
+        case .singbox:
+            url = URL(string: "https://sing-box.sagernet.org/configuration/dns")!
         }
+        NSWorkspace.shared.open(url)
     }
 
     func goViewConfig(_ sender: Any) {

@@ -164,6 +164,8 @@ enum LanguageLabel: String, CaseIterable {
     case DnsSaveFail
     case DnsClear
     case DnsDefault
+    case DnsXray
+    case DnsSingbox
 
     // MARK: - Subscription Settings
     case SubscriptionSettings

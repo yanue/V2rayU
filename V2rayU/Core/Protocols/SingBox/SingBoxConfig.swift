@@ -215,6 +215,11 @@ struct UTLSConfig: Codable {
 struct DNSConfig: Codable {
     var servers: [DNSServer] = []
     var rules: [DNSRule] = []
+
+    init(servers: [DNSServer] = [], rules: [DNSRule] = []) {
+        self.servers = servers
+        self.rules = rules
+    }
 }
 
 struct DNSRule: Codable {

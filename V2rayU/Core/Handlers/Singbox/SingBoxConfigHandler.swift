@@ -140,15 +140,7 @@ class SingboxConfigHandler {
 
         self.singbox.inbounds = inbounds
         self.singbox.outbounds = outbounds
-        self.singbox.dns.servers = [
-            DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
-            DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
-            DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
-        ]
-        self.singbox.dns.rules = [
-            DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-            DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-        ]
+        self.singbox.dns = getDnsConfig()
         self.singbox.route.rules = comboRules + RoutingManager().getSingboxRoutingRules()
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
@@ -293,25 +285,42 @@ class SingboxConfigHandler {
         self.singbox.outbounds = _outbounds
 
         if self.forPing {
-            // 默认 DNS
             self.singbox.dns.servers = [
                 DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
             ]
         } else {
-            // dns
-            self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
-                DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
-            ]
-            self.singbox.dns.rules = [
-                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-            ]
-            // 路由配置
+            self.singbox.dns = getDnsConfig()
             self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
+    }
+
+    private func getDnsConfig() -> DNSConfig {
+        let jsonStr = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
+        guard let data = jsonStr.data(using: .utf8) else {
+            return defaultDnsConfig()
+        }
+        do {
+            let config = try JSONDecoder().decode(DNSConfig.self, from: data)
+            return config
+        } catch {
+            logger.error("Failed to parse sing-box DNS config: \(error)")
+            return defaultDnsConfig()
+        }
+    }
+
+    private func defaultDnsConfig() -> DNSConfig {
+        DNSConfig(
+            servers: [
+                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
+                DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
+                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
+            ],
+            rules: [
+                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
+                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
+            ]
+        )
     }
 
     private func applyLogConfig(level: V2rayLogLevel) {
