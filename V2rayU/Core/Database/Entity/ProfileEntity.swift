@@ -65,6 +65,72 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
+    // 安全的 decode 辅助：支持 NULL 回退 + 未知枚举值回退
+    private static func safeDecode<T: RawRepresentable & Decodable>(
+        from container: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys,
+        fallback: T
+    ) -> T where T.RawValue == String {
+        if let raw = try? container.decodeIfPresent(String.self, forKey: key),
+           let value = T(rawValue: raw) {
+            return value
+        }
+        return fallback
+    }
+
+    private static func safeDecode<T: Decodable>(
+        from container: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys,
+        fallback: T
+    ) -> T {
+        if let value = try? container.decodeIfPresent(T.self, forKey: key) {
+            return value
+        }
+        return fallback
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uuid = try container.decode(String.self, forKey: .uuid)
+        remark = Self.safeDecode(from: container, forKey: .remark, fallback: "")
+        speed = Self.safeDecode(from: container, forKey: .speed, fallback: -1)
+        sort = Self.safeDecode(from: container, forKey: .sort, fallback: 0)
+        `protocol` = Self.safeDecode(from: container, forKey: .protocol, fallback: .freedom)
+        subid = Self.safeDecode(from: container, forKey: .subid, fallback: "")
+        address = Self.safeDecode(from: container, forKey: .address, fallback: "")
+        port = Self.safeDecode(from: container, forKey: .port, fallback: 0)
+        password = Self.safeDecode(from: container, forKey: .password, fallback: "")
+        alterId = Self.safeDecode(from: container, forKey: .alterId, fallback: 0)
+        encryption = Self.safeDecode(from: container, forKey: .encryption, fallback: "")
+        network = Self.safeDecode(from: container, forKey: .network, fallback: .tcp)
+        headerType = Self.safeDecode(from: container, forKey: .headerType, fallback: .none)
+        host = Self.safeDecode(from: container, forKey: .host, fallback: "")
+        path = Self.safeDecode(from: container, forKey: .path, fallback: "")
+        security = Self.safeDecode(from: container, forKey: .security, fallback: .none)
+        allowInsecure = Self.safeDecode(from: container, forKey: .allowInsecure, fallback: true)
+        flow = Self.safeDecode(from: container, forKey: .flow, fallback: "")
+        sni = Self.safeDecode(from: container, forKey: .sni, fallback: "")
+        alpn = Self.safeDecode(from: container, forKey: .alpn, fallback: .h2h1)
+        fingerprint = Self.safeDecode(from: container, forKey: .fingerprint, fallback: .chrome)
+        publicKey = Self.safeDecode(from: container, forKey: .publicKey, fallback: "")
+        shortId = Self.safeDecode(from: container, forKey: .shortId, fallback: "")
+        spiderX = Self.safeDecode(from: container, forKey: .spiderX, fallback: "")
+        extra = Self.safeDecode(from: container, forKey: .extra, fallback: "")
+        shareUri = Self.safeDecode(from: container, forKey: .shareUri, fallback: "")
+        serverIp = Self.safeDecode(from: container, forKey: .serverIp, fallback: "")
+        serverRegion = Self.safeDecode(from: container, forKey: .serverRegion, fallback: "")
+        if let raw = try? container.decodeIfPresent(String.self, forKey: .coreType) {
+            coreType = ProfileCoreSelection(rawValue: raw) ?? .auto
+        } else {
+            coreType = nil
+        }
+        totalUp = Self.safeDecode(from: container, forKey: .totalUp, fallback: Int64(0))
+        totalDown = Self.safeDecode(from: container, forKey: .totalDown, fallback: Int64(0))
+        todayUp = Self.safeDecode(from: container, forKey: .todayUp, fallback: Int64(0))
+        todayDown = Self.safeDecode(from: container, forKey: .todayDown, fallback: Int64(0))
+        lastUpdate = Self.safeDecode(from: container, forKey: .lastUpdate, fallback: Date())
+    }
+
     // 提供默认值的初始化器
     init(
         uuid: String = UUID().uuidString,
