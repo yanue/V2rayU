@@ -15,6 +15,9 @@
 		66078E352F6838E5002E64AE /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E312F6838E5002E64AE /* SleepManager.swift */; };
 		66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E322F6838E5002E64AE /* V2rayLaunch.swift */; };
 		660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AB2E2CF99600D84D5D /* CoreView.swift */; };
+		66D525032E0000010000C001 /* CoreTypeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525022E0000010000C001 /* CoreTypeSettingsView.swift */; };
+		66D525052E0000010000C001 /* CoreCapabilityRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */; };
+		66D525072E0000010000C001 /* CoreDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525062E0000010000C001 /* CoreDownloadView.swift */; };
 		660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AD2E2CF9AD00D84D5D /* DnsView.swift */; };
 		660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AF2E2CF9B700D84D5D /* PacView.swift */; };
 		66255BAC2EBF291600DC8406 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 66255BAB2EBF291600DC8406 /* FirebaseAnalytics */; };
@@ -187,6 +190,9 @@
 		66078E312F6838E5002E64AE /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66078E322F6838E5002E64AE /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		660A63AB2E2CF99600D84D5D /* CoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreView.swift; sourceTree = "<group>"; };
+		66D525022E0000010000C001 /* CoreTypeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTypeSettingsView.swift; sourceTree = "<group>"; };
+		66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreCapabilityRulesView.swift; sourceTree = "<group>"; };
+		66D525062E0000010000C001 /* CoreDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDownloadView.swift; sourceTree = "<group>"; };
 		660A63AD2E2CF9AD00D84D5D /* DnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsView.swift; sourceTree = "<group>"; };
 		660A63AF2E2CF9B700D84D5D /* PacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacView.swift; sourceTree = "<group>"; };
 		662CC3BF2D1BED9B006E8450 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -455,9 +461,20 @@
 				660A63AF2E2CF9B700D84D5D /* PacView.swift */,
 				660A63AD2E2CF9AD00D84D5D /* DnsView.swift */,
 				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
+				66D525012E0000010000C001 /* Core */,
 				666BD1E52FB374DA009FC480 /* TunView.swift */,
 			);
 			path = Setting;
+			sourceTree = "<group>";
+		};
+		66D525012E0000010000C001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				66D525022E0000010000C001 /* CoreTypeSettingsView.swift */,
+				66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */,
+				66D525062E0000010000C001 /* CoreDownloadView.swift */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 		662CC4002D1BED9B006E8450 /* Views */ = {
@@ -1031,6 +1048,9 @@
 				66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */,
 				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */,
+				66D525032E0000010000C001 /* CoreTypeSettingsView.swift in Sources */,
+				66D525052E0000010000C001 /* CoreCapabilityRulesView.swift in Sources */,
+				66D525072E0000010000C001 /* CoreDownloadView.swift in Sources */,
 				662CC4032D1BED9B006E8450 /* String+Extension.swift in Sources */,
 				662CC4052D1BED9B006E8450 /* Shell.swift in Sources */,
 				66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */,

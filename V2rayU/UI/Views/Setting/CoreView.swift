@@ -8,200 +8,64 @@
 import Foundation
 import SwiftUI
 
+enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
+    case type
+    case rules
+    case download
+
+    var id: String { rawValue }
+
+    var titleLabel: LanguageLabel {
+        switch self {
+        case .type: return .CoreTabType
+        case .rules: return .CoreTabRules
+        case .download: return .CoreTabDownload
+        }
+    }
+
+    var iconSystemName: String {
+        switch self {
+        case .type: return "slider.horizontal.3"
+        case .rules: return "checklist"
+        case .download: return "arrow.down.app"
+        }
+    }
+}
+
 struct CoreView: View {
     @StateObject private var vm = CoreViewModel()
+    @State private var selectedTab: CoreSettingTab = .type
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Core 类型设置")
-                    .font(.headline)
-                Text("Profile 选择 Auto 时会使用这里的默认核心；启动前仍会按 CoreCapabilityRules 校验。")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                LazyVGrid(columns: [GridItem(.fixed(170), alignment: .leading), GridItem(.fixed(260), alignment: .leading)], alignment: .leading, spacing: 10) {
-                    ForEach(vm.coreSelectionProtocols, id: \.self) { proto in
-                        Text(proto.rawValue)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Picker("", selection: Binding(
-                            get: { vm.coreSelection(for: proto) },
-                            set: { vm.setCoreSelection($0, for: proto) }
-                        )) {
-                            ForEach(ProfileCoreSelection.allCases) { selection in
-                                Text(selection.displayName).tag(selection)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .frame(width: 220, alignment: .leading)
-                    }
+        VStack(spacing: 0) {
+            Picker("", selection: $selectedTab) {
+                ForEach(CoreSettingTab.allCases) { tab in
+                    Label(String(localized: tab.titleLabel), systemImage: tab.iconSystemName)
+                        .tag(tab)
                 }
             }
+            .pickerStyle(.segmented)
+            .focusable(false)
+            .padding(.horizontal, 12)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(String(localized: .LocalCoreVersionDetail))
-                    .font(.headline)
-                LocalCoreFilesView(viewModel: vm)
-            }
-
-            Divider()
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text(String(localized: .CapabilityRulesSettingsTitle))
-                    .font(.headline)
-
-                Text(String(localized: .CapabilityRulesRemoteBaseURL))
-                    .font(.subheadline)
-
-                TextField(defaultCapabilityRulesBaseURL, text: $vm.capabilityRulesBaseURL)
-                    .textFieldStyle(.roundedBorder)
-                    .onSubmit {
-                        vm.saveCapabilityRulesBaseURL()
-                    }
-
-                HStack {
-                    Button(action: { vm.updateCapabilityRules() }) {
-                        Label(String(localized: .UpdateCapabilityRules), systemImage: "arrow.clockwise.circle")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(vm.isUpdatingCapabilityRules)
-
-                    Button(action: { vm.openCapabilityRulesDirectory() }) {
-                        Label(String(localized: .OpenCapabilityRulesDirectory), systemImage: "folder")
-                    }
-                    .buttonStyle(.bordered)
-
-                    Spacer()
-
-                    if vm.isUpdatingCapabilityRules {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
-                }
-
-                if let xrayStatus = vm.xrayCapabilityRulesStatus {
-                    CapabilityRulesStatusCard(item: xrayStatus)
-                }
-
-                if let singboxStatus = vm.singboxCapabilityRulesStatus {
-                    CapabilityRulesStatusCard(item: singboxStatus)
+            ZStack {
+                switch selectedTab {
+                case .type:
+                    CoreTypeSettingsView(vm: vm)
+                case .rules:
+                    CoreCapabilityRulesView(vm: vm)
+                case .download:
+                    CoreDownloadView(vm: vm)
                 }
             }
-
-            Divider()
-
-            // MARK: - Pagination Controls
-
-            HStack {
-                Text(String(localized: .AvailableVersions))
-                    .font(.headline)
-
-                Spacer()
-
-                Button(action: { vm.refresh() }) {
-                    Label(String(localized: .Refresh),
-                          systemImage: "arrow.triangle.2.circlepath")
-                }
-                .buttonStyle(.borderedProminent)
-                .focusable(false)
-                .disabled(vm.isLoading)
-
-                Button(action: { vm.goToPreviousPage() }) {
-                    Label(String(localized: .PreviousPage), systemImage: "chevron.left")
-                }
-                .disabled(vm.currentPage <= 1 || vm.isLoading)
-                .buttonStyle(.bordered)
-                .focusable(false)
-
-                Button(action: { vm.goToNextPage() }) {
-                    Label(String(localized: .NextPage), systemImage: "chevron.right")
-                }
-                .disabled(!vm.hasMorePages || vm.isLoading)
-                .buttonStyle(.bordered)
-                .focusable(false)
-            }
-            .padding(.top, 4)
-
-            // MARK: - Download Dialog
-
-            if vm.showDownloadDialog, let version = vm.selectedVersion {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Spacer()
-                        Button(action: { vm.closeDownloadDialog() }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
-                        }
-                        .buttonStyle(.plain)
-                        .focusable(false)
-                    }
-                    DownloadView(
-                        version: version,
-                        downloadedBtn: String(localized: .ReplaceCore),
-                        onDownloadSuccess: { filePath in
-                            vm.onDownloadSuccess(filePath: filePath)
-                        },
-                        onDownloadFail: { err in
-                            vm.onDownloadFail(err: err)
-                        }
-                    )
-                }
-                .padding()
-                .background()
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-            }
-
-            // MARK: - 可滚动区域（下载 + 版本列表）
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // MARK: - Available Versions
-
-                    if !vm.versions.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    ForEach(vm.versions, id: \.self) { version in
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 2) {
-                                                Text(version.tagName)
-                                                    .font(.title3)
-                                                    .fontWeight(.medium)
-                                                Text(version.formattedPublishedAt)
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
-                                            }
-                                            Spacer()
-                                            Button(action: {
-                                                vm.downloadAndReplace(version: version)
-                                            }) {
-                                                Label(String(localized: .UpdateCore), systemImage: "arrow.down.circle")
-                                            }
-                                            .disabled(vm.isLoading || vm.showDownloadDialog)
-                                            .buttonStyle(.bordered)
-                                        }
-                                        .padding(.vertical, 4)
-                                        .padding(.horizontal, 8)
-                                        .background(Color.secondary.opacity(0.08))
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .padding()
         .onAppear {
             vm.loadCoreVersions()
-            vm.fetchPage(1)
         }
         .onDisappear {
             vm.saveCapabilityRulesBaseURL()
@@ -216,6 +80,9 @@ struct CoreView: View {
     }
 }
 
+// MARK: - 共用小组件
+
+/// 能力规则状态卡片 (供"功能支持规则" tab 使用)
 struct CapabilityRulesStatusCard: View {
     let item: CoreViewModel.CapabilityRulesDisplayItem
 
@@ -224,20 +91,20 @@ struct CapabilityRulesStatusCard: View {
             Text(item.title)
                 .font(.subheadline)
                 .fontWeight(.semibold)
-            Text("\(String(localized: .CapabilityRulesSource)): \(item.source)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text("\(String(localized: .CapabilityRulesReviewedVersion)): \(item.reviewedVersion)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text("\(String(localized: .CapabilityRulesCapabilities)): \(item.capabilityCount)")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            HStack(spacing: 16) {
+                Label("\(String(localized: .CapabilityRulesSource)): \(item.source)", systemImage: "shippingbox")
+                Label("\(String(localized: .CapabilityRulesReviewedVersion)): \(item.reviewedVersion)", systemImage: "checkmark.seal")
+                Label("\(String(localized: .CapabilityRulesCapabilities)): \(item.capabilityCount)", systemImage: "list.bullet.rectangle")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
             if let path = item.path {
                 Text(path)
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .textSelection(.enabled)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
             }
         }
         .padding(10)
@@ -247,41 +114,39 @@ struct CapabilityRulesStatusCard: View {
     }
 }
 
-struct LocalCoreFilesView: View {
-    private let corePath = V2rayU.xrayCorePath
-
-    @ObservedObject var viewModel: CoreViewModel
+/// 通用本地核心文件视图: 显示文件名 + 版本 + 打开目录
+struct LocalCoreFileRow: View {
+    let title: String
+    let directory: String
+    let displayText: String
 
     var body: some View {
-        HStack {
+        HStack(spacing: 10) {
             Image(systemName: "terminal")
                 .foregroundColor(.accentColor)
-            Text(displayName)
-                .font(.system(.body, design: .monospaced))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(displayText)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundColor(.secondary)
+            }
             Spacer()
-            Button(action: { openDirectory() }) {
+            Button(action: openDirectory) {
                 Image(systemName: "folder")
             }
             .buttonStyle(.borderless)
+            .focusable(false)
+            .help(directory)
         }
-        .padding(.vertical, 4)
-    }
-
-    private var displayName: String {
-        let fileName = xrayFileName
-        let version = viewModel.xrayCoreVersion
-        return "\(fileName) (v\(version))"
-    }
-
-    private var xrayFileName: String {
-        #if arch(arm64)
-            return "xray-arm64"
-        #else
-            return "xray-64"
-        #endif
+        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .background(Color.secondary.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     private func openDirectory() {
-        NSWorkspace.shared.open(URL(fileURLWithPath: corePath))
+        NSWorkspace.shared.open(URL(fileURLWithPath: directory))
     }
 }

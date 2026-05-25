@@ -447,6 +447,33 @@ enum LanguageLabel: String, CaseIterable {
     case CapabilityRulesSource
     case CapabilityRulesReviewedVersion
     case CapabilityRulesCapabilities
+
+    // MARK: - Core Tabs / Sections (V4.x 重构)
+    case CoreTabType
+    case CoreTabRules
+    case CoreTabDownload
+    case CoreTypeSettingsSubtitle
+    case CoreRulesEmpty
+    case CoreRulesSearchPlaceholder
+    case CoreRulesFilterAll
+    case CoreRulesKind
+    case CoreRulesStatus
+    case CoreRulesNote
+    case CoreRulesAppSupport
+    case CoreRulesEvidence
+    case CapabilityKindInbound
+    case CapabilityKindOutbound
+    case CapabilityKindTransport
+    case CapabilityKindSecurity
+    case CapabilityKindAdditional
+    case CapabilityKindFlow
+    case CapabilityStatusSupported
+    case CapabilityStatusLegacy
+    case CapabilityStatusCompatibility
+    case CapabilityStatusUnsupported
+    case CapabilityStatusRemoved
+    case CapabilityStatusPendingReview
+    case CoreDownloadCurrent
     case OperationFailed
     case DownloadTimeoutError
     case DownloadSaveFailed

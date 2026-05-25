@@ -9,9 +9,11 @@ import SwiftUI
 
 struct DownloadView: View {
     @StateObject private var manager = DownloadViewModel()
-    
+
     var version: GithubRelease
     var downloadedBtn: String = String(localized: .Downloading)
+    /// 自定义 asset 选择器；默认按 xray/V2rayU 命名匹配。sing-box 等核心可传入对应匹配函数。
+    var assetResolver: (GithubRelease) -> GithubAsset = { $0.getDownloadAsset() }
     var onDownloadSuccess: (String) -> Void
     var onDownloadFail: (String) -> Void
     
@@ -117,7 +119,7 @@ struct DownloadView: View {
     }
 
     private func startDownload() {
-        let asset = version.getDownloadAsset()
+        let asset = assetResolver(version)
         logger.info("startDownload-asset: name=\(asset.name),url=\(asset.browserDownloadUrl)")
         manager.startDownload(
             from: asset.browserDownloadUrl,

@@ -43,19 +43,19 @@ struct GithubRelease: Codable, Equatable, Hashable {
         for asset in self.assets {
             logger.debug("asset: \(asset.browserDownloadUrl),")
             let lowerName = asset.browserDownloadUrl.lowercased()
-            
+
             // https://github.com/XTLS/Xray-core/releases/download/v25.10.15/Xray-macos-64.zip 需要包含·macos·
             // https://github.com/yanue/V2rayU/releases/download/v4.2.8/V2rayU-arm64.dmg
             var suffix: String = ".zip"
             var contains: String = "macos"
-            
+
             // 判断是V2rayU
-            
+
             if lowerName.contains(V2rayU.lowercased()) {
                 suffix = ".dmg"
                 contains = V2rayU.lowercased()
             }
-            
+
             // 判断
             if lowerName.hasSuffix(suffix) && lowerName.contains(contains) {
                 // GithubAsset: Xray-macos-arm64-v8a.zip -> xray-macos-arm64-v8a.zip
@@ -66,6 +66,22 @@ struct GithubRelease: Codable, Equatable, Hashable {
                 if arch != "arm64" && !lowerName.contains("arm64") {
                     return asset
                 }
+            }
+        }
+        return GithubAsset(name: "", browserDownloadUrl: "", size: 0)
+    }
+
+    /// sing-box release 资产命名: sing-box-<version>-darwin-{amd64,arm64}.tar.gz
+    func getSingboxDownloadAsset() -> GithubAsset {
+        let arch = getArch()
+        for asset in self.assets {
+            let lowerName = asset.browserDownloadUrl.lowercased()
+            guard lowerName.hasSuffix(".tar.gz"), lowerName.contains("darwin") else { continue }
+            if arch == "arm64" && lowerName.contains("arm64") {
+                return asset
+            }
+            if arch != "arm64" && (lowerName.contains("amd64") || lowerName.contains("x86_64") || lowerName.contains("-64.")) {
+                return asset
             }
         }
         return GithubAsset(name: "", browserDownloadUrl: "", size: 0)

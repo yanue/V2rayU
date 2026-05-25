@@ -77,6 +77,11 @@ sudo cp -f ./update-xray.sh "$APP_BIN_ROOT/"
 sudo chown root:wheel "$APP_BIN_ROOT/update-xray.sh"
 sudo chmod 755 "$APP_BIN_ROOT/update-xray.sh"
 
+# update-singbox.sh (sing-box 更新脚本，以 root 权限运行)
+sudo cp -f ./update-singbox.sh "$APP_BIN_ROOT/"
+sudo chown root:wheel "$APP_BIN_ROOT/update-singbox.sh"
+sudo chmod 755 "$APP_BIN_ROOT/update-singbox.sh"
+
 # update-capability-rules.sh (功能支持规则更新脚本，拉取远程 xray/sing-box 配置)
 sudo cp -f ./update-capability-rules.sh "$APP_BIN_ROOT/"
 sudo chown root:wheel "$APP_BIN_ROOT/update-capability-rules.sh"
@@ -151,6 +156,8 @@ __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
 __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
 # xray-core 更新脚本 (CoreViewModel.swift: onDownloadSuccess)
 __USERNAME__ ALL=(root) NOPASSWD: __APP_BIN_ROOT__/update-xray.sh *
+# sing-box 更新脚本 (CoreViewModel.swift: onDownloadSuccess)
+__USERNAME__ ALL=(root) NOPASSWD: __APP_BIN_ROOT__/update-singbox.sh *
 # end by V2rayU
 SUDOERS_EOF
 
