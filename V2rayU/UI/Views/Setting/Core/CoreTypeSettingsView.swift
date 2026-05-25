@@ -13,7 +13,7 @@ struct CoreTypeSettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 header
 
                 protocolMatrix
@@ -25,18 +25,19 @@ struct CoreTypeSettingsView: View {
     // MARK: - 头部
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 10) {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.title3)
-                    .foregroundColor(.accentColor)
+        HStack(spacing: 10) {
+            Image(systemName: "slider.horizontal.3")
+                .font(.title3)
+                .foregroundColor(.accentColor)
+                .frame(width: 24, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: .CoreTabType))
                     .font(.headline)
+                Text(String(localized: .CoreTypeSettingsSubtitle))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Text(String(localized: .CoreTypeSettingsSubtitle))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

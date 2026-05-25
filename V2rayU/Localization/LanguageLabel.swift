@@ -474,6 +474,7 @@ enum LanguageLabel: String, CaseIterable {
     case CapabilityStatusRemoved
     case CapabilityStatusPendingReview
     case CoreDownloadCurrent
+    case CoreDownloadSubtitle
     case OperationFailed
     case DownloadTimeoutError
     case DownloadSaveFailed

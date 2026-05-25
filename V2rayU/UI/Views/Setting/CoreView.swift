@@ -48,7 +48,7 @@ struct CoreView: View {
             .focusable(false)
             .padding(.horizontal, 12)
             .padding(.top, 12)
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
 
             Divider()
 

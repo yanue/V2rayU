@@ -17,14 +17,10 @@ struct CoreDownloadView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
-            
-            coreSwitcher
-
-            currentVersionCard
-
-            Divider()
 
             pageControls
+            
+            currentVersionCard
 
             if vm.showDownloadDialog, let version = vm.selectedVersion, vm.activeDownloadKind == coreTab {
                 downloadDialog(version: version)
@@ -42,12 +38,18 @@ struct CoreDownloadView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "arrow.down.app")
+            Image(systemName: "square.and.arrow.down")
                 .font(.title3)
                 .foregroundColor(.accentColor)
-            Text(String(localized: .CoreTabDownload))
-                .font(.headline)
-            Spacer()
+                .frame(width: 24, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(localized: .CoreTabDownload))
+                    .font(.headline)
+                Text(String(localized: .CoreDownloadSubtitle))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -61,7 +63,8 @@ struct CoreDownloadView: View {
         }
         .pickerStyle(.segmented)
         .focusable(false)
-        .padding(.vertical, 12)
+        .labelsHidden()
+        .fixedSize()
     }
 
     // MARK: - 当前版本卡片
@@ -106,22 +109,10 @@ struct CoreDownloadView: View {
 
     private var pageControls: some View {
         let ch = vm.channel(coreTab)
-        return HStack {
-            Text(String(localized: .AvailableVersions))
-                .font(.headline)
-
-            Text(String(localized: .PageIndicator, arguments: ch.currentPage))
-                .font(.caption.monospaced())
-                .foregroundColor(.secondary)
+        return HStack(spacing: 10) {
+            coreSwitcher
 
             Spacer()
-
-            Button(action: { vm.refresh(for: coreTab) }) {
-                Label(String(localized: .Refresh), systemImage: "arrow.triangle.2.circlepath")
-            }
-            .buttonStyle(.borderedProminent)
-            .focusable(false)
-            .disabled(ch.isLoading)
 
             Button(action: { vm.goToPreviousPage(for: coreTab) }) {
                 Label(String(localized: .PreviousPage), systemImage: "chevron.left")
@@ -130,17 +121,29 @@ struct CoreDownloadView: View {
             .focusable(false)
             .disabled(ch.currentPage <= 1 || ch.isLoading)
 
+            Text(String(localized: .PageIndicator, arguments: ch.currentPage))
+                .font(.caption.monospaced())
+                .foregroundColor(.secondary)
+
             Button(action: { vm.goToNextPage(for: coreTab) }) {
                 Label(String(localized: .NextPage), systemImage: "chevron.right")
             }
             .buttonStyle(.bordered)
             .focusable(false)
             .disabled(!ch.hasMorePages || ch.isLoading)
-
-            if ch.isLoading {
-                ProgressView()
-                    .controlSize(.small)
+            
+            Button(action: { vm.refresh(for: coreTab) }) {
+                if ch.isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Label(String(localized: .Refresh), systemImage: "arrow.triangle.2.circlepath")
+                }
             }
+            .buttonStyle(.borderedProminent)
+            .focusable(false)
+            .disabled(ch.isLoading)
+
         }
     }
 

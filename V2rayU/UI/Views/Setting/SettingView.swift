@@ -31,6 +31,8 @@ struct SettingView: View {
             .pickerStyle(.segmented)
             .focusable(false)
             .padding(.vertical, 12)
+            .fixedSize()
+            .labelsHidden()
 
             VStack {
                 // Content based on Selected Tab

@@ -414,8 +414,8 @@
 "CapabilityRulesSettingsTitle" = "功能支持规则";
 "CapabilityRulesRemoteBaseURL" = "远程基地址";
 "CapabilityRulesRemoteBaseURLHint" = "默认：https://raw.githubusercontent.com/yanue/V2rayU/main/Build/capability-rules";
-"UpdateCapabilityRules" = "更新功能支持规则";
-"OpenCapabilityRulesDirectory" = "打开规则目录";
+"UpdateCapabilityRules" = "更新功能规则";
+"OpenCapabilityRulesDirectory" = "规则目录";
 "CapabilityRulesUpdateSuccess" = "功能支持规则更新成功。";
 "CapabilityRulesBaseURLRequired" = "请先填写远程功能支持规则基地址。";
 "XrayCapabilityRulesStatus" = "Xray 功能支持";
@@ -453,6 +453,7 @@
 "CapabilityStatusRemoved" = "已移除";
 "CapabilityStatusPendingReview" = "待审核";
 "CoreDownloadCurrent" = "当前版本";
+"CoreDownloadSubtitle" = "浏览并下载 Xray-core 和 Sing-box 的 GitHub 版本";
 "OperationFailed" = "操作失败: %@";
 "DownloadTimeoutError" = "下载超时";
 "DownloadSaveFailed" = "保存文件失败";

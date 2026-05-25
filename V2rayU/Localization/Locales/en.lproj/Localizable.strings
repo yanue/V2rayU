@@ -420,7 +420,7 @@
 "CapabilityRulesRemoteBaseURL" = "Remote Base URL";
 "CapabilityRulesRemoteBaseURLHint" = "Default: https://raw.githubusercontent.com/yanue/V2rayU/main/Build/capability-rules";
 "UpdateCapabilityRules" = "Update Capability Rules";
-"OpenCapabilityRulesDirectory" = "Open Rules Directory";
+"OpenCapabilityRulesDirectory" = "Rules Directory";
 "CapabilityRulesUpdateSuccess" = "Capability rules updated successfully.";
 "CapabilityRulesBaseURLRequired" = "Please enter the remote capability-rules base URL first.";
 "XrayCapabilityRulesStatus" = "Xray Rules";
@@ -458,6 +458,7 @@
 "CapabilityStatusRemoved" = "Removed";
 "CapabilityStatusPendingReview" = "Pending Review";
 "CoreDownloadCurrent" = "Current";
+"CoreDownloadSubtitle" = "Browse and download Xray-core / Sing-box releases from GitHub";
 "OperationFailed" = "Operation Failed: %@";
 "DownloadTimeoutError" = "Download timed out";
 "DownloadSaveFailed" = "Failed to save file";
