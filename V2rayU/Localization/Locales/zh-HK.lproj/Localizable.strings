@@ -69,7 +69,7 @@
 "Advanced" = "進階設定";
 "PAC" = "PAC 設定";
 "DNS" = "DNS 設定";
-"Core" = "xray-core管理";
+"Core" = "core管理";
 "Tun" = "TUN 設定";
 
 // MARK: - 一般設定
@@ -399,7 +399,7 @@
 "NextPage" = "下一頁";
 "PageIndicator" = "第 %d 頁";
 "AvailableVersions" = "可用版本";
-"UpdateCore" = "更新";
+"UpdateCore" = "下載";
 "LocalCoreDirectory" = "本機 Xray Core 目錄";
 "FileDirectory" = "檔案目錄:";
 "LocalCoreVersionDetail" = "本機 Xray Core 版本詳情";
@@ -429,9 +429,9 @@
 "CapabilityRulesReviewedVersion" = "核對版本";
 "CapabilityRulesCapabilities" = "功能項";
 
-"CoreTabType" = "核心類型";
-"CoreTabRules" = "功能支援規則";
-"CoreTabDownload" = "核心下載";
+"CoreTabType" = "core類型设定";
+"CoreTabRules" = "core功能規則";
+"CoreTabDownload" = "core下載";
 "CoreTypeSettingsSubtitle" = "Profile 選擇 Auto 時將依 CoreCapabilityRules 自動決定核心，可在此設定每個協定的預設核心。";
 "CoreRulesEmpty" = "暫無可用的能力規則資料。";
 "CoreRulesSearchPlaceholder" = "搜尋功能項 / 備註";

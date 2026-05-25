@@ -70,7 +70,7 @@
 "Advanced" = "高级设置";
 "PAC" = "PAC 设置";
 "DNS" = "DNS 设置";
-"Core" = "xray-core管理";
+"Core" = "core管理";
 "Tun" = "TUN 设置";
 
 // MARK: - 通用设置
@@ -398,9 +398,9 @@
 "NextPage" = "下一页";
 "PageIndicator" = "第 %d 页";
 "AvailableVersions" = "可用版本";
-"UpdateCore" = "更新";
+"UpdateCore" = "下载";
 "LocalCoreDirectory" = "本地 Xray Core 目录";
-"FileDirectory" = "文件目录:";
+"FileDirectory" = "文件目录";
 "LocalCoreVersionDetail" = "本地 Xray Core 版本详情";
 "GithubLatestVersion" = "GitHub 最新版本";
 "DownloadAndReplace" = "下载并替换";
@@ -428,9 +428,9 @@
 "CapabilityRulesReviewedVersion" = "核对版本";
 "CapabilityRulesCapabilities" = "功能项";
 
-"CoreTabType" = "核心类型";
-"CoreTabRules" = "功能支持规则";
-"CoreTabDownload" = "核心下载";
+"CoreTabType" = "core类型设置";
+"CoreTabRules" = "core功能规则";
+"CoreTabDownload" = "core下载";
 "CoreTypeSettingsSubtitle" = "Profile 选择 Auto 时按 CoreCapabilityRules 自动决定核心，可在此设置每个协议的默认核心。";
 "CoreRulesEmpty" = "暂无可用的能力规则数据。";
 "CoreRulesSearchPlaceholder" = "搜索功能项 / 备注";

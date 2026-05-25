@@ -17,7 +17,7 @@ struct CoreDownloadView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
-
+            
             coreSwitcher
 
             currentVersionCard
@@ -61,7 +61,7 @@ struct CoreDownloadView: View {
         }
         .pickerStyle(.segmented)
         .focusable(false)
-        .frame(maxWidth: 360)
+        .padding(.vertical, 12)
     }
 
     // MARK: - 当前版本卡片

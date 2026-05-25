@@ -35,12 +35,13 @@ struct CoreCapabilityRulesView: View {
             sourceConfigSection
 
             Divider()
+            
+            coreSwitcher
 
             statusCards
 
             Divider()
 
-            coreSwitcher
 
             filterBar
 
@@ -161,7 +162,7 @@ struct CoreCapabilityRulesView: View {
             }
             .pickerStyle(.menu)
             .focusable(false)
-            .frame(maxWidth: 180)
+            .padding(.vertical, 12)
 
             Spacer()
 

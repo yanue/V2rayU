@@ -17,10 +17,6 @@ struct CoreTypeSettingsView: View {
                 header
 
                 protocolMatrix
-
-                Divider()
-
-                localCoreSection
             }
             .padding(16)
         }
