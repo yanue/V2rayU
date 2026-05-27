@@ -201,6 +201,18 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换组合配置
     func switchCombination(uuid: String) async {
+        // 点击已激活的组合配置 → 取消选择
+        if runningCombination == uuid {
+            runningCombination = ""
+            runningProfile = ""
+            runningServer = nil
+            v2rayTurnOn = false
+            await setCoreRunning(false)
+            logger.info("switchCombination-deselect: \(uuid)")
+            AppMenuManager.shared.refreshCombinedConfigItems()
+            AppMenuManager.shared.refreshServerItems()
+            return
+        }
         guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
             runningCombination = ""
             noticeTip(title: "组合配置无效", informativeText: "请检查端口、出站配置和关联的服务器是否仍然存在")
@@ -223,6 +235,17 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换配置
     func switchServer(uuid: String) async {
+        // 点击已激活的单个服务器 → 取消选择
+        if runningCombination.isEmpty && runningProfile == uuid {
+            runningProfile = ""
+            runningServer = nil
+            v2rayTurnOn = false
+            await setCoreRunning(false)
+            logger.info("switchServer-deselect: \(uuid)")
+            AppMenuManager.shared.refreshServerItems()
+            AppMenuManager.shared.refreshBasicMenus()
+            return
+        }
         runningCombination = ""
         runningProfile = uuid
         v2rayTurnOn = true

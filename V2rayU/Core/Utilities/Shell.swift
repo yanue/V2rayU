@@ -78,7 +78,7 @@ func killProcess(processIdentifier: pid_t) {
 }
 
 func killAllPing() {
-    let pskillCmd = "ps aux | grep v2ray | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
+    let pskillCmd = "ps aux | grep -E 'xray|sing-box|v2ray' | grep '.V2rayU/.config.' | awk '{print $2}' | xargs kill"
     let msg = shell(launchPath: "/bin/bash", arguments: ["-c", pskillCmd])
     logger.info("killAllPing: \(String(describing: msg))")
     let rmPingJsonCmd = "rm -f ~/.V2rayU/.config.*.json"

@@ -39,13 +39,17 @@ class CoreConfigHandler {
     }
 
     public func toJSON(item: ProfileEntity, httpPort: String) -> String {
+        toJSON(item: item, httpPort: httpPort, apiPort: nil)
+    }
+
+    public func toJSON(item: ProfileEntity, httpPort: String, apiPort: String?) -> String {
         switch item.AdaptCore() {
         case .SingBox:
             let cfg = SingboxConfigHandler()
-            return cfg.toJSON(item: item, httpPort: httpPort)
+            return cfg.toJSON(item: item, httpPort: httpPort, apiPort: apiPort)
         case .XrayCore:
             let vCfg = V2rayConfigHandler()
-            return vCfg.toJSON(item: item, httpPort: httpPort)
+            return vCfg.toJSON(item: item, httpPort: httpPort, apiPort: apiPort)
         }
     }
 

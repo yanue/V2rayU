@@ -38,8 +38,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var routingItem: NSMenuItem!
     private var routingSubMenu: NSMenu!
     private var goRoutingSettingItem: NSMenuItem!
-    private var combinationItem: NSMenuItem!
-    private var combinationSubMenu: NSMenu!
     private var goCombinationSettingItem: NSMenuItem!
     private var serverItem: NSMenuItem!
     private var serverSubMenu: NSMenu!
@@ -148,12 +146,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func refreshCombinedConfigItems() {
-        combinationSubMenu = getCombinedConfigSubMenus()
-        combinationItem.submenu = combinationSubMenu
-        let count = CombinedConfigStore.shared.fetchAll().count
-        combinationItem.title = count > 0
-            ? "\(String(localized: .CombinationList)) (\(count))"
-            : String(localized: .CombinationList)
+        refreshServerItems()
     }
 
     func refreshBasicMenus() {
@@ -172,7 +165,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         refreshBasicMenus()
         refreshServerItems()
         refreshRoutingItems()
-        refreshCombinedConfigItems()
         updateMenuTitles()
     }
 
@@ -182,7 +174,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     func loadDatabaseMenus() {
         refreshServerItems()
         refreshRoutingItems()
-        refreshCombinedConfigItems()
         // Update server count in title
         let count = ProfileStore.shared.fetchAll().count
         if count > 0 {
@@ -289,10 +280,6 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         helpItem?.title = String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))"
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
-        let combinationCount = CombinedConfigStore.shared.fetchAll().count
-        combinationItem?.title = combinationCount > 0
-            ? "\(String(localized: .CombinationList)) (\(combinationCount))"
-            : String(localized: .CombinationList)
         let serverCount = ProfileStore.shared.fetchAll().count
         serverItem?.title = serverCount > 0 ? "\(String(localized: .ServerList)) (\(serverCount))" : String(localized: .ServerList)
     }
@@ -335,15 +322,12 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // AppDatabase.shared before AppInstaller.checkInstall() has run.
         routingItem = NSMenuItem(title: String(localized: .RoutingList), action: nil, keyEquivalent: "")
         routingItem.submenu = NSMenu()
-        combinationItem = NSMenuItem(title: String(localized: .CombinationList), action: nil, keyEquivalent: "")
-        combinationItem.submenu = NSMenu()
         serverItem = NSMenuItem(title: String(localized: .ServerList), action: nil, keyEquivalent: "")
         serverItem.submenu = NSMenu()
         // 预先初始化一次
         pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
         menu.addItem(routingItem)
-        menu.addItem(combinationItem)
         menu.addItem(serverItem)
         menu.addItem(pingItem)
         // 预先初始化一次
@@ -511,6 +495,36 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         let menu = NSMenu()
 
+        // 组合配置列表放在顶部
+        let combos = CombinedConfigStore.shared.fetchAll()
+        for combo in combos {
+            let isActive = combo.uuid == AppState.shared.runningCombination
+            let comboColor = CombinationColor(rawValue: combo.colorName) ?? .blue
+            let dotImage = coloredDotImage(color: comboColor.nsColor, size: NSSize(width: 10, height: 10), filled: true)
+            let dotAttachment = NSTextAttachment()
+            dotAttachment.image = dotImage
+            dotAttachment.bounds = CGRect(x: 0, y: -2, width: 10, height: 10)
+            let indicatorText = " [\(String(localized: .CombinationIndicator))]"
+            let displayText = " \(combo.displayName)"
+            let attrStr = NSMutableAttributedString(attachment: dotAttachment)
+            attrStr.append(NSAttributedString(string: indicatorText, attributes: [.foregroundColor: comboColor.nsColor]))
+            attrStr.append(NSAttributedString(string: displayText))
+            let item = NSMenuItem(title: "", action: #selector(switchCombination), keyEquivalent: "")
+            item.attributedTitle = attrStr
+            item.representedObject = combo.uuid
+            item.isEnabled = true
+            item.target = self
+            item.state = isActive ? .on : .off
+            let groupCount = combo.groups.count
+            let profileCount = combo.groups.reduce(0) { $0 + $1.outboundProfileUUIDs.count }
+            item.toolTip = "groups: \(groupCount), profiles: \(profileCount)"
+            menu.addItem(item)
+        }
+
+        if !combos.isEmpty {
+            menu.addItem(NSMenuItem.separator())
+        }
+
         // 直接拿有序数组
         let groupedServers = ProfileStore.shared.getGroupedProfiles()
         let useGrouping = groupedServers.count >= 2
@@ -524,7 +538,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
                 groupItem.title = groupName
                 groupItem.submenu = subMenu
                 groupItem.image = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
-                groupItem.state = profiles.contains { $0.uuid == AppState.shared.runningProfile } ? .on : .off
+                groupItem.state = AppState.shared.runningCombination.isEmpty && profiles.contains { $0.uuid == AppState.shared.runningProfile } ? .on : .off
 
                 for profile in profiles {
                     let item = createServerMenuItem(profile: profile)
@@ -567,7 +581,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         item.representedObject = profile.uuid
         item.isEnabled = true
         item.target = self
-        item.state = profile.uuid == AppState.shared.runningProfile ? .on : .off
+        item.state = (AppState.shared.runningCombination.isEmpty && profile.uuid == AppState.shared.runningProfile) ? .on : .off
         item.toolTip = "\(profile.`protocol`)-\(profile.address):\(profile.port)-\(profile.uuid)"
 
         return item
@@ -835,5 +849,22 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     @objc private func terminateApp() {
         NSApp.terminate(self)
+    }
+
+    // MARK: - Helpers
+
+    private func coloredDotImage(color: NSColor, size: NSSize, filled: Bool = true) -> NSImage {
+        let image = NSImage(size: size)
+        image.lockFocus()
+        let rect = NSRect(origin: .zero, size: size)
+        if filled {
+            color.setFill()
+            NSBezierPath(ovalIn: rect).fill()
+        } else {
+            color.withAlphaComponent(0.4).setStroke()
+            NSBezierPath(ovalIn: rect).stroke()
+        }
+        image.unlockFocus()
+        return image
     }
 }

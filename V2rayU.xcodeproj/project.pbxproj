@@ -15,9 +15,6 @@
 		66078E352F6838E5002E64AE /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E312F6838E5002E64AE /* SleepManager.swift */; };
 		66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E322F6838E5002E64AE /* V2rayLaunch.swift */; };
 		660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AB2E2CF99600D84D5D /* CoreView.swift */; };
-		66D525032E0000010000C001 /* CoreTypeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525022E0000010000C001 /* CoreTypeSettingsView.swift */; };
-		66D525052E0000010000C001 /* CoreCapabilityRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */; };
-		66D525072E0000010000C001 /* CoreDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525062E0000010000C001 /* CoreDownloadView.swift */; };
 		660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AD2E2CF9AD00D84D5D /* DnsView.swift */; };
 		660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AF2E2CF9B700D84D5D /* PacView.swift */; };
 		66255BAC2EBF291600DC8406 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 66255BAB2EBF291600DC8406 /* FirebaseAnalytics */; };
@@ -123,6 +120,9 @@
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ShareQrCode.swift */; };
 		66D27AE62E098E3A004C600E /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE72E098E3A004C600E /* ExportView.swift */; };
+		66D525032E0000010000C001 /* CoreTypeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525022E0000010000C001 /* CoreTypeSettingsView.swift */; };
+		66D525052E0000010000C001 /* CoreCapabilityRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */; };
+		66D525072E0000010000C001 /* CoreDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D525062E0000010000C001 /* CoreDownloadView.swift */; };
 		66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */; };
 		66E0AF3F2E7DABC2004E44FF /* ShareWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E0AF3E2E7DABBD004E44FF /* ShareWindow.swift */; };
 		66E94B322D26B95D003745B5 /* LanguageLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E94B2F2D26B95D003745B5 /* LanguageLabel.swift */; };
@@ -190,9 +190,6 @@
 		66078E312F6838E5002E64AE /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66078E322F6838E5002E64AE /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
 		660A63AB2E2CF99600D84D5D /* CoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreView.swift; sourceTree = "<group>"; };
-		66D525022E0000010000C001 /* CoreTypeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTypeSettingsView.swift; sourceTree = "<group>"; };
-		66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreCapabilityRulesView.swift; sourceTree = "<group>"; };
-		66D525062E0000010000C001 /* CoreDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDownloadView.swift; sourceTree = "<group>"; };
 		660A63AD2E2CF9AD00D84D5D /* DnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsView.swift; sourceTree = "<group>"; };
 		660A63AF2E2CF9B700D84D5D /* PacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacView.swift; sourceTree = "<group>"; };
 		662CC3BF2D1BED9B006E8450 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -305,6 +302,9 @@
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D27AE42E098E3A004C600D /* ShareQrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrCode.swift; sourceTree = "<group>"; };
 		66D27AE72E098E3A004C600E /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		66D525022E0000010000C001 /* CoreTypeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTypeSettingsView.swift; sourceTree = "<group>"; };
+		66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreCapabilityRulesView.swift; sourceTree = "<group>"; };
+		66D525062E0000010000C001 /* CoreDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDownloadView.swift; sourceTree = "<group>"; };
 		66E0AF3C2E7DABA6004E44FF /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		66E0AF3E2E7DABBD004E44FF /* ShareWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareWindow.swift; sourceTree = "<group>"; };
 		66E94B2D2D26B95D003745B5 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
@@ -465,16 +465,6 @@
 				666BD1E52FB374DA009FC480 /* TunView.swift */,
 			);
 			path = Setting;
-			sourceTree = "<group>";
-		};
-		66D525012E0000010000C001 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				66D525022E0000010000C001 /* CoreTypeSettingsView.swift */,
-				66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */,
-				66D525062E0000010000C001 /* CoreDownloadView.swift */,
-			);
-			path = Core;
 			sourceTree = "<group>";
 		};
 		662CC4002D1BED9B006E8450 /* Views */ = {
@@ -850,6 +840,16 @@
 				6632EF562EC4C21400CED47B /* UI */,
 			);
 			path = V2rayU;
+			sourceTree = "<group>";
+		};
+		66D525012E0000010000C001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				66D525022E0000010000C001 /* CoreTypeSettingsView.swift */,
+				66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */,
+				66D525062E0000010000C001 /* CoreDownloadView.swift */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 		66E0AF3B2E7DAB79004E44FF /* Windows */ = {
@@ -1407,8 +1407,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/groue/GRDB.swift";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		660330582D11BF28009FEB56 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
@@ -1439,8 +1439,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver.git";
 			requirement = {
-				kind = exactVersion;
-				version = 2.1.1;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
 			};
 		};
 		66EB6C112E37B87200A12DB3 /* XCRemoteSwiftPackageReference "FlyingFox" */ = {

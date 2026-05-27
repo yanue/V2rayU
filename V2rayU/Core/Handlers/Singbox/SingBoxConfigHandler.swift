@@ -40,11 +40,24 @@ class SingboxConfigHandler {
 
     // ping配置
     func toJSON(item: ProfileEntity, httpPort: String) -> String {
+        toJSON(item: item, httpPort: httpPort, apiPort: nil)
+    }
+
+    // ping配置
+    func toJSON(item: ProfileEntity, httpPort: String, apiPort: String?) -> String {
         self.forPing = true
         self.httpPort = httpPort
         var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         outbound.domain_resolver = domain_resolver
         self.combine(_outbounds: [outbound])
+        if let apiPort {
+            self.singbox.experimental = ExperimentalConfig(
+                clash_api: ClashAPIConfig(
+                    external_controller: "127.0.0.1:\(apiPort)",
+                    secret: ""
+                )
+            )
+        }
         return self.singbox.toJSON()
     }
 

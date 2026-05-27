@@ -338,6 +338,33 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
 }
 
+enum CombinationColor: String, Codable, CaseIterable, Identifiable {
+    case red, orange, yellow, green, teal, blue, indigo, purple, pink, gray
+
+    var id: Self { self }
+
+    var displayName: String { rawValue.capitalized }
+
+    var nsColor: NSColor {
+        switch self {
+        case .red:     return .systemRed
+        case .orange:  return .systemOrange
+        case .yellow:  return .systemYellow
+        case .green:   return .systemGreen
+        case .teal:    return .systemTeal
+        case .blue:    return .systemBlue
+        case .indigo:  return .systemIndigo
+        case .purple:  return .systemPurple
+        case .pink:    return .systemPink
+        case .gray:    return .systemGray
+        }
+    }
+
+    var color: Color {
+        Color(nsColor)
+    }
+}
+
 enum CombinedInboundType: String, Codable, CaseIterable, Identifiable {
     case http
     case socks
@@ -365,6 +392,8 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
     var sort: Int
     var groupsJson: String
     var coreType: ProfileCoreSelection?
+    var colorName: String
+    var balancerStrategy: String
     var lastUpdate: Date
 
     var id: String { uuid }
@@ -372,7 +401,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
     static var databaseTableName: String { "combined_config" }
 
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, sort, groupsJson, coreType, lastUpdate
+        case uuid, remark, sort, groupsJson, coreType, colorName, balancerStrategy, lastUpdate
     }
 
     enum Columns {
@@ -381,6 +410,8 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
         static let sort = Column(CodingKeys.sort)
         static let groupsJson = Column(CodingKeys.groupsJson)
         static let coreType = Column(CodingKeys.coreType)
+        static let colorName = Column(CodingKeys.colorName)
+        static let balancerStrategy = Column(CodingKeys.balancerStrategy)
         static let lastUpdate = Column(CodingKeys.lastUpdate)
     }
 
@@ -390,12 +421,16 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
         sort: Int = 0,
         groups: [CombinedInboundOutboundGroup] = [CombinedInboundOutboundGroup()],
         coreType: ProfileCoreSelection? = .auto,
+        colorName: String = CombinationColor.blue.rawValue,
+        balancerStrategy: String = "roundRobin",
         lastUpdate: Date = Date()
     ) {
         self.uuid = uuid
         self.remark = remark
         self.sort = sort
         self.coreType = coreType
+        self.colorName = colorName
+        self.balancerStrategy = balancerStrategy
         self.lastUpdate = lastUpdate
         self.groupsJson = CombinedConfigEntity.encodeGroups(groups)
     }
@@ -434,6 +469,19 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
                 t.column(Columns.groupsJson.name, .text).notNull().defaults(to: "[]")
                 t.column(Columns.coreType.name, .text).defaults(to: ProfileCoreSelection.auto.rawValue)
                 t.column(Columns.lastUpdate.name, .datetime).defaults(to: "CURRENT_DATETIME")
+            }
+        }
+        migrator.registerMigration("addColorAndBalancerToCombinedConfig") { db in
+            if try !db.tableExists(databaseTableName) { return }
+            if try !db.columns(in: databaseTableName).contains(where: { $0.name == "colorName" }) {
+                try db.alter(table: databaseTableName) { t in
+                    t.add(column: Columns.colorName.name, .text).defaults(to: CombinationColor.blue.rawValue)
+                }
+            }
+            if try !db.columns(in: databaseTableName).contains(where: { $0.name == "balancerStrategy" }) {
+                try db.alter(table: databaseTableName) { t in
+                    t.add(column: Columns.balancerStrategy.name, .text).defaults(to: "roundRobin")
+                }
             }
         }
     }

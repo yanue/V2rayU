@@ -77,6 +77,49 @@ struct CombinedConfigFormView: View {
                             .textFieldStyle(.roundedBorder)
                     }
 
+                    HStack(spacing: 0) {
+                        Text("Color")
+                            .frame(width: 80, alignment: .leading)
+                        HStack(spacing: 8) {
+                            ForEach(CombinationColor.allCases) { color in
+                                Circle()
+                                    .fill(color.color)
+                                    .frame(width: 20, height: 20)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(item.colorName == color.rawValue ? Color.primary : Color.clear, lineWidth: 2)
+                                    )
+                                    .onTapGesture { item.colorName = color.rawValue }
+                            }
+                        }
+                        Spacer()
+                    }
+
+                    HStack(spacing: 0) {
+                        Text(String(localized: .Core))
+                            .frame(width: 80, alignment: .leading)
+                        Picker(selection: $item.coreType, label: EmptyView()) {
+                            Text("Auto").tag(ProfileCoreSelection?.some(.auto))
+                            Text("Xray").tag(ProfileCoreSelection?.some(.xray))
+                            Text("Sing-Box").tag(ProfileCoreSelection?.some(.singbox))
+                        }
+                        .pickerStyle(.segmented)
+                        Spacer()
+                    }
+
+                    HStack(spacing: 0) {
+                        Text("Balancer")
+                            .frame(width: 80, alignment: .leading)
+                        Picker(selection: $item.balancerStrategy, label: EmptyView()) {
+                            Text("Round Robin").tag("roundRobin")
+                            Text("Least Ping").tag("leastPing")
+                            Text("Random").tag("random")
+                            Text("Least Load").tag("leastLoad")
+                        }
+                        .pickerStyle(.menu)
+                        Spacer()
+                    }
+
                     HStack {
                         Text(String(localized: .Combinations))
                             .font(.subheadline.bold())
@@ -204,9 +247,15 @@ struct CombinedConfigFormView: View {
                 .disabled(groups.count <= 1)
             }
 
-            Text("Outbound profiles:")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            HStack {
+                Text("Outbound profiles:")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("\(profiles.count) available")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
 
             if profiles.isEmpty {
                 Text("(no profiles available)")
@@ -214,21 +263,55 @@ struct CombinedConfigFormView: View {
                     .foregroundColor(.secondary)
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 1) {
                         ForEach(profiles) { p in
-                            Toggle(isOn: outboundBinding(idx: idx, uuid: p.uuid)) {
-                                HStack(spacing: 4) {
-                                    Text(p.remark.isEmpty ? p.address : p.remark)
-                                    Text("(\(p.protocol.rawValue))")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                            HStack(spacing: 6) {
+                                Toggle(isOn: outboundBinding(idx: idx, uuid: p.uuid)) {
+                                    EmptyView()
+                                }
+                                .toggleStyle(.checkbox)
+                                .labelsHidden()
+
+                                if !p.serverRegion.isEmpty {
+                                    Text(countryCodeToEmoji(p.serverRegion))
+                                }
+
+                                Text(p.remark.isEmpty ? p.address : p.remark)
+                                    .lineLimit(1)
+
+                                Text(p.protocol.rawValue)
+                                    .font(.caption2.bold())
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1)
+                                    .background(Color.accentColor.opacity(0.8))
+                                    .cornerRadius(3)
+
+                                Text("\(p.address):\(p.port)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+
+                                Spacer(minLength: 4)
+
+                                if p.speed > 0 {
+                                    Text("[\(p.speed)ms]")
+                                        .font(.caption2)
+                                        .foregroundColor(Color(getSpeedColor(latency: Double(p.speed))))
                                 }
                             }
-                            .toggleStyle(.checkbox)
+                            .padding(.vertical, 3)
+                            .padding(.horizontal, 4)
+                            .background(
+                                groups[idx].outboundProfileUUIDs.contains(p.uuid)
+                                    ? Color.accentColor.opacity(0.06)
+                                    : Color.clear
+                            )
+                            .cornerRadius(4)
                         }
                     }
                 }
-                .frame(maxHeight: 140)
+                .frame(maxHeight: 160)
             }
         }
     }

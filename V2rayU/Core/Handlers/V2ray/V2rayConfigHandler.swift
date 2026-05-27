@@ -120,11 +120,19 @@ class V2rayConfigHandler {
 
     // ping配置
     func toJSON(item: ProfileEntity, httpPort: String) -> String {
+        toJSON(item: item, httpPort: httpPort, apiPort: nil)
+    }
+
+    // ping配置
+    func toJSON(item: ProfileEntity, httpPort: String, apiPort: String?) -> String {
         self.forPing = true
         self.enableSocks = false
         self.httpPort = String(httpPort)
         let outbound = V2rayOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         self.combine(_outbounds: [outbound])
+        if let apiPort {
+            addPingMetrics(apiPort: apiPort)
+        }
         return self.v2ray.toJSON()
     }
 
@@ -219,6 +227,33 @@ class V2rayConfigHandler {
         // ------------------------------------- routing end ----------------------------------------------
     }
 
+    private func addPingMetrics(apiPort: String) {
+        let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: apiPort, enableSniffing: false, tag: "metrics_in")
+        self.v2ray.inbounds?.append(inApi)
+
+        let outboundFreedom = V2rayOutbound()
+        outboundFreedom.protocol = .freedom
+        outboundFreedom.tag = "direct"
+        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
+        self.v2ray.outbounds?.append(outboundFreedom)
+
+        var apiRule = V2rayRoutingRule()
+        apiRule.type = "field"
+        apiRule.inboundTag = ["metrics_in"]
+        apiRule.outboundTag = "metrics_out"
+        apiRule.domain = nil
+        apiRule.ip = nil
+        self.v2ray.routing.rules = [apiRule]
+        self.v2ray.stats = V2rayStats()
+        self.v2ray.metrics = v2rayMetrics()
+        self.v2ray.policy = V2rayPolicy()
+        var observatory = V2rayObservatory()
+        observatory.subjectSelector = ["proxy"]
+        observatory.probeUrl = getLatencyTestURLString()
+        observatory.probeInterval = "1s"
+        self.v2ray.observatory = observatory
+    }
+
     func toJSON(combination resolved: CombinedConfigResolved) -> String {
         self.v2ray.log.loglevel = V2rayLogLevel(rawValue: UserDefaults.get(forKey: .v2rayLogLevel)) ?? V2rayLogLevel.info
         self.v2ray.log.access = coreLogFilePath
@@ -265,9 +300,10 @@ class V2rayConfigHandler {
                 let balancerTag = "combo-balancer-\(groupIndex)"
                 rule.outboundTag = nil
                 rule.balancerTag = balancerTag
+                let strat = resolved.combination.balancerStrategy.isEmpty ? "roundRobin" : resolved.combination.balancerStrategy
                 balancers.append(V2rayRoutingBalancer(
                     selector: outboundTags,
-                    strategy: V2rayRoutingBalancerStrategy(type: "roundRobin"),
+                    strategy: V2rayRoutingBalancerStrategy(type: strat),
                     tag: balancerTag,
                     fallbackTag: outboundTags.first
                 ))

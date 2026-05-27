@@ -70,7 +70,7 @@
 "Advanced" = "高级设置";
 "PAC" = "PAC 设置";
 "DNS" = "DNS 设置";
-"Core" = "core管理";
+"Core" = "核心";
 "Tun" = "TUN 设置";
 
 // MARK: - 通用设置
@@ -279,6 +279,7 @@
 "RoutingList" = "选择路由";
 "ServerList" = "选择服务器";
 "CombinationList" = "选择组合配置";
+"CombinationIndicator" = "组合";
 "GoSubscriptionSettings" = "订阅设置...";
 "GoRoutingSettings" = "路由设置...";
 "GoServerSettings" = "服务器配置...";

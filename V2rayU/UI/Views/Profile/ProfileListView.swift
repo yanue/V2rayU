@@ -49,7 +49,7 @@ struct ProfileListView: View {
     @State private var showRemoveDuplicatesConfirm = false
 
     private var isRunningRow: (ProfileEntity) -> Bool {
-        { $0.uuid == AppState.shared.runningProfile }
+        { AppState.shared.runningCombination.isEmpty && $0.uuid == AppState.shared.runningProfile }
     }
 
     var filteredAndSortedItems: [ProfileEntity] {

@@ -284,6 +284,7 @@
 "RoutingList" = "Select Routing";
 "ServerList" = "Select Server";
 "CombinationList" = "Select Combination";
+"CombinationIndicator" = "Combo";
 "GoSubscriptionSettings" = "Subscription Settings...";
 "GoRoutingSettings" = "Routing Settings...";
 "GoServerSettings" = "Server Settings...";

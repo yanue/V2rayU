@@ -140,6 +140,8 @@ actor PingServer {
     private var process: Process = Process()
     private var jsonFile: String = ""
     private var bindPort: UInt16 = 0
+    private var apiPort: UInt16 = 0
+    private var coreType: CoreType = .XrayCore
 
     private var serverIpCache: [String: String] = [:]
 
@@ -157,6 +159,10 @@ actor PingServer {
         }
         self.item = item
         bindPort = getRandomPort()
+        repeat {
+            apiPort = getRandomPort()
+        } while apiPort == bindPort
+        coreType = item.AdaptCore()
         jsonFile = "\(AppHomePath)/.config.\(item.uuid).json"
 
         createV2rayJsonFileForPing()
@@ -171,7 +177,7 @@ actor PingServer {
             ProfileStore.shared.updateSpeed(uuid: self.item.uuid, speed: self.item.speed)
         }
         do {
-            let pingTime = try await testLatencyByProxyPort(port: bindPort)
+            let pingTime = try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort)
             item.speed = pingTime
 
             if let serverIp = await fetchServerIp(port: bindPort), !serverIp.isEmpty {
@@ -312,7 +318,7 @@ actor PingServer {
 
     private func createV2rayJsonFileForPing() {
         let vCfg = CoreConfigHandler()
-        let jsonText = vCfg.toJSON(item: item, httpPort: String(bindPort))
+        let jsonText = vCfg.toJSON(item: item, httpPort: String(bindPort), apiPort: String(apiPort))
         do {
             try jsonText.write(to: URL(fileURLWithPath: jsonFile), atomically: true, encoding: .utf8)
         } catch {
@@ -336,7 +342,7 @@ actor PingServer {
     }
 
     private func launchProcess() async throws {
-        let corePath = item.getCoreFile()
+        let corePath = getCoreFile(mode: coreType)
         let pingCmd = "cd \(AppHomePath) && \(corePath) run -c \(jsonFile)"
         process = createProcess(command: pingCmd)
         process.launch()
@@ -345,6 +351,11 @@ actor PingServer {
         if !ready {
             terminate()
             throw NSError(domain: "PingServerError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Port \(bindPort) not ready after timeout"])
+        }
+        let apiReady = await waitForPortReady(apiPort, timeout: 2)
+        if !apiReady {
+            terminate()
+            throw NSError(domain: "PingServerError", code: -1, userInfo: [NSLocalizedDescriptionKey: "API port \(apiPort) not ready after timeout"])
         }
     }
 
@@ -479,6 +490,91 @@ actor PingRunning {
             await AppMenuManager.shared.refreshServerItems()
         }
     }
+}
+
+func testLatencyByCoreApi(coreType: CoreType, apiPort: UInt16) async throws -> Int {
+    switch coreType {
+    case .XrayCore:
+        return try await testXrayObservatoryLatency(apiPort: apiPort)
+    case .SingBox:
+        return try await testSingBoxApiLatency(apiPort: apiPort)
+    }
+}
+
+private func coreApiSessionConfiguration(timeout: TimeInterval) -> URLSessionConfiguration {
+    let configuration = URLSessionConfiguration.default
+    configuration.connectionProxyDictionary = [:]
+    configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+    configuration.urlCache = nil
+    configuration.timeoutIntervalForRequest = timeout
+    configuration.timeoutIntervalForResource = timeout
+    return configuration
+}
+
+private func testXrayObservatoryLatency(apiPort: UInt16) async throws -> Int {
+    let timeout = TimeInterval(defaultLatencyTestTimeout)
+    let deadline = Date().addingTimeInterval(timeout)
+    let configuration = coreApiSessionConfiguration(timeout: timeout)
+    let session = URLSession(configuration: configuration)
+    defer { session.finishTasksAndInvalidate() }
+
+    guard let url = URL(string: "http://127.0.0.1:\(apiPort)/debug/vars") else {
+        throw URLError(.badURL)
+    }
+
+    var lastError: Error?
+    while Date() < deadline {
+        do {
+            let (data, response) = try await session.data(for: URLRequest(url: url))
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw URLError(.badServerResponse)
+            }
+
+            let vars = try JSONDecoder().decode(V2rayMetricsVars.self, from: data)
+            if let delay = vars.observatory?["proxy"]?.delay, delay > 0 {
+                let latency = Int(delay.rounded())
+                logger.info("Xray observatory latency: \(latency)ms")
+                return latency
+            }
+        } catch {
+            lastError = error
+        }
+        try await Task.sleep(nanoseconds: 300_000_000)
+    }
+
+    throw lastError ?? NSError(domain: "PingServerError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Xray observatory latency unavailable"])
+}
+
+private func testSingBoxApiLatency(apiPort: UInt16) async throws -> Int {
+    let timeoutMs = defaultLatencyTestTimeout * 1000
+    let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+    var components = URLComponents(string: "http://127.0.0.1:\(apiPort)/proxies/proxy/delay")
+    components?.queryItems = [
+        URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
+        URLQueryItem(name: "url", value: testURL)
+    ]
+    guard let url = components?.url else {
+        throw URLError(.badURL)
+    }
+
+    let timeout = TimeInterval(defaultLatencyTestTimeout)
+    let configuration = coreApiSessionConfiguration(timeout: timeout)
+    let session = URLSession(configuration: configuration)
+    defer { session.finishTasksAndInvalidate() }
+
+    let (data, response) = try await session.data(for: URLRequest(url: url))
+    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        throw URLError(.badServerResponse)
+    }
+    guard let result = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let delay = result["delay"] as? Double,
+          delay > 0 else {
+        throw NSError(domain: "PingServerError", code: -3, userInfo: [NSLocalizedDescriptionKey: "Sing-Box delay unavailable"])
+    }
+
+    let latency = Int(delay.rounded())
+    logger.info("Sing-Box API latency: \(latency)ms")
+    return latency
 }
 
 // MARK: - Fix 7: 预热和采样共享同一个 session，确保连接池复用真正生效

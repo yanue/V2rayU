@@ -299,6 +299,7 @@ enum LanguageLabel: String, CaseIterable {
     case RoutingList
     case ServerList
     case CombinationList
+    case CombinationIndicator
     case GoSubscriptionSettings
     case GoRoutingSettings
     case GoServerSettings

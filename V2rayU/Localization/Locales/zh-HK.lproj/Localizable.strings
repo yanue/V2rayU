@@ -280,6 +280,7 @@
 "RoutingList" = "選擇路由";
 "ServerList" = "選擇伺服器";
 "CombinationList" = "選擇組合設定";
+"CombinationIndicator" = "組合";
 "GoSubscriptionSettings" = "訂閱設定...";
 "GoRoutingSettings" = "路由設定...";
 "GoServerSettings" = "伺服器設定...";

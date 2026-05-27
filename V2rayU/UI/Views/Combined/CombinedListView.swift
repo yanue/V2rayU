@@ -131,54 +131,92 @@ private struct CombinedConfigRow: View {
     let onActivate: () -> Void
     let onDelete: () -> Void
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: isRunning ? "checkmark.circle.fill" : "rectangle.stack")
-                .foregroundColor(isRunning ? .green : .secondary)
-                .font(.system(size: 16))
-                .frame(width: 22)
+    private var comboColor: Color {
+        (CombinationColor(rawValue: item.colorName) ?? .blue).color
+    }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.displayName)
-                    .font(.headline)
-                ForEach(item.groups) { group in
-                    HStack(spacing: 6) {
-                        Text(group.inboundType.rawValue.uppercased())
-                            .font(.caption2.bold())
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.accentColor.opacity(0.15))
-                            .cornerRadius(4)
-                        Text(":\(group.port)")
-                            .font(.caption.monospaced())
-                        Text("→ \(group.outboundProfileUUIDs.count) outbound(s)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+    private var coreBadge: String {
+        guard let core = item.coreType, core != .auto else { return "" }
+        return core.displayName
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // 左侧状态指示
+            if isRunning {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .font(.system(size: 14))
+                    .frame(width: 18)
+            } else {
+                Circle()
+                    .fill(comboColor)
+                    .frame(width: 10, height: 10)
+                    .frame(width: 18)
+            }
+
+            // 中间信息区
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 5) {
+                    Text(item.displayName)
+                        .font(.body)
+                        .fontWeight(.medium)
+                    if !coreBadge.isEmpty {
+                        Text(coreBadge)
+                            .font(.caption2)
+                            .foregroundColor(comboColor)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(comboColor.opacity(0.12))
+                            .cornerRadius(3)
+                    }
+                }
+                HStack(spacing: 8) {
+                    ForEach(item.groups) { group in
+                        HStack(spacing: 2) {
+                            Text(group.inboundType.rawValue.uppercased())
+                                .font(.caption2.bold())
+                            Text(":\(group.port)")
+                                .font(.caption.monospaced())
+                            Text("\(group.outboundProfileUUIDs.count)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.leading, 4)
+                        }
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(Color.secondary.opacity(0.08))
+                        .cornerRadius(3)
                     }
                 }
             }
 
-            Spacer()
+            Spacer(minLength: 8)
 
-            HStack(spacing: 6) {
+            // 右侧操作
+            HStack(spacing: 4) {
                 Button(action: onActivate) {
-                    Label(String(localized: .SetActive), systemImage: "play.circle")
+                    Label(String(localized: .SetActive), systemImage: "bolt")
+                        .font(.caption)
                 }
                 .buttonStyle(.borderless)
                 Button(action: onEdit) {
                     Label(String(localized: .Edit), systemImage: "pencil")
+                        .font(.caption)
                 }
                 .buttonStyle(.borderless)
                 Button(action: onDelete) {
                     Label(String(localized: .Delete), systemImage: "trash")
+                        .font(.caption)
                         .foregroundColor(.red)
                 }
                 .buttonStyle(.borderless)
             }
-            .labelStyle(.iconOnly)
-            .font(.system(size: 15))
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 5)
+        .padding(.horizontal, 4)
+        .background(isRunning ? comboColor.opacity(0.06) : Color.clear)
+        .cornerRadius(6)
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: onEdit)
     }
