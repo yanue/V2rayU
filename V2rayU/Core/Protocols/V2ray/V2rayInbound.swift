@@ -12,6 +12,7 @@ import Cocoa
 enum V2rayProtocolInbound: String, CaseIterable, Codable {
     case http
     case socks
+    case mixed
     case dokodemoDoor = "dokodemo-door"
     case tun
 }
@@ -28,6 +29,7 @@ struct V2rayInbound: Codable {
 
     var settingHttp: V2rayInboundHttp = V2rayInboundHttp()
     var settingSocks: V2rayInboundSocks = V2rayInboundSocks()
+    var settingMixed: V2rayInboundSocks = V2rayInboundSocks()
     var settingDokodemoDoor: V2rayInboundDokodemoDoor = V2rayInboundDokodemoDoor()
     var settingTun: V2rayInboundTun = V2rayInboundTun()
 
@@ -69,6 +71,9 @@ extension V2rayInbound {
         case .socks:
             settingSocks = try container.decode(V2rayInboundSocks.self, forKey: CodingKeys.settings)
             break
+        case .mixed:
+            settingMixed = try container.decode(V2rayInboundSocks.self, forKey: CodingKeys.settings)
+            break
         case .dokodemoDoor:
             settingDokodemoDoor = try container.decode(V2rayInboundDokodemoDoor.self, forKey: CodingKeys.settings)
             break
@@ -109,6 +114,9 @@ extension V2rayInbound {
             break
         case .socks:
             try container.encode(self.settingSocks, forKey: .settings)
+            break
+        case .mixed:
+            try container.encode(self.settingMixed, forKey: .settings)
             break
         case .dokodemoDoor:
             try container.encode(self.settingDokodemoDoor, forKey: .settings)

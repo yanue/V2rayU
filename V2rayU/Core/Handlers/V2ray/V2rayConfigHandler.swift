@@ -163,16 +163,19 @@ class V2rayConfigHandler {
         }
         // ------------------------------------- inbound start ---------------------------------------------
 
-        let useMixedInbound = self.enableMixedPort && !self.forPing && !self.enableTun
-        // check same
-        if !useMixedInbound && !self.forPing && self.httpPort == self.socksPort {
-            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun && XraySupportCatalog.isSupported(key: "inbound.mixed")
+
+        var inbounds: [V2rayInbound] = []
+        if useMixedInbound {
+            let inMixed = getInbound(protocol: .mixed, listen: self.httpHost, port: self.mixedPort, enableSniffing: self.enableSniffing, tag: "mixed-in")
+            inbounds.append(inMixed)
+        } else {
+            if !self.forPing && self.httpPort == self.socksPort {
+                self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+            }
+            let inHttp = getInbound(protocol: .http, listen: self.httpHost, port: self.httpPort , enableSniffing: self.enableSniffing, tag: "http-in")
+            inbounds.append(inHttp)
         }
-        let httpInboundPort = useMixedInbound ? self.mixedPort : self.httpPort
-        let socksInboundPort = useMixedInbound ? self.mixedPort : self.socksPort
-        let inHttp = getInbound(protocol: .http, listen: self.httpHost, port: httpInboundPort , enableSniffing: self.enableSniffing, tag: "http-in")
-        // inbounds
-        var inbounds: [V2rayInbound] = [inHttp]
         // for ping just use http
         if !self.forPing {
             if self.enableTun {
@@ -180,9 +183,12 @@ class V2rayConfigHandler {
                 inbounds.append(inTun)
                 let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
                 inbounds.append(inApi)
-            } else {
-                let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: socksInboundPort , enableSniffing: self.enableSniffing, tag: "socks-in")
+            } else if !useMixedInbound {
+                let inSocks = getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort , enableSniffing: self.enableSniffing, tag: "socks-in")
                 inbounds.append(inSocks)
+                let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
+                inbounds.append(inApi)
+            } else {
                 let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
                 inbounds.append(inApi)
             }
@@ -317,15 +323,16 @@ class V2rayConfigHandler {
             outbounds.append(proxyFallback)
         }
 
-        // Add default SOCKS/HTTP proxy inbounds
-        let useMixedInbound = self.enableMixedPort
-        if !useMixedInbound && self.httpPort == self.socksPort {
-            self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+        // Add default proxy inbounds
+        if self.enableMixedPort && XraySupportCatalog.isSupported(key: "inbound.mixed") {
+            inbounds.append(getInbound(protocol: .mixed, listen: self.httpHost, port: self.mixedPort, enableSniffing: enableSniffing, tag: "mixed-in"))
+        } else {
+            if self.httpPort == self.socksPort {
+                self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)
+            }
+            inbounds.append(getInbound(protocol: .http, listen: self.httpHost, port: self.httpPort, enableSniffing: enableSniffing, tag: "http-in"))
+            inbounds.append(getInbound(protocol: .socks, listen: self.socksHost, port: self.socksPort, enableSniffing: enableSniffing, tag: "socks-in"))
         }
-        let httpInboundPort = useMixedInbound ? self.mixedPort : self.httpPort
-        let socksInboundPort = useMixedInbound ? self.mixedPort : self.socksPort
-        inbounds.append(getInbound(protocol: .http, listen: self.httpHost, port: httpInboundPort, enableSniffing: enableSniffing, tag: "http-in"))
-        inbounds.append(getInbound(protocol: .socks, listen: self.socksHost, port: socksInboundPort, enableSniffing: enableSniffing, tag: "socks-in"))
 
         let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: coreApiPort, enableSniffing: false, tag: "metrics_in")
         inbounds.append(inApi)

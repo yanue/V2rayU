@@ -24,6 +24,16 @@
       }
     },
     {
+      "key": "inbound.mixed",
+      "display_name": "Mixed (HTTP+SOCKS) inbound",
+      "kind": "Inbound",
+      "rule": {
+        "type": "supported",
+        "legacy_min": "1.8.24",
+        "note": "Xray-core 已支持 mixed 入站协议类型，可同时处理 HTTP 和 SOCKS5 连接。"
+      }
+    },
+    {
       "key": "inbound.shadowsocks",
       "display_name": "Shadowsocks inbound",
       "kind": "Inbound",

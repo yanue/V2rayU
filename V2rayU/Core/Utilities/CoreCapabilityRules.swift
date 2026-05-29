@@ -466,6 +466,8 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "inbound.hysteria", displayName: "Hysteria inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/hysteria.html"),
         XrayCapabilityDefinition(key: "inbound.tun", displayName: "TUN inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/tun.html"),
 
+        XrayCapabilityDefinition(key: "inbound.mixed", displayName: "Mixed (HTTP+SOCKS) inbound", kind: .inboundProtocol, rule: .supported(note: "Xray-core 已支持 mixed 入站协议类型，可同时处理 HTTP 和 SOCKS5 连接。", legacyMin: XrayVersion(1, 8, 24)), docsPath: nil),
+
         // MARK: Outbound protocols
         XrayCapabilityDefinition(key: "outbound.blackhole", displayName: "Blackhole outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/blackhole.html"),
         XrayCapabilityDefinition(key: "outbound.dns", displayName: "DNS outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/dns.html"),
@@ -541,6 +543,13 @@ enum XraySupportCatalog {
 
     static func definitions(for kind: XrayCapabilityKind) -> [XrayCapabilityDefinition] {
         allCapabilities().filter { $0.kind == kind }
+    }
+
+    /// Check whether a specific capability is supported by the current core version
+    static func isSupported(key: String) -> Bool {
+        guard let definition = capability(forKey: key) else { return true }
+        let version = XrayCompatibilityResolver.currentVersion()
+        return evaluate(definition: definition, version: version) == nil
     }
 
     static func definition(forOutbound protocol: V2rayProtocolOutbound) -> XrayCapabilityDefinition? {
