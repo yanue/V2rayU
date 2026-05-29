@@ -14,6 +14,7 @@
 		66078E342F6838E5002E64AE /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E302F6838E5002E64AE /* LaunchAgent.swift */; };
 		66078E352F6838E5002E64AE /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E312F6838E5002E64AE /* SleepManager.swift */; };
 		66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E322F6838E5002E64AE /* V2rayLaunch.swift */; };
+		66078E382F6838E5002E64AE /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66078E372F6838E5002E64AE /* NetworkMonitor.swift */; };
 		660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AB2E2CF99600D84D5D /* CoreView.swift */; };
 		660A63AE2E2CF9B000D84D5D /* DnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AD2E2CF9AD00D84D5D /* DnsView.swift */; };
 		660A63B02E2CF9CD00D84D5D /* PacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660A63AF2E2CF9B700D84D5D /* PacView.swift */; };
@@ -189,6 +190,7 @@
 		66078E302F6838E5002E64AE /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
 		66078E312F6838E5002E64AE /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		66078E322F6838E5002E64AE /* V2rayLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayLaunch.swift; sourceTree = "<group>"; };
+		66078E372F6838E5002E64AE /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		660A63AB2E2CF99600D84D5D /* CoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreView.swift; sourceTree = "<group>"; };
 		660A63AD2E2CF9AD00D84D5D /* DnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsView.swift; sourceTree = "<group>"; };
 		660A63AF2E2CF9B700D84D5D /* PacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacView.swift; sourceTree = "<group>"; };
@@ -633,6 +635,7 @@
 				667464172F0E7FD800D3D1E9 /* Singbox */,
 				6632EF5D2EC4C50A00CED47B /* V2ray */,
 				66078E312F6838E5002E64AE /* SleepManager.swift */,
+				66078E372F6838E5002E64AE /* NetworkMonitor.swift */,
 				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
 				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
 				66078E2F2F6838E5002E64AE /* AppInstaller.swift */,
@@ -1046,6 +1049,7 @@
 				66078E342F6838E5002E64AE /* LaunchAgent.swift in Sources */,
 				66078E352F6838E5002E64AE /* SleepManager.swift in Sources */,
 				66078E362F6838E5002E64AE /* V2rayLaunch.swift in Sources */,
+				66078E382F6838E5002E64AE /* NetworkMonitor.swift in Sources */,
 				662CC4482D1C4CE9006E8450 /* ShareHandler.swift in Sources */,
 				660A63AC2E2CF9A600D84D5D /* CoreView.swift in Sources */,
 				66D525032E0000010000C001 /* CoreTypeSettingsView.swift in Sources */,

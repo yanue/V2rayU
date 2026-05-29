@@ -36,6 +36,30 @@ struct TunView: View {
                 }
             }
 
+            HStack {
+                Toggle(isOn: $settings.tunStrictRoute) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("强制路由 (strict_route)")
+                        Text("默认开启。网络切换后偶发断网时可尝试关闭")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+            }
+
+            HStack {
+                Toggle(isOn: $settings.tunAutoRebuild) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("网络变化后自动重建 TUN")
+                        Text("切换 Wi-Fi / 唤醒后自动重建隧道，避免路由失效导致断网")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+            }
+
             Divider()
 
             Text(String(localized: .DNS))

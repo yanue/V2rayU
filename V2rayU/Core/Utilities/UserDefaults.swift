@@ -92,6 +92,10 @@ extension UserDefaults {
         case tunDnsChina
         // tun fakeip range
         case tunFakeipRange
+        // tun strict_route (强制路由), 默认开启; 网络切换异常时可关闭
+        case tunStrictRoute
+        // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
+        case tunAutoRebuild
 
         // sing-box dns json config
         case dnsJsonSingbox

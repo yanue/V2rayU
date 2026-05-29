@@ -70,6 +70,10 @@ final class AppSettings: ObservableObject {
     @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
     @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
     @Published var tunFakeipRange: String = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
+    // strict_route: 强制路由, 默认开启
+    @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+    // 网络变化/唤醒后自动重建 TUN, 默认开启
+    @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
 
     init() {
         if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
@@ -139,6 +143,8 @@ final class AppSettings: ObservableObject {
         tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
         tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
+        tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+        tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
     }
 
     func saveSettings() {
@@ -199,6 +205,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunDnsDefault, value: tunDnsDefault)
         UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
         UserDefaults.set(forKey: .tunFakeipRange, value: tunFakeipRange)
+        UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
+        UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
     }
 
     func handleChange(old: AppSettings) {
@@ -227,7 +235,8 @@ final class AppSettings: ObservableObject {
             old.tunStack != tunStack ||
             old.tunDnsDefault != tunDnsDefault ||
             old.tunDnsChina != tunDnsChina ||
-            old.tunFakeipRange != tunFakeipRange {
+            old.tunFakeipRange != tunFakeipRange ||
+            old.tunStrictRoute != tunStrictRoute {
             needRestartV2ray = true
         }
 

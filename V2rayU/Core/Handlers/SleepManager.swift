@@ -39,19 +39,33 @@ actor SystemSleepManager {
         }
     }
     
-    private func handleSystemWillSleep() {
+    private func handleSystemWillSleep() async {
         // 系统即将睡眠时的处理逻辑
-        // 例如：保存数据、关闭连接、暂停任务等
+        // TUN 模式下主动停掉 tun-helper, 避免休眠期间 utun 设备 / 系统路由表残留为"脏"状态,
+        // 唤醒后由 didWake 干净重建。
+        let turnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
+        let mode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .tun)
+        if turnOn && mode == .tun {
+            logger.info("willSleep: stop tun-helper to avoid stale route on wake")
+            await LaunchAgent.shared.stopTunHelper()
+        }
     }
     
     private func handleSystemDidWake() {
         // 系统唤醒后的处理逻辑
-        // 例如：重新建立连接、恢复任务、刷新数据等
         logger.info("onWakeNote")
         if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            logger.info("V2rayLaunch restart")
+            logger.info("V2rayLaunch rebuild after wake")
             Task {
-               await V2rayLaunch.shared.restart()
+                // 不直接 restart: 唤醒瞬间 Wi-Fi 仍在重连/DHCP, 过早重启会导致接口探测失败。
+                // rebuildAfterNetworkChange 内部会等待物理网络就绪后再重建(TUN 模式),
+                // 非 TUN 模式则回退为普通重启。
+                let mode = await MainActor.run { AppState.shared.runMode }
+                if mode == .tun {
+                    await V2rayLaunch.shared.rebuildAfterNetworkChange(reason: "system wake")
+                } else {
+                    await V2rayLaunch.shared.restart()
+                }
             }
         }
         if UserDefaults.getBool(forKey: .autoCheckVersion) {

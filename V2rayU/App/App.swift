@@ -54,6 +54,8 @@ struct V2rayUApp: App {
 
 /// AppDelegate - 应用
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private var isTerminating = false
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         logger.info("Application did finish launching.")
         FirebaseCore.FirebaseApp.configure()
@@ -68,6 +70,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             await AppInstaller.shared.checkInstall()
             // 初始化睡眠管理器
             await SystemSleepManager.shared.setup()
+            // 初始化网络变化监听(切换 Wi-Fi/网络中断恢复时自动重建 TUN)
+            await NetworkMonitor.shared.start()
             // 启动设置(内部会初始化默认路由、同步状态并一次性刷新所有菜单)
             AppState.shared.appDidLaunch()
 
@@ -85,19 +89,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         logger.info("applicationShouldTerminate")
 
+        guard !isTerminating else {
+            return .terminateNow
+        }
+        isTerminating = true
+
         // 停止所有快捷键监听
         KeyboardShortcuts.removeAllHandlers()
 
-        // 停止 V2ray
-        Task{
+        // 停止 V2ray / TUN helper 后再允许退出，避免 root tun-helper 残留导致系统路由黑洞
+        Task {
             await V2rayLaunch.shared.stop()
+            // 终止 V2ray 进程
+            killSelfV2ray()
+            logger.info("applicationShouldTerminate end")
+            NSApp.reply(toApplicationShouldTerminate: true)
         }
 
-        // 终止 V2ray 进程
-        killSelfV2ray()
-
-        logger.info("applicationShouldTerminate end")
-        return .terminateNow
+        return .terminateLater
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

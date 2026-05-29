@@ -197,12 +197,14 @@ class SingboxConfigHandler {
             let tunAddr = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
             let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
             let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
+            // strict_route 可配置: 默认开启; 部分网络切换场景下可关闭以降低"锁死"风险
+            let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
             let tunInbound = SingboxInbound(
                 type: "tun",
                 tag: "tun-in",
                 address: [tunAddr],
                 auto_route: true,
-                strict_route: true,
+                strict_route: tunStrictRoute,
                 mtu: tunMtu,
                 stack: tunStack.rawValue,
                 sniff: true,

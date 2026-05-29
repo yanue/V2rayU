@@ -8,6 +8,7 @@
 
 import Cocoa
 import SystemConfiguration
+import Network
 
 enum RunMode: String, CaseIterable {
     case global
@@ -46,6 +47,9 @@ enum RunMode: String, CaseIterable {
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
     var lastCore: CoreType?
+    private var rebuildInProgress = false
+    private var lastRebuildAt: Date?
+    private let minRebuildInterval: TimeInterval = 8
 
     func restart() async {
         let _ = await start()
@@ -101,6 +105,15 @@ actor V2rayLaunch {
             return false
         }
         let mode = await AppState.shared.runMode
+        if mode == .tun {
+            let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
+            guard socksReady else {
+                logger.error("start aborted: SOCKS port is not ready before starting TUN")
+                noticeTip(title: "启动失败", informativeText: "SOCKS 端口未就绪，未启动 TUN 服务")
+                await LaunchAgent.shared.stopAgent()
+                return false
+            }
+        }
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
         Task {
@@ -119,6 +132,8 @@ actor V2rayLaunch {
             let tunStarted = await LaunchAgent.shared.startTunHelper()
             if !tunStarted {
                 noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
                 return false
             }
             logger.info("start tun-helper ok")
@@ -178,6 +193,15 @@ actor V2rayLaunch {
             return false
         }
         let mode = await AppState.shared.runMode
+        if mode == .tun {
+            let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
+            guard socksReady else {
+                logger.error("start combined config aborted: SOCKS port is not ready before starting TUN")
+                noticeTip(title: "启动失败", informativeText: "SOCKS 端口未就绪，未启动 TUN 服务")
+                await LaunchAgent.shared.stopAgent()
+                return false
+            }
+        }
         setSystemProxy(mode: mode)
         logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
         Task {
@@ -196,6 +220,8 @@ actor V2rayLaunch {
             let tunStarted = await LaunchAgent.shared.startTunHelper()
             if !tunStarted {
                 noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
                 return false
             }
             logger.info("start tun-helper ok")
@@ -216,6 +242,133 @@ actor V2rayLaunch {
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
         setSystemProxy(mode: nil)
+    }
+
+    private func waitForLocalTCPReady(port: UInt16, timeout: TimeInterval) async -> Bool {
+        guard port > 0 else { return false }
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if await TCPConnectivity.canConnect(host: "127.0.0.1", port: port, timeout: 0.8) {
+                return true
+            }
+            try? await Task.sleep(nanoseconds: 300_000_000)
+        }
+        return false
+    }
+
+    private func currentDefaultRoute() -> (gateway: String?, interface: String?) {
+        do {
+            let output = try runCommand(at: "/sbin/route", with: ["-n", "get", "default"])
+            var gateway: String?
+            var interface: String?
+            for line in output.components(separatedBy: .newlines) {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.hasPrefix("gateway:") {
+                    gateway = trimmed.replacingOccurrences(of: "gateway:", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                } else if trimmed.hasPrefix("interface:") {
+                    interface = trimmed.replacingOccurrences(of: "interface:", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+            }
+            return (gateway, interface)
+        } catch {
+            logger.info("currentDefaultRoute failed: \(error)")
+            return (nil, nil)
+        }
+    }
+
+    private func hasPhysicalDefaultRoute() -> Bool {
+        let route = currentDefaultRoute()
+        guard let interface = route.interface, !interface.isEmpty else { return false }
+        // TUN/loopback 默认路由说明还未回到物理网络，不能据此重建 TUN。
+        if interface.hasPrefix("utun") || interface == "lo0" || interface.hasPrefix("lo") {
+            logger.info("physical route not ready: default interface=\(interface), gateway=\(route.gateway ?? "")")
+            return false
+        }
+        logger.info("physical route ready: interface=\(interface), gateway=\(route.gateway ?? "")")
+        return true
+    }
+
+    /// 等待物理网络就绪（接口可用），用于唤醒/换网后避免过早重启导致接口探测失败。
+    /// 同时要求默认路由回到非 utun/loopback 接口，避免旧 TUN 路由让 NWPathMonitor 误报 satisfied。
+    /// - Parameter timeout: 最长等待时间，超时也返回（由调用方决定是否继续重启）
+    /// - Returns: true 表示在超时前网络已就绪
+    func waitForNetworkReady(timeout: TimeInterval = 15) async -> Bool {
+        let ready = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
+            let monitor = NWPathMonitor()
+            let flag = ResumeFlag()
+            monitor.pathUpdateHandler = { path in
+                if path.status == .satisfied {
+                    Task {
+                        await flag.tryResumeBool(cont, result: true)
+                        monitor.cancel()
+                    }
+                }
+            }
+            monitor.start(queue: DispatchQueue(label: "net.yanue.V2rayU.networkReady"))
+            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
+                Task {
+                    await flag.tryResumeBool(cont, result: false)
+                    monitor.cancel()
+                }
+            }
+        }
+        guard ready else { return false }
+
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if hasPhysicalDefaultRoute() {
+                // 网络刚就绪时路由/DHCP 可能仍在收敛，额外等待一小段时间再确认一次
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                return hasPhysicalDefaultRoute()
+            }
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
+        return false
+    }
+
+    /// 网络变化/唤醒后安全重建（仅在 TUN 模式且已开启时）。
+    /// 先等待物理网络就绪，再走完整 restart()（重建 core + tun + 系统代理），
+    /// 确保不会在内核未就绪时让 TUN 抢占路由形成黑洞。
+    func rebuildAfterNetworkChange(reason: String) async {
+        if rebuildInProgress {
+            logger.info("rebuildAfterNetworkChange skip: rebuild already in progress (\(reason))")
+            return
+        }
+        if let lastRebuildAt = lastRebuildAt, Date().timeIntervalSince(lastRebuildAt) < minRebuildInterval {
+            logger.info("rebuildAfterNetworkChange skip: too soon after previous rebuild (\(reason))")
+            return
+        }
+
+        let (turnOn, mode) = await MainActor.run { (AppState.shared.v2rayTurnOn, AppState.shared.runMode) }
+        guard turnOn else {
+            logger.info("rebuildAfterNetworkChange skip: not running (\(reason))")
+            return
+        }
+        guard mode == .tun else {
+            logger.info("rebuildAfterNetworkChange skip: mode=\(mode.rawValue) (\(reason))")
+            return
+        }
+        guard UserDefaults.getBool(forKey: .tunAutoRebuild, default: true) else {
+            logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
+            return
+        }
+
+        rebuildInProgress = true
+        defer { rebuildInProgress = false }
+
+        logger.info("rebuildAfterNetworkChange: \(reason), stopping stale TUN before waiting for network...")
+        await LaunchAgent.shared.stopTunHelper()
+
+        logger.info("rebuildAfterNetworkChange: \(reason), waiting for network...")
+        let ready = await waitForNetworkReady()
+        guard ready else {
+            logger.info("rebuildAfterNetworkChange: network not ready, skip restart (\(reason))")
+            return
+        }
+
+        logger.info("rebuildAfterNetworkChange: network ready=\(ready), restarting (\(reason))")
+        await restart()
+        lastRebuildAt = Date()
     }
 
     private func createJsonFile(item: ProfileEntity) {

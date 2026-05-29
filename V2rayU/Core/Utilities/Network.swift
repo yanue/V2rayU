@@ -27,6 +27,14 @@ actor ResumeFlag {
             conn.cancel()
         }
     }
+
+    /// 一次性恢复（无需 NWConnection 资源），用于纯状态等待（如 NWPathMonitor）
+    func tryResumeBool(_ cont: CheckedContinuation<Bool, Never>, result: Bool) {
+        if !resumed {
+            resumed = true
+            cont.resume(returning: result)
+        }
+    }
 }
 
 /// 网络连通性检查工具
