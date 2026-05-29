@@ -12,16 +12,52 @@ import SwiftUI
 
 struct CombinedConfigListView: View {
     @StateObject private var viewModel = CombinedConfigViewModel()
+    @State private var sortOrder: [KeyPathComparator<CombinedConfigEntity>] = []
+    @State private var searchText = ""
     @State private var editingItem: CombinedConfigEntity?
     @State private var pendingDeleteUUID: String?
     @State private var showDeleteConfirm = false
 
-    private func isRunning(_ item: CombinedConfigEntity) -> Bool {
-        item.uuid == AppState.shared.runningCombination
+    private var isRunningRow: (CombinedConfigEntity) -> Bool {
+        { $0.uuid == AppState.shared.runningCombination }
+    }
+
+    private var filteredAndSortedItems: [CombinedConfigEntity] {
+        let filteredItems: [CombinedConfigEntity]
+        if searchText.isEmpty {
+            filteredItems = viewModel.list
+        } else {
+            filteredItems = viewModel.list.filter { item in
+                item.remark.lowercased().contains(searchText.lowercased())
+            }
+        }
+        guard !sortOrder.isEmpty else { return filteredItems }
+        return filteredItems.sorted(using: sortOrder)
+    }
+
+    private func comboColor(_ item: CombinedConfigEntity) -> Color {
+        (CombinationColor(rawValue: item.colorName) ?? .blue).color
+    }
+
+    private func coreBadge(_ item: CombinedConfigEntity) -> String {
+        guard let core = item.coreType, core != .auto else { return "" }
+        return core.displayName
+    }
+
+    private func strategyLabel(_ strategy: String) -> String {
+        guard !strategy.isEmpty else { return "roundRobin" }
+        return strategy
+    }
+
+    private func inboundSummary(_ item: CombinedConfigEntity) -> String {
+        item.groups.map { group in
+            "\(group.inboundType.rawValue.uppercased()):\(group.port)(\(group.outboundProfileUUIDs.count))"
+        }
+        .joined(separator: ", ")
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             PageHeader(
                 icon: "rectangle.stack.badge.person.crop",
                 title: localizedString(.Combinations),
@@ -44,6 +80,35 @@ struct CombinedConfigListView: View {
                 }
             }
 
+            // Search bar
+            HStack(spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 13))
+                    TextField(String(localized: .SearchTip), text: $searchText)
+                        .textFieldStyle(.plain)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color(NSColor.controlBackgroundColor))
+                .cornerRadius(6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                )
+                .frame(width: 200)
+
+                Spacer()
+
+                // Summary stats
+                Text("共 \(viewModel.list.count) 个组合")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.bottom, 6)
+
             // Default ports & current node
             HStack(spacing: 12) {
                 Label("SOCKS:\(getSocksProxyPort())", systemImage: "rectangle.connected.to.line.below")
@@ -63,6 +128,7 @@ struct CombinedConfigListView: View {
             .padding(.vertical, 6)
             .background(Color.secondary.opacity(0.06))
             .cornerRadius(6)
+            .padding(.horizontal, 8)
 
             if viewModel.list.isEmpty {
                 Spacer()
@@ -76,23 +142,9 @@ struct CombinedConfigListView: View {
                 }
                 Spacer()
             } else {
-                List {
-                    ForEach(viewModel.list) { item in
-                        CombinedConfigRow(
-                            item: item,
-                            isRunning: isRunning(item),
-                            onEdit: { editingItem = item },
-                            onActivate: {
-                                Task { await AppState.shared.switchCombination(uuid: item.uuid) }
-                            },
-                            onDelete: {
-                                pendingDeleteUUID = item.uuid
-                                showDeleteConfirm = true
-                            }
-                        )
-                    }
-                }
-                .listStyle(.inset)
+                tableView
+                    .padding(.horizontal, 8)
+                    .padding(.top, 4)
             }
         }
         .padding(8)
@@ -122,102 +174,159 @@ struct CombinedConfigListView: View {
         }
         .task { viewModel.getList() }
     }
-}
 
-private struct CombinedConfigRow: View {
-    let item: CombinedConfigEntity
-    let isRunning: Bool
-    let onEdit: () -> Void
-    let onActivate: () -> Void
-    let onDelete: () -> Void
-
-    private var comboColor: Color {
-        (CombinationColor(rawValue: item.colorName) ?? .blue).color
-    }
-
-    private var coreBadge: String {
-        guard let core = item.coreType, core != .auto else { return "" }
-        return core.displayName
-    }
-
-    var body: some View {
-        HStack(spacing: 10) {
-            // 左侧状态指示
-            if isRunning {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-                    .font(.system(size: 14))
-                    .frame(width: 18)
-            } else {
-                Circle()
-                    .fill(comboColor)
-                    .frame(width: 10, height: 10)
-                    .frame(width: 18)
-            }
-
-            // 中间信息区
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 5) {
-                    Text(item.displayName)
-                        .font(.body)
-                        .fontWeight(.medium)
-                    if !coreBadge.isEmpty {
-                        Text(coreBadge)
-                            .font(.caption2)
-                            .foregroundColor(comboColor)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(comboColor.opacity(0.12))
-                            .cornerRadius(3)
+    @ViewBuilder
+    private func contextMenuProvider(item: CombinedConfigEntity) -> some View {
+        let isRunning = isRunningRow(item)
+        Group {
+            Button {
+                performAfterMenuDismiss {
+                    Task {
+                        await AppState.shared.switchCombination(uuid: item.uuid)
+                        viewModel.getList()
                     }
                 }
-                HStack(spacing: 8) {
-                    ForEach(item.groups) { group in
-                        HStack(spacing: 2) {
-                            Text(group.inboundType.rawValue.uppercased())
-                                .font(.caption2.bold())
-                            Text(":\(group.port)")
-                                .font(.caption.monospaced())
-                            Text("\(group.outboundProfileUUIDs.count)")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .padding(.leading, 4)
-                        }
+            } label: {
+                Label(isRunning ? "Deactivate" : String(localized: .SetActive),
+                      systemImage: isRunning ? "stop.circle" : "bolt")
+            }
+            .focusable(false)
+
+            Divider()
+
+            Button {
+                performAfterMenuDismiss {
+                    editingItem = item
+                }
+            } label: {
+                Label(String(localized: .Edit), systemImage: "pencil")
+            }
+            .focusable(false)
+
+            Button {
+                performAfterMenuDismiss {
+                    pendingDeleteUUID = item.uuid
+                    showDeleteConfirm = true
+                }
+            } label: {
+                Label(String(localized: .Delete), systemImage: "trash")
+                    .foregroundColor(.red)
+            }
+            .focusable(false)
+        }
+    }
+
+    private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
+        DispatchQueue.main.async(execute: action)
+    }
+
+    private var tableView: some View {
+        Table(of: CombinedConfigEntity.self, sortOrder: $sortOrder) {
+            TableColumn("#") { (row: CombinedConfigEntity) in
+                HStack(spacing: 4) {
+                    if isRunningRow(row) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.system(size: 13))
+                    } else if let idx = viewModel.list.firstIndex(where: { $0.uuid == row.uuid }) {
+                        Text("\(idx + 1)")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .width(28)
+
+            TableColumn(String(localized: .TableFieldSort)) { (row: CombinedConfigEntity) in
+                HStack(spacing: 5) {
+                    if isRunningRow(row) {
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundColor(.green)
+                    } else {
+                        Image(systemName: "line.3.horizontal")
+                    }
+                }
+                .contentShape(Rectangle())
+                .draggable(row)
+                .onHover { inside in
+                    if inside { NSCursor.openHand.push() } else { NSCursor.pop() }
+                }
+            }
+            .width(26)
+
+            TableColumn(String(localized: .TableFieldRemark)) { (row: CombinedConfigEntity) in
+                HStack(spacing: 4) {
+                    if isRunningRow(row) {
+                        Image(systemName: "square.and.pencil")
+                            .foregroundColor(.green)
+                            .font(.system(size: 13))
+                        Text(row.displayName)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.green)
+                    } else {
+                        Image(systemName: "square.and.pencil")
+                        Text(row.displayName)
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture { editingItem = row }
+                .onHover { inside in
+                    if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                }
+            }
+            .width(min: 120, max: 300)
+
+            TableColumn("Color") { (row: CombinedConfigEntity) in
+                Circle()
+                    .fill(comboColor(row))
+                    .frame(width: 10, height: 10)
+            }
+            .width(36)
+
+            TableColumn("Core") { (row: CombinedConfigEntity) in
+                let badge = coreBadge(row)
+                if !badge.isEmpty {
+                    Text(badge)
+                        .font(.caption2)
+                        .foregroundColor(comboColor(row))
                         .padding(.horizontal, 5)
                         .padding(.vertical, 1)
-                        .background(Color.secondary.opacity(0.08))
+                        .background(comboColor(row).opacity(0.12))
                         .cornerRadius(3)
-                    }
                 }
             }
+            .width(60)
 
-            Spacer(minLength: 8)
-
-            // 右侧操作
-            HStack(spacing: 4) {
-                Button(action: onActivate) {
-                    Label(String(localized: .SetActive), systemImage: "bolt")
-                        .font(.caption)
-                }
-                .buttonStyle(.borderless)
-                Button(action: onEdit) {
-                    Label(String(localized: .Edit), systemImage: "pencil")
-                        .font(.caption)
-                }
-                .buttonStyle(.borderless)
-                Button(action: onDelete) {
-                    Label(String(localized: .Delete), systemImage: "trash")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
-                .buttonStyle(.borderless)
+            TableColumn("Combinations") { (row: CombinedConfigEntity) in
+                Text(inboundSummary(row))
+                    .font(.caption.monospaced())
             }
+            .width(min: 100, max: 200)
+
+            TableColumn("Strategy") { (row: CombinedConfigEntity) in
+                Text(strategyLabel(row.balancerStrategy))
+                    .font(.caption)
+            }
+            .width(70)
+        } rows: {
+            ForEach(filteredAndSortedItems) { row in
+                TableRow(row)
+                    .draggable(row)
+                    .contextMenu { contextMenuProvider(item: row) }
+            }
+            .dropDestination(for: CombinedConfigEntity.self, action: handleDrop)
         }
-        .padding(.vertical, 5)
-        .padding(.horizontal, 4)
-        .background(isRunning ? comboColor.opacity(0.06) : Color.clear)
-        .cornerRadius(6)
-        .contentShape(Rectangle())
-        .onTapGesture(count: 2, perform: onEdit)
+    }
+
+    func handleDrop(index: Int, rows: [CombinedConfigEntity]) {
+        guard let firstRow = rows.first,
+              let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid })
+        else { return }
+
+        viewModel.list.removeAll(where: { row in
+            rows.contains(where: { $0.uuid == row.uuid })
+        })
+        viewModel.list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
+        viewModel.updateSortOrderInDB()
     }
 }

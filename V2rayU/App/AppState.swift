@@ -136,6 +136,8 @@ final class AppState: ObservableObject {
         self.directDownSpeed = directDownSpeed
         self.proxyUpSpeed = proxyUpSpeed
         self.proxyDownSpeed = proxyDownSpeed
+        // 组合模式下, 各 profile 的 speed 已由 XrayApiStatsHandler.parseV2RayStats 单独更新
+        guard runningCombination.isEmpty else { return }
         ProfileStore.shared.updateSpeed(uuid: self.runningProfile, speed: Int(latency))
     }
 
@@ -199,9 +201,9 @@ final class AppState: ObservableObject {
         AppMenuManager.shared.refreshRoutingItems()
     }
 
-    // MARK: - 切换组合配置
+    // MARK: - 切换组合配置 (与 switchServer 一致, toggle 行为)
     func switchCombination(uuid: String) async {
-        // 点击已激活的组合配置 → 取消选择
+        // 已激活 → 取消选择
         if runningCombination == uuid {
             runningCombination = ""
             runningProfile = ""

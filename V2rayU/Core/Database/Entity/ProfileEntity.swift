@@ -368,6 +368,7 @@ enum CombinationColor: String, Codable, CaseIterable, Identifiable {
 enum CombinedInboundType: String, Codable, CaseIterable, Identifiable {
     case http
     case socks
+    case mixed
 
     var id: Self { self }
 
@@ -375,18 +376,19 @@ enum CombinedInboundType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .http: return .http
         case .socks: return .socks
+        case .mixed: return .mixed
         }
     }
 }
 
 struct CombinedInboundOutboundGroup: Codable, Identifiable, Equatable, Hashable {
     var id: String = UUID().uuidString
-    var inboundType: CombinedInboundType = .socks
+    var inboundType: CombinedInboundType = .mixed
     var port: Int = 1080
     var outboundProfileUUIDs: [String] = []
 }
 
-struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
+struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
     var uuid: String
     var remark: String
     var sort: Int
@@ -395,6 +397,11 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, TableRe
     var colorName: String
     var balancerStrategy: String
     var lastUpdate: Date
+
+    static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: draggableType)
+    }
 
     var id: String { uuid }
     static var idColumn: Column { CombinedConfigEntity.Columns.uuid }

@@ -16,6 +16,18 @@ struct CombinedConfigFormView: View {
 
     @State private var groups: [CombinedInboundOutboundGroup] = []
 
+    /// 根据当前选中的核心类型过滤兼容的 profile
+    private var filteredProfiles: [ProfileEntity] {
+        guard let coreType = item.coreType, let forcedType = coreType.forcedCoreType else {
+            return profiles
+        }
+        return profiles.filter { p in
+            var copy = p
+            copy.coreType = forcedType == .XrayCore ? .xray : .singbox
+            return copy.resolveCoreCompatibility().canLaunch
+        }
+    }
+
     private var conflictPorts: Set<Int> {
         isMixedProxyPortEnabled()
             ? [Int(getMixedProxyPort())]
@@ -33,6 +45,7 @@ struct CombinedConfigFormView: View {
     private var validationError: String? {
         var ports = Set<Int>()
         let profileUUIDs = Set(profiles.map { $0.uuid })
+        let filteredUUIDs = Set(filteredProfiles.map { $0.uuid })
 
         for group in groups {
             guard (1...65535).contains(group.port) else {
@@ -50,6 +63,9 @@ struct CombinedConfigFormView: View {
             }
             guard group.outboundProfileUUIDs.allSatisfy({ profileUUIDs.contains($0) }) else {
                 return "Some selected outbound profiles no longer exist."
+            }
+            guard group.outboundProfileUUIDs.allSatisfy({ filteredUUIDs.contains($0) }) else {
+                return "Some selected outbound profiles are incompatible with the selected core."
             }
             ports.insert(group.port)
         }
@@ -69,7 +85,7 @@ struct CombinedConfigFormView: View {
             Divider()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text(String(localized: .Remark))
                             .frame(width: 80, alignment: .leading)
@@ -99,7 +115,6 @@ struct CombinedConfigFormView: View {
                         Text(String(localized: .Core))
                             .frame(width: 80, alignment: .leading)
                         Picker(selection: $item.coreType, label: EmptyView()) {
-                            Text("Auto").tag(ProfileCoreSelection?.some(.auto))
                             Text("Xray").tag(ProfileCoreSelection?.some(.xray))
                             Text("Sing-Box").tag(ProfileCoreSelection?.some(.singbox))
                         }
@@ -135,24 +150,6 @@ struct CombinedConfigFormView: View {
                         .buttonStyle(.bordered)
                     }
 
-                    // Default ports & current node
-                    HStack(spacing: 12) {
-                        Label("SOCKS:\(getSocksProxyPort())", systemImage: "rectangle.connected.to.line.below")
-                        Label("HTTP:\(getHttpProxyPort())", systemImage: "rectangle.connected.to.line.below")
-                        Spacer()
-                        if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
-                            Label(server.remark.isEmpty ? server.address : server.remark,
-                                  systemImage: "point.3.connected.trianglepath.dotted")
-                                .foregroundColor(.accentColor)
-                        } else {
-                            Label("-", systemImage: "point.3.connected.trianglepath.dotted")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .font(.caption)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    
                     ForEach(groups.indices, id: \.self) { idx in
                         groupEditor(idx: idx)
                             .padding(10)
@@ -160,7 +157,7 @@ struct CombinedConfigFormView: View {
                             .cornerRadius(8)
                     }
                 }
-                .padding()
+                .padding(12)
             }
 
             Divider()
@@ -184,6 +181,10 @@ struct CombinedConfigFormView: View {
         }
         .frame(minWidth: 560, minHeight: 420)
         .onAppear {
+            // 去掉 auto, 默认使用 Xray
+            if item.coreType == nil || item.coreType == .auto {
+                item.coreType = .xray
+            }
             if item.groups.isEmpty {
                 var newGroups = [CombinedInboundOutboundGroup()]
                 let usedPorts = Set(newGroups.map { $0.port })
@@ -210,7 +211,9 @@ struct CombinedConfigFormView: View {
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Picker(selection: binding.inboundType, label: Text("Inbound")) {
+                Text("Inbound")
+                    .frame(width: 80, alignment: .leading)
+                Picker(selection: binding.inboundType, label: EmptyView()) {
                     ForEach(CombinedInboundType.allCases) { kind in
                         Text(kind.rawValue.uppercased()).tag(kind)
                     }
@@ -252,66 +255,69 @@ struct CombinedConfigFormView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("\(profiles.count) available")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                let totalCount = profiles.count
+                let filteredCount = filteredProfiles.count
+                if filteredCount < totalCount {
+                    Text("\(filteredCount)/\(totalCount) available")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("\(totalCount) available")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
 
-            if profiles.isEmpty {
-                Text("(no profiles available)")
+            if filteredProfiles.isEmpty {
+                Text("(no compatible profiles for the selected core)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        ForEach(profiles) { p in
-                            HStack(spacing: 6) {
-                                Toggle(isOn: outboundBinding(idx: idx, uuid: p.uuid)) {
-                                    EmptyView()
-                                }
-                                .toggleStyle(.checkbox)
-                                .labelsHidden()
-
-                                if !p.serverRegion.isEmpty {
-                                    Text(countryCodeToEmoji(p.serverRegion))
-                                }
-
-                                Text(p.remark.isEmpty ? p.address : p.remark)
-                                    .lineLimit(1)
-
-                                Text(p.protocol.rawValue)
-                                    .font(.caption2.bold())
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 1)
-                                    .background(Color.accentColor.opacity(0.8))
-                                    .cornerRadius(3)
-
-                                Text("\(p.address):\(p.port)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-
-                                Spacer(minLength: 4)
-
-                                if p.speed > 0 {
-                                    Text("[\(p.speed)ms]")
-                                        .font(.caption2)
-                                        .foregroundColor(Color(getSpeedColor(latency: Double(p.speed))))
-                                }
+                VStack(alignment: .leading, spacing: 1) {
+                    ForEach(filteredProfiles) { p in
+                        HStack(spacing: 6) {
+                            Toggle(isOn: outboundBinding(idx: idx, uuid: p.uuid)) {
+                                EmptyView()
                             }
-                            .padding(.vertical, 3)
-                            .padding(.horizontal, 4)
-                            .background(
-                                groups[idx].outboundProfileUUIDs.contains(p.uuid)
-                                    ? Color.accentColor.opacity(0.06)
-                                    : Color.clear
-                            )
-                            .cornerRadius(4)
+                            .toggleStyle(.checkbox)
+                            .labelsHidden()
+
+                            if !p.serverRegion.isEmpty {
+                                Text(countryCodeToEmoji(p.serverRegion))
+                            }
+
+                            Text(p.remark.isEmpty ? p.address : p.remark)
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Text(p.protocol.rawValue)
+                                .font(.caption2.bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(Color.accentColor.opacity(0.8))
+                                .cornerRadius(3)
+
+                            Text("\(p.address):\(p.port)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+
+                            Text(p.speed > 0 ? "[\(p.speed)ms]" : "[-]")
+                                .font(.caption2)
+                                .foregroundColor(p.speed > 0 ? Color(getSpeedColor(latency: Double(p.speed))) : .secondary)
+                                .frame(width: 60, alignment: .trailing)
                         }
+                        .padding(.vertical, 3)
+                        .padding(.horizontal, 4)
+                        .background(
+                            groups[idx].outboundProfileUUIDs.contains(p.uuid)
+                                ? Color.accentColor.opacity(0.06)
+                                : Color.clear
+                        )
+                        .cornerRadius(4)
                     }
                 }
-                .frame(maxHeight: 160)
             }
         }
     }

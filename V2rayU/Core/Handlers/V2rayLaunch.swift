@@ -206,11 +206,6 @@ actor V2rayLaunch {
         logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
-            do {
-                try await PingRunning.shared.startPing()
-            } catch {
-                logger.error("PingRunning.startPing failed: \(error)")
-            }
         }
 
         if mode == .tun {

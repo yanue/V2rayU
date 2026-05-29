@@ -149,9 +149,30 @@ actor XrayApiStatsHandler: NSObject {
                 logger.warning("Invalid V2Ray Stats")
                 return
             }
-            if let latencyValue = vars.observatory?["proxy"] {
-                latency = latencyValue.delay // proxy的延迟
+
+            // 检测是否在组合模式
+            let runningCombination = await MainActor.run { AppState.shared.runningCombination }
+            let isComboMode = !runningCombination.isEmpty
+
+            if isComboMode, let observatory = vars.observatory {
+                // 组合模式: 遍历所有 combo-out-* 条目, 提取 UUID 更新每个 profile 的延迟
+                var delays: [Double] = []
+                for (tag, obs) in observatory where tag.hasPrefix("combo-out-") {
+                    let parts = tag.components(separatedBy: "-")
+                    guard parts.count >= 5 else { continue }
+                    let uuid = parts[4...].joined(separator: "-")
+                    let delay = obs.delay
+                    if delay > 0 {
+                        delays.append(delay)
+                        ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
+                    }
+                }
+                // 使用最低延迟作为整体显示值
+                latency = delays.min() ?? 0
+            } else if let latencyValue = vars.observatory?["proxy"] {
+                latency = latencyValue.delay
             }
+
             if let directUpLinkValue = stats.outbound["direct"] {
                 directUpLink = directUpLinkValue.uplink
                 directDownLink = directUpLinkValue.downlink
@@ -180,7 +201,13 @@ actor ClashApilatencyHandler: NSObject {
         timer?.schedule(deadline: .now(), repeating: interval)
         timer?.setEventHandler { [weak self] in
             Task { [weak self] in
-               await self?.checkDelayByClashApi(proxyName: "proxy")
+                // 检测组合模式
+                let runningCombination = await MainActor.run { AppState.shared.runningCombination }
+                if !runningCombination.isEmpty {
+                    await self?.checkDelayForCombination(comboUuid: runningCombination)
+                } else {
+                    await self?.checkDelayByClashApi(proxyName: "proxy")
+                }
             }
         }
         timer?.resume()
@@ -189,6 +216,92 @@ actor ClashApilatencyHandler: NSObject {
     func stopTask() {
         timer?.cancel()
         timer = nil
+    }
+
+    /// 组合模式：逐个查询组合中每个 selector/outbound 的延迟
+    private func checkDelayForCombination(comboUuid: String) async {
+        guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: comboUuid) else { return }
+
+        var allDelays: [Double] = []
+
+        for (groupIndex, group) in combo.groups.enumerated() {
+            if group.outboundProfileUUIDs.count == 1 {
+                // 单出站组：使用 combo-out-{groupIndex}-0-{uuid} 标签
+                let uuid = group.outboundProfileUUIDs[0]
+                let tag = "combo-out-\(groupIndex)-0-\(uuid)"
+                if let delay = await queryDelay(proxyName: tag) {
+                    ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
+                    allDelays.append(delay)
+                }
+            } else {
+                // 多出站组：查询 selector 延迟, 响应包含所有出站的延迟
+                let selectorTag = "combo-selector-\(groupIndex)"
+                let result = await querySelectorDelay(selectorName: selectorTag)
+                for (tag, delay) in result {
+                    let parts = tag.components(separatedBy: "-")
+                    guard parts.count >= 5 else { continue }
+                    let uuid = parts[4...].joined(separator: "-")
+                    ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
+                    allDelays.append(delay)
+                }
+            }
+        }
+
+        if !allDelays.isEmpty {
+            let minDelay = allDelays.min() ?? 0
+            await AppState.shared.setLatency(latency: minDelay)
+        }
+    }
+
+    /// 查询单个代理的延迟 (返回 `{"delay": 123}`)
+    private func queryDelay(proxyName: String) async -> Double? {
+        let timeoutMs = defaultLatencyTestTimeout * 1000
+        let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+        var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay")
+        components?.queryItems = [
+            URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
+            URLQueryItem(name: "url", value: testURL)
+        ]
+        guard let url = components?.url else { return nil }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let result = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let delay = result["delay"] as? Double, delay > 0 {
+                return delay
+            }
+        } catch {
+            logger.error("Delay query failed for \(proxyName): \(error.localizedDescription)")
+        }
+        return nil
+    }
+
+    /// 查询 selector 下所有出站的延迟 (返回 `{"combo-out-...": 123, ...}`)
+    private func querySelectorDelay(selectorName: String) async -> [String: Double] {
+        let timeoutMs = defaultLatencyTestTimeout * 1000
+        let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
+        var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(selectorName)/delay")
+        components?.queryItems = [
+            URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
+            URLQueryItem(name: "url", value: testURL)
+        ]
+        guard let url = components?.url else { return [:] }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let result = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                var delays: [String: Double] = [:]
+                for (key, value) in result {
+                    if let delay = value as? Double, delay > 0 {
+                        delays[key] = delay
+                    }
+                }
+                return delays
+            }
+        } catch {
+            logger.error("Selector delay query failed for \(selectorName): \(error.localizedDescription)")
+        }
+        return [:]
     }
 
     private func checkDelayByClashApi(proxyName: String) {
