@@ -19,7 +19,9 @@ actor PingAll {
     private var finishedCount = 0
 
     private func localized(_ label: LanguageLabel, _ arguments: CVarArg...) async -> String {
-        await MainActor.run { String(localized: label, arguments: arguments) }
+        let format = await MainActor.run { LanguageManager.shared.localizedString(label.rawValue) }
+        if arguments.isEmpty { return format }
+        return String(format: format, arguments: arguments)
     }
 
     func run() async {
@@ -384,7 +386,9 @@ actor PingRunning {
     private var item: ProfileEntity = ProfileEntity()
 
     private func localized(_ label: LanguageLabel, _ arguments: CVarArg...) async -> String {
-        await MainActor.run { String(localized: label, arguments: arguments) }
+        let format = await MainActor.run { LanguageManager.shared.localizedString(label.rawValue) }
+        if arguments.isEmpty { return format }
+        return String(format: format, arguments: arguments)
     }
 
     /// 开始 Ping 流程
