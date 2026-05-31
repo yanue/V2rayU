@@ -177,7 +177,7 @@ actor PingServer {
             ProfileStore.shared.updateSpeed(uuid: self.item.uuid, speed: self.item.speed)
         }
         do {
-            let pingTime = try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort)
+            let pingTime = try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort, proxyPort: bindPort)
             item.speed = pingTime
 
             if let serverIp = await fetchServerIp(port: bindPort), !serverIp.isEmpty {
@@ -493,11 +493,36 @@ actor PingRunning {
 }
 
 func testLatencyByCoreApi(coreType: CoreType, apiPort: UInt16) async throws -> Int {
+    try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort, proxyPort: nil)
+}
+
+func testLatencyByCoreApi(coreType: CoreType, apiPort: UInt16, proxyPort: UInt16?) async throws -> Int {
     switch coreType {
     case .XrayCore:
-        return try await testXrayObservatoryLatency(apiPort: apiPort)
+        async let observatoryLatency = optionalLatency("xray-observatory") {
+            try await testXrayObservatoryLatency(apiPort: apiPort)
+        }
+        async let proxyLatency = optionalLatency("xray-http-proxy") {
+            guard let proxyPort else { throw URLError(.badURL) }
+            return try await testLatencyByProxyPort(port: proxyPort, warmup: false)
+        }
+        let results = await [observatoryLatency, proxyLatency].compactMap { $0 }
+        if let best = results.min() {
+            logger.info("Xray best latency: \(best)ms from \(results)")
+            return best
+        }
+        throw NSError(domain: "PingServerError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Xray latency unavailable"])
     case .SingBox:
         return try await testSingBoxApiLatency(apiPort: apiPort)
+    }
+}
+
+private func optionalLatency(_ label: String, operation: @escaping () async throws -> Int) async -> Int? {
+    do {
+        return try await operation()
+    } catch {
+        logger.info("Latency path failed [\(label)]: \(error)")
+        return nil
     }
 }
 
@@ -577,7 +602,7 @@ private func testSingBoxApiLatency(apiPort: UInt16) async throws -> Int {
 
 // MARK: - Fix 7: 预热和采样共享同一个 session，确保连接池复用真正生效
 
-func testLatencyByProxyPort(port: UInt16) async throws -> Int {
+func testLatencyByProxyPort(port: UInt16, warmup: Bool = true) async throws -> Int {
     logger.info("testLatencyByProxyPort: \(port)")
     let configuration = getProxyUrlSessionConfigure(httpProxyPort: port)
     let timeoutInterval = TimeInterval(defaultLatencyTestTimeout)
@@ -589,9 +614,11 @@ func testLatencyByProxyPort(port: UInt16) async throws -> Int {
     // 用 NoRedirectSessionDelegate 阻断 3xx，避免:
     // 1) 跟随 301/302 让 latency 数字虚高
     // 2) HSTS/区域跳转后 statusCode 不再是 204 导致校验失败
-    let warmupSession = URLSession(configuration: configuration, delegate: NoRedirectSessionDelegate(), delegateQueue: nil)
-    defer { warmupSession.finishTasksAndInvalidate() }
-    _ = try await performLatencyRequest(session: warmupSession)
+    if warmup {
+        let warmupSession = URLSession(configuration: configuration, delegate: NoRedirectSessionDelegate(), delegateQueue: nil)
+        defer { warmupSession.finishTasksAndInvalidate() }
+        _ = try await performLatencyRequest(session: warmupSession)
+    }
 
     // 采样：复用相同 configuration，共享连接
     var samples: [Int] = []
@@ -735,7 +762,7 @@ final class LatencyMetricsDelegate: NSObject, URLSessionDataDelegate, @unchecked
             return
         }
         guard let transactionMetrics = metrics.transactionMetrics.last(where: { $0.responseEndDate != nil }) ?? metrics.transactionMetrics.first,
-              let fetchStart = transactionMetrics.fetchStartDate,
+              let fetchStart = transactionMetrics.requestStartDate ?? transactionMetrics.fetchStartDate,
               let responseEnd = transactionMetrics.responseEndDate else {
             // metrics 数据不完整时用错误兜底，避免 continuation 泄漏
             resumeWithError(NSError(domain: "LatencyMetrics", code: -1, userInfo: [NSLocalizedDescriptionKey: "Incomplete metrics"]))

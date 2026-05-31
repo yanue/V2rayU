@@ -28,6 +28,21 @@ let defaultRuleEn = Dictionary(uniqueKeysWithValues: [
     (RoutingRuleLANAndCn, "🌏 Bypassing LAN and mainland address"),
 ])
 
+let mainlandDirectDnsIps = [
+    "223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1",
+    "119.29.29.29", "1.12.12.12", "120.53.53.53", "2402:4e00::", "2402:4e00:1::",
+    "180.76.76.76", "2400:da00::6666", "114.114.114.114", "114.114.115.115",
+    "114.114.114.119", "114.114.115.119", "114.114.114.110", "114.114.115.110",
+    "180.184.1.1", "180.184.2.2", "101.226.4.6", "218.30.118.6", "123.125.81.6",
+    "140.207.198.6", "1.2.4.8", "210.2.4.8", "52.80.66.66", "117.50.22.22",
+    "2400:7fc0:849e:200::4", "2404:c2c0:85d8:901::4", "117.50.10.10", "52.80.52.52",
+    "2400:7fc0:849e:200::8", "2404:c2c0:85d8:901::8", "117.50.60.30", "52.80.60.30"
+]
+
+let mainlandDirectDnsDomains = [
+    "domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "domain:360.cn", "domain:onedns.net"
+]
+
 func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) {
     let all = domainIpStr.split(separator: "\n")
     var domains: [String] = []
@@ -36,11 +51,12 @@ func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) 
     for item in all {
         let tmp = item.trimmingCharacters(in: .whitespacesAndNewlines)
         if tmp.isEmpty { continue }
-        
-        if isIp(str: tmp) || tmp.contains("geoip:") {
-            ips.append(tmp)
-        } else if tmp.contains("domain:") || tmp.contains("geosite:") || isDomain(str: tmp) {
-            domains.append(tmp)
+        let normalized = tmp == "category-ads-all" ? "geosite:category-ads-all" : tmp
+
+        if isIp(str: normalized) || normalized.contains("geoip:") || isIPv6Literal(normalized) {
+            ips.append(normalized)
+        } else if normalized == "localhost" || normalized.contains("domain:") || normalized.contains("geosite:") || isDomain(str: normalized) {
+            domains.append(normalized)
         }
     }
     return (domains, ips)
@@ -56,13 +72,17 @@ func isDomain(str: String) -> Bool {
     return str.range(of: pattern, options: .regularExpression) != nil
 }
 
+func isIPv6Literal(_ str: String) -> Bool {
+    return str.contains(":") && str.range(of: "^[0-9a-fA-F:]+$", options: .regularExpression) != nil
+}
+
 class RoutingManager {
 
     let defaultRules = Dictionary(uniqueKeysWithValues: [
        (RoutingRuleGlobal, RoutingEntity(name: RoutingRuleGlobal, remark: "🌏 Global")),
-       (RoutingRuleLAN, RoutingEntity(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"category-ads-all", direct: "geoip:private\nlocalhost")),
-       (RoutingRuleCn, RoutingEntity(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", block:"category-ads-all", direct: "geoip:cn\ngeosite:cn")),
-       (RoutingRuleLANAndCn, RoutingEntity(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", block:"category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
+       (RoutingRuleLAN, RoutingEntity(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"geosite:category-ads-all", direct: "geoip:private\nlocalhost")),
+       (RoutingRuleCn, RoutingEntity(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeosite:cn")),
+       (RoutingRuleLANAndCn, RoutingEntity(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
     ])
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
@@ -96,7 +116,6 @@ class RoutingManager {
         if all.count == 0 {
             for (rule, var item) in defaultRules {
                 if isMainland {
-                    item.domainStrategy = "AsIs"
                     item.domainMatcher = "hybrid"
                     item.remark = defaultRuleCn[rule] ?? item.remark
                 }
@@ -114,44 +133,41 @@ class RoutingManager {
         let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: routingEntity.proxy)
         let (directDomains, directIps) = parseDomainOrIp(domainIpStr: routingEntity.direct)
         
-        if !blockDomains.isEmpty || !blockIps.isEmpty {
-            rules.append(RouteRule(outbound: "block", domain: blockDomains + blockIps))
-        }
-        
-        if !proxyDomains.isEmpty || !proxyIps.isEmpty {
-            rules.append(RouteRule(outbound: "proxy", domain: proxyDomains + proxyIps))
-        }
-        
-        if !directDomains.isEmpty || !directIps.isEmpty {
-            rules.append(RouteRule(outbound: "direct", domain: directDomains + directIps))
-        }
-        
+        rules.append(RouteRule(action: "sniff"))
+        rules.append(RouteRule(action: "reject", network: ["udp"], port: [443]))
+        appendSingboxRouteRules(to: &rules, outbound: "block", domains: blockDomains, ips: blockIps)
+
+        appendSingboxRouteRules(to: &rules, outbound: "proxy", domains: proxyDomains, ips: proxyIps)
+        appendSingboxRouteRules(to: &rules, outbound: "direct", domains: directDomains, ips: directIps)
+
         switch routingEntity.name {
         case RoutingRuleGlobal:
             break
         case RoutingRuleLAN:
             if !directIps.contains("geoip:private") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: [], ips: ["geoip:private"])
             }
             if !directDomains.contains("localhost") {
                 rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
             }
         case RoutingRuleCn:
+            appendSingboxRouteRules(to: &rules, outbound: "direct", domains: mainlandDirectDnsDomains, ips: mainlandDirectDnsIps)
             if !directIps.contains("geoip:cn") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geoip:cn"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: [], ips: ["geoip:cn"])
             }
             if !directDomains.contains("geosite:cn") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geosite:cn"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: ["geosite:cn"], ips: [])
             }
         case RoutingRuleLANAndCn:
+            appendSingboxRouteRules(to: &rules, outbound: "direct", domains: mainlandDirectDnsDomains, ips: mainlandDirectDnsIps)
             if !directIps.contains("geoip:cn") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geoip:cn"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: [], ips: ["geoip:cn"])
             }
             if !directIps.contains("geoip:private") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: [], ips: ["geoip:private"])
             }
             if !directDomains.contains("geosite:cn") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geosite:cn"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: ["geosite:cn"], ips: [])
             }
             if !directDomains.contains("localhost") {
                 rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
@@ -163,7 +179,7 @@ class RoutingManager {
         // allowLAN: route private IPs direct to prevent LAN traffic loop
         if UserDefaults.getBool(forKey: .allowLAN) {
             if !directIps.contains("geoip:private") {
-                rules.append(RouteRule(outbound: "direct", domain: ["geoip:private"]))
+                appendSingboxRouteRules(to: &rules, outbound: "direct", domains: [], ips: ["geoip:private"])
             }
             if !directDomains.contains("localhost") {
                 rules.append(RouteRule(outbound: "direct", domain: ["localhost"]))
@@ -172,7 +188,41 @@ class RoutingManager {
 
         return rules
     }
-    
+
+    private func appendSingboxRouteRules(to rules: inout [RouteRule], outbound: String, domains: [String], ips: [String]) {
+        var plainDomains: [String] = []
+        var geosites: [String] = []
+        var geoips: [String] = []
+        var ipCidrs: [String] = []
+        var routePrivateIps = false
+
+        for domain in domains {
+            if domain.hasPrefix("geosite:") {
+                geosites.append(String(domain.dropFirst("geosite:".count)))
+            } else if domain.hasPrefix("domain:") {
+                plainDomains.append(String(domain.dropFirst("domain:".count)))
+            } else {
+                plainDomains.append(domain)
+            }
+        }
+
+        for ip in ips {
+            if ip == "geoip:private" {
+                routePrivateIps = true
+            } else if ip.hasPrefix("geoip:") {
+                geoips.append(String(ip.dropFirst("geoip:".count)))
+            } else {
+                ipCidrs.append(ip)
+            }
+        }
+
+        if !plainDomains.isEmpty { rules.append(RouteRule(outbound: outbound, domain: plainDomains)) }
+        if !geosites.isEmpty { rules.append(RouteRule(outbound: outbound, geosite: geosites)) }
+        if routePrivateIps { rules.append(RouteRule(outbound: outbound, ip_is_private: true)) }
+        if !geoips.isEmpty { rules.append(RouteRule(outbound: outbound, geoip: geoips)) }
+        if !ipCidrs.isEmpty { rules.append(RouteRule(outbound: outbound, ip_cidr: ipCidrs)) }
+    }
+
     func getRunningEntity() -> RoutingEntity {
         ensureDefaultRouting()
         let runningRouting = UserDefaults.get(forKey: .runningRouting)
@@ -224,6 +274,9 @@ class RoutingHandler {
 
         // 根据默认规则生成
         var rules: [V2rayRoutingRule] = [apiRule]
+        if self.routing.name != RoutingRuleGlobal {
+            rules.append(getRoutingRule(outTag: "block", domain: nil, ip: nil, port: "443", network: "udp"))
+        }
 
         let (blockDomains, blockIps) = parseDomainOrIp(domainIpStr: self.routing.block)
         let (proxyDomains, proxyIps) = parseDomainOrIp(domainIpStr: self.routing.proxy)
@@ -316,6 +369,10 @@ class RoutingHandler {
             ruleDirectIp!.domain = nil
             rules.append(ruleDirectIp!)
         }
+        if self.routing.name == RoutingRuleCn || self.routing.name == RoutingRuleLANAndCn {
+            rules.append(getRoutingRule(outTag: "direct", domain: nil, ip: mainlandDirectDnsIps, port: nil))
+            rules.append(getRoutingRule(outTag: "direct", domain: mainlandDirectDnsDomains, ip: nil, port: nil))
+        }
         // 如果匹配失败，则私有地址和大陆境内地址直连，否则走代理。
         if ruleDirectIpDefault != nil {
             ruleDirectIpDefault!.domain = nil
@@ -331,6 +388,9 @@ class RoutingHandler {
             settings.domainStrategy = .AsIs
         } else {
             settings.domainStrategy = V2rayRouting.domainStrategy(rawValue: self.routing.domainStrategy) ?? .AsIs
+        }
+        if (self.routing.name == RoutingRuleCn || self.routing.name == RoutingRuleLANAndCn) && settings.domainStrategy == .AsIs {
+            settings.domainStrategy = .IPOnDemand
         }
         // 最后添加默认规则
 //        let proxyRule = getRoutingRule(outTag: "proxy", )

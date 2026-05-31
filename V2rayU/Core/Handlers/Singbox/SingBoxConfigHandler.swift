@@ -23,7 +23,7 @@ class SingboxConfigHandler {
     var mixedPort = "1080"
     var enableTun = false
     var forPing = false
-    var domain_resolver = "default-dns"
+    var domain_resolver = "direct-dns"
     var logLevel: V2rayLogLevel = .info
 
     init(enableTun: Bool = false) {
@@ -77,7 +77,8 @@ class SingboxConfigHandler {
     func toJSON(items: [ProfileEntity]) -> String {
         var _outbounds: [SingboxOutbound] = []
         for item in items {
-            let outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
+            var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
+            outbound.domain_resolver = domain_resolver
             _outbounds.append(outbound)
         }
         self.combine(_outbounds: _outbounds)
@@ -155,7 +156,8 @@ class SingboxConfigHandler {
 
         self.singbox.inbounds = inbounds
         self.singbox.outbounds = outbounds
-        self.singbox.dns = getDnsConfig()
+        self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: outbounds)
+        self.singbox.route.default_domain_resolver = "direct-dns"
         self.singbox.route.rules = comboRules + RoutingManager().getSingboxRoutingRules()
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
@@ -226,23 +228,16 @@ class SingboxConfigHandler {
             self.singbox.outbounds = [socksOutbound, directOutbound]
 
             // DNS配置
-            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
-            let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
-            let fakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
-            self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: dnsDefault),
-                DNSServer(type: "udp", tag: "china-dns", server: dnsChina),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: fakeipRange, inet6_range: "fc00::/18")
-            ]
-            self.singbox.dns.rules = [
-                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-            ]
+            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
+            self.singbox.dns = defaultDnsConfig()
+            if let index = self.singbox.dns.servers.firstIndex(where: { $0.tag == "local-dns" }) {
+                self.singbox.dns.servers[index].server = dnsDefault
+            }
 
             // TUN模式路由配置 - 所有流量转发到SOCKS，由SOCKS端处理路由
             self.singbox.route = RouteConfig(
                 auto_detect_interface: true,
-                default_domain_resolver: "default-dns",
+                default_domain_resolver: "direct-dns",
                 rules: [
                     RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]),
                 ]
@@ -298,22 +293,22 @@ class SingboxConfigHandler {
         }
 
         self.singbox.inbounds = inbounds
-
         self.singbox.outbounds = _outbounds
 
         if self.forPing {
             self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
+                DNSServer(type: "udp", tag: "direct-dns", server: defaultBootstrapDns),
             ]
         } else {
-            self.singbox.dns = getDnsConfig()
+            self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: _outbounds)
+            self.singbox.route.default_domain_resolver = "direct-dns"
             self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
     }
 
     private func getDnsConfig() -> DNSConfig {
-        let jsonStr = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
+        let jsonStr = getDefaultSingboxDnsSetting()
         guard let data = jsonStr.data(using: .utf8) else {
             return defaultDnsConfig()
         }
@@ -327,17 +322,50 @@ class SingboxConfigHandler {
     }
 
     private func defaultDnsConfig() -> DNSConfig {
-        DNSConfig(
-            servers: [
-                DNSServer(type: "udp", tag: "default-dns", server: defaultDomesticDns),
-                DNSServer(type: "udp", tag: "china-dns", server: secondaryDomesticDns),
-                DNSServer(type: "fakeip", tag: "fakedns", inet4_range: "198.18.0.0/15", inet6_range: "fc00::/18")
-            ],
-            rules: [
-                DNSRule(server: "china-dns", domain: ["geosite:cn"]),
-                DNSRule(server: "fakedns", domain: ["geosite:geolocation-!cn"])
-            ]
+        if let data = defaultSingboxDns.data(using: .utf8),
+           let config = try? JSONDecoder().decode(DNSConfig.self, from: data) {
+            return config
+        }
+
+        return DNSConfig(
+            servers: [DNSServer(type: "udp", tag: "direct-dns", server: defaultBootstrapDns)],
+            rules: [],
+            final: "direct-dns",
+            independent_cache: true
         )
+    }
+
+    private func dnsConfigWithProxyServerRules(outbounds: [SingboxOutbound]) -> DNSConfig {
+        var config = getDnsConfig()
+        let domains = proxyServerDomains(from: outbounds)
+        guard !domains.isEmpty else { return config }
+
+        let dnsTag = config.servers.contains { $0.tag == "direct-dns" } ? "direct-dns" :
+            (config.servers.contains { $0.tag == "local-dns" } ? "local-dns" : "direct-dns")
+
+        for domain in domains.reversed() {
+            let exists = config.rules.contains { $0.server == dnsTag && $0.domain?.contains(domain) == true }
+            if !exists {
+                config.rules.insert(DNSRule(server: dnsTag, domain: [domain]), at: min(1, config.rules.count))
+            }
+        }
+
+        return config
+    }
+
+    private func proxyServerDomains(from outbounds: [SingboxOutbound]) -> [String] {
+        var domains: [String] = []
+        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true {
+            guard let server = outbound.server?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !server.isEmpty,
+                  isDomain(str: server),
+                  !isIPAddressLiteral(server),
+                  !domains.contains(server) else {
+                continue
+            }
+            domains.append(server)
+        }
+        return domains
     }
 
     private func applyLogConfig(level: V2rayLogLevel) {

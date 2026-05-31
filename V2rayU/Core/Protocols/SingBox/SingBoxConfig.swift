@@ -215,25 +215,86 @@ struct UTLSConfig: Codable {
 struct DNSConfig: Codable {
     var servers: [DNSServer] = []
     var rules: [DNSRule] = []
+    var final: String?
+    var independent_cache: Bool?
 
-    init(servers: [DNSServer] = [], rules: [DNSRule] = []) {
+    init(servers: [DNSServer] = [], rules: [DNSRule] = [], final: String? = nil, independent_cache: Bool? = nil) {
         self.servers = servers
         self.rules = rules
+        self.final = final
+        self.independent_cache = independent_cache
     }
 }
 
 struct DNSRule: Codable {
-    var server: String
+    var server: String?
     var domain: [String]?
     var disable_cache: Bool?
+    var action: String?
+    var rcode: String?
+    var query_type: [Int]?
+    var ip_accept_any: Bool?
+    var geosite: [String]?
+    var geoip: [String]?
+    var clash_mode: String?
+
+    init(
+        server: String? = nil,
+        domain: [String]? = nil,
+        disable_cache: Bool? = nil,
+        action: String? = nil,
+        rcode: String? = nil,
+        query_type: [Int]? = nil,
+        ip_accept_any: Bool? = nil,
+        geosite: [String]? = nil,
+        geoip: [String]? = nil,
+        clash_mode: String? = nil
+    ) {
+        self.server = server
+        self.domain = domain
+        self.disable_cache = disable_cache
+        self.action = action
+        self.rcode = rcode
+        self.query_type = query_type
+        self.ip_accept_any = ip_accept_any
+        self.geosite = geosite
+        self.geoip = geoip
+        self.clash_mode = clash_mode
+    }
 }
 
 struct DNSServer: Codable {
     var type: String
     var tag: String?
     var server: String?
+    var domain_resolver: String?
+    var path: String?
+    var detour: String?
+    var predefined: [String: [String]]?
     var inet4_range: String?
     var inet6_range: String?
+
+    init(
+        type: String,
+        tag: String? = nil,
+        server: String? = nil,
+        domain_resolver: String? = nil,
+        path: String? = nil,
+        detour: String? = nil,
+        predefined: [String: [String]]? = nil,
+        inet4_range: String? = nil,
+        inet6_range: String? = nil
+    ) {
+        self.type = type
+        self.tag = tag
+        self.server = server
+        self.domain_resolver = domain_resolver
+        self.path = path
+        self.detour = detour
+        self.predefined = predefined
+        self.inet4_range = inet4_range
+        self.inet6_range = inet6_range
+    }
 }
 
 // TUN stack type
@@ -246,13 +307,52 @@ enum TunStack: String, Codable, CaseIterable {
 // Route
 struct RouteConfig: Codable {
     var auto_detect_interface: Bool = true
-    var default_domain_resolver: String = "default-dns"
+    var default_domain_resolver: String = "direct-dns"
     var rules: [RouteRule] = []
 }
 
 struct RouteRule: Codable {
-    var outbound: String
+    var outbound: String?
+    var action: String?
     var domain: [String]?
+    var geosite: [String]?
+    var geoip: [String]?
+    var ip_cidr: [String]?
+    var ip_is_private: Bool?
     var process_name: [String]?
     var inbound: [String]?
+    var network: [String]?
+    var port: [Int]?
+    var `protocol`: [String]?
+    var clash_mode: String?
+
+    init(
+        outbound: String? = nil,
+        action: String? = nil,
+        domain: [String]? = nil,
+        geosite: [String]? = nil,
+        geoip: [String]? = nil,
+        ip_cidr: [String]? = nil,
+        ip_is_private: Bool? = nil,
+        process_name: [String]? = nil,
+        inbound: [String]? = nil,
+        network: [String]? = nil,
+        port: [Int]? = nil,
+        `protocol`: [String]? = nil,
+        clash_mode: String? = nil
+    ) {
+        self.outbound = outbound
+        self.action = action
+        self.domain = domain
+        self.geosite = geosite
+        self.geoip = geoip
+        self.ip_cidr = ip_cidr
+        self.ip_is_private = ip_is_private
+        self.process_name = process_name
+        self.inbound = inbound
+        self.network = network
+        self.port = port
+        self.`protocol` = `protocol`
+        self.clash_mode = clash_mode
+    }
 }

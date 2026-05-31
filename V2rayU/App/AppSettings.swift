@@ -47,8 +47,13 @@ final class AppSettings: ObservableObject {
     @Published var mux: Int = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
     @Published var enableStat: Bool = UserDefaults.getBool(forKey: .enableStat)
     @Published var logLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+    @Published var dnsDirect: String = getDnsDirectSetting()
+    @Published var dnsRemote: String = getDnsRemoteSetting()
+    @Published var dnsBootstrap: String = getDnsBootstrapSetting()
+    @Published var dnsDirectStrategy: String = getDnsDirectStrategySetting()
+    @Published var dnsProxyStrategy: String = getDnsProxyStrategySetting()
     @Published var dnsJson = getDefaultDnsSetting()
-    @Published var dnsJsonSingbox: String = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
+    @Published var dnsJsonSingbox: String = getDefaultSingboxDnsSetting()
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
     @Published var latencyTestConcurrency: Int = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
     @Published var pingTestURL: String = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -67,7 +72,7 @@ final class AppSettings: ObservableObject {
     @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
     @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
+    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
     @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
     @Published var tunFakeipRange: String = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
     // strict_route: 强制路由, 默认开启
@@ -129,8 +134,13 @@ final class AppSettings: ObservableObject {
         mux = UserDefaults.getInt(forKey: .muxConcurrent, defaultValue: 8)
         enableStat = UserDefaults.getBool(forKey: .enableStat)
         logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
+        dnsDirect = getDnsDirectSetting()
+        dnsRemote = getDnsRemoteSetting()
+        dnsBootstrap = getDnsBootstrapSetting()
+        dnsDirectStrategy = getDnsDirectStrategySetting()
+        dnsProxyStrategy = getDnsProxyStrategySetting()
         dnsJson = getDefaultDnsSetting()
-        dnsJsonSingbox = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: defaultSingboxDns)
+        dnsJsonSingbox = getDefaultSingboxDnsSetting()
         gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
         latencyTestConcurrency = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
         pingTestURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -140,7 +150,7 @@ final class AppSettings: ObservableObject {
         tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
         tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultDomesticDns)
+        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
         tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
@@ -191,6 +201,11 @@ final class AppSettings: ObservableObject {
         UserDefaults.setBool(forKey: .enableMux, value: enableMux)
         UserDefaults.setInt(forKey: .muxConcurrent, value: mux)
         UserDefaults.set(forKey: .v2rayLogLevel, value: logLevel.rawValue)
+        UserDefaults.set(forKey: .dnsDirect, value: dnsDirect)
+        UserDefaults.set(forKey: .dnsRemote, value: dnsRemote)
+        UserDefaults.set(forKey: .dnsBootstrap, value: dnsBootstrap)
+        UserDefaults.set(forKey: .dnsDirectStrategy, value: dnsDirectStrategy)
+        UserDefaults.set(forKey: .dnsProxyStrategy, value: dnsProxyStrategy)
         UserDefaults.set(forKey: .dnsServers, value: dnsJson)
         UserDefaults.set(forKey: .dnsJsonSingbox, value: dnsJsonSingbox)
         UserDefaults.set(forKey: .gfwPacListUrl, value: gfwPacListUrl)
@@ -227,6 +242,11 @@ final class AppSettings: ObservableObject {
             old.mux != mux ||
             old.enableStat != enableStat ||
             old.logLevel != logLevel ||
+            old.dnsDirect != dnsDirect ||
+            old.dnsRemote != dnsRemote ||
+            old.dnsBootstrap != dnsBootstrap ||
+            old.dnsDirectStrategy != dnsDirectStrategy ||
+            old.dnsProxyStrategy != dnsProxyStrategy ||
             old.dnsJson != dnsJson ||
             old.dnsJsonSingbox != dnsJsonSingbox ||
             old.pingTestURL != pingTestURL ||

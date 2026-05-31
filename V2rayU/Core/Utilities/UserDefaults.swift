@@ -53,6 +53,12 @@ extension UserDefaults {
         case localPacPort
         // dns servers
         case dnsServers
+        // dns basic settings
+        case dnsDirect
+        case dnsRemote
+        case dnsBootstrap
+        case dnsDirectStrategy
+        case dnsProxyStrategy
         // enable udp
         case enableUdp
         // enable mux

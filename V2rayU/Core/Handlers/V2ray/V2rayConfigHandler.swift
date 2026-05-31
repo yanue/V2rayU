@@ -9,40 +9,201 @@ import Foundation
 
 let defaultDomesticDns = "119.29.29.29"
 let secondaryDomesticDns = "223.5.5.5"
+let defaultBootstrapDns = "223.5.5.5"
+let defaultDirectDns = "https://dns.alidns.com/dns-query"
+let defaultRemoteDns = "https://cloudflare-dns.com/dns-query"
+let defaultDnsTargetStrategy = "Default"
 
 let defaultSingboxDns = """
 {
     "servers": [
-        {"type": "udp", "tag": "default-dns", "server": "119.29.29.29"},
-        {"type": "udp", "tag": "china-dns", "server": "223.5.5.5"},
-        {"type": "fakeip", "tag": "fakedns", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}
+        {"type": "udp", "tag": "local-dns", "server": "223.5.5.5"},
+        {"type": "https", "tag": "remote-dns", "server": "cloudflare-dns.com", "domain_resolver": "hosts-dns", "path": "/dns-query", "detour": "proxy"},
+        {"type": "https", "tag": "direct-dns", "server": "dns.alidns.com", "domain_resolver": "hosts-dns", "path": "/dns-query"},
+        {"type": "hosts", "tag": "hosts-dns", "predefined": {
+            "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"],
+            "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
+            "cloudflare-dns.com": ["104.16.249.249", "104.16.248.249", "2606:4700::6810:f8f9", "2606:4700::6810:f9f9"],
+            "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+            "doh.pub": ["1.12.12.12", "120.53.53.53"],
+            "dot.pub": ["1.12.12.12", "120.53.53.53"]
+        }}
     ],
     "rules": [
-        {"server": "china-dns", "domain": ["geosite:cn"]},
-        {"server": "fakedns", "domain": ["geosite:geolocation-!cn"]}
-    ]
+        {"server": "hosts-dns", "ip_accept_any": true},
+        {"server": "remote-dns", "geosite": ["geolocation-!cn"]},
+        {"server": "direct-dns", "geosite": ["cn", "private"]},
+        {"action": "predefined", "rcode": "NOERROR", "query_type": [64, 65]}
+    ],
+    "final": "remote-dns",
+    "independent_cache": true
 }
 """
 
 let defaultDns = """
 {
+    "hosts": {
+      "geosite:category-ads-all": ["127.0.0.1"]
+    },
     "servers": [
       {
-        "address": "119.29.29.29",
-        "domains": ["geosite:cn"]  
+        "address": "https://cloudflare-dns.com/dns-query",
+        "domains": ["geosite:geolocation-!cn"],
+        "expectIPs": ["geoip:!cn"]
       },
-      "119.29.29.29",
+      {
+        "address": "https://dns.google/dns-query",
+        "domains": ["geosite:geolocation-!cn"],
+        "expectIPs": ["geoip:!cn"]
+      },
+      "1.1.1.1",
       "223.5.5.5",
-      "1.1.1.1"
+      "localhost"
     ],
-    "queryStrategy": "UseIPv4",
     "disableFallbackIfMatch": true
   }
 """
 
 func getDefaultDnsSetting() -> String {
-    let dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: defaultDns)
-    return isLegacyBuiltinDns(dnsJson) ? defaultDns : dnsJson
+    let builtinDns = buildDefaultDnsSetting()
+    let dnsJson = UserDefaults.get(forKey: .dnsServers, defaultValue: builtinDns)
+    return isLegacyBuiltinDns(dnsJson) ? builtinDns : dnsJson
+}
+
+func getDefaultSingboxDnsSetting() -> String {
+    let builtinDns = buildDefaultSingboxDnsSetting()
+    let dnsJson = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: builtinDns)
+    return isLegacyBuiltinSingboxDns(dnsJson) ? builtinDns : dnsJson
+}
+
+func getDnsDirectSetting() -> String {
+    UserDefaults.get(forKey: .dnsDirect, defaultValue: defaultDirectDns)
+}
+
+func getDnsRemoteSetting() -> String {
+    UserDefaults.get(forKey: .dnsRemote, defaultValue: defaultRemoteDns)
+}
+
+func getDnsBootstrapSetting() -> String {
+    UserDefaults.get(forKey: .dnsBootstrap, defaultValue: defaultBootstrapDns)
+}
+
+func getDnsDirectStrategySetting() -> String {
+    UserDefaults.get(forKey: .dnsDirectStrategy, defaultValue: defaultDnsTargetStrategy)
+}
+
+func getDnsProxyStrategySetting() -> String {
+    UserDefaults.get(forKey: .dnsProxyStrategy, defaultValue: defaultDnsTargetStrategy)
+}
+
+func buildDefaultDnsSetting() -> String {
+    buildDefaultDnsSetting(
+        directDns: getDnsDirectSetting(),
+        remoteDns: getDnsRemoteSetting(),
+        bootstrapDns: getDnsBootstrapSetting()
+    )
+}
+
+func buildDefaultDnsSetting(directDns: String, remoteDns: String, bootstrapDns: String) -> String {
+    let directDns = directDns.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultDirectDns : directDns.trimmingCharacters(in: .whitespacesAndNewlines)
+    let remoteDns = remoteDns.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultRemoteDns : remoteDns.trimmingCharacters(in: .whitespacesAndNewlines)
+    let bootstrapDns = bootstrapDns.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultBootstrapDns : bootstrapDns.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    return """
+    {
+        "hosts": {
+          "geosite:category-ads-all": ["127.0.0.1"]
+        },
+        "servers": [
+          {
+            "address": "\(remoteDns)",
+            "domains": ["geosite:geolocation-!cn"],
+            "expectIPs": ["geoip:!cn"]
+          },
+          {
+            "address": "https://dns.google/dns-query",
+            "domains": ["geosite:geolocation-!cn"],
+            "expectIPs": ["geoip:!cn"]
+          },
+          {
+            "address": "\(directDns)",
+            "domains": ["geosite:cn", "geosite:private"],
+            "expectIPs": ["geoip:cn", "geoip:private"],
+            "skipFallback": true
+          },
+          "1.1.1.1",
+          "\(bootstrapDns)",
+          "localhost"
+        ],
+        "disableFallbackIfMatch": true
+      }
+    """
+}
+
+func buildDefaultSingboxDnsSetting() -> String {
+    buildDefaultSingboxDnsSetting(
+        directDns: getDnsDirectSetting(),
+        remoteDns: getDnsRemoteSetting(),
+        bootstrapDns: getDnsBootstrapSetting()
+    )
+}
+
+func buildDefaultSingboxDnsSetting(directDns directDnsValue: String, remoteDns remoteDnsValue: String, bootstrapDns bootstrapDnsValue: String) -> String {
+    let bootstrapDns = bootstrapDnsValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultBootstrapDns : bootstrapDnsValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    let remoteDns = normalizedSingboxDoH(remoteDnsValue.trimmingCharacters(in: .whitespacesAndNewlines), defaultHost: "cloudflare-dns.com", defaultPath: "/dns-query")
+    let directDns = normalizedSingboxDoH(directDnsValue.trimmingCharacters(in: .whitespacesAndNewlines), defaultHost: "dns.alidns.com", defaultPath: "/dns-query")
+
+    return """
+    {
+        "servers": [
+            {"type": "udp", "tag": "local-dns", "server": "\(bootstrapDns)"},
+            {"type": "https", "tag": "remote-dns", "server": "\(remoteDns.host)", "domain_resolver": "hosts-dns", "path": "\(remoteDns.path)", "detour": "proxy"},
+            {"type": "https", "tag": "direct-dns", "server": "\(directDns.host)", "domain_resolver": "hosts-dns", "path": "\(directDns.path)"},
+            {"type": "hosts", "tag": "hosts-dns", "predefined": {
+                "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"],
+                "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
+                "cloudflare-dns.com": ["104.16.249.249", "104.16.248.249", "2606:4700::6810:f8f9", "2606:4700::6810:f9f9"],
+                "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+                "doh.pub": ["1.12.12.12", "120.53.53.53"],
+                "dot.pub": ["1.12.12.12", "120.53.53.53"]
+            }}
+        ],
+        "rules": [
+            {"server": "hosts-dns", "ip_accept_any": true},
+            {"server": "remote-dns", "geosite": ["geolocation-!cn"]},
+            {"server": "direct-dns", "geosite": ["cn", "private"]},
+            {"action": "predefined", "rcode": "NOERROR", "query_type": [64, 65]}
+        ],
+        "final": "remote-dns",
+        "independent_cache": true
+    }
+    """
+}
+
+private func normalizedSingboxDoH(_ value: String, defaultHost: String, defaultPath: String) -> (host: String, path: String) {
+    guard let url = URL(string: value), let host = url.host, !host.isEmpty else {
+        return (value.isEmpty ? defaultHost : value, defaultPath)
+    }
+    let path = url.path.isEmpty ? defaultPath : url.path
+    return (host, path)
+}
+
+func saveDnsBasicSettings(direct: String, remote: String, bootstrap: String, directStrategy: String, proxyStrategy: String) {
+    UserDefaults.set(forKey: .dnsDirect, value: direct.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultDirectDns : direct.trimmingCharacters(in: .whitespacesAndNewlines))
+    UserDefaults.set(forKey: .dnsRemote, value: remote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultRemoteDns : remote.trimmingCharacters(in: .whitespacesAndNewlines))
+    UserDefaults.set(forKey: .dnsBootstrap, value: bootstrap.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultBootstrapDns : bootstrap.trimmingCharacters(in: .whitespacesAndNewlines))
+    UserDefaults.set(forKey: .dnsDirectStrategy, value: normalizeDnsTargetStrategy(directStrategy))
+    UserDefaults.set(forKey: .dnsProxyStrategy, value: normalizeDnsTargetStrategy(proxyStrategy))
+}
+
+func normalizeDnsTargetStrategy(_ strategy: String) -> String {
+    let allowed = ["Default", "AsIs", "UseIP", "UseIPv4", "UseIPv6"]
+    return allowed.contains(strategy) ? strategy : defaultDnsTargetStrategy
+}
+
+func getFreedomDomainStrategySetting() -> String {
+    let strategy = normalizeDnsTargetStrategy(getDnsDirectStrategySetting())
+    return strategy == "Default" ? "AsIs" : strategy
 }
 
 func getLatencyTestURLString() -> String {
@@ -60,11 +221,14 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
     var hasGoogle = false
     var hasCloudflare = false
     var hasTencentForCN = false
+    var hasAli = false
 
     for server in servers {
         if let server = server as? String {
             hasGoogle = hasGoogle || server == "8.8.8.8"
             hasCloudflare = hasCloudflare || server == "1.1.1.1"
+            hasTencentForCN = hasTencentForCN || server == defaultDomesticDns
+            hasAli = hasAli || server == secondaryDomesticDns
         } else if let server = server as? [String: Any],
                   let address = server["address"] as? String,
                   let domains = server["domains"] as? [String] {
@@ -72,7 +236,19 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
         }
     }
 
-    return servers.count == 3 && hasGoogle && hasCloudflare && hasTencentForCN
+    return (servers.count == 3 && hasGoogle && hasCloudflare && hasTencentForCN) ||
+        (servers.count == 4 && hasCloudflare && hasTencentForCN && hasAli)
+}
+
+private func isLegacyBuiltinSingboxDns(_ dnsJson: String) -> Bool {
+    guard let data = dnsJson.data(using: .utf8),
+          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let servers = json["servers"] as? [[String: Any]] else {
+        return false
+    }
+
+    let tags = Set(servers.compactMap { $0["tag"] as? String })
+    return tags == Set(["default-dns", "china-dns", "fakedns"])
 }
 
 class V2rayConfigHandler {
@@ -205,7 +381,7 @@ class V2rayConfigHandler {
             let outboundFreedom = V2rayOutbound()
             outboundFreedom.protocol = .freedom
             outboundFreedom.tag = "direct"
-            outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
+            outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: getFreedomDomainStrategySetting())
 
             // outbound Blackhole
             let outboundBlackhole = V2rayOutbound()
@@ -219,7 +395,9 @@ class V2rayConfigHandler {
         }
 
         self.v2ray.outbounds = outbounds
-        self.v2ray.dns = self.getDns() // dns：ping 配置也需要，避免默认海外 DNS 拖慢节点/测速域名解析
+        var dns = self.getDns() // dns：ping 配置也需要，避免默认海外 DNS 拖慢节点/测速域名解析
+        self.applyProxyServerDnsRules(to: &dns, outbounds: _outbounds)
+        self.v2ray.dns = dns
         // ------------------------------------- routing start --------------------------------------------
         if !self.forPing {
             self.v2ray.routing = RoutingManager().getRunning() // 路由
@@ -240,7 +418,7 @@ class V2rayConfigHandler {
         let outboundFreedom = V2rayOutbound()
         outboundFreedom.protocol = .freedom
         outboundFreedom.tag = "direct"
-        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
+        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: getFreedomDomainStrategySetting())
         self.v2ray.outbounds?.append(outboundFreedom)
 
         var apiRule = V2rayRoutingRule()
@@ -256,7 +434,8 @@ class V2rayConfigHandler {
         var observatory = V2rayObservatory()
         observatory.subjectSelector = ["proxy"]
         observatory.probeUrl = getLatencyTestURLString()
-        observatory.probeInterval = "1s"
+        observatory.probeInterval = "300ms"
+        observatory.enableConcurrency = true
         self.v2ray.observatory = observatory
     }
 
@@ -340,7 +519,7 @@ class V2rayConfigHandler {
         let outboundFreedom = V2rayOutbound()
         outboundFreedom.protocol = .freedom
         outboundFreedom.tag = "direct"
-        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: "UseIP")
+        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: getFreedomDomainStrategySetting())
 
         let outboundBlackhole = V2rayOutbound()
         outboundBlackhole.protocol = .blackhole
@@ -352,7 +531,9 @@ class V2rayConfigHandler {
 
         self.v2ray.inbounds = inbounds
         self.v2ray.outbounds = outbounds
-        self.v2ray.dns = self.getDns()
+        var dns = self.getDns()
+        self.applyProxyServerDnsRules(to: &dns, outbounds: outbounds)
+        self.v2ray.dns = dns
 
         var routing = RoutingManager().getRunning()
         let existingRules = routing.rules.filter { $0.inboundTag != ["metrics_in"] }
@@ -390,7 +571,68 @@ class V2rayConfigHandler {
         }
         return V2rayDns()
     }
-    
+
+    private func applyProxyServerDnsRules(to dns: inout V2rayDns, outbounds: [V2rayOutbound]) {
+        let domains = proxyServerDomains(from: outbounds)
+        guard !domains.isEmpty else { return }
+
+        var servers = dns.servers ?? []
+        for domain in domains {
+            let exists = servers.contains { server in
+                if case .detailed(let detail) = server {
+                    return detail.address == defaultDomesticDns && detail.domains?.contains(domain) == true
+                }
+                return false
+            }
+            if exists { continue }
+
+            let detail = V2rayDns.Server.ServerDetail(
+                address: defaultDomesticDns,
+                port: nil,
+                domains: [domain],
+                expectIPs: nil,
+                skipFallback: true,
+                clientIP: nil,
+                queryStrategy: nil
+            )
+            servers.append(.detailed(detail))
+        }
+        dns.servers = servers
+    }
+
+    private func proxyServerDomains(from outbounds: [V2rayOutbound]) -> [String] {
+        var domains: [String] = []
+
+        func appendIfDomain(_ address: String) {
+            let value = address.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !value.isEmpty, isDomain(str: value), !isIPAddressLiteral(value), !domains.contains(value) else { return }
+            domains.append(value)
+        }
+
+        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true {
+            switch outbound.settings {
+            case let settings as V2rayOutboundTrojan:
+                settings.servers.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundHysteria2:
+                appendIfDomain(settings.address)
+            case let settings as V2rayOutboundVMess:
+                settings.vnext.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundVLess:
+                settings.vnext.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundShadowsocks:
+                settings.servers.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundSocks:
+                settings.servers.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundHttp:
+                settings.servers.forEach { appendIfDomain($0.address) }
+            default:
+                break
+            }
+        }
+
+        return domains
+    }
+
     func getInbound(`protocol`: V2rayProtocolInbound, listen: String, port: String, enableSniffing:Bool, tag: String? = nil) -> V2rayInbound {
         var inbound = V2rayInbound()
         if `protocol` != .tun {
@@ -405,3 +647,9 @@ class V2rayConfigHandler {
         return inbound
     }
 }
+
+private func isIPAddressLiteral(_ value: String) -> Bool {
+    if isIp(str: value) { return true }
+    return value.contains(":") && value.range(of: "^[0-9a-fA-F:.]+$", options: .regularExpression) != nil
+}
+
