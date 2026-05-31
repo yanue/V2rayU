@@ -115,18 +115,20 @@ class SingboxConfigHandler {
                 outboundTags.append(outboundTag)
             }
 
-            let routeOutbound: String
-            if outboundTags.count == 1 {
-                routeOutbound = outboundTags[0]
+            let routeOutbound = "combo-selector-\(groupIndex)"
+            let isMultiOutbound = outboundTags.count > 1
+            let balancerStrategy = resolved.combination.balancerStrategy
+            let groupType: String
+            if isMultiOutbound, balancerStrategy == "leastPing" || balancerStrategy == "leastLoad" {
+                groupType = "urltest"
             } else {
-                routeOutbound = "combo-selector-\(groupIndex)"
-                outbounds.append(SingboxOutbound(
-                    type: "selector",
-                    tag: routeOutbound,
-                    outbounds: outboundTags,
-                    default: outboundTags.first
-                ))
+                groupType = "selector"
             }
+            outbounds.append(SingboxOutbound(
+                type: groupType,
+                tag: routeOutbound,
+                outbounds: outboundTags
+            ))
             comboRules.append(RouteRule(outbound: routeOutbound, domain: nil, process_name: nil, inbound: [inboundTag]))
         }
 

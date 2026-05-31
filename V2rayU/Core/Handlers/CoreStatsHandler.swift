@@ -218,29 +218,17 @@ actor ClashApilatencyHandler: NSObject {
         timer = nil
     }
 
-    /// 组合模式：逐个查询组合中每个 selector/outbound 的延迟
+    /// 组合模式：逐个查询组合中每个出站的延迟
+    /// sing-box 的 Clash API 对 selector 组的 delay 查询可能不返回单个出站延迟，因此直接查每个出站
     private func checkDelayForCombination(comboUuid: String) async {
         guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: comboUuid) else { return }
 
         var allDelays: [Double] = []
 
         for (groupIndex, group) in combo.groups.enumerated() {
-            if group.outboundProfileUUIDs.count == 1 {
-                // 单出站组：使用 combo-out-{groupIndex}-0-{uuid} 标签
-                let uuid = group.outboundProfileUUIDs[0]
-                let tag = "combo-out-\(groupIndex)-0-\(uuid)"
-                if let delay = await queryDelay(proxyName: tag) {
-                    ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
-                    allDelays.append(delay)
-                }
-            } else {
-                // 多出站组：查询 selector 延迟, 响应包含所有出站的延迟
-                let selectorTag = "combo-selector-\(groupIndex)"
-                let result = await querySelectorDelay(selectorName: selectorTag)
-                for (tag, delay) in result {
-                    let parts = tag.components(separatedBy: "-")
-                    guard parts.count >= 5 else { continue }
-                    let uuid = parts[4...].joined(separator: "-")
+            for (profileIndex, uuid) in group.outboundProfileUUIDs.enumerated() {
+                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(uuid)"
+                if let delay = await queryDelay(proxyName: outboundTag) {
                     ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
                     allDelays.append(delay)
                 }
@@ -276,34 +264,6 @@ actor ClashApilatencyHandler: NSObject {
         return nil
     }
 
-    /// 查询 selector 下所有出站的延迟 (返回 `{"combo-out-...": 123, ...}`)
-    private func querySelectorDelay(selectorName: String) async -> [String: Double] {
-        let timeoutMs = defaultLatencyTestTimeout * 1000
-        let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
-        var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(selectorName)/delay")
-        components?.queryItems = [
-            URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
-            URLQueryItem(name: "url", value: testURL)
-        ]
-        guard let url = components?.url else { return [:] }
-
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let result = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                var delays: [String: Double] = [:]
-                for (key, value) in result {
-                    if let delay = value as? Double, delay > 0 {
-                        delays[key] = delay
-                    }
-                }
-                return delays
-            }
-        } catch {
-            logger.error("Selector delay query failed for \(selectorName): \(error.localizedDescription)")
-        }
-        return [:]
-    }
-
     private func checkDelayByClashApi(proxyName: String) {
         let timeoutMs = defaultLatencyTestTimeout * 1000
         let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -316,10 +276,10 @@ actor ClashApilatencyHandler: NSObject {
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data,
                let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let delay = result["delay"] as? Double {
-                Task {
-                  await AppState.shared.setLatency(latency: delay)
-                }
+               let delay = result["delay"] as? Double, delay > 0 {
+                 Task {
+                   await AppState.shared.setLatency(latency: delay)
+                 }
             } else if let error = error {
                 logger.error("Delay check failed: \(error.localizedDescription)")
             }

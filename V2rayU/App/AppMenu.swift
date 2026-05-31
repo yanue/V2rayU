@@ -183,10 +183,27 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     private func coreTitle() -> String {
         let onOff = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
-        if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
-            return "\(onOff) (\(server.AdaptCore().rawValue))"
+        guard AppState.shared.v2rayTurnOn else { return onOff }
+
+        let coreName: String
+        if !AppState.shared.runningCombination.isEmpty,
+           let combo = CombinedConfigStore.shared.fetchOne(uuid: AppState.shared.runningCombination) {
+            if let forced = combo.coreType?.forcedCoreType {
+                coreName = forced.displayName
+            } else {
+                // auto: 走 resolveCombination 逻辑确定实际 core
+                if let resolved = CoreConfigHandler().resolveCombination(combo) {
+                    coreName = resolved.coreType.displayName
+                } else {
+                    return onOff
+                }
+            }
+        } else if let server = AppState.shared.runningServer {
+            coreName = server.AdaptCore().displayName
+        } else {
+            return onOff
         }
-        return onOff
+        return "\(onOff) (\(coreName))"
     }
 
     private func updateMenuKeyEquivalents() {
