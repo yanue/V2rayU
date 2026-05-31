@@ -282,11 +282,11 @@ actor LegacyMigrationHandler {
 
         // 显示系统弹窗
         let alert = NSAlert()
-        alert.messageText = "检测到旧版数据"
-        alert.informativeText = "发现 \(data.servers) 个服务器和 \(data.subscriptions) 个订阅。是否导入到新版本？"
+        alert.messageText = String(localized: .ImportLegacyDataTitle)
+        alert.informativeText = String(localized: .ImportLegacyInfo, arguments: data.servers, data.subscriptions)
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "导入")
-        alert.addButton(withTitle: "跳过")
+        alert.addButton(withTitle: String(localized: .ImportLegacyButton))
+        alert.addButton(withTitle: String(localized: .ImportLegacySkip))
 
         let response = await presentAlert(alert)
 

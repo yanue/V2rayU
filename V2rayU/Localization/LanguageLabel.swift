@@ -126,6 +126,10 @@ enum LanguageLabel: String, CaseIterable {
     case TunDefaultDns
     case TunChinaDns
     case TunFakeipRange
+    case TunStrictRoute
+    case TunStrictRouteTip
+    case TunAutoRebuild
+    case TunAutoRebuildTip
 
     // MARK: - PAC Settings
     case PacSettings
@@ -166,6 +170,13 @@ enum LanguageLabel: String, CaseIterable {
     case DnsDefault
     case DnsXray
     case DnsSingbox
+    case DnsBasic
+    case DnsBasicSettings
+    case DnsDirect
+    case DnsRemote
+    case DnsDirectStrategy
+    case DnsProxyStrategy
+    case DnsBasicSettingsTip
 
     // MARK: - Subscription Settings
     case SubscriptionSettings
@@ -287,6 +298,8 @@ enum LanguageLabel: String, CaseIterable {
     case ViewErrorLog
     case ViewLogFiles
     case ClearAllLogs
+    case ClearAllLogsConfirm
+    case LogsCleared
     case OpenHomeFolder
     case Logs
     case ViewConfigJson
@@ -477,6 +490,20 @@ enum LanguageLabel: String, CaseIterable {
     case CoreDownloadCurrent
     case CoreDownloadSubtitle
     case OperationFailed
+    case StartFailed
+    case NoAvailableServerConfig
+    case LaunchDaemonStartFailed
+    case SocksPortNotReadyForTun
+    case TunServiceStartFailed
+    case InvalidCombination
+    case InvalidCombinationTip
+    case InvalidCombinationStartTip
+    case CombinationNoAvailableOutbounds
+    case XrayCompatibilityWarningTitle
+    case CoreCompatibilityWarningTitle
+    case PacGenerateFailed
+    case PacGenerateFailedTip
+    case DownloadTimeoutProxy
     case DownloadTimeoutError
     case DownloadSaveFailed
     case DownloadErrorOccurred
@@ -583,6 +610,10 @@ enum LanguageLabel: String, CaseIterable {
     case DiagSystemProxyNotNeeded
     case DiagReportCopied
     case DiagReportTooLong
+    case DiagCategoryFiles
+    case DiagCategoryStatus
+    case DiagCategoryNetwork
+    case DiagCategoryLogs
 
     // MARK: - Diagnostics - Actions
     case DiagOpenNetworkSettings
@@ -700,4 +731,19 @@ enum LanguageLabel: String, CaseIterable {
     case ImportFailedDetail
     case ImportParsing
     case ImportFromFile
+
+    // MARK: - Combination / Profile Hints
+    case CombinationCountFormat
+    case AutoCoreSelectionHint
+    case AutoDefaultCoreSelectionHint
+    case ManualCoreSelectionHint
+    case PingAlreadyRunning
+    case PingNoNodes
+    case PingStartAll
+    case PingSingleAlreadyRunning
+    case PingStartNode
+    case PingStartSingleNodeFormat
+    case PingSuccessFormat
+    case PingFailureRetryFormat
+    case PingCompleteSingleNodeFormat
 }

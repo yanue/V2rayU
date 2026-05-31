@@ -10,7 +10,7 @@ enum DnsCoreTab: String, CaseIterable, Identifiable, Hashable {
 
     var title: LocalizedStringKey {
         switch self {
-        case .basic: return "DnsBasic"
+        case .basic: return LocalizedStringKey(LanguageLabel.DnsBasic.rawValue)
         case .xray: return "DnsXray"
         case .singbox: return "DnsSingbox"
         }
@@ -81,28 +81,28 @@ struct DnsView: View {
     private var dnsBasicSettings: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                Text("DNS 基础设置")
+                Text(String(localized: .DnsBasicSettings))
                     .font(.headline)
                     .foregroundColor(.secondary)
 
-                getPlainTextFieldWithLabel(label: "直连 DNS", text: $settings.dnsDirect, labelWidth: labelWidth)
-                getPlainTextFieldWithLabel(label: "远程 DNS", text: $settings.dnsRemote, labelWidth: labelWidth)
+                getPlainTextFieldWithLabel(label: String(localized: .DnsDirect), text: $settings.dnsDirect, labelWidth: labelWidth)
+                getPlainTextFieldWithLabel(label: String(localized: .DnsRemote), text: $settings.dnsRemote, labelWidth: labelWidth)
                 getPlainTextFieldWithLabel(label: "Bootstrap DNS", text: $settings.dnsBootstrap, labelWidth: labelWidth)
 
                 HStack() {
-                    Text("直连目标解析策略")
+                    Text(String(localized: .DnsDirectStrategy))
                         .frame(width: labelWidth, alignment: .leading)
                     dnsStrategyPicker(selection: $settings.dnsDirectStrategy)
 
                 }
                 
                 HStack() {
-                    Text("代理目标解析策略")
+                    Text(String(localized: .DnsProxyStrategy))
                         .frame(width: labelWidth, alignment: .leading)
                     dnsStrategyPicker(selection: $settings.dnsProxyStrategy)
                 }
 
-                Text("说明：这些基础选项会用于生成默认 v2ray/sing-box DNS。若下方自定义 DNS JSON 已保存，则自定义 JSON 优先；修改基础选项后，到对应自定义 DNS 标签页点击“默认”可按当前基础设置重新生成 JSON。")
+                Text(String(localized: .DnsBasicSettingsTip))
                     .font(.caption)
                     .foregroundColor(.secondary)
 

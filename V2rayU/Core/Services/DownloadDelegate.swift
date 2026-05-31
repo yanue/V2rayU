@@ -48,8 +48,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
             guard let self = self else { return }
             self.didTimeout = true
             downloadTask.cancel()
-            DispatchQueue.main.async {
-                self.onError("下载超时，请检查网络或代理设置")
+            Task { @MainActor in
+                self.onError(String(localized: .DownloadTimeoutProxy))
             }
         }
     }
@@ -61,8 +61,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
             guard let self = self else { return }
             self.didTimeout = true
             task.cancel()
-            DispatchQueue.main.async {
-                self.onError("下载超时，请检查网络或代理设置")
+            Task { @MainActor in
+                self.onError(String(localized: .DownloadTimeoutProxy))
             }
         }
     }
@@ -107,7 +107,9 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
                 try FileManager.default.removeItem(atPath: filePath)
             }
         } catch let catchError {
-            alertDialog(title: "下载失败1", message: "保存出错 = \(catchError.localizedDescription)")
+            Task { @MainActor in
+                alertDialog(title: String(localized: .DownloadSaveFailed), message: String(localized: .OperationFailed, arguments: catchError.localizedDescription))
+            }
         }
         do {
             if FileManager.default.fileExists(atPath: documentsPath) == false {
@@ -116,7 +118,9 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
             // 移动文件,不然随时被删除
             try FileManager.default.moveItem(atPath: locationPath, toPath: filePath)
         } catch let catchError {
-            alertDialog(title: "下载失败2", message: "保存出错 = \(catchError.localizedDescription)")
+            Task { @MainActor in
+                alertDialog(title: String(localized: .DownloadSaveFailed), message: String(localized: .OperationFailed, arguments: catchError.localizedDescription))
+            }
         }
         DispatchQueue.main.async {
             self.onSuccess(filePath)
@@ -130,8 +134,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
                 // 已在超时回调处理
                 return
             }
-            DispatchQueue.main.async {
-                self.onError("下载失败: \(error.localizedDescription)")
+            Task { @MainActor in
+                self.onError(String(localized: .OperationFailed, arguments: error.localizedDescription))
             }
         }
     }

@@ -102,7 +102,7 @@ struct CombinedConfigListView: View {
                 Spacer()
 
                 // Summary stats
-                Text("共 \(viewModel.list.count) 个组合")
+                Text(String(localized: .CombinationCountFormat, arguments: viewModel.list.count))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

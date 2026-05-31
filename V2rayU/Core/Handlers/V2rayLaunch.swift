@@ -51,6 +51,16 @@ actor V2rayLaunch {
     private var lastRebuildAt: Date?
     private let minRebuildInterval: TimeInterval = 8
 
+    private func localized(_ label: LanguageLabel) async -> String {
+        await MainActor.run { String(localized: label) }
+    }
+
+    private func noticeLocalized(title: LanguageLabel, message: LanguageLabel) async {
+        let titleText = await localized(title)
+        let messageText = await localized(message)
+        noticeTip(title: titleText, informativeText: messageText)
+    }
+
     func restart() async {
         let _ = await start()
     }
@@ -63,7 +73,7 @@ actor V2rayLaunch {
         }
 
         guard let item = ProfileStore.shared.getRunning() else {
-            noticeTip(title: "启动失败", informativeText: "无可用服务器配置，请先添加服务器或订阅")
+            await noticeLocalized(title: .StartFailed, message: .NoAvailableServerConfig)
             await MainActor.run {
                 AppState.shared.runningProfile = ""
                 AppState.shared.runningServer = nil
@@ -72,7 +82,7 @@ actor V2rayLaunch {
         }
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
-            await showAlert(title: "Xray 版本兼容性提醒", message: warningMessage)
+            await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
         }
         if !coreDecision.canLaunch {
             logger.error("start aborted: profile is incompatible with current Xray-core and cannot fallback to Sing-Box")
@@ -101,7 +111,7 @@ actor V2rayLaunch {
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
         if !started {
-            noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
+            await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
             return false
         }
         let mode = await AppState.shared.runMode
@@ -109,7 +119,7 @@ actor V2rayLaunch {
             let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
             guard socksReady else {
                 logger.error("start aborted: SOCKS port is not ready before starting TUN")
-                noticeTip(title: "启动失败", informativeText: "SOCKS 端口未就绪，未启动 TUN 服务")
+                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
                 await LaunchAgent.shared.stopAgent()
                 return false
             }
@@ -131,7 +141,7 @@ actor V2rayLaunch {
 
             let tunStarted = await LaunchAgent.shared.startTunHelper()
             if !tunStarted {
-                noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
                 return false
@@ -150,7 +160,7 @@ actor V2rayLaunch {
 
     private func startCombination(uuid: String) async -> Bool {
         guard let combination = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
-            noticeTip(title: "启动失败", informativeText: "组合配置无效，请检查端口和出站服务器")
+            await noticeLocalized(title: .StartFailed, message: .InvalidCombinationStartTip)
             await MainActor.run {
                 AppState.shared.runningCombination = ""
             }
@@ -159,12 +169,12 @@ actor V2rayLaunch {
 
         let cfg = CoreConfigHandler()
         guard let resolved = cfg.resolveCombination(combination), let firstProfile = resolved.firstProfile else {
-            noticeTip(title: "启动失败", informativeText: "组合配置没有可用的出站服务器")
+            await noticeLocalized(title: .StartFailed, message: .CombinationNoAvailableOutbounds)
             return false
         }
 
         if let warningMessage = resolved.warningMessage {
-            await showAlert(title: "核心兼容性提醒", message: warningMessage)
+            await showAlert(title: await localized(.CoreCompatibilityWarningTitle), message: warningMessage)
         }
         if !resolved.canLaunch {
             logger.error("start combination aborted: combined config is incompatible with selected core")
@@ -189,7 +199,7 @@ actor V2rayLaunch {
 
         let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
         if !started {
-            noticeTip(title: "启动失败", informativeText: "无法启动LaunchDaemon")
+            await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
             return false
         }
         let mode = await AppState.shared.runMode
@@ -197,7 +207,7 @@ actor V2rayLaunch {
             let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
             guard socksReady else {
                 logger.error("start combined config aborted: SOCKS port is not ready before starting TUN")
-                noticeTip(title: "启动失败", informativeText: "SOCKS 端口未就绪，未启动 TUN 服务")
+                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
                 await LaunchAgent.shared.stopAgent()
                 return false
             }
@@ -214,7 +224,7 @@ actor V2rayLaunch {
 
             let tunStarted = await LaunchAgent.shared.startTunHelper()
             if !tunStarted {
-                noticeTip(title: "启动失败", informativeText: "无法启动TUN服务")
+                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
                 return false
@@ -416,7 +426,9 @@ actor V2rayLaunch {
         }
         if mode == .pac {
             if !GeneratePACFile(rewrite: false) {
-                noticeTip(title: "PAC 生成失败", informativeText: "无法生成 proxy.js，PAC 模式可能不会生效")
+                Task { @MainActor in
+                    noticeTip(title: String(localized: .PacGenerateFailed), informativeText: String(localized: .PacGenerateFailedTip))
+                }
             }
             pacUrl = getPacUrl()
         }

@@ -151,6 +151,13 @@
 "DnsDefault" = "Default";
 "DnsXray" = "Xray";
 "DnsSingbox" = "Sing-Box";
+"DnsBasic" = "Basic";
+"DnsBasicSettings" = "DNS Basic Settings";
+"DnsDirect" = "Direct DNS";
+"DnsRemote" = "Remote DNS";
+"DnsDirectStrategy" = "Direct target resolution strategy";
+"DnsProxyStrategy" = "Proxy target resolution strategy";
+"DnsBasicSettingsTip" = "Note: These basic options are used to generate the default v2ray/sing-box DNS configuration. If a custom DNS JSON below has been saved, the custom JSON takes precedence. After changing the basic options, click Default in the corresponding custom DNS tab to regenerate JSON with the current basic settings.";
 
 // MARK: - Subscription Settings
 "SubscriptionSettings" = "Subscription Settings";
@@ -271,6 +278,8 @@
 "ViewTunLog" = "View Tun Log";
 "ViewLogFiles" = "View Log Files...";
 "ClearAllLogs" = "Clear All Logs";
+"ClearAllLogsConfirm" = "Are you sure you want to clear all log files? This action cannot be undone.";
+"LogsCleared" = "Logs cleared";
 "ViewFiles" = "View Files";
 "OpenHomeFolder" = "open ~/.V2rayU folder";
 "Logs" = "Logs";
@@ -461,6 +470,20 @@
 "CoreDownloadCurrent" = "Current";
 "CoreDownloadSubtitle" = "Browse and download Xray-core / Sing-box releases from GitHub";
 "OperationFailed" = "Operation Failed: %@";
+"StartFailed" = "Start Failed";
+"NoAvailableServerConfig" = "No available server configuration. Please add a server or subscription first.";
+"LaunchDaemonStartFailed" = "Unable to start LaunchDaemon";
+"SocksPortNotReadyForTun" = "SOCKS port is not ready. TUN service was not started.";
+"TunServiceStartFailed" = "Unable to start TUN service";
+"InvalidCombination" = "Invalid Combination";
+"InvalidCombinationTip" = "Please check whether ports, outbound settings, and linked servers still exist.";
+"InvalidCombinationStartTip" = "Invalid combination. Please check the ports and outbound servers.";
+"CombinationNoAvailableOutbounds" = "The combination has no available outbound servers.";
+"XrayCompatibilityWarningTitle" = "Xray Version Compatibility Notice";
+"CoreCompatibilityWarningTitle" = "Core Compatibility Notice";
+"PacGenerateFailed" = "PAC Generation Failed";
+"PacGenerateFailedTip" = "Unable to generate proxy.js. PAC mode may not take effect.";
+"DownloadTimeoutProxy" = "Download timed out. Please check your network or proxy settings.";
 "DownloadTimeoutError" = "Download timed out";
 "DownloadSaveFailed" = "Failed to save file";
 "DownloadErrorOccurred" = "An error occurred during download";
@@ -619,6 +642,10 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagSystemProxyNotNeeded" = "System proxy not needed in current mode";
 "DiagReportCopied" = "Report copied to clipboard. Please paste into the GitHub issue.";
 "DiagReportTooLong" = "Report too long for URL, copied to clipboard instead";
+"DiagCategoryFiles" = "File Checks";
+"DiagCategoryStatus" = "Runtime Status";
+"DiagCategoryNetwork" = "Network Checks";
+"DiagCategoryLogs" = "Log Analysis";
 "DiagCoreArchCorrect" = "Architecture matches system (%@)";
 "DiagCoreArchMismatch" = "Architecture mismatch (file: %@, system: %@)";
 "DiagSingBoxNotExecutable" = "sing-box binary is not executable";
@@ -705,3 +732,22 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunDefaultDns" = "Default DNS";
 "TunChinaDns" = "China DNS";
 "TunFakeipRange" = "FakeIP Range";
+"TunStrictRoute" = "Strict route (strict_route)";
+"TunStrictRouteTip" = "Enabled by default. Try turning it off if the network occasionally breaks after switching networks.";
+"TunAutoRebuild" = "Auto rebuild TUN after network changes";
+"TunAutoRebuildTip" = "Automatically rebuild the tunnel after Wi-Fi changes or wake-up to avoid broken routes.";
+
+// MARK: - Combination / Profile Hints
+"CombinationCountFormat" = "%d combinations";
+"AutoCoreSelectionHint" = "Auto: Select via CoreCapabilityRules, prefer Xray, and fall back to Sing-Box when needed.";
+"AutoDefaultCoreSelectionHint" = "Auto: This protocol defaults to %@. CoreCapabilityRules will still be checked before startup.";
+"ManualCoreSelectionHint" = "%@ selected. CoreCapabilityRules will check whether the current node is compatible before startup.";
+"PingAlreadyRunning" = "Ping is already running";
+"PingNoNodes" = "No nodes available to ping";
+"PingStartAll" = "Started pinging all nodes";
+"PingSingleAlreadyRunning" = "Ping is already running, skipped single-node ping";
+"PingStartNode" = "Started pinging node";
+"PingStartSingleNodeFormat" = "Started single-node ping: %@";
+"PingSuccessFormat" = "Ping succeeded: %@ - %dms";
+"PingFailureRetryFormat" = "Ping failed: %@ - attempt %d: %@";
+"PingCompleteSingleNodeFormat" = "Completed single-node ping: %@";

@@ -243,7 +243,7 @@ struct DiagnosticsView: View {
                         .font(.system(size: 13))
                         .foregroundColor(.accentColor)
 
-                    Text(category.rawValue)
+                    Text(category.localizedTitle)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.primary)
 

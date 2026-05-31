@@ -719,14 +719,14 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             Task { @MainActor in
                 let alert = NSAlert()
                 alert.messageText = String(localized: .ClearAllLogs)
-                alert.informativeText = "确定要清除所有日志文件吗？此操作不可撤销。"
+                alert.informativeText = String(localized: .ClearAllLogsConfirm)
                 alert.alertStyle = .warning
                 alert.addButton(withTitle: String(localized: .Confirm))
                 alert.addButton(withTitle: String(localized: .Cancel))
 
                 if await presentAlert(alert) == .alertFirstButtonReturn {
                     LogRotation.clearAllLogs()
-                    noticeTip(title: String(localized: .ClearAllLogs), informativeText: "日志已清除")
+                    noticeTip(title: String(localized: .ClearAllLogs), informativeText: String(localized: .LogsCleared))
                 }
             }
         }

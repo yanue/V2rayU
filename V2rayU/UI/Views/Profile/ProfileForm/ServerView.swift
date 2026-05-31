@@ -152,11 +152,11 @@ struct ConfigServerView: View {
         if selection == .auto {
             let defaultSelection = CoreSelectionDefaults.selection(for: item.protocol)
             if defaultSelection == .auto {
-                return "Auto：按 CoreCapabilityRules 自动选择，优先 Xray，必要时回退 Sing-Box。"
+                return String(localized: .AutoCoreSelectionHint)
             }
-            return "Auto：当前协议默认使用 \(defaultSelection.displayName)，启动前仍会校验 CoreCapabilityRules。"
+            return String(localized: .AutoDefaultCoreSelectionHint, arguments: defaultSelection.displayName)
         }
-        return "已选择 \(selection.displayName)，启动前会按 CoreCapabilityRules 校验当前节点是否兼容。"
+        return String(localized: .ManualCoreSelectionHint, arguments: selection.displayName)
     }
 
     private var coreCompatibilityWarning: String? {

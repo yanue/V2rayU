@@ -151,6 +151,13 @@
 "DnsDefault" = "推薦";
 "DnsXray" = "Xray";
 "DnsSingbox" = "Sing-Box";
+"DnsBasic" = "基礎";
+"DnsBasicSettings" = "DNS 基礎設定";
+"DnsDirect" = "直連 DNS";
+"DnsRemote" = "遠端 DNS";
+"DnsDirectStrategy" = "直連目標解析策略";
+"DnsProxyStrategy" = "代理目標解析策略";
+"DnsBasicSettingsTip" = "說明：這些基礎選項會用於產生預設 v2ray/sing-box DNS。若下方自訂 DNS JSON 已儲存，則自訂 JSON 優先；修改基礎選項後，到對應自訂 DNS 標籤頁點擊「推薦」即可按目前基礎設定重新產生 JSON。";
 
 // MARK: - 訂閱設定
 "SubscriptionSettings" = "訂閱設定";
@@ -246,6 +253,10 @@
 "ObfuscationSettings" = "混淆設定";
 "ObfsType" = "混淆類型";
 "ObfsPassword" = "混淆密碼";
+"HopPortRange" = "跳躍連接埠範圍";
+"HopPortRangeTip" = "會覆蓋連接埠，多組時用逗號 (,) 分隔";
+"Masquerade" = "Masquerade";
+"FinalMask" = "FinalMask";
 "AuthenticationSettings" = "認證設定";
 "AuthType" = "認證類型";
 "None" = "無";
@@ -267,6 +278,8 @@
 "ViewTunLog" = "檢視 Tun 日誌";
 "ViewLogFiles" = "檢視日誌檔案...";
 "ClearAllLogs" = "清除所有日誌";
+"ClearAllLogsConfirm" = "確定要清除所有日誌檔案嗎？此操作無法復原。";
+"LogsCleared" = "日誌已清除";
 "ViewFiles" = "查看文件";
 "OpenHomeFolder" = "打开 ~/.V2rayU 目录";
 "Logs" = "日誌";
@@ -457,6 +470,20 @@
 "CoreDownloadCurrent" = "當前版本";
 "CoreDownloadSubtitle" = "瀏覽並下載 Xray-core 和 Sing-box 的 GitHub 版本";
 "OperationFailed" = "操作失敗: %@";
+"StartFailed" = "啟動失敗";
+"NoAvailableServerConfig" = "沒有可用的伺服器設定，請先新增伺服器或訂閱";
+"LaunchDaemonStartFailed" = "無法啟動 LaunchDaemon";
+"SocksPortNotReadyForTun" = "SOCKS 連接埠尚未就緒，未啟動 TUN 服務";
+"TunServiceStartFailed" = "無法啟動 TUN 服務";
+"InvalidCombination" = "組合設定無效";
+"InvalidCombinationTip" = "請檢查連接埠、出站設定和關聯的伺服器是否仍然存在";
+"InvalidCombinationStartTip" = "組合設定無效，請檢查連接埠和出站伺服器";
+"CombinationNoAvailableOutbounds" = "組合設定沒有可用的出站伺服器";
+"XrayCompatibilityWarningTitle" = "Xray 版本相容性提醒";
+"CoreCompatibilityWarningTitle" = "核心相容性提醒";
+"PacGenerateFailed" = "PAC 產生失敗";
+"PacGenerateFailedTip" = "無法產生 proxy.js，PAC 模式可能不會生效";
+"DownloadTimeoutProxy" = "下載逾時，請檢查網路或代理設定";
 "DownloadTimeoutError" = "下載逾時";
 "DownloadSaveFailed" = "儲存檔案失敗";
 "DownloadErrorOccurred" = "下載過程中發生錯誤";
@@ -615,6 +642,10 @@
 "DiagSystemProxyNotNeeded" = "目前模式不需要系統代理";
 "DiagReportCopied" = "報告已複製到剪貼簿，請貼到 GitHub Issue 中。";
 "DiagReportTooLong" = "報告超出 URL 長度限制，已複製到剪貼簿";
+"DiagCategoryFiles" = "檔案檢查";
+"DiagCategoryStatus" = "執行狀態";
+"DiagCategoryNetwork" = "網路檢查";
+"DiagCategoryLogs" = "日誌分析";
 "DiagCoreArchCorrect" = "架構與系統匹配 (%@)";
 "DiagCoreArchMismatch" = "架構不匹配（檔案: %@，系統: %@）";
 "DiagSingBoxNotExecutable" = "sing-box 二進位檔案不可執行";
@@ -701,3 +732,22 @@
 "TunDefaultDns" = "默認 DNS";
 "TunChinaDns" = "國內 DNS";
 "TunFakeipRange" = "FakeIP 範圍";
+"TunStrictRoute" = "強制路由 (strict_route)";
+"TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";
+"TunAutoRebuild" = "網路變化後自動重建 TUN";
+"TunAutoRebuildTip" = "切換 Wi-Fi / 喚醒後自動重建隧道，避免路由失效導致斷線";
+
+// MARK: - 組合設定 / 核心提示
+"CombinationCountFormat" = "共 %d 個組合";
+"AutoCoreSelectionHint" = "Auto：按 CoreCapabilityRules 自動選擇，優先 Xray，必要時回退 Sing-Box。";
+"AutoDefaultCoreSelectionHint" = "Auto：目前協議預設使用 %@，啟動前仍會校驗 CoreCapabilityRules。";
+"ManualCoreSelectionHint" = "已選擇 %@，啟動前會按 CoreCapabilityRules 校驗目前節點是否相容。";
+"PingAlreadyRunning" = "Ping 已經在執行中";
+"PingNoNodes" = "沒有可 Ping 的節點";
+"PingStartAll" = "開始 Ping 所有節點";
+"PingSingleAlreadyRunning" = "Ping 已在執行中，跳過單節點 Ping";
+"PingStartNode" = "開始 Ping 節點";
+"PingStartSingleNodeFormat" = "開始單節點 Ping: %@";
+"PingSuccessFormat" = "Ping 成功: %@ - %dms";
+"PingFailureRetryFormat" = "Ping 失敗: %@ - 第%d次: %@";
+"PingCompleteSingleNodeFormat" = "完成單節點 Ping: %@";

@@ -18,10 +18,14 @@ actor PingAll {
     private var totalCount = 0
     private var finishedCount = 0
 
+    private func localized(_ label: LanguageLabel, _ arguments: CVarArg...) async -> String {
+        await MainActor.run { String(localized: label, arguments: arguments) }
+    }
+
     func run() async {
         guard !inPing else {
             logger.info("Ping is already running.")
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 已经在运行中")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingAlreadyRunning))
             return
         }
         inPing = true
@@ -32,7 +36,7 @@ actor PingAll {
         guard !items.isEmpty else {
             logger.info("No items to ping.")
             inPing = false
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "没有可 Ping 的节点")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingNoNodes))
             return
         }
 
@@ -43,7 +47,7 @@ actor PingAll {
         }
 
         logger.info("Ping started.")
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 所有节点")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartAll))
         await pingTaskGroup(items: items)
     }
 
@@ -122,14 +126,14 @@ actor PingAll {
     func pingOne(item: ProfileEntity) async {
         guard !inPing else {
             logger.info("Ping is already running, skip pingOne.")
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 已在运行中，跳过单节点 Ping")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingSingleAlreadyRunning))
             return
         }
         inPing = true
         defer {
             Task { await self.setInPingFalse() }
         }
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始 Ping 节点")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartNode))
         await pingTaskGroup(items: [item])
     }
 }
@@ -379,6 +383,10 @@ actor PingRunning {
     private var isExecuting = false
     private var item: ProfileEntity = ProfileEntity()
 
+    private func localized(_ label: LanguageLabel, _ arguments: CVarArg...) async -> String {
+        await MainActor.run { String(localized: label, arguments: arguments) }
+    }
+
     /// 开始 Ping 流程
     func startPing() async throws {
         guard !isExecuting else {
@@ -386,11 +394,13 @@ actor PingRunning {
             return
         }
         guard let item = ProfileStore.shared.getRunning() else {
-            noticeTip(title: "启动失败", informativeText: "配置文件不存在")
+            let title = await localized(.StartFailed)
+            let message = await localized(.DiagConfigFileMissing)
+            noticeTip(title: title, informativeText: message)
             return
         }
         self.item = item
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "开始单节点 Ping: \(item.remark)")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartSingleNodeFormat, item.remark))
         // 睡眠
         try await Task.sleep(nanoseconds: 2 * 1000000000) // Wait for 2 seconds
         // 替换
@@ -405,12 +415,12 @@ actor PingRunning {
             do {
                 let pingTime = try await testLatencyByProxyPort(port: port)
                 logger.info("Ping success, time: \(pingTime)ms")
-                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 成功: \(item.remark) - \(pingTime)ms")
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingSuccessFormat, item.remark, pingTime))
                 resetFailureCount()
                 success = true
             } catch {
                 retries += 1
-                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping 失败: \(item.remark) - 第\(retries)次: \(error.localizedDescription)")
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingFailureRetryFormat, item.remark, retries, error.localizedDescription))
                 logger.info("Ping failed (\(retries)/\(self.maxRetries)): \(error)")
             }
         }
@@ -418,7 +428,7 @@ actor PingRunning {
         if !success {
             await handleFailure()
         } else {
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "完成单节点 Ping: \(item.remark)")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingCompleteSingleNodeFormat, item.remark))
         }
     }
 

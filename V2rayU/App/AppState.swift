@@ -218,7 +218,7 @@ final class AppState: ObservableObject {
         }
         guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
             runningCombination = ""
-            noticeTip(title: "组合配置无效", informativeText: "请检查端口、出站配置和关联的服务器是否仍然存在")
+            noticeTip(title: String(localized: .InvalidCombination), informativeText: String(localized: .InvalidCombinationTip))
             AppMenuManager.shared.refreshCombinedConfigItems()
             AppMenuManager.shared.refreshBasicMenus()
             return

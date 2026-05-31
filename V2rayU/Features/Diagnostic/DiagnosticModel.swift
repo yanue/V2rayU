@@ -17,6 +17,16 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    @MainActor
+    var localizedTitle: String {
+        switch self {
+        case .files: return String(localized: .DiagCategoryFiles)
+        case .status: return String(localized: .DiagCategoryStatus)
+        case .network: return String(localized: .DiagCategoryNetwork)
+        case .logs: return String(localized: .DiagCategoryLogs)
+        }
+    }
+
     var icon: String {
         switch self {
         case .files:   return "folder.badge.gearshape"
