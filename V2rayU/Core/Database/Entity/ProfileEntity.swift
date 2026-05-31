@@ -208,6 +208,26 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         }
     }
 
+    // trim all string fields
+    mutating func trimFields() {
+        remark = remark.trimmingCharacters(in: .whitespacesAndNewlines)
+        subid = subid.trimmingCharacters(in: .whitespacesAndNewlines)
+        address = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        password = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        encryption = encryption.trimmingCharacters(in: .whitespacesAndNewlines)
+        host = host.trimmingCharacters(in: .whitespacesAndNewlines)
+        path = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        flow = flow.trimmingCharacters(in: .whitespacesAndNewlines)
+        sni = sni.trimmingCharacters(in: .whitespacesAndNewlines)
+        publicKey = publicKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        shortId = shortId.trimmingCharacters(in: .whitespacesAndNewlines)
+        spiderX = spiderX.trimmingCharacters(in: .whitespacesAndNewlines)
+        extra = extra.trimmingCharacters(in: .whitespacesAndNewlines)
+        shareUri = shareUri.trimmingCharacters(in: .whitespacesAndNewlines)
+        serverIp = serverIp.trimmingCharacters(in: .whitespacesAndNewlines)
+        serverRegion = serverRegion.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     // 自定义表名
     static var databaseTableName: String {
         return "profile" // 设置你的表名

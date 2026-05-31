@@ -18,10 +18,41 @@ struct ProfileStore: StoreProtocol {
     let dbWriter: DatabaseWriter = AppDatabase.shared.dbWriter
     
     @discardableResult
-    func insertMany(_ items: [ProfileEntity]) -> Bool {
+    func insert(_ entity: ProfileEntity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
         do {
             try dbWriter.write { db in
-                for item in items {
+                try trimmed.insert(db)
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.insert error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func upsert(_ entity: ProfileEntity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
+        do {
+            try dbWriter.write { db in
+                try trimmed.save(db)
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.upsert error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func insertMany(_ items: [ProfileEntity]) -> Bool {
+        let trimmed = items.map { var e = $0; e.trimFields(); return e }
+        do {
+            try dbWriter.write { db in
+                for item in trimmed {
                     try item.save(db)
                 }
             }
@@ -81,6 +112,7 @@ struct ProfileStore: StoreProtocol {
         do {
             try dbWriter.write { db in
                 var updatedDto = newDto
+                updatedDto.trimFields()
                 updatedDto.uuid = oldDto.uuid
                 updatedDto.speed = oldDto.speed
                 updatedDto.totalUp = oldDto.totalUp
