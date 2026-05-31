@@ -56,11 +56,17 @@ class CoreConfigHandler {
     public func resolveCombination(_ combination: CombinedConfigEntity) -> CombinedConfigResolved? {
         guard let validCombination = CombinedConfigStore.shared.getValidCombination(uuid: combination.uuid) else { return nil }
         let profilesByUUID = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
+        let forcedCore = validCombination.coreType?.forcedCoreType
         var resolvedGroups: [CombinedConfigResolvedGroup] = []
         var allProfiles: [ProfileEntity] = []
 
         for group in validCombination.groups {
-            let profiles = group.outboundProfileUUIDs.compactMap { profilesByUUID[$0] }
+            let profiles = group.outboundProfileUUIDs.compactMap { profilesByUUID[$0] }.map { profile -> ProfileEntity in
+                guard let forcedCore else { return profile }
+                var copy = profile
+                copy.coreType = forcedCore == .XrayCore ? .xray : .singbox
+                return copy
+            }
             guard profiles.count == group.outboundProfileUUIDs.count, !profiles.isEmpty else { return nil }
             resolvedGroups.append(CombinedConfigResolvedGroup(group: group, profiles: profiles))
             allProfiles.append(contentsOf: profiles)
@@ -68,14 +74,7 @@ class CoreConfigHandler {
 
         guard !resolvedGroups.isEmpty else { return nil }
 
-        let forcedCore = validCombination.coreType?.forcedCoreType
-        let checkedProfiles = allProfiles.map { profile -> ProfileEntity in
-            guard let forcedCore else { return profile }
-            var copy = profile
-            copy.coreType = forcedCore == .XrayCore ? .xray : .singbox
-            return copy
-        }
-        let decisions = checkedProfiles.map { $0.resolveCoreCompatibility() }
+        let decisions = allProfiles.map { $0.resolveCoreCompatibility() }
         let warningMessage = decisions.compactMap { $0.warningMessage }.joined(separator: "\n\n")
         let canLaunch = decisions.allSatisfy { $0.canLaunch }
         let coreType: CoreType

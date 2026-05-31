@@ -566,9 +566,7 @@ private func testSingBoxApiLatency(apiPort: UInt16) async throws -> Int {
     guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
         throw URLError(.badServerResponse)
     }
-    guard let result = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-          let delay = result["delay"] as? Double,
-          delay > 0 else {
+    guard let delay = parseClashDelay(from: data) else {
         throw NSError(domain: "PingServerError", code: -3, userInfo: [NSLocalizedDescriptionKey: "Sing-Box delay unavailable"])
     }
 

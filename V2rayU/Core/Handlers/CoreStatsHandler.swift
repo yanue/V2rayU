@@ -5,6 +5,25 @@ struct Traffic: Codable {
     let down: Double
 }
 
+func parseClashDelayValue(_ value: Any?) -> Double? {
+    let delay: Double?
+    switch value {
+    case let number as NSNumber where !(number is Bool):
+        delay = number.doubleValue
+    case let string as String:
+        delay = Double(string)
+    default:
+        delay = nil
+    }
+    guard let delay, delay.isFinite, delay > 0 else { return nil }
+    return delay
+}
+
+func parseClashDelay(from data: Data) -> Double? {
+    guard let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+    return parseClashDelayValue(result["delay"])
+}
+
 actor CoreTrafficStatsHandler {
     static let shared = CoreTrafficStatsHandler()
     
@@ -254,8 +273,7 @@ actor ClashApilatencyHandler: NSObject {
 
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            if let result = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let delay = result["delay"] as? Double, delay > 0 {
+            if let delay = parseClashDelay(from: data) {
                 return delay
             }
         } catch {
@@ -275,8 +293,7 @@ actor ClashApilatencyHandler: NSObject {
         guard let url = components?.url else { return }
         let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data,
-               let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let delay = result["delay"] as? Double, delay > 0 {
+               let delay = parseClashDelay(from: data) {
                  Task {
                    await AppState.shared.setLatency(latency: delay)
                  }

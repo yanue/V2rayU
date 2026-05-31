@@ -213,12 +213,14 @@ final class AppState: ObservableObject {
             logger.info("switchCombination-deselect: \(uuid)")
             AppMenuManager.shared.refreshCombinedConfigItems()
             AppMenuManager.shared.refreshServerItems()
+            AppMenuManager.shared.refreshBasicMenus()
             return
         }
         guard let combo = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
             runningCombination = ""
             noticeTip(title: "组合配置无效", informativeText: "请检查端口、出站配置和关联的服务器是否仍然存在")
             AppMenuManager.shared.refreshCombinedConfigItems()
+            AppMenuManager.shared.refreshBasicMenus()
             return
         }
         runningCombination = uuid
@@ -233,6 +235,7 @@ final class AppState: ObservableObject {
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshCombinedConfigItems()
         AppMenuManager.shared.refreshServerItems()
+        AppMenuManager.shared.refreshBasicMenus()
     }
 
     // MARK: - 切换配置
