@@ -18,16 +18,30 @@ actor LocalHttpServer {
     static let shared = LocalHttpServer()
 
     private var httpServer: HTTPServer?
+    private var currentPort: UInt16?
+    private var currentAddress: String?
 
     func restart() async {
         logger.info("Restarting LocalHttpServer")
         await stop()
+        try? await Task.sleep(nanoseconds: 200_000_000)
         await start()
     }
-    
+
     func start() async {
         let pacPort = getPacPort()
-        logger.info("pacPort: \(pacPort)")
+        let listenAddress = getListenAddress()
+        logger.info("pacPort: \(pacPort), listenAddress: \(listenAddress)")
+
+        if httpServer != nil, currentPort == pacPort, currentAddress == listenAddress {
+            logger.info("LocalHttpServer already running at \(listenAddress):\(pacPort)")
+            return
+        }
+
+        if httpServer != nil {
+            await stop()
+            try? await Task.sleep(nanoseconds: 200_000_000)
+        }
 
         if isPortOpen(pacPort) {
             let title = await String(localized: .PortInUse)
@@ -43,7 +57,7 @@ actor LocalHttpServer {
         let server: HTTPServer
         do {
             // 绑定到所有网络接口，支持局域网访问
-            server = try HTTPServer(address: .inet(ip4: getListenAddress(), port: UInt16(pacPort)))
+            server = try HTTPServer(address: .inet(ip4: listenAddress, port: UInt16(pacPort)))
         } catch {
             logger.info("Failed to create HTTP server: \(error)")
             return
@@ -76,18 +90,31 @@ actor LocalHttpServer {
         }
         
         httpServer = server
+        currentPort = pacPort
+        currentAddress = listenAddress
         Task {
             do {
+                logger.info("FlyingFox HTTPServer starting at \(listenAddress):\(pacPort)")
                 try await server.run()
-                logger.info("FlyingFox HTTPServer started at port: \(pacPort)")
+                logger.info("FlyingFox HTTPServer stopped at \(listenAddress):\(pacPort)")
             } catch {
                 logger.info("FlyingFox HTTPServer run error: \(error)")
             }
+            await self.clearIfCurrent(server)
         }
+    }
+
+    private func clearIfCurrent(_ server: HTTPServer) {
+        guard httpServer === server else { return }
+        httpServer = nil
+        currentPort = nil
+        currentAddress = nil
     }
 
     func stop() async {
         await httpServer?.stop()
         httpServer = nil
+        currentPort = nil
+        currentAddress = nil
     }
 }

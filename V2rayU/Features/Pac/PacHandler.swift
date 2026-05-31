@@ -14,6 +14,23 @@ let PACAbpFile = PACRulesDirPath + "abp.js"
 let GFWListFilePath = PACRulesDirPath + "gfwlist.txt"
 let GFWListURL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
 
+private let LocalHttpAddress = "127.0.0.1"
+
+
+func getLocalPacUrl() -> String {
+    "http://\(LocalHttpAddress):\(getPacPort())/proxy.js"
+}
+
+
+func getLocalConfigUrl() -> String {
+    "http://\(LocalHttpAddress):\(getPacPort())/config.json"
+}
+
+
+func getLocalTunConfigUrl() -> String {
+    "http://\(LocalHttpAddress):\(getPacPort())/tun.json"
+}
+
 
 func getPacUrl() -> String {
     let pacUrl = "http://" + getPacAddress() + ":" + String(getPacPort()) + "/proxy.js"

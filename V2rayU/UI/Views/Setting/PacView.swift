@@ -91,7 +91,7 @@ struct PacView: View {
     }
 
     func viewPacFile(_ sender: Any) {
-        let pacUrl = getPacUrl()
+        let pacUrl = getLocalPacUrl()
         logger.info("viewPacFile PACUrl: \(pacUrl)")
         guard let url = URL(string: pacUrl) else { return }
         NSWorkspace.shared.open(url)

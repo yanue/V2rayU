@@ -174,7 +174,7 @@ struct DnsView: View {
     }
 
     func goViewConfig(_ sender: Any) {
-        let confUrl = getConfigUrl()
+        let confUrl = getLocalConfigUrl()
         if let url = URL(string: confUrl) {
             NSWorkspace.shared.open(url)
         }

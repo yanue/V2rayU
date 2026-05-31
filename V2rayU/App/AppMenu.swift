@@ -629,21 +629,23 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func openConfigFile() {
-        let confUrl = getConfigUrl()
-        guard let url = URL(string: confUrl) else { return }
-        NSWorkspace.shared.open(url)
+        openLocalHttpUrl(getLocalConfigUrl())
     }
 
     func openTunConfigFile() {
-        let confUrl = getTunConfigUrl()
-        guard let url = URL(string: confUrl) else { return }
-        NSWorkspace.shared.open(url)
+        openLocalHttpUrl(getLocalTunConfigUrl())
     }
 
     func openPacFile() {
-        let pacUrl = getPacUrl()
-        guard let url = URL(string: pacUrl) else { return }
-        NSWorkspace.shared.open(url)
+        openLocalHttpUrl(getLocalPacUrl())
+    }
+
+    private func openLocalHttpUrl(_ urlString: String) {
+        if let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+        } else {
+            noticeTip(title: "Open URL failed", informativeText: "Invalid URL: \(urlString)")
+        }
     }
 
     func openLogsFile() {
