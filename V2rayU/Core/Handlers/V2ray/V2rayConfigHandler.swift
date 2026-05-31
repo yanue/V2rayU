@@ -648,7 +648,7 @@ class V2rayConfigHandler {
     }
 }
 
-private func isIPAddressLiteral(_ value: String) -> Bool {
+func isIPAddressLiteral(_ value: String) -> Bool {
     if isIp(str: value) { return true }
     return value.contains(":") && value.range(of: "^[0-9a-fA-F:.]+$", options: .regularExpression) != nil
 }

@@ -8,11 +8,11 @@ enum DnsCoreTab: String, CaseIterable, Identifiable, Hashable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
-        case .basic: return "DNS 基础设置"
-        case .xray: return String(localized: .DnsXray)
-        case .singbox: return String(localized: .DnsSingbox)
+        case .basic: return "DnsBasic"
+        case .xray: return "DnsXray"
+        case .singbox: return "DnsSingbox"
         }
     }
 
@@ -89,17 +89,17 @@ struct DnsView: View {
                 getPlainTextFieldWithLabel(label: "远程 DNS", text: $settings.dnsRemote, labelWidth: labelWidth)
                 getPlainTextFieldWithLabel(label: "Bootstrap DNS", text: $settings.dnsBootstrap, labelWidth: labelWidth)
 
-                HStack(spacing: 12) {
+                HStack() {
                     Text("直连目标解析策略")
                         .frame(width: labelWidth, alignment: .leading)
                     dnsStrategyPicker(selection: $settings.dnsDirectStrategy)
-                        .frame(width: 180)
 
+                }
+                
+                HStack() {
                     Text("代理目标解析策略")
                         .frame(width: labelWidth, alignment: .leading)
                     dnsStrategyPicker(selection: $settings.dnsProxyStrategy)
-                        .frame(width: 180)
-                    Spacer()
                 }
 
                 Text("说明：这些基础选项会用于生成默认 v2ray/sing-box DNS。若下方自定义 DNS JSON 已保存，则自定义 JSON 优先；修改基础选项后，到对应自定义 DNS 标签页点击“默认”可按当前基础设置重新生成 JSON。")
@@ -254,6 +254,7 @@ struct DnsView: View {
         }
     }
 
+    @MainActor
     private func saveDns() {
         normalizeDnsBasicSettings()
         let str = dnsJson.trimmingCharacters(in: .whitespacesAndNewlines)
