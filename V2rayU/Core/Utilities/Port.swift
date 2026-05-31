@@ -62,7 +62,8 @@ func findFreePort() -> UInt16 {
     })
 
     if result == 0 {
-        port = addr_in.sin_port
+        // sin_port 是网络字节序(大端)，需转换为主机字节序
+        port = UInt16(bigEndian: addr_in.sin_port)
     }
 
     Darwin.shutdown(socketFD, SHUT_RDWR)

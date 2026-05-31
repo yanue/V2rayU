@@ -157,6 +157,8 @@ class VmessUri: BaseShareUri {
      导入配置时，不在列表中的参数一般会按照 Core 的默认值处理。
      */
     func parseType1(url: URL) {
+        // 清空 parseType2 可能残留的错误，避免成功解析后仍被判定为失败
+        error = ""
         let urlStr = url.absoluteString
         // vmess://
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 8)

@@ -39,9 +39,13 @@ func runCommand(at path: String, with arguments: [String]) throws -> String {
 
     do {
         try process.run()
+
+        // 必须先读取管道数据再 waitUntilExit：
+        // 若子进程输出超过管道缓冲区(约 64KB)，先 waitUntilExit 会导致子进程阻塞在写、
+        // 主线程阻塞在等待，形成死锁。
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
 
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8) ?? ""
 
         // 检查退出码
