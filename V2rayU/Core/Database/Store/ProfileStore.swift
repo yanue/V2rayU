@@ -160,6 +160,21 @@ struct ProfileStore: StoreProtocol {
     }
 
     @discardableResult
+    func updatePinnedCert(uuid: String, pin: String) -> Bool {
+        do {
+            _ = try dbWriter.write { db in
+                try ProfileEntity
+                    .filter(ProfileEntity.Columns.uuid == uuid)
+                    .updateAll(db, [ProfileEntity.Columns.pinnedPeerCertSha256.set(to: pin)])
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.updatePinnedCert error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
     func updateServerRegion(uuid: String, serverRegion: String) -> Bool {
         do {
             _ = try dbWriter.write { db in

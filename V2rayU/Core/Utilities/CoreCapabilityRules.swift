@@ -523,6 +523,27 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "security.none", displayName: "No extra transport security", kind: .transportSecurity, rule: .compatibility(note: "无 TLS/REALITY 时的默认情况，不在官方 transport security 主列表单列。"), docsPath: nil),
         XrayCapabilityDefinition(key: "security.reality", displayName: "REALITY", kind: .transportSecurity, rule: .supported(note: "当前官方 transport security 主列表明确列出。"), docsPath: "/config/transports/reality.html"),
         XrayCapabilityDefinition(key: "security.tls", displayName: "TLS", kind: .transportSecurity, rule: .supported(note: "当前官方 transport security 主列表明确列出。"), docsPath: "/config/transports/tls.html"),
+        XrayCapabilityDefinition(
+            key: "security.tls.allowInsecure",
+            displayName: "TLS allowInsecure",
+            kind: .transportSecurity,
+            rule: .removed(note: "Xray-core 自 26.1.31 移除 allowInsecure，并于 UTC 2026-06-01 00:00 起硬禁用；请改用 pinnedPeerCertSha256（应用会自动获取证书指纹），获取失败或 Hysteria2 将回退 Sing-Box。", removedAt: XrayVersion(26, 1, 31)),
+            docsPath: "/config/transports/tls.html",
+            evidence: [
+                CapabilityEvidence(
+                    id: "release-v26.2.6-allowinsecure-removed",
+                    kind: "releaseNote",
+                    statement: "Xray-core v26.2.6 release note 明确移除 allowInsecure，迁移到 pinnedPeerCertSha256 / verifyPeerCertByName，并设延时自动禁用至 UTC 2026-06-01。",
+                    sourceTitle: "Xray-core v26.2.6 release notes",
+                    sourceURL: "https://github.com/XTLS/Xray-core/releases/tag/v26.2.6",
+                    sourceVersion: "26.2.6",
+                    sourceDate: "2026-02-06",
+                    quote: "TLS 移除了 allowInsecure 配置项，请使用 pinnedPeerCertSha256 和 verifyPeerCertByName 代替",
+                    reviewedAt: "2026-06-01",
+                    note: "首次移除见 v26.1.31；hy2 自签 + pinnedPeerCertSha256 失效见 issue #5655。"
+                )
+            ]
+        ),
         XrayCapabilityDefinition(key: "additional.finalmask", displayName: "FinalMask", kind: .additionalConfig, rule: .supported(note: "当前官方 additional config 主列表明确列出。"), docsPath: "/config/transports/finalmask.html"),
         XrayCapabilityDefinition(key: "additional.sockopt", displayName: "Sockopt", kind: .additionalConfig, rule: .supported(note: "当前官方 additional config 主列表明确列出。"), docsPath: "/config/transports/sockopt.html"),
 
@@ -973,7 +994,34 @@ enum XrayCompatibilityResolver {
             issues.append(issue)
         }
 
+        if let issue = allowInsecureIssue(for: profile, version: version) {
+            issues.append(issue)
+        }
+
         return issues
+    }
+
+    // allowInsecure 在 Xray-core 26.1.31 被移除。新核心下：
+    // - 已自动获取到 pinnedPeerCertSha256 的普通 TLS 节点 -> 可继续用 Xray（无 issue）。
+    // - Hysteria2 -> 无法用 TCP tls ping 取证书，且 Xray hy2 自签 + pinnedPeerCertSha256 失效(#5655)，强制回退 Sing-Box。
+    // - 其余未能取到指纹的节点 -> 阻塞，交由自动回退到 Sing-Box（sing-box 仍支持 insecure）。
+    private static func allowInsecureIssue(for profile: ProfileEntity, version: XrayVersion?) -> XrayCompatibilityIssue? {
+        guard profile.security == .tls, profile.allowInsecure else { return nil }
+        // 仅 >= 26.1.31 的核心受影响；旧核心仍支持 allowInsecure。版本未知时按现代核心处理。
+        if let version, version < xrayAllowInsecureRemovedVersion { return nil }
+        guard let definition = XraySupportCatalog.capability(forKey: "security.tls.allowInsecure") else { return nil }
+        let versionText = version?.description ?? "(未知版本)"
+
+        if profile.protocol == .hysteria2 {
+            return XrayCompatibilityIssue(capability: definition, availability: .unsupported(
+                reason: "Hysteria2 在 Xray-core \(versionText) 无法用 allowInsecure 跳过证书校验（26.1.31 已移除），且无法自动获取其 QUIC 证书指纹、Xray hy2 自签 + pinnedPeerCertSha256 当前不可用（#5655）；将回退 Sing-Box。"))
+        }
+
+        let hasPin = !profile.pinnedPeerCertSha256.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        if hasPin { return nil }
+
+        return XrayCompatibilityIssue(capability: definition, availability: .unsupported(
+            reason: "allowInsecure 已在 Xray-core 26.1.31 移除；未能自动获取服务器证书指纹（pinnedPeerCertSha256），将回退 Sing-Box。请确认节点可达后重试 Ping 以重新获取。"))
     }
 }
 

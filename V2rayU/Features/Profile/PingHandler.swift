@@ -158,9 +158,11 @@ actor PingServer {
     }
 
     func doPing() async throws {
-        guard let item = ProfileStore.shared.fetchOne(uuid: uuid) else {
+        guard let fetched = ProfileStore.shared.fetchOne(uuid: uuid) else {
             throw NSError(domain: "PingServerError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Item not found"])
         }
+        // 测试前自动获取证书指纹（allowInsecure 已被新 Xray-core 移除）；失败则由 AdaptCore 回退 Sing-Box。
+        let item = await CertPinningCoordinator.ensurePinnedCert(for: fetched)
         self.item = item
         bindPort = getRandomPort()
         repeat {

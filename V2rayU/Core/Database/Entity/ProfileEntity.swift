@@ -29,6 +29,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var host: String // 请求域名: headers.Host(ws, h2) | host(xhttp)
     var path: String // 请求路径: path(ws, h2, xhttp) | serviceName(grpc) | key(quic) | seed(kcp)
     var allowInsecure: Bool = true // 允许不安全连接,默认true
+    var pinnedPeerCertSha256: String = "" // 固定服务器叶子证书 SHA256(hex): 新核心(>=26.1.31)替代 allowInsecure,自动获取
     var flow: String = "" // 流控(xtls-rprx-vision | xtls-rprx-vision-udp443): 支持vless|trojan
     var sni: String = "" // sni即serverName(tls): tls|reality
     var alpn: V2rayStreamAlpn = .h2h1 // h3,h2,http1.1
@@ -62,7 +63,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, pinnedPeerCertSha256, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
     // 安全的 decode 辅助：支持 NULL 回退 + 未知枚举值回退
@@ -108,6 +109,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         path = Self.safeDecode(from: container, forKey: .path, fallback: "")
         security = Self.safeDecode(from: container, forKey: .security, fallback: .none)
         allowInsecure = Self.safeDecode(from: container, forKey: .allowInsecure, fallback: true)
+        pinnedPeerCertSha256 = Self.safeDecode(from: container, forKey: .pinnedPeerCertSha256, fallback: "")
         flow = Self.safeDecode(from: container, forKey: .flow, fallback: "")
         sni = Self.safeDecode(from: container, forKey: .sni, fallback: "")
         alpn = Self.safeDecode(from: container, forKey: .alpn, fallback: .h2h1)
@@ -149,6 +151,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         path: String = "",
         security: V2rayStreamSecurity = .none,
         allowInsecure: Bool = true,
+        pinnedPeerCertSha256: String = "",
         subid: String = "",
         flow: String = "",
         sni: String = "",
@@ -179,6 +182,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.path = path
         self.security = security
         self.allowInsecure = allowInsecure
+        self.pinnedPeerCertSha256 = pinnedPeerCertSha256
         self.subid = subid
         self.flow = flow
         self.sni = sni
@@ -252,6 +256,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let path = Column(CodingKeys.path)
         static let security = Column(CodingKeys.security)
         static let allowInsecure = Column(CodingKeys.allowInsecure)
+        static let pinnedPeerCertSha256 = Column(CodingKeys.pinnedPeerCertSha256)
         static let flow = Column(CodingKeys.flow)
         static let sni = Column(CodingKeys.sni)
         static let alpn = Column(CodingKeys.alpn)
@@ -352,6 +357,14 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 try db.alter(table: databaseTableName) { t in
                     t.add(column: Columns.serverRegion.name, .text).notNull().defaults(to: "")
                 }
+            }
+        }
+
+        migrator.registerMigration("addProfilePinnedPeerCertSha256") { db in
+            let hasColumn = try db.columns(in: databaseTableName).contains { $0.name == Columns.pinnedPeerCertSha256.name }
+            guard !hasColumn else { return }
+            try db.alter(table: databaseTableName) { t in
+                t.add(column: Columns.pinnedPeerCertSha256.name, .text).notNull().defaults(to: "")
             }
         }
     }
