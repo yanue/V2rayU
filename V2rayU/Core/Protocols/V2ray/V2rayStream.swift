@@ -116,7 +116,10 @@ struct HysteriaUdpmaskSettings: Codable {
 
 struct TlsSettings: Codable {
     var serverName: String = ""
-    var allowInsecure: Bool = true
+    // allowInsecure 已在 Xray-core 26.1.31 移除：仅旧核心(<26.1.31)下发；新核心置 nil 不编码。
+    var allowInsecure: Bool?
+    // 新核心(>=26.1.31)用它替代 allowInsecure：固定服务器叶子证书 SHA256(hex)，适配自签/跳过校验场景。
+    var pinnedPeerCertSha256: String?
     var allowInsecureCiphers: Bool?
     var certificates: TlsCertificates?
     var alpn: [String]?

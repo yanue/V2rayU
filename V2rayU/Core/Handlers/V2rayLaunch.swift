@@ -72,7 +72,7 @@ actor V2rayLaunch {
             return await startCombination(uuid: runningCombination)
         }
 
-        guard let item = ProfileStore.shared.getRunning() else {
+        guard let running = ProfileStore.shared.getRunning() else {
             await noticeLocalized(title: .StartFailed, message: .NoAvailableServerConfig)
             await MainActor.run {
                 AppState.shared.runningProfile = ""
@@ -80,6 +80,8 @@ actor V2rayLaunch {
             }
             return false
         }
+        // 启动前自动获取证书指纹（allowInsecure 已被新 Xray-core 移除）；失败则回退 Sing-Box。
+        let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
             await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
@@ -166,6 +168,11 @@ actor V2rayLaunch {
             }
             return false
         }
+
+        // 启动前为组合内各 TLS 节点自动获取证书指纹（持久化到 DB，供 resolveCombination 读取）。
+        let memberUUIDs = Set(combination.groups.flatMap { $0.outboundProfileUUIDs })
+        let memberProfiles = ProfileStore.shared.fetchAll().filter { memberUUIDs.contains($0.uuid) }
+        await CertPinningCoordinator.ensurePinnedCerts(for: memberProfiles)
 
         let cfg = CoreConfigHandler()
         guard let resolved = cfg.resolveCombination(combination), let firstProfile = resolved.firstProfile else {

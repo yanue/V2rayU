@@ -492,6 +492,18 @@ struct XrayVersion: Comparable, CustomStringConvertible {
     }
 }
 
+// allowInsecure 在 Xray-core v26.1.31 首次被移除；v26.2.6 改为延时自动禁用（截止 UTC 2026-06-01 00:00），
+// 该日期之后所有 >= 26.1.31 的核心一律硬报错。因此对 >= 26.1.31 的核心都不能再下发 allowInsecure，
+// 自签/跳过校验场景必须改用 pinnedPeerCertSha256。
+let xrayAllowInsecureRemovedVersion = XrayVersion(26, 1, 31)
+
+/// 当前 Xray-core 是否已移除 allowInsecure（即必须改用 pinnedPeerCertSha256）。
+/// 版本无法识别时按"现代核心"处理（返回 true），避免对今天普遍 >= 26.1.31 的核心继续下发已失效字段。
+func xrayRequiresPinnedCert(version: XrayVersion? = XrayVersion(getCoreVersion())) -> Bool {
+    guard let version else { return true }
+    return version >= xrayAllowInsecureRemovedVersion
+}
+
 struct SingboxVersion: Comparable, CustomStringConvertible {
     let major: Int
     let minor: Int

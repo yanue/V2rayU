@@ -254,12 +254,13 @@ class V2rayOutboundHandler {
         settings.hysteriaSettings = hys
 
         settings.security = .tls
-        settings.tlsSettings = TlsSettings(
+        var hyTls = TlsSettings(
             serverName: profile.sni.isEmpty ? profile.address : profile.sni,
-            allowInsecure: profile.allowInsecure,
             alpn: ["h3"],
             fingerprint: profile.fingerprint.rawValue
         )
+        applyCertVerification(to: &hyTls)
+        settings.tlsSettings = hyTls
 
         if !hyConfig.obfsPassword.isEmpty {
             var obfsSettings = HysteriaUdpmaskSettings()
@@ -278,10 +279,10 @@ class V2rayOutboundHandler {
         case .tls:
             securityTls = TlsSettings(
                 serverName: self.profile.sni.isEmpty ? self.profile.address : self.profile.sni,
-                allowInsecure: self.profile.allowInsecure,
                 alpn: profile.entity.getAlpn(),
                 fingerprint: self.profile.fingerprint.rawValue
             )
+            applyCertVerification(to: &securityTls)
             settings.tlsSettings = securityTls
         case .reality:
             securityReality = RealitySettings(
@@ -294,6 +295,23 @@ class V2rayOutboundHandler {
             settings.realitySettings = securityReality
         default:
             break
+        }
+    }
+
+    // 按 Xray-core 版本决定如何"跳过/固定"证书校验：
+    // - allowInsecure == false：双方都不需要额外字段（走标准校验）。
+    // - 旧核心(<26.1.31)：沿用 allowInsecure。
+    // - 新核心(>=26.1.31)：allowInsecure 已移除，改下发 pinnedPeerCertSha256（需事先自动获取指纹）。
+    //   指纹为空时不下发任何字段——此类节点应已被兼容判定路由到 sing-box，万一仍走到 Xray 则按严格校验运行。
+    private func applyCertVerification(to tls: inout TlsSettings) {
+        guard profile.allowInsecure else { return }
+        if xrayRequiresPinnedCert() {
+            let pin = profile.pinnedPeerCertSha256.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !pin.isEmpty {
+                tls.pinnedPeerCertSha256 = pin
+            }
+        } else {
+            tls.allowInsecure = true
         }
     }
 }
