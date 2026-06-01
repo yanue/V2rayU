@@ -24,10 +24,11 @@ struct VmessShare: Codable {
     var fp: String = ""
     var serviceName: String = "" // grpc
     var seed: String = "" // kcp
+    var pcks: String = "" // pinnedPeerCertSha256
 
     // 自定义解码以处理可能的不同类型
     enum CodingKeys: String, CodingKey {
-        case v, ps, add, port, id, aid, net, type, host, path, tls, alpn, sni, security, scy, fp, serviceName, seed
+        case v, ps, add, port, id, aid, net, type, host, path, tls, alpn, sni, security, scy, fp, serviceName, seed, pcks
     }
     
     init(from model: ProfileEntity) {
@@ -48,6 +49,7 @@ struct VmessShare: Codable {
         self.fp = model.fingerprint.rawValue
         self.serviceName = model.network == .grpc ? model.path : ""
         self.seed = model.network == .kcp ? model.path : ""
+        self.pcks = model.pinnedPeerCertSha256
     }
     
     init(from decoder: Decoder) throws {
@@ -69,6 +71,7 @@ struct VmessShare: Codable {
         fp   = try container.decodeIfPresent(String.self, forKey: .fp) ?? ""
         serviceName = try container.decodeIfPresent(String.self, forKey: .serviceName) ?? ""
         seed = try container.decodeIfPresent(String.self, forKey: .seed) ?? ""
+        pcks = try container.decodeIfPresent(String.self, forKey: .pcks) ?? ""
 
         // 处理 port 字段的类型不确定性
         if let portValue = try? container.decode(Int.self, forKey: .port) {
@@ -205,6 +208,7 @@ class VmessUri: BaseShareUri {
         }
         profile.sni = query.getString(forKey: "tlsServer", defaultValue:  query.getString(forKey: "sni", defaultValue: profile.address))
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .none)
+        profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
         profile.allowInsecure = query.getString(forKey: "allowInsecure", defaultValue: "1") == "1" ? true : false
         profile.alterId = query.getInt(forKey: "aid", defaultValue: 0)
         profile.remark = query.getString(forKey: "remark", defaultValue: "vmess")
@@ -367,6 +371,8 @@ class VmessUri: BaseShareUri {
                     profile.path = vmess.path
                 }
             }
+            profile.pinnedPeerCertSha256 = vmess.pcks
+
             if profile.remark.isEmpty {
                 if let fragment = url.fragment, !fragment.isEmpty {
                     profile.remark = fragment.urlDecoded()

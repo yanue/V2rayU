@@ -60,6 +60,7 @@ class VlessUri: BaseShareUri {
             URLQueryItem(name: "fp", value: self.profile.fingerprint.rawValue),
             URLQueryItem(name: "pbk", value: self.profile.publicKey),
             URLQueryItem(name: "sid", value: self.profile.shortId),
+            URLQueryItem(name: "pcks", value: self.profile.pinnedPeerCertSha256),
         ]
         switch self.profile.network {
         case .tcp:
@@ -179,6 +180,7 @@ class VlessUri: BaseShareUri {
         self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)
         self.profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        self.profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
         // 从 query 获取字符串
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")
         // 尝试转换成枚举

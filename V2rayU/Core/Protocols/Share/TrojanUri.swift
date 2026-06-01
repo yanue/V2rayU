@@ -32,6 +32,7 @@ class TrojanUri: BaseShareUri {
             URLQueryItem(name: "security", value: profile.security.rawValue),
             URLQueryItem(name: "sni", value: profile.sni),
             URLQueryItem(name: "fp", value: profile.fingerprint.rawValue),
+            URLQueryItem(name: "pcks", value: profile.pinnedPeerCertSha256),
         ]
         // 判断 network 类型
         switch profile.network {
@@ -77,6 +78,7 @@ class TrojanUri: BaseShareUri {
         profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
         profile.sni = query.getString(forKey: "sni", defaultValue: profile.address)
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
         // security 不能为 none
         if profile.security == .none {
             profile.security = .tls

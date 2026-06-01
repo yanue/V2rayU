@@ -31,6 +31,7 @@ class AnyTlsUri: BaseShareUri {
             URLQueryItem(name: "insecure", value: profile.allowInsecure ? "1" : "0"),
             URLQueryItem(name: "alpn", value: profile.alpn.rawValue),
             URLQueryItem(name: "fp", value: profile.fingerprint.rawValue),
+            URLQueryItem(name: "pcks", value: profile.pinnedPeerCertSha256),
         ]
         if !profile.host.isEmpty {
             queryItems.append(URLQueryItem(name: "host", value: profile.host))
@@ -70,6 +71,7 @@ class AnyTlsUri: BaseShareUri {
         profile.sni = query.getString(forKey: "sni", defaultValue: query.getString(forKey: "peer", defaultValue: host))
         profile.allowInsecure = query.getBool(forKey: "insecure", defaultValue: query.getBool(forKey: "allowInsecure", defaultValue: false))
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
         profile.host = query.getString(forKey: "host", defaultValue: "")
         profile.path = query.getString(forKey: "path", defaultValue: "")
 
@@ -126,6 +128,7 @@ class NaiveUri: BaseShareUri {
             URLQueryItem(name: "insecure", value: profile.allowInsecure ? "1" : "0"),
             URLQueryItem(name: "alpn", value: profile.alpn.rawValue),
             URLQueryItem(name: "fp", value: profile.fingerprint.rawValue),
+            URLQueryItem(name: "pcks", value: profile.pinnedPeerCertSha256),
         ]
 
         return (uri.url?.absoluteString ?? "") + "#" + profile.remark.urlEncoded()
@@ -160,6 +163,7 @@ class NaiveUri: BaseShareUri {
         profile.sni = query.getString(forKey: "sni", defaultValue: query.getString(forKey: "peer", defaultValue: host))
         profile.allowInsecure = query.getBool(forKey: "insecure", defaultValue: query.getBool(forKey: "allowInsecure", defaultValue: false))
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
 
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")
         if let alpn = V2rayStreamAlpn(rawValue: alpnString) {
