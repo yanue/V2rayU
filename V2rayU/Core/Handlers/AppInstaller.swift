@@ -179,17 +179,20 @@ actor AppInstaller: NSObject {
             }
         }
 
-        // update-xray.sh 存在 + 可执行
-        let updateScript = AppBinRoot + "/update-xray.sh"
-        if !needRunInstall && !fileMgr.fileExists(atPath: updateScript) {
-            logger.info("\(updateScript) not exists")
-            installReason = "update-xray.sh missing"
-            needRunInstall = true
-        }
-        if !needRunInstall && !fileMgr.isExecutableFile(atPath: updateScript) {
-            logger.info("\(updateScript) not executable")
-            installReason = "update-xray.sh not executable"
-            needRunInstall = true
+        // core 更新脚本存在 + 可执行
+        let coreUpdateScripts = ["update-xray.sh", "update-singbox.sh"]
+        for scriptName in coreUpdateScripts {
+            let updateScript = AppBinRoot + "/" + scriptName
+            if !needRunInstall && !fileMgr.fileExists(atPath: updateScript) {
+                logger.info("\(updateScript) not exists")
+                installReason = "\(scriptName) missing"
+                needRunInstall = true
+            }
+            if !needRunInstall && !fileMgr.isExecutableFile(atPath: updateScript) {
+                logger.info("\(updateScript) not executable")
+                installReason = "\(scriptName) not executable"
+                needRunInstall = true
+            }
         }
 
         let updateRulesScript = AppBinRoot + "/update-capability-rules.sh"
@@ -223,6 +226,20 @@ actor AppInstaller: NSObject {
                 logger.info("sudoers NOPASSWD not effective for launchctl: start=\(startOk), stop=\(stopOk)")
                 installReason = "sudoers rules incorrect"
                 needRunInstall = true
+            }
+        }
+
+        if !needRunInstall {
+            for scriptName in coreUpdateScripts {
+                let scriptPath = AppBinRoot + "/" + scriptName
+                let testScript = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", scriptPath, "*"])
+                let scriptOk = testScript != nil && testScript!.contains(scriptPath)
+                if !scriptOk {
+                    logger.info("sudoers NOPASSWD not effective for \(scriptName): \(scriptOk)")
+                    installReason = "sudoers rules incorrect for \(scriptName)"
+                    needRunInstall = true
+                    break
+                }
             }
         }
 

@@ -95,8 +95,17 @@ file_path = Path(sys.argv[1])
 expected_core = sys.argv[2]
 
 data = json.loads(file_path.read_text(encoding='utf-8'))
-if data.get('schemaVersion') not in {1, 2, 3, 4}:
-    raise SystemExit(f"schemaVersion must be 1, 2, 3 or 4: {file_path}")
+
+def get_value(obj, camel_key, snake_key=None):
+    if camel_key in obj:
+        return obj[camel_key]
+    if snake_key and snake_key in obj:
+        return obj[snake_key]
+    return None
+
+schema_version = get_value(data, 'schemaVersion', 'schema_version')
+if schema_version not in {1, 2, 3, 4}:
+    raise SystemExit(f"schema_version must be 1, 2, 3 or 4: {file_path}")
 if data.get('core') != expected_core:
     raise SystemExit(f"core mismatch in {file_path}: {data.get('core')} != {expected_core}")
 capabilities = data.get('capabilities')
@@ -105,8 +114,8 @@ if not isinstance(capabilities, list) or not capabilities:
 for index, capability in enumerate(capabilities):
     if not isinstance(capability, dict):
         raise SystemExit(f"capability[{index}] must be an object: {file_path}")
-    for key in ('key', 'displayName', 'kind', 'rule'):
-        if key not in capability:
+    for key, snake_key in (('key', None), ('displayName', 'display_name'), ('kind', None), ('rule', None)):
+        if get_value(capability, key, snake_key) is None:
             raise SystemExit(f"capability[{index}] missing {key}: {file_path}")
     rule = capability['rule']
     if not isinstance(rule, dict) or 'type' not in rule or 'note' not in rule:
@@ -118,8 +127,8 @@ for index, capability in enumerate(capabilities):
         for evidence_index, item in enumerate(evidence):
             if not isinstance(item, dict):
                 raise SystemExit(f"capability[{index}].evidence[{evidence_index}] must be an object: {file_path}")
-            for key in ('id', 'kind', 'statement', 'sourceTitle', 'sourceURL', 'quote'):
-                if key not in item:
+            for key, snake_key in (('id', None), ('kind', None), ('statement', None), ('sourceTitle', 'source_title'), ('sourceURL', 'source_url'), ('quote', None)):
+                if get_value(item, key, snake_key) is None:
                     raise SystemExit(f"capability[{index}].evidence[{evidence_index}] missing {key}: {file_path}")
 print(file_path)
 PY

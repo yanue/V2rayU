@@ -90,6 +90,7 @@
 		66638BD32F2B8C1B003E7CBC /* DnsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66638BD22F2B8BFB003E7CBC /* DnsResolver.swift */; };
 		666A61072F1933A0003654D3 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61062F1933A0003654D3 /* install.sh */; };
 		666A61082F1933A1003654D3 /* update-xray.sh in Resources */ = {isa = PBXBuildFile; fileRef = 666A61092F1933A1003654D3 /* update-xray.sh */; };
+		66F100072FA1000100A1B2C3 /* update-singbox.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F100062FA1000100A1B2C3 /* update-singbox.sh */; };
 		666A610C2F193A5C003654D3 /* plist in Resources */ = {isa = PBXBuildFile; fileRef = 666A610B2F193A56003654D3 /* plist */; };
 		666BD1E62FB374DA009FC480 /* TunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666BD1E52FB374DA009FC480 /* TunView.swift */; };
 		666BD2112FC08AB3009FC480 /* CombinedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666BD2102FC08AA2009FC480 /* CombinedListView.swift */; };
@@ -266,6 +267,7 @@
 		66638BD22F2B8BFB003E7CBC /* DnsResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnsResolver.swift; sourceTree = "<group>"; };
 		666A61062F1933A0003654D3 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		666A61092F1933A1003654D3 /* update-xray.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "update-xray.sh"; sourceTree = "<group>"; };
+		66F100062FA1000100A1B2C3 /* update-singbox.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "update-singbox.sh"; sourceTree = "<group>"; };
 		666A610B2F193A56003654D3 /* plist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plist; sourceTree = "<group>"; };
 		666BD1E52FB374DA009FC480 /* TunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunView.swift; sourceTree = "<group>"; };
 		666BD2102FC08AA2009FC480 /* CombinedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedListView.swift; sourceTree = "<group>"; };
@@ -790,6 +792,7 @@
 			children = (
 				666A61062F1933A0003654D3 /* install.sh */,
 				666A61092F1933A1003654D3 /* update-xray.sh */,
+				66F100062FA1000100A1B2C3 /* update-singbox.sh */,
 				66F100002FA1000100A1B2C3 /* update-capability-rules.sh */,
 				666A610B2F193A56003654D3 /* plist */,
 				66F100022FA1000100A1B2C3 /* capability-rules */,
@@ -988,6 +991,7 @@
 				667028F52F0D46E0008F27D8 /* bin in Resources */,
 				666A61072F1933A0003654D3 /* install.sh in Resources */,
 				666A61082F1933A1003654D3 /* update-xray.sh in Resources */,
+				66F100072FA1000100A1B2C3 /* update-singbox.sh in Resources */,
 				66F100012FA1000100A1B2C3 /* update-capability-rules.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,

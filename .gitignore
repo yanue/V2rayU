@@ -20,6 +20,8 @@ xcuserdata/
 
 ## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
 build/
+!Build/
+!Build/**
 DerivedData/
 *.moved-aside
 *.pbxuser
