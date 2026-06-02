@@ -162,6 +162,33 @@ struct CapabilityRulesStatusSnapshot {
     let capabilityCount: Int
 }
 
+struct CapabilityRulesUpdateResult: Sendable {
+    let targetDirectory: String
+    let xrayCapabilityCount: Int
+    let singboxCapabilityCount: Int
+
+    var message: String {
+        "Capability rules updated in \(targetDirectory)\nXray: \(xrayCapabilityCount), Sing-Box: \(singboxCapabilityCount)"
+    }
+}
+
+enum CapabilityRulesUpdateError: LocalizedError {
+    case invalidBaseURL(String)
+    case unexpectedHTTPStatus(URL, Int)
+    case invalidDocument(URL, String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidBaseURL(let value):
+            return "Invalid capability-rules base URL: \(value)"
+        case .unexpectedHTTPStatus(let url, let statusCode):
+            return "Capability rules download failed (\(statusCode)): \(url.absoluteString)"
+        case .invalidDocument(let url, let reason):
+            return "Invalid capability rules at \(url.absoluteString): \(reason)"
+        }
+    }
+}
+
 enum CapabilityRulesLoader {
     private static let bundleSubdirectory = "capability-rules"
     private static let primaryOverrideDirectoryName = "capability-rules"
@@ -208,6 +235,31 @@ enum CapabilityRulesLoader {
             .path
     }
 
+    static func updateFromRemote(baseURL: String) async throws -> CapabilityRulesUpdateResult {
+        let xrayURL = try remoteRulesURL(baseURL: baseURL, fileName: CapabilityRulesCore.xray.bundledFileName)
+        let singboxURL = try remoteRulesURL(baseURL: baseURL, fileName: CapabilityRulesCore.singbox.bundledFileName)
+
+        let xray = try await downloadAndValidateRules(from: xrayURL, expectedCore: .xray)
+        let singbox = try await downloadAndValidateRules(from: singboxURL, expectedCore: .singbox)
+
+        let targetDirectory = URL(fileURLWithPath: overrideDirectoryPath(), isDirectory: true)
+        try FileManager.default.createDirectory(at: targetDirectory, withIntermediateDirectories: true)
+        try xray.data.write(
+            to: targetDirectory.appendingPathComponent("\(CapabilityRulesCore.xray.bundledFileName).json"),
+            options: .atomic
+        )
+        try singbox.data.write(
+            to: targetDirectory.appendingPathComponent("\(CapabilityRulesCore.singbox.bundledFileName).json"),
+            options: .atomic
+        )
+
+        return CapabilityRulesUpdateResult(
+            targetDirectory: targetDirectory.path,
+            xrayCapabilityCount: xray.document.capabilities.count,
+            singboxCapabilityCount: singbox.document.capabilities.count
+        )
+    }
+
     private static func loadDetailed(core: CapabilityRulesCore) -> (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)? {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -244,6 +296,50 @@ enum CapabilityRulesLoader {
         }
 
         return urls
+    }
+
+    private static func remoteRulesURL(baseURL: String, fileName: String) throws -> URL {
+        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let separator = trimmed.hasSuffix("/") ? "" : "/"
+        guard let url = URL(string: "\(trimmed)\(separator)\(fileName).json"),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            throw CapabilityRulesUpdateError.invalidBaseURL(baseURL)
+        }
+        return url
+    }
+
+    private static func downloadAndValidateRules(from url: URL, expectedCore: CapabilityRulesCore) async throws -> (data: Data, document: CapabilityRulesDocument) {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 30
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200..<300).contains(httpResponse.statusCode) {
+            throw CapabilityRulesUpdateError.unexpectedHTTPStatus(url, httpResponse.statusCode)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let document = try decoder.decode(CapabilityRulesDocument.self, from: data)
+        try validateRemoteDocument(document, expectedCore: expectedCore, sourceURL: url)
+        return (data, document)
+    }
+
+    private static func validateRemoteDocument(_ document: CapabilityRulesDocument, expectedCore: CapabilityRulesCore, sourceURL: URL) throws {
+        guard supportedSchemaVersions.contains(document.schemaVersion) else {
+            throw CapabilityRulesUpdateError.invalidDocument(sourceURL, "schemaVersion must be 1, 2, 3, or 4")
+        }
+        guard document.core == expectedCore else {
+            throw CapabilityRulesUpdateError.invalidDocument(sourceURL, "core mismatch: \(document.core.rawValue) != \(expectedCore.rawValue)")
+        }
+        guard !document.capabilities.isEmpty else {
+            throw CapabilityRulesUpdateError.invalidDocument(sourceURL, "capabilities must be a non-empty array")
+        }
+        for (index, capability) in document.capabilities.enumerated() {
+            if let evidence = capability.evidence, evidence.isEmpty {
+                throw CapabilityRulesUpdateError.invalidDocument(sourceURL, "capability[\(index)].evidence must be non-empty when present")
+            }
+        }
     }
 }
 

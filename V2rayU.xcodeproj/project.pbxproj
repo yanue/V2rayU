@@ -140,7 +140,6 @@
 		66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A52E2E669400E72DE2 /* PacHandler.swift */; };
 		66EB76A82E2E7E0800E72DE2 /* JsonAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */; };
 		66EB76B02E31135200E72DE2 /* DownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB76AF2E31135200E72DE2 /* DownloadViewModel.swift */; };
-		66F100012FA1000100A1B2C3 /* update-capability-rules.sh in Resources */ = {isa = PBXBuildFile; fileRef = 66F100002FA1000100A1B2C3 /* update-capability-rules.sh */; };
 		66F100032FA1000100A1B2C3 /* capability-rules in Resources */ = {isa = PBXBuildFile; fileRef = 66F100022FA1000100A1B2C3 /* capability-rules */; };
 		66F100052FA1000100A1B2C3 /* CoreCapabilityRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F100042FA1000100A1B2C3 /* CoreCapabilityRules.swift */; };
 		66F1C5CA2E62E6B2009D0024 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F1C5C92E62E6B1009D0024 /* LanguageManager.swift */; };
@@ -323,7 +322,6 @@
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
-		66F100002FA1000100A1B2C3 /* update-capability-rules.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "update-capability-rules.sh"; sourceTree = "<group>"; };
 		66F100022FA1000100A1B2C3 /* capability-rules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "capability-rules"; sourceTree = "<group>"; };
 		66F100042FA1000100A1B2C3 /* CoreCapabilityRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreCapabilityRules.swift; sourceTree = "<group>"; };
 		66F1C5C92E62E6B1009D0024 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
@@ -793,7 +791,6 @@
 				666A61062F1933A0003654D3 /* install.sh */,
 				666A61092F1933A1003654D3 /* update-xray.sh */,
 				66F100062FA1000100A1B2C3 /* update-singbox.sh */,
-				66F100002FA1000100A1B2C3 /* update-capability-rules.sh */,
 				666A610B2F193A56003654D3 /* plist */,
 				66F100022FA1000100A1B2C3 /* capability-rules */,
 				667028F42F0D46DA008F27D8 /* bin */,
@@ -992,7 +989,6 @@
 				666A61072F1933A0003654D3 /* install.sh in Resources */,
 				666A61082F1933A1003654D3 /* update-xray.sh in Resources */,
 				66F100072FA1000100A1B2C3 /* update-singbox.sh in Resources */,
-				66F100012FA1000100A1B2C3 /* update-capability-rules.sh in Resources */,
 				6632EF4D2EC4B9E100CED47B /* Localizable.strings in Resources */,
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
 				6632EF502EC4B9E100CED47B /* GoogleService-Info.plist in Resources */,

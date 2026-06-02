@@ -154,13 +154,9 @@ final class CoreViewModel: ObservableObject {
 
         Task {
             do {
-                let script = AppBinRoot + "/update-capability-rules.sh"
-                let targetDir = CapabilityRulesLoader.overrideDirectoryPath()
-                let msg = try await Task.detached(priority: .userInitiated) {
-                    try runCommand(at: script, with: ["--base-url", baseURL, "--target-dir", targetDir])
-                }.value
+                let result = try await CapabilityRulesLoader.updateFromRemote(baseURL: baseURL)
                 loadCapabilityRulesStatus()
-                errorMsg = String(localized: .CapabilityRulesUpdateSuccess) + "\n" + msg
+                errorMsg = String(localized: .CapabilityRulesUpdateSuccess) + "\n" + result.message
             } catch {
                 errorMsg = String(localized: .OperationFailed, arguments: error.localizedDescription)
             }

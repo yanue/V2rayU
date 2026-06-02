@@ -82,11 +82,6 @@ sudo cp -f ./update-singbox.sh "$APP_BIN_ROOT/"
 sudo chown root:wheel "$APP_BIN_ROOT/update-singbox.sh"
 sudo chmod 755 "$APP_BIN_ROOT/update-singbox.sh"
 
-# update-capability-rules.sh (功能支持规则更新脚本，拉取远程 xray/sing-box 配置)
-sudo cp -f ./update-capability-rules.sh "$APP_BIN_ROOT/"
-sudo chown root:wheel "$APP_BIN_ROOT/update-capability-rules.sh"
-sudo chmod 755 "$APP_BIN_ROOT/update-capability-rules.sh"
-
 # bin 文件 (xray-core, sing-box)
 sudo rm -rf "$APP_BIN_ROOT/bin/"
 sudo cp -rf ./bin/ "$APP_BIN_ROOT/bin/"
