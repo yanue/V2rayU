@@ -40,8 +40,7 @@ struct AboutView: View {
         "https://github.com/groue/GRDB.swift",
         "https://github.com/swhitty/FlyingFox.git",
         "https://github.com/jpsim/Yams.git",
-        "https://github.com/sindresorhus/KeyboardShortcuts.git",
-        "https://github.com/SwiftyBeaver/SwiftyBeaver.git"
+        "https://github.com/sindresorhus/KeyboardShortcuts.git"
     ]
     
     var body: some View {
