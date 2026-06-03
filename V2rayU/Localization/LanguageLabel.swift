@@ -130,6 +130,7 @@ enum LanguageLabel: String, CaseIterable {
     case TunStrictRouteTip
     case TunAutoRebuild
     case TunAutoRebuildTip
+    case TunLogLevel
 
     // MARK: - PAC Settings
     case PacSettings

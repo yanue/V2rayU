@@ -79,6 +79,7 @@ final class AppSettings: ObservableObject {
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
     // 网络变化/唤醒后自动重建 TUN, 默认开启
     @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
+    @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
 
     init() {
         if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
@@ -155,6 +156,7 @@ final class AppSettings: ObservableObject {
         tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
+        tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
     }
 
     func saveSettings() {
@@ -222,6 +224,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunFakeipRange, value: tunFakeipRange)
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
+        UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
     }
 
     func handleChange(old: AppSettings) {
@@ -256,7 +259,8 @@ final class AppSettings: ObservableObject {
             old.tunDnsDefault != tunDnsDefault ||
             old.tunDnsChina != tunDnsChina ||
             old.tunFakeipRange != tunFakeipRange ||
-            old.tunStrictRoute != tunStrictRoute {
+            old.tunStrictRoute != tunStrictRoute ||
+            old.tunLogLevel != tunLogLevel {
             needRestartV2ray = true
         }
 

@@ -31,7 +31,7 @@ func importUri(url: String) {
 }
 
 func supportProtocol(uri: String) -> Bool {
-    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") || uri.hasPrefix("naive://") {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") || uri.hasPrefix("naive://") || uri.hasPrefix("naive+https://") {
         return true
     }
     return false
@@ -288,6 +288,13 @@ class ImportUri {
         } else if share_uri.hasPrefix("anytls://") {
             uriHandler = AnyTlsUri()
         } else if share_uri.hasPrefix("naive://") {
+            uriHandler = NaiveUri()
+        } else if share_uri.hasPrefix("naive+https://") {
+            // normalize naive+https:// to naive:// for NaiveUri parser
+            let normalizedUri = share_uri.replacingOccurrences(of: "naive+https://", with: "naive://", options: .anchored)
+            if let normalizedUrl = URL(string: normalizedUri) {
+                url = normalizedUrl
+            }
             uriHandler = NaiveUri()
         }
 

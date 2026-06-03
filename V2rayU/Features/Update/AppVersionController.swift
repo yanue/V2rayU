@@ -127,9 +127,10 @@ class AppVersionController: NSWindowController {
                         await MainActor.run {
                             vm.checkError = String(localized: .AlreadyLatestToast,arguments: appVersion)
                             if showWindow {
+                                self.closeWindow()
                                 let title = String(localized: .AlreadyLatestVersion)
                                 let toast = String(localized: .AlreadyLatestToast,arguments: appVersion)
-                                alertDialog(title: title,message:toast)
+                                alertDialog(title: title, message: toast)
                             }
                         }
                         logger.info("checkForUpdates-no need: release=\(release.tagName) body=\(release.body)")

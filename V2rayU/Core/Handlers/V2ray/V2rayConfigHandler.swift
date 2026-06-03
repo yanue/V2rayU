@@ -18,22 +18,10 @@ let defaultSingboxDns = """
 {
     "servers": [
         {"type": "udp", "tag": "local-dns", "server": "223.5.5.5"},
-        {"type": "https", "tag": "remote-dns", "server": "cloudflare-dns.com", "domain_resolver": "hosts-dns", "path": "/dns-query", "detour": "proxy"},
-        {"type": "https", "tag": "direct-dns", "server": "dns.alidns.com", "domain_resolver": "hosts-dns", "path": "/dns-query"},
-        {"type": "hosts", "tag": "hosts-dns", "predefined": {
-            "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"],
-            "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
-            "cloudflare-dns.com": ["104.16.249.249", "104.16.248.249", "2606:4700::6810:f8f9", "2606:4700::6810:f9f9"],
-            "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
-            "doh.pub": ["1.12.12.12", "120.53.53.53"],
-            "dot.pub": ["1.12.12.12", "120.53.53.53"]
-        }}
+        {"type": "https", "tag": "remote-dns", "server": "cloudflare-dns.com", "domain_resolver": "local-dns", "path": "/dns-query", "detour": "proxy"}
     ],
     "rules": [
-        {"server": "hosts-dns", "ip_accept_any": true},
-        {"server": "remote-dns", "geosite": ["geolocation-!cn"]},
-        {"server": "direct-dns", "geosite": ["cn", "private"]},
-        {"action": "predefined", "rcode": "NOERROR", "query_type": [64, 65]}
+        {"server": "local-dns", "domain": ["localhost", "local"]}
     ],
     "final": "remote-dns",
     "independent_cache": true
@@ -157,22 +145,10 @@ func buildDefaultSingboxDnsSetting(directDns directDnsValue: String, remoteDns r
     {
         "servers": [
             {"type": "udp", "tag": "local-dns", "server": "\(bootstrapDns)"},
-            {"type": "https", "tag": "remote-dns", "server": "\(remoteDns.host)", "domain_resolver": "hosts-dns", "path": "\(remoteDns.path)", "detour": "proxy"},
-            {"type": "https", "tag": "direct-dns", "server": "\(directDns.host)", "domain_resolver": "hosts-dns", "path": "\(directDns.path)"},
-            {"type": "hosts", "tag": "hosts-dns", "predefined": {
-                "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"],
-                "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
-                "cloudflare-dns.com": ["104.16.249.249", "104.16.248.249", "2606:4700::6810:f8f9", "2606:4700::6810:f9f9"],
-                "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
-                "doh.pub": ["1.12.12.12", "120.53.53.53"],
-                "dot.pub": ["1.12.12.12", "120.53.53.53"]
-            }}
+            {"type": "https", "tag": "remote-dns", "server": "\(remoteDns.host)", "domain_resolver": "local-dns", "path": "\(remoteDns.path)", "detour": "proxy"}
         ],
         "rules": [
-            {"server": "hosts-dns", "ip_accept_any": true},
-            {"server": "remote-dns", "geosite": ["geolocation-!cn"]},
-            {"server": "direct-dns", "geosite": ["cn", "private"]},
-            {"action": "predefined", "rcode": "NOERROR", "query_type": [64, 65]}
+            {"server": "local-dns", "domain": ["localhost", "local"]}
         ],
         "final": "remote-dns",
         "independent_cache": true

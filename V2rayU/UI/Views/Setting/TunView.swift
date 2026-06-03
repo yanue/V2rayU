@@ -92,6 +92,22 @@ struct TunView: View {
 
             Divider()
 
+            Text(String(localized: .Logs))
+                .font(.headline)
+                .foregroundColor(.secondary)
+
+            HStack {
+                getTextLabel(label: .TunLogLevel, labelWidth: labelWidth)
+                Spacer()
+                Picker("", selection: $settings.tunLogLevel) {
+                    ForEach(V2rayLogLevel.allCases, id: \.self) { pick in
+                        Text(pick.rawValue)
+                    }
+                }
+            }
+
+            Divider()
+
             HStack {
                 Button(String(localized: .Save)) {
                     settings.saveSettings()

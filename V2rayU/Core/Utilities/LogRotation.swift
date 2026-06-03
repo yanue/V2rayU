@@ -103,7 +103,8 @@ struct LogRotation {
         let allFiles = [
             (name: "当前日志", path: coreLogFilePath),
             (name: "异常日志", path: recentErrorLogFilePath),
-            (name: "TUN日志", path: tunLogFilePath)
+            (name: "TUN日志", path: tunLogFilePath),
+            (name: "TUN启动日志", path: runTunLogFilePath)
         ]
         
         for (name, path) in allFiles {
@@ -128,7 +129,7 @@ struct LogRotation {
     
     static func clearAllLogs() {
         // 所有日志文件现在都在用户目录下，直接清空
-        let userPaths = [coreLogFilePath, recentErrorLogFilePath, tunLogFilePath]
+        let userPaths = [coreLogFilePath, recentErrorLogFilePath, tunLogFilePath, runTunLogFilePath]
         for path in userPaths {
             if FileManager.default.fileExists(atPath: path) {
                 try? "".write(toFile: path, atomically: true, encoding: .utf8)

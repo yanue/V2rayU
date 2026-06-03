@@ -662,7 +662,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             importUri(url: uri)
         } else {
-            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or anytls:// or naive:// or ss:// from Pasteboard")
+            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or anytls:// or naive:// or naive+https:// or ss:// from Pasteboard")
         }
     }
 
@@ -703,8 +703,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func openTunLogs(_ sender: NSMenuItem) {
-        // 打开文件查看器并显示日志列表
+        // 同时打开 tun.log（sing-box 结构化日志）和 run-tun.log（launchd stdout/stderr）
         OpenLogs(logFilePath: tunLogFilePath)
+        OpenLogs(logFilePath: runTunLogFilePath)
     }
 
     @objc private func openHomeFolder(_ sender: NSMenuItem) {

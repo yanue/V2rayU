@@ -84,10 +84,13 @@ actor V2rayLaunch {
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
-            await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
+            if coreDecision.canLaunch {
+                makeToast(message: warningMessage, displayDuration: 5)
+            } else {
+                await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
+            }
         }
         if !coreDecision.canLaunch {
-            logger.error("start aborted: profile is incompatible with current Xray-core and cannot fallback to Sing-Box")
             return false
         }
         // 同步 AppState 与实际使用的服务器
@@ -109,6 +112,7 @@ actor V2rayLaunch {
         truncateLogFile(appLogFilePath)
         truncateLogFile(coreLogFilePath)
         truncateLogFile(tunLogFilePath)
+        truncateLogFile(runTunLogFilePath)
 
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
@@ -181,7 +185,11 @@ actor V2rayLaunch {
         }
 
         if let warningMessage = resolved.warningMessage {
-            await showAlert(title: await localized(.CoreCompatibilityWarningTitle), message: warningMessage)
+            if resolved.canLaunch {
+                makeToast(message: warningMessage, displayDuration: 5)
+            } else {
+                await showAlert(title: await localized(.CoreCompatibilityWarningTitle), message: warningMessage)
+            }
         }
         if !resolved.canLaunch {
             logger.error("start combination aborted: combined config is incompatible with selected core")
@@ -203,6 +211,7 @@ actor V2rayLaunch {
         truncateLogFile(appLogFilePath)
         truncateLogFile(coreLogFilePath)
         truncateLogFile(tunLogFilePath)
+        truncateLogFile(runTunLogFilePath)
 
         let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
         if !started {

@@ -1016,6 +1016,11 @@ enum XrayCompatibilityResolver {
         let futureVersionText = forwardNotice.map { "\n\n\($0)" } ?? ""
 
         if blockingIssues.isEmpty {
+            // 无非阻塞问题：检查 sing-box 是否能接管；能则静默切换，否则继续用 xray 并提示
+            let fallbackReasons = SingboxFallbackCompatibility.incompatibilityReasons(for: profile)
+            if fallbackReasons.isEmpty {
+                return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: nil, issues: issues, canLaunch: true)
+            }
             let warningMessage = "当前节点与已安装的 Xray-core \(shortVersion) 存在以下兼容性提示：\n\n\(issueText)\n\n本次仍继续使用 Xray-core 启动。\n\n\(capabilityRulesNotice)\(futureVersionText)"
             return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: true)
         }
@@ -1027,8 +1032,7 @@ enum XrayCompatibilityResolver {
             return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: false)
         }
 
-        let warningMessage = "当前节点与已安装的 Xray-core \(shortVersion) 存在以下不兼容项：\n\n\(issueText)\n\n系统已自动切换为 Sing-Box 以避免启动失败。\n\n\(capabilityRulesNotice)\(futureVersionText)"
-        return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: warningMessage, issues: issues, canLaunch: true)
+        return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: nil, issues: issues, canLaunch: true)
     }
 
     private static func xrayDecision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {

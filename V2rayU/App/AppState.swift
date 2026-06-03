@@ -240,15 +240,8 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换配置
     func switchServer(uuid: String) async {
-        // 点击已激活的单个服务器 → 取消选择
-        if runningCombination.isEmpty && runningProfile == uuid {
-            runningProfile = ""
-            runningServer = nil
-            v2rayTurnOn = false
-            await setCoreRunning(false)
-            logger.info("switchServer-deselect: \(uuid)")
-            AppMenuManager.shared.refreshServerItems()
-            AppMenuManager.shared.refreshBasicMenus()
+        // 点击已激活的服务器不做任何操作
+        if runningProfile == uuid {
             return
         }
         runningCombination = ""

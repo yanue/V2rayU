@@ -12,10 +12,12 @@ import SwiftUI
 // MARK: - Alert 对话框
 
 @MainActor
-func presentAlert(_ alert: NSAlert, attachedTo window: NSWindow? = NSApp.mainWindow ?? NSApp.windows.first) async -> NSApplication.ModalResponse {
-    await withCheckedContinuation { continuation in
-        if let window {
-            alert.beginSheetModal(for: window) { response in
+func presentAlert(_ alert: NSAlert, attachedTo window: NSWindow? = nil) async -> NSApplication.ModalResponse {
+    // 避免 menu-bar 模式无主窗口时 fallback 到弹出窗口（如更新窗口）
+    let win = window ?? MainWindowManager.shared.mainWindow ?? NSApp.mainWindow
+    return await withCheckedContinuation { continuation in
+        if let win {
+            alert.beginSheetModal(for: win) { response in
                 continuation.resume(returning: response)
             }
         } else {
@@ -25,10 +27,11 @@ func presentAlert(_ alert: NSAlert, attachedTo window: NSWindow? = NSApp.mainWin
 }
 
 @MainActor
-func presentOpenPanel(_ panel: NSOpenPanel, attachedTo window: NSWindow? = NSApp.mainWindow ?? NSApp.windows.first) async -> NSApplication.ModalResponse {
-    await withCheckedContinuation { continuation in
-        if let window {
-            panel.beginSheetModal(for: window) { response in
+func presentOpenPanel(_ panel: NSOpenPanel, attachedTo window: NSWindow? = nil) async -> NSApplication.ModalResponse {
+    let win = window ?? MainWindowManager.shared.mainWindow ?? NSApp.mainWindow
+    return await withCheckedContinuation { continuation in
+        if let win {
+            panel.beginSheetModal(for: win) { response in
                 continuation.resume(returning: response)
             }
         } else {
@@ -45,7 +48,8 @@ func alertDialog(title: String, message: String) {
     DispatchQueue.main.async {
         // Prefer a non-blocking sheet when a window is available. This avoids
         // nested modal run loops that can interfere with SwiftUI updates.
-        if let window = NSApp.mainWindow ?? NSApp.windows.first {
+        let alertWindow = MainWindowManager.shared.mainWindow ?? NSApp.mainWindow
+        if let window = alertWindow {
             let alert = NSAlert()
             alert.messageText = title
             alert.informativeText = message

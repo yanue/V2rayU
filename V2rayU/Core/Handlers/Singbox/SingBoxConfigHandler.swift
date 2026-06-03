@@ -181,9 +181,20 @@ class SingboxConfigHandler {
         // TUN模式配置
         if enableTun {
             // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
-            if self.singbox.log.disabled != true {
+            let tunLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
+            switch tunLevel {
+            case .none:
+                self.singbox.log.disabled = true
+            case .warning:
+                self.singbox.log.disabled = nil
                 self.singbox.log.level = "warn"
                 self.singbox.log.output = tunLogFilePath
+                self.singbox.log.timestamp = true
+            default:
+                self.singbox.log.disabled = nil
+                self.singbox.log.level = tunLevel.rawValue
+                self.singbox.log.output = tunLogFilePath
+                self.singbox.log.timestamp = true
             }
             /**
              {

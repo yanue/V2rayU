@@ -13,6 +13,8 @@ import SwiftUI
 class MainWindowManager {
     static let shared = MainWindowManager()
     private var windowController: NSWindowController?
+
+    var mainWindow: NSWindow? { windowController?.window }
     
     public func openMainWindow() {
         // 1. 切回常规模式（显示 Dock 图标、主菜单）

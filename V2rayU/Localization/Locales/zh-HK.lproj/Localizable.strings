@@ -736,6 +736,7 @@
 "TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";
 "TunAutoRebuild" = "網路變化後自動重建 TUN";
 "TunAutoRebuildTip" = "切換 Wi-Fi / 喚醒後自動重建隧道，避免路由失效導致斷線";
+"TunLogLevel" = "TUN 日誌級別";
 
 // MARK: - 組合設定 / 核心提示
 "CombinationCountFormat" = "共 %d 個組合";

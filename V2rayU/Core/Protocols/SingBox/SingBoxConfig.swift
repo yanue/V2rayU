@@ -229,6 +229,7 @@ struct DNSConfig: Codable {
 struct DNSRule: Codable {
     var server: String?
     var domain: [String]?
+    var rule_set: [String]?
     var disable_cache: Bool?
     var action: String?
     var rcode: String?
@@ -241,6 +242,7 @@ struct DNSRule: Codable {
     init(
         server: String? = nil,
         domain: [String]? = nil,
+        rule_set: [String]? = nil,
         disable_cache: Bool? = nil,
         action: String? = nil,
         rcode: String? = nil,
@@ -252,6 +254,7 @@ struct DNSRule: Codable {
     ) {
         self.server = server
         self.domain = domain
+        self.rule_set = rule_set
         self.disable_cache = disable_cache
         self.action = action
         self.rcode = rcode

@@ -102,6 +102,8 @@ extension UserDefaults {
         case tunStrictRoute
         // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
         case tunAutoRebuild
+        // tun log level
+        case tunLogLevel
 
         // sing-box dns json config
         case dnsJsonSingbox
