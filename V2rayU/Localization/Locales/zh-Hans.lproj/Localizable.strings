@@ -565,7 +565,7 @@
 "DiagSudoersCheck" = "v2rayu-sudoer 权限规则";
 "DiagTunDaemon" = "tun-helper.plist 守护进程";
 "DiagConfigCheck" = "~/.V2rayU/config.json 检查";
-"DiagGeoDataFiles" = "geoip.dat & geosite.dat 数据文件";
+"DiagGeoDataFiles" = "GeoData / sing-box 规则集文件";
 
 // MARK: - 诊断 - 状态描述
 "DiagPending" = "等待检查…";

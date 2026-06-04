@@ -125,6 +125,19 @@ actor AppInstaller: NSObject {
             needRunInstall = true
         }
 
+        // sing-box >= 1.12 removed inline geosite/geoip support; keep local rule sets synced.
+        if !needRunInstall {
+            for name in singboxBundledRuleSetFiles {
+                let path = singboxRuleSetPath + "/" + name
+                if !fileMgr.fileExists(atPath: path) {
+                    logger.info("sing-box rule-set missing: \(path)")
+                    installReason = "sing-box rule-set missing"
+                    needRunInstall = true
+                    break
+                }
+            }
+        }
+
         // ====== 隔离标记 ======
         let quarantineFiles = [
             (xrayCoreFile, "xray-core"),

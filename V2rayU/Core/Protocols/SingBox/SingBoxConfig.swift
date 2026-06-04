@@ -29,7 +29,12 @@ struct SingboxStruct: Codable {
 
 // 顶层 experimental 改成 clash_api
 struct ExperimentalConfig: Codable {
-    var clash_api: ClashAPIConfig
+    var clash_api: ClashAPIConfig? = nil
+    var cache_file: CacheFileConfig? = nil
+}
+
+struct CacheFileConfig: Codable {
+    var enabled: Bool
 }
 
 // Clash API 配置
@@ -312,6 +317,14 @@ struct RouteConfig: Codable {
     var auto_detect_interface: Bool = true
     var default_domain_resolver: String = "direct-dns"
     var rules: [RouteRule] = []
+    var rule_set: [RuleSetConfig]? = nil
+}
+
+struct RuleSetConfig: Codable {
+    var type: String
+    var tag: String
+    var format: String
+    var path: String
 }
 
 struct RouteRule: Codable {
@@ -322,6 +335,8 @@ struct RouteRule: Codable {
     var geoip: [String]?
     var ip_cidr: [String]?
     var ip_is_private: Bool?
+    var rule_set: [String]?
+    var invert: Bool?
     var process_name: [String]?
     var inbound: [String]?
     var network: [String]?
@@ -337,6 +352,8 @@ struct RouteRule: Codable {
         geoip: [String]? = nil,
         ip_cidr: [String]? = nil,
         ip_is_private: Bool? = nil,
+        rule_set: [String]? = nil,
+        invert: Bool? = nil,
         process_name: [String]? = nil,
         inbound: [String]? = nil,
         network: [String]? = nil,
@@ -351,11 +368,104 @@ struct RouteRule: Codable {
         self.geoip = geoip
         self.ip_cidr = ip_cidr
         self.ip_is_private = ip_is_private
+        self.rule_set = rule_set
+        self.invert = invert
         self.process_name = process_name
         self.inbound = inbound
         self.network = network
         self.port = port
         self.`protocol` = `protocol`
         self.clash_mode = clash_mode
+    }
+}
+
+
+enum SingboxBundledRuleSet {
+    private static let geositeTags: [String: String] = [
+        "category-ads-all": "geosite-category-ads-all",
+        "cn": "geosite-cn",
+        "geolocation-!cn": "geosite-geolocation-!cn",
+    ]
+
+    private static let geoipTags: [String: String] = [
+        "cn": "geoip-cn",
+    ]
+
+    static func normalize(routeRules rules: [RouteRule]) -> (rules: [RouteRule], ruleSets: [RuleSetConfig]) {
+        var usedTags: Set<String> = []
+        let normalized = rules.map { rule in
+            normalize(routeRule: rule, usedTags: &usedTags)
+        }
+        return (normalized, ruleSets(for: usedTags))
+    }
+
+    static func normalize(dnsRules rules: [DNSRule]) -> (rules: [DNSRule], ruleSets: [RuleSetConfig]) {
+        var usedTags: Set<String> = []
+        let normalized = rules.map { rule in
+            normalize(dnsRule: rule, usedTags: &usedTags)
+        }
+        return (normalized, ruleSets(for: usedTags))
+    }
+
+    static func mergeRuleSets(_ groups: [RuleSetConfig]...) -> [RuleSetConfig]? {
+        var seen: Set<String> = []
+        var merged: [RuleSetConfig] = []
+        for group in groups {
+            for item in group where !seen.contains(item.tag) {
+                seen.insert(item.tag)
+                merged.append(item)
+            }
+        }
+        return merged.isEmpty ? nil : merged
+    }
+
+    private static func normalize(routeRule rule: RouteRule, usedTags: inout Set<String>) -> RouteRule {
+        var rule = rule
+        let geositeResult = consume(values: rule.geosite, table: geositeTags, usedTags: &usedTags)
+        let geoipResult = consume(values: rule.geoip, table: geoipTags, usedTags: &usedTags)
+        let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
+
+        rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
+        rule.geoip = geoipResult.remaining.isEmpty ? nil : geoipResult.remaining
+        rule.rule_set = ruleSet.isEmpty ? nil : ruleSet
+        return rule
+    }
+
+    private static func normalize(dnsRule rule: DNSRule, usedTags: inout Set<String>) -> DNSRule {
+        var rule = rule
+        let geositeResult = consume(values: rule.geosite, table: geositeTags, usedTags: &usedTags)
+        let geoipResult = consume(values: rule.geoip, table: geoipTags, usedTags: &usedTags)
+        let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
+
+        rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
+        rule.geoip = geoipResult.remaining.isEmpty ? nil : geoipResult.remaining
+        rule.rule_set = ruleSet.isEmpty ? nil : ruleSet
+        return rule
+    }
+
+    private static func consume(values: [String]?, table: [String: String], usedTags: inout Set<String>) -> (tags: [String], remaining: [String]) {
+        guard let values else { return ([], []) }
+        var tags: [String] = []
+        var remaining: [String] = []
+        for value in values {
+            if let tag = table[value] {
+                tags.append(tag)
+                usedTags.insert(tag)
+            } else {
+                remaining.append(value)
+            }
+        }
+        return (tags, remaining)
+    }
+
+    private static func ruleSets(for tags: Set<String>) -> [RuleSetConfig] {
+        tags.sorted().map { tag in
+            RuleSetConfig(
+                type: "local",
+                tag: tag,
+                format: "binary",
+                path: "\(singboxRuleSetPath)/\(tag).srs"
+            )
+        }
     }
 }

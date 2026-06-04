@@ -560,6 +560,15 @@ final class DiagnosticsViewModel: ObservableObject {
             allOk = false
         }
 
+        for name in singboxBundledRuleSetFiles {
+            if FileManager.default.fileExists(atPath: singboxRuleSetPath + "/" + name) {
+                details.append("✓ sing-box/rule-set/\(name)")
+            } else {
+                details.append("✗ sing-box/rule-set/\(name)")
+                allOk = false
+            }
+        }
+
         if allOk {
             return .pass(.geoDataFiles, details.joined(separator: "\n"))
         }

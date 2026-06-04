@@ -159,6 +159,7 @@ class SingboxConfigHandler {
         self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: outbounds)
         self.singbox.route.default_domain_resolver = "direct-dns"
         self.singbox.route.rules = comboRules + RoutingManager().getSingboxRoutingRules()
+        applyBundledRuleSets()
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
                 external_controller: "127.0.0.1:\(coreApiPort)",
@@ -253,6 +254,7 @@ class SingboxConfigHandler {
                     RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]),
                 ]
             )
+            applyBundledRuleSets()
 
             self.singbox.inbounds = inbounds
             return
@@ -314,8 +316,26 @@ class SingboxConfigHandler {
             self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: _outbounds)
             self.singbox.route.default_domain_resolver = "direct-dns"
             self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
+            applyBundledRuleSets()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
+    }
+
+    private func applyBundledRuleSets() {
+        guard singboxSupportsRuleSet() else { return }
+
+        let normalizedRoute = SingboxBundledRuleSet.normalize(routeRules: self.singbox.route.rules)
+        let normalizedDns = SingboxBundledRuleSet.normalize(dnsRules: self.singbox.dns.rules)
+        self.singbox.route.rules = normalizedRoute.rules
+        self.singbox.dns.rules = normalizedDns.rules
+        self.singbox.route.rule_set = SingboxBundledRuleSet.mergeRuleSets(normalizedRoute.ruleSets, normalizedDns.ruleSets)
+    }
+
+    private func singboxSupportsRuleSet() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else {
+            return true
+        }
+        return version >= SingboxVersion(1, 8, 0)
     }
 
     private func getDnsConfig() -> DNSConfig {

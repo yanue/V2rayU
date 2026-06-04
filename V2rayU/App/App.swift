@@ -34,6 +34,13 @@ let coreLogFilePath = AppHomePath + "/core.log"
 let tunLogFilePath = AppHomePath + "/tun.log"
 let runTunLogFilePath = AppHomePath + "/run-tun.log"
 let xrayCorePath = AppBinRoot + "/bin/xray-core"
+let singboxRuleSetPath = AppBinRoot + "/bin/sing-box/rule-set"
+let singboxBundledRuleSetFiles = [
+    "geosite-category-ads-all.srs",
+    "geosite-cn.srs",
+    "geosite-geolocation-!cn.srs",
+    "geoip-cn.srs",
+]
 #if arch(arm64)
 let xrayCoreFile = xrayCorePath + "/xray-arm64"
 #else

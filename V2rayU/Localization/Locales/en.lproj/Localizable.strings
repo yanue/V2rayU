@@ -564,7 +564,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagSudoersCheck" = "v2rayu-sudoer Rules";
 "DiagTunDaemon" = "tun-helper.plist Daemon";
 "DiagConfigCheck" = "~/.V2rayU/config.json Check";
-"DiagGeoDataFiles" = "geoip.dat & geosite.dat Files";
+"DiagGeoDataFiles" = "GeoData / sing-box Rule Set Files";
 
 // MARK: - Diagnostics - Status
 "DiagPending" = "Pending...";
