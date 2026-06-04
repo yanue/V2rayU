@@ -391,18 +391,18 @@ enum SingboxBundledRuleSet {
         "cn": "geoip-cn",
     ]
 
-    static func normalize(routeRules rules: [RouteRule]) -> (rules: [RouteRule], ruleSets: [RuleSetConfig]) {
+    static func normalize(routeRules rules: [RouteRule], forceAll: Bool = false) -> (rules: [RouteRule], ruleSets: [RuleSetConfig]) {
         var usedTags: Set<String> = []
         let normalized = rules.map { rule in
-            normalize(routeRule: rule, usedTags: &usedTags)
+            normalize(routeRule: rule, forceAll: forceAll, usedTags: &usedTags)
         }
         return (normalized, ruleSets(for: usedTags))
     }
 
-    static func normalize(dnsRules rules: [DNSRule]) -> (rules: [DNSRule], ruleSets: [RuleSetConfig]) {
+    static func normalize(dnsRules rules: [DNSRule], forceAll: Bool = false) -> (rules: [DNSRule], ruleSets: [RuleSetConfig]) {
         var usedTags: Set<String> = []
         let normalized = rules.map { rule in
-            normalize(dnsRule: rule, usedTags: &usedTags)
+            normalize(dnsRule: rule, forceAll: forceAll, usedTags: &usedTags)
         }
         return (normalized, ruleSets(for: usedTags))
     }
@@ -419,10 +419,10 @@ enum SingboxBundledRuleSet {
         return merged.isEmpty ? nil : merged
     }
 
-    private static func normalize(routeRule rule: RouteRule, usedTags: inout Set<String>) -> RouteRule {
+    private static func normalize(routeRule rule: RouteRule, forceAll: Bool, usedTags: inout Set<String>) -> RouteRule {
         var rule = rule
-        let geositeResult = consume(values: rule.geosite, table: geositeTags, usedTags: &usedTags)
-        let geoipResult = consume(values: rule.geoip, table: geoipTags, usedTags: &usedTags)
+        let geositeResult = consume(values: rule.geosite, table: geositeTags, defaultPrefix: "geosite", forceAll: forceAll, usedTags: &usedTags)
+        let geoipResult = consume(values: rule.geoip, table: geoipTags, defaultPrefix: "geoip", forceAll: forceAll, usedTags: &usedTags)
         let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
 
         rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
@@ -431,10 +431,10 @@ enum SingboxBundledRuleSet {
         return rule
     }
 
-    private static func normalize(dnsRule rule: DNSRule, usedTags: inout Set<String>) -> DNSRule {
+    private static func normalize(dnsRule rule: DNSRule, forceAll: Bool, usedTags: inout Set<String>) -> DNSRule {
         var rule = rule
-        let geositeResult = consume(values: rule.geosite, table: geositeTags, usedTags: &usedTags)
-        let geoipResult = consume(values: rule.geoip, table: geoipTags, usedTags: &usedTags)
+        let geositeResult = consume(values: rule.geosite, table: geositeTags, defaultPrefix: "geosite", forceAll: forceAll, usedTags: &usedTags)
+        let geoipResult = consume(values: rule.geoip, table: geoipTags, defaultPrefix: "geoip", forceAll: forceAll, usedTags: &usedTags)
         let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
 
         rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
@@ -443,7 +443,7 @@ enum SingboxBundledRuleSet {
         return rule
     }
 
-    private static func consume(values: [String]?, table: [String: String], usedTags: inout Set<String>) -> (tags: [String], remaining: [String]) {
+    private static func consume(values: [String]?, table: [String: String], defaultPrefix: String, forceAll: Bool, usedTags: inout Set<String>) -> (tags: [String], remaining: [String]) {
         guard let values else { return ([], []) }
         var tags: [String] = []
         var remaining: [String] = []
@@ -451,9 +451,12 @@ enum SingboxBundledRuleSet {
             if let tag = table[value] {
                 tags.append(tag)
                 usedTags.insert(tag)
-            } else {
+            } else if !forceAll {
+                // keep unrecognized geosite/geoip for older sing-box versions
                 remaining.append(value)
             }
+            // forceAll: unrecognized values are dropped entirely
+            // (no geosite/geoip support + no .srs file to back rule_set)
         }
         return (tags, remaining)
     }

@@ -162,7 +162,8 @@ class NaiveUri: BaseShareUri {
         profile.security = .tls
         profile.sni = query.getString(forKey: "sni", defaultValue: query.getString(forKey: "peer", defaultValue: host))
         profile.allowInsecure = query.getBool(forKey: "insecure", defaultValue: query.getBool(forKey: "allowInsecure", defaultValue: false))
-        profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
+        // uTLS is not supported on naive outbound
+        profile.fingerprint = .none
         profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
 
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")

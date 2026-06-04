@@ -162,9 +162,8 @@ extension clashProxy {
             profile.host = self.username ?? ""
             profile.password = self.password ?? ""
             profile.sni = self.servername ?? self.sni ?? self.server
-            profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) }
-                ?? self.fp.flatMap { V2rayStreamFingerprint(rawValue: $0) }
-                ?? .chrome
+            // uTLS is not supported on naive outbound
+            profile.fingerprint = .none
 
         default:
             return nil

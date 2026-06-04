@@ -24,7 +24,9 @@ struct ConfigTransportView: View {
                 getPickerWithLabel(label: .Security, selection: $item.security)
                 getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.allowInsecure)
                 getTextFieldWithLabel(label: .Sni, text: $item.sni)
-                getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
+                if item.selectedProtocol != .naive && item.selectedProtocol != .anytls {
+                    getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
+                }
                 // Use .id(item.security) so SwiftUI fully tears down and recreates
                 // this Group (including TextField focus state) when security changes,
                 // preventing AttributeGraph / UpdateViewFocusItem crashes.

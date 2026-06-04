@@ -251,11 +251,7 @@ class SingboxOutboundHandler {
                 enabled: true,
                 server_name: profile.sni.isEmpty ? profile.address : profile.sni,
                 insecure: profile.allowInsecure,
-                alpn: profile.entity.getAlpn(),
-                utls: UTLSConfig(
-                    enabled: true,
-                    fingerprint: profile.fingerprint.rawValue
-                )
+                alpn: profile.entity.getAlpn()
             )
         )
     }
