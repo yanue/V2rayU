@@ -107,6 +107,8 @@ extension UserDefaults {
 
         // sing-box dns json config
         case dnsJsonSingbox
+        // pinnedPeerCertSha256 successful refresh timestamps by profile uuid
+        case certPinRefreshTimestamps
     }
 
     static func del(forKey key: KEY) {

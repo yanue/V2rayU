@@ -176,10 +176,16 @@ actor V2rayLaunch {
         // 启动前为组合内各 TLS 节点自动获取证书指纹（持久化到 DB，供 resolveCombination 读取）。
         let memberUUIDs = Set(combination.groups.flatMap { $0.outboundProfileUUIDs })
         let memberProfiles = ProfileStore.shared.fetchAll().filter { memberUUIDs.contains($0.uuid) }
-        await CertPinningCoordinator.ensurePinnedCerts(for: memberProfiles)
+        let pinningResults = await CertPinningCoordinator.ensurePinnedCerts(for: memberProfiles)
+        let profileOverrides = pinningResults.map(\.profile)
+        let forceSingboxUUIDs = Set(pinningResults.filter { $0.forceSingBox }.map { $0.profile.uuid })
 
         let cfg = CoreConfigHandler()
-        guard let resolved = cfg.resolveCombination(combination), let firstProfile = resolved.firstProfile else {
+        guard let resolved = cfg.resolveCombination(
+            combination,
+            profileOverrides: profileOverrides,
+            forceSingboxProfileUUIDs: forceSingboxUUIDs
+        ), let firstProfile = resolved.firstProfile else {
             await noticeLocalized(title: .StartFailed, message: .CombinationNoAvailableOutbounds)
             return false
         }

@@ -53,15 +53,27 @@ class CoreConfigHandler {
         }
     }
 
-    public func resolveCombination(_ combination: CombinedConfigEntity) -> CombinedConfigResolved? {
+    public func resolveCombination(
+        _ combination: CombinedConfigEntity,
+        profileOverrides: [ProfileEntity] = [],
+        forceSingboxProfileUUIDs: Set<String> = []
+    ) -> CombinedConfigResolved? {
         guard let validCombination = CombinedConfigStore.shared.getValidCombination(uuid: combination.uuid) else { return nil }
-        let profilesByUUID = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
+        var profilesByUUID = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
+        for profile in profileOverrides {
+            profilesByUUID[profile.uuid] = profile
+        }
         let forcedCore = validCombination.coreType?.forcedCoreType
         var resolvedGroups: [CombinedConfigResolvedGroup] = []
         var allProfiles: [ProfileEntity] = []
 
         for group in validCombination.groups {
             let profiles = group.outboundProfileUUIDs.compactMap { profilesByUUID[$0] }.map { profile -> ProfileEntity in
+                if forceSingboxProfileUUIDs.contains(profile.uuid) {
+                    var copy = profile
+                    copy.coreType = .singbox
+                    return copy
+                }
                 guard let forcedCore else { return profile }
                 var copy = profile
                 copy.coreType = forcedCore == .XrayCore ? .xray : .singbox
@@ -79,7 +91,9 @@ class CoreConfigHandler {
         let canLaunch = decisions.allSatisfy { $0.canLaunch }
         let coreType: CoreType
 
-        if let forcedCore {
+        if !forceSingboxProfileUUIDs.isEmpty {
+            coreType = .SingBox
+        } else if let forcedCore {
             coreType = forcedCore
         } else if decisions.contains(where: { $0.coreType == .SingBox }) {
             coreType = .SingBox
