@@ -42,7 +42,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
             return [.appDataDir, .v2rayUTool, .xrayCore, .singBox, .updateScript,
                     .sudoersCheck, .tunDaemon, .configCheck, .geoDataFiles]
         case .status:
-            return [.coreRunning, .launchdProcess, .systemProxy, .localPortConflict]
+            return [.coreRunning, .launchdProcess, .systemProxy, .localPortConflict, .tunRuntime]
         case .network:
             return [.basicNetwork, .nodeConnectivity, .pingLatency]
         case .logs:
@@ -69,6 +69,7 @@ enum DiagnosticStep: String, CaseIterable {
     case launchdProcess
     case systemProxy
     case localPortConflict
+    case tunRuntime
     // Network
     case basicNetwork
     case nodeConnectivity
@@ -85,7 +86,7 @@ enum DiagnosticStep: String, CaseIterable {
         case .appDataDir, .v2rayUTool, .xrayCore, .singBox, .updateScript,
              .sudoersCheck, .tunDaemon, .configCheck, .geoDataFiles:
             return .files
-        case .coreRunning, .launchdProcess, .systemProxy, .localPortConflict:
+        case .coreRunning, .launchdProcess, .systemProxy, .localPortConflict, .tunRuntime:
             return .status
         case .basicNetwork, .nodeConnectivity, .pingLatency:
             return .network

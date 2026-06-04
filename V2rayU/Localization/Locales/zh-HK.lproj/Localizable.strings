@@ -473,6 +473,7 @@
 "StartFailed" = "啟動失敗";
 "NoAvailableServerConfig" = "沒有可用的伺服器設定，請先新增伺服器或訂閱";
 "LaunchDaemonStartFailed" = "無法啟動 LaunchDaemon";
+"LocalProxyPortNotReady" = "本機代理連接埠尚未就緒，核心可能啟動失敗或連接埠被佔用";
 "SocksPortNotReadyForTun" = "SOCKS 連接埠尚未就緒，未啟動 TUN 服務";
 "TunServiceStartFailed" = "無法啟動 TUN 服務";
 "InvalidCombination" = "組合設定無效";
@@ -549,6 +550,7 @@
 "DiagLaunchdRunning" = "進程執行中 (PID: %@)";
 "DiagLaunchdReload" = "重新載入";
 "DiagLocalPortConflict" = "本機連接埠衝突";
+"DiagTunRuntime" = "TUN 執行狀態";
 "DiagPingLatency" = "延遲與可用性";
 "DiagLogAnalysis" = "日誌分析";
 "DiagVPNConflict" = "VPN 衝突檢測";
@@ -632,6 +634,12 @@
 "DiagBasicNetworkFailed" = "無法存取網際網路（apple.com 不可達），請檢查網路連線。";
 "DiagProxyConnectFailed" = "無法透過本機代理存取外網，代理可能未正常運作。";
 "DiagProxyConnectOK" = "代理連線正常";
+"DiagTunRuntimeOK" = "TUN 執行正常（預設路由: %@）";
+"DiagTunNotActive" = "目前未執行 TUN 模式";
+"DiagTunBackendNotReady" = "TUN 後端 SOCKS 連接埠 %d 尚未就緒";
+"DiagTunHelperNotRunning" = "tun-helper 未執行";
+"DiagTunRouteNotReady" = "預設路由未指向 TUN（目前: %@）";
+"DiagTunInterfaceNotFound" = "未發現 utun 介面";
 "DiagBasicNetworkOK" = "網際網路可存取";
 "DiagConfigValidOK" = "設定檔 JSON 合法且包含必要欄位";
 "DiagConfigValidProblems" = "設定問題：%@";

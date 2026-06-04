@@ -473,6 +473,7 @@
 "StartFailed" = "Start Failed";
 "NoAvailableServerConfig" = "No available server configuration. Please add a server or subscription first.";
 "LaunchDaemonStartFailed" = "Unable to start LaunchDaemon";
+"LocalProxyPortNotReady" = "Local proxy port is not ready. The core may have failed to start or the port is occupied.";
 "SocksPortNotReadyForTun" = "SOCKS port is not ready. TUN service was not started.";
 "TunServiceStartFailed" = "Unable to start TUN service";
 "InvalidCombination" = "Invalid Combination";
@@ -549,6 +550,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagLaunchdRunning" = "Process running (PID: %@)";
 "DiagLaunchdReload" = "Reload";
 "DiagLocalPortConflict" = "Local Port Conflict";
+"DiagTunRuntime" = "TUN Runtime Status";
 "DiagPingLatency" = "Latency & Availability";
 "DiagLogAnalysis" = "Log Analysis";
 "DiagVPNConflict" = "VPN Conflict Detection";
@@ -632,6 +634,12 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagBasicNetworkFailed" = "Cannot access the internet (apple.com unreachable). Check your network connection";
 "DiagProxyConnectFailed" = "Cannot access external sites via local proxy. The proxy may not be working properly";
 "DiagProxyConnectOK" = "Proxy connectivity OK";
+"DiagTunRuntimeOK" = "TUN is running normally (default route: %@)";
+"DiagTunNotActive" = "TUN mode is not currently running";
+"DiagTunBackendNotReady" = "TUN backend SOCKS port %d is not ready";
+"DiagTunHelperNotRunning" = "tun-helper is not running";
+"DiagTunRouteNotReady" = "Default route does not point to TUN (current: %@)";
+"DiagTunInterfaceNotFound" = "No utun interface found";
 "DiagBasicNetworkOK" = "Internet accessible";
 "DiagConfigValidOK" = "Configuration is valid JSON with required fields";
 "DiagConfigValidProblems" = "Configuration issues: %@";

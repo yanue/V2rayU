@@ -494,6 +494,7 @@ enum LanguageLabel: String, CaseIterable {
     case StartFailed
     case NoAvailableServerConfig
     case LaunchDaemonStartFailed
+    case LocalProxyPortNotReady
     case SocksPortNotReadyForTun
     case TunServiceStartFailed
     case InvalidCombination
@@ -549,6 +550,7 @@ enum LanguageLabel: String, CaseIterable {
     case DiagCoreRunning
     case DiagLaunchdProcess
     case DiagLocalPortConflict
+    case DiagTunRuntime
     case DiagPingLatency
     case DiagLogAnalysis
     case DiagVPNConflict
@@ -604,6 +606,12 @@ enum LanguageLabel: String, CaseIterable {
     case DiagBasicNetworkFailed
     case DiagProxyConnectFailed
     case DiagProxyConnectOK
+    case DiagTunRuntimeOK
+    case DiagTunNotActive
+    case DiagTunBackendNotReady
+    case DiagTunHelperNotRunning
+    case DiagTunRouteNotReady
+    case DiagTunInterfaceNotFound
     case DiagBasicNetworkOK
     case DiagConfigValidOK
     case DiagConfigValidProblems

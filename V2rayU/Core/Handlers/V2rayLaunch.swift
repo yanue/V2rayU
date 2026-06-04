@@ -121,14 +121,10 @@ actor V2rayLaunch {
             return false
         }
         let mode = await AppState.shared.runMode
-        if mode == .tun {
-            let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
-            guard socksReady else {
-                logger.error("start aborted: SOCKS port is not ready before starting TUN")
-                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
-                await LaunchAgent.shared.stopAgent()
-                return false
-            }
+        guard await ensureLocalProxyReady(mode: mode, context: "start") else {
+            await LaunchAgent.shared.stopAgent()
+            setSystemProxy(mode: nil)
+            return false
         }
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
@@ -225,14 +221,10 @@ actor V2rayLaunch {
             return false
         }
         let mode = await AppState.shared.runMode
-        if mode == .tun {
-            let socksReady = await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)
-            guard socksReady else {
-                logger.error("start combined config aborted: SOCKS port is not ready before starting TUN")
-                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
-                await LaunchAgent.shared.stopAgent()
-                return false
-            }
+        guard await ensureLocalProxyReady(mode: mode, context: "start combined config") else {
+            await LaunchAgent.shared.stopAgent()
+            setSystemProxy(mode: nil)
+            return false
         }
         setSystemProxy(mode: mode)
         logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
@@ -281,6 +273,18 @@ actor V2rayLaunch {
             try? await Task.sleep(nanoseconds: 300_000_000)
         }
         return false
+    }
+
+    private func ensureLocalProxyReady(mode: RunMode, context: String) async -> Bool {
+        let port = getEffectiveSocksProxyPort()
+        let ready = await waitForLocalTCPReady(port: port, timeout: 6)
+        guard ready else {
+            logger.error("\(context) aborted: local SOCKS/Mixed port \(port) is not ready, mode=\(mode.rawValue)")
+            let message = mode == .tun ? LanguageLabel.SocksPortNotReadyForTun : LanguageLabel.LocalProxyPortNotReady
+            await showAlert(title: await localized(.StartFailed), message: await localized(message))
+            return false
+        }
+        return true
     }
 
     private func currentDefaultRoute() -> (gateway: String?, interface: String?) {

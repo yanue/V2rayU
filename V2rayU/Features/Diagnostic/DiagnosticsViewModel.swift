@@ -102,6 +102,7 @@ final class DiagnosticsViewModel: ObservableObject {
         case .launchdProcess:    return String(localized: .DiagLaunchdProcess)
         case .systemProxy:       return String(localized: .DiagSystemProxy)
         case .localPortConflict: return String(localized: .DiagLocalPortConflict)
+        case .tunRuntime:        return String(localized: .DiagTunRuntime)
         case .basicNetwork:      return String(localized: .DiagBasicNetwork)
         case .nodeConnectivity:  return String(localized: .DiagNetworkConnectivity)
         case .pingLatency:       return String(localized: .DiagPingLatency)
@@ -188,6 +189,7 @@ final class DiagnosticsViewModel: ObservableObject {
         case .launchdProcess:    return await checkLaunchdProcess()
         case .systemProxy:       return await checkSystemProxy()
         case .localPortConflict: return await checkLocalPortConflict()
+        case .tunRuntime:        return await checkTunRuntime()
         case .basicNetwork:      return await checkBasicNetwork()
         case .nodeConnectivity:  return await checkNodeConnectivity()
         case .pingLatency:       return await checkPingLatency()
@@ -580,7 +582,7 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: ── Status Checks ──
 
     private func checkCoreRunning() async -> CheckResult {
-        let running = await runInBackground { ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray") }
+        let running = await runInBackground { Self.isCoreProcessRunningSync() }
         if running {
             return CheckResult(step: .coreRunning, ok: true, subtitle: String(localized: .DiagPassed),
                                problem: nil, actionId: .restartCore)
@@ -695,7 +697,7 @@ final class DiagnosticsViewModel: ObservableObject {
         let (socksListening, httpListening, coreRunning, ownerSocks, ownerHTTP) = await runInBackground {
             let sl = ProcessChecker.isPortListening(socksPort)
             let hl = ProcessChecker.isPortListening(httpPort)
-            let cr = ProcessChecker.isProcessRunning("v2ray") || ProcessChecker.isProcessRunning("xray")
+            let cr = Self.isCoreProcessRunningSync()
             let os = ProcessChecker.portOwner(socksPort) ?? "未知"
             let oh = ProcessChecker.portOwner(httpPort) ?? "未知"
             return (sl, hl, cr, os, oh)
@@ -715,6 +717,61 @@ final class DiagnosticsViewModel: ObservableObject {
         }
         return .fail(.localPortConflict, subtitle: String(localized: .DiagPortOccupied),
                      problem: msg, action: .restartCore)
+    }
+
+    private func checkTunRuntime() async -> CheckResult {
+        guard appState.runMode == .tun, appState.v2rayTurnOn else {
+            return .pass(.tunRuntime, String(localized: .DiagTunNotActive))
+        }
+
+        let socksPort = UInt16(exactly: localSocksPort) ?? 0
+        let socksReady = await TCPConnectivity.canConnect(host: "127.0.0.1", port: socksPort, timeout: 1.5)
+        let state = await runInBackground {
+            Self.tunRuntimeStateSync()
+        }
+
+        var details: [String] = []
+        var problems: [String] = []
+
+        if socksReady {
+            details.append("✓ SOCKS 127.0.0.1:\(socksPort)")
+        } else {
+            let msg = String(format: String(localized: .DiagTunBackendNotReady), Int(socksPort))
+            details.append("✗ \(msg)")
+            problems.append(msg)
+        }
+
+        if state.helperRunning {
+            details.append("✓ tun-helper")
+        } else {
+            let msg = String(localized: .DiagTunHelperNotRunning)
+            details.append("✗ \(msg)")
+            problems.append(msg)
+        }
+
+        if state.hasUTun {
+            details.append("✓ utun")
+        } else {
+            let msg = String(localized: .DiagTunInterfaceNotFound)
+            details.append("✗ \(msg)")
+            problems.append(msg)
+        }
+
+        if let interface = state.defaultInterface, interface.hasPrefix("utun") {
+            details.append("✓ default route: \(interface)")
+        } else {
+            let current = state.defaultInterface ?? "unknown"
+            let msg = String(format: String(localized: .DiagTunRouteNotReady), current)
+            details.append("✗ \(msg)")
+            problems.append(msg)
+        }
+
+        guard problems.isEmpty else {
+            return .fail(.tunRuntime, subtitle: details.joined(separator: "\n"),
+                         problem: problems.joined(separator: "\n"), action: .restartCore)
+        }
+
+        return .pass(.tunRuntime, String(format: String(localized: .DiagTunRuntimeOK), state.defaultInterface ?? "utun"))
     }
 
     // MARK: ── Network Checks ──
@@ -793,6 +850,12 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: ── Process utilities (run off main) ──
 
+    nonisolated private static func isCoreProcessRunningSync() -> Bool {
+        ProcessChecker.isProcessRunning("v2ray") ||
+        ProcessChecker.isProcessRunning("xray") ||
+        ProcessChecker.isProcessRunning("sing-box")
+    }
+
     /// Read system proxy status synchronously (called from background)
     nonisolated private static func getSystemProxyStatusSync(type: String) -> (enabled: Bool, port: Int) {
         let task = Process()
@@ -847,6 +910,58 @@ final class DiagnosticsViewModel: ObservableObject {
             }
         } catch {}
         return nil
+    }
+
+    nonisolated private static func tunRuntimeStateSync() -> (helperRunning: Bool, hasUTun: Bool, defaultInterface: String?) {
+        let helperRunning = launchdJobHasPID(label: "yanue.v2rayu.tun-helper")
+        let ifconfigOutput = commandOutput(path: "/sbin/ifconfig", arguments: [])
+        let hasUTun = ifconfigOutput.components(separatedBy: .newlines).contains { line in
+            line.hasPrefix("utun")
+        }
+        let routeOutput = commandOutput(path: "/sbin/route", arguments: ["-n", "get", "default"])
+        var defaultInterface: String?
+        for line in routeOutput.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.hasPrefix("interface:") {
+                defaultInterface = trimmed
+                    .replacingOccurrences(of: "interface:", with: "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                break
+            }
+        }
+        return (helperRunning, hasUTun, defaultInterface)
+    }
+
+    nonisolated private static func launchdJobHasPID(label: String) -> Bool {
+        let output = commandOutput(path: "/bin/launchctl", arguments: ["list", label])
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard trimmed.hasPrefix("\"PID\"") else { continue }
+            let value = trimmed
+                .components(separatedBy: "=")
+                .dropFirst()
+                .joined(separator: "=")
+                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\";")))
+            return Int(value).map { $0 > 0 } ?? false
+        }
+        return false
+    }
+
+    nonisolated private static func commandOutput(path: String, arguments: [String]) -> String {
+        let task = Process()
+        task.launchPath = path
+        task.arguments = arguments
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = Pipe()
+        do {
+            try task.run()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            task.waitUntilExit()
+            return String(data: data, encoding: .utf8) ?? ""
+        } catch {
+            return ""
+        }
     }
 
     private func testProxyConnectivity(socksPort: UInt16) async -> Bool {
