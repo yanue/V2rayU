@@ -188,8 +188,9 @@ struct SingboxMultiplexConfig: Codable {
 
 // Transport 配置
 struct TransportConfig: Codable {
-    var type: String?              // "tcp", "ws", "grpc"
-    var path: String?              // ws 路径
+    var type: String?              // "tcp", "ws", "grpc", "http"
+    var path: String?              // ws/http 路径
+    var host: [String]?            // http host (host 数组)
     var headers: [String:String]?  // ws 头部
     var service_name: String?      // grpc service_name
 }

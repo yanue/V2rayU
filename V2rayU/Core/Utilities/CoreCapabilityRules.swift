@@ -1019,7 +1019,7 @@ enum XrayCompatibilityResolver {
             // 无非阻塞问题：检查 sing-box 是否能接管；能则静默切换，否则继续用 xray 并提示
             let fallbackReasons = SingboxFallbackCompatibility.incompatibilityReasons(for: profile)
             if fallbackReasons.isEmpty {
-                return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: nil, issues: issues, canLaunch: true)
+                return singboxFallbackDecision(for: profile, issues: issues)
             }
             let warningMessage = "当前节点与已安装的 Xray-core \(shortVersion) 存在以下兼容性提示：\n\n\(issueText)\n\n本次仍继续使用 Xray-core 启动。\n\n\(capabilityRulesNotice)\(futureVersionText)"
             return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: true)
@@ -1032,7 +1032,15 @@ enum XrayCompatibilityResolver {
             return XrayCoreCompatibilityDecision(coreType: .XrayCore, warningMessage: warningMessage, issues: issues, canLaunch: false)
         }
 
-        return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: nil, issues: issues, canLaunch: true)
+        return singboxFallbackDecision(for: profile, issues: issues)
+    }
+
+    private static func singboxFallbackDecision(for profile: ProfileEntity, issues: [XrayCompatibilityIssue]) -> XrayCoreCompatibilityDecision {
+        var warningMessage: String?
+        if profile.protocol == .vmess && profile.alterId > 0 {
+            warningMessage = "VMess alterId > 0（旧版 MD5 认证）与 sing-box 不兼容，请将 alterId 改为 0（AEAD 模式）"
+        }
+        return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: warningMessage, issues: issues, canLaunch: true)
     }
 
     private static func xrayDecision(for profile: ProfileEntity) -> XrayCoreCompatibilityDecision {

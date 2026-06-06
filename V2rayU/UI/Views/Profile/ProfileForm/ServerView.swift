@@ -68,6 +68,12 @@ struct ConfigServerView: View {
                         getNumFieldWithLabel(label: .Port, num: $item.port)
                         getTextFieldWithLabel(label: .ID, text: $item.password)
                         getNumFieldWithLabel(label: .AlterID, num: $item.alterId)
+                        if item.alterId > 0 {
+                            Text("alterId > 0 与 sing-box 不兼容，建议改为 0")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .padding(.leading, 107)
+                        }
                         getTextFieldWithLabel(label: .Encryption, text: $item.encryption)
                     }
 

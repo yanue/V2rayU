@@ -77,6 +77,8 @@ class SingboxOutboundHandler {
             uuid: profile.password, // vmess 用 id
             security: profile.encryption.isEmpty ? "auto" : profile.encryption,
             alter_id: profile.alterId,
+            global_padding: true,
+            authenticated_length: true,
             tls: buildTLS(),
             transport: buildTransport()
         )
@@ -150,7 +152,7 @@ class SingboxOutboundHandler {
             return TransportConfig(
                 type: "http",
                 path: profile.path.isEmpty ? nil : profile.path,
-                headers: profile.host.isEmpty ? nil : ["Host": profile.host]
+                host: profile.host.isEmpty ? nil : [profile.host]
             )
             
         case .grpc:

@@ -84,11 +84,7 @@ actor V2rayLaunch {
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
-            if coreDecision.canLaunch {
-                makeToast(message: warningMessage, displayDuration: 5)
-            } else {
-                await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
-            }
+            await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
         }
         if !coreDecision.canLaunch {
             return false
