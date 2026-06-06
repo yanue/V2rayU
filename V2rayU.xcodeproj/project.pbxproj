@@ -162,6 +162,13 @@
 			remoteGlobalIDString = 66B1B54B2D2979060032DD09;
 			remoteInfo = V2rayUTool;
 		};
+		66F0FE092FD3B9A700F7BF9D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66CBCECF2C63B16400313949 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66CBCED62C63B16400313949;
+			remoteInfo = V2rayU;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -331,6 +338,7 @@
 		66EB76A52E2E669400E72DE2 /* PacHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacHandler.swift; sourceTree = "<group>"; };
 		66EB76A72E2E7E0300E72DE2 /* JsonAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonAny.swift; sourceTree = "<group>"; };
 		66EB76AF2E31135200E72DE2 /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
+		66F0FE052FD3B9A700F7BF9D /* V2rayUTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = V2rayUTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		66F100022FA1000100A1B2C3 /* capability-rules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "capability-rules"; sourceTree = "<group>"; };
 		66F100042FA1000100A1B2C3 /* CoreCapabilityRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreCapabilityRules.swift; sourceTree = "<group>"; };
 		66F100062FA1000100A1B2C3 /* update-singbox.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "update-singbox.sh"; sourceTree = "<group>"; };
@@ -346,6 +354,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		66B1B54D2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTool; sourceTree = "<group>"; };
+		66F0FE062FD3B9A700F7BF9D /* V2rayUTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,16 +385,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		66F0FE022FD3B9A700F7BF9D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		660330072D0D5540009FEB56 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		662CC3C92D1BED9B006E8450 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -831,7 +840,7 @@
 				66B1B55C2D297B3F0032DD09 /* Build */,
 				66CBCED92C63B16400313949 /* V2rayU */,
 				66B1B54D2D2979060032DD09 /* V2rayUTool */,
-				660330072D0D5540009FEB56 /* Frameworks */,
+				66F0FE062FD3B9A700F7BF9D /* V2rayUTests */,
 				66CBCED82C63B16400313949 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -841,6 +850,7 @@
 			children = (
 				66CBCED72C63B16400313949 /* V2rayU.app */,
 				66B1B54C2D2979060032DD09 /* V2rayUTool */,
+				66F0FE052FD3B9A700F7BF9D /* V2rayUTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -942,6 +952,29 @@
 			productReference = 66CBCED72C63B16400313949 /* V2rayU.app */;
 			productType = "com.apple.product-type.application";
 		};
+		66F0FE042FD3B9A700F7BF9D /* V2rayUTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66F0FE0B2FD3B9A700F7BF9D /* Build configuration list for PBXNativeTarget "V2rayUTests" */;
+			buildPhases = (
+				66F0FE012FD3B9A700F7BF9D /* Sources */,
+				66F0FE022FD3B9A700F7BF9D /* Frameworks */,
+				66F0FE032FD3B9A700F7BF9D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66F0FE0A2FD3B9A700F7BF9D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				66F0FE062FD3B9A700F7BF9D /* V2rayUTests */,
+			);
+			name = V2rayUTests;
+			packageProductDependencies = (
+			);
+			productName = V2rayUTests;
+			productReference = 66F0FE052FD3B9A700F7BF9D /* V2rayUTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -949,7 +982,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1610;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					66B1B54B2D2979060032DD09 = {
@@ -957,6 +990,10 @@
 					};
 					66CBCED62C63B16400313949 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					66F0FE042FD3B9A700F7BF9D = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 66CBCED62C63B16400313949;
 					};
 				};
 			};
@@ -984,6 +1021,7 @@
 			targets = (
 				66CBCED62C63B16400313949 /* V2rayU */,
 				66B1B54B2D2979060032DD09 /* V2rayUTool */,
+				66F0FE042FD3B9A700F7BF9D /* V2rayUTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1003,6 +1041,13 @@
 				6632EF4E2EC4B9E100CED47B /* Assets.xcassets in Resources */,
 				6632EF502EC4B9E100CED47B /* GoogleService-Info.plist in Resources */,
 				667028E42F0D467E008F27D8 /* pac in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66F0FE032FD3B9A700F7BF9D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,6 +1189,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		66F0FE012FD3B9A700F7BF9D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1151,6 +1203,11 @@
 			isa = PBXTargetDependency;
 			target = 66B1B54B2D2979060032DD09 /* V2rayUTool */;
 			targetProxy = 66B1B5532D2979530032DD09 /* PBXContainerItemProxy */;
+		};
+		66F0FE0A2FD3B9A700F7BF9D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66CBCED62C63B16400313949 /* V2rayU */;
+			targetProxy = 66F0FE092FD3B9A700F7BF9D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1171,7 +1228,6 @@
 		66B1B5512D2979060032DD09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
@@ -1186,7 +1242,6 @@
 		66B1B5522D2979060032DD09 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
@@ -1388,6 +1443,50 @@
 			};
 			name = Release;
 		};
+		66F0FE0C2FD3B9A700F7BF9D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/V2rayU.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/V2rayU";
+			};
+			name = Debug;
+		};
+		66F0FE0D2FD3B9A700F7BF9D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayUTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/V2rayU.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/V2rayU";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1414,6 +1513,15 @@
 			buildConfigurations = (
 				66CBCEE92C63B16500313949 /* Debug */,
 				66CBCEEA2C63B16500313949 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66F0FE0B2FD3B9A700F7BF9D /* Build configuration list for PBXNativeTarget "V2rayUTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66F0FE0C2FD3B9A700F7BF9D /* Debug */,
+				66F0FE0D2FD3B9A700F7BF9D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -110,6 +110,7 @@ struct ProfileListView: View {
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
+                    .accessibilityIdentifier(ViewAccessibilityIdentifier.profileAddButton.rawValue)
 
                     Button(action: {
                         activeSheet = .importServers
@@ -118,6 +119,7 @@ struct ProfileListView: View {
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
+                    .accessibilityIdentifier(ViewAccessibilityIdentifier.profileImportButton.rawValue)
 
                     Divider()
                         .frame(height: 20)
@@ -176,6 +178,7 @@ struct ProfileListView: View {
                     }
                     .pickerStyle(.menu)
                     .focusable(false)
+                    .accessibilityIdentifier(ViewAccessibilityIdentifier.profileGroupPicker.rawValue)
                     Spacer()
 
                     HStack(spacing: 6) {
@@ -185,6 +188,7 @@ struct ProfileListView: View {
                         TextField(String(localized: .SearchTip), text: $searchText)
                             .textFieldStyle(.plain)
                             .frame(width: 180)
+                            .accessibilityIdentifier(ViewAccessibilityIdentifier.profileSearchField.rawValue)
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 5)

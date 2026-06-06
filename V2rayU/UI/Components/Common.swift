@@ -40,7 +40,35 @@ func getNumFieldWithLabel(label: LanguageLabel, num: Binding<Int>, labelWidth: C
             TextField(String(localized: label), value: num, formatter: NumberFormatter())
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.leading, 7)
-        }
+    }
+}
+
+enum ViewAccessibilityIdentifier: String {
+    case sidebarSubscription = "sidebar-subscription"
+    case sidebarServer = "sidebar-server"
+    case sidebarCombination = "sidebar-combination"
+    case sidebarRouting = "sidebar-routing"
+    case sidebarSetting = "sidebar-setting"
+    case sidebarDiagnostic = "sidebar-diagnostic"
+    case sidebarAbout = "sidebar-about"
+
+    case profileAddButton = "profile-add"
+    case profileImportButton = "profile-import"
+    case profileMoreButton = "profile-more"
+    case profileTable = "profile-table"
+    case profileSearchField = "profile-search"
+    case profileGroupPicker = "profile-group-picker"
+
+    case settingTabGeneral = "setting-tab-general"
+    case settingTabAdvanced = "setting-tab-advanced"
+    case settingTabTun = "setting-tab-tun"
+    case settingTabShortcuts = "setting-tab-shortcuts"
+    case settingTabDns = "setting-tab-dns"
+    case settingTabPac = "setting-tab-pac"
+    case settingTabCore = "setting-tab-core"
+
+    case toggleCoreMenu = "toggle-core"
+    case proxyModeMenu = "proxy-mode"
 }
 
 @MainActor
