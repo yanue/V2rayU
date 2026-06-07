@@ -36,7 +36,11 @@ func findFreePort() -> UInt16 {
         return port
     }
 
-    result = Darwin.bind(socketFD, addressInfo!.pointee.ai_addr, socklen_t(addressInfo!.pointee.ai_addrlen))
+    guard let addrInfo = addressInfo else {
+        close(socketFD)
+        return port
+    }
+    result = Darwin.bind(socketFD, addrInfo.pointee.ai_addr, socklen_t(addrInfo.pointee.ai_addrlen))
     if result == -1 {
         // logger.info("Error binding socket to an address: \(errno)")
         close(socketFD)

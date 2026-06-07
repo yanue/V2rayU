@@ -85,6 +85,10 @@ class ShadowsocksUri: BaseShareUri {
 
     func decodeUrl(url: URL) -> (String?, String?) {
         let urlStr = url.absoluteString
+        guard urlStr.count > 5 else {
+            self.error = "invalid ss url"
+            return (nil, nil)
+        }
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 5)
         let base64End = urlStr.firstIndex(of: "#")
         let encodedStr = String(urlStr[base64Begin..<(base64End ?? urlStr.endIndex)])

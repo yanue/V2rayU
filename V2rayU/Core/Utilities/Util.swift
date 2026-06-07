@@ -320,7 +320,8 @@ func isMixedProxyPortEnabled() -> Bool {
 
 func getMixedProxyPort() -> UInt16 {
     let port = UserDefaults.getInt(forKey: .mixedPort, defaultValue: Int(getSocksProxyPort()))
-    return port > 0 ? UInt16(port) : getSocksProxyPort()
+    guard port > 0, port <= 65535 else { return getSocksProxyPort() }
+    return UInt16(port)
 }
 
 func getEffectiveHttpProxyPort() -> UInt16 {

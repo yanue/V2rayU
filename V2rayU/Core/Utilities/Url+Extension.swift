@@ -67,17 +67,14 @@ class QueryParameters: NSObject {
 
 // 自定义的 metrics 代理
 class MetricsCollectorDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    private let completion: @Sendable (URLSessionTaskMetrics) -> Void
     private let queue = DispatchQueue(label: "MetricsCollectorDelegate.queue")
-
-    init(completion: @escaping @Sendable (URLSessionTaskMetrics) -> Void) {
-        self.completion = completion
-    }
+    var completion: (@Sendable (URLSessionTaskMetrics) -> Void)?
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        // 确保 completion 在安全的队列上调用
-        queue.async {
-            self.completion(metrics)
+        queue.async { [weak self] in
+            guard let completion = self?.completion else { return }
+            completion(metrics)
+            self?.completion = nil
         }
     }
 }
@@ -86,12 +83,14 @@ class MetricsCollectorDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sen
 extension URLSession {
     /// 获取请求的 metrics
     func metrics(for request: URLRequest) async throws -> URLSessionTaskMetrics {
-        let task = dataTask(with: request)
+        let delegate = MetricsCollectorDelegate()
+        let session = URLSession(configuration: self.configuration, delegate: delegate, delegateQueue: nil)
+        let task = session.dataTask(with: request)
         return try await withCheckedThrowingContinuation { continuation in
-            let delegate = MetricsCollectorDelegate { metrics in
+            delegate.completion = { metrics in
                 continuation.resume(with: .success(metrics))
+                session.invalidateAndCancel()
             }
-            task.delegate = delegate
             task.resume()
         }
     }

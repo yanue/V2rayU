@@ -32,7 +32,11 @@ struct DNSResolver {
             let errorMsg = String(cString: gai_strerror(status))
             throw DNSError.resolutionFailed(errorMsg)
         }
-        
+
+        guard result != nil else {
+            throw DNSError.noAddressFound
+        }
+
         defer { freeaddrinfo(result) }
         
         var addresses: [String] = []

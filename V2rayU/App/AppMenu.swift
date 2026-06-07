@@ -136,11 +136,13 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func refreshServerItems() {
+        guard inited else { return }
         serverSubMenu = getServerSubMenus()
         serverItem.submenu = serverSubMenu
     }
 
     func refreshRoutingItems() {
+        guard inited else { return }
         routingSubMenu = getRoutingSubMenus()
         routingItem.submenu = routingSubMenu
     }

@@ -189,7 +189,11 @@ struct TCPConnectivity {
     static func canConnect(host: String, port: UInt16, timeout: TimeInterval = 5) async -> Bool {
         await withCheckedContinuation { cont in
             let params = NWParameters.tcp
-            let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(rawValue: port)!)
+            guard let nwPort = NWEndpoint.Port(rawValue: port) else {
+                cont.resume(returning: false)
+                return
+            }
+            let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: nwPort)
             let conn = NWConnection(to: endpoint, using: params)
             let flag = ResumeFlag()
             

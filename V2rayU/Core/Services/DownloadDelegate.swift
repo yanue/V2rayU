@@ -85,8 +85,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
         lastTime = now
         let progress = totalBytesExpectedToWrite > 0 ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) : 0
         let downloadedSize = formatByte(Double(totalBytesWritten))
-        DispatchQueue.main.async {
-            self.onProgress(progress, speed, downloadedSize)
+        DispatchQueue.main.async { [weak self] in
+            self?.onProgress(progress, speed, downloadedSize)
         }
         resetTimeout()
     }
@@ -122,8 +122,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
                 alertDialog(title: String(localized: .DownloadSaveFailed), message: String(localized: .OperationFailed, arguments: catchError.localizedDescription))
             }
         }
-        DispatchQueue.main.async {
-            self.onSuccess(filePath)
+        DispatchQueue.main.async { [weak self] in
+            self?.onSuccess(filePath)
         }
     }
 

@@ -164,6 +164,10 @@ class VmessUri: BaseShareUri {
         error = ""
         let urlStr = url.absoluteString
         // vmess://
+        guard urlStr.count > 8 else {
+            error = "invalid vmess url"
+            return
+        }
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 8)
         let base64End = urlStr.firstIndex(of: "?")
         let encodedStr = String(urlStr[base64Begin ..< (base64End ?? urlStr.endIndex)])
@@ -330,6 +334,10 @@ class VmessUri: BaseShareUri {
      */
     func parseType2(url: URL) {
         let urlStr = url.absoluteString
+        guard urlStr.count > 8 else {
+            error = "invalid vmess url"
+            return
+        }
         // vmess://
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 8)
         let base64End = urlStr.firstIndex(of: "?")
@@ -339,7 +347,10 @@ class VmessUri: BaseShareUri {
             return
         }
         do {
-            let jsonData = decodeStr.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+            guard let jsonData = decodeStr.data(using: String.Encoding.utf8, allowLossyConversion: false) else {
+                self.error = "decode vmess json error"
+                return
+            }
             logger.info("parseType2: url=\(url),decodeStr=\(decodeStr),jsonData=\(jsonData)")
             let decoder = JSONDecoder()
             let vmess = try decoder.decode(VmessShare.self, from: jsonData)

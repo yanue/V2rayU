@@ -347,7 +347,7 @@ actor AppInstaller: NSObject {
             return true
         } catch {
             logger.info("executeAppleScript-Error: \(error)")
-            DispatchQueue.main.sync {
+            await MainActor.run {
                 let title = String(localized: .InstallFailed)
                 let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
                 alertDialog(title: title, message: toast)

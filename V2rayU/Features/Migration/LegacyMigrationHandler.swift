@@ -499,7 +499,7 @@ actor LegacyMigrationHandler {
         }
 
         // 关联订阅
-        let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+        let legacySubId = legacyServer.subscribe.hasPrefix("subscribe.") ? String(legacyServer.subscribe.dropFirst("subscribe.".count)) : ""
         if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
             profile.subid = newSubId
             logger.debug("LegacyMigration: Mapped subscription '\(legacySubId)' -> '\(newSubId)'")
@@ -521,7 +521,7 @@ actor LegacyMigrationHandler {
                 profile.remark = legacyServer.remark
                 profile.shareUri = legacyServer.url
                 // subid 从 legacyServer.subscribe 解析
-                let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+                let legacySubId = legacyServer.subscribe.hasPrefix("subscribe.") ? String(legacyServer.subscribe.dropFirst("subscribe.".count)) : ""
                 if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
                     profile.subid = newSubId
                 }
@@ -542,7 +542,7 @@ actor LegacyMigrationHandler {
                 profile.remark = legacyServer.remark
                 profile.shareUri = legacyServer.url
                 // subid 从 legacyServer.subscribe 解析
-                let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
+                let legacySubId = legacyServer.subscribe.hasPrefix("subscribe.") ? String(legacyServer.subscribe.dropFirst("subscribe.".count)) : ""
                 if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
                     profile.subid = newSubId
                 }
@@ -565,9 +565,9 @@ actor LegacyMigrationHandler {
                     profile.uuid = profileUuid  // 使用传入的 profileUuid
                     profile.remark = legacyServer.remark
                     profile.shareUri = legacyServer.remark
-                    // subid 从 legacyServer.subscribe 解析
-                    let legacySubId = String(legacyServer.subscribe.dropFirst("subscribe.".count))
-                    if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
+                // subid 从 legacyServer.subscribe 解析
+                let legacySubId = legacyServer.subscribe.hasPrefix("subscribe.") ? String(legacyServer.subscribe.dropFirst("subscribe.".count)) : ""
+                if !legacySubId.isEmpty, let newSubId = subidMapping[legacySubId] {
                         profile.subid = newSubId
                     }
                     // speed 从 legacyServer.speed 解析

@@ -259,6 +259,10 @@ class ImportUri {
         if url == nil {
             // 标准url不支持非url-encoded
             let aUri = self.share_uri.split(separator: "#")
+            guard !aUri.isEmpty else {
+                self.error = "invalid url"
+                return nil
+            }
             url = URL(string: String(aUri[0]))
             if url == nil {
                 self.error = "invalid url"

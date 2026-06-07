@@ -235,7 +235,7 @@ class RoutingManager {
         if let first = all.first {
             return first
         }
-        return defaultRules[RoutingRuleLANAndCn]!
+        return defaultRules[RoutingRuleLANAndCn] ?? RoutingEntity(name: RoutingRuleLANAndCn, remark: "Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")
     }
 
     @MainActor

@@ -54,6 +54,10 @@ class ShadowsocksRUri: ShadowsocksUri {
 
     override func decodeUrl(url: URL) -> (String?, String?) {
         let urlStr = url.absoluteString
+        guard urlStr.count > 6 else {
+            self.error = "invalid ssr url"
+            return (nil, nil)
+        }
         // remove left ssr://
         let base64Begin = urlStr.index(urlStr.startIndex, offsetBy: 6)
         let encodedStr = String(urlStr[base64Begin...])
