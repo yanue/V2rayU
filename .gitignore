@@ -22,6 +22,9 @@ xcuserdata/
 build/
 !Build/
 !Build/**
+!Build/tests/**
+Build/tests/bin/
+Build/tests/reports/
 DerivedData/
 *.moved-aside
 *.pbxuser

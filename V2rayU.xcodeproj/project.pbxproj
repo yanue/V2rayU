@@ -355,6 +355,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		66B1B54D2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTool; sourceTree = "<group>"; };
 		66F0FE062FD3B9A700F7BF9D /* V2rayUTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = V2rayUTests; sourceTree = "<group>"; };
+		66F0FE432FD4157400F7BF9D /* tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = tests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -807,6 +808,7 @@
 		66B1B55C2D297B3F0032DD09 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				66F0FE432FD4157400F7BF9D /* tests */,
 				666A61062F1933A0003654D3 /* install.sh */,
 				666A61092F1933A1003654D3 /* update-xray.sh */,
 				66F100062FA1000100A1B2C3 /* update-singbox.sh */,

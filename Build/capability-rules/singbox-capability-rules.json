@@ -121,7 +121,8 @@
       "docs_path": null,
       "rule": {
         "type": "supported",
-        "note": "当前回退功能支持规则按 sing-box Naive 出站功能处理。"
+        "legacy_min": "1.13.0",
+        "note": "Naive outbound 需要 sing-box >= 1.13.0。"
       },
       "app_support": {
         "level": "supported",
@@ -218,12 +219,8 @@
       "kind": "Transport",
       "docs_path": null,
       "rule": {
-        "type": "supported",
-        "note": "当前回退功能支持规则按 sing-box 常规 KCP transport 处理。"
-      },
-      "app_support": {
-        "level": "supported",
-        "note": "当前生成器已实现 kcp transport。"
+        "type": "unsupported",
+        "note": "Sing-Box 不支持 KCP 传输协议。"
       }
     },
     {

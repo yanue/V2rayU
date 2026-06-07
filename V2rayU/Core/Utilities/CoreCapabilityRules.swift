@@ -578,7 +578,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
-        XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/hysteria.html"),
+        XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria outbound", kind: .outboundProtocol,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria outbound 支持。日历版本 < 26.1.23 不支持。", calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/outbounds/hysteria.html"),
 
         // MARK: Transport methods
         XrayCapabilityDefinition(key: "transport.raw", displayName: "RAW transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表可见；RAW 为曾经 TCP transport 的新名称。"), docsPath: "/config/transports/raw.html"),
@@ -608,10 +608,10 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "transport.grpc", displayName: "gRPC transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/grpc.html"),
         XrayCapabilityDefinition(key: "transport.websocket", displayName: "WebSocket transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/websocket.html"),
         XrayCapabilityDefinition(key: "transport.httpupgrade", displayName: "HTTPUpgrade transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表明确列出。"), docsPath: "/config/transports/httpupgrade.html"),
-        XrayCapabilityDefinition(key: "transport.hysteria", displayName: "Hysteria transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表明确列出。"), docsPath: "/config/transports/hysteria.html"),
+        XrayCapabilityDefinition(key: "transport.hysteria", displayName: "Hysteria transport", kind: .transportMethod,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria transport 支持。日历版本 < 26.1.23 不支持。", calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/transports/hysteria.html"),
 
         // MARK: Legacy or compatibility items
-        XrayCapabilityDefinition(key: "transport.h2", displayName: "HTTP/2 transport", kind: .transportMethod, rule: .legacy(note: "HTTP/2 不在当前官方 transport 主列表中，但站点仍保留历史页面/兼容痕迹；V2rayU 对导入的旧节点保留兼容，不再直接假定其已在所有新版本中下架。"), docsPath: "/config/transports/h2.html"),
+        XrayCapabilityDefinition(key: "transport.h2", displayName: "HTTP/2 transport", kind: .transportMethod,             rule: .supported(note: "Xray-core v24.12.18 移除了 HTTP/2 transport，迁移至 XHTTP stream-one H2 & H3。旧版本（<24.12.18）仍支持 h2 transport。", removedAt: XrayVersion(24, 12, 18)), docsPath: "/config/transports/h2.html"),
         XrayCapabilityDefinition(key: "transport.quic", displayName: "QUIC transport", kind: .transportMethod, rule: .legacy(note: "QUIC 不在当前官方 transport 主列表中，但站点仍保留历史页面；V2rayU 仅作历史兼容映射。"), docsPath: "/config/transports/quic.html"),
         XrayCapabilityDefinition(key: "transport.domainsocket", displayName: "Domain Socket transport", kind: .transportMethod, rule: .compatibility(note: "当前官方 transport 主列表未单列 Domain Socket；V2rayU 仅按现有模型做兼容保留。"), docsPath: nil),
 
@@ -788,6 +788,14 @@ enum SingboxFallbackResolver {
             appendReasons(for: RequiredCapability(key: "additional.tcphttpheader", displayName: "TCP + HTTP header disguise", kind: .additionalConfig), capabilities: capabilities, version: version, reasons: &reasons)
         }
 
+        if profile.network == .kcp {
+            reasons.append("当前节点使用 KCP 传输，Sing-Box 不支持 KCP 协议，不能自动回退。")
+        }
+
+        if profile.protocol == .vmess && profile.alterId > 0 {
+            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），与 Sing-Box 不兼容，请将 alterId 改为 0（AEAD 模式）。")
+        }
+
         return unique(reasons)
     }
 
@@ -945,6 +953,8 @@ enum SingboxFallbackResolver {
         switch profile.network {
         case .xhttp:
             reasons.append("当前节点使用 xhttp 传输，Sing-Box 回退路径暂无可用等价实现，不能直接自动切换。")
+        case .kcp:
+            reasons.append("当前节点使用 KCP 传输，Sing-Box 不支持 KCP 协议，不能自动回退。")
         default:
             break
         }
@@ -955,6 +965,10 @@ enum SingboxFallbackResolver {
 
         if profile.network == .tcp && profile.headerType == .http {
             reasons.append("当前节点使用 TCP + HTTP 伪装，现有自动回退逻辑未实现对应的 Sing-Box 配置转换。")
+        }
+
+        if profile.protocol == .vmess && profile.alterId > 0 {
+            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），与 Sing-Box 不兼容，请将 alterId 改为 0（AEAD 模式）。")
         }
 
         return reasons

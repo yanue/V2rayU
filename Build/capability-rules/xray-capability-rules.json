@@ -250,7 +250,8 @@
       "docs_path": "/config/outbounds/hysteria.html",
       "rule": {
         "type": "supported",
-        "note": "当前官方出站协议列表明确列出。"
+        "calendar_min": "26.1.23",
+        "note": "Xray-core 在 v26.1.23 新增 hysteria outbound 支持。日历版本 < 26.1.23 不支持。"
       }
     },
     {
@@ -346,7 +347,8 @@
       "docs_path": "/config/transports/hysteria.html",
       "rule": {
         "type": "supported",
-        "note": "当前官方 transport 主列表明确列出。"
+        "calendar_min": "26.1.23",
+        "note": "Xray-core 在 v26.1.23 新增 hysteria transport 支持。日历版本 < 26.1.23 不支持。"
       }
     },
     {
@@ -355,8 +357,9 @@
       "kind": "Transport",
       "docs_path": "/config/transports/h2.html",
       "rule": {
-        "type": "legacy",
-        "note": "HTTP/2 不在当前官方 transport 主列表中，但站点仍保留历史页面/兼容痕迹；V2rayU 对导入的旧节点保留兼容，不再直接假定其已在所有新版本中下架。"
+        "type": "supported",
+        "removed_at": "24.12.18",
+        "note": "Xray-core v24.12.18 移除了 HTTP/2 transport，迁移至 XHTTP stream-one H2 & H3。旧版本（<24.12.18）仍支持 h2 transport。"
       }
     },
     {
