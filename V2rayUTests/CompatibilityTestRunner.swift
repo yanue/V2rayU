@@ -205,8 +205,6 @@ import Testing
 
         let portTimeout: TimeInterval = profile.network == .kcp ? 3 : 1
         let portReady = waitForPortSync(bindPort, timeout: portTimeout)
-
-        let portReady = waitForPortSync(bindPort, timeout: portTimeout)
         guard portReady else {
             return ProfileTestResult(
                 profileUUID: profile.uuid, profileRemark: profile.remark,

@@ -587,7 +587,7 @@ enum XraySupportCatalog {
             key: "transport.xhttp",
             displayName: "XHTTP transport",
             kind: .transportMethod,
-            rule: .supported(note: "官方当前 transport 主列表可见；这里保留 V2rayU 现有的 XHTTP 最低版本兼容阈值。", legacyMin: XrayVersion(1, 8, 24), calendarMin: XrayVersion(24, 9, 30), removedAt: nil),
+            rule: .supported(note: "经兼容性测试验证，XHTTP 在 v24.10.31 及之后版本稳定可用；早期版本（v1.8.24/v24.9.30）的 XHTTP 实现存在启动超时缺陷，已从支持列表中排除。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(24, 10, 31), removedAt: nil),
             docsPath: "/config/transports/xhttp.html",
             evidence: [
                 CapabilityEvidence(
