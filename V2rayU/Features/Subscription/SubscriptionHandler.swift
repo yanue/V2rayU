@@ -261,7 +261,14 @@ actor SubscriptionHandler {
         for del in dels {
             ProfileStore.shared.delete(uuid: del.uuid)
         }
-        
+
+        if !dels.isEmpty {
+            let uuids = dels.map(\.uuid)
+            Task { @MainActor in
+                uuids.forEach { CombinedConfigStore.removeProfile(uuid: $0) }
+            }
+        }
+
         logTip(title: "importByNormal: ", informativeText: "\(sub.remark), \(sub.url) added=\(adds.count), deleted=\(dels.count), exists=\(exists.count)")
     }
 

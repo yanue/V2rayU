@@ -415,7 +415,7 @@
 "AvailableVersions" = "Available Versions";
 "UpdateCore" = "Download";
 "LocalCoreDirectory" = "Local Xray Core Directory";
-"FileDirectory" = "File Directory:";
+"FileDirectory" = "File Directory";
 "LocalCoreVersionDetail" = "Local Xray Core Version Detail";
 "GithubLatestVersion" = "GitHub Latest Version";
 "DownloadAndReplace" = "Download and Replace";

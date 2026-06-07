@@ -130,7 +130,19 @@ struct CombinedConfigListView: View {
             .cornerRadius(6)
             .padding(.horizontal, 8)
 
-            if viewModel.list.isEmpty {
+            if viewModel.profiles.isEmpty {
+                Spacer()
+                VStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 38))
+                        .foregroundColor(.orange)
+                    Text(String(localized: .NoAvailableServerConfig))
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                Spacer()
+            } else if viewModel.list.isEmpty {
                 Spacer()
                 VStack(spacing: 8) {
                     Image(systemName: "rectangle.stack.badge.plus")

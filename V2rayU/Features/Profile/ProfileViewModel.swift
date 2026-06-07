@@ -55,32 +55,7 @@ final class ProfileViewModel: ObservableObject {
     }
 
     private func removeProfileFromCombinedConfigs(uuid: String) {
-        let combinedStore = CombinedConfigStore.shared
-        for var combo in combinedStore.fetchAll() {
-            var changed = false
-            var groups = combo.groups
-
-            for index in groups.indices {
-                let originalCount = groups[index].outboundProfileUUIDs.count
-                groups[index].outboundProfileUUIDs.removeAll { $0 == uuid }
-                changed = changed || groups[index].outboundProfileUUIDs.count != originalCount
-            }
-
-            guard changed else { continue }
-            groups.removeAll { $0.outboundProfileUUIDs.isEmpty }
-
-            if groups.isEmpty {
-                combinedStore.delete(uuid: combo.uuid)
-                if AppState.shared.runningCombination == combo.uuid {
-                    AppState.shared.runningCombination = ""
-                }
-            } else {
-                combo.groups = groups
-                combo.lastUpdate = Date()
-                combinedStore.upsert(combo)
-            }
-        }
-        AppMenuManager.shared.refreshCombinedConfigItems()
+        CombinedConfigStore.removeProfile(uuid: uuid)
     }
 
     func upsert(item: ProfileEntity) {

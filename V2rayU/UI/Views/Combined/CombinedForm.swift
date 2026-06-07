@@ -199,6 +199,12 @@ struct CombinedConfigFormView: View {
                     groups[i].port = nextAvailablePort(from: groups[i].port, usedPorts: usedPorts.subtracting([groups[i].port]))
                 }
             }
+            // 清理已被删除的 outbound profile UUID（例如订阅更新后服务器被移除）
+            let validUUIDs = Set(profiles.map { $0.uuid })
+            for i in groups.indices {
+                groups[i].outboundProfileUUIDs.removeAll { !validUUIDs.contains($0) }
+            }
+            groups.removeAll { $0.outboundProfileUUIDs.isEmpty }
         }
     }
 

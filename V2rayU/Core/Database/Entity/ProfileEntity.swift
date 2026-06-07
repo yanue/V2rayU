@@ -552,6 +552,37 @@ struct CombinedConfigStore: StoreProtocol {
         }
     }
 
+    /// 当 outbound profile 被删除时，从所有组合配置中移除该 UUID
+    /// 如果某个 group 变空则移除该 group，如果所有 group 都空了则删除整个组合
+    @MainActor static func removeProfile(uuid: String) {
+        let store = CombinedConfigStore.shared
+        for var combo in store.fetchAll() {
+            var changed = false
+            var groups = combo.groups
+
+            for index in groups.indices {
+                let originalCount = groups[index].outboundProfileUUIDs.count
+                groups[index].outboundProfileUUIDs.removeAll { $0 == uuid }
+                changed = changed || groups[index].outboundProfileUUIDs.count != originalCount
+            }
+
+            guard changed else { continue }
+            groups.removeAll { $0.outboundProfileUUIDs.isEmpty }
+
+            if groups.isEmpty {
+                store.delete(uuid: combo.uuid)
+                if AppState.shared.runningCombination == combo.uuid {
+                    AppState.shared.runningCombination = ""
+                }
+            } else {
+                combo.groups = groups
+                combo.lastUpdate = Date()
+                store.upsert(combo)
+            }
+        }
+        AppMenuManager.shared.refreshCombinedConfigItems()
+    }
+
     func getValidCombination(uuid: String) -> CombinedConfigEntity? {
         guard let item = fetchOne(uuid: uuid), !item.groups.isEmpty else { return nil }
         let profiles = Dictionary(uniqueKeysWithValues: ProfileStore.shared.fetchAll().map { ($0.uuid, $0) })
