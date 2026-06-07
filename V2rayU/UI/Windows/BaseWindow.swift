@@ -1,5 +1,5 @@
 //
-//  HotKeyWindow.swift
+//  BaseWindow.swift
 //  V2rayU
 //
 //  Created by yanue on 2025/8/6.

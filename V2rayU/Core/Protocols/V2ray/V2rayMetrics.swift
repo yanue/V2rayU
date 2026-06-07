@@ -5,7 +5,7 @@
 //  Created by yanue on 2025/1/3.
 //
 
-import Cocoa
+import Foundation
 
 // go的exportVars: http://127.0.0.1:11111/debug/vars
 

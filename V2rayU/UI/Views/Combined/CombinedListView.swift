@@ -1,5 +1,5 @@
 //
-//  CombinedConfigListView.swift
+//  CombinedListView.swift
 //  V2rayU
 //
 //  Created by yanue on 2026/5/22.

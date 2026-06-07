@@ -1,12 +1,12 @@
 //
-//  v2rayStream.swift
+//  V2rayStream.swift
 //  V2rayU
 //
 //  Created by yanue on 2018/10/26.
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 // protocol
 enum V2rayStreamNetwork: String, Codable, CaseIterable, Identifiable {

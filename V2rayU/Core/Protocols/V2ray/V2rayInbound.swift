@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 // protocol
 enum V2rayProtocolInbound: String, CaseIterable, Codable {

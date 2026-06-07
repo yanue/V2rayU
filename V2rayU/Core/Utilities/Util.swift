@@ -5,7 +5,6 @@
 //  Created by yanue on 2024/12/25.
 //  Copyright © 2024 yanue. All rights reserved.
 
-import Foundation
 import Cocoa
 import Network
 

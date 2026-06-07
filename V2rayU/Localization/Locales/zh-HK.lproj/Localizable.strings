@@ -69,7 +69,7 @@
 "Advanced" = "進階設定";
 "PAC" = "PAC 設定";
 "DNS" = "DNS 設定";
-"Core" = "core管理";
+"Core" = "Core管理";
 "Tun" = "TUN 設定";
 
 // MARK: - 一般設定
@@ -280,8 +280,8 @@
 "ClearAllLogs" = "清除所有日誌";
 "ClearAllLogsConfirm" = "確定要清除所有日誌檔案嗎？此操作無法復原。";
 "LogsCleared" = "日誌已清除";
-"ViewFiles" = "查看文件";
-"OpenHomeFolder" = "打开 ~/.V2rayU 目录";
+"ViewFiles" = "檢視檔案";
+"OpenHomeFolder" = "開啟 ~/.V2rayU 目錄";
 "Logs" = "日誌";
 "ViewConfigJson" = "檢視 config.json";
 "ViewTunJson" = "檢視 tun.json";
@@ -342,7 +342,7 @@
 "Diagnostics" = "診斷";
 "DiagnosticSubHead" = "檢查常見問題與解決方案";
 "FAQ" = "常見問題";
-"FaqSubtitle" = "查看常見問題與解決方案";
+"FaqSubtitle" = "檢視常見問題與解決方案";
 "SubmitIssue" = "提交問題";
 "RunDiagnostic" = "執行診斷";
 
@@ -559,7 +559,7 @@
 
 // MARK: - 診斷 - 合併後的檔案檢查項標題
 "DiagAppDataDir" = "~/.V2rayU 目錄檢查";
-"DiagV2rayUTool" = "V2rayUTool 文件檢查";
+"DiagV2rayUTool" = "V2rayUTool 檔案檢查";
 "DiagXrayCore" = "xray-core 核心檢查";
 "DiagSingBox" = "sing-box 核心檢查";
 "DiagUpdateScript" = "update-xray.sh 腳本檢查";
@@ -617,7 +617,7 @@
 "DiagCoreNotExecutable" = "核心檔案存在但無法執行。請嘗試重新安裝或手動修復權限。";
 "DiagCoreNotRunning" = "核心程序未執行，無法提供代理服務。";
 "DiagCoreStopped" = "代理功能已關閉。如需使用代理，請點擊「啟動核心」。";
-"DiagCoreStartFailed" = "核心程序未執行。可能原因：\n1. 設定檔有誤\n2. 連接埠被佔用\n3. 核心程式崩潰\n\n請查看日誌分析取得更多資訊，或嘗試重新啟動核心。";
+"DiagCoreStartFailed" = "核心程序未執行。可能原因：\n1. 設定檔有誤\n2. 連接埠被佔用\n3. 核心程式崩潰\n\n請檢視日誌分析取得更多資訊，或嘗試重新啟動核心。";
 "DiagToolMissing" = "V2rayU 輔助工具未安裝，可能導致核心無法自動安裝。請嘗試重新安裝 V2rayU。";
 "DiagToolNoPermission" = "輔助工具權限不足。V2rayU 需要管理員權限來安裝核心和修改系統設定。請嘗試：\n1. 重新開啟 V2rayU\n2. 在系統設定中授予完整磁碟存取權限";
 "DiagConfigNotExist" = "設定檔不存在";

@@ -1,6 +1,4 @@
-import SwiftData
 import SwiftUI
-import Foundation
 import OSLog
 import KeyboardShortcuts
 

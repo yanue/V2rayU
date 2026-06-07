@@ -1,5 +1,5 @@
 //
-//  QA.swift
+//  FAQView.swift
 //  V2rayU
 //
 //  Created by yanue on 2025/9/13.

@@ -1,5 +1,5 @@
 //
-//  ToastWindowController.swift
+//  ToastWindow.swift
 //  V2rayU
 //
 //  Toast 通知窗口管理

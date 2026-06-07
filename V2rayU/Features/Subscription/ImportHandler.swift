@@ -4,8 +4,6 @@
 //
 
 import Cocoa
-import CoreGraphics
-import CoreImage
 
 func importUri(url: String) {
     let urls = url.split(separator: "\n")

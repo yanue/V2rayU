@@ -1,4 +1,3 @@
-import JavaScriptCore
 import SwiftUI
 
 enum DnsCoreTab: String, CaseIterable, Identifiable, Hashable {

@@ -1,5 +1,5 @@
 //
-//  StoreProtocal.swift
+//  Protocol.swift
 //  V2rayU
 //
 //  Created by yanue on 2025/11/11.

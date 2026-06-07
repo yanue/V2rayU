@@ -6,7 +6,7 @@
 //  Copyright © 2018 yanue. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 protocol V2rayOutboundSettings: Codable {}
 

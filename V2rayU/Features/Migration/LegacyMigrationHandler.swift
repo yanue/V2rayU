@@ -9,7 +9,6 @@
 //  v4 版本使用 NSKeyedArchiver 存储 V2rayItem 和 V2raySubItem 对象
 //
 
-import Foundation
 import GRDB
 import AppKit
 
