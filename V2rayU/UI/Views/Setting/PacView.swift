@@ -151,7 +151,7 @@ struct PacView: View {
                     self.tips = String(localized: .GfwListDownloadFailed)
                     self.showAlert = true
                 }
-                Task {
+                Task { @MainActor in
                     tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
                 }
                 return

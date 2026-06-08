@@ -154,7 +154,7 @@ class V2rayOutboundHandler {
     }
 
     private func updateStreamSettings() {
-        if self.profile.protocol == .socks || self.profile.protocol == .hysteria2 {
+        if self.profile.protocol == .socks || self.profile.protocol == .hysteria2 || self.profile.protocol == .shadowsocks {
             return
         }
 

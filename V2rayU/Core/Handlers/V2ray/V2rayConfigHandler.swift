@@ -315,11 +315,12 @@ class V2rayConfigHandler {
         }
         // ------------------------------------- inbound start ---------------------------------------------
 
-        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun && XraySupportCatalog.isSupported(key: "inbound.mixed")
+        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun
 
         var inbounds: [V2rayInbound] = []
         if useMixedInbound {
-            let inMixed = getInbound(protocol: .mixed, listen: self.httpHost, port: self.mixedPort, enableSniffing: self.enableSniffing, tag: "mixed-in")
+            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求（功能等价于 mixed），且仅 v25.3.6+ 支持 mixed 协议别名
+            let inMixed = getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: self.enableSniffing, tag: "mixed-in")
             inbounds.append(inMixed)
         } else {
             if !self.forPing && self.httpPort == self.socksPort {
@@ -430,8 +431,10 @@ class V2rayConfigHandler {
 
         for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
             let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
+            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求，mixed 协议别名仅 v25.3.6+ 支持
+            let proto: V2rayProtocolInbound = resolvedGroup.group.inboundType.v2rayProtocol == .mixed ? .socks : resolvedGroup.group.inboundType.v2rayProtocol
             let inbound = getInbound(
-                protocol: resolvedGroup.group.inboundType.v2rayProtocol,
+                protocol: proto,
                 listen: listenAddress,
                 port: String(resolvedGroup.group.port),
                 enableSniffing: enableSniffing,
@@ -479,8 +482,9 @@ class V2rayConfigHandler {
         }
 
         // Add default proxy inbounds
-        if self.enableMixedPort && XraySupportCatalog.isSupported(key: "inbound.mixed") {
-            inbounds.append(getInbound(protocol: .mixed, listen: self.httpHost, port: self.mixedPort, enableSniffing: enableSniffing, tag: "mixed-in"))
+        if self.enableMixedPort {
+            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求，无需使用 mixed 协议别名
+            inbounds.append(getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: enableSniffing, tag: "mixed-in"))
         } else {
             if self.httpPort == self.socksPort {
                 self.httpPort = String((Int(self.socksPort) ?? 1080) + 1)

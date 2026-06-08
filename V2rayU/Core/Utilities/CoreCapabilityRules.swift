@@ -562,7 +562,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "inbound.hysteria", displayName: "Hysteria inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/hysteria.html"),
         XrayCapabilityDefinition(key: "inbound.tun", displayName: "TUN inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/tun.html"),
 
-        XrayCapabilityDefinition(key: "inbound.mixed", displayName: "Mixed (HTTP+SOCKS) inbound", kind: .inboundProtocol, rule: .supported(note: "Xray-core 已支持 mixed 入站协议类型，可同时处理 HTTP 和 SOCKS5 连接。", legacyMin: XrayVersion(1, 8, 24)), docsPath: nil),
+        XrayCapabilityDefinition(key: "inbound.mixed", displayName: "Mixed (HTTP+SOCKS) inbound", kind: .inboundProtocol, rule: .supported(note: "Xray-core 官方入站协议列表未列出 mixed 类型，但代码实现自 v24.12.31 起以 socks 别名形式支持（commit 5af9068）。经 Build/tests/test-mixed-inbound.sh 批量测试验证：v1.8.4～v24.12.18 报 unknown config id: mixed，v24.12.31+ 正常接受。", calendarMin: XrayVersion(24, 12, 31)), docsPath: nil),
 
         // MARK: Outbound protocols
         XrayCapabilityDefinition(key: "outbound.blackhole", displayName: "Blackhole outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/blackhole.html"),
@@ -1114,6 +1114,16 @@ enum XrayCompatibilityResolver {
            let definition = XraySupportCatalog.definition(forFlow: profile.flow),
            let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
             issues.append(issue)
+        }
+
+        // Shadowsocks in Xray-core does not support TLS/REALITY/XTLS transport security
+        if profile.protocol == .shadowsocks, profile.security != .none {
+            if let definition = XraySupportCatalog.definition(forSecurity: profile.security) {
+                issues.append(XrayCompatibilityIssue(
+                    capability: definition,
+                    availability: .unsupported(reason: "Xray-core 的 Shadowsocks 协议不支持 \(definition.displayName) 传输层安全（TLS/REALITY 仅适用于 VMess/VLESS/Trojan 等协议），将自动回退到 Sing-Box。")
+                ))
+            }
         }
 
         if let issue = allowInsecureIssue(for: profile, version: version) {

@@ -1,7 +1,7 @@
 import ServiceManagement
 import SwiftUI
 
-let defaultLatencyTestConcurrency = 5
+let defaultLatencyTestConcurrency = 10
 let defaultLatencyTestTimeout = 5
 // 选用 gstatic 的原因:
 // 1) 始终直接返回 204, 不会 301/302

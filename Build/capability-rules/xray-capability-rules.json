@@ -29,9 +29,23 @@
       "kind": "Inbound",
       "rule": {
         "type": "supported",
-        "legacy_min": "1.8.24",
-        "note": "Xray-core 已支持 mixed 入站协议类型，可同时处理 HTTP 和 SOCKS5 连接。"
-      }
+        "calendar_min": "24.12.31",
+        "note": "Xray-core 官方入站协议列表未列出 mixed 类型，但代码实现自 v24.12.31 起以 socks 别名形式支持（commit 5af9068）。"
+      },
+      "evidence": [
+        {
+          "id": "batch-test-mixed-inbound-v24.12.31",
+          "kind": "batchTest",
+          "statement": "经 Build/tests/test-mixed-inbound.sh 批量测试验证：v1.8.4～v24.12.18 报 unknown config id: mixed，v24.12.31+ 正常接受。",
+          "source_title": "V2rayU mixed inbound batch test",
+          "source_url": "https://github.com/yanue/V2rayU",
+          "source_version": null,
+          "source_date": "2026-06-08",
+          "quote": "PASS v24.12.31 — mixed inbound accepted; FAIL v24.12.18 — unknown config id: mixed",
+          "reviewed_at": null,
+          "note": null
+        }
+      ]
     },
     {
       "key": "inbound.shadowsocks",
