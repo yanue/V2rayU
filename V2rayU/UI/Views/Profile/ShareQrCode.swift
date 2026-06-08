@@ -109,7 +109,7 @@ struct ShareQrCodeView: View {
     func regenerate() {
         shareUri = ShareUri.generateShareUri(item: profile.toEntity())
         currentQRCode = generateQRCode(from: shareUri)
-        logger.debug("regenerate: \(self.shareUri)")
+        logger.debug("regenerate share QR code")
     }
 
     private func copyToClipboard() {

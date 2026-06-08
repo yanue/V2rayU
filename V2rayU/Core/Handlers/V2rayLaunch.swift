@@ -403,7 +403,7 @@ actor V2rayLaunch {
         let jsonText = cfg.toJSON(item: item)
         do {
             try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
-            logger.info("createJsonFile: \(jsonText)")
+            logger.info("createJsonFile: wrote \(JsonConfigFilePath)")
         } catch {
             logger.info("Failed to write JSON file: \(error)")
             noticeTip(title: "Failed to write JSON file: \(error)")
@@ -415,7 +415,7 @@ actor V2rayLaunch {
         let jsonText = cfg.toJSON(combination: resolved)
         do {
             try jsonText.write(to: URL(fileURLWithPath: JsonConfigFilePath), atomically: true, encoding: .utf8)
-            logger.info("createCombinedJsonFile: \(jsonText)")
+            logger.info("createCombinedJsonFile: wrote \(JsonConfigFilePath)")
         } catch {
             logger.info("Failed to write combined JSON file: \(error)")
             noticeTip(title: "Failed to write combined JSON file: \(error)")
@@ -429,7 +429,7 @@ actor V2rayLaunch {
         let jsonText = cfg.toJSON(item: item)
         do {
             try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)
-            logger.info("createTunJsonFile: \(jsonText)")
+            logger.info("createTunJsonFile: wrote \(TunConfigFilePath)")
         } catch {
             logger.info("Failed to write tun JSON file: \(error)")
             noticeTip(title: "Failed to write tun JSON file: \(error)")

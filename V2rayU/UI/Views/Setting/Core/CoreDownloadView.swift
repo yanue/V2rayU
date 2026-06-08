@@ -175,6 +175,8 @@ struct CoreDownloadView: View {
                     case .singbox: return release.getSingboxDownloadAsset()
                     }
                 },
+                manager: vm.downloadManager,
+                startsAutomatically: false,
                 onDownloadSuccess: { filePath in vm.onDownloadSuccess(filePath: filePath) },
                 onDownloadFail: { err in vm.onDownloadFail(err: err) }
             )
@@ -245,7 +247,7 @@ struct CoreDownloadView: View {
             }
             .buttonStyle(.bordered)
             .focusable(false)
-            .disabled(vm.channel(coreTab).isLoading || vm.showDownloadDialog)
+            .disabled(vm.channel(coreTab).isLoading || vm.hasActiveDownload)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 10)

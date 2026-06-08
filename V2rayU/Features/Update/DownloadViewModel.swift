@@ -26,6 +26,10 @@ final class DownloadViewModel: ObservableObject {
     }
     
     func startDownload(from urlStr: String, version: String, totalSize: Int64? = nil, timeout: Double = 120) {
+        if downloadingUrl == urlStr, downloadingVersion == version, session != nil || isFinished {
+            return
+        }
+
         // 重置状态
         progress = 0
         speed = ""
@@ -33,6 +37,7 @@ final class DownloadViewModel: ObservableObject {
         self.totalSize = totalSize.map { formatByte(Double($0)) } ?? "—"
         isFinished = false
         errorMessage = ""
+        downloadedPath = ""
         downloadingUrl = urlStr
         downloadingVersion = version
         logger.info("startDownload: from=\(urlStr),version=\(version)")
@@ -54,6 +59,9 @@ final class DownloadViewModel: ObservableObject {
             onSuccess: { [weak self] filePath in
                 DispatchQueue.main.async {
                     self?.isFinished = true
+                    self?.downloadedPath = filePath
+                    self?.session?.finishTasksAndInvalidate()
+                    self?.session = nil
                     self?.onSuccess(filePath)
                 }
             },
@@ -61,6 +69,8 @@ final class DownloadViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self?.isFinished = true
                     self?.errorMessage = err
+                    self?.session?.invalidateAndCancel()
+                    self?.session = nil
                     self?.onError(err)
                 }
             }
@@ -68,11 +78,20 @@ final class DownloadViewModel: ObservableObject {
 
         self.delegate = delegate
         session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
-        session?.downloadTask(with: url).resume()
+        let task = session?.downloadTask(with: url)
+        if let task {
+            delegate.startTimeout(downloadTask: task)
+            task.resume()
+        }
     }
 
     func cancelTask() {
         delegate?.cancelTask()
         session?.invalidateAndCancel()
+        session = nil
+        isFinished = true
+        if errorMessage.isEmpty {
+            errorMessage = String(localized: .DownloadCanceled)
+        }
     }
 }

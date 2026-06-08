@@ -69,6 +69,8 @@ enum CoreUpdateKind: String, CaseIterable, Identifiable, Hashable {
 
 @MainActor
 final class CoreViewModel: ObservableObject {
+    static let shared = CoreViewModel()
+
     struct CapabilityRulesDisplayItem {
         let title: String
         let source: String
@@ -110,9 +112,14 @@ final class CoreViewModel: ObservableObject {
     @Published var selectedVersion: GithubRelease?
     @Published var activeDownloadKind: CoreUpdateKind?
     @Published var showDownloadDialog = false
+    let downloadManager = DownloadViewModel()
 
     let perPage: Int = 20
     private let service: GithubServiceProtocol
+
+    var hasActiveDownload: Bool {
+        activeDownloadKind != nil && !downloadManager.isFinished
+    }
 
     init(service: GithubServiceProtocol = GithubService()) {
         self.service = service
@@ -238,9 +245,38 @@ final class CoreViewModel: ObservableObject {
     // MARK: - 下载 / 替换
 
     func downloadAndReplace(version: GithubRelease, for kind: CoreUpdateKind) {
+        if hasActiveDownload {
+            showDownloadDialog = true
+            return
+        }
+
         selectedVersion = version
         activeDownloadKind = kind
         showDownloadDialog = true
+
+        let asset: GithubAsset
+        switch kind {
+        case .xray:
+            asset = version.getDownloadAsset()
+        case .singbox:
+            asset = version.getSingboxDownloadAsset()
+        }
+
+        downloadManager.setCallback(
+            onSuccess: { [weak self] filePath in
+                self?.onDownloadSuccess(filePath: filePath)
+            },
+            onError: { [weak self] err in
+                self?.onDownloadFail(err: err)
+            }
+        )
+        logger.info("start core download: kind=\(kind.rawValue), version=\(version.tagName), asset=\(asset.name)")
+        downloadManager.startDownload(
+            from: asset.browserDownloadUrl,
+            version: version.tagName,
+            totalSize: Int64(asset.size),
+            timeout: 10
+        )
     }
 
     func onDownloadSuccess(filePath: String) {
@@ -276,7 +312,6 @@ final class CoreViewModel: ObservableObject {
 
     func closeDownloadDialog() {
         showDownloadDialog = false
-        activeDownloadKind = nil
     }
 
     /// 根据当前下载的核心选择 asset (xray 走默认匹配,sing-box 用 tar.gz/darwin 匹配)

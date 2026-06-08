@@ -7,6 +7,7 @@
 import SwiftUI
 struct ContentView: View {
     @StateObject private var navigationState = NavigationState.shared
+    @ObservedObject private var coreViewModel = CoreViewModel.shared
     @State private var version = getAppVersion() // 控制设置页面的显示
 
     var body: some View {
@@ -74,6 +75,13 @@ struct ContentView: View {
             ) // 4. 添加边框和阴影
             .padding(.all, 16) // 5. 外边距
             .frame(minWidth: 640) // 设置右侧内容区的宽度
+        }
+        .alert(isPresented: $coreViewModel.showAlert) {
+            Alert(
+                title: Text(String(localized: .DownloadHint)),
+                message: Text(coreViewModel.errorMsg),
+                dismissButton: .default(Text(String(localized: .Confirm)))
+            )
         }
     }
   

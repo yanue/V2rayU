@@ -33,7 +33,7 @@ enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
 }
 
 struct CoreView: View {
-    @StateObject private var vm = CoreViewModel()
+    @ObservedObject private var vm = CoreViewModel.shared
     @State private var selectedTab: CoreSettingTab = .type
 
     var body: some View {
@@ -69,13 +69,6 @@ struct CoreView: View {
         }
         .onDisappear {
             vm.saveCapabilityRulesBaseURL()
-        }
-        .alert(isPresented: $vm.showAlert) {
-            Alert(
-                title: Text(String(localized: .DownloadHint)),
-                message: Text(vm.errorMsg),
-                dismissButton: .default(Text(String(localized: .Confirm)))
-            )
         }
     }
 }

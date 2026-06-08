@@ -70,11 +70,12 @@ actor LocalHttpServer {
             let relativePath = requestedPath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
             // 安全过滤：规范化路径，防止 ../ 目录遍历攻击
-            let baseURL = URL(fileURLWithPath: AppHomePath)
-            let resolvedURL = baseURL.appendingPathComponent(relativePath).standardized
+            let baseURL = URL(fileURLWithPath: AppHomePath, isDirectory: true).resolvingSymlinksInPath().standardized
+            let resolvedURL = baseURL.appendingPathComponent(relativePath).resolvingSymlinksInPath().standardized
 
             // 确保解析后的路径仍在 AppHomePath 下
-            guard resolvedURL.path.hasPrefix(baseURL.standardized.path) else {
+            let basePath = baseURL.path
+            guard resolvedURL.path == basePath || resolvedURL.path.hasPrefix(basePath + "/") else {
                 logger.warning("Path traversal attempt blocked: \(path)")
                 return HTTPResponse(statusCode: .forbidden)
             }

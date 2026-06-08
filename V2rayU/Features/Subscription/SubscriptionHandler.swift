@@ -122,7 +122,7 @@ actor SubscriptionHandler {
 
         guard let reqUrl = URL(string: url) else {
             logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + url + "\n\n")
-            return
+            throw NSError(domain: "SubscriptionHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey: "url is not valid: \(url)"])
         }
 
         // url request with proxy
@@ -133,10 +133,12 @@ actor SubscriptionHandler {
                 handle(base64Str: outputStr, sub: sub, url: url)
             } else {
                 logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
+                throw NSError(domain: "SubscriptionHandler", code: 1002, userInfo: [NSLocalizedDescriptionKey: "subscription data is not valid UTF-8"])
             }
         } catch let error {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
             logger.info("save json file fail: \(error)")
+            throw error
         }
     }
 
@@ -231,7 +233,7 @@ actor SubscriptionHandler {
         // 遍历新的列表
         for item in list {
             let key = item.uniqueKey()
-            logTip(title: "正在处理 \(key)", informativeText: "\(item)")
+            logTip(title: "正在处理 \(key)", informativeText: "\(item.remark), \(item.address):\(item.port)")
             if let old = oldMap[key] {
                 exists.insert(key)
                 // 更新旧的

@@ -25,6 +25,7 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
     private let onError: (String) -> Void
     private var lastWritten: Int64 = 0
     private var lastTime: Date = Date()
+    private var isFinished = false
 
     /// 初始化
     /// - Parameters:
@@ -43,31 +44,36 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
     }
 
     func startTimeout(downloadTask: URLSessionDownloadTask) {
+        didTimeout = false
+        isFinished = false
         self.downloadTask = downloadTask
-        timer = Timer.scheduledTimer(withTimeInterval: timeoutSeconds, repeats: false) { [weak self] _ in
-            guard let self = self else { return }
-            self.didTimeout = true
-            downloadTask.cancel()
-            Task { @MainActor in
-                self.onError(String(localized: .DownloadTimeoutProxy))
-            }
-        }
+        scheduleTimeout(for: downloadTask)
     }
 
     func resetTimeout() {
-        timer?.invalidate()
         guard let task = downloadTask else { return }
-        timer = Timer.scheduledTimer(withTimeInterval: timeoutSeconds, repeats: false) { [weak self] _ in
+        scheduleTimeout(for: task)
+    }
+
+    private func scheduleTimeout(for task: URLSessionDownloadTask) {
+        DispatchQueue.main.async { [weak self, weak task] in
             guard let self = self else { return }
-            self.didTimeout = true
-            task.cancel()
-            Task { @MainActor in
+            guard !self.isFinished else { return }
+            self.timer?.invalidate()
+            self.timer = Timer.scheduledTimer(withTimeInterval: self.timeoutSeconds, repeats: false) { [weak self, weak task] _ in
+                guard let self = self else { return }
+                guard !self.isFinished else { return }
+                self.didTimeout = true
+                self.isFinished = true
+                task?.cancel()
                 self.onError(String(localized: .DownloadTimeoutProxy))
             }
         }
     }
 
     func cancelTask() {
+        isFinished = true
+        timer?.invalidate()
         if downloadTask != nil {
             downloadTask?.cancel()
         }
@@ -92,9 +98,11 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        isFinished = true
         timer?.invalidate()
         let locationPath = location.path
-        let fileName = downloadTask.response?.suggestedFilename ?? ""
+        let suggestedName = downloadTask.response?.suggestedFilename ?? ""
+        let fileName = URL(fileURLWithPath: suggestedName).lastPathComponent
         guard locationPath != "", fileName != "" else {
             print("urlSession: locationPath or fileName missing")
             return
@@ -110,6 +118,7 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
             Task { @MainActor in
                 alertDialog(title: String(localized: .DownloadSaveFailed), message: String(localized: .OperationFailed, arguments: catchError.localizedDescription))
             }
+            return
         }
         do {
             if FileManager.default.fileExists(atPath: documentsPath) == false {
@@ -121,6 +130,7 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
             Task { @MainActor in
                 alertDialog(title: String(localized: .DownloadSaveFailed), message: String(localized: .OperationFailed, arguments: catchError.localizedDescription))
             }
+            return
         }
         DispatchQueue.main.async { [weak self] in
             self?.onSuccess(filePath)
@@ -130,6 +140,7 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDownloadDe
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         timer?.invalidate()
         if let error = error {
+            isFinished = true
             if didTimeout {
                 // 已在超时回调处理
                 return

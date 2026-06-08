@@ -8,14 +8,33 @@
 import SwiftUI
 
 struct DownloadView: View {
-    @StateObject private var manager = DownloadViewModel()
+    @StateObject private var manager: DownloadViewModel
 
     var version: GithubRelease
     var downloadedBtn: String = String(localized: .Downloading)
     /// 自定义 asset 选择器；默认按 xray/V2rayU 命名匹配。sing-box 等核心可传入对应匹配函数。
     var assetResolver: (GithubRelease) -> GithubAsset = { $0.getDownloadAsset() }
+    var startsAutomatically: Bool = true
     var onDownloadSuccess: (String) -> Void
     var onDownloadFail: (String) -> Void
+
+    init(
+        version: GithubRelease,
+        downloadedBtn: String = String(localized: .Downloading),
+        assetResolver: @escaping (GithubRelease) -> GithubAsset = { $0.getDownloadAsset() },
+        manager: DownloadViewModel = DownloadViewModel(),
+        startsAutomatically: Bool = true,
+        onDownloadSuccess: @escaping (String) -> Void,
+        onDownloadFail: @escaping (String) -> Void
+    ) {
+        _manager = StateObject(wrappedValue: manager)
+        self.version = version
+        self.downloadedBtn = downloadedBtn
+        self.assetResolver = assetResolver
+        self.startsAutomatically = startsAutomatically
+        self.onDownloadSuccess = onDownloadSuccess
+        self.onDownloadFail = onDownloadFail
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -104,14 +123,16 @@ struct DownloadView: View {
     }
     
     private func onAppear(){
+        guard startsAutomatically else { return }
+
         // 在这里把父级的回调传给 manager
         manager.setCallback(
             onSuccess: { path in
                 // 更新下载路径
-                self.manager.downloadedPath = path
+                onDownloadSuccess(path)
             },
             onError: { message in
-                self.manager.errorMessage = message
+                onDownloadFail(message)
             }
         )
         // 开始下载

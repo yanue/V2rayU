@@ -101,7 +101,7 @@ struct PacView: View {
         tips = String(localized: .UpdatingPacRules)
 
         do {
-            logger.info("user-rules: \(pacUserRules)")
+            logger.info("user-rules updated, length=\(pacUserRules.count)")
             try pacUserRules.write(toFile: PACUserRuleFilePath, atomically: true, encoding: .utf8)
             UpdatePACFromGFWList(gfwPacListUrl: gfwPacListUrl)
 
@@ -152,7 +152,7 @@ struct PacView: View {
                     self.showAlert = true
                 }
                 Task {
-                    await tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
+                    tryDownloadByShell(gfwPacListUrl: gfwPacListUrl)
                 }
                 return
             }
@@ -185,16 +185,41 @@ struct PacView: View {
 
     func tryDownloadByShell(gfwPacListUrl: String) {
         let sockPort = getEffectiveSocksProxyPort()
-        let curlCmd = "cd \(PACRulesDirPath) && /usr/bin/curl -o gfwlist.txt \(gfwPacListUrl) -x socks5://127.0.0.1:\(sockPort)"
-        logger.info("curlCmd: \(curlCmd)")
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
+        process.currentDirectoryURL = URL(fileURLWithPath: PACRulesDirPath, isDirectory: true)
+        process.arguments = [
+            "--fail",
+            "--location",
+            "--output", "gfwlist.txt",
+            "--proxy", "socks5://127.0.0.1:\(sockPort)",
+            gfwPacListUrl,
+        ]
 
-        let msg = shell(launchPath: "/bin/bash", arguments: ["-c", curlCmd])
-        logger.info("curl msg: \(String(describing: msg))")
-        if GeneratePACFile(rewrite: true) {
-            self.tips = String(localized: .PacUpdatedByGfwList)
-        } else {
-            self.tips = String(localized: .PacUpdateFailedByCurl)
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            process.waitUntilExit()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            logger.info("curl fallback exit=\(process.terminationStatus), output=\(String(output.prefix(200)))")
+            DispatchQueue.main.async {
+                if process.terminationStatus == 0, GeneratePACFile(rewrite: true) {
+                    self.tips = String(localized: .PacUpdatedByGfwList)
+                } else {
+                    self.tips = String(localized: .PacUpdateFailedByCurl)
+                }
+                self.showAlert = true
+            }
+        } catch {
+            logger.info("curl fallback failed: \(error)")
+            DispatchQueue.main.async {
+                self.tips = String(localized: .PacUpdateFailedByCurl)
+                self.showAlert = true
+            }
         }
-        self.showAlert = true
     }
 }
