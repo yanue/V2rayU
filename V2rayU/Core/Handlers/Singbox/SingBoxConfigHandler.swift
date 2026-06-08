@@ -246,7 +246,11 @@ class SingboxConfigHandler {
             let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
             self.singbox.dns = defaultDnsConfig()
             if let index = self.singbox.dns.servers.firstIndex(where: { $0.tag == "local-dns" }) {
-                self.singbox.dns.servers[index].server = dnsDefault
+                if singboxSupportsNewDnsFormat() {
+                    self.singbox.dns.servers[index].address = "udp://\(dnsDefault)"
+                } else {
+                    self.singbox.dns.servers[index].server = dnsDefault
+                }
             }
 
             // TUN模式路由配置 - 所有流量转发到SOCKS，由SOCKS端处理路由
@@ -315,9 +319,15 @@ class SingboxConfigHandler {
         self.singbox.outbounds = _outbounds
 
         if self.forPing {
-            self.singbox.dns.servers = [
-                DNSServer(type: "udp", tag: "direct-dns", server: defaultBootstrapDns),
-            ]
+            if singboxSupportsNewDnsFormat() {
+                self.singbox.dns.servers = [
+                    DNSServer(tag: "direct-dns", address: "udp://\(defaultBootstrapDns)"),
+                ]
+            } else {
+                self.singbox.dns.servers = [
+                    DNSServer(tag: "direct-dns", type: "udp", server: defaultBootstrapDns),
+                ]
+            }
         } else {
             self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: _outbounds)
             self.singbox.route.default_domain_resolver = "local-dns"
@@ -359,6 +369,13 @@ class SingboxConfigHandler {
         return version >= SingboxVersion(1, 8, 0)
     }
 
+    private func singboxSupportsNewDnsFormat() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else {
+            return true
+        }
+        return version >= SingboxVersion(1, 12, 0)
+    }
+
     private func getDnsConfig() -> DNSConfig {
         let jsonStr = getDefaultSingboxDnsSetting()
         guard let data = jsonStr.data(using: .utf8) else {
@@ -366,6 +383,9 @@ class SingboxConfigHandler {
         }
         do {
             let config = try JSONDecoder().decode(DNSConfig.self, from: data)
+            if singboxSupportsNewDnsFormat() {
+                return migratingDnsServerIfNeeded(config)
+            }
             return config
         } catch {
             logger.error("Failed to parse sing-box DNS config: \(error)")
@@ -374,17 +394,57 @@ class SingboxConfigHandler {
     }
 
     private func defaultDnsConfig() -> DNSConfig {
+        if singboxSupportsNewDnsFormat() {
+            return DNSConfig(
+                servers: [
+                    DNSServer(tag: "local-dns", address: "udp://\(defaultBootstrapDns)"),
+                    DNSServer(tag: "remote-dns", detour: "proxy", address: "https://cloudflare-dns.com/dns-query", address_resolver: "local-dns"),
+                ],
+                rules: [
+                    DNSRule(server: "local-dns", domain: ["localhost", "local"]),
+                ],
+                final: "remote-dns",
+                independent_cache: true
+            )
+        }
+
         if let data = defaultSingboxDns.data(using: .utf8),
            let config = try? JSONDecoder().decode(DNSConfig.self, from: data) {
             return config
         }
 
         return DNSConfig(
-            servers: [DNSServer(type: "udp", tag: "direct-dns", server: defaultBootstrapDns)],
+            servers: [DNSServer(tag: "local-dns", type: "udp", server: defaultBootstrapDns)],
             rules: [],
-            final: "direct-dns",
+            final: "local-dns",
             independent_cache: true
         )
+    }
+
+    private func migratingDnsServerIfNeeded(_ config: DNSConfig) -> DNSConfig {
+        var config = config
+        for i in config.servers.indices {
+            let server = config.servers[i]
+            guard server.server != nil, server.address == nil else { continue }
+            let addr: String
+            switch server.type {
+            case "udp":
+                addr = "udp://\(server.server!)"
+            case "https":
+                addr = "https://\(server.server!)\(server.path ?? "/dns-query")"
+            case "tcp":
+                addr = "tcp://\(server.server!)"
+            default:
+                continue
+            }
+            config.servers[i].address = addr
+            config.servers[i].address_resolver = server.domain_resolver
+            config.servers[i].type = nil
+            config.servers[i].server = nil
+            config.servers[i].domain_resolver = nil
+            config.servers[i].path = nil
+        }
+        return config
     }
 
     private func dnsConfigWithProxyServerRules(outbounds: [SingboxOutbound]) -> DNSConfig {

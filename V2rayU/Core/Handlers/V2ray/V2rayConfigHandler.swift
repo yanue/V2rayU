@@ -17,8 +17,8 @@ let defaultDnsTargetStrategy = "Default"
 let defaultSingboxDns = """
 {
     "servers": [
-        {"type": "udp", "tag": "local-dns", "server": "223.5.5.5"},
-        {"type": "https", "tag": "remote-dns", "server": "cloudflare-dns.com", "domain_resolver": "local-dns", "path": "/dns-query", "detour": "proxy"}
+        {"tag": "local-dns", "address": "udp://223.5.5.5"},
+        {"tag": "remote-dns", "address": "https://cloudflare-dns.com/dns-query", "address_resolver": "local-dns", "detour": "proxy"}
     ],
     "rules": [
         {"server": "local-dns", "domain": ["localhost", "local"]}
@@ -144,8 +144,8 @@ func buildDefaultSingboxDnsSetting(directDns directDnsValue: String, remoteDns r
     return """
     {
         "servers": [
-            {"type": "udp", "tag": "local-dns", "server": "\(bootstrapDns)"},
-            {"type": "https", "tag": "remote-dns", "server": "\(remoteDns.host)", "domain_resolver": "local-dns", "path": "\(remoteDns.path)", "detour": "proxy"}
+            {"tag": "local-dns", "address": "udp://\(bootstrapDns)"},
+            {"tag": "remote-dns", "address": "https://\(remoteDns.host)\(remoteDns.path)", "address_resolver": "local-dns", "detour": "proxy"}
         ],
         "rules": [
             {"server": "local-dns", "domain": ["localhost", "local"]}

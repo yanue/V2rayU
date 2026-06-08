@@ -273,8 +273,8 @@ struct DNSRule: Codable {
 }
 
 struct DNSServer: Codable {
-    var type: String
     var tag: String?
+    var type: String?
     var server: String?
     var domain_resolver: String?
     var path: String?
@@ -282,20 +282,24 @@ struct DNSServer: Codable {
     var predefined: [String: [String]]?
     var inet4_range: String?
     var inet6_range: String?
+    var address: String?
+    var address_resolver: String?
 
     init(
-        type: String,
         tag: String? = nil,
+        type: String? = nil,
         server: String? = nil,
         domain_resolver: String? = nil,
         path: String? = nil,
         detour: String? = nil,
         predefined: [String: [String]]? = nil,
         inet4_range: String? = nil,
-        inet6_range: String? = nil
+        inet6_range: String? = nil,
+        address: String? = nil,
+        address_resolver: String? = nil
     ) {
-        self.type = type
         self.tag = tag
+        self.type = type
         self.server = server
         self.domain_resolver = domain_resolver
         self.path = path
@@ -303,6 +307,8 @@ struct DNSServer: Codable {
         self.predefined = predefined
         self.inet4_range = inet4_range
         self.inet6_range = inet6_range
+        self.address = address
+        self.address_resolver = address_resolver
     }
 }
 
