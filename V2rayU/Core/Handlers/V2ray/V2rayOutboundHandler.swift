@@ -19,6 +19,9 @@ import Foundation
  */
 
 class V2rayOutboundHandler {
+    /// 测试覆盖：设置后替代 getCoreVersion() 用于证书校验决策
+    nonisolated(unsafe) static var testCoreVersionOverride: XrayVersion?
+
     private(set) var profile: ProfileModel
     // server
     private(set) var serverVmess = V2rayOutboundVMessItem()
@@ -305,7 +308,8 @@ class V2rayOutboundHandler {
     //   指纹为空时不下发任何字段——此类节点应已被兼容判定路由到 sing-box，万一仍走到 Xray 则按严格校验运行。
     private func applyCertVerification(to tls: inout TlsSettings) {
         guard profile.allowInsecure else { return }
-        if xrayRequiresPinnedCert() {
+        let version = Self.testCoreVersionOverride ?? XrayVersion(getCoreVersion())
+        if xrayRequiresPinnedCert(version: version) {
             let pin = profile.pinnedPeerCertSha256.trimmingCharacters(in: .whitespacesAndNewlines)
             if !pin.isEmpty {
                 tls.pinnedPeerCertSha256 = pin

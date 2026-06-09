@@ -365,7 +365,7 @@ tr:hover {{ background: #f8f9ff; }}
 
 <h2>意外失败明细 (unexpected_fail)</h2>
 <table>
-<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th><th>错误/log</th></tr>
+<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th><th style='width:800px'>错误/log</th></tr>
 '''
     for r in sorted(classified.get('unexpected_fail', []), key=lambda x: (x['profileRemark'], x['coreVersion'])):
         err = r['connection'].get('error', '')
@@ -384,7 +384,7 @@ tr:hover {{ background: #f8f9ff; }}
 
 <h2>规则偏差汇总 (ruleMismatches from report)</h2>
 <table>
-<tr><th>Profile</th><th>Core</th><th>版本</th><th>状态</th><th>预测</th><th>错误</th></tr>
+<tr><th>Profile</th><th>Core</th><th>版本</th><th>状态</th><th>预测</th><th style="width:800px">错误</th></tr>
 '''
     for m in mismatches:
         html += f'''<tr class="mismatch">
@@ -404,7 +404,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         report_path = sys.argv[1]
     else:
-        report_path = '/Users/yanue/swift/V2rayU/Build/tests/reports/compatibility-report-2026-06-07_165331.json'
+        report_path = '/Users/yanue/swift/V2rayU/Build/tests/reports/compatibility-report-2026-06-10_001614.json'
 
     db_path = '/Users/yanue/.V2rayU/.V2rayU.db'
 

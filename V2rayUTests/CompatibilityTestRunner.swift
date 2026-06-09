@@ -121,7 +121,11 @@ import Testing
         print("  Testing \(profile.remark) on port \(bindPort)...")
         var testProfile = profile
         testProfile.coreType = coreType == .XrayCore ? .xray : .singbox
+        if coreType == .XrayCore {
+            V2rayOutboundHandler.testCoreVersionOverride = XrayVersion(version)
+        }
         let jsonText = configHandler.toJSON(item: testProfile, httpPort: String(bindPort), apiPort: nil)
+        V2rayOutboundHandler.testCoreVersionOverride = nil
 
         return launchAndTest(
             profile: profile,
