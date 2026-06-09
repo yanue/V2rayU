@@ -296,7 +296,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         shareQRCodeItem?.title = String(localized: .ShareQrCode)
         copyHttpProxyItem?.title = String(localized: .CopyHttpProxyShellExportLine)
         checkForUpdatesItem?.title = String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))"
-        helpItem?.title = String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))"
+        let xrayVer = getCoreShortVersion()
+        let singBoxVer = getSingboxShortVersion()
+        helpItem?.title = String(localized: .Help)+" (Xray \(xrayVer) | Singbox \(singBoxVer))"
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
         let serverCount = ProfileStore.shared.fetchAll().count
@@ -376,7 +378,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
-        helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray-core \(getCoreShortVersion()))", action: #selector(goHelp), keyEquivalent: "")
+        helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray \(getCoreShortVersion()) | Singbox \(getSingboxShortVersion()))", action: #selector(goHelp), keyEquivalent: "")
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())

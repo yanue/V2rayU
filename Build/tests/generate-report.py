@@ -382,35 +382,6 @@ tr:hover {{ background: #f8f9ff; }}
 </tr>
 '''
 
-    html += '''
-</table>
-
-<h2>规则更新建议</h2>
-<table>
-<tr><th>规则</th><th>当前状态</th><th>建议</th><th>依据</th></tr>
-<tr>
-  <td>transport.h2</td>
-  <td>已更新: supported(removedAt: 24.12.18)</td>
-  <td>✅ 已修复</td>
-  <td>xray v24.12.18 明确报错 "HTTP transport has been removed"</td>
-</tr>
-<tr>
-  <td>transport.hysteria</td>
-  <td>已更新: supported(calendarMin: 26.1.23)</td>
-  <td>✅ 已修复</td>
-  <td>xray v25.12.8 报错 "unknown transport protocol: hysteria"; v26.1.23 正常启动</td>
-</tr>
-<tr>
-  <td>outbound.hysteria</td>
-  <td>已更新: supported(calendarMin: 26.1.23)</td>
-  <td>✅ 已修复</td>
-  <td>同上，hysteria2 protocol 和 transport 同时添加</td>
-</tr>
-</table>
-
-<p>生成脚本: Build/tests/generate-report.py</p>
-</body>
-</html>'''
 
     return html
 

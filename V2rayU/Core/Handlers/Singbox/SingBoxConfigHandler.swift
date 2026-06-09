@@ -258,7 +258,7 @@ class SingboxConfigHandler {
             if useSniffRuleAction {
                 tunRules.append(RouteRule(action: "sniff"))
             }
-            tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]))
+            tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
             self.singbox.route = RouteConfig(
                 auto_detect_interface: true,
                 default_domain_resolver: "local-dns",

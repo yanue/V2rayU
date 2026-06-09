@@ -56,7 +56,7 @@ cat > "$CONFIG_OLD" <<'EOF'
     "auto_detect_interface": true,
     "default_domain_resolver": "local-dns",
     "rules": [
-      {"outbound": "direct", "process_name": ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]}
+      {"outbound": "direct", "process_name": ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]}
     ]
   }
 }
@@ -96,7 +96,7 @@ cat > "$CONFIG_NEW" <<'EOF'
     "default_domain_resolver": "local-dns",
     "rules": [
       {"action": "sniff"},
-      {"outbound": "direct", "process_name": ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core"]}
+      {"outbound": "direct", "process_name": ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]}
     ]
   }
 }

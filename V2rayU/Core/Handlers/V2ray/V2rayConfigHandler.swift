@@ -315,11 +315,11 @@ class V2rayConfigHandler {
         }
         // ------------------------------------- inbound start ---------------------------------------------
 
-        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun
+        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun && xraySupportsMixedProtocol()
 
         var inbounds: [V2rayInbound] = []
         if useMixedInbound {
-            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求（功能等价于 mixed），且仅 v25.3.6+ 支持 mixed 协议别名
+            // Xray v24.12.31+ 支持 mixed 协议别名，旧版用独立 HTTP + SOCKS
             let inMixed = getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: self.enableSniffing, tag: "mixed-in")
             inbounds.append(inMixed)
         } else {
@@ -388,6 +388,13 @@ class V2rayConfigHandler {
         // ------------------------------------- routing end ----------------------------------------------
     }
 
+    private func xraySupportsMixedProtocol() -> Bool {
+        guard let version = XrayVersion(getCoreVersion()) else {
+            return false
+        }
+        return version >= XrayVersion(24, 12, 31)
+    }
+
     private func addPingMetrics(apiPort: String) {
         let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: apiPort, enableSniffing: false, tag: "metrics_in")
         self.v2ray.inbounds?.append(inApi)
@@ -431,8 +438,8 @@ class V2rayConfigHandler {
 
         for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
             let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
-            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求，mixed 协议别名仅 v25.3.6+ 支持
-            let proto: V2rayProtocolInbound = resolvedGroup.group.inboundType.v2rayProtocol == .mixed ? .socks : resolvedGroup.group.inboundType.v2rayProtocol
+            // Xray v24.12.31+ 支持 mixed 协议别名，旧版回退 socks
+            let proto: V2rayProtocolInbound = resolvedGroup.group.inboundType.v2rayProtocol == .mixed && !xraySupportsMixedProtocol() ? .socks : resolvedGroup.group.inboundType.v2rayProtocol
             let inbound = getInbound(
                 protocol: proto,
                 listen: listenAddress,
@@ -482,8 +489,8 @@ class V2rayConfigHandler {
         }
 
         // Add default proxy inbounds
-        if self.enableMixedPort {
-            // Xray v1.8.24+ SOCKS 入站已默认兼容 HTTP 代理请求，无需使用 mixed 协议别名
+        if self.enableMixedPort && xraySupportsMixedProtocol() {
+            // Xray v24.12.31+ 支持 mixed 协议别名，旧版用独立 HTTP + SOCKS
             inbounds.append(getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: enableSniffing, tag: "mixed-in"))
         } else {
             if self.httpPort == self.socksPort {
