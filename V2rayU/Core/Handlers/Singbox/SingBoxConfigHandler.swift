@@ -158,7 +158,12 @@ class SingboxConfigHandler {
         self.singbox.outbounds = outbounds
         self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: outbounds)
         self.singbox.route.default_domain_resolver = "direct-dns"
-        self.singbox.route.rules = comboRules + RoutingManager().getSingboxRoutingRules()
+        var routeRules = comboRules + RoutingManager().getSingboxRoutingRules()
+        if singboxBlockOutboundRemoved() {
+            migrateBlockOutboundToAction(&routeRules)
+            self.singbox.outbounds.removeAll { $0.type == "block" }
+        }
+        self.singbox.route.rules = routeRules
         applyBundledRuleSets()
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
@@ -247,9 +252,13 @@ class SingboxConfigHandler {
             self.singbox.dns = defaultDnsConfig()
             if let index = self.singbox.dns.servers.firstIndex(where: { $0.tag == "local-dns" }) {
                 if singboxSupportsNewDnsFormat() {
-                    self.singbox.dns.servers[index].address = "udp://\(dnsDefault)"
-                } else {
+                    self.singbox.dns.servers[index].type = "udp"
                     self.singbox.dns.servers[index].server = dnsDefault
+                    self.singbox.dns.servers[index].address = nil
+                } else {
+                    self.singbox.dns.servers[index].address = "udp://\(dnsDefault)"
+                    self.singbox.dns.servers[index].type = nil
+                    self.singbox.dns.servers[index].server = nil
                 }
             }
 
@@ -321,20 +330,41 @@ class SingboxConfigHandler {
         if self.forPing {
             if singboxSupportsNewDnsFormat() {
                 self.singbox.dns.servers = [
-                    DNSServer(tag: "direct-dns", address: "udp://\(defaultBootstrapDns)"),
+                    DNSServer(tag: "direct-dns", type: "udp", server: defaultBootstrapDns),
                 ]
             } else {
                 self.singbox.dns.servers = [
-                    DNSServer(tag: "direct-dns", type: "udp", server: defaultBootstrapDns),
+                    DNSServer(tag: "direct-dns", address: "udp://\(defaultBootstrapDns)"),
                 ]
             }
         } else {
             self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: _outbounds)
             self.singbox.route.default_domain_resolver = "local-dns"
-            self.singbox.route.rules = RoutingManager().getSingboxRoutingRules()
+            var routeRules = RoutingManager().getSingboxRoutingRules()
+            if singboxBlockOutboundRemoved() {
+                migrateBlockOutboundToAction(&routeRules)
+                self.singbox.outbounds.removeAll { $0.type == "block" }
+            }
+            self.singbox.route.rules = routeRules
             applyBundledRuleSets()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
+    }
+
+    private func migrateBlockOutboundToAction(_ rules: inout [RouteRule]) {
+        for i in rules.indices {
+            if rules[i].outbound == "block" {
+                rules[i].outbound = nil
+                rules[i].action = "reject"
+            }
+        }
+    }
+
+    private func singboxBlockOutboundRemoved() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else {
+            return true
+        }
+        return version >= SingboxVersion(1, 13, 0)
     }
 
     private func applyBundledRuleSets() {
@@ -397,14 +427,13 @@ class SingboxConfigHandler {
         if singboxSupportsNewDnsFormat() {
             return DNSConfig(
                 servers: [
-                    DNSServer(tag: "local-dns", address: "udp://\(defaultBootstrapDns)"),
-                    DNSServer(tag: "remote-dns", detour: "proxy", address: "https://cloudflare-dns.com/dns-query", address_resolver: "local-dns"),
+                    DNSServer(tag: "local-dns", type: "udp", server: defaultBootstrapDns),
+                    DNSServer(tag: "remote-dns", type: "https", server: "cloudflare-dns.com", domain_resolver: "local-dns", detour: "proxy"),
                 ],
                 rules: [
                     DNSRule(server: "local-dns", domain: ["localhost", "local"]),
                 ],
-                final: "remote-dns",
-                independent_cache: true
+                final: "remote-dns"
             )
         }
 
@@ -414,10 +443,9 @@ class SingboxConfigHandler {
         }
 
         return DNSConfig(
-            servers: [DNSServer(tag: "local-dns", type: "udp", server: defaultBootstrapDns)],
+            servers: [DNSServer(tag: "local-dns", address: "udp://\(defaultBootstrapDns)")],
             rules: [],
-            final: "local-dns",
-            independent_cache: true
+            final: "local-dns"
         )
     }
 
@@ -425,24 +453,42 @@ class SingboxConfigHandler {
         var config = config
         for i in config.servers.indices {
             let server = config.servers[i]
-            guard server.server != nil, server.address == nil else { continue }
-            let addr: String
-            switch server.type {
-            case "udp":
-                addr = "udp://\(server.server!)"
-            case "https":
-                addr = "https://\(server.server!)\(server.path ?? "/dns-query")"
-            case "tcp":
-                addr = "tcp://\(server.server!)"
-            default:
+            guard let address = server.address, server.type == nil else { continue }
+            if address == "local" {
+                config.servers[i].type = "local"
+            } else if address == "fakeip" {
+                config.servers[i].type = "fakeip"
+            } else if address.hasPrefix("dhcp://") {
+                config.servers[i].type = "dhcp"
+                let iface = String(address.dropFirst("dhcp://".count))
+                if iface != "auto" {
+                    config.servers[i].interface = iface.isEmpty ? nil : iface
+                }
+            } else if let url = URL(string: address), let scheme = url.scheme {
+                guard let host = url.host, !host.isEmpty else { continue }
+                switch scheme {
+                case "udp", "tcp", "tls", "quic":
+                    config.servers[i].type = scheme
+                    if let port = url.port {
+                        config.servers[i].server = "\(host):\(port)"
+                    } else {
+                        config.servers[i].server = host
+                    }
+                case "https":
+                    config.servers[i].type = "https"
+                    config.servers[i].server = host
+                case "h3":
+                    config.servers[i].type = "h3"
+                    config.servers[i].server = host
+                default:
+                    continue
+                }
+            } else {
                 continue
             }
-            config.servers[i].address = addr
-            config.servers[i].address_resolver = server.domain_resolver
-            config.servers[i].type = nil
-            config.servers[i].server = nil
-            config.servers[i].domain_resolver = nil
-            config.servers[i].path = nil
+            config.servers[i].domain_resolver = server.address_resolver
+            config.servers[i].address = nil
+            config.servers[i].address_resolver = nil
         }
         return config
     }

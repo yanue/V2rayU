@@ -4,19 +4,10 @@ import Foundation
 // MARK: - Test environment configuration
 
 struct CompatibilityTestConfig {
-    /// Root directory containing versioned core binaries
-    static var binDir: String {
-        ProcessInfo.processInfo.environment["V2RAYU_TEST_BIN_DIR"]
-            ?? "\(projectRoot)/Build/tests/bin"
-    }
+    static let binDir = "\(NSHomeDirectory())/bin"
 
-    /// Report output directory
-    static var reportDir: String {
-        ProcessInfo.processInfo.environment["V2RAYU_TEST_REPORT_DIR"]
-            ?? "\(projectRoot)/Build/tests/reports"
-    }
+    static let reportDir = "\(projectRoot)/Build/tests/reports"
 
-    /// Report file path for current run
     static var reportPath: String {
         let fm = DateFormatter()
         fm.dateFormat = "yyyy-MM-dd_HHmmss"
@@ -24,22 +15,20 @@ struct CompatibilityTestConfig {
         return "\(reportDir)/compatibility-report-\(ts).json"
     }
 
-    /// Xray versions to test (sorted ascending)
     static let xrayVersions: [String] = {
-        sampled(versionsInRange(
+        versionsInRange(
             coreDir: "\(binDir)/xray-core",
             min: "v1.8.0",
             max: "v26.5.6"
-        ))
+        )
     }()
 
-    /// Sing-box versions to test (sorted ascending)
     static let singboxVersions: [String] = {
-        sampled(versionsInRange(
+        versionsInRange(
             coreDir: "\(binDir)/sing-box",
             min: "v1.12.0",
             max: "v1.13.12"
-        ))
+        )
     }()
 
     static var projectRoot: String {
@@ -47,51 +36,30 @@ struct CompatibilityTestConfig {
             ?? ProcessInfo.processInfo.environment["SRCROOT"] {
             return envPath
         }
-        // Fallback: calculate from file path
-        // xcodebuild typically gives full path in #file
         let base = #file as NSString
-        // Go up from V2rayUTests/ to project root
         let dir = (base.deletingLastPathComponent as NSString).deletingLastPathComponent
         return dir
     }
 
-    /// Check if test binaries are available for a given core type
-    static func isAvailable(core: CoreType) -> Bool {
-        switch core {
-        case .XrayCore: return !xrayVersions.isEmpty
-        case .SingBox: return !singboxVersions.isEmpty
-        }
-    }
-
-    /// Get the binary path for a specific core version
     static func binaryPath(core: CoreType, version: String) -> String {
         let subDir: String
         let binaryName: String
-        #if arch(arm64)
+#if arch(arm64)
         switch core {
         case .XrayCore: binaryName = "xray-arm64"
         case .SingBox: binaryName = "sing-box-arm64"
         }
-        #else
+#else
         switch core {
         case .XrayCore: binaryName = "xray-64"
         case .SingBox: binaryName = "sing-box-64"
         }
-        #endif
+#endif
         switch core {
         case .XrayCore: subDir = "xray-core"
         case .SingBox: subDir = "sing-box"
         }
         return "\(binDir)/\(subDir)/\(version)/\(binaryName)"
-    }
-
-    /// Sample N versions evenly from the sorted list (env V2RAYU_SAMPLE_VERSIONS, default 0 = all)
-    static func sampled(_ versions: [String]) -> [String] {
-        let maxStr = ProcessInfo.processInfo.environment["V2RAYU_SAMPLE_VERSIONS"] ?? "0"
-        let maxCount = Int(maxStr) ?? 0
-        guard maxCount > 0, versions.count > maxCount else { return versions }
-        let step = Double(versions.count - 1) / Double(maxCount - 1)
-        return (0..<maxCount).map { versions[Int(round(step * Double($0)))] }
     }
 
     static func versionsInRange(coreDir: String, min: String, max: String) -> [String] {
@@ -118,20 +86,20 @@ struct CompatibilityTestConfig {
 // MARK: - Test result models
 
 enum ConnectionTestStatus: String, Codable {
-    case skipped       // 根据能力规则跳过（不兼容）
-    case pass          // 连接成功
-    case fail          // 连接失败（核心启动但代理不通）
-    case launchFailed  // 核心进程无法启动
-    case configError   // JSON 配置生成失败
-    case timeout       // 超时
+    case skipped
+    case pass
+    case fail
+    case launchFailed
+    case configError
+    case timeout
 }
 
 struct ConnectionTestDetail: Codable {
     let status: ConnectionTestStatus
     let latencyMs: Int?
     let error: String?
-    let rulePrediction: String  // "supported", "advisory", "unsupported", "unknown"
-    let ruleMatched: Bool       // 规则预测与实际结果是否一致
+    let rulePrediction: String
+    let ruleMatched: Bool
 }
 
 struct ProfileTestResult: Codable {
@@ -140,7 +108,7 @@ struct ProfileTestResult: Codable {
     let protocolRaw: String
     let networkRaw: String
     let securityRaw: String
-    let coreTypeRaw: String        // "xray" or "sing-box"
+    let coreTypeRaw: String
     let coreVersion: String
     let connection: ConnectionTestDetail
 }
@@ -219,11 +187,11 @@ enum CompatibilityReportGenerator {
         df.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let generatedAt = df.string(from: Date())
 
-        #if arch(arm64)
+#if arch(arm64)
         let arch = "arm64"
-        #else
+#else
         let arch = "x86_64"
-        #endif
+#endif
 
         let env = CompatibilityTestReport.ReportEnvironment(
             arch: arch,

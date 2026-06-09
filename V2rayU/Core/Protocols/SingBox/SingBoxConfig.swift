@@ -284,6 +284,7 @@ struct DNSServer: Codable {
     var inet6_range: String?
     var address: String?
     var address_resolver: String?
+    var interface: String?
 
     init(
         tag: String? = nil,
@@ -296,7 +297,8 @@ struct DNSServer: Codable {
         inet4_range: String? = nil,
         inet6_range: String? = nil,
         address: String? = nil,
-        address_resolver: String? = nil
+        address_resolver: String? = nil,
+        interface: String? = nil
     ) {
         self.tag = tag
         self.type = type
@@ -309,6 +311,7 @@ struct DNSServer: Codable {
         self.inet6_range = inet6_range
         self.address = address
         self.address_resolver = address_resolver
+        self.interface = interface
     }
 }
 

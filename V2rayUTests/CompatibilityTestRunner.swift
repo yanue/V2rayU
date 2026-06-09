@@ -8,7 +8,6 @@ import Testing
 
     @Test("Run full compatibility test matrix")
     func runCompatibilityTest() {
-        let testConfig = readTestConfig()
         let xrayVersions = CompatibilityTestConfig.xrayVersions
         let singboxVersions = CompatibilityTestConfig.singboxVersions
 
@@ -17,37 +16,27 @@ import Testing
             return
         }
 
-        let profiles = ProfileStore.shared.fetchAll()
-        guard !profiles.isEmpty else {
+        let allProfiles = ProfileStore.shared.fetchAll()
+        guard !allProfiles.isEmpty else {
             print("SKIP: No profiles found in database")
             return
         }
 
-        let limitedProfiles = testConfig.maxProfiles > 0
-            ? Array(profiles.prefix(testConfig.maxProfiles))
-            : profiles
-        let sampledXray = testConfig.sampleVersions > 0
-            ? sample(from: xrayVersions, count: testConfig.sampleVersions)
-            : xrayVersions
-        let sampledSingbox = testConfig.sampleVersions > 0
-            ? sample(from: singboxVersions, count: testConfig.sampleVersions)
-            : singboxVersions
-
-        let totalCombos = limitedProfiles.count * (sampledXray.count + sampledSingbox.count)
+        let totalCombos = allProfiles.count * (xrayVersions.count + singboxVersions.count)
         print("=== Compatibility Test ===")
-        print("Profiles: \(limitedProfiles.count) (config.max=\(testConfig.maxProfiles))")
-        print("Xray versions: \(sampledXray.count) (total=\(xrayVersions.count), sample=\(testConfig.sampleVersions))")
-        print("Sing-box versions: \(sampledSingbox.count) (total=\(singboxVersions.count), sample=\(testConfig.sampleVersions))")
+        print("Profiles: \(allProfiles.count)")
+        print("Xray versions: \(xrayVersions.count)")
+        print("Sing-box versions: \(singboxVersions.count)")
         print("Total combinations: \(totalCombos)")
 
         var allResults: [ProfileTestResult] = []
 
-        for profile in limitedProfiles {
-            for version in sampledXray {
+        for profile in allProfiles {
+            for version in xrayVersions {
                 let r = testSingleCombination(profile: profile, coreType: .XrayCore, version: version)
                 allResults.append(r)
             }
-            for version in sampledSingbox {
+            for version in singboxVersions {
                 let r = testSingleCombination(profile: profile, coreType: .SingBox, version: version)
                 allResults.append(r)
             }
@@ -133,7 +122,6 @@ import Testing
         var testProfile = profile
         testProfile.coreType = coreType == .XrayCore ? .xray : .singbox
         let jsonText = configHandler.toJSON(item: testProfile, httpPort: String(bindPort), apiPort: nil)
-        print("  JSON generated (\(jsonText.count) chars)")
 
         return launchAndTest(
             profile: profile,
@@ -320,38 +308,6 @@ import Testing
         }
         return "supported"
     }
-}
-
-private struct TestScopeConfig {
-    let maxProfiles: Int
-    let sampleVersions: Int
-}
-
-private func readTestConfig() -> TestScopeConfig {
-    let env = ProcessInfo.processInfo.environment
-    let configPaths: [String] = [
-        env["PROJECT_DIR"].map { "\($0)/Build/tests/test-config.json" },
-        "\(CompatibilityTestConfig.projectRoot)/Build/tests/test-config.json",
-    ].compactMap { $0 }
-
-    for path in configPaths {
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Int] else {
-            continue
-        }
-        return TestScopeConfig(
-            maxProfiles: json["maxProfiles"] ?? 0,
-            sampleVersions: json["sampleVersions"] ?? 0
-        )
-    }
-    return TestScopeConfig(maxProfiles: 0, sampleVersions: 0)
-}
-
-private func sample<T>(from array: [T], count: Int) -> [T] {
-    guard count > 0, array.count > count else { return array }
-    if count == 1 { return [array[0]] }
-    let step = Double(array.count - 1) / Double(count - 1)
-    return (0..<count).map { array[Int(round(step * Double($0)))] }
 }
 
 private func waitForPortSync(_ port: UInt16, timeout: TimeInterval) -> Bool {
