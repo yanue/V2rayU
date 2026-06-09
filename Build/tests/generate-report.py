@@ -293,51 +293,63 @@ tr:hover {{ background: #f8f9ff; }}
 </tr>
 '''
 
-    html += '''</table>
+    html += '''</table>'''
 
-<h2>版本兼容矩阵</h2>
+    for core_label, core_type in [('XrayCore', 'XrayCore'), ('SingBox', 'SingBox')]:
+        core_results = [r for r in results if r['coreTypeRaw'] == core_type]
+        core_vers = sorted(set(r['coreVersion'] for r in core_results),
+                          key=lambda v: [int(x) for x in v.lstrip('v').split('.')[:3]])
+        core_profiles = []
+        seen = set()
+        for r in core_results:
+            key = r['profileRemark']
+            if key not in seen:
+                core_profiles.append(key)
+                seen.add(key)
+
+        html += f'''
+<h2>版本兼容矩阵 — {core_label}</h2>
 <p>P=通过 F=连接失败 T=超时(端口未就绪) S=跳过 | 颜色: <span style="background:#d4edda">通过</span> <span style="background:#f8d7da">失败</span> <span style="background:#fff3cd">超时</span> <span style="background:#e2e3e5">跳过</span> | <b>红字=规则偏差</b></p>
 
-<div style="overflow-x: auto; max-height: 800px; overflow-y: auto;">
+<div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
 <table>
 <tr>
-  <th style="position: sticky; left: 0; z-index: 20; background: #f1f3f5;">Profile / Core</th>
+  <th style="position: sticky; left: 0; z-index: 20; background: #f1f3f5;">Profile</th>
 '''
-
-    for ver in core_versions:
-        html += f'<th>{ver}</th>'
-    html += '</tr>\n'
-
-    for remark, core_type in profile_names:
-        html += f'<tr><td class="profile-col" style="position: sticky; left: 0; background: white; z-index: 5;">{escape(remark)}<br><small>{core_type}</small></td>'
-        for ver in core_versions:
-            r = lookup.get((None, core_type, ver))
-            # Find matching result
-            for puid in profile_stats:
-                if profile_stats[puid]['remark'] == remark:
-                    r = lookup.get((puid, core_type, ver))
-                    break
-            if r:
-                cat = classify_mismatch(r)
-                is_mismatch = not cat.startswith('correct')
-                style = cell_color(r)
-                char = status_char(r)
-                extra = ' font-weight: bold; color: red;' if is_mismatch else ''
-                title = f"{r['connection'].get('error','')} | pred={r['connection'].get('rulePrediction','?')}"
-                html += f'<td style="background:{style};{extra}" title="{escape(title)}">{char}</td>'
-            else:
-                html += '<td>-</td>'
+        for ver in core_vers:
+            html += f'<th>{ver}</th>'
         html += '</tr>\n'
 
-    html += '''</table>
+        for remark in core_profiles:
+            html += f'<tr><td class="profile-col" style="position: sticky; left: 0; background: white; z-index: 5;">{escape(remark)}</td>'
+            for ver in core_vers:
+                r = None
+                for puid in profile_stats:
+                    if profile_stats[puid]['remark'] == remark:
+                        r = lookup.get((puid, core_type, ver))
+                        break
+                if r:
+                    cat = classify_mismatch(r)
+                    is_mismatch = not cat.startswith('correct')
+                    style = cell_color(r)
+                    char = status_char(r)
+                    extra = ' font-weight: bold; color: red;' if is_mismatch else ''
+                    title = f"{r['connection'].get('error','')} | pred={r['connection'].get('rulePrediction','?')}"
+                    html += f'<td style="background:{style};{extra}" title="{escape(title)}">{char}</td>'
+                else:
+                    html += '<td>-</td>'
+            html += '</tr>\n'
+
+        html += '''</table>
 </div>
 
 <h2>意外超时明细 (unexpected_timeout)</h2>
 <p>这些组合预测为supported/advisory但核心端口未就绪，需要分析根因</p>
 <table>
-<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th></tr>
+<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th><th>错误/stderr</th></tr>
 '''
     for r in sorted(classified.get('unexpected_timeout', []), key=lambda x: (x['profileRemark'], x['coreVersion'])):
+        err = r['connection'].get('error', '')
         html += f'''<tr class="mismatch">
   <td>{escape(r['profileRemark'])}</td>
   <td>{r['coreTypeRaw']}</td>
@@ -345,6 +357,7 @@ tr:hover {{ background: #f8f9ff; }}
   <td>{r['connection'].get('rulePrediction','?')}</td>
   <td>{r['protocolRaw']}</td>
   <td>{r['networkRaw']}</td>
+  <td style="font-size:11px;max-width:400px;word-break:break-all;"><pre style="margin:2px;white-space:pre-wrap;max-height:100px;overflow-y:auto;">{escape(err)}</pre></td>
 </tr>
 '''
 
@@ -352,9 +365,10 @@ tr:hover {{ background: #f8f9ff; }}
 
 <h2>意外失败明细 (unexpected_fail)</h2>
 <table>
-<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th></tr>
+<tr><th>Profile</th><th>Core</th><th>版本</th><th>预测</th><th>协议</th><th>网络</th><th>错误/log</th></tr>
 '''
     for r in sorted(classified.get('unexpected_fail', []), key=lambda x: (x['profileRemark'], x['coreVersion'])):
+        err = r['connection'].get('error', '')
         html += f'''<tr class="mismatch">
   <td>{escape(r['profileRemark'])}</td>
   <td>{r['coreTypeRaw']}</td>
@@ -362,6 +376,7 @@ tr:hover {{ background: #f8f9ff; }}
   <td>{r['connection'].get('rulePrediction','?')}</td>
   <td>{r['protocolRaw']}</td>
   <td>{r['networkRaw']}</td>
+  <td style="font-size:11px;max-width:400px;word-break:break-all;"><pre style="margin:2px;white-space:pre-wrap;max-height:100px;overflow-y:auto;">{escape(err)}</pre></td>
 </tr>
 '''
 

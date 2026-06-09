@@ -144,6 +144,7 @@ import Testing
         rulePrediction: String
     ) -> ProfileTestResult {
         let configFile = "\(AppHomePath)/.compat-test.\(profile.uuid).\(coreType.rawValue).\(version).json"
+        let coreLogFile = "\(AppHomePath)/.compat-corelog.\(profile.uuid).\(coreType.rawValue).\(version).log"
 
         do {
             try jsonText.write(to: URL(fileURLWithPath: configFile), atomically: true, encoding: .utf8)
@@ -160,14 +161,16 @@ import Testing
 
         let process = Process()
         process.launchPath = "/bin/bash"
-        process.arguments = ["-c", "cd \(AppHomePath) && \(binaryPath) run -c \(configFile)"]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
+        // Capture both stdout and stderr via shell redirection (&>)
+        process.arguments = ["-c", "cd \(AppHomePath) && \(binaryPath) run -c \(configFile) &>\(coreLogFile)"]
+        process.standardOutput = nil
+        process.standardError = nil
 
         do {
             try process.run()
         } catch {
             try? FileManager.default.removeItem(atPath: configFile)
+            try? FileManager.default.removeItem(atPath: coreLogFile)
             return ProfileTestResult(
                 profileUUID: profile.uuid, profileRemark: profile.remark,
                 protocolRaw: profile.protocol.rawValue, networkRaw: profile.network.rawValue,
@@ -189,18 +192,35 @@ import Testing
                 }
                 process.waitUntilExit()
             }
+            try? FileManager.default.removeItem(atPath: configFile)
+            try? FileManager.default.removeItem(atPath: coreLogFile)
+        }
+
+        func readCoreLog() -> String {
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: coreLogFile)),
+                  let text = String(data: data, encoding: .utf8)
+            else { return "" }
+            let lines = text.components(separatedBy: .newlines).filter { !$0.isEmpty }
+            let maxLines = 20
+            let tail = lines.suffix(maxLines)
+            let joined = tail.joined(separator: "\n")
+            return joined.count <= 2000 ? joined : String(joined.suffix(2000))
         }
 
         let portTimeout: TimeInterval = profile.network == .kcp ? 3 : 1
         let portReady = waitForPortSync(bindPort, timeout: portTimeout)
         guard portReady else {
+            let logText = readCoreLog()
+            let msg = logText.isEmpty
+                ? "Port \(bindPort) not ready after \(Int(portTimeout))s"
+                : "Port \(bindPort) not ready after \(Int(portTimeout))s\ncore log:\n\(logText)"
             return ProfileTestResult(
                 profileUUID: profile.uuid, profileRemark: profile.remark,
                 protocolRaw: profile.protocol.rawValue, networkRaw: profile.network.rawValue,
                 securityRaw: profile.security.rawValue, coreTypeRaw: coreType.rawValue,
                 coreVersion: version,
                 connection: ConnectionTestDetail(status: .timeout, latencyMs: nil,
-                    error: "Port \(bindPort) not ready after \(Int(portTimeout))s",
+                    error: msg,
                     rulePrediction: rulePrediction, ruleMatched: false))
         }
 
@@ -216,6 +236,11 @@ import Testing
                 connection: ConnectionTestDetail(status: .pass, latencyMs: latency, error: nil,
                     rulePrediction: rulePrediction, ruleMatched: ruleMatched))
         } catch {
+            let logText = readCoreLog()
+            let errMsg = "\(error.localizedDescription)"
+            let msg = logText.isEmpty
+                ? errMsg
+                : "\(errMsg)\ncore log:\n\(logText)"
             let ruleMatched = (rulePrediction == "unsupported") || (rulePrediction == "unknown")
             return ProfileTestResult(
                 profileUUID: profile.uuid, profileRemark: profile.remark,
@@ -223,7 +248,7 @@ import Testing
                 securityRaw: profile.security.rawValue, coreTypeRaw: coreType.rawValue,
                 coreVersion: version,
                 connection: ConnectionTestDetail(status: .fail, latencyMs: nil,
-                    error: "Connectivity test failed: \(error.localizedDescription)",
+                    error: msg,
                     rulePrediction: rulePrediction, ruleMatched: ruleMatched))
         }
     }
@@ -286,11 +311,6 @@ import Testing
             issues.append(issue)
         }
         if let def = XraySupportCatalog.definition(forSecurity: profile.security),
-           let issue = XraySupportCatalog.evaluate(definition: def, version: xrayVersion) {
-            issues.append(issue)
-        }
-        if profile.security == .tls, profile.allowInsecure,
-           let def = XraySupportCatalog.capability(forKey: "security.tls.allowInsecure"),
            let issue = XraySupportCatalog.evaluate(definition: def, version: xrayVersion) {
             issues.append(issue)
         }
