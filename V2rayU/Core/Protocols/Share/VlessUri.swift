@@ -183,12 +183,10 @@ class VlessUri: BaseShareUri {
         self.profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
         // 从 query 获取字符串
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")
-        // 尝试转换成枚举
-        if let alpnEnum = V2rayStreamAlpn(rawValue: alpnString) {
+        // normalize standard ALPN ID before enum lookup
+        let normalizedAlpn = alpnString.replacingOccurrences(of: "http/1.1", with: "http1.1")
+        if let alpnEnum = V2rayStreamAlpn(rawValue: normalizedAlpn) {
             self.profile.alpn = alpnEnum
-        } else {
-            // 如果转换失败，给一个默认值
-            self.profile.alpn = .h2h1
         }
 
         switch self.profile.network {

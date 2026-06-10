@@ -361,7 +361,7 @@ class VmessUri: BaseShareUri {
             profile.password = vmess.id
             profile.alterId = Int(vmess.aid) ?? 0
             profile.encryption = vmess.scy == "auto" && vmess.security != "auto" ? vmess.security : vmess.scy
-            profile.alpn = V2rayStreamAlpn(rawValue: vmess.alpn) ?? .none
+            profile.alpn = V2rayStreamAlpn(rawValue: vmess.alpn.replacingOccurrences(of: "http/1.1", with: "http1.1")) ?? .none
             profile.sni = !vmess.sni.isEmpty ? vmess.sni : vmess.host
             profile.network = V2rayStreamNetwork(rawValue: vmess.net) ?? .tcp
             profile.host = vmess.host

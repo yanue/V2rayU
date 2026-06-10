@@ -145,6 +145,12 @@ extension ProfileEntity {
             alpn = ["h2"]
         } else if !self.alpn.rawValue.isEmpty {
             alpn = self.alpn.rawValue.split(separator: ",").map { String($0) }
+            // WebSocket only supports HTTP/1.1 upgrade (h2/h3 breaks WS)
+            if self.network == .ws {
+                alpn = alpn.filter { $0 != "h2" && $0 != "h3" }
+            }
+            // Normalize to standard ALPN protocol IDs
+            alpn = alpn.map { $0 == "http1.1" ? "http/1.1" : $0 }
         }
         return alpn
     }

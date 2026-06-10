@@ -112,8 +112,10 @@ struct SubscriptionFormView: View {
                         if let callback = onSaveAndSync {
                             callback()
                         }
+                        await MainActor.run {
+                            onClose()
+                        }
                     }
-                    onClose()
                 }
                 .buttonStyle(.borderedProminent)
                 .focusable(false)

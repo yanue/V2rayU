@@ -76,10 +76,9 @@ class AnyTlsUri: BaseShareUri {
         profile.path = query.getString(forKey: "path", defaultValue: "")
 
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")
-        if let alpn = V2rayStreamAlpn(rawValue: alpnString) {
+        let normalizedAlpn = alpnString.replacingOccurrences(of: "http/1.1", with: "http1.1")
+        if let alpn = V2rayStreamAlpn(rawValue: normalizedAlpn) {
             profile.alpn = alpn
-        } else {
-            profile.alpn = .h2h1
         }
 
         if let fragment = url.fragment, !fragment.isEmpty {
@@ -167,10 +166,9 @@ class NaiveUri: BaseShareUri {
         profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
 
         let alpnString = query.getString(forKey: "alpn", defaultValue: "")
-        if let alpn = V2rayStreamAlpn(rawValue: alpnString) {
+        let normalizedAlpn = alpnString.replacingOccurrences(of: "http/1.1", with: "http1.1")
+        if let alpn = V2rayStreamAlpn(rawValue: normalizedAlpn) {
             profile.alpn = alpn
-        } else {
-            profile.alpn = .h2h1
         }
 
         if let fragment = url.fragment, !fragment.isEmpty {

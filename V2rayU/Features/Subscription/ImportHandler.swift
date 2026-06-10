@@ -150,8 +150,10 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
         if let tls = outbound["tls"] as? [String: Any] {
             profile.sni = tls["server_name"] as? String ?? tls["serverName"] as? String ?? profile.address
             profile.allowInsecure = tls["insecure"] as? Bool ?? tls["allowInsecure"] as? Bool ?? false
-            if let alpn = tls["alpn"] as? [String] {
-                profile.alpn = V2rayStreamAlpn(rawValue: alpn.joined(separator: ",")) ?? .h2h1
+            if let alpnArray = tls["alpn"] as? [String], !alpnArray.isEmpty {
+                let alpnStr = alpnArray.joined(separator: ",")
+                    .replacingOccurrences(of: "http/1.1", with: "http1.1")
+                profile.alpn = V2rayStreamAlpn(rawValue: alpnStr) ?? .h2h1
             }
         }
 
@@ -172,8 +174,10 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
         if let tls = outbound["tls"] as? [String: Any] {
             profile.sni = tls["server_name"] as? String ?? tls["serverName"] as? String ?? profile.address
             profile.allowInsecure = tls["insecure"] as? Bool ?? tls["allowInsecure"] as? Bool ?? false
-            if let alpn = tls["alpn"] as? [String] {
-                profile.alpn = V2rayStreamAlpn(rawValue: alpn.joined(separator: ",")) ?? .h2h1
+            if let alpnArray = tls["alpn"] as? [String], !alpnArray.isEmpty {
+                let alpnStr = alpnArray.joined(separator: ",")
+                    .replacingOccurrences(of: "http/1.1", with: "http1.1")
+                profile.alpn = V2rayStreamAlpn(rawValue: alpnStr) ?? .h2h1
             }
         }
 
@@ -216,8 +220,10 @@ private func parseStreamSettings(_ streamSettings: [String: Any], into profile: 
             if let tlsSettings = streamSettings["tlsSettings"] as? [String: Any] {
                 profile.sni = tlsSettings["serverName"] as? String ?? ""
                 profile.allowInsecure = tlsSettings["allowInsecure"] as? Bool ?? true
-                if let alpn = tlsSettings["alpn"] as? [String] {
-                    profile.alpn = V2rayStreamAlpn(rawValue: alpn.first ?? "h2,http/1.1") ?? .h2h1
+                if let alpnArray = tlsSettings["alpn"] as? [String], !alpnArray.isEmpty {
+                    let alpnStr = alpnArray.joined(separator: ",")
+                        .replacingOccurrences(of: "http/1.1", with: "http1.1")
+                    profile.alpn = V2rayStreamAlpn(rawValue: alpnStr) ?? .h2h1
                 }
                 if let fingerprint = tlsSettings["fingerprint"] as? String {
                     profile.fingerprint = V2rayStreamFingerprint(rawValue: fingerprint) ?? .chrome
