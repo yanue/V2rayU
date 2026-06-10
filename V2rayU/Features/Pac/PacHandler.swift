@@ -47,6 +47,27 @@ func getTunConfigUrl() -> String {
     return configUrl
 }
 
+// Copy PAC template files from app bundle if missing at user home path
+func ensurePacTemplateFiles() {
+    let files = ["abp.js", "user-rule.txt", "gfwlist.txt"]
+    for file in files {
+        let destPath = PACRulesDirPath + file
+        if FileManager.default.fileExists(atPath: destPath) {
+            continue
+        }
+        guard let srcUrl = Bundle.main.url(forResource: file, withExtension: nil, subdirectory: "pac") else {
+            logger.info("ensurePacTemplateFiles: bundle missing \(file)")
+            continue
+        }
+        do {
+            try FileManager.default.copyItem(at: srcUrl, to: URL(fileURLWithPath: destPath))
+            logger.info("ensurePacTemplateFiles: copied \(file) from bundle")
+        } catch {
+            logger.info("ensurePacTemplateFiles: copy \(file) failed \(error)")
+        }
+    }
+}
+
 // Because of LocalSocks5.ListenPort may be changed
 func GeneratePACFile(rewrite: Bool) -> Bool {
     let socksPort = String(getEffectiveSocksProxyPort())
@@ -61,6 +82,9 @@ func GeneratePACFile(rewrite: Bool) -> Bool {
             return false
         }
     }
+    
+    // ensure template files exist (copy from bundle if missing)
+    ensurePacTemplateFiles()
     
     // permission
     _ = shell(launchPath: "/bin/bash", arguments: ["-c", "cd " + AppHomePath + " && /bin/chmod -R 755 ./pac"])

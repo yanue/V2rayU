@@ -35,6 +35,11 @@ class QueryParameters: NSObject {
         dict[key] = value
     }
 
+    // 检查参数是否存在
+    func has(_ key: String) -> Bool {
+        return dict.keys.contains(key)
+    }
+
     // 获取 String 类型的参数
     func getString(forKey key: String, defaultValue: String = "") -> String {
         return dict[key] ?? defaultValue

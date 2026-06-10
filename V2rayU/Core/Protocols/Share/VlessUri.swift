@@ -169,13 +169,13 @@ class VlessUri: BaseShareUri {
             self.profile.network = .h2
         }
         // 只有当 URL 没有 security 参数时，才默认为 tls
-        // 如果用户明确设置了 security=none，应当尊重该值
-        let securityStr = query.getString(forKey: "security")
-        if securityStr.isEmpty {
+        // 如果用户明确设置了 security=none 或 security=(空)，应当尊重该值
+        if query.has("security") {
+            let securityStr = query.getString(forKey: "security")
+            self.profile.security = V2rayStreamSecurity(rawValue: securityStr) ?? .none
+        } else {
             // security 参数缺失，默认为 tls（大多数 vless 使用 TLS）
             self.profile.security = .tls
-        } else {
-            self.profile.security = V2rayStreamSecurity(rawValue: securityStr) ?? .tls
         }
         self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)
@@ -266,7 +266,7 @@ class VlessUri: BaseShareUri {
                     self.profile.shortId = query.getString(forKey: "sid", defaultValue: "")
                 }
             }
-        } else if !tlsParam.isEmpty && securityStr.isEmpty {
+        } else if !tlsParam.isEmpty && !query.has("security") {
             // 只在没有 security 参数时才使用 tls 参数
             if tlsParam == "1" {
                 self.profile.security = .tls
