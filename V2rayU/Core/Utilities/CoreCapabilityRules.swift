@@ -194,6 +194,7 @@ enum CapabilityRulesLoader {
     private static let primaryOverrideDirectoryName = "capability-rules"
     private static let supportedSchemaVersions: Set<Int> = [1, 2, 3, 4]
 
+    // load + 定期更新模式: 首次 populate 后只读, 仅显式更新时 invalidate, 无需锁
     private static nonisolated(unsafe) var cache: [CapabilityRulesCore: (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)] = [:]
 
     static func load(core: CapabilityRulesCore) -> CapabilityRulesDocument? {
@@ -595,6 +596,19 @@ struct XrayCoreCompatibilityDecision {
     let warningMessage: String?
     let issues: [XrayCompatibilityIssue]
     let canLaunch: Bool
+
+    /// 兼容此配置所需的最小核心版本（从 blocking issue 的规则中提取）
+    var minimumRequiredVersion: String? {
+        let blocking = issues.filter { $0.isBlocking }
+        switch coreType {
+        case .XrayCore:
+            let versions = blocking.compactMap { $0.capability.rule.legacyMin }
+            return versions.max()?.description
+        case .SingBox:
+            let versions = blocking.compactMap { $0.capability.rule.legacyMin }
+            return versions.max()?.description
+        }
+    }
 }
 
 enum SingboxFallbackCompatibility {

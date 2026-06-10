@@ -1212,13 +1212,13 @@ final class DiagnosticsViewModel: ObservableObject {
         // ── 6. TUN Logs (when TUN mode) ──
         if !runTunLogContent.isEmpty {
             report += "## Run-TUN Log (launchd stdout/stderr)\n```\n"
-            report += String(runTunLogContent.suffix(2000))
+            report += String(runTunLogContent.prefix(2000))
             if runTunLogContent.count > 2000 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
         if !tunLogContent.isEmpty {
             report += "## TUN Log (sing-box structured)\n```\n"
-            report += String(tunLogContent.suffix(2000))
+            report += String(tunLogContent.prefix(2000))
             if tunLogContent.count > 2000 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
@@ -1238,15 +1238,30 @@ final class DiagnosticsViewModel: ObservableObject {
     func submitToGitHub() {
         if appState.latency > 0 { return }
         Task {
-            // Gather running core info from V2rayLaunch actor
+            // ── 重启 + 清日志, 获取干净的启动阶段输出 ──
+            let wasRunning = appState.v2rayTurnOn
+            if wasRunning {
+                await V2rayLaunch.shared.stop()
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+            for path in [coreLogFilePath, tunLogFilePath, runTunLogFilePath] {
+                try? "".write(toFile: path, atomically: false, encoding: .utf8)
+            }
+            // 启动 core (如果是 TUN 模式会连带启动 TUN)
+            await AppState.shared.turnOnCore()
+            // 等待启动阶段的日志输出
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+
+            // ── 收集干净的启动输出 ──
+            let freshCoreLog = await LogAnalyzer.getSurroundingLog(logPath: coreLogFilePath, lastLines: 500, contextLines: 3)
+            self.logContent = freshCoreLog
+
             let coreType = await V2rayLaunch.shared.lastCore
             let singboxVer = getSingboxShortVersion()
 
-            // Gather TUN logs when in TUN mode
             var tunLog = "", runTunLog = ""
             if appState.runMode == .tun {
                 tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 500, contextLines: 2)
-                // run-tun.log (launchd stderr) 基本全是错误, 全量带上
                 if let raw = try? String(contentsOfFile: runTunLogFilePath, encoding: .utf8), !raw.isEmpty {
                     runTunLog = raw
                 }

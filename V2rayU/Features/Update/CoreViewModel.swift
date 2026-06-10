@@ -242,6 +242,54 @@ final class CoreViewModel: ObservableObject {
         fetchPage(ch.currentPage + 1, for: kind)
     }
 
+    // MARK: - 自动下载最小兼容版本
+
+    func downloadMinimumVersion(for decision: XrayCoreCompatibilityDecision) async {
+        let kind: CoreUpdateKind = decision.coreType == .XrayCore ? .xray : .singbox
+        guard let minVersion = decision.minimumRequiredVersion else {
+            // 没有版本信息就只导航到下载页
+            return
+        }
+        await fetchAndDownload(minVersion: minVersion, kind: kind)
+    }
+
+    func downloadMinimumVersion(for resolved: CombinedConfigResolved) async {
+        let kind: CoreUpdateKind = resolved.coreType == .XrayCore ? .xray : .singbox
+        // 组合配置没有精确的最小版本, 导航到下载页由用户选择
+    }
+
+    private func fetchAndDownload(minVersion: String, kind: CoreUpdateKind) async {
+        do {
+            let releases = try await service.fetchReleases(repo: kind.repo, page: 1, perPage: 20)
+            // 找到第一个 >= minVersion 的正式发布版(非 prerelease)
+            let candidates = releases.filter { !$0.prerelease }
+            let match: GithubRelease?
+            switch kind {
+            case .xray:
+                guard let min = XrayVersion(minVersion) else { return }
+                match = candidates.first { release in
+                    guard let v = XrayVersion(release.tagName) else { return false }
+                    return v >= min
+                }
+            case .singbox:
+                guard let min = SingboxVersion(minVersion) else { return }
+                match = candidates.first { release in
+                    guard let v = SingboxVersion(release.tagName) else { return false }
+                    return v >= min
+                }
+            }
+            guard let release = match else {
+                errorMsg = "未找到 \(kind.displayName) >= \(minVersion) 的发布版本"
+                showAlert = true
+                return
+            }
+            downloadAndReplace(version: release, for: kind)
+        } catch {
+            errorMsg = String(localized: .OperationFailed, arguments: error.localizedDescription)
+            showAlert = true
+        }
+    }
+
     // MARK: - 下载 / 替换
 
     func downloadAndReplace(version: GithubRelease, for kind: CoreUpdateKind) {

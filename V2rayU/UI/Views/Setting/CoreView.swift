@@ -66,9 +66,20 @@ struct CoreView: View {
         }
         .onAppear {
             vm.loadCoreVersions()
+            // Navigate to requested subtab (from compatibility alert)
+            if let requestedTab = NavigationState.shared.coreSettingTab {
+                selectedTab = requestedTab
+                NavigationState.shared.coreSettingTab = nil
+            }
         }
         .onDisappear {
             vm.saveCapabilityRulesBaseURL()
+        }
+        .onChange(of: NavigationState.shared.coreSettingTab) { _, newValue in
+            if let tab = newValue {
+                selectedTab = tab
+                NavigationState.shared.coreSettingTab = nil
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ final class NavigationState: ObservableObject {
 
     @Published var mainTab: MainTab = .server
     @Published var settingTab: SettingsTab = .general
+    @Published var coreSettingTab: CoreSettingTab?
 
     private init() {}
 }

@@ -505,6 +505,7 @@ enum LanguageLabel: String, CaseIterable {
     case CombinationNoAvailableOutbounds
     case XrayCompatibilityWarningTitle
     case CoreCompatibilityWarningTitle
+    case DownloadCompatVersion
     case PacGenerateFailed
     case PacGenerateFailedTip
     case DownloadTimeoutProxy

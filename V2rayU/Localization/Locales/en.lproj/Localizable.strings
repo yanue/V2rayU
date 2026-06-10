@@ -484,6 +484,8 @@
 "CombinationNoAvailableOutbounds" = "The combination has no available outbound servers.";
 "XrayCompatibilityWarningTitle" = "Xray Version Compatibility Notice";
 "CoreCompatibilityWarningTitle" = "Core Compatibility Notice";
+
+"DownloadCompatVersion" = "Download Compatible Version";
 "PacGenerateFailed" = "PAC Generation Failed";
 "PacGenerateFailedTip" = "Unable to generate proxy.js. PAC mode may not take effect.";
 "DownloadTimeoutProxy" = "Download timed out. Please check your network or proxy settings.";

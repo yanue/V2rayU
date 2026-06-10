@@ -84,7 +84,22 @@ actor V2rayLaunch {
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
-            await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
+            if coreDecision.canLaunch {
+                await showAlert(title: await localized(.XrayCompatibilityWarningTitle), message: warningMessage)
+            } else {
+                let downloadMsg = warningMessage + "\n\n正在自动下载兼容版本..."
+                let needDownload = await showDownloadAlert(title: await localized(.XrayCompatibilityWarningTitle), message: downloadMsg)
+                if needDownload {
+                    await MainActor.run {
+                        NavigationState.shared.mainTab = .setting
+                        NavigationState.shared.settingTab = .core
+                        NavigationState.shared.coreSettingTab = .download
+                        MainWindowManager.shared.openMainWindow()
+                    }
+                    await CoreViewModel.shared.downloadMinimumVersion(for: coreDecision)
+                }
+                return false
+            }
         }
         if !coreDecision.canLaunch {
             return false
@@ -186,7 +201,17 @@ actor V2rayLaunch {
             if resolved.canLaunch {
                 makeToast(message: warningMessage, displayDuration: 5)
             } else {
-                await showAlert(title: await localized(.CoreCompatibilityWarningTitle), message: warningMessage)
+                let downloadMsg = warningMessage + "\n\n正在自动下载兼容版本..."
+                let needDownload = await showDownloadAlert(title: await localized(.CoreCompatibilityWarningTitle), message: downloadMsg)
+                if needDownload {
+                    await MainActor.run {
+                        NavigationState.shared.mainTab = .setting
+                        NavigationState.shared.settingTab = .core
+                        NavigationState.shared.coreSettingTab = .download
+                        MainWindowManager.shared.openMainWindow()
+                    }
+                    await CoreViewModel.shared.downloadMinimumVersion(for: resolved)
+                }
             }
         }
         if !resolved.canLaunch {

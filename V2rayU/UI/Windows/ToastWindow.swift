@@ -102,6 +102,22 @@ func showConfirmAlert(title: String, message: String, confirmTitle: String = Str
     return await presentAlert(alert) == .alertFirstButtonReturn
 }
 
+/// 显示一个带"下载"按钮的兼容性警告对话框
+/// - Returns: 用户是否点击了"下载"按钮
+@MainActor
+func showDownloadAlert(title: String, message: String, downloadTitle: String = String(localized: .DownloadCompatVersion), okTitle: String = String(localized: .OK)) async -> Bool {
+    let alert = NSAlert()
+    if let icon = NSImage(named: "V2rayU") {
+        alert.icon = icon
+    }
+    alert.messageText = title
+    alert.informativeText = message
+    alert.alertStyle = .warning
+    alert.addButton(withTitle: downloadTitle)
+    alert.addButton(withTitle: okTitle)
+    return await presentAlert(alert) == .alertFirstButtonReturn
+}
+
 // MARK: - Toast 通知
 
 /// 全局 Toast 显示函数（主入口）

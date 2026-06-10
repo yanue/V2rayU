@@ -485,6 +485,8 @@
 "CombinationNoAvailableOutbounds" = "组合配置没有可用的出站服务器";
 "XrayCompatibilityWarningTitle" = "Xray 版本兼容性提醒";
 "CoreCompatibilityWarningTitle" = "核心兼容性提醒";
+
+"DownloadCompatVersion" = "下载兼容版本";
 "PacGenerateFailed" = "PAC 生成失败";
 "PacGenerateFailedTip" = "无法生成 proxy.js，PAC 模式可能不会生效";
 "DownloadTimeoutProxy" = "下载超时，请检查网络或代理设置";
