@@ -382,7 +382,7 @@ struct LogAnalyzer {
             var matchIndices = Set<Int>()
             for (index, line) in recentLines.enumerated() {
                 let lowerLine = line.lowercased()
-                let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]") || lowerLine.contains("[info]")
+                let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]")
                 let isErrorPattern = lowerLine.contains("failed") || lowerLine.contains("error") || 
                                     lowerLine.contains("timeout") || lowerLine.contains("reset") || 
                                     lowerLine.contains("denied") || lowerLine.contains("reject")

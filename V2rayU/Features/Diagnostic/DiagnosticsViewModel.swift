@@ -833,12 +833,27 @@ final class DiagnosticsViewModel: ObservableObject {
         let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
         let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
 
-        let ok = problems.isEmpty || (problems.count == 1 && problems[0] == "未发现明显错误")
-        self.logContent = log
+        // Also check TUN logs when in TUN mode
+        var tunProblems: [String] = []
+        var tunLog = ""
+        if appState.runMode == .tun {
+            tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 200, contextLines: 3)
+            let runTunLog = await LogAnalyzer.getSurroundingLog(logPath: runTunLogFilePath, lastLines: 200, contextLines: 3)
+            tunProblems = await LogAnalyzer.analyze(logPath: tunLogFilePath, lastLines: 200)
+            let runTunProblems = await LogAnalyzer.analyze(logPath: runTunLogFilePath, lastLines: 200)
+            tunProblems += runTunProblems
+            if !runTunLog.isEmpty {
+                tunLog += "\n--- run-tun.log ---\n" + runTunLog
+            }
+        }
+
+        let allProblems = problems + tunProblems
+        let ok = allProblems.isEmpty || (allProblems.count == 1 && allProblems[0] == "未发现明显错误")
+        self.logContent = log + (tunLog.isEmpty ? "" : "\n--- TUN logs ---\n" + tunLog)
 
         if ok { return .pass(.logAnalysis) }
         return .fail(.logAnalysis, subtitle: String(localized: .DiagFailed),
-                     problem: problems.joined(separator: "\n"))
+                     problem: allProblems.joined(separator: "\n"))
     }
 
     // MARK: ── Background helper ──
@@ -1117,20 +1132,50 @@ final class DiagnosticsViewModel: ObservableObject {
     }
 
     // MARK: ── Report & Submit ──
-    func generateReport() -> String {
+    func generateReport(coreType: CoreType? = nil, singboxVersion: String = "",
+                        tunLogContent: String = "", runTunLogContent: String = "") -> String {
         let arch = getArch()
+        let sbVersion = singboxVersion.isEmpty ? getSingboxShortVersion() : singboxVersion
+
+        let coreDisplay: String
+        if let ct = coreType {
+            coreDisplay = ct.displayName
+        } else {
+            coreDisplay = "Unknown"
+        }
 
         var report = ""
 
         // ── 1. Environment ──
         report += "## Environment\n"
         report += "- V2rayU: \(appVersion) | macOS: \(osVersion) | Arch: \(arch)\n"
-        report += "- Core: \(coreVersion) | Mode: \(appState.runMode.rawValue) | Status: \(appState.v2rayTurnOn ? "ON" : "OFF")\n"
+        report += "- Running Core: \(coreDisplay) | Xray: \(coreVersion) | Sing-Box: \(sbVersion)\n"
+        report += "- Mode: \(appState.runMode.rawValue) | Status: \(appState.v2rayTurnOn ? "ON" : "OFF")\n"
         report += "- SOCKS: \(localSocksPort) | HTTP: \(localHTTPPort)"
         if appState.latency > 0 { report += " | Latency: \(Int(appState.latency))ms" }
         report += "\n\n"
 
-        // ── 2. Diagnostic Results ──
+        // ── 2. Core Selection (capability rules) ──
+        if let s = appState.runningServer {
+            report += "## Core Selection\n"
+            report += "- Profile Core: \(s.coreType?.rawValue ?? "auto")"
+            let resolved = s.resolveCoreCompatibility()
+            report += " | Resolved: \(resolved.coreType.displayName)"
+            report += " | Launchable: \(resolved.canLaunch ? "YES" : "NO")\n"
+            if let w = resolved.warningMessage {
+                report += "- Warning: \(w)\n"
+            }
+            let blocking = resolved.issues.filter { $0.isBlocking }
+            if !blocking.isEmpty {
+                report += "- Blocking issues: \(blocking.count)\n"
+                for issue in blocking.prefix(3) {
+                    report += "  - \(issue.message)\n"
+                }
+            }
+            report += "\n"
+        }
+
+        // ── 3. Diagnostic Results ──
         report += "## Diagnostic Results (\(passedCount)/\(totalCount) passed)\n"
         for item in items {
             if !item.ok && item.category == .files {
@@ -1142,7 +1187,7 @@ final class DiagnosticsViewModel: ObservableObject {
         }
         report += "\n"
 
-        // ── 3. Node Config ──
+        // ── 4. Node Config ──
         if let s = appState.runningServer {
             report += "## Config\n"
             report += "- Protocol: \(s.protocol.rawValue) | Network: \(s.network.rawValue) | Security: \(s.security.rawValue)\n"
@@ -1156,11 +1201,25 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "\n"
         }
 
-        // ── 4. Error Logs ──
+        // ── 5. Error Logs (core.log) ──
         if !logContent.isEmpty {
             report += "## Error Logs\n```\n"
             report += String(logContent.prefix(3000))
             if logContent.count > 3000 { report += "\n... (truncated)" }
+            report += "\n```\n"
+        }
+
+        // ── 6. TUN Logs (when TUN mode) ──
+        if !runTunLogContent.isEmpty {
+            report += "## Run-TUN Log (launchd stdout/stderr)\n```\n"
+            report += String(runTunLogContent.suffix(2000))
+            if runTunLogContent.count > 2000 { report += "\n... (truncated)" }
+            report += "\n```\n"
+        }
+        if !tunLogContent.isEmpty {
+            report += "## TUN Log (sing-box structured)\n```\n"
+            report += String(tunLogContent.suffix(2000))
+            if tunLogContent.count > 2000 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
 
@@ -1179,7 +1238,22 @@ final class DiagnosticsViewModel: ObservableObject {
     func submitToGitHub() {
         if appState.latency > 0 { return }
         Task {
-            let report = generateReport()
+            // Gather running core info from V2rayLaunch actor
+            let coreType = await V2rayLaunch.shared.lastCore
+            let singboxVer = getSingboxShortVersion()
+
+            // Gather TUN logs when in TUN mode
+            var tunLog = "", runTunLog = ""
+            if appState.runMode == .tun {
+                tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 500, contextLines: 2)
+                // run-tun.log (launchd stderr) 基本全是错误, 全量带上
+                if let raw = try? String(contentsOfFile: runTunLogFilePath, encoding: .utf8), !raw.isEmpty {
+                    runTunLog = raw
+                }
+            }
+
+            let report = generateReport(coreType: coreType, singboxVersion: singboxVer,
+                                        tunLogContent: tunLog, runTunLogContent: runTunLog)
             let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
             let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? title
             let encodedBody = report.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? ""
