@@ -604,7 +604,7 @@ enum XraySupportCatalog {
                 )
             ]
         ),
-        XrayCapabilityDefinition(key: "transport.mkcp", displayName: "mKCP transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表可见。"), docsPath: "/config/transports/mkcp.html"),
+        XrayCapabilityDefinition(key: "transport.mkcp", displayName: "mKCP transport", kind: .transportMethod, rule: .supported(note: "Xray-core v26.2.6 起 mKCP 启动超时/端口不可用，疑似已移除或需要适配。遗留版本和 v26.1.23 及之前的日历版本均正常工作。", removedAt: XrayVersion(26, 2, 6)), docsPath: "/config/transports/mkcp.html"),
         XrayCapabilityDefinition(key: "transport.grpc", displayName: "gRPC transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/grpc.html"),
         XrayCapabilityDefinition(key: "transport.websocket", displayName: "WebSocket transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/websocket.html"),
         XrayCapabilityDefinition(key: "transport.httpupgrade", displayName: "HTTPUpgrade transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表明确列出。"), docsPath: "/config/transports/httpupgrade.html"),

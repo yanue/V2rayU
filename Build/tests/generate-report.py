@@ -401,15 +401,39 @@ tr:hover {{ background: #f8f9ff; }}
     return html
 
 if __name__ == '__main__':
+    import glob as glob_mod
+
+    reports_dir = os.path.join(os.path.dirname(__file__), 'reports')
+
     if len(sys.argv) > 1:
         report_path = sys.argv[1]
     else:
-        report_path = '/Users/yanue/swift/V2rayU/Build/tests/reports/compatibility-report-2026-06-10_001614.json'
+        json_files = sorted(
+            glob_mod.glob(os.path.join(reports_dir, 'compatibility-report-*.json')),
+            key=os.path.getmtime, reverse=True
+        )
+        if not json_files:
+            print("Error: no compatibility-report-*.json found in", reports_dir)
+            sys.exit(1)
+        report_path = json_files[0]
 
-    db_path = '/Users/yanue/.V2rayU/.V2rayU.db'
+    db_path = os.path.expanduser('~/.V2rayU/.V2rayU.db')
 
-    report = load_report(report_path)
-    profiles = get_profiles(db_path)
+    try:
+        report = load_report(report_path)
+    except FileNotFoundError:
+        print(f"Error: report file not found: {report_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error: invalid JSON in report file: {e}")
+        sys.exit(1)
+
+    try:
+        profiles = get_profiles(db_path)
+    except sqlite3.OperationalError as e:
+        print(f"Warning: cannot read profiles from DB ({e}), proceeding without profile data")
+        profiles = {}
+
     html = generate_html(report, profiles)
 
     out_path = report_path.replace('.json', '.html')

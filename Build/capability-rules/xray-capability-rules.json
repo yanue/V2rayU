@@ -322,8 +322,16 @@
       "docs_path": "/config/transports/mkcp.html",
       "rule": {
         "type": "supported",
-        "note": "当前官方 transport 主列表可见。"
-      }
+        "removed_at": "26.2.6",
+        "note": "Xray-core v26.2.6 起 mKCP 启动超时/端口不可用，疑似已移除或需要适配。遗留版本和 v26.1.23 及之前的日历版本均正常工作。"
+      },
+      "evidence": [
+        {
+          "description": "兼容性测试: v26.2.6 及之后 mKCP 端口不可用",
+          "source_url": "",
+          "detail": "全版本测试显示 v1.8.0 到 v26.1.23 均正常，v26.2.6 开始无法启动监听。"
+        }
+      ]
     },
     {
       "key": "transport.grpc",

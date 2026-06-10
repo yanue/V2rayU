@@ -8,17 +8,35 @@ import Testing
 
     @Test("Run full compatibility test matrix")
     func runCompatibilityTest() {
-        let xrayVersions = CompatibilityTestConfig.xrayVersions
-        let singboxVersions = CompatibilityTestConfig.singboxVersions
-
-        guard !xrayVersions.isEmpty || !singboxVersions.isEmpty else {
-            print("SKIP: No test binaries found")
-            return
+        // DIAGNOSTIC: check capability rules status
+        let xrayStatus = CapabilityRulesLoader.status(core: .xray)
+        print("DIAG: Xray capability rules source: \(xrayStatus.sourceKind), path: \(xrayStatus.path ?? "nil"), count: \(xrayStatus.capabilityCount), version: \(xrayStatus.latestReviewedVersion ?? "nil")")
+        if let mkcpDef = XraySupportCatalog.definition(forTransport: .kcp) {
+            print("DIAG: mkcp def key=\(mkcpDef.key) rule=\(mkcpDef.rule.describe())")
+            if let testVersion = XrayVersion("v26.2.6") {
+                if let issue = XraySupportCatalog.evaluate(definition: mkcpDef, version: testVersion) {
+                    print("DIAG: mkcp @ v26.2.6: blocking=\(issue.isBlocking) msg=\(issue.message)")
+                } else {
+                    print("DIAG: mkcp @ v26.2.6: no issue (SUPPORTED)")
+                }
+            } else {
+                print("DIAG: mkcp: failed to parse test version")
+            }
+        } else {
+            print("DIAG: mkcp definition not found!")
         }
 
         let allProfiles = ProfileStore.shared.fetchAll()
         guard !allProfiles.isEmpty else {
             print("SKIP: No profiles found in database")
+            return
+        }
+
+        let xrayVersions = CompatibilityTestConfig.xrayVersions
+        let singboxVersions = CompatibilityTestConfig.singboxVersions
+
+        guard !xrayVersions.isEmpty || !singboxVersions.isEmpty else {
+            print("SKIP: No test binaries found")
             return
         }
 
