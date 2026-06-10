@@ -68,6 +68,15 @@ struct RoutingEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let sort = Column(CodingKeys.sort)
     }
 
+    mutating func trimFields() {
+        remark = remark.trimmingCharacters(in: .whitespacesAndNewlines)
+        domainStrategy = domainStrategy.trimmingCharacters(in: .whitespacesAndNewlines)
+        domainMatcher = domainMatcher.trimmingCharacters(in: .whitespacesAndNewlines)
+        block = block.trimmingCharacters(in: .whitespacesAndNewlines)
+        proxy = proxy.trimmingCharacters(in: .whitespacesAndNewlines)
+        direct = direct.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     // 定义迁移
     static func registerMigrations(in migrator: inout DatabaseMigrator) {
         // 创建表

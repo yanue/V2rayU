@@ -83,6 +83,8 @@ extension SubscriptionEntity {
     func upsert() {
         do {
             var toSave = self
+            toSave.remark = toSave.remark.trimmingCharacters(in: .whitespacesAndNewlines)
+            toSave.url = toSave.url.trimmingCharacters(in: .whitespacesAndNewlines)
             // 如果 updateInterval 为 0，默认设置为 3600
             if toSave.updateInterval == 0 {
                 toSave.updateInterval = 3600

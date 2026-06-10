@@ -173,6 +173,8 @@
 "SyncAllSubscriptionTip" = "立即同步所有订阅";
 "SyncSubscriptionNow" = "立即同步订阅";
 "SyncSubscriptionIng" = "正在同步订阅...";
+"SyncThroughProxy" = "通过代理同步";
+"SyncDirect" = "直连同步";
 
 // MARK: - 路由设置
 "RoutingSettings" = "路由设置";

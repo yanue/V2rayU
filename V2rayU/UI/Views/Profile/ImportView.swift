@@ -620,7 +620,8 @@ struct ImportView: View {
 
     /// 从订阅链接导入（不创建订阅记录，直接导入服务器到默认分组）
     private func importFromSubscription(url: String) {
-        guard let reqUrl = URL(string: url), reqUrl.scheme != nil else {
+        let trimmedUrl = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let reqUrl = URL(string: trimmedUrl), reqUrl.scheme != nil else {
             isImporting = false
             resultMessage = String(localized: .ImportFailedDetail, arguments: "Invalid URL")
             resultIsError = true

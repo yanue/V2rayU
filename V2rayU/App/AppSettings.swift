@@ -185,8 +185,12 @@ final class AppSettings: ObservableObject {
 
     func _save() {
         // 保存到UserDefaults
+        // trim 所有 URL 输入字段
+        pingTestURL = pingTestURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        udpTestURL = udpTestURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        currentConnectionTestURL = currentConnectionTestURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        gfwPacListUrl = gfwPacListUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         UserDefaults.setBool(forKey: .autoCheckVersion, value: checkForUpdates)
-        UserDefaults.setBool(forKey: .autoUpdateServers, value: autoUpdateServers)
         UserDefaults.setBool(forKey: .autoSelectFastestServer, value: selectFastestServer)
         UserDefaults.setBool(forKey: .showSpeedOnTray, value: showSpeedOnTray)
         UserDefaults.setBool(forKey: .showLatencyOnTray, value: showLatencyOnTray)

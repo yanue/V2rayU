@@ -590,9 +590,10 @@ actor LegacyMigrationHandler {
     /// - Parameter uri: 分享链接 URI
     /// - Returns: 解析后的 ProfileEntity，失败返回 nil
     private func importFromUri(uri: String) -> ProfileEntity? {
-        logger.debug("LegacyMigration: Parsing URI: \(uri.prefix(50))...")
+        let trimmed = uri.trimmingCharacters(in: .whitespacesAndNewlines)
+        logger.debug("LegacyMigration: Parsing URI: \(trimmed.prefix(50))...")
 
-        let importUri = ImportUri(share_uri: uri)
+        let importUri = ImportUri(share_uri: trimmed)
 
         if var profile = importUri.doImport() {
             profile.shareUri = uri

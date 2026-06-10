@@ -21,18 +21,34 @@ struct SubscriptionSyncView: View {
                 Text(isAll ? String(localized: .SyncAllSubscriptionTitle) : String(localized: .SyncSubscriptionTitle))
                     .font(.title2).bold()
                 Spacer()
-                Button(isSyncing ? String(localized: .SyncSubscriptionIng) : String(localized: .SyncSubscriptionNow)) {
-                    isSyncing = true
-                    logs.removeAll()
-                    if isAll {
-                        doSyncAll()
-                    } else if let sub = subscription {
-                        doSyncItem(item: sub)
+                if !isSyncing {
+                    Button(String(localized: .SyncThroughProxy)) {
+                        isSyncing = true
+                        logs.removeAll()
+                        if isAll {
+                            doSyncAll(useProxy: true)
+                        } else if let sub = subscription {
+                            doSyncItem(item: sub, useProxy: true)
+                        }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .focusable(false)
+
+                    Button(String(localized: .SyncDirect)) {
+                        isSyncing = true
+                        logs.removeAll()
+                        if isAll {
+                            doSyncAll(useProxy: false)
+                        } else if let sub = subscription {
+                            doSyncItem(item: sub, useProxy: false)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .focusable(false)
+                } else {
+                    Text(String(localized: .SyncSubscriptionIng))
+                        .foregroundColor(.secondary)
                 }
-                .disabled(isSyncing)
-                .buttonStyle(.borderedProminent)
-                .focusable(false)
                 Button(action: onClose) {
                     localized(.Close)
                 }
@@ -92,6 +108,7 @@ struct SubscriptionSyncView: View {
                             }
                         }
                         .padding(.horizontal, 20)
+                        .textSelection(.enabled)
                     }
                     .onAppear { scrollProxy = proxy }
                     .onChange(of: logs) { _,_ in
@@ -147,15 +164,15 @@ struct SubscriptionSyncView: View {
         }
     }
 
-    func doSyncItem(item: SubscriptionEntity) {
+    func doSyncItem(item: SubscriptionEntity, useProxy: Bool = true) {
         Task {
-            await SubscriptionHandler.shared.syncOne(item: item)
+            await SubscriptionHandler.shared.syncOne(item: item, useProxy: useProxy)
         }
     }
 
-    func doSyncAll() {
+    func doSyncAll(useProxy: Bool = true) {
         Task {
-            await SubscriptionHandler.shared.sync()
+            await SubscriptionHandler.shared.sync(useProxy: useProxy)
         }
     }
 }

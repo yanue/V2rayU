@@ -192,6 +192,8 @@ enum LanguageLabel: String, CaseIterable {
     case SyncAllSubscriptionTip
     case SyncSubscriptionNow
     case SyncSubscriptionIng
+    case SyncThroughProxy
+    case SyncDirect
 
     // MARK: - Routing Settings
     case RoutingSettings

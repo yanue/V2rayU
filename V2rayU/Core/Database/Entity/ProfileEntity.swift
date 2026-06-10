@@ -230,6 +230,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         shareUri = shareUri.trimmingCharacters(in: .whitespacesAndNewlines)
         serverIp = serverIp.trimmingCharacters(in: .whitespacesAndNewlines)
         serverRegion = serverRegion.trimmingCharacters(in: .whitespacesAndNewlines)
+        pinnedPeerCertSha256 = pinnedPeerCertSha256.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // 自定义表名
@@ -527,6 +528,13 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
     }
 }
 
+extension CombinedConfigEntity {
+    mutating func trimFields() {
+        remark = remark.trimmingCharacters(in: .whitespacesAndNewlines)
+        balancerStrategy = balancerStrategy.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 struct CombinedConfigStore: StoreProtocol {
     typealias Entity = CombinedConfigEntity
 
@@ -534,6 +542,36 @@ struct CombinedConfigStore: StoreProtocol {
 
     let dbReader: DatabaseReader = AppDatabase.shared.reader
     let dbWriter: DatabaseWriter = AppDatabase.shared.dbWriter
+
+    @discardableResult
+    func upsert(_ entity: Entity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
+        do {
+            try dbWriter.write { db in
+                try trimmed.save(db)
+            }
+            return true
+        } catch {
+            logger.error("CombinedConfigStore.upsert error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func insert(_ entity: Entity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
+        do {
+            try dbWriter.write { db in
+                try trimmed.insert(db)
+            }
+            return true
+        } catch {
+            logger.error("CombinedConfigStore.insert error: \(error)")
+            return false
+        }
+    }
 
     @discardableResult
     func updateSortOrder(_ entities: [CombinedConfigEntity]) -> Bool {

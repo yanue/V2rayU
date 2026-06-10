@@ -13,7 +13,7 @@ actor SubscriptionHandler {
     private var cancellables = Set<AnyCancellable>()
 
     // sync from Subscription list
-    public func sync() {
+    public func sync(useProxy: Bool = true) {
         if SubscriptionHandlering {
             logger.info("SubscriptionHandler Syncing ...")
             return
@@ -28,10 +28,10 @@ actor SubscriptionHandler {
         }
 
         // 开始执行异步任务
-        syncTaskGroup(items: list)
+        syncTaskGroup(items: list, useProxy: useProxy)
     }
 
-    func syncOne(item: SubscriptionEntity) {
+    func syncOne(item: SubscriptionEntity, useProxy: Bool = true) {
         if SubscriptionHandlering {
             logger.info("SubscriptionHandler Syncing ...")
             return
@@ -45,7 +45,7 @@ actor SubscriptionHandler {
                 self.refreshMenu()
             }
             do {
-                try await self.dlFromUrl(url: item.url, sub: item)
+                try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                 logger.info("SubscriptionHandler syncOne success")
                 
                 // 下载成功后更新 updateTime 并保存
@@ -59,13 +59,13 @@ actor SubscriptionHandler {
         }
     }
 
-    private func syncTaskGroup(items: [SubscriptionEntity]) {
+    private func syncTaskGroup(items: [SubscriptionEntity], useProxy: Bool = true) {
         // 使用 Combine 处理多个异步任务
         items.publisher.flatMap(maxPublishers: .max(maxConcurrentTasks)) { item in
             Future<Void, Error> { promise in
                 Task {
                     do {
-                        try await self.dlFromUrl(url: item.url, sub: item)
+                        try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                         // 下载成功后更新 updateTime 并保存
                         var updated = item
                         updated.updateTime = Int(Date().timeIntervalSince1970)
@@ -117,16 +117,17 @@ actor SubscriptionHandler {
         }
     }
 
-    public func dlFromUrl(url: String, sub: SubscriptionEntity) async throws {
-        logTip(title: "loading from : ", uri: "", informativeText: url + "\n\n")
+    public func dlFromUrl(url: String, sub: SubscriptionEntity, useProxy: Bool = true) async throws {
+        let trimmedUrl = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        logTip(title: "loading from : ", uri: "", informativeText: trimmedUrl + "\n\n")
 
-        guard let reqUrl = URL(string: url) else {
-            logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + url + "\n\n")
-            throw NSError(domain: "SubscriptionHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey: "url is not valid: \(url)"])
+        guard let reqUrl = URL(string: trimmedUrl) else {
+            logTip(title: "loading from : ", uri: "", informativeText: "url is not valid: " + trimmedUrl + "\n\n")
+            throw NSError(domain: "SubscriptionHandler", code: 1001, userInfo: [NSLocalizedDescriptionKey: "url is not valid: \(trimmedUrl)"])
         }
 
-        // url request with proxy
-        let session = URLSession(configuration: getProxyUrlSessionConfigure())
+        let configuration: URLSessionConfiguration = useProxy ? getProxyUrlSessionConfigure() : .default
+        let session = URLSession(configuration: configuration)
         do {
             let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
             if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
@@ -143,17 +144,24 @@ actor SubscriptionHandler {
     }
 
     func handle(base64Str: String, sub: SubscriptionEntity, url: String) {
-        guard let strTmp = base64Str.trimmingCharacters(in: .whitespacesAndNewlines).base64Decoded() else {
-            logTip(title: "parse fail : ", uri: "", informativeText: base64Str)
+        let trimmed = base64Str.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Try base64 decode first
+        if let strTmp = trimmed.base64Decoded() {
+            logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
+            if importByYaml(strTmp: strTmp, sub: sub) {
+                return
+            }
+            importByNormal(strTmp: strTmp, sub: sub)
             return
         }
 
-        logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
-
-        if importByYaml(strTmp: strTmp, sub: sub) {
+        // Not valid base64 — try parsing as plain text directly
+        logTip(title: "not base64, try direct parse: ", uri: "", informativeText: url + "\n\n")
+        if importByYaml(strTmp: trimmed, sub: sub) {
             return
         }
-        importByNormal(strTmp: strTmp, sub: sub)
+        importByNormal(strTmp: trimmed, sub: sub)
     }
 
     func getOldCount(sub: SubscriptionEntity) -> Int {

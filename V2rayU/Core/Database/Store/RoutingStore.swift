@@ -18,6 +18,38 @@ struct RoutingStore: StoreProtocol {
     let dbReader: DatabaseReader = AppDatabase.shared.reader
     let dbWriter: DatabaseWriter = AppDatabase.shared.dbWriter
 
+    // MARK: - CRUD
+
+    @discardableResult
+    func upsert(_ entity: Entity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
+        do {
+            try dbWriter.write { db in
+                try trimmed.save(db)
+            }
+            return true
+        } catch {
+            logger.error("RoutingStore.upsert error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func insert(_ entity: Entity) -> Bool {
+        var trimmed = entity
+        trimmed.trimFields()
+        do {
+            try dbWriter.write { db in
+                try trimmed.insert(db)
+            }
+            return true
+        } catch {
+            logger.error("RoutingStore.insert error: \(error)")
+            return false
+        }
+    }
+
     // MARK: - Sort
     @discardableResult
     func updateSortOrder(_ entities: [Entity]) -> Bool {

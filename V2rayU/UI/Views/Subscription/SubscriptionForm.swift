@@ -106,7 +106,8 @@ struct SubscriptionFormView: View {
                 }
                 .focusable(false)
                 Button(String(localized: .Save)) {
-                    // updateInterval 已经在 Binding 中转换为秒
+                    // trim URL 避免首尾空白导致解析失败
+                    item.url = item.url.trimmingCharacters(in: .whitespacesAndNewlines)
                     Task {
                         item.entity.upsert()
                         if let callback = onSaveAndSync {

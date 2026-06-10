@@ -124,11 +124,12 @@ struct PacView: View {
     }
 
     func UpdatePACFromGFWList(gfwPacListUrl: String) {
+        let trimmedUrl = gfwPacListUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         if !FileManager.default.fileExists(atPath: PACRulesDirPath) {
             try? FileManager.default.createDirectory(atPath: PACRulesDirPath, withIntermediateDirectories: true)
         }
 
-        guard let reqUrl = URL(string: gfwPacListUrl) else {
+        guard let reqUrl = URL(string: trimmedUrl) else {
             DispatchQueue.main.async {
                 self.tips = String(localized: .InvalidGfwUrl)
                 self.showAlert = true
@@ -184,6 +185,7 @@ struct PacView: View {
     }
 
     func tryDownloadByShell(gfwPacListUrl: String) {
+        let trimmedUrl = gfwPacListUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         let sockPort = getEffectiveSocksProxyPort()
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
@@ -193,7 +195,7 @@ struct PacView: View {
             "--location",
             "--output", "gfwlist.txt",
             "--proxy", "socks5://127.0.0.1:\(sockPort)",
-            gfwPacListUrl,
+            trimmedUrl,
         ]
 
         let pipe = Pipe()

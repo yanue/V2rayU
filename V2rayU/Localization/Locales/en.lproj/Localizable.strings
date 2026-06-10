@@ -172,6 +172,8 @@
 "SyncAllSubscriptionTip" = "Sync all subscriptions now";
 "SyncSubscriptionNow" = "Sync subscription now";
 "SyncSubscriptionIng" = "Syncing subscriptions...";
+"SyncThroughProxy" = "Sync through proxy";
+"SyncDirect" = "Sync directly";
 
 // MARK: - Routing Settings
 "RoutingSettings" = "Routing Settings";
