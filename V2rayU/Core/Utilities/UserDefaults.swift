@@ -71,6 +71,8 @@ extension UserDefaults {
         case gfwPacListUrl
         // capability rules remote base url
         case capabilityRulesBaseURL
+        // capability rules last successful update date (yyyy-MM-dd)
+        case capabilityRulesUpdateDate
 
         // MARK: - Test settings
         case latencyTestConcurrency

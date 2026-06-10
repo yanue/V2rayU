@@ -19,12 +19,10 @@ class MainWindowManager {
     public func openMainWindow() {
         // 1. 切回常规模式（显示 Dock 图标、主菜单）
         NSApp.setActivationPolicy(.regular)
-        // 2. 激活应用，确保接收键盘事件
-        NSApp.activate(ignoringOtherApps: true)
 
-        // 3. 如果还没创建 windowController，就初始化
+        // 2. 如果还没创建 windowController，就初始化
         if windowController == nil {
-            // 3.1 构建 SwiftUI 内容视图
+            // 2.1 构建 SwiftUI 内容视图
             let contentView = ContentView()
                 .environment(\.locale, LanguageManager.shared.currentLocale)
             let hostingVC = NSHostingController(rootView: contentView)
@@ -34,7 +32,7 @@ class MainWindowManager {
                 hostingVC.sizingOptions = []
             }
 
-            // 3.2 初始化自定义窗口
+            // 2.2 初始化自定义窗口
             let window = BaseWindow(
                 contentRect: .zero,
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -42,10 +40,10 @@ class MainWindowManager {
                 defer: false
             )
 
-            // 3.3 关键：设置代理，触发 windowWillClose 等
+            // 2.3 关键：设置代理，触发 windowWillClose 等
             window.delegate = window
 
-            // 3.4 配置窗口内容和大小
+            // 2.4 配置窗口内容和大小
             window.contentViewController = hostingVC
             window.setContentSize(NSSize(width: 760, height: 600))
             window.contentMinSize = NSSize(width: 760, height: 600)
@@ -54,13 +52,16 @@ class MainWindowManager {
             window.center()
             window.isReleasedWhenClosed = false
 
-            // 3.5 包装成 NSWindowController
+            // 2.5 包装成 NSWindowController
             windowController = NSWindowController(window: window)
         }
 
-        // 4. 显示并确保成为 key window
+        // 3. 显示窗口
         windowController?.showWindow(nil)
-        if let win = windowController?.window {
+        // 4. 延迟激活与置前，确保菜单 tracking 结束后窗口能正确弹出
+        DispatchQueue.main.async { [weak self] in
+            guard let win = self?.windowController?.window else { return }
+            NSApp.activate(ignoringOtherApps: true)
             win.makeKeyAndOrderFront(nil)
         }
     }

@@ -327,9 +327,16 @@
       },
       "evidence": [
         {
-          "description": "兼容性测试: v26.2.6 及之后 mKCP 端口不可用",
+          "id": "transport.mkcp.compatibility",
+          "kind": "compatibility_test",
+          "statement": "兼容性测试: v26.2.6 及之后 mKCP 端口不可用",
+          "source_title": "",
           "source_url": "",
-          "detail": "全版本测试显示 v1.8.0 到 v26.1.23 均正常，v26.2.6 开始无法启动监听。"
+          "source_version": null,
+          "source_date": "2026-06-10",
+          "quote": "",
+          "reviewed_at": null,
+          "note": "全版本测试显示 v1.8.0 到 v26.1.23 均正常，v26.2.6 开始无法启动监听。"
         }
       ]
     },

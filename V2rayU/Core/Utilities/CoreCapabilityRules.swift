@@ -194,8 +194,56 @@ enum CapabilityRulesLoader {
     private static let primaryOverrideDirectoryName = "capability-rules"
     private static let supportedSchemaVersions: Set<Int> = [1, 2, 3, 4]
 
+    private static nonisolated(unsafe) var cache: [CapabilityRulesCore: (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)] = [:]
+
     static func load(core: CapabilityRulesCore) -> CapabilityRulesDocument? {
         loadDetailed(core: core)?.document
+    }
+
+    static func invalidateCache() {
+        cache = [:]
+    }
+
+    /// 首次启动时把 bundle 内的 rules 拷贝到 ~/.V2rayU/capability-rules/
+    /// 保证重装或清空目录后也有初始副本，避免旧版损坏文件阻塞 bundle fallback
+    static func seedOverrideIfNeeded() {
+        let fm = FileManager.default
+        let overrideDir = URL(fileURLWithPath: overrideDirectoryPath(), isDirectory: true)
+        guard !fm.fileExists(atPath: overrideDir.path) else { return }
+        guard let bundleDir = Bundle.main.url(forResource: "capability-rules", withExtension: nil) else { return }
+
+        do {
+            try fm.createDirectory(at: overrideDir, withIntermediateDirectories: true)
+            let items = try fm.contentsOfDirectory(at: bundleDir, includingPropertiesForKeys: nil)
+            for item in items where item.pathExtension == "json" {
+                let dest = overrideDir.appendingPathComponent(item.lastPathComponent)
+                try fm.copyItem(at: item, to: dest)
+            }
+            logger.info("capability rules seeded to \(overrideDir.path)")
+        } catch {
+            logger.warning("capability rules seed failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// 启动时检查更新，7 天内只检查一次
+    static func checkForUpdatesIfNeeded() {
+        let autoInterval: TimeInterval = 24 * 3600
+        let lastUpdate = UserDefaults.standard.double(forKey: UserDefaults.KEY.capabilityRulesUpdateDate.rawValue)
+        let elapsed = Date.now.timeIntervalSince1970 - lastUpdate
+        guard lastUpdate == 0 || elapsed > autoInterval else { return }
+
+        Task {
+            let trimmed = UserDefaults.get(forKey: .capabilityRulesBaseURL, defaultValue: defaultCapabilityRulesBaseURL)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let baseURL = trimmed.isEmpty ? defaultCapabilityRulesBaseURL : trimmed
+            do {
+                _ = try await updateFromRemote(baseURL: baseURL)
+                UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: UserDefaults.KEY.capabilityRulesUpdateDate.rawValue)
+                logger.info("capability rules auto-updated from \(baseURL)")
+            } catch {
+                logger.warning("capability rules auto-update failed: \(error.localizedDescription)")
+            }
+        }
     }
 
     static func status(core: CapabilityRulesCore) -> CapabilityRulesStatusSnapshot {
@@ -253,6 +301,8 @@ enum CapabilityRulesLoader {
             options: .atomic
         )
 
+        invalidateCache()
+        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: UserDefaults.KEY.capabilityRulesUpdateDate.rawValue)
         return CapabilityRulesUpdateResult(
             targetDirectory: targetDirectory.path,
             xrayCapabilityCount: xray.document.capabilities.count,
@@ -261,6 +311,9 @@ enum CapabilityRulesLoader {
     }
 
     private static func loadDetailed(core: CapabilityRulesCore) -> (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)? {
+        if let cached = cache[core] {
+            return cached
+        }
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         for candidate in candidateURLs(for: core) {
@@ -274,7 +327,9 @@ enum CapabilityRulesLoader {
                     logger.warning("capability rules invalid: \(candidate.url.path)")
                     continue
                 }
-                return (document, candidate.url, candidate.sourceKind)
+                let result = (document, candidate.url, candidate.sourceKind)
+                cache[core] = result
+                return result
             } catch {
                 logger.warning("capability rules load failed: \(candidate.url.path) error=\(error.localizedDescription)")
             }

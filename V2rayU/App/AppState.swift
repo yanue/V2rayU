@@ -312,6 +312,13 @@ final class AppState: ObservableObject {
                 AppMenuManager.shared.versionController.checkForUpdates(showWindow: false)
             }
         }
+
+        // 首次启动时拷贝 bundle rules 到 ~/.V2rayU/capability-rules/
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+            CapabilityRulesLoader.seedOverrideIfNeeded()
+            // 检查远程更新（1 天一次）
+            CapabilityRulesLoader.checkForUpdatesIfNeeded()
+        }
     }
 
     // MARK: - 菜单栏 Toggle
