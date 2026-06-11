@@ -231,13 +231,8 @@ class VlessUri: BaseShareUri {
             self.profile.sni = host
         }
 
-        switch self.profile.security {
-        case .reality: // reality
-            self.profile.publicKey = query.getString(forKey: "pbk", defaultValue: "")
-            self.profile.shortId = query.getString(forKey: "sid", defaultValue: "")
-        default:
-            break
-        }
+        self.profile.publicKey = query.getString(forKey: "pbk", defaultValue: self.profile.publicKey)
+        self.profile.shortId = query.getString(forKey: "sid", defaultValue: self.profile.shortId)
 
         self.profile.remark = (url.fragment ?? "vless").urlDecoded()
 
@@ -293,8 +288,10 @@ class VlessUri: BaseShareUri {
             } else if v == "h2" {
                 self.profile.network = .h2
             } else if v == "http" {
-                self.profile.network = .tcp
-                self.profile.headerType = .http
+             // vless的h2分享是: obfs=http, 而tcp的http路径也是 obfs=http
+             self.profile.network = .h2
+            }  else if v == "xhttp" {
+               self.profile.network = .xhttp
             } else if v == "grpc" {
                 self.profile.network = .grpc
             } else if v == "domainsocket" {
@@ -312,11 +309,11 @@ class VlessUri: BaseShareUri {
                 self.profile.remark = remarks.urlDecoded()
             }
 
-            // 解析 shadowrocket 的 obfsParam 参数: ws/h2 host
+            // 解析 shadowrocket 的 obfsParam 参数: ws/h2/xhttp host
             let obfsParam = query.getString(forKey: "obfsParam")
             if !obfsParam.isEmpty {
-                // 这里是 ws,h2 的 host
-                if self.profile.network == .ws || self.profile.network == .h2 {
+                // 这里是 ws,h2,xhttp 的 host
+                if self.profile.network == .ws || self.profile.network == .h2 || self.profile.network == .xhttp {
                     self.profile.host = obfsParam
                 }
                 // kcp seed 兼容

@@ -113,75 +113,75 @@ class TrojanUri: BaseShareUri {
         if url.absoluteString.contains("trojan://%3A") {
             // 去掉前面的 %3A,即:
             profile.password = password.replacingOccurrences(of: "%3A", with: "").replacingOccurrences(of: ":", with: "")
-             // 以下是 shadowrocket 的分享参数:
-            // 方式1: peer=sni.xx.xx&obfs=grpc&obfsParam=hjfjkdkdi&path=tekdjjd#yanue-trojan1
-            // 方式2: ?peer=sni.xx.xx&plugin=obfs-local;obfs=websocket;obfs-host=%7B%22Host%22:%22hjfjkdkdi%22%7D;obfs-uri=tekdjjd#trojan3
-            let peer = query.getString(forKey: "peer", defaultValue: "")
-            if peer.count > 0 {
-                profile.sni = peer
+        }
+        // 以下是 shadowrocket 的分享参数:
+        // 方式1: peer=sni.xx.xx&obfs=grpc&obfsParam=hjfjkdkdi&path=tekdjjd#yanue-trojan1
+        // 方式2: ?peer=sni.xx.xx&plugin=obfs-local;obfs=websocket;obfs-host=%7B%22Host%22:%22hjfjkdkdi%22%7D;obfs-uri=tekdjjd#trojan3
+        let peer = query.getString(forKey: "peer", defaultValue: "")
+        if peer.count > 0 {
+            profile.sni = peer
+        }
+        let obfs = query.getString(forKey: "obfs", defaultValue: "")
+        // 方式1: 以obfs方式
+        if obfs.count > 0 {
+            // 这里是 obfs 的参数
+            if obfs == "grpc" {
+                profile.network = .grpc
+            } else if obfs == "websocket" || obfs == "ws" {
+                profile.network = .ws
+            } else if obfs == "h2" {
+                profile.network = .h2
+            } else {
+                profile.network = .tcp
             }
-            let obfs = query.getString(forKey: "obfs", defaultValue: "")
-            // 方式1: 以obfs方式
-            if obfs.count > 0 {
-                // 这里是 obfs 的参数
-                if obfs == "grpc" {
-                    profile.network = .grpc
-                } else if obfs == "websocket" || obfs == "ws" {
-                    profile.network = .ws
-                } else if obfs == "h2" {
-                    profile.network = .h2
-                } else {
-                    profile.network = .tcp
+        }
+        let obfsParam = query.getString(forKey: "obfs-uri", defaultValue: "")
+        if  obfsParam.count > 0 {
+            // 这里是 obfsParam 的参数,即 host
+            profile.host = obfsParam
+        }
+        let path = query.getString(forKey: "path", defaultValue: "")
+        if path .count > 0 {
+            // 这里是 obfsParam 的参数,即 path
+            profile.path = path
+        }
+        // 方式2: 以 plugin 方式
+        let plugin = query.getString(forKey: "plugin", defaultValue: "")
+        if plugin.count > 0 {
+            // 这里是 plugin 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
+            // 按 ; 分割
+            let plugins = plugin.components(separatedBy: ";")
+            for plugin in plugins {
+                let pluginParts = plugin.components(separatedBy: "=")
+                if pluginParts.count < 2 {
+                    continue
                 }
-            }
-            let obfsParam = query.getString(forKey: "obfs-uri", defaultValue: "")
-            if  obfsParam.count > 0 {
-                // 这里是 obfsParam 的参数,即 host
-                profile.host = obfsParam
-            }
-            let path = query.getString(forKey: "path", defaultValue: "")
-            if path .count > 0 {
-                // 这里是 obfsParam 的参数,即 path
-                profile.path = path
-            }
-            // 方式2: 以 plugin 方式
-            let plugin = query.getString(forKey: "plugin", defaultValue: "")
-            if plugin.count > 0 {
-                // 这里是 plugin 的参数: obfs-local;obfs=websocket;obfs-host={"Host":"hjfjkdkdi"};obfs-uri=tekdjjd
-                // 按 ; 分割
-                let plugins = plugin.components(separatedBy: ";")
-                for plugin in plugins {
-                    let pluginParts = plugin.components(separatedBy: "=")
-                    if pluginParts.count < 2 {
-                        continue
+                switch pluginParts[0] {
+                case "obfs":
+                    // 这里是 ws 的
+                    if pluginParts[1] == "websocket" || pluginParts[1] == "ws" {
+                        profile.network = .ws
+                    } else if pluginParts[1] == "h2" {
+                        profile.network = .h2
+                    } else if pluginParts[1] == "grpc" {
+                        profile.network = .grpc
+                    } else {
+                        profile.network = .tcp
                     }
-                    switch pluginParts[0] {
-                    case "obfs":
-                        // 这里是 ws 的
-                        if pluginParts[1] == "websocket" || pluginParts[1] == "ws" {
-                            profile.network = .ws
-                        } else if pluginParts[1] == "h2" {
-                            profile.network = .h2
-                        } else if pluginParts[1] == "grpc" {
-                            profile.network = .grpc
-                        } else {
-                            profile.network = .tcp
+                case "obfs-host":
+                    // 这里是 ws,h2 的 host: {"Host":"hjfjkdkdi"}
+                    if let hostValue = pluginParts[1].removingPercentEncoding,let data = hostValue.data(using: .utf8) {
+                        // 解析 JSON 字典:  {"Host":"hjfjkdkdi"}
+                        if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String],
+                           let host = json["Host"] {
+                            profile.host = host
                         }
-                    case "obfs-host":
-                        // 这里是 ws,h2 的 host: {"Host":"hjfjkdkdi"}
-                        if let hostValue = pluginParts[1].removingPercentEncoding,let data = hostValue.data(using: .utf8) {
-                            // 解析 JSON 字典:  {"Host":"hjfjkdkdi"}
-                            if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String],
-                               let host = json["Host"] {
-                                profile.host = host
-                            }
-                        }
-                    case "obfs-uri":
-                        // 这里是 ws,h2 的 path
-                        profile.path = pluginParts[1]
-                    default:
-                        break
                     }
+                case "obfs-uri":
+                    // 这里是 ws,h2 的 path
+                    profile.path = pluginParts[1]
+                default:
+                    break
                 }
             }
         }

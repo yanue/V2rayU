@@ -7,23 +7,32 @@ import Cocoa
 
 func importUri(url: String) {
     let urls = url.split(separator: "\n")
+    var successCount = 0
+    var failCount = 0
 
     for url in urls {
         let uri = url.trimmingCharacters(in: .whitespaces)
 
         if uri.count == 0 {
-            noticeTip(title: "import server fail", informativeText: "import error: uri not found")
             continue
         }
 
         let importUri = ImportUri(share_uri: uri)
 
         if let profile = importUri.doImport() {
-            // 保存到数据库
             ProfileStore.shared.insert(profile)
-            continue
+            successCount += 1
         } else {
             noticeTip(title: "import server fail", informativeText: importUri.error)
+            failCount += 1
+        }
+    }
+
+    if successCount > 0 {
+        if successCount == 1 {
+            noticeTip(title: "import server success", informativeText: "Successfully imported 1 server")
+        } else {
+            noticeTip(title: "import server success", informativeText: "Successfully imported \(successCount) servers")
         }
     }
 }

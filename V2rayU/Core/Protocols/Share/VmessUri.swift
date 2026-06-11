@@ -254,6 +254,16 @@ class VmessUri: BaseShareUri {
 
         // 以下是 shadowrocket 的分享参数:
         // remarks=vmess_ws&obfsParam=ws.host.domain&path=/vmwss&obfs=websocket&tls=1&peer=ws.sni.domain&alterId=64
+        // shadowrocket: peer 参数优先于 sni
+        let peer = query.getString(forKey: "peer")
+        if !peer.isEmpty {
+            profile.sni = peer
+        }
+        // shadowrocket: remarks
+        let remarksParam = query.getString(forKey: "remarks")
+        if !remarksParam.isEmpty {
+            self.profile.remark = remarksParam.urlDecoded()
+        }
         let obfs = query.getString(forKey: "obfs")
         if !obfs.isEmpty {
             let v = obfs.lowercased()
