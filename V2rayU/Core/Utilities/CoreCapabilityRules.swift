@@ -194,15 +194,17 @@ enum CapabilityRulesLoader {
     private static let primaryOverrideDirectoryName = "capability-rules"
     private static let supportedSchemaVersions: Set<Int> = [1, 2, 3, 4]
 
-    // load + 定期更新模式: 首次 populate 后只读, 仅显式更新时 invalidate, 无需锁
+    // 多线程安全: PingAll 并发调用 loadDetailed，用 NSLock 保护 cache 避免 Dictionary 数据竞争
+    private static let cacheLock = NSLock()
     private static nonisolated(unsafe) var cache: [CapabilityRulesCore: (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)] = [:]
 
     static func load(core: CapabilityRulesCore) -> CapabilityRulesDocument? {
         loadDetailed(core: core)?.document
     }
 
+    // 远程更新后清空 cache，保证下次读取拿到新文件
     static func invalidateCache() {
-        cache = [:]
+        cacheLock.withLock { cache = [:] }
     }
 
     /// 首次启动时把 bundle 内的 rules 拷贝到 ~/.V2rayU/capability-rules/
@@ -312,9 +314,11 @@ enum CapabilityRulesLoader {
     }
 
     private static func loadDetailed(core: CapabilityRulesCore) -> (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)? {
-        if let cached = cache[core] {
+        // 持锁读取 cache，避免与 invalidateCache 或其他并发读写的竞争
+        if let cached = cacheLock.withLock({ cache[core] }) {
             return cached
         }
+
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         for candidate in candidateURLs(for: core) {
@@ -329,7 +333,7 @@ enum CapabilityRulesLoader {
                     continue
                 }
                 let result = (document, candidate.url, candidate.sourceKind)
-                cache[core] = result
+                cacheLock.withLock { cache[core] = result } // 持锁写入 cache
                 return result
             } catch {
                 logger.warning("capability rules load failed: \(candidate.url.path) error=\(error.localizedDescription)")
