@@ -1235,19 +1235,9 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "\n```\n"
         }
 
-        // ── 8. TUN Config (template) ──
-        report += "## TUN Config Template\n```\n"
-        report += """
-TUN mode forwards all traffic through sing-box:
-  inbound: tun → outbound: socks(127.0.0.1:<socks_port>) → proxy(outbound config above)
-
-Key TUN fields (varies by setup):
-  stack: system|gvisor|mixed
-  mtu: 1500
-  strict_route: true|false
-  dns: local/remote resolver
-  route.rules: sniff / bypass core processes
-"""
+        // ── 8. TUN Config (please copy tun.json content) ──
+        report += "## TUN Config\n```\n"
+        report += "请复制 ~/.V2rayU/tun.json 的内容粘贴到此\n"
         report += "```\n"
 
         return report
