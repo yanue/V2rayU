@@ -13,6 +13,9 @@ private nonisolated(unsafe) var cachedCoreVersion: String?
 private let singboxVersionCacheLock = NSLock()
 private nonisolated(unsafe) var cachedSingboxVersion: String?
 
+// Test override: set this to simulate a specific sing-box version for testing
+nonisolated(unsafe) var testSingboxVersionOverride: String?
+
 func getArch() -> String {
     #if arch(arm64)
         return "arm64"
@@ -94,6 +97,10 @@ func getSingboxShortVersion(refresh: Bool = false) -> String {
 }
 
 func getSingboxVersion(refresh: Bool = false) -> String {
+    if let override = testSingboxVersionOverride {
+        return override
+    }
+
     singboxVersionCacheLock.lock()
     if !refresh, let cachedSingboxVersion {
         singboxVersionCacheLock.unlock()
