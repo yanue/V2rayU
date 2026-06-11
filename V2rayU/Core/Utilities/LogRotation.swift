@@ -97,36 +97,37 @@ struct LogRotation {
         logger.info("Extracted \(errorLines.count) error lines to \(destPath)")
     }
     
-    static func getLogFiles() -> [(name: String, path: String, size: Int64)] {
-        var files: [(name: String, path: String, size: Int64)] = []
-        
-        let allFiles = [
-            (name: "当前日志", path: coreLogFilePath),
-            (name: "异常日志", path: recentErrorLogFilePath),
-            (name: "TUN日志", path: tunLogFilePath),
-            (name: "TUN启动日志", path: runTunLogFilePath)
-        ]
-        
-        for (name, path) in allFiles {
-            if FileManager.default.fileExists(atPath: path),
-               let attrs = try? FileManager.default.attributesOfItem(atPath: path),
-               let size = attrs[.size] as? Int64 {
-                files.append((name: name, path: path, size: size))
-            }
+    /// 按 session 轮转: 将当前日志 rename → <path>.YYYYMMDD-HHmmss, 创建新空文件
+    static func rotateSessionLog(at path: String) {
+        guard FileManager.default.fileExists(atPath: path),
+              let attrs = try? FileManager.default.attributesOfItem(atPath: path),
+              let size = attrs[.size] as? Int64, size > 0 else {
+            // 文件不存在或为空则不用备份
+            return
         }
-        
-        for i in 1...maxBackupCount {
-            let backupPath = "\(coreLogFilePath).\(i)"
-            if FileManager.default.fileExists(atPath: backupPath),
-               let attrs = try? FileManager.default.attributesOfItem(atPath: backupPath),
-               let size = attrs[.size] as? Int64 {
-                files.append((name: "备份 \(i)", path: backupPath, size: size))
-            }
-        }
-        
-        return files
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd-HHmmss"
+        let backupPath = "\(path).\(df.string(from: Date()))"
+        try? FileManager.default.moveItem(atPath: path, toPath: backupPath)
+        FileManager.default.createFile(atPath: path, contents: nil)
     }
-    
+
+    /// 清理 session 轮转备份 (保留最近 maxBackupCount 个)
+    static func cleanSessionBackups(at path: String) {
+        let dir = (path as NSString).deletingLastPathComponent
+        let base = (path as NSString).lastPathComponent
+        guard let files = try? FileManager.default.contentsOfDirectory(atPath: dir) else { return }
+        let backups = files
+            .filter { $0.hasPrefix(base + ".") }
+            .filter { $0.count > base.count + 1 } // core.log. 略过 core.log 自身
+            .sorted(by: >) // 按文件名倒序 (最新在前)
+        if backups.count > maxBackupCount {
+            for name in backups[maxBackupCount...] {
+                try? FileManager.default.removeItem(atPath: (dir as NSString).appendingPathComponent(name))
+            }
+        }
+    }
+
     static func clearAllLogs() {
         // 所有日志文件现在都在用户目录下，直接清空
         let userPaths = [coreLogFilePath, recentErrorLogFilePath, tunLogFilePath, runTunLogFilePath]
@@ -140,7 +141,68 @@ struct LogRotation {
             let backupPath = "\(coreLogFilePath).\(i)"
             try? FileManager.default.removeItem(atPath: backupPath)
         }
-        
+
+        // 清理 session 备份文件
+        for path in [coreLogFilePath, tunLogFilePath, runTunLogFilePath] {
+            let dir = (path as NSString).deletingLastPathComponent
+            let base = (path as NSString).lastPathComponent
+            guard let files = try? FileManager.default.contentsOfDirectory(atPath: dir) else { continue }
+            let sessionBackups = files.filter { $0.hasPrefix(base + ".") && $0.count > base.count + 1 }
+            for name in sessionBackups {
+                try? FileManager.default.removeItem(atPath: (dir as NSString).appendingPathComponent(name))
+            }
+        }
+
         logger.info("All logs cleared")
+    }
+
+    /// 获取当前日志文件列表（含 session 备份）
+    static func getLogFiles() -> [(name: String, path: String, size: Int64)] {
+        var files: [(name: String, path: String, size: Int64)] = []
+
+        let allFiles = [
+            (name: "当前日志", path: coreLogFilePath),
+            (name: "异常日志", path: recentErrorLogFilePath),
+            (name: "TUN日志", path: tunLogFilePath),
+            (name: "TUN启动日志", path: runTunLogFilePath)
+        ]
+
+        for (name, path) in allFiles {
+            if FileManager.default.fileExists(atPath: path),
+               let attrs = try? FileManager.default.attributesOfItem(atPath: path),
+               let size = attrs[.size] as? Int64 {
+                files.append((name: name, path: path, size: size))
+            }
+        }
+
+        for i in 1...maxBackupCount {
+            let backupPath = "\(coreLogFilePath).\(i)"
+            if FileManager.default.fileExists(atPath: backupPath),
+               let attrs = try? FileManager.default.attributesOfItem(atPath: backupPath),
+               let size = attrs[.size] as? Int64 {
+                files.append((name: "备份 \(i)", path: backupPath, size: size))
+            }
+        }
+
+        // session 备份
+        let sessionPaths = [
+            (name: "Session 备份", path: coreLogFilePath),
+            (name: "TUN Session 备份", path: tunLogFilePath),
+            (name: "TUN 启动 Session 备份", path: runTunLogFilePath),
+        ]
+        for (_, path) in sessionPaths {
+            let dir = (path as NSString).deletingLastPathComponent
+            let base = (path as NSString).lastPathComponent
+            guard let entries = try? FileManager.default.contentsOfDirectory(atPath: dir) else { continue }
+            for entry in entries where entry.hasPrefix(base + ".") && entry.count > base.count + 1 {
+                let full = (dir as NSString).appendingPathComponent(entry)
+                if let attrs = try? FileManager.default.attributesOfItem(atPath: full),
+                   let size = attrs[.size] as? Int64 {
+                    files.append((name: entry, path: full, size: size))
+                }
+            }
+        }
+
+        return files
     }
 }

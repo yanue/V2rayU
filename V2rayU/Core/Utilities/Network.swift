@@ -323,11 +323,11 @@ struct LogAnalyzer {
         let lineNumber: Int
     }
     
-    static func analyze(logPath: String, lastLines: Int = 500) async -> [String] {
+    static func analyze(logPath: String, lastLines: Int = 500, firstLines: Int? = nil) async -> [String] {
         return await Task.detached(priority: .userInitiated) {
             guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
             let lines = content.components(separatedBy: .newlines)
-            let recentLines = Array(lines.suffix(lastLines))
+            let recentLines = firstLines.map { Array(lines.prefix($0)) } ?? Array(lines.suffix(lastLines))
             
             var problems: [String] = []
             var addedMessages: Set<String> = []
@@ -372,11 +372,11 @@ struct LogAnalyzer {
         }.value
     }
     
-    static func getSurroundingLog(logPath: String, lastLines: Int = 500, contextLines: Int = 3) async -> String {
+    static func getSurroundingLog(logPath: String, lastLines: Int = 500, firstLines: Int? = nil, contextLines: Int = 3) async -> String {
         await Task.detached(priority: .userInitiated) {
             guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return "" }
             let lines = content.components(separatedBy: .newlines)
-            let recentLines = Array(lines.suffix(lastLines))
+            let recentLines = firstLines.map { Array(lines.prefix($0)) } ?? Array(lines.suffix(lastLines))
             
             // collect all matching line indices
             var matchIndices = Set<Int>()

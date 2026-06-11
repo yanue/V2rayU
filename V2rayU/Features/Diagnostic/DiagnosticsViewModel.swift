@@ -830,16 +830,16 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: ── Log Check ──
 
     private func checkLogAnalysis() async -> CheckResult {
-        let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 500)
-        let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 500, contextLines: 3)
+        let problems = await LogAnalyzer.analyze(logPath: logPath, firstLines: 100)
+        let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, firstLines: 100, contextLines: 3)
 
         // Also check TUN logs when in TUN mode
         var tunProblems: [String] = []
         var tunLog = ""
         if appState.runMode == .tun {
-            tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 200, contextLines: 3)
+            tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, firstLines: 100, contextLines: 3)
             let runTunLog = await LogAnalyzer.getSurroundingLog(logPath: runTunLogFilePath, lastLines: 200, contextLines: 3)
-            tunProblems = await LogAnalyzer.analyze(logPath: tunLogFilePath, lastLines: 200)
+            tunProblems = await LogAnalyzer.analyze(logPath: tunLogFilePath, firstLines: 100)
             let runTunProblems = await LogAnalyzer.analyze(logPath: runTunLogFilePath, lastLines: 200)
             tunProblems += runTunProblems
             if !runTunLog.isEmpty {
@@ -1133,7 +1133,8 @@ final class DiagnosticsViewModel: ObservableObject {
 
     // MARK: ── Report & Submit ──
     func generateReport(coreType: CoreType? = nil, singboxVersion: String = "",
-                        tunLogContent: String = "", runTunLogContent: String = "") -> String {
+                        tunLogContent: String = "", runTunLogContent: String = "",
+                        outboundConfig: String = "") -> String {
         let arch = getArch()
         let sbVersion = singboxVersion.isEmpty ? getSingboxShortVersion() : singboxVersion
 
@@ -1201,27 +1202,53 @@ final class DiagnosticsViewModel: ObservableObject {
             report += "\n"
         }
 
-        // ── 5. Error Logs (core.log) ──
-        if !logContent.isEmpty {
-            report += "## Error Logs\n```\n"
-            report += String(logContent.prefix(3000))
-            if logContent.count > 3000 { report += "\n... (truncated)" }
+        // ── 5. Outbound Config (masked) ──
+        if !outboundConfig.isEmpty {
+            report += "## Outbound Config\n```json\n"
+            report += String(outboundConfig.prefix(1500))
+            if outboundConfig.count > 1500 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
 
-        // ── 6. TUN Logs (when TUN mode) ──
+        // ── 6. Error Logs (core.log) ──
+        if !logContent.isEmpty {
+            let deduped = deduplicateLogLines(logContent)
+            report += "## Error Logs\n```\n"
+            report += String(deduped.prefix(1500))
+            if deduped.count > 1500 { report += "\n... (truncated)" }
+            report += "\n```\n"
+        }
+
+        // ── 7. TUN Logs (when TUN mode) ──
         if !runTunLogContent.isEmpty {
+            let deduped = deduplicateLogLines(runTunLogContent)
             report += "## Run-TUN Log (launchd stdout/stderr)\n```\n"
-            report += String(runTunLogContent.prefix(2000))
-            if runTunLogContent.count > 2000 { report += "\n... (truncated)" }
+            report += String(deduped.suffix(1000))
+            if deduped.count > 1000 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
         if !tunLogContent.isEmpty {
+            let deduped = deduplicateLogLines(tunLogContent)
             report += "## TUN Log (sing-box structured)\n```\n"
-            report += String(tunLogContent.prefix(2000))
-            if tunLogContent.count > 2000 { report += "\n... (truncated)" }
+            report += String(deduped.suffix(1000))
+            if deduped.count > 1000 { report += "\n... (truncated)" }
             report += "\n```\n"
         }
+
+        // ── 8. TUN Config (template) ──
+        report += "## TUN Config Template\n```\n"
+        report += """
+TUN mode forwards all traffic through sing-box:
+  inbound: tun → outbound: socks(127.0.0.1:<socks_port>) → proxy(outbound config above)
+
+Key TUN fields (varies by setup):
+  stack: system|gvisor|mixed
+  mtu: 1500
+  strict_route: true|false
+  dns: local/remote resolver
+  route.rules: sniff / bypass core processes
+"""
+        report += "```\n"
 
         return report
     }
@@ -1235,40 +1262,137 @@ final class DiagnosticsViewModel: ObservableObject {
         return cs
     }()
 
+    // MARK: ── JSON 脱敏 ──
+
+    private static let sensitiveKeys: Set<String> = [
+        "address", "server", "password", "pass", "id", "uuid",
+        "user", "username", "servername", "server_name", "sni",
+        "publickey", "public_key", "shortid", "short_id",
+        "spiderx", "spider_x", "pinnedpeercertsha256",
+        "auth", "key", "seed", "host",
+    ]
+
+    private static func isSensitiveKey(_ key: String) -> Bool {
+        sensitiveKeys.contains(key.lowercased())
+    }
+
+    private static func maskJSONValue(_ value: Any) -> Any {
+        if let dict = value as? [String: Any] {
+            var masked: [String: Any] = [:]
+            for (k, v) in dict {
+                if isSensitiveKey(k) {
+                    masked[k] = "***"
+                } else {
+                    masked[k] = maskJSONValue(v)
+                }
+            }
+            return masked
+        }
+        if let arr = value as? [Any] {
+            return arr.map { maskJSONValue($0) }
+        }
+        return value
+    }
+
+    private static func maskSensitiveJSON(_ data: Data) -> String? {
+        guard let obj = try? JSONSerialization.jsonObject(with: data),
+              let masked = maskJSONValue(obj) as? NSObject else { return nil }
+        guard let out = try? JSONSerialization.data(withJSONObject: masked, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]) else { return nil }
+        return String(data: out, encoding: .utf8)
+    }
+
+    private func readAndMaskJSON(path: String) -> String? {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return nil }
+        return Self.maskSensitiveJSON(data)
+    }
+
+    /// 从 config.json 提取 outbounds 数组 JSON
+    private func extractOutbounds(from data: Data) -> Data? {
+        guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let outbounds = obj["outbounds"] else { return nil }
+        return try? JSONSerialization.data(withJSONObject: outbounds, options: [.prettyPrinted, .sortedKeys])
+    }
+
+    // MARK: ── Log deduplication ──
+
+    /// 对 getSurroundingLog 输出做内容去重: 归一化后相同的 `>>>` 行只保留第一条, 后续标记跳过数
+    private func deduplicateLogLines(_ log: String) -> String {
+        let lines = log.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        var out: [String] = []
+        var seen: Set<String> = []
+        var skipped = 0
+        for line in lines {
+            if line.hasPrefix(">>> ") {
+                let norm = Self.normalizeLogLine(line)
+                if seen.contains(norm) {
+                    skipped += 1
+                    continue
+                }
+                if skipped > 0 {
+                    out.append("    ... (skipped \(skipped) similar)")
+                    skipped = 0
+                }
+                seen.insert(norm)
+                out.append(line)
+            } else {
+                if skipped > 0 {
+                    out.append("    ... (skipped \(skipped) similar)")
+                    skipped = 0
+                }
+                out.append(line)
+            }
+        }
+        if skipped > 0 {
+            out.append("    ... (skipped \(skipped) similar)")
+        }
+        return out.joined(separator: "\n")
+    }
+
+    /// 归一化日志行: 剥离时间戳、session ID、IP:port、URL 等易变信息
+    private static func normalizeLogLine(_ line: String) -> String {
+        var s = line
+        // >>> prefix
+        s = s.replacingOccurrences(of: #"^>>>\s*"#, with: "", options: .regularExpression)
+        // "2026/06/10 22:52:57 "
+        s = s.replacingOccurrences(of: #"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} "#, with: "", options: .regularExpression)
+        // "+0800 2026-06-10 22:53:04 "
+        s = s.replacingOccurrences(of: #"\+\d{4} \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} "#, with: "", options: .regularExpression)
+        // session ID [1664709103]
+        s = s.replacingOccurrences(of: #"\[\d+\]"#, with: "[]", options: .regularExpression)
+        // IP:port
+        s = s.replacingOccurrences(of: #"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?"#, with: "IP", options: .regularExpression)
+        // wss:// 或 ws:// URL
+        s = s.replacingOccurrences(of: #"wss?://\S+"#, with: "URL", options: .regularExpression)
+        return s
+    }
+
     func submitToGitHub() {
         if appState.latency > 0 { return }
         Task {
-            // ── 重启 + 清日志, 获取干净的启动阶段输出 ──
-            let wasRunning = appState.v2rayTurnOn
-            if wasRunning {
-                await V2rayLaunch.shared.stop()
-                try? await Task.sleep(nanoseconds: 500_000_000)
-            }
-            for path in [coreLogFilePath, tunLogFilePath, runTunLogFilePath] {
-                try? "".write(toFile: path, atomically: false, encoding: .utf8)
-            }
-            // 启动 core (如果是 TUN 模式会连带启动 TUN)
-            await AppState.shared.turnOnCore()
-            // 等待启动阶段的日志输出
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
-
-            // ── 收集干净的启动输出 ──
-            let freshCoreLog = await LogAnalyzer.getSurroundingLog(logPath: coreLogFilePath, lastLines: 500, contextLines: 3)
-            self.logContent = freshCoreLog
-
+            // Gather running core info from V2rayLaunch actor
             let coreType = await V2rayLaunch.shared.lastCore
             let singboxVer = getSingboxShortVersion()
 
+            // Gather TUN logs when in TUN mode
             var tunLog = "", runTunLog = ""
             if appState.runMode == .tun {
-                tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 500, contextLines: 2)
+                tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, firstLines: 100, contextLines: 2)
+                // run-tun.log (launchd stderr) 基本全是错误, 全量带上
                 if let raw = try? String(contentsOfFile: runTunLogFilePath, encoding: .utf8), !raw.isEmpty {
                     runTunLog = raw
                 }
             }
 
+            // 读取 outbound 配置 (脱敏)
+            var outboundConfig = ""
+            if let rawData = try? Data(contentsOf: URL(fileURLWithPath: JsonConfigFilePath)),
+               let outboundData = extractOutbounds(from: rawData) {
+                outboundConfig = Self.maskSensitiveJSON(outboundData) ?? ""
+            }
+
             let report = generateReport(coreType: coreType, singboxVersion: singboxVer,
-                                        tunLogContent: tunLog, runTunLogContent: runTunLog)
+                                        tunLogContent: tunLog, runTunLogContent: runTunLog,
+                                        outboundConfig: outboundConfig)
             let title = "[Bug] V2rayU Diagnostic - \(Date().formatted(date: .abbreviated, time: .shortened))"
             let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? title
             let encodedBody = report.addingPercentEncoding(withAllowedCharacters: Self.queryValueAllowed) ?? ""

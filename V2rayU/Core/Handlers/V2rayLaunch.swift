@@ -119,11 +119,14 @@ actor V2rayLaunch {
 
         createJsonFile(item: item)
 
-        // Clear log files on start
+        // Rotate log files on start (save previous session, start fresh)
         truncateLogFile(appLogFilePath)
-        truncateLogFile(coreLogFilePath)
-        truncateLogFile(tunLogFilePath)
-        truncateLogFile(runTunLogFilePath)
+        LogRotation.rotateSessionLog(at: coreLogFilePath)
+        LogRotation.rotateSessionLog(at: tunLogFilePath)
+        LogRotation.rotateSessionLog(at: runTunLogFilePath)
+        LogRotation.cleanSessionBackups(at: coreLogFilePath)
+        LogRotation.cleanSessionBackups(at: tunLogFilePath)
+        LogRotation.cleanSessionBackups(at: runTunLogFilePath)
 
         // 启动
         let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
@@ -232,9 +235,12 @@ actor V2rayLaunch {
         createJsonFile(combination: resolved)
 
         truncateLogFile(appLogFilePath)
-        truncateLogFile(coreLogFilePath)
-        truncateLogFile(tunLogFilePath)
-        truncateLogFile(runTunLogFilePath)
+        LogRotation.rotateSessionLog(at: coreLogFilePath)
+        LogRotation.rotateSessionLog(at: tunLogFilePath)
+        LogRotation.rotateSessionLog(at: runTunLogFilePath)
+        LogRotation.cleanSessionBackups(at: coreLogFilePath)
+        LogRotation.cleanSessionBackups(at: tunLogFilePath)
+        LogRotation.cleanSessionBackups(at: runTunLogFilePath)
 
         let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
         if !started {
