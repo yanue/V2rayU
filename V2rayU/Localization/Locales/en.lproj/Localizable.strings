@@ -163,6 +163,11 @@
 "SubscriptionSettings" = "Subscription Settings";
 "SubscriptionSettingsSubHead" = "Manage subscription details";
 "SubscriptionUrl" = "Subscription URL";
+"Notes" = "Notes";
+"ConfigType" = "Config Type";
+"ConfigTypeAuto" = "Auto";
+"ConfigTypeClash" = "Clash";
+"ConfigTypeNormal" = "Normal";
 "Sort" = "Sort";
 "UpdateInterval" = "Update Interval";
 "AddSubscription" = "Add Subscription";

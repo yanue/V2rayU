@@ -163,6 +163,11 @@
 "SubscriptionSettings" = "訂閱設定";
 "SubscriptionSettingsSubHead" = "管理訂閱詳細資訊";
 "SubscriptionUrl" = "訂閱網址";
+"Notes" = "備註說明";
+"ConfigType" = "配置類型";
+"ConfigTypeAuto" = "自動";
+"ConfigTypeClash" = "Clash";
+"ConfigTypeNormal" = "普通";
 "Sort" = "排序";
 "UpdateInterval" = "更新間隔";
 "AddSubscription" = "新增訂閱";

@@ -164,6 +164,11 @@
 "SubscriptionSettings" = "订阅设置";
 "SubscriptionSettingsSubHead" = "管理订阅详情";
 "SubscriptionUrl" = "订阅地址";
+"Notes" = "备注说明";
+"ConfigType" = "配置类型";
+"ConfigTypeAuto" = "自动";
+"ConfigTypeClash" = "Clash";
+"ConfigTypeNormal" = "普通";
 "Sort" = "排序";
 "UpdateInterval" = "更新间隔";
 "AddSubscription" = "添加订阅";

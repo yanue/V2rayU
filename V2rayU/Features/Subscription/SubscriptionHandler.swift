@@ -45,12 +45,13 @@ actor SubscriptionHandler {
                 self.refreshMenu()
             }
             do {
-                try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
+                let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                 logger.info("SubscriptionHandler syncOne success")
                 
                 // 下载成功后更新 updateTime 并保存
                 var updated = item
                 updated.updateTime = Int(Date().timeIntervalSince1970)
+                updated.configType = configType
                 updated.upsert()
             } catch {
                 logger.info("SubscriptionHandler syncOne error: \(error)")
@@ -65,10 +66,11 @@ actor SubscriptionHandler {
             Future<Void, Error> { promise in
                 Task {
                     do {
-                        try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
+                        let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                         // 下载成功后更新 updateTime 并保存
                         var updated = item
                         updated.updateTime = Int(Date().timeIntervalSince1970)
+                        updated.configType = configType
                         updated.upsert()
                         promise(.success(()))
                     } catch {
@@ -104,6 +106,7 @@ actor SubscriptionHandler {
         // refresh server
         Task {
             await AppMenuManager.shared.refreshServerItems()
+            await AppMenuManager.shared.updateMenuTitles()
         }
         // 仅在有节点时才触发 ping，避免在无节点时将 inPing 卡住
         let hasProfiles = !ProfileStore.shared.fetchAll().isEmpty
@@ -117,7 +120,7 @@ actor SubscriptionHandler {
         }
     }
 
-    public func dlFromUrl(url: String, sub: SubscriptionEntity, useProxy: Bool = true) async throws {
+    public func dlFromUrl(url: String, sub: SubscriptionEntity, useProxy: Bool = true) async throws -> String {
         let trimmedUrl = url.trimmingCharacters(in: .whitespacesAndNewlines)
         logTip(title: "loading from : ", uri: "", informativeText: trimmedUrl + "\n\n")
 
@@ -131,7 +134,7 @@ actor SubscriptionHandler {
         do {
             let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
             if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
-                handle(base64Str: outputStr, sub: sub, url: url)
+                return handle(base64Str: outputStr, sub: sub, url: url)
             } else {
                 logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
                 throw NSError(domain: "SubscriptionHandler", code: 1002, userInfo: [NSLocalizedDescriptionKey: "subscription data is not valid UTF-8"])
@@ -143,25 +146,44 @@ actor SubscriptionHandler {
         }
     }
 
-    func handle(base64Str: String, sub: SubscriptionEntity, url: String) {
+    func handle(base64Str: String, sub: SubscriptionEntity, url: String) -> String {
         let trimmed = base64Str.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Try base64 decode first
+        // 如果用户手动指定了 configType，则强制使用对应解析方式
+        if sub.configType == "clash" {
+            if let strTmp = trimmed.base64Decoded() {
+                if importByYaml(strTmp: strTmp, sub: sub) { return "clash" }
+            }
+            if importByYaml(strTmp: trimmed, sub: sub) { return "clash" }
+            logTip(title: "clash parse fail: ", uri: url, informativeText: "forced clash mode but no valid proxies found")
+            return "clash"
+        }
+        if sub.configType == "normal" {
+            if let strTmp = trimmed.base64Decoded() {
+                importByNormal(strTmp: strTmp, sub: sub)
+            } else {
+                importByNormal(strTmp: trimmed, sub: sub)
+            }
+            return "normal"
+        }
+
+        // Auto mode — try base64 decode first
         if let strTmp = trimmed.base64Decoded() {
             logTip(title: "handle url: ", uri: "", informativeText: url + "\n\n")
             if importByYaml(strTmp: strTmp, sub: sub) {
-                return
+                return "clash"
             }
             importByNormal(strTmp: strTmp, sub: sub)
-            return
+            return "normal"
         }
 
         // Not valid base64 — try parsing as plain text directly
         logTip(title: "not base64, try direct parse: ", uri: "", informativeText: url + "\n\n")
         if importByYaml(strTmp: trimmed, sub: sub) {
-            return
+            return "clash"
         }
         importByNormal(strTmp: trimmed, sub: sub)
+        return "normal"
     }
 
     func getOldCount(sub: SubscriptionEntity) -> Int {
@@ -170,7 +192,6 @@ actor SubscriptionHandler {
 
     func importByYaml(strTmp: String, sub: SubscriptionEntity) -> Bool {
         var list: [ProfileEntity] = []
-        let oldCount = getOldCount(sub: sub)
 
         // parse clash yaml
         do {
@@ -180,21 +201,59 @@ actor SubscriptionHandler {
                 return false
             }
             for clash in decoded.proxies {
-                if let item = clash.toProfile() {
+                if var item = clash.toProfile() {
+                    item.subid = sub.uuid
                     list.append(item)
                 }
             }
 
-            logTip(title: "importByYaml: ", informativeText: "old=\(oldCount) - new=\(list.count)")
-
             if list.isEmpty {
                 return false
             }
-            // 删除旧的
-            ProfileStore.shared.delete(filter: [ProfileEntity.Columns.subid.name: sub.uuid])
 
-            // 插入新的
-            ProfileStore.shared.insertMany(list)
+            logTip(title: "importByYaml: ", informativeText: "old=\(getOldCount(sub: sub)) - new=\(list.count)")
+
+            // 使用 diff 模式：按 uniqueKey 对比，保留旧 profile 的 metadata（速度、流量等）
+            let olds = ProfileStore.shared.getGroupProfiles(subid: sub.uuid)
+            var oldMap = [String: ProfileEntity]()
+            for item in olds {
+                let key = item.uniqueKey()
+                oldMap[key] = item
+            }
+
+            var adds = [ProfileEntity]()
+            var dels = [ProfileEntity]()
+            var exists = Set<String>()
+            var seenKeys = Set<String>()
+
+            for item in list {
+                let key = item.uniqueKey()
+                guard seenKeys.insert(key).inserted else { continue }
+                if let old = oldMap[key] {
+                    exists.insert(key)
+                    ProfileStore.shared.updateProfile(oldDto: old, newDto: item)
+                } else {
+                    adds.append(item)
+                }
+            }
+
+            for (key, item) in oldMap where !exists.contains(key) {
+                dels.append(item)
+            }
+
+            if !adds.isEmpty {
+                ProfileStore.shared.insertMany(adds)
+            }
+            for del in dels {
+                ProfileStore.shared.delete(uuid: del.uuid)
+            }
+
+            if !dels.isEmpty {
+                let uuids = dels.map(\.uuid)
+                Task { @MainActor in
+                    uuids.forEach { CombinedConfigStore.removeProfile(uuid: $0) }
+                }
+            }
 
             return true
         } catch {
@@ -237,10 +296,16 @@ actor SubscriptionHandler {
         var adds = [ProfileEntity]()
         var dels = [ProfileEntity]()
         var exists = Set<String>()
+        var seenKeys = Set<String>()
 
         // 遍历新的列表
         for item in list {
             let key = item.uniqueKey()
+            // 跳过同一批次中重复的 key（订阅内容里相同的 URI 可能出现多次）
+            guard seenKeys.insert(key).inserted else {
+                logTip(title: "skip duplicate: ", informativeText: "\(item.remark), \(item.address):\(item.port)")
+                continue
+            }
             logTip(title: "正在处理 \(key)", informativeText: "\(item.remark), \(item.address):\(item.port)")
             if let old = oldMap[key] {
                 exists.insert(key)

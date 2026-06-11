@@ -19,6 +19,8 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
     var sort: Int
     var updateInterval: Int
     var updateTime: Int
+    var notes: String
+    var configType: String
 
     var id: String {
         return uuid
@@ -38,7 +40,9 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         enable: Bool = true,
         sort: Int = 0,
         updateInterval: Int = 3600,
-        updateTime: Int = Int(Date().timeIntervalSince1970)
+        updateTime: Int = Int(Date().timeIntervalSince1970),
+        notes: String = "",
+        configType: String = ""
     ) {
         self.uuid = uuid
         self.remark = remark
@@ -47,6 +51,8 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         self.sort = sort
         self.updateInterval = updateInterval
         self.updateTime = updateTime
+        self.notes = notes
+        self.configType = configType
     }
 
     // 自定义表名
@@ -60,6 +66,8 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         static let sort = Column(CodingKeys.sort)
         static let updateInterval = Column(CodingKeys.updateInterval)
         static let updateTime = Column(CodingKeys.updateTime)
+        static let notes = Column(CodingKeys.notes)
+        static let configType = Column(CodingKeys.configType)
     }
 
     // 定义迁移
@@ -76,6 +84,14 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
                 t.column(Columns.updateTime.name, .integer).notNull().defaults(to: 0)
             }
         }
+
+        // 添加 notes 和 configType 列
+        migrator.registerMigration("addNotesAndConfigTypeToSub") { db in
+            try db.alter(table: databaseTableName) { t in
+                t.add(column: Columns.notes.name, .text).notNull().defaults(to: "")
+                t.add(column: Columns.configType.name, .text).notNull().defaults(to: "")
+            }
+        }
     }
 }
 
@@ -85,6 +101,7 @@ extension SubscriptionEntity {
             var toSave = self
             toSave.remark = toSave.remark.trimmingCharacters(in: .whitespacesAndNewlines)
             toSave.url = toSave.url.trimmingCharacters(in: .whitespacesAndNewlines)
+            toSave.notes = toSave.notes.trimmingCharacters(in: .whitespacesAndNewlines)
             // 如果 updateInterval 为 0，默认设置为 3600
             if toSave.updateInterval == 0 {
                 toSave.updateInterval = 3600

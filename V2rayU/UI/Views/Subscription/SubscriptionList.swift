@@ -238,6 +238,30 @@ struct SubscriptionListView: View {
                 }
                 .width(min: 200,max: 400)
 
+                TableColumn(String(localized: .ConfigType)) { (row: SubscriptionEntity) in
+                    HStack(spacing: 4) {
+                        if row.configType == "clash" {
+                            Image(systemName: "bolt.fill")
+                                .foregroundColor(.orange)
+                                .font(.system(size: 10))
+                            Text("Clash")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        } else if row.configType == "normal" {
+                            Image(systemName: "doc.text")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 10))
+                            Text("Normal")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("-")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .width(80)
+
                 TableColumn(String(localized: .TableFieldInterval)) { (row: SubscriptionEntity) in
                     Text(row.updateInterval.localizedInterval(locale: LanguageManager.shared.currentLocale))
                 }

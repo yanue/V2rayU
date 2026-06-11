@@ -69,11 +69,23 @@ struct SubscriptionFormView: View {
             VStack {
                 getTextFieldWithLabel(label: .Remark, text: $item.remark)
                 getTextFieldWithLabel(label: .SubscriptionUrl, text: $item.url)
+                // 配置类型选择
+                HStack {
+                    LocalizedTextLabelView(label: .ConfigType)
+                        .frame(width: 150, alignment: .trailing)
+                    Spacer()
+                    Picker("", selection: $item.configType) {
+                        Text(String(localized: .ConfigTypeAuto)).tag("")
+                        Text(String(localized: .ConfigTypeNormal)).tag("normal")
+                        Text(String(localized: .ConfigTypeClash)).tag("clash")
+                    }
+                    .pickerStyle(.segmented)
+                }
                 getBoolFieldWithLabel(label: .Enable, isOn: $item.enable)
                 // 数字输入 + 单位选择
                 HStack {
                     LocalizedTextLabelView(label: .UpdateInterval)
-                        .frame(width: 100, alignment: .trailing)
+                        .frame(width: 150, alignment: .trailing)
                     Spacer()
                     // .id(intervalUnit) forces the TextField to be fully recreated
                     // when the unit changes. The computed displayedInterval binding
@@ -91,6 +103,7 @@ struct SubscriptionFormView: View {
                     }
                     .pickerStyle(.segmented)
                 }
+                getTextFieldWithLabel(label: .Notes, text: $item.notes)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 12)

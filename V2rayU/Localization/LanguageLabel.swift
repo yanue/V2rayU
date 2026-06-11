@@ -183,6 +183,11 @@ enum LanguageLabel: String, CaseIterable {
     case SubscriptionSettings
     case SubscriptionSettingsSubHead
     case SubscriptionUrl
+    case Notes
+    case ConfigType
+    case ConfigTypeAuto
+    case ConfigTypeClash
+    case ConfigTypeNormal
     case Sort
     case UpdateInterval
     case AddSubscription
