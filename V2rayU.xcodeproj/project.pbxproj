@@ -606,7 +606,6 @@
 				66EB6C1C2E3B99F300A12DB3 /* Protocols */,
 				66764BDD2EB4F00C002F330B /* Services */,
 				6632EF5A2EC4C41800CED47B /* Handlers */,
-				662CC3C92D1BED9B006E8450 /* Utilities */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -865,6 +864,7 @@
 				6632EF522EC4BB0C00CED47B /* Localization */,
 				6632EF552EC4C1D700CED47B /* Core */,
 				6632EF542EC4C15000CED47B /* Features */,
+				662CC3C92D1BED9B006E8450 /* Utilities */,
 				6632EF562EC4C21400CED47B /* UI */,
 			);
 			path = V2rayU;
