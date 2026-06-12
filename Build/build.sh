@@ -35,6 +35,16 @@ function build() {
       exit 1
     fi
 
+    echo "Extracting dSYM files for crash symbolication..."
+    DSYM_SRC="${V2rayU_ARCHIVE}/dSYMs"
+    if [ -d "$DSYM_SRC" ]; then
+        cp -R "$DSYM_SRC" "${V2rayU_RELEASE}/dSYMs"
+        echo "Packaging dSYM archive..."
+        rm -f "${V2rayU_RELEASE}/${APP_NAME}-${APP_Version}-dSYM.zip"
+        (cd "${V2rayU_RELEASE}" && zip -rX "${APP_NAME}-${APP_Version}-dSYM.zip" dSYMs -x ".*")
+        echo "dSYM files packaged to ${V2rayU_RELEASE}/${APP_NAME}-${APP_Version}-dSYM.zip"
+    fi
+
     echo "Cleaning up archive..."
     rm -rf ${V2rayU_ARCHIVE}
     if [ $? -ne 0 ]; then
