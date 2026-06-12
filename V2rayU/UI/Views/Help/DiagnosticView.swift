@@ -309,24 +309,10 @@ struct DiagnosticsView: View {
                 }
             }
 
-            // Title + subtitle
-            VStack(alignment: .leading, spacing: 3) {
-                Text(item.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.primary)
-
-                Text(item.subtitle)
-                    .font(.system(size: 11))
-                    .foregroundColor(item.ok ? .secondary : item.color)
-                    .lineLimit(2)
-
-                if let problem = item.problem, !problem.isEmpty, !item.ok {
-                    Text(problem)
-                        .font(.system(size: 10))
-                        .foregroundColor(.red.opacity(0.8))
-                        .lineLimit(3)
-                }
-            }
+            // Title + subtitle + problem as single selectable block
+            combinedText(for: item)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
 
@@ -349,6 +335,29 @@ struct DiagnosticsView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.gray.opacity(0.08), lineWidth: 0.5)
         )
+    }
+
+    // MARK: - Combined Text (single selectable block)
+
+    private func combinedText(for item: DiagnosticItem) -> Text {
+        let base = Text(item.title)
+            .font(.system(size: 13, weight: .medium))
+            .foregroundColor(.primary)
+        + Text("\n")
+            .font(.system(size: 11))
+        + Text(item.subtitle)
+            .font(.system(size: 11))
+            .foregroundColor(item.ok ? .secondary : item.color)
+
+        if let problem = item.problem, !problem.isEmpty, !item.ok {
+            return base
+            + Text("\n")
+                .font(.system(size: 10))
+            + Text(problem)
+                .font(.system(size: 10))
+                .foregroundColor(.red.opacity(0.8))
+        }
+        return base
     }
 
     // MARK: - Log Viewer
