@@ -494,7 +494,7 @@ actor V2rayLaunch {
             ])
             logger.info("setSystemProxy: ok \(output)")
         } catch {
-            alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
+            alertDialog(title: "setSystemProxy Error", message: error.localizedDescription, blocking: true)
             Task { await AppInstaller.shared.showInstallAlert() }
         }
     }

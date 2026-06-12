@@ -350,7 +350,7 @@ actor AppInstaller: NSObject {
             await MainActor.run {
                 let title = String(localized: .InstallFailed)
                 let toast = "\(String(localized: .InstallFailedManual))\n \(script)"
-                alertDialog(title: title, message: toast)
+                alertDialog(title: title, message: toast, blocking: true)
             }
             return false
         }

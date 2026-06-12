@@ -56,13 +56,15 @@ class MainWindowManager {
             windowController = NSWindowController(window: window)
         }
 
-        // 3. 显示窗口
+        // 3. 先激活应用（必须同步，确保窗口能正确接收焦点）
+        NSApp.activate(ignoringOtherApps: true)
+        // 4. 显示窗口
         windowController?.showWindow(nil)
-        // 4. 延迟激活与置前，确保菜单 tracking 结束后窗口能正确弹出
+        // 5. 延迟置前，确保菜单 tracking 结束后窗口能正确弹出
         DispatchQueue.main.async { [weak self] in
             guard let win = self?.windowController?.window else { return }
-            NSApp.activate(ignoringOtherApps: true)
             win.makeKeyAndOrderFront(nil)
+            win.orderFrontRegardless()
         }
     }
 }
