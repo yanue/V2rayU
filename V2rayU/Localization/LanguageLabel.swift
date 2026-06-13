@@ -110,7 +110,6 @@ enum LanguageLabel: String, CaseIterable {
     case EnableSniffing
     case EnableMux
     case Mux
-    case EnableTrafficStatistics
     case V2rayCoreLogLevel
     case TestSettings
     case LatencyTestConcurrency
@@ -294,6 +293,12 @@ enum LanguageLabel: String, CaseIterable {
     case UploadBandwidth
     case DownloadBandwidth
     case AdvancedSettings
+
+    // MARK: - Mode Tips (tooltip)
+    case GlobalTip
+    case PacTip
+    case ManualTip
+    case TunTip
 
     // MARK: - Menu Operations
     case CoreOn

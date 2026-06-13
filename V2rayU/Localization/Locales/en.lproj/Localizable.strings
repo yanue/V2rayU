@@ -104,7 +104,6 @@
 "EnableSniffing" = "Enable sniffing";
 "EnableMux" = "Enable Mux";
 "Mux" = "Mux";
-"EnableTrafficStatistics" = "Enable traffic statistics";
 "V2rayCoreLogLevel" = "V2Ray core log level";
 "TestSettings" = "Test Settings";
 "LatencyTestConcurrency" = "Concurrent latency tests";
@@ -293,6 +292,10 @@
 "ViewConfigJson" = "View config.json";
 "ViewTunJson" = "View tun.json";
 "ViewPacFile" = "View PAC File";
+"GlobalTip" = "set system HTTP, HTTPS, SOCKS proxy";
+"PacTip" = "set system PAC proxy";
+"ManualTip" = "clear system HTTP, HTTPS, SOCKS proxy";
+"TunTip" = "transparent system-wide proxy via TUN interface";
 "PacMode" = "PAC Mode (pac rule Proxy)";
 "TunMode" = "Tun Mode (transparent Proxy)";
 "GlobalMode" = "Global Mode (set system proxies)";

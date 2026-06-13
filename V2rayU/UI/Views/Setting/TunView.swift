@@ -37,6 +37,16 @@ struct TunView: View {
             }
 
             HStack {
+                getTextLabel(label: .TunLogLevel, labelWidth: labelWidth)
+                Spacer()
+                Picker("", selection: $settings.tunLogLevel) {
+                    ForEach(V2rayLogLevel.allCases, id: \.self) { pick in
+                        Text(pick.rawValue)
+                    }
+                }
+            }
+
+            HStack {
                 Toggle(isOn: $settings.tunStrictRoute) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(String(localized: .TunStrictRoute))
@@ -88,22 +98,6 @@ struct TunView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.leading, 7)
                 Spacer()
-            }
-
-            Divider()
-
-            Text(String(localized: .Logs))
-                .font(.headline)
-                .foregroundColor(.secondary)
-
-            HStack {
-                getTextLabel(label: .TunLogLevel, labelWidth: labelWidth)
-                Spacer()
-                Picker("", selection: $settings.tunLogLevel) {
-                    ForEach(V2rayLogLevel.allCases, id: \.self) { pick in
-                        Text(pick.rawValue)
-                    }
-                }
             }
 
             Divider()

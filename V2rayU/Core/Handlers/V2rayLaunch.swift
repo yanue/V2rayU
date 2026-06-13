@@ -29,16 +29,16 @@ enum RunMode: String, CaseIterable {
         }
     }
 
-    var tip: String {
+    var tip: LanguageLabel {
         switch self {
         case .global:
-            return "Global.tip"
+            return .GlobalTip
         case .pac:
-            return "Pac.tip"
+            return .PacTip
         case .manual:
-            return "Manual.tip"
+            return .ManualTip
         case .tun:
-            return "Tun.tip"
+            return .TunTip
         }
     }
 }
@@ -419,12 +419,11 @@ actor V2rayLaunch {
 
         logger.info("rebuildAfterNetworkChange: \(reason), waiting for network...")
         let ready = await waitForNetworkReady()
-        guard ready else {
-            logger.info("rebuildAfterNetworkChange: network not ready, skip restart (\(reason))")
-            return
+        if !ready {
+            logger.info("rebuildAfterNetworkChange: network not ready, proceeding with restart anyway (\(reason))")
         }
 
-        logger.info("rebuildAfterNetworkChange: network ready=\(ready), restarting (\(reason))")
+        logger.info("rebuildAfterNetworkChange: restarting (\(reason))")
         await restart()
         lastRebuildAt = Date()
     }

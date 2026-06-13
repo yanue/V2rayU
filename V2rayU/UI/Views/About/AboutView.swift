@@ -21,13 +21,13 @@ struct AboutView: View {
         ("~/.V2rayU/", "config, logs, database"),
         // 系统二进制 (root:wheel)
         ("/usr/local/v2rayu/", "xray-core, sing-box, V2rayUTool"),
+        // 权限配置
+        ("/private/etc/sudoers.d/v2rayu-sudoer", "sudoers rules"),
         // LaunchAgent (用户进程)
         ("~/Library/LaunchAgents/yanue.v2rayu.sing-box.plist", "sing-box agent"),
         ("~/Library/LaunchAgents/yanue.v2rayu.xray-core.plist", "xray-core agent"),
         // LaunchDaemon (root 进程)
         ("/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist", "tun daemon"),
-        // 权限配置
-        ("/private/etc/sudoers.d/v2rayu-sudoer", "sudoers rules"),
         // App 偏好设置与缓存
         ("~/Library/Preferences/net.yanue.V2rayU.plist", "preferences"),
         ("~/Library/Application Support/net.yanue.V2rayU/", "app support"),
@@ -40,7 +40,9 @@ struct AboutView: View {
         "https://github.com/groue/GRDB.swift",
         "https://github.com/swhitty/FlyingFox.git",
         "https://github.com/jpsim/Yams.git",
-        "https://github.com/sindresorhus/KeyboardShortcuts.git"
+        "https://github.com/sindresorhus/KeyboardShortcuts.git",
+        "https://github.com/microsoft/appcenter-sdk-apple.git",
+        "https://github.com/firebase/firebase-ios-sdk.git",
     ]
     
     var body: some View {

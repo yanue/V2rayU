@@ -45,7 +45,6 @@ struct AdvanceView: View {
                 Spacer()
                 getNumFieldWithLabel(label: .Mux, num: $settings.mux)
             }
-            getBoolFieldWithLabel(label: .EnableTrafficStatistics, isOn: $settings.enableStat, labelWidth: labelWidth)
             HStack {
                 getTextLabel(label: .V2rayCoreLogLevel, labelWidth: labelWidth)
                 Spacer()

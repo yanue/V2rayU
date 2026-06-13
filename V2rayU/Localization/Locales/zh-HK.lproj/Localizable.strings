@@ -104,7 +104,6 @@
 "EnableSniffing" = "啟用流量嗅探";
 "EnableMux" = "啟用 Mux 多路複用";
 "Mux" = "Mux";
-"EnableTrafficStatistics" = "啟用流量統計";
 "V2rayCoreLogLevel" = "核心日誌等級";
 "TestSettings" = "測速設定";
 "LatencyTestConcurrency" = "多執行緒測試時的並發數量";
@@ -293,6 +292,10 @@
 "ViewConfigJson" = "檢視 config.json";
 "ViewTunJson" = "檢視 tun.json";
 "ViewPacFile" = "檢視 PAC 檔案";
+"GlobalTip" = "設定系統 HTTP、HTTPS、SOCKS 代理";
+"PacTip" = "設定系統 PAC 代理";
+"ManualTip" = "清除系統 HTTP、HTTPS、SOCKS 代理";
+"TunTip" = "通過 TUN 介面實現透明系統級代理";
 "PacMode" = "PAC 模式 (pac规则代理)";
 "TunMode" = "Tun 模式 (透明代理)";
 "GlobalMode" = "全域模式 (設定系統代理)";
