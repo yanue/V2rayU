@@ -757,8 +757,8 @@ final class DiagnosticsViewModel: ObservableObject {
             problems.append(msg)
         }
 
-        if let interface = state.defaultInterface, interface.hasPrefix("utun") {
-            details.append("✓ default route: \(interface)")
+        if let interface = state.tunRouteInterface {
+            details.append("✓ TUN route: \(interface)")
         } else {
             let current = state.defaultInterface ?? "unknown"
             let msg = String(format: String(localized: .DiagTunRouteNotReady), current)
@@ -771,7 +771,7 @@ final class DiagnosticsViewModel: ObservableObject {
                          problem: problems.joined(separator: "\n"), action: .restartCore)
         }
 
-        return .pass(.tunRuntime, String(format: String(localized: .DiagTunRuntimeOK), state.defaultInterface ?? "utun"))
+        return .pass(.tunRuntime, String(format: String(localized: .DiagTunRuntimeOK), state.tunRouteInterface ?? "utun"))
     }
 
     // MARK: ── Network Checks ──
@@ -927,7 +927,7 @@ final class DiagnosticsViewModel: ObservableObject {
         return nil
     }
 
-    nonisolated private static func tunRuntimeStateSync() -> (helperRunning: Bool, hasUTun: Bool, defaultInterface: String?) {
+    nonisolated private static func tunRuntimeStateSync() -> (helperRunning: Bool, hasUTun: Bool, defaultInterface: String?, tunRouteInterface: String?) {
         let helperRunning = launchdJobHasPID(label: "yanue.v2rayu.tun-helper")
         let ifconfigOutput = commandOutput(path: "/sbin/ifconfig", arguments: [])
         let hasUTun = ifconfigOutput.components(separatedBy: .newlines).contains { line in
@@ -944,11 +944,22 @@ final class DiagnosticsViewModel: ObservableObject {
                 break
             }
         }
-        return (helperRunning, hasUTun, defaultInterface)
+        let netstatOutput = commandOutput(path: "/usr/sbin/netstat", arguments: ["-rn", "-f", "inet"])
+        let tunRouteInterface = detectTunRouteInterface(defaultInterface: defaultInterface, netstatOutput: netstatOutput)
+        return (helperRunning, hasUTun, defaultInterface, tunRouteInterface)
     }
 
     nonisolated private static func launchdJobHasPID(label: String) -> Bool {
         let output = commandOutput(path: "/bin/launchctl", arguments: ["list", label])
+        if launchdListOutputHasPID(output) {
+            return true
+        }
+
+        let systemOutput = commandOutput(path: "/bin/launchctl", arguments: ["print", "system/\(label)"])
+        return launchdPrintOutputHasPID(systemOutput)
+    }
+
+    nonisolated private static func launchdListOutputHasPID(_ output: String) -> Bool {
         for line in output.components(separatedBy: .newlines) {
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
             guard trimmed.hasPrefix("\"PID\"") else { continue }
@@ -960,6 +971,50 @@ final class DiagnosticsViewModel: ObservableObject {
             return Int(value).map { $0 > 0 } ?? false
         }
         return false
+    }
+
+    nonisolated private static func launchdPrintOutputHasPID(_ output: String) -> Bool {
+        var isRunning = false
+        var hasPID = false
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed == "state = running" {
+                isRunning = true
+            } else if trimmed.hasPrefix("pid =") {
+                let value = trimmed
+                    .replacingOccurrences(of: "pid =", with: "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                hasPID = Int(value).map { $0 > 0 } ?? false
+            }
+        }
+        return isRunning && hasPID
+    }
+
+    nonisolated private static func detectTunRouteInterface(defaultInterface: String?, netstatOutput: String) -> String? {
+        if let defaultInterface, defaultInterface.hasPrefix("utun") {
+            return defaultInterface
+        }
+
+        let splitDefaultDestinations: Set<String> = [
+            "0/1", "1", "1/8", "2/7", "4/6", "8/5", "16/4", "32/3", "64/2", "128/1", "128.0/1"
+        ]
+        var routeCountsByInterface: [String: Int] = [:]
+
+        for line in netstatOutput.components(separatedBy: .newlines) {
+            let parts = line.split(whereSeparator: { $0 == " " || $0 == "\t" }).map(String.init)
+            guard parts.count >= 4 else { continue }
+            let destination = parts[0]
+            guard destination == "default" || splitDefaultDestinations.contains(destination),
+                  let netif = parts.first(where: { $0.hasPrefix("utun") }) else {
+                continue
+            }
+            routeCountsByInterface[netif, default: 0] += 1
+        }
+
+        return routeCountsByInterface
+            .filter { $0.value >= 2 }
+            .max { $0.value < $1.value }?
+            .key
     }
 
     nonisolated private static func commandOutput(path: String, arguments: [String]) -> String {

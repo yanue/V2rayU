@@ -647,11 +647,11 @@
 "DiagBasicNetworkFailed" = "无法访问互联网（apple.com 不可达），请检查网络连接。";
 "DiagProxyConnectFailed" = "无法通过本地代理访问外网，代理可能未正常工作。";
 "DiagProxyConnectOK" = "代理连通正常";
-"DiagTunRuntimeOK" = "TUN 运行正常（默认路由: %@）";
+"DiagTunRuntimeOK" = "TUN 运行正常（路由: %@）";
 "DiagTunNotActive" = "当前未运行 TUN 模式";
 "DiagTunBackendNotReady" = "TUN 后端 SOCKS 端口 %d 未就绪";
 "DiagTunHelperNotRunning" = "tun-helper 未运行";
-"DiagTunRouteNotReady" = "默认路由未指向 TUN（当前: %@）";
+"DiagTunRouteNotReady" = "TUN 路由未就绪（当前默认路由: %@）";
 "DiagTunInterfaceNotFound" = "未发现 utun 接口";
 "DiagBasicNetworkOK" = "互联网可访问";
 "DiagConfigValidOK" = "配置文件 JSON 合法且包含必要字段";

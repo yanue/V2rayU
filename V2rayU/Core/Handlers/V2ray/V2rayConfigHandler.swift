@@ -198,6 +198,7 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
     var hasCloudflare = false
     var hasTencentForCN = false
     var hasAli = false
+    var hasLocalhost = false
 
     for server in servers {
         if let server = server as? String {
@@ -205,6 +206,7 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
             hasCloudflare = hasCloudflare || server == "1.1.1.1"
             hasTencentForCN = hasTencentForCN || server == defaultDomesticDns
             hasAli = hasAli || server == secondaryDomesticDns
+            hasLocalhost = hasLocalhost || server == "localhost"
         } else if let server = server as? [String: Any],
                   let address = server["address"] as? String,
                   let domains = server["domains"] as? [String] {
@@ -213,6 +215,7 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
     }
 
     return (servers.count == 3 && hasGoogle && hasCloudflare && hasTencentForCN) ||
+        (servers.count == 3 && hasCloudflare && hasAli && hasLocalhost) ||
         (servers.count == 4 && hasCloudflare && hasTencentForCN && hasAli)
 }
 
@@ -639,4 +642,3 @@ func isIPAddressLiteral(_ value: String) -> Bool {
     if isIp(str: value) { return true }
     return value.contains(":") && value.range(of: "^[0-9a-fA-F:.]+$", options: .regularExpression) != nil
 }
-

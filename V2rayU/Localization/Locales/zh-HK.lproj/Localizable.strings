@@ -646,11 +646,11 @@
 "DiagBasicNetworkFailed" = "無法存取網際網路（apple.com 不可達），請檢查網路連線。";
 "DiagProxyConnectFailed" = "無法透過本機代理存取外網，代理可能未正常運作。";
 "DiagProxyConnectOK" = "代理連線正常";
-"DiagTunRuntimeOK" = "TUN 執行正常（預設路由: %@）";
+"DiagTunRuntimeOK" = "TUN 執行正常（路由: %@）";
 "DiagTunNotActive" = "目前未執行 TUN 模式";
 "DiagTunBackendNotReady" = "TUN 後端 SOCKS 連接埠 %d 尚未就緒";
 "DiagTunHelperNotRunning" = "tun-helper 未執行";
-"DiagTunRouteNotReady" = "預設路由未指向 TUN（目前: %@）";
+"DiagTunRouteNotReady" = "TUN 路由未就緒（目前預設路由: %@）";
 "DiagTunInterfaceNotFound" = "未發現 utun 介面";
 "DiagBasicNetworkOK" = "網際網路可存取";
 "DiagConfigValidOK" = "設定檔 JSON 合法且包含必要欄位";

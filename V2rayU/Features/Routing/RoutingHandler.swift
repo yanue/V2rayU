@@ -43,6 +43,10 @@ let mainlandDirectDnsDomains = [
     "domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "domain:360.cn", "domain:onedns.net"
 ]
 
+let mainlandBypassProxyDomains = [
+    "geosite:geolocation-!cn"
+]
+
 func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) {
     let all = domainIpStr.split(separator: "\n")
     var domains: [String] = []
@@ -138,6 +142,9 @@ class RoutingManager {
         appendSingboxRouteRules(to: &rules, outbound: "block", domains: blockDomains, ips: blockIps)
 
         appendSingboxRouteRules(to: &rules, outbound: "proxy", domains: proxyDomains, ips: proxyIps)
+        if routingEntity.name == RoutingRuleCn || routingEntity.name == RoutingRuleLANAndCn {
+            appendSingboxRouteRules(to: &rules, outbound: "proxy", domains: mainlandBypassProxyDomains, ips: [])
+        }
         appendSingboxRouteRules(to: &rules, outbound: "direct", domains: directDomains, ips: directIps)
 
         switch routingEntity.name {
@@ -348,6 +355,9 @@ class RoutingHandler {
         if ruleProxyDomain != nil {
             ruleProxyDomain?.ip = nil
             rules.append(ruleProxyDomain!)
+        }
+        if self.routing.name == RoutingRuleCn || self.routing.name == RoutingRuleLANAndCn {
+            rules.append(getRoutingRule(outTag: "proxy", domain: mainlandBypassProxyDomains, ip: nil, port: nil))
         }
         // 域名直连
         if ruleDirectDomain != nil {

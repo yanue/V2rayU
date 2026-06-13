@@ -646,11 +646,11 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagBasicNetworkFailed" = "Cannot access the internet (apple.com unreachable). Check your network connection";
 "DiagProxyConnectFailed" = "Cannot access external sites via local proxy. The proxy may not be working properly";
 "DiagProxyConnectOK" = "Proxy connectivity OK";
-"DiagTunRuntimeOK" = "TUN is running normally (default route: %@)";
+"DiagTunRuntimeOK" = "TUN is running normally (route: %@)";
 "DiagTunNotActive" = "TUN mode is not currently running";
 "DiagTunBackendNotReady" = "TUN backend SOCKS port %d is not ready";
 "DiagTunHelperNotRunning" = "tun-helper is not running";
-"DiagTunRouteNotReady" = "Default route does not point to TUN (current: %@)";
+"DiagTunRouteNotReady" = "TUN routes are not ready (current default: %@)";
 "DiagTunInterfaceNotFound" = "No utun interface found";
 "DiagBasicNetworkOK" = "Internet accessible";
 "DiagConfigValidOK" = "Configuration is valid JSON with required fields";
