@@ -600,7 +600,7 @@ final class DiagnosticsViewModel: ObservableObject {
             var agentNames = [LaunchAgent.shared.singBoxAgentName, LaunchAgent.shared.xrayCoreAgentName]
             // 判断是否启动tun
             if runMode == .tun {
-                agentNames.append(LaunchAgent.shared.tunHelperDaemon)
+                agentNames.append(TunHandler.shared.tunHelperDaemon)
             }
             for name in agentNames {
                 let task = Process()

@@ -150,6 +150,8 @@
 		66F77A122F00000100A00002 /* Hysteria2Uri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F77A112F00000100A00001 /* Hysteria2Uri.swift */; };
 		66F77A142F00000100A00004 /* Hysteria2Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F77A132F00000100A00003 /* Hysteria2Config.swift */; };
 		67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A1B2C12D2F000000000001 /* LegacyMigrationHandler.swift */; };
+		8715fc6608e749a4938748358461bdf4 /* TunHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484a881068a04deaa0ba587131acefc2 /* TunHandler.swift */; };
+		9f1d5960fd3b4c258b6ad5b7 /* TunConfigHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38b9f8140e994e7fbd6bc5c3 /* TunConfigHandler.swift */; };
 		E11A8F2C4B2D4E1A91B70001 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11A8F2C4B2D4E1A91B70000 /* NavigationState.swift */; };
 		afe3cb16bd1b48cba200bdf16bba3fa0 /* LogRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664b3bd4b2d847108fa8dd99adbadeba /* LogRotation.swift */; };
 /* End PBXBuildFile section */
@@ -204,6 +206,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		38b9f8140e994e7fbd6bc5c3 /* TunConfigHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunConfigHandler.swift; sourceTree = "<group>"; };
+		484a881068a04deaa0ba587131acefc2 /* TunHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunHandler.swift; sourceTree = "<group>"; };
 		66078E2F2F6838E5002E64AE /* AppInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInstaller.swift; sourceTree = "<group>"; };
 		66078E302F6838E5002E64AE /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
 		66078E312F6838E5002E64AE /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
@@ -664,6 +668,8 @@
 				66078E2F2F6838E5002E64AE /* AppInstaller.swift */,
 				66078E302F6838E5002E64AE /* LaunchAgent.swift */,
 				66078E322F6838E5002E64AE /* V2rayLaunch.swift */,
+				484a881068a04deaa0ba587131acefc2 /* TunHandler.swift */,
+				38b9f8140e994e7fbd6bc5c3 /* TunConfigHandler.swift */,
 			);
 			path = Handlers;
 			sourceTree = "<group>";
@@ -1188,6 +1194,8 @@
 				669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */,
 				66EB76A62E2E669C00E72DE2 /* PacHandler.swift in Sources */,
 				67A1B2C32D2F000000000001 /* LegacyMigrationHandler.swift in Sources */,
+				8715fc6608e749a4938748358461bdf4 /* TunHandler.swift in Sources */,
+				9f1d5960fd3b4c258b6ad5b7 /* TunConfigHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

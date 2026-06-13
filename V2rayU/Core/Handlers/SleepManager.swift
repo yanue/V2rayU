@@ -47,7 +47,7 @@ actor SystemSleepManager {
         let mode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .tun)
         if turnOn && mode == .tun {
             logger.info("willSleep: stop tun-helper to avoid stale route on wake")
-            await LaunchAgent.shared.stopTunHelper()
+            await TunHandler.shared.stop()
         }
     }
     
@@ -62,7 +62,7 @@ actor SystemSleepManager {
                 // 非 TUN 模式则回退为普通重启。
                 let mode = await MainActor.run { AppState.shared.runMode }
                 if mode == .tun {
-                    await V2rayLaunch.shared.rebuildAfterNetworkChange(reason: "system wake")
+                    await TunHandler.shared.rebuildAfterNetworkChange(reason: "system wake")
                 } else {
                     await V2rayLaunch.shared.restart()
                 }

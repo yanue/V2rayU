@@ -7,6 +7,33 @@
 
 import Foundation
 
+enum SingboxVersionCheck {
+    static func supportsSniffRuleAction() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 11, 0)
+    }
+
+    static func supportsNewDnsFormat() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 12, 0)
+    }
+
+    static func geositeRemoved() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 12, 0)
+    }
+
+    static func supportsRuleSet() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 8, 0)
+    }
+
+    static func blockOutboundRemoved() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 13, 0)
+    }
+}
+
 class SingboxConfigHandler {
     var singbox: SingboxStruct = SingboxStruct()
     var isValid = false
@@ -159,12 +186,12 @@ class SingboxConfigHandler {
         self.singbox.dns = dnsConfigWithProxyServerRules(outbounds: outbounds)
         self.singbox.route.default_domain_resolver = "direct-dns"
         var routeRules = comboRules + RoutingManager().getSingboxRoutingRules()
-        if singboxBlockOutboundRemoved() {
+        if SingboxVersionCheck.blockOutboundRemoved() {
             migrateBlockOutboundToAction(&routeRules)
             self.singbox.outbounds.removeAll { $0.type == "block" }
         }
         self.singbox.route.rules = routeRules
-        applyBundledRuleSets()
+        self.singbox.applyBundledRuleSets()
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
                 external_controller: "127.0.0.1:\(coreApiPort)",
@@ -183,101 +210,6 @@ class SingboxConfigHandler {
             self.singbox.log.output = coreLogFilePath
         }
         var inbounds: [SingboxInbound] = []
-
-        // TUN模式配置
-        if enableTun {
-            // tun模式下,是独立的LaunchDaemon,转发流量到socks(xray|sing-box)
-            let tunLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
-            switch tunLevel {
-            case .none:
-                self.singbox.log.disabled = true
-            case .warning:
-                self.singbox.log.disabled = nil
-                self.singbox.log.level = "warn"
-                self.singbox.log.output = tunLogFilePath
-                self.singbox.log.timestamp = true
-            default:
-                self.singbox.log.disabled = nil
-                self.singbox.log.level = tunLevel.rawValue
-                self.singbox.log.output = tunLogFilePath
-                self.singbox.log.timestamp = true
-            }
-            /**
-             {
-               "type": "tun",
-               "tag": "tun-in",
-               "address": ["10.0.0.1/30"],
-               "auto_route": true,
-               "strict_route": true,
-               "mtu": 9000,
-               "stack": "system",
-               "sniff": true,
-               "sniff_override_destination": true
-             }
-             */
-            let tunAddr = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
-            let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
-            let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-            // strict_route 可配置: 默认开启; 部分网络切换场景下可关闭以降低"锁死"风险
-            let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
-            // sing-box 1.11.0+ removed legacy inbound fields, use route rule sniff action instead
-            let useSniffRuleAction = singboxSupportsSniffRuleAction()
-
-            let tunInbound = SingboxInbound(
-                type: "tun",
-                tag: "tun-in",
-                address: [tunAddr],
-                auto_route: true,
-                strict_route: tunStrictRoute,
-                mtu: tunMtu,
-                stack: tunStack.rawValue,
-                sniff: useSniffRuleAction ? nil : true,
-                sniff_override_destination: useSniffRuleAction ? nil : true
-            )
-            inbounds.append(tunInbound)
-
-            // TUN模式: outbound使用socks代理到本地
-            let socksOutbound = SingboxOutbound(
-                type: "socks",
-                tag: "proxy",
-                server: "127.0.0.1",
-                server_port: Int(getEffectiveSocksProxyPort())
-            )
-            let directOutbound = SingboxOutbound(type: "direct", tag: "direct")
-
-            self.singbox.outbounds = [socksOutbound, directOutbound]
-
-            // DNS配置
-            let dnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
-            self.singbox.dns = defaultDnsConfig()
-            if let index = self.singbox.dns.servers.firstIndex(where: { $0.tag == "local-dns" }) {
-                if singboxSupportsNewDnsFormat() {
-                    self.singbox.dns.servers[index].type = "udp"
-                    self.singbox.dns.servers[index].server = dnsDefault
-                    self.singbox.dns.servers[index].address = nil
-                } else {
-                    self.singbox.dns.servers[index].address = "udp://\(dnsDefault)"
-                    self.singbox.dns.servers[index].type = nil
-                    self.singbox.dns.servers[index].server = nil
-                }
-            }
-
-            // TUN模式路由配置 - 所有流量转发到SOCKS，由SOCKS端处理路由
-            var tunRules: [RouteRule] = []
-            if useSniffRuleAction {
-                tunRules.append(RouteRule(action: "sniff"))
-            }
-            tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
-            self.singbox.route = RouteConfig(
-                auto_detect_interface: true,
-                default_domain_resolver: "local-dns",
-                rules: tunRules
-            )
-            applyBundledRuleSets()
-
-            self.singbox.inbounds = inbounds
-            return
-        }
 
         // 非TUN模式配置
         // 默认 inbound: socks + http
@@ -346,7 +278,7 @@ class SingboxConfigHandler {
                 self.singbox.outbounds.removeAll { $0.type == "block" }
             }
             self.singbox.route.rules = routeRules
-            applyBundledRuleSets()
+            self.singbox.applyBundledRuleSets()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
     }
@@ -365,17 +297,6 @@ class SingboxConfigHandler {
             return true
         }
         return version >= SingboxVersion(1, 13, 0)
-    }
-
-    private func applyBundledRuleSets() {
-        guard singboxSupportsRuleSet() else { return }
-        let forceAll = singboxGeositeRemoved()
-
-        let normalizedRoute = SingboxBundledRuleSet.normalize(routeRules: self.singbox.route.rules, forceAll: forceAll)
-        let normalizedDns = SingboxBundledRuleSet.normalize(dnsRules: self.singbox.dns.rules, forceAll: forceAll)
-        self.singbox.route.rules = normalizedRoute.rules
-        self.singbox.dns.rules = normalizedDns.rules
-        self.singbox.route.rule_set = SingboxBundledRuleSet.mergeRuleSets(normalizedRoute.ruleSets, normalizedDns.ruleSets)
     }
 
     private func singboxSupportsSniffRuleAction() -> Bool {

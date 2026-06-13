@@ -83,8 +83,7 @@ import Testing
         testSingboxVersionOverride = latestVersion
         defer { testSingboxVersionOverride = nil }
 
-        let tunCfg = SingboxConfigHandler(enableTun: true)
-        let jsonText = tunCfg.toJSON(item: testProfile)
+        let jsonText = TunConfigHandler.buildTunConfig(item: testProfile)
 
         let configFile = "\(AppHomePath)/.tun-runtime-test.json"
         let logFile = "\(AppHomePath)/.tun-runtime-test.log"
@@ -187,8 +186,7 @@ import Testing
         testSingboxVersionOverride = version
         defer { testSingboxVersionOverride = nil }
 
-        let tunCfg = SingboxConfigHandler(enableTun: true)
-        let jsonText = tunCfg.toJSON(item: testProfile)
+        let jsonText = TunConfigHandler.buildTunConfig(item: testProfile)
         result.generatedConfig = jsonText
 
         guard let data = jsonText.data(using: String.Encoding.utf8),

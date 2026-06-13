@@ -30,7 +30,7 @@ class CoreConfigHandler {
         // 目前架构: sing-box的tun服务(daemon) -> socks(sing-box|xray-core) ,因此这里agent端不需要内部的tun功能了
         switch item.AdaptCore() {
         case .SingBox:
-            let cfg = SingboxConfigHandler(enableTun: false) // 这里不需要内部的tun功能
+            let cfg = SingboxConfigHandler()
             return cfg.toJSON(item: item)
         case .XrayCore:
             let vCfg = V2rayConfigHandler(enableTun: false) // 这里不需要xray内部的tun功能
@@ -113,7 +113,7 @@ class CoreConfigHandler {
     public func toJSON(combination resolved: CombinedConfigResolved) -> String {
         switch resolved.coreType {
         case .SingBox:
-            let cfg = SingboxConfigHandler(enableTun: false)
+            let cfg = SingboxConfigHandler()
             return cfg.toJSON(combination: resolved)
         case .XrayCore:
             let cfg = V2rayConfigHandler(enableTun: false)

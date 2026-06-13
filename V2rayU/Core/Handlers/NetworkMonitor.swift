@@ -4,7 +4,7 @@
 //
 //  监听网络路径变化（切换 Wi-Fi / 插拔网线 / 网络中断恢复）。
 //  TUN 模式下, 物理默认接口/网关变化会使 sing-box 已建立的路由失效 → 整体断网。
-//  本监听器在网络变化后(去抖)触发 V2rayLaunch.rebuildAfterNetworkChange, 重建 TUN。
+//  本监听器在网络变化后(去抖)触发 TunHandler.rebuildAfterNetworkChange, 重建 TUN。
 //
 
 import Foundation
@@ -87,7 +87,7 @@ actor NetworkMonitor {
             // 去抖: 等待网络切换的多次抖动平息
             try? await Task.sleep(nanoseconds: 2_000_000_000)
             if Task.isCancelled { return }
-            await V2rayLaunch.shared.rebuildAfterNetworkChange(reason: "network change")
+            await TunHandler.shared.rebuildAfterNetworkChange(reason: "network change")
         }
     }
 

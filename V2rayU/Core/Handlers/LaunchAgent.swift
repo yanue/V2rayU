@@ -13,7 +13,6 @@ actor LaunchAgent: NSObject {
 
     let singBoxAgentName = "yanue.v2rayu.sing-box"
     let xrayCoreAgentName = "yanue.v2rayu.xray-core"
-    let tunHelperDaemon = "yanue.v2rayu.tun-helper" // 位于 `/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist`, 由 install.sh 安装
 
     let launchAgentDirPath = NSHomeDirectory() + "/Library/LaunchAgents/" 
     var lastCoreFile = getCoreFile()
@@ -118,8 +117,6 @@ actor LaunchAgent: NSObject {
 
     // 停止任务
     func stopAgent() {
-        stopTunHelper()
-
         for agentName in [singBoxAgentName, xrayCoreAgentName] {
             guard agentExists(agentName) else { continue }
             do {
@@ -132,42 +129,4 @@ actor LaunchAgent: NSObject {
         }
     }
 
-    // 启动tun-helper (sing-box based)
-    func startTunHelper() async -> Bool {
-        do {
-            let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
-            logger.info("startTunHelper done: \(output)")
-            return true
-        } catch let error {
-            logger.info("startTunHelper failed: \(error), trigger install")
-            // 任何失败（sudo 权限、daemon 未 load 等）都直接弹出安装授权
-            // install.sh 会重新配置 sudoers 并 load daemon plist
-            await AppInstaller.shared.forceInstall(reason: "startTunHelper failed: \(error)")
-            // 安装后重试
-            do {
-                let output = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "start", tunHelperDaemon])
-                logger.info("startTunHelper retry done: \(output)")
-                return true
-            } catch {
-                logger.info("startTunHelper retry failed: \(error)")
-                return false
-            }
-        }
-    }
-
-
-    // 停止tun-helper
-    func stopTunHelper() {
-        do {
-            _ = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "stop", tunHelperDaemon])
-            logger.info("stopTunHelper done")
-        } catch let error {
-            // 如果是sudo需要密码的错误，说明没有配置好，不需要报错
-            if error.localizedDescription.contains("password is required") {
-                logger.info("stopTunHelper skipped: sudo not configured, run install first")
-            } else {
-                logger.info("stopTunHelper failed: \(error)")
-            }
-        }
-    }
 }

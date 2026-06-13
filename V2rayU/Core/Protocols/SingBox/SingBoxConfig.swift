@@ -482,3 +482,16 @@ enum SingboxBundledRuleSet {
         }
     }
 }
+
+extension SingboxStruct {
+    mutating func applyBundledRuleSets() {
+        guard SingboxVersionCheck.supportsRuleSet() else { return }
+        let forceAll = SingboxVersionCheck.geositeRemoved()
+
+        let normalizedRoute = SingboxBundledRuleSet.normalize(routeRules: self.route.rules, forceAll: forceAll)
+        let normalizedDns = SingboxBundledRuleSet.normalize(dnsRules: self.dns.rules, forceAll: forceAll)
+        self.route.rules = normalizedRoute.rules
+        self.dns.rules = normalizedDns.rules
+        self.route.rule_set = SingboxBundledRuleSet.mergeRuleSets(normalizedRoute.ruleSets, normalizedDns.ruleSets)
+    }
+}

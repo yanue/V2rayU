@@ -106,6 +106,10 @@ Tests read the **real DB** at `~/.V2rayU/.V2rayU.db` — profiles must exist.
 - `/Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist` — system LaunchDaemon
 - `/private/etc/sudoers.d/v2rayu-sudoer` — sudoers entry for tun-helper + core updates
 
+## CRITICAL: Never delete DerivedData
+
+**NEVER** delete `~/Library/Developer/Xcode/DerivedData/`. This directory contains SPM package checkouts. Due to network restrictions (GFW), re-resolving SPM dependencies will fail. Use `xcodebuild clean build` (NOT `rm -rf DerivedData`) for clean builds. If DerivedData is corrupted, the user must manually re-resolve via Xcode or VPN.
+
 ## Repository conventions
 
 - **No CI**, no linter/formatter config, no typecheck script

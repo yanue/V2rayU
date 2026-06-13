@@ -8,7 +8,6 @@
 
 import Cocoa
 import SystemConfiguration
-import Network
 
 enum RunMode: String, CaseIterable {
     case global
@@ -47,9 +46,6 @@ enum RunMode: String, CaseIterable {
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
     var lastCore: CoreType?
-    private var rebuildInProgress = false
-    private var lastRebuildAt: Date?
-    private let minRebuildInterval: TimeInterval = 8
 
     private func localized(_ label: LanguageLabel) async -> String {
         await MainActor.run { String(localized: label) }
@@ -150,19 +146,13 @@ actor V2rayLaunch {
                 logger.error("PingRunning.startPing failed: \(error)")
             }
         }
-        // TUN模式: 使用sing-box(tun) -> xray/sing(socks)
         if mode == .tun {
-            createTunJsonFile(item: item)
-            logger.info("create tun config ok, path: \(TunConfigFilePath)")
-
-            let tunStarted = await LaunchAgent.shared.startTunHelper()
-            if !tunStarted {
+            guard await TunHandler.shared.start(item: item) else {
                 await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
                 return false
             }
-            logger.info("start tun-helper ok")
         }
         self.lastCore = coreDecision.coreType
 
@@ -260,17 +250,12 @@ actor V2rayLaunch {
         }
 
         if mode == .tun {
-            createTunJsonFile(item: firstProfile)
-            logger.info("create tun config ok, path: \(TunConfigFilePath)")
-
-            let tunStarted = await LaunchAgent.shared.startTunHelper()
-            if !tunStarted {
+            guard await TunHandler.shared.start(item: firstProfile) else {
                 await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
                 return false
             }
-            logger.info("start tun-helper ok")
         }
 
         self.lastCore = resolved.coreType
@@ -284,6 +269,7 @@ actor V2rayLaunch {
     }
 
     func stop() async {
+        await TunHandler.shared.stop()
         await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
@@ -314,120 +300,6 @@ actor V2rayLaunch {
         return true
     }
 
-    private func currentDefaultRoute() -> (gateway: String?, interface: String?) {
-        do {
-            let output = try runCommand(at: "/sbin/route", with: ["-n", "get", "default"])
-            var gateway: String?
-            var interface: String?
-            for line in output.components(separatedBy: .newlines) {
-                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.hasPrefix("gateway:") {
-                    gateway = trimmed.replacingOccurrences(of: "gateway:", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                } else if trimmed.hasPrefix("interface:") {
-                    interface = trimmed.replacingOccurrences(of: "interface:", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                }
-            }
-            return (gateway, interface)
-        } catch {
-            logger.info("currentDefaultRoute failed: \(error)")
-            return (nil, nil)
-        }
-    }
-
-    private func hasPhysicalDefaultRoute() -> Bool {
-        let route = currentDefaultRoute()
-        guard let interface = route.interface, !interface.isEmpty else { return false }
-        // TUN/loopback 默认路由说明还未回到物理网络，不能据此重建 TUN。
-        if interface.hasPrefix("utun") || interface == "lo0" || interface.hasPrefix("lo") {
-            logger.info("physical route not ready: default interface=\(interface), gateway=\(route.gateway ?? "")")
-            return false
-        }
-        logger.info("physical route ready: interface=\(interface), gateway=\(route.gateway ?? "")")
-        return true
-    }
-
-    /// 等待物理网络就绪（接口可用），用于唤醒/换网后避免过早重启导致接口探测失败。
-    /// 同时要求默认路由回到非 utun/loopback 接口，避免旧 TUN 路由让 NWPathMonitor 误报 satisfied。
-    /// - Parameter timeout: 最长等待时间，超时也返回（由调用方决定是否继续重启）
-    /// - Returns: true 表示在超时前网络已就绪
-    func waitForNetworkReady(timeout: TimeInterval = 15) async -> Bool {
-        let ready = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
-            let monitor = NWPathMonitor()
-            let flag = ResumeFlag()
-            monitor.pathUpdateHandler = { path in
-                if path.status == .satisfied {
-                    Task {
-                        await flag.tryResumeBool(cont, result: true)
-                        monitor.cancel()
-                    }
-                }
-            }
-            monitor.start(queue: DispatchQueue(label: "net.yanue.V2rayU.networkReady"))
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                Task {
-                    await flag.tryResumeBool(cont, result: false)
-                    monitor.cancel()
-                }
-            }
-        }
-        guard ready else { return false }
-
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if hasPhysicalDefaultRoute() {
-                // 网络刚就绪时路由/DHCP 可能仍在收敛，额外等待一小段时间再确认一次
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
-                return hasPhysicalDefaultRoute()
-            }
-            try? await Task.sleep(nanoseconds: 500_000_000)
-        }
-        return false
-    }
-
-    /// 网络变化/唤醒后安全重建（仅在 TUN 模式且已开启时）。
-    /// 先等待物理网络就绪，再走完整 restart()（重建 core + tun + 系统代理），
-    /// 确保不会在内核未就绪时让 TUN 抢占路由形成黑洞。
-    func rebuildAfterNetworkChange(reason: String) async {
-        if rebuildInProgress {
-            logger.info("rebuildAfterNetworkChange skip: rebuild already in progress (\(reason))")
-            return
-        }
-        if let lastRebuildAt = lastRebuildAt, Date().timeIntervalSince(lastRebuildAt) < minRebuildInterval {
-            logger.info("rebuildAfterNetworkChange skip: too soon after previous rebuild (\(reason))")
-            return
-        }
-
-        let (turnOn, mode) = await MainActor.run { (AppState.shared.v2rayTurnOn, AppState.shared.runMode) }
-        guard turnOn else {
-            logger.info("rebuildAfterNetworkChange skip: not running (\(reason))")
-            return
-        }
-        guard mode == .tun else {
-            logger.info("rebuildAfterNetworkChange skip: mode=\(mode.rawValue) (\(reason))")
-            return
-        }
-        guard UserDefaults.getBool(forKey: .tunAutoRebuild, default: true) else {
-            logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
-            return
-        }
-
-        rebuildInProgress = true
-        defer { rebuildInProgress = false }
-
-        logger.info("rebuildAfterNetworkChange: \(reason), stopping stale TUN before waiting for network...")
-        await LaunchAgent.shared.stopTunHelper()
-
-        logger.info("rebuildAfterNetworkChange: \(reason), waiting for network...")
-        let ready = await waitForNetworkReady()
-        if !ready {
-            logger.info("rebuildAfterNetworkChange: network not ready, proceeding with restart anyway (\(reason))")
-        }
-
-        logger.info("rebuildAfterNetworkChange: restarting (\(reason))")
-        await restart()
-        lastRebuildAt = Date()
-    }
-
     private func createJsonFile(item: ProfileEntity) {
         let cfg = CoreConfigHandler()
         let jsonText = cfg.toJSON(item: item)
@@ -449,20 +321,6 @@ actor V2rayLaunch {
         } catch {
             logger.info("Failed to write combined JSON file: \(error)")
             noticeTip(title: "Failed to write combined JSON file: \(error)")
-        }
-    }
-
-    // TUN模式: 创建tun配置文件
-    private func createTunJsonFile(item: ProfileEntity) {
-        // TUN模式使用sing-box
-        let cfg = SingboxConfigHandler(enableTun: true)
-        let jsonText = cfg.toJSON(item: item)
-        do {
-            try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)
-            logger.info("createTunJsonFile: wrote \(TunConfigFilePath)")
-        } catch {
-            logger.info("Failed to write tun JSON file: \(error)")
-            noticeTip(title: "Failed to write tun JSON file: \(error)")
         }
     }
 
