@@ -13,7 +13,7 @@ var authRef: AuthorizationRef?
 let _version = "4.0.0"
 
 class V2rayUTool: NSObject {
-    static let usage = "Usage: \n V2rayUTool -mode <global|manual|pac|off> -pac <url> -http-port <port> -sock-port <port> \n V2rayUTool version"
+    static let usage = "Usage: \n V2rayUTool -mode <global|manual|pac|off> -pac <url> -http-port <port> -sock-port <port> \n V2rayUTool -dns-setup <ip> \n V2rayUTool -dns-restore <ip1> [ip2] ... \n V2rayUTool -dns-clear \n V2rayUTool version"
 
     enum RunMode: String {
         case global
@@ -30,6 +30,22 @@ class V2rayUTool: NSObject {
                 return
             }
         }
+        if arguments.count >= 2 {
+            switch arguments[1] {
+            case "-dns-setup" where arguments.count >= 3:
+                dnsSetup(address: arguments[2])
+                return
+            case "-dns-restore" where arguments.count >= 3:
+                dnsRestore(addresses: Array(arguments.dropFirst(2)))
+                return
+            case "-dns-clear":
+                dnsSetup(address: nil)
+                return
+            default:
+                break
+            }
+        }
+
         if arguments.count < 9 {
             print(self.usage)
             return
@@ -112,6 +128,68 @@ class V2rayUTool: NSObject {
 
             Swift.print("after SCPreferencesCommitChanges: commitRet = \(commitRet), applyRet = \(applyRet)")
         }
+    }
+
+    // MARK: - DNS
+
+    static func dnsSetup(address: String?) {
+        let authErr = AuthorizationCreate(nil, nil, [.interactionAllowed, .extendRights, .preAuthorize], &authRef)
+        guard authErr == noErr, authRef != nil else {
+            NSLog("DNS setup: authorization failed")
+            return
+        }
+        let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "V2rayU" as CFString, nil, authRef)!
+        guard let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices) else { return }
+
+        var dnsDict: [NSObject: AnyObject] = [:]
+        if let addr = address {
+            dnsDict[kSCPropNetDNSServerAddresses] = [addr] as NSObject
+        } else {
+            dnsDict[kSCPropNetDNSServerAddresses] = [] as NSObject
+        }
+
+        sets.allKeys!.forEach { key in
+            let dict = sets.object(forKey: key)!
+            let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
+            if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
+                SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetDNS)" as CFString, dnsDict as CFDictionary)
+            }
+        }
+
+        SCPreferencesCommitChanges(prefRef)
+        SCPreferencesApplyChanges(prefRef)
+        SCPreferencesSynchronize(prefRef)
+        Swift.print("DNS setup: \(address ?? "empty")")
+    }
+
+    static func dnsRestore(addresses: [String]) {
+        let authErr = AuthorizationCreate(nil, nil, [.interactionAllowed, .extendRights, .preAuthorize], &authRef)
+        guard authErr == noErr, authRef != nil else {
+            NSLog("DNS restore: authorization failed")
+            return
+        }
+        let prefRef = SCPreferencesCreateWithAuthorization(kCFAllocatorDefault, "V2rayU" as CFString, nil, authRef)!
+        guard let sets = SCPreferencesGetValue(prefRef, kSCPrefNetworkServices) else { return }
+
+        var dnsDict: [NSObject: AnyObject] = [:]
+        if !addresses.isEmpty {
+            dnsDict[kSCPropNetDNSServerAddresses] = addresses as NSObject
+        } else {
+            dnsDict[kSCPropNetDNSServerAddresses] = [] as NSObject
+        }
+
+        sets.allKeys!.forEach { key in
+            let dict = sets.object(forKey: key)!
+            let hardware = (dict as AnyObject).value(forKeyPath: "Interface.Hardware")
+            if hardware != nil && ["AirPort", "Wi-Fi", "Ethernet"].contains(hardware as! String) {
+                SCPreferencesPathSetValue(prefRef, "/\(kSCPrefNetworkServices)/\(key)/\(kSCEntNetDNS)" as CFString, dnsDict as CFDictionary)
+            }
+        }
+
+        SCPreferencesCommitChanges(prefRef)
+        SCPreferencesApplyChanges(prefRef)
+        SCPreferencesSynchronize(prefRef)
+        Swift.print("DNS restore: \(addresses.joined(separator: ", "))")
     }
 }
 

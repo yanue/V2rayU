@@ -12,6 +12,7 @@ actor TunHandler {
     // MARK: - Start
 
     func start(item: ProfileEntity) async -> Bool {
+        stop()
         do {
             let jsonText = TunConfigHandler.buildTunConfig(item: item)
             try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)

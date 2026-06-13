@@ -223,8 +223,9 @@ struct DNSConfig: Codable {
     var rules: [DNSRule] = []
     var final: String?
     var independent_cache: Bool?
+    var strategy: String?
 
-    init(servers: [DNSServer] = [], rules: [DNSRule] = [], final: String? = nil, independent_cache: Bool? = nil) {
+    init(servers: [DNSServer] = [], rules: [DNSRule] = [], final: String? = nil, independent_cache: Bool? = nil, strategy: String? = nil) {
         self.servers = servers
         self.rules = rules
         self.final = final
@@ -244,6 +245,7 @@ struct DNSRule: Codable {
     var geosite: [String]?
     var geoip: [String]?
     var clash_mode: String?
+    var strategy: String?
 
     init(
         server: String? = nil,
@@ -256,7 +258,8 @@ struct DNSRule: Codable {
         ip_accept_any: Bool? = nil,
         geosite: [String]? = nil,
         geoip: [String]? = nil,
-        clash_mode: String? = nil
+        clash_mode: String? = nil,
+        strategy: String? = nil
     ) {
         self.server = server
         self.domain = domain
@@ -269,6 +272,7 @@ struct DNSRule: Codable {
         self.geosite = geosite
         self.geoip = geoip
         self.clash_mode = clash_mode
+        self.strategy = strategy
     }
 }
 
@@ -341,6 +345,9 @@ struct RouteRule: Codable {
     var outbound: String?
     var action: String?
     var domain: [String]?
+    var domain_suffix: [String]?
+    var domain_keyword: [String]?
+    var domain_regex: [String]?
     var geosite: [String]?
     var geoip: [String]?
     var ip_cidr: [String]?
@@ -358,6 +365,9 @@ struct RouteRule: Codable {
         outbound: String? = nil,
         action: String? = nil,
         domain: [String]? = nil,
+        domain_suffix: [String]? = nil,
+        domain_keyword: [String]? = nil,
+        domain_regex: [String]? = nil,
         geosite: [String]? = nil,
         geoip: [String]? = nil,
         ip_cidr: [String]? = nil,
@@ -374,6 +384,9 @@ struct RouteRule: Codable {
         self.outbound = outbound
         self.action = action
         self.domain = domain
+        self.domain_suffix = domain_suffix
+        self.domain_keyword = domain_keyword
+        self.domain_regex = domain_regex
         self.geosite = geosite
         self.geoip = geoip
         self.ip_cidr = ip_cidr

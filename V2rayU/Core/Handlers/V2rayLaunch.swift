@@ -54,7 +54,7 @@ actor V2rayLaunch {
     private func noticeLocalized(title: LanguageLabel, message: LanguageLabel) async {
         let titleText = await localized(title)
         let messageText = await localized(message)
-        noticeTip(title: titleText, informativeText: messageText)
+        await showAlert(title: titleText, message: messageText)
     }
 
     func restart() async {
@@ -111,6 +111,8 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
+        // 先停止所有已有服务（包括 TUN），避免切换模式时残留路由规则
+        await TunHandler.shared.stop()
         await LaunchAgent.shared.stopAgent()
 
         createJsonFile(item: item)
@@ -154,6 +156,7 @@ actor V2rayLaunch {
                 return false
             }
         }
+        Task.detached { Self.setupTunDns() }
         self.lastCore = coreDecision.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -258,6 +261,7 @@ actor V2rayLaunch {
             }
         }
 
+        Task.detached { Self.setupTunDns() }
         self.lastCore = resolved.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -269,6 +273,7 @@ actor V2rayLaunch {
     }
 
     func stop() async {
+        Self.restoreTunDns()
         await TunHandler.shared.stop()
         await LaunchAgent.shared.stopAgent()
         await AppState.shared.resetSpeed()
@@ -354,5 +359,48 @@ actor V2rayLaunch {
             alertDialog(title: "setSystemProxy Error", message: error.localizedDescription)
             Task { await AppInstaller.shared.showInstallAlert() }
         }
+    }
+
+    // MARK: - DNS management
+
+    nonisolated(unsafe) private static var savedOriginalDns: [String] = []
+
+    /// 读取当前系统 DNS
+    nonisolated private static func readCurrentDns() -> [String] {
+        for svc in ["Wi-Fi", "Ethernet", "Thunderbolt"] {
+            if let output = try? runCommand(at: "/usr/sbin/networksetup", with: ["-getdnsservers", svc]) {
+                let servers = output.split(separator: "\n").filter { !$0.contains("empty") && !$0.contains("There") }
+                if !servers.isEmpty {
+                    return servers.map { $0.trimmingCharacters(in: .whitespaces) }
+                }
+            }
+        }
+        return []
+    }
+
+    /// 启动时设置系统 DNS 到 1.1.1.1（通过 V2rayUTool 提权）
+    nonisolated static func setupTunDns() {
+        let current = readCurrentDns()
+        // 保存原值（可能为空 = DHCP 自动获取，在中国会拿到 223.5.5.5）
+        savedOriginalDns = current
+
+        if (try? runCommand(at: v2rayUTool, with: ["-dns-setup", "1.1.1.1"])) != nil {
+            logger.info("DNS set to 1.1.1.1")
+        } else {
+            logger.warning("DNS change failed")
+        }
+    }
+
+    /// 停止时恢复原始 DNS
+    nonisolated static func restoreTunDns() {
+        if savedOriginalDns.isEmpty {
+            // 原值空 = DHCP 自动获取，清空让 DHCP 恢复
+            _ = try? runCommand(at: v2rayUTool, with: ["-dns-clear"])
+        } else {
+            if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {
+                logger.info("DNS restored")
+            }
+        }
+        savedOriginalDns = []
     }
 }
