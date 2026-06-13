@@ -42,9 +42,51 @@ enum RunMode: String, CaseIterable {
     }
 }
 
+// MARK: - 统一运行状态
+
+enum LaunchState: Equatable {
+    case stopped
+    case starting
+    case running(coreType: CoreType, mode: RunMode)
+    case stopping
+    case failed(String)
+
+    var isRunning: Bool {
+        if case .running = self { return true }
+        return false
+    }
+    var description: String {
+        switch self {
+        case .stopped: return "stopped"
+        case .starting: return "starting"
+        case .running(let c, let m): return "running(\(c.rawValue), \(m.rawValue))"
+        case .stopping: return "stopping"
+        case .failed(let e): return "failed(\(e))"
+        }
+    }
+}
+
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
+
+    nonisolated(unsafe) private static var _launchState: LaunchState = .stopped
+    nonisolated static var launchState: LaunchState { _launchState }
+
+    /// 是否可以安全调用 start()
+    nonisolated private static var canStart: Bool {
+        V2rayLaunch._launchState == .stopped || { if case .failed = V2rayLaunch._launchState { return true }; return false }()
+    }
+
+    nonisolated private static func transition(to newState: LaunchState) {
+        let old = _launchState
+        _launchState = newState
+        logger.info("LaunchState: \(old.description) → \(newState.description)")
+        Task { @MainActor in
+            AppState.shared.launchState = newState
+        }
+    }
+
     var lastCore: CoreType?
 
     private func localized(_ label: LanguageLabel) async -> String {
@@ -57,26 +99,45 @@ actor V2rayLaunch {
         await showAlert(title: titleText, message: messageText)
     }
 
+    /// 完全重启（先停后启）
     func restart() async {
-        let _ = await start()
+        let wasRunning = V2rayLaunch._launchState.isRunning || V2rayLaunch._launchState == .starting
+        if wasRunning { await stop() }
+        let success = await start()
+        if !wasRunning {
+            await MainActor.run { AppState.shared.v2rayTurnOn = success }
+        }
     }
 
     func start() async -> Bool {
-        logger.info("start v2ray-core begin")
+        logger.info("start v2ray-core begin, current state=\(V2rayLaunch._launchState.description)")
+
+        // 防止重复进入（允许从 .stopped / .failed 启动）
+        guard V2rayLaunch.canStart else {
+            logger.info("start skipped: invalid state=\(V2rayLaunch._launchState.description)")
+            return false
+        }
+        Self.transition(to: .starting)
+
+        // 检查组合配置
         let runningCombination = await MainActor.run { AppState.shared.runningCombination }
         if !runningCombination.isEmpty {
-            return await startCombination(uuid: runningCombination)
+            let result = await startCombination(uuid: runningCombination)
+            if !result { Self.transition(to: .stopped) }
+            return result
         }
 
+        // 获取运行中的 profile
         guard let running = ProfileStore.shared.getRunning() else {
             await noticeLocalized(title: .StartFailed, message: .NoAvailableServerConfig)
             await MainActor.run {
                 AppState.shared.runningProfile = ""
                 AppState.shared.runningServer = nil
             }
+            Self.transition(to: .stopped)
             return false
         }
-        // 启动前自动获取证书指纹（allowInsecure 已被新 Xray-core 移除）；失败则回退 Sing-Box。
+        // 启动前自动获取证书指纹
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
         if let warningMessage = coreDecision.warningMessage {
@@ -94,13 +155,15 @@ actor V2rayLaunch {
                     }
                     await CoreViewModel.shared.downloadMinimumVersion(for: coreDecision)
                 }
+                Self.transition(to: .stopped)
                 return false
             }
         }
         if !coreDecision.canLaunch {
+            Self.transition(to: .stopped)
             return false
         }
-        // 同步 AppState 与实际使用的服务器
+        // 同步 AppState
         await MainActor.run {
             if AppState.shared.runningProfile != item.uuid {
                 AppState.shared.runningProfile = item.uuid
@@ -111,13 +174,13 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        // 先停止所有已有服务（包括 TUN），避免切换模式时残留路由规则
+        // 停止已有服务
         await TunHandler.shared.stop()
         await LaunchAgent.shared.stopAgent()
 
         createJsonFile(item: item)
 
-        // Rotate log files on start (save previous session, start fresh)
+        // 轮转日志
         truncateLogFile(appLogFilePath)
         LogRotation.rotateSessionLog(at: coreLogFilePath)
         LogRotation.rotateSessionLog(at: tunLogFilePath)
@@ -126,20 +189,25 @@ actor V2rayLaunch {
         LogRotation.cleanSessionBackups(at: tunLogFilePath)
         LogRotation.cleanSessionBackups(at: runTunLogFilePath)
 
-        // 启动
+        // 启动守护进程
         let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
         if !started {
             await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
+            Self.transition(to: .stopped)
             return false
         }
+        // 等待代理端口就绪
         let mode = await AppState.shared.runMode
         guard await ensureLocalProxyReady(mode: mode, context: "start") else {
             await LaunchAgent.shared.stopAgent()
             setSystemProxy(mode: nil)
+            Self.transition(to: .stopped)
             return false
         }
+        // 设置系统代理
         setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
+        // 后台统计 + ping（非关键，不阻塞）
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
             do {
@@ -148,15 +216,18 @@ actor V2rayLaunch {
                 logger.error("PingRunning.startPing failed: \(error)")
             }
         }
+        // TUN 模式开启 tun-helper
         if mode == .tun {
             guard await TunHandler.shared.start(item: item) else {
                 await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
                 return false
             }
         }
-        Task.detached { Self.setupTunDns() }
+        // DNS 设置
+        Self.setupTunDns()
         self.lastCore = coreDecision.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -164,19 +235,18 @@ actor V2rayLaunch {
             LogRotation.extractErrors()
         }
 
+        Self.transition(to: .running(coreType: coreDecision.coreType, mode: mode))
         return true
     }
 
     private func startCombination(uuid: String) async -> Bool {
         guard let combination = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
             await noticeLocalized(title: .StartFailed, message: .InvalidCombinationStartTip)
-            await MainActor.run {
-                AppState.shared.runningCombination = ""
-            }
+            await MainActor.run { AppState.shared.runningCombination = "" }
+            Self.transition(to: .stopped)
             return false
         }
 
-        // 启动前为组合内各 TLS 节点自动获取证书指纹（持久化到 DB，供 resolveCombination 读取）。
         let memberUUIDs = Set(combination.groups.flatMap { $0.outboundProfileUUIDs })
         let memberProfiles = ProfileStore.shared.fetchAll().filter { memberUUIDs.contains($0.uuid) }
         let pinningResults = await CertPinningCoordinator.ensurePinnedCerts(for: memberProfiles)
@@ -190,6 +260,7 @@ actor V2rayLaunch {
             forceSingboxProfileUUIDs: forceSingboxUUIDs
         ), let firstProfile = resolved.firstProfile else {
             await noticeLocalized(title: .StartFailed, message: .CombinationNoAvailableOutbounds)
+            Self.transition(to: .stopped)
             return false
         }
 
@@ -211,7 +282,8 @@ actor V2rayLaunch {
             }
         }
         if !resolved.canLaunch {
-            logger.error("start combination aborted: combined config is incompatible with selected core")
+            logger.error("start combination aborted: incompatible with selected core")
+            Self.transition(to: .stopped)
             return false
         }
 
@@ -226,7 +298,6 @@ actor V2rayLaunch {
         await LaunchAgent.shared.stopAgent()
 
         createJsonFile(combination: resolved)
-
         truncateLogFile(appLogFilePath)
         LogRotation.rotateSessionLog(at: coreLogFilePath)
         LogRotation.rotateSessionLog(at: tunLogFilePath)
@@ -238,12 +309,14 @@ actor V2rayLaunch {
         let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
         if !started {
             await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
+            Self.transition(to: .stopped)
             return false
         }
         let mode = await AppState.shared.runMode
         guard await ensureLocalProxyReady(mode: mode, context: "start combined config") else {
             await LaunchAgent.shared.stopAgent()
             setSystemProxy(mode: nil)
+            Self.transition(to: .stopped)
             return false
         }
         setSystemProxy(mode: mode)
@@ -257,11 +330,12 @@ actor V2rayLaunch {
                 await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
                 return false
             }
         }
 
-        Task.detached { Self.setupTunDns() }
+        Self.setupTunDns()
         self.lastCore = resolved.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -269,16 +343,31 @@ actor V2rayLaunch {
             LogRotation.extractErrors()
         }
 
+        Self.transition(to: .running(coreType: resolved.coreType, mode: mode))
         return true
     }
 
     func stop() async {
+        logger.info("stop begin, current state=\(V2rayLaunch._launchState.description)")
+        guard V2rayLaunch._launchState.isRunning || V2rayLaunch._launchState == .starting else {
+            logger.info("stop skipped: not running")
+            return
+        }
+        Self.transition(to: .stopping)
+
+        // 1. 恢复 DNS
         Self.restoreTunDns()
+        // 2. 停止 TUN
         await TunHandler.shared.stop()
+        // 3. 停止代理核心
         await LaunchAgent.shared.stopAgent()
+        // 4. 清理系统代理
+        setSystemProxy(mode: nil)
+        // 5. 重置 UI 状态
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        setSystemProxy(mode: nil)
+
+        Self.transition(to: .stopped)
     }
 
     private func waitForLocalTCPReady(port: UInt16, timeout: TimeInterval) async -> Bool {

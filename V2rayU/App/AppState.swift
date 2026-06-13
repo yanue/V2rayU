@@ -34,6 +34,7 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.set(forKey: .runningCombination, value: runningCombination) }
     }
     @Published var runningServer: ProfileEntity? = nil
+    @Published var launchState: LaunchState = .stopped
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
@@ -126,8 +127,6 @@ final class AppState: ObservableObject {
         }
     }
 
-    private var isCoreOperationInProgress = false
-
     // MARK: - 更新速度
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
         if !self.v2rayTurnOn { return }
@@ -160,24 +159,26 @@ final class AppState: ObservableObject {
 
     // MARK: - 启动/停止核心
     func setCoreRunning(_ running: Bool) async {
-        guard !isCoreOperationInProgress else {
-            logger.info("setCoreRunning: isCoreOperationInProgress, return")
-            return
-        }
-        isCoreOperationInProgress = true
-        defer { isCoreOperationInProgress = false }
+        let currentState = launchState
 
         if running {
+            guard currentState != .starting, !currentState.isRunning, currentState != .stopping else {
+                logger.info("setCoreRunning: skip start, current=\(currentState.description)")
+                return
+            }
             let success = await V2rayLaunch.shared.start()
+            launchState = V2rayLaunch.launchState
             v2rayTurnOn = success
             logger.info("setCoreRunning: started=\(success), v2rayTurnOn=\(self.v2rayTurnOn.description)")
-            if !success {
-                await V2rayLaunch.shared.stop()
-                v2rayTurnOn = false
-                logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
-            }
         } else {
+            guard currentState.isRunning || currentState == .starting || {
+                if case .failed = currentState { return true }; return false
+            }() else {
+                logger.info("setCoreRunning: skip stop, current=\(currentState.description)")
+                return
+            }
             await V2rayLaunch.shared.stop()
+            launchState = V2rayLaunch.launchState
             v2rayTurnOn = false
             logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
         }
