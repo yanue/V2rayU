@@ -77,6 +77,11 @@ actor NetworkMonitor {
         lastInterfaceKey = key
         wasSatisfied = true
 
+        guard interfaceChanged || recovered else {
+            logger.info("NetworkMonitor: path update ignored (no meaningful change)")
+            return
+        }
+
         logger.info("NetworkMonitor: path update (interfaceChanged=\(interfaceChanged), recovered=\(recovered)), schedule rebuild probe")
         scheduleRebuild()
     }
@@ -92,8 +97,10 @@ actor NetworkMonitor {
     }
 
     /// 用可用接口的 类型+名称 组合作为标识, 判断接口集合是否变化
+    /// 过滤掉 utun/lo（TUN 和 loopback 接口变化不应触发重建）
     private static func interfaceKey(_ path: NWPath) -> String {
         path.availableInterfaces
+            .filter { !$0.name.hasPrefix("utun") && $0.name != "lo0" }
             .map { "\($0.type):\($0.name)" }
             .sorted()
             .joined(separator: ",")
