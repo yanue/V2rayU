@@ -5,6 +5,27 @@
 //  Created by yanue on 2018/10/17.
 //  Copyright © 2018 yanue. All rights reserved.
 //
+//  架构说明（重构后）
+//  ------------------------------------------------------------------
+//  运行时由三个相互独立的部分组成, 任意一个变化都不应牵连其它两个:
+//
+//    1. 代理核心 (proxy core)  : sing-box / xray, 以用户级 LaunchAgent 运行,
+//                               读取 config.json, 暴露固定的本地 SOCKS/Mixed 端口。
+//                               config.json 只与 "运行的 profile/combination + 路由"
+//                               有关, 与 RunMode 无关。
+//    2. TUN 守护进程 (tun daemon): sing-box, 以特权 LaunchDaemon 运行, 读取 tun.json,
+//                               把全局流量转发到上面那个固定的本地 SOCKS 端口。
+//                               tun.json 只与 TUN 设置有关, 与 profile/路由无关。
+//    3. 系统代理 (system proxy) : pac / global / manual, 通过 V2rayUTool 设置。
+//
+//  因此各种"切换"只需触碰真正变化的那一部分:
+//    - 切服务器 / 路由 / 组合      → 只重载核心 (reloadCore), 不动 TUN / 系统代理。
+//    - 切模式 (pac/global/manual/tun) → 只调整 TUN 与系统代理 (applyMode), 不重启核心。
+//    - 网络变化 / 唤醒              → 只重建 TUN (rebuildTun), 不重启核心。
+//
+//  所有改变运行状态的公开方法都经由内部串行锁, 保证彼此不会交错执行,
+//  从而消除 TUN 切换时的竞态与不稳定。
+//
 
 import Cocoa
 import SystemConfiguration
@@ -42,52 +63,46 @@ enum RunMode: String, CaseIterable {
     }
 }
 
-// MARK: - 统一运行状态
-
-enum LaunchState: Equatable {
-    case stopped
-    case starting
-    case running(coreType: CoreType, mode: RunMode)
-    case stopping
-    case failed(String)
-
-    var isRunning: Bool {
-        if case .running = self { return true }
-        return false
-    }
-    var description: String {
-        switch self {
-        case .stopped: return "stopped"
-        case .starting: return "starting"
-        case .running(let c, let m): return "running(\(c.rawValue), \(m.rawValue))"
-        case .stopping: return "stopping"
-        case .failed(let e): return "failed(\(e))"
-        }
-    }
-}
-
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
 
-    nonisolated(unsafe) private static var _launchState: LaunchState = .stopped
-    nonisolated static var launchState: LaunchState { _launchState }
+    /// 当前是否处于"已启动"状态（核心已拉起）。唯一的运行状态来源。
+    private var running = false
+    /// 最近一次使用的核心类型（供诊断/统计读取）。
+    var lastCore: CoreType?
 
-    /// 是否可以安全调用 start()
-    nonisolated private static var canStart: Bool {
-        V2rayLaunch._launchState == .stopped || { if case .failed = V2rayLaunch._launchState { return true }; return false }()
-    }
+    /// 对外暴露的只读运行状态。
+    var isRunning: Bool { running }
 
-    nonisolated private static func transition(to newState: LaunchState) {
-        let old = _launchState
-        _launchState = newState
-        logger.info("LaunchState: \(old.description) → \(newState.description)")
-        Task { @MainActor in
-            AppState.shared.launchState = newState
+    // MARK: - 串行锁
+    // actor 在 await 处会让出执行权, 多个公开操作可能交错。用一个公平的串行锁
+    // 把每个完整操作包成临界区, 保证 start/stop/reloadCore/applyMode/rebuildTun
+    // 永不交错执行。
+
+    private var locked = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    private func lock() async {
+        if !locked {
+            locked = true
+            return
+        }
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            waiters.append(cont)
         }
     }
 
-    var lastCore: CoreType?
+    private func unlock() {
+        if waiters.isEmpty {
+            locked = false
+        } else {
+            let next = waiters.removeFirst()
+            next.resume()
+        }
+    }
+
+    // MARK: - 本地化辅助
 
     private func localized(_ label: LanguageLabel) async -> String {
         await MainActor.run { String(localized: label) }
@@ -99,72 +114,169 @@ actor V2rayLaunch {
         await showAlert(title: titleText, message: messageText)
     }
 
-    /// TUN 模式下切换 server：保留 TUN 运行，只重启 core
-    /// 不碰 DNS、不重启 TUN daemon（tun.json 不依赖任何 profile 属性，无需更新）
-    func switchCoreOnly(item: ProfileEntity) async -> Bool {
-        Self.transition(to: .starting)
+    private func syncTurnOn(_ value: Bool) async {
+        await MainActor.run { AppState.shared.v2rayTurnOn = value }
+    }
 
-        createJsonFile(item: item)
-        LogRotation.rotateSessionLog(at: coreLogFilePath)
+    /// TUN 守护进程确实未起来时, 用非阻塞 Toast 告知（不再像旧版那样弹窗 + 整体回滚）。
+    /// 仅用于用户主动发起的 TUN 拉起, 自动重建(rebuildTun)失败不打扰。
+    private func notifyTunFailed() async {
+        let msg = await localized(.TunServiceStartFailed)
+        makeToast(message: msg, displayDuration: 4)
+    }
 
-        await LaunchAgent.shared.stopAgent()
+    // MARK: - 公开操作（均经过串行锁）
 
-        let coreDecision = item.resolveCoreCompatibility()
-        let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
-        guard started else {
-            await stop()
+    /// 完整启动: 核心 + (TUN, 若为 tun 模式) + 系统代理。
+    /// 已在运行则视为空操作。
+    @discardableResult
+    func start() async -> Bool {
+        await lock(); defer { unlock() }
+        if running {
+            logger.info("start skipped: already running")
+            return true
+        }
+        return await startAll()
+    }
+
+    /// 完整停止: 系统代理 + TUN + 核心。
+    func stop() async {
+        await lock(); defer { unlock() }
+        await stopAll()
+    }
+
+    /// 完整重启（先全停后全启）。供端口/核心二进制等"影响全部"的设置变更使用。
+    @discardableResult
+    func restart() async -> Bool {
+        await lock(); defer { unlock() }
+        await stopAll()
+        return await startAll()
+    }
+
+    /// 只重载代理核心（重写 config.json + 重启 LaunchAgent）, 不动 TUN 与系统代理。
+    /// 适用于: 切服务器 / 切路由 / 切组合。
+    /// 若当前未运行, 等价于完整 start()。
+    @discardableResult
+    func reloadCore() async -> Bool {
+        await lock(); defer { unlock() }
+        if !running {
+            return await startAll()
+        }
+        guard await prepareAndStartCore() != nil else {
+            // 核心重载失败: 回到安全的全停状态
+            await stopAll()
             return false
         }
-
-        let mode = await AppState.shared.runMode
-        guard await ensureLocalProxyReady(mode: mode, context: "switchCoreOnly") else {
-            await LaunchAgent.shared.stopAgent()
-            await stop()
-            return false
-        }
-
-        setSystemProxy(mode: mode)
-
-        Task {
-            await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
-            do {
-                try await PingRunning.shared.startPing()
-            } catch {
-                logger.error("PingRunning.startPing failed: \(error)")
-            }
-        }
-
-        self.lastCore = coreDecision.coreType
-        Self.transition(to: .running(coreType: coreDecision.coreType, mode: mode))
+        // TUN 仍指向同一个固定 SOCKS 端口, 系统代理也不变, 无需触碰。
+        running = true
+        await syncTurnOn(true)
         return true
     }
 
-    /// 完全重启（先停后启）
-    func restart() async {
-        let wasRunning = V2rayLaunch._launchState.isRunning || V2rayLaunch._launchState == .starting
-        if wasRunning { await stop() }
-        let success = await start()
-        if !wasRunning {
-            await MainActor.run { AppState.shared.v2rayTurnOn = success }
+    /// 只调整运行模式相关部分（TUN 启停 + 系统代理）, 不重启核心。
+    /// 适用于 pac/global/manual/tun 之间切换。
+    @discardableResult
+    func applyMode(from oldMode: RunMode) async -> Bool {
+        await lock(); defer { unlock() }
+        guard running else {
+            // 未运行: 无可应用; 由调用方决定是否 start()
+            return true
         }
+        let newMode = await MainActor.run { AppState.shared.runMode }
+        if newMode == oldMode {
+            return true
+        }
+        if newMode == .tun && oldMode != .tun {
+            if !(await startTun()) {
+                await notifyTunFailed()
+            }
+        } else if oldMode == .tun && newMode != .tun {
+            await stopTun()
+        }
+        setSystemProxy(mode: newMode)
+        logger.info("applyMode: \(oldMode.rawValue) -> \(newMode.rawValue)")
+        return true
     }
 
-    func start() async -> Bool {
-        logger.info("start v2ray-core begin, current state=\(V2rayLaunch._launchState.description)")
-
-        // 防止重复进入（允许从 .stopped / .failed 启动）
-        guard V2rayLaunch.canStart else {
-            logger.info("start skipped: invalid state=\(V2rayLaunch._launchState.description)")
+    /// 只重建 TUN（停 TUN → 重写 tun.json → 起 TUN → 重设 DNS）, 不重启核心。
+    /// 适用于网络变化 / 系统唤醒后恢复。仅在 tun 模式且运行中时生效。
+    @discardableResult
+    func rebuildTun() async -> Bool {
+        await lock(); defer { unlock() }
+        guard running else {
+            logger.info("rebuildTun skip: not running")
             return false
         }
-        Self.transition(to: .starting)
+        let mode = await MainActor.run { AppState.shared.runMode }
+        guard mode == .tun else {
+            logger.info("rebuildTun skip: mode=\(mode.rawValue)")
+            return false
+        }
+        await stopTun()
+        let ok = await startTun()
+        logger.info("rebuildTun done: \(ok.description)")
+        return ok
+    }
 
-        // 检查组合配置
+    // MARK: - 内部组合操作（已持有锁时调用）
+
+    private func startAll() async -> Bool {
+        // 干净起步: 清掉可能残留的 TUN
+        await stopTun()
+
+        guard let _ = await prepareAndStartCore() else {
+            setSystemProxy(mode: nil)
+            running = false
+            await syncTurnOn(false)
+            return false
+        }
+
+        let mode = await MainActor.run { AppState.shared.runMode }
+        if mode == .tun {
+            // TUN 不依赖 SOCKS 端口就绪(sing-box 会自行重连上游), 立即启动, 不等待 SOCKS。
+            // 失败也不整体回滚（避免切换不稳定）, 仅以非阻塞 Toast 告知。
+            if !(await startTun()) {
+                await notifyTunFailed()
+            }
+        } else {
+            // 非 TUN: 尽力等 SOCKS 就绪再设系统代理, 缩短首次请求失败窗口(不就绪也继续)。
+            if !(await waitForLocalTCPReady(port: getEffectiveSocksProxyPort(), timeout: 6)) {
+                logger.warning("startAll: SOCKS port not ready in time, continuing anyway")
+            }
+        }
+        setSystemProxy(mode: mode)
+
+        running = true
+        await syncTurnOn(true)
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            LogRotation.rotateIfNeeded()
+            LogRotation.extractErrors()
+        }
+        logger.info("startAll ok: mode=\(mode.rawValue)")
+        return true
+    }
+
+    private func stopAll() async {
+        logger.info("stopAll begin, running=\(self.running.description)")
+        await stopTun()
+        await LaunchAgent.shared.stopAgent()
+        setSystemProxy(mode: nil)
+        await AppState.shared.resetSpeed()
+        await CoreTrafficStatsHandler.shared.resetData()
+        running = false
+        await syncTurnOn(false)
+        logger.info("stopAll done")
+    }
+
+    // MARK: - 代理核心（不含 TUN / 系统代理 / DNS）
+
+    /// 写配置 + 启动代理核心。返回核心类型, 失败返回 nil。
+    /// 不触碰 TUN、系统代理、DNS。
+    private func prepareAndStartCore() async -> CoreType? {
         let runningCombination = await MainActor.run { AppState.shared.runningCombination }
         if !runningCombination.isEmpty {
-            let result = await startCombination(uuid: runningCombination)
-            if !result { Self.transition(to: .stopped) }
-            return result
+            return await prepareAndStartCombinationCore(uuid: runningCombination)
         }
 
         // 获取运行中的 profile
@@ -174,8 +286,7 @@ actor V2rayLaunch {
                 AppState.shared.runningProfile = ""
                 AppState.shared.runningServer = nil
             }
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
         // 启动前自动获取证书指纹
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
@@ -195,29 +306,26 @@ actor V2rayLaunch {
                     }
                     await CoreViewModel.shared.downloadMinimumVersion(for: coreDecision)
                 }
-                Self.transition(to: .stopped)
-                return false
+                return nil
             }
         }
         if !coreDecision.canLaunch {
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
         // 同步 AppState
         await MainActor.run {
             if AppState.shared.runningProfile != item.uuid {
                 AppState.shared.runningProfile = item.uuid
                 AppState.shared.runningServer = item
-                logger.info("V2rayLaunch.start: sync runningProfile to \(item.remark)")
+                logger.info("prepareAndStartCore: sync runningProfile to \(item.remark)")
             }
             AppMenuManager.shared.refreshServerItems()
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        // 停止已有服务
-        await TunHandler.shared.stop()
-        await LaunchAgent.shared.stopAgent()
 
+        // 停止旧核心
+        await LaunchAgent.shared.stopAgent()
         // 等待旧核心释放 SOCKS 端口（避免新核心 bind 失败）
         _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
 
@@ -226,55 +334,18 @@ actor V2rayLaunch {
         // 轮转日志
         truncateLogFile(appLogFilePath)
         LogRotation.rotateSessionLog(at: coreLogFilePath)
-        LogRotation.rotateSessionLog(at: tunLogFilePath)
-        LogRotation.rotateSessionLog(at: runTunLogFilePath)
         LogRotation.cleanSessionBackups(at: coreLogFilePath)
-        LogRotation.cleanSessionBackups(at: tunLogFilePath)
-        LogRotation.cleanSessionBackups(at: runTunLogFilePath)
 
         // 启动守护进程
         let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
         if !started {
             await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
-        // 等待代理端口就绪
-        let mode = await AppState.shared.runMode
-        if mode == .tun {
-            // TUN 模式：SOCKS 端口等待与 TUN daemon 启动并行执行
-            // TUN 不依赖 SOCKS 端口，即使核心未就绪也正常启动
-            async let socksReady = ensureLocalProxyReady(mode: mode, context: "start")
-            async let tunReady = TunHandler.shared.start()
-            let (socksOk, tunOk) = await (socksReady, tunReady)
-            guard tunOk else {
-                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            guard socksOk else {
-                logger.error("start: SOCKS port not ready, TUN daemon is still running")
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            // TUN 和核心都就绪后才配置 DNS，避免 DNS 被改成不可达地址
-            Self.setupTunDns()
-            setSystemProxy(mode: mode)
-        } else {
-            guard await ensureLocalProxyReady(mode: mode, context: "start") else {
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            setSystemProxy(mode: mode)
-        }
-        logger.info("start v2ray-core ok: \(mode.rawValue)")
-        // 后台统计 + ping（非关键，不阻塞）
+
+        // 注意: 这里不再等待 SOCKS 端口就绪。是否等待由调用方按模式决定:
+        // TUN 模式不依赖 SOCKS(sing-box 自行重连上游), 非 TUN 模式才在设系统代理前尽力等。
+        // 后台统计 + ping（非关键, 不阻塞）
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
             do {
@@ -284,22 +355,15 @@ actor V2rayLaunch {
             }
         }
         self.lastCore = coreDecision.coreType
-
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-            LogRotation.rotateIfNeeded()
-            LogRotation.extractErrors()
-        }
-
-        Self.transition(to: .running(coreType: coreDecision.coreType, mode: mode))
-        return true
+        logger.info("prepareAndStartCore ok: core=\(coreDecision.coreType.rawValue)")
+        return coreDecision.coreType
     }
 
-    private func startCombination(uuid: String) async -> Bool {
+    private func prepareAndStartCombinationCore(uuid: String) async -> CoreType? {
         guard let combination = CombinedConfigStore.shared.getValidCombination(uuid: uuid) else {
             await noticeLocalized(title: .StartFailed, message: .InvalidCombinationStartTip)
             await MainActor.run { AppState.shared.runningCombination = "" }
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
 
         let memberUUIDs = Set(combination.groups.flatMap { $0.outboundProfileUUIDs })
@@ -315,8 +379,7 @@ actor V2rayLaunch {
             forceSingboxProfileUUIDs: forceSingboxUUIDs
         ), let firstProfile = resolved.firstProfile else {
             await noticeLocalized(title: .StartFailed, message: .CombinationNoAvailableOutbounds)
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
 
         if let warningMessage = resolved.warningMessage {
@@ -338,8 +401,7 @@ actor V2rayLaunch {
         }
         if !resolved.canLaunch {
             logger.error("start combination aborted: incompatible with selected core")
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
 
         await MainActor.run {
@@ -350,93 +412,55 @@ actor V2rayLaunch {
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()
-        await LaunchAgent.shared.stopAgent()
 
-        // 等待旧核心释放 SOCKS 端口
+        await LaunchAgent.shared.stopAgent()
         _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
 
         createJsonFile(combination: resolved)
         truncateLogFile(appLogFilePath)
         LogRotation.rotateSessionLog(at: coreLogFilePath)
-        LogRotation.rotateSessionLog(at: tunLogFilePath)
-        LogRotation.rotateSessionLog(at: runTunLogFilePath)
         LogRotation.cleanSessionBackups(at: coreLogFilePath)
-        LogRotation.cleanSessionBackups(at: tunLogFilePath)
-        LogRotation.cleanSessionBackups(at: runTunLogFilePath)
 
         let started = await LaunchAgent.shared.startAgent(coreType: resolved.coreType)
         if !started {
             await noticeLocalized(title: .StartFailed, message: .LaunchDaemonStartFailed)
-            Self.transition(to: .stopped)
-            return false
+            return nil
         }
-        let mode = await AppState.shared.runMode
-        if mode == .tun {
-            async let socksReady = ensureLocalProxyReady(mode: mode, context: "start combined config")
-            async let tunReady = TunHandler.shared.start()
-            let (socksOk, tunOk) = await (socksReady, tunReady)
-            guard tunOk else {
-                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            guard socksOk else {
-                logger.error("startCombination: SOCKS port not ready, TUN daemon is still running")
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            Self.setupTunDns()
-            setSystemProxy(mode: mode)
-        } else {
-            guard await ensureLocalProxyReady(mode: mode, context: "start combined config") else {
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-            setSystemProxy(mode: mode)
-        }
-        logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
+
+        // 同 prepareAndStartCore: 不在此等待 SOCKS, 由调用方按模式决定。
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
         }
         self.lastCore = resolved.coreType
-
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-            LogRotation.rotateIfNeeded()
-            LogRotation.extractErrors()
-        }
-
-        Self.transition(to: .running(coreType: resolved.coreType, mode: mode))
-        return true
+        logger.info("prepareAndStartCombinationCore ok: \(combination.displayName), core=\(resolved.coreType.rawValue)")
+        return resolved.coreType
     }
 
-    func stop() async {
-        logger.info("stop begin, current state=\(V2rayLaunch._launchState.description)")
-        guard V2rayLaunch._launchState.isRunning || V2rayLaunch._launchState == .starting else {
-            logger.info("stop skipped: not running")
-            return
-        }
-        Self.transition(to: .stopping)
+    // MARK: - TUN（守护进程 + DNS）
 
-        // 1. 恢复 DNS
+    /// 重写 tun.json、启动 TUN 守护进程、设置防污染 DNS。尽力而为, 失败仅记录日志。
+    private func startTun() async -> Bool {
+        LogRotation.rotateSessionLog(at: tunLogFilePath)
+        LogRotation.rotateSessionLog(at: runTunLogFilePath)
+        LogRotation.cleanSessionBackups(at: tunLogFilePath)
+        LogRotation.cleanSessionBackups(at: runTunLogFilePath)
+        let ok = await TunHandler.shared.start()
+        if ok {
+            Self.setupTunDns()
+            logger.info("startTun ok")
+        } else {
+            logger.warning("startTun: TUN daemon failed to start (continuing without teardown)")
+        }
+        return ok
+    }
+
+    /// 先恢复 DNS, 再停止 TUN 守护进程。
+    private func stopTun() async {
         Self.restoreTunDns()
-        // 2. 停止 TUN
         await TunHandler.shared.stop()
-        // 3. 停止代理核心
-        await LaunchAgent.shared.stopAgent()
-        // 4. 清理系统代理
-        setSystemProxy(mode: nil)
-        // 5. 重置 UI 状态
-        await AppState.shared.resetSpeed()
-        await CoreTrafficStatsHandler.shared.resetData()
-
-        Self.transition(to: .stopped)
     }
+
+    // MARK: - 端口探测
 
     private func waitForLocalTCPReady(port: UInt16, timeout: TimeInterval) async -> Bool {
         guard port > 0 else { return false }
@@ -460,22 +484,11 @@ actor V2rayLaunch {
             }
             try? await Task.sleep(nanoseconds: 200_000_000)
         }
-        // 超时后仍然继续（旧核心可能已死但端口未被占用，不影响新核心启动）
         logger.info("waitForLocalTCPReleased: port \(port) still occupied after \(timeout)s, proceeding anyway")
         return false
     }
 
-    private func ensureLocalProxyReady(mode: RunMode, context: String) async -> Bool {
-        let port = getEffectiveSocksProxyPort()
-        let ready = await waitForLocalTCPReady(port: port, timeout: 6)
-        guard ready else {
-            logger.error("\(context) aborted: local SOCKS/Mixed port \(port) is not ready, mode=\(mode.rawValue)")
-            let message = mode == .tun ? LanguageLabel.SocksPortNotReadyForTun : LanguageLabel.LocalProxyPortNotReady
-            await showAlert(title: await localized(.StartFailed), message: await localized(message))
-            return false
-        }
-        return true
-    }
+    // MARK: - 配置文件生成
 
     private func createJsonFile(item: ProfileEntity) {
         let cfg = CoreConfigHandler()
@@ -500,6 +513,8 @@ actor V2rayLaunch {
             noticeTip(title: "Failed to write combined JSON file: \(error)")
         }
     }
+
+    // MARK: - 系统代理
 
     func setSystemProxy(mode: RunMode?) {
         let modeValue = mode?.rawValue ?? "off"

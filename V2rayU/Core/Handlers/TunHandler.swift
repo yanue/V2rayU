@@ -140,8 +140,10 @@ actor TunHandler {
             logger.info("rebuildAfterNetworkChange: network not ready, proceeding with restart anyway (\(reason))")
         }
 
-        logger.info("rebuildAfterNetworkChange: restarting (\(reason))")
-        await V2rayLaunch.shared.restart()
+        // 网络变化只会让 TUN 的自动路由失效, 代理核心的 SOCKS 服务不受影响,
+        // 因此只重建 TUN, 不重启核心（大幅降低切换/恢复时的不稳定）。
+        logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
+        await V2rayLaunch.shared.rebuildTun()
         lastRebuildAt = Date()
     }
 
