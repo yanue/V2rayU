@@ -259,9 +259,9 @@ class RoutingManager {
             return
         }
 
-        logger.info("RoutingManager.saveAndReloadIfNeeded: running routing changed, restart current core")
+        logger.info("RoutingManager.saveAndReloadIfNeeded: running routing changed, reload core only")
         Task {
-            await V2rayLaunch.shared.restart()
+            await V2rayLaunch.shared.reloadCore()
         }
     }
     

@@ -7,6 +7,12 @@ final class AppState: ObservableObject {
     static let shared = AppState()
 
 
+    // 运行状态的"真值"在 V2rayLaunch actor 的 `running`(受串行锁保护)。
+    // `v2rayTurnOn` 是它在 UI 侧的镜像: 每个 V2rayLaunch 操作结束都会把它同步成 running,
+    // 各 switch 方法对它的写入也始终等于该操作的返回值, 因此最终值恒等于 running(不会脑裂)。
+    // `icon` 完全由 (v2rayTurnOn, runMode) 派生(见下方 didSet), 不存在第二个写入点,
+    // 所以图标永远与 v2rayTurnOn 一致。
+    // 需要判断"子系统是否该在运行"的并发逻辑(如网络重建)一律以 actor 的 running 为准, 而非本字段。
     @Published var v2rayTurnOn: Bool = UserDefaults.getBool(forKey: .v2rayTurnOn) {
         didSet {
             UserDefaults.setBool(forKey: .v2rayTurnOn, value: v2rayTurnOn)
@@ -34,7 +40,6 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.set(forKey: .runningCombination, value: runningCombination) }
     }
     @Published var runningServer: ProfileEntity? = nil
-    @Published var launchState: LaunchState = .stopped
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
@@ -158,90 +163,60 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - 启动/停止核心
-    func setCoreRunning(_ running: Bool) async {
-        let currentState = launchState
-
-        if running {
-            guard currentState != .starting, !currentState.isRunning, currentState != .stopping else {
-                logger.info("setCoreRunning: skip start, current=\(currentState.description)")
-                return
-            }
+    // 状态机收敛到 V2rayLaunch actor（内部串行锁 + running 标志）。
+    // AppState 只负责: 更新可观察状态 → 调用 V2rayLaunch 的某个粒度操作 → 刷新菜单。
+    func setCoreRunning(_ on: Bool) async {
+        if on {
             let success = await V2rayLaunch.shared.start()
-            launchState = V2rayLaunch.launchState
             v2rayTurnOn = success
-            logger.info("setCoreRunning: started=\(success), v2rayTurnOn=\(self.v2rayTurnOn.description)")
+            logger.info("setCoreRunning: started=\(success)")
         } else {
-            guard currentState.isRunning || currentState == .starting || {
-                if case .failed = currentState { return true }; return false
-            }() else {
-                logger.info("setCoreRunning: skip stop, current=\(currentState.description)")
-                return
-            }
             await V2rayLaunch.shared.stop()
-            launchState = V2rayLaunch.launchState
             v2rayTurnOn = false
-            logger.info("setCoreRunning: stopped, v2rayTurnOn=\(self.v2rayTurnOn.description)")
+            logger.info("setCoreRunning: stopped")
         }
     }
 
     // MARK: - 切换运行模式
+    // 模式只影响"系统代理"与"TUN", 与核心配置无关 → 不重启核心。
     func switchRunMode(mode: RunMode) async {
         let oldMode = runMode
+        guard oldMode != mode else { return }
         runMode = mode
         v2rayTurnOn = true
         logger.info("switchRunMode: \(oldMode.rawValue) -> \(mode.rawValue)")
-        if launchState.isRunning || launchState == .starting {
-            // 从 TUN 切出时立即恢复 DNS（不等待后台 Task）
-            if oldMode == .tun {
-                V2rayLaunch.restoreTunDns()
-            }
-            // 后台重启，不阻塞 UI
-            Task {
-                await V2rayLaunch.shared.restart()
-                await MainActor.run {
-                    launchState = V2rayLaunch.launchState
-                    v2rayTurnOn = V2rayLaunch.launchState.isRunning
-                    AppMenuManager.shared.refreshBasicMenus()
-                }
-            }
+        if await V2rayLaunch.shared.isRunning {
+            // 运行中: 只调整 TUN + 系统代理, 核心保持不动。
+            await V2rayLaunch.shared.applyMode(from: oldMode)
         } else {
-            // 从 TUN 切出且核心未运行：DNS 可能还是 TUN 残留的
-            if oldMode == .tun {
-                V2rayLaunch.restoreTunDns()
-            }
-            await setCoreRunning(v2rayTurnOn)
+            // 未运行: 直接按新模式拉起。
+            let success = await V2rayLaunch.shared.start()
+            v2rayTurnOn = success
         }
         AppMenuManager.shared.refreshBasicMenus()
     }
 
     // MARK: - 切换路由
+    // 路由属于核心配置 → 只重载核心, 不动 TUN / 系统代理。
     func switchRouting(uuid: String) async {
         runningRouting = uuid
         v2rayTurnOn = true
-        if launchState.isRunning || launchState == .starting {
-            await V2rayLaunch.shared.restart()
-            launchState = V2rayLaunch.launchState
-        } else {
-            await setCoreRunning(v2rayTurnOn)
-        }
+        let success = await V2rayLaunch.shared.reloadCore()
+        v2rayTurnOn = success
         logger.info("switchRouting: \(self.runningRouting)")
         AppMenuManager.shared.refreshRoutingItems()
+        AppMenuManager.shared.refreshBasicMenus()
     }
 
-    // MARK: - 切换组合配置 (与 switchServer 一致, toggle 行为)
+    // MARK: - 切换组合配置 (toggle 行为)
     func switchCombination(uuid: String) async {
-        // 已激活 → 取消选择
+        // 已激活 → 取消选择 → 停止
         if runningCombination == uuid {
             runningCombination = ""
             runningProfile = ""
             runningServer = nil
             v2rayTurnOn = false
-            if launchState.isRunning || launchState == .starting {
-                await V2rayLaunch.shared.stop()
-                launchState = V2rayLaunch.launchState
-            } else {
-                await setCoreRunning(false)
-            }
+            await V2rayLaunch.shared.stop()
             logger.info("switchCombination-deselect: \(uuid)")
             AppMenuManager.shared.refreshCombinedConfigItems()
             AppMenuManager.shared.refreshServerItems()
@@ -264,43 +239,27 @@ final class AppState: ObservableObject {
             runningServer = profile
         }
         v2rayTurnOn = true
-        if launchState.isRunning || launchState == .starting {
-            await V2rayLaunch.shared.restart()
-            launchState = V2rayLaunch.launchState
-        } else {
-            await setCoreRunning(v2rayTurnOn)
-        }
+        // 组合属于核心配置 → 只重载核心。
+        let success = await V2rayLaunch.shared.reloadCore()
+        v2rayTurnOn = success
         AppMenuManager.shared.refreshCombinedConfigItems()
         AppMenuManager.shared.refreshServerItems()
         AppMenuManager.shared.refreshBasicMenus()
     }
+
     // MARK: - 切换配置
+    // 服务器属于核心配置 → 只重载核心, 不动 TUN / 系统代理。
     func switchServer(uuid: String) async {
-        // 点击已激活的服务器不做任何操作
-        if runningProfile == uuid {
+        // 点击已激活的单服务器不做任何操作
+        if runningProfile == uuid, runningCombination.isEmpty {
             return
         }
         runningCombination = ""
         runningProfile = uuid
         v2rayTurnOn = true
 
-        if runMode == .tun, launchState.isRunning {
-            // TUN 快速路径：保留 TUN 守护进程，只重启核心
-            guard let item = ProfileStore.shared.getRunning() else {
-                v2rayTurnOn = false
-                return
-            }
-            let success = await V2rayLaunch.shared.switchCoreOnly(item: item)
-            launchState = V2rayLaunch.launchState
-            v2rayTurnOn = success
-        } else if launchState.isRunning || launchState == .starting {
-            // 非 TUN 模式且核心运行中：完全重启
-            await V2rayLaunch.shared.restart()
-            launchState = V2rayLaunch.launchState
-            v2rayTurnOn = V2rayLaunch.launchState.isRunning
-        } else {
-            await setCoreRunning(v2rayTurnOn)
-        }
+        let success = await V2rayLaunch.shared.reloadCore()
+        v2rayTurnOn = success
 
         runningServer = ProfileStore.shared.getRunning()
         latency = Double(runningServer?.speed ?? 0)
