@@ -49,7 +49,7 @@ enum TunConfigHandler {
         return ip
     }
 
-    static func buildTunConfig(item: ProfileEntity) -> String {
+    static func buildTunConfig() -> String {
         var singbox = SingboxStruct()
 
         let tunLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
@@ -148,10 +148,6 @@ enum TunConfigHandler {
         }
         // 代理核心（xray/sing-box）直连，避免回路
         tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
-        // 代理服务器域名直连（不依赖 process_name，通过 sniff SNI 匹配）
-        if useSniffRuleAction, !item.address.isEmpty {
-            tunRules.append(RouteRule(outbound: "direct", domain_suffix: [item.address]))
-        }
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(
             auto_detect_interface: true,

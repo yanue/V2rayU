@@ -11,10 +11,10 @@ actor TunHandler {
 
     // MARK: - Start
 
-    func start(item: ProfileEntity) async -> Bool {
+    func start() async -> Bool {
         stop()
         do {
-            let jsonText = TunConfigHandler.buildTunConfig(item: item)
+            let jsonText = TunConfigHandler.buildTunConfig()
             try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)
             logger.info("create tun config ok, path: \(TunConfigFilePath)")
         } catch {
