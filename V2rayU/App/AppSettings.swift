@@ -72,9 +72,8 @@ final class AppSettings: ObservableObject {
     @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
     @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-    @Published var tunDnsDefault: String = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
-    @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
-    @Published var tunFakeipRange: String = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
+    @Published var tunDnsRemote: String = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+    @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
     // strict_route: 强制路由, 默认开启
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
     // 网络变化/唤醒后自动重建 TUN, 默认开启
@@ -151,9 +150,8 @@ final class AppSettings: ObservableObject {
         tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
         tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-        tunDnsDefault = UserDefaults.get(forKey: .tunDnsDefault, defaultValue: defaultBootstrapDns)
-        tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
-        tunFakeipRange = UserDefaults.get(forKey: .tunFakeipRange, defaultValue: "198.18.0.0/15")
+        tunDnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+        tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
@@ -223,9 +221,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunAddress, value: tunAddress)
         UserDefaults.setInt(forKey: .tunMtu, value: tunMtu)
         UserDefaults.set(forKey: .tunStack, value: tunStack.rawValue)
-        UserDefaults.set(forKey: .tunDnsDefault, value: tunDnsDefault)
+        UserDefaults.set(forKey: .tunDnsRemote, value: tunDnsRemote)
         UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
-        UserDefaults.set(forKey: .tunFakeipRange, value: tunFakeipRange)
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
@@ -260,9 +257,8 @@ final class AppSettings: ObservableObject {
             old.tunAddress != tunAddress ||
             old.tunMtu != tunMtu ||
             old.tunStack != tunStack ||
-            old.tunDnsDefault != tunDnsDefault ||
+            old.tunDnsRemote != tunDnsRemote ||
             old.tunDnsChina != tunDnsChina ||
-            old.tunFakeipRange != tunFakeipRange ||
             old.tunStrictRoute != tunStrictRoute ||
             old.tunLogLevel != tunLogLevel {
             needRestartV2ray = true

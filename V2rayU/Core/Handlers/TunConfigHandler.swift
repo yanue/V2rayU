@@ -103,14 +103,17 @@ enum TunConfigHandler {
         }
 
         // DNS 分流: 国内域名走 local-dns, 海外域名走 remote-dns（通过代理）
-        // 参考 v2rayN: remote-dns 用 IP（8.8.8.8）+ prefer_ipv4
-        let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: secondaryDomesticDns)
+        let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
+        let dnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
         let useNewDns = SingboxVersionCheck.supportsNewDnsFormat()
 
         if useNewDns {
+            let isIP = isIPAddressLiteral(dnsRemote)
+            var remoteDns = DNSServer(tag: "remote-dns", type: "tcp", server: dnsRemote, detour: "proxy")
+            if !isIP { remoteDns.domain_resolver = "local-dns" }
             singbox.dns = DNSConfig(
                 servers: [
-                    DNSServer(tag: "remote-dns", type: "tcp", server: "8.8.8.8", detour: "proxy"),
+                    remoteDns,
                     DNSServer(tag: "local-dns", type: "udp", server: dnsChina),
                 ],
                 rules: [
@@ -122,9 +125,12 @@ enum TunConfigHandler {
                 strategy: "prefer_ipv4"
             )
         } else {
+            let isIP = isIPAddressLiteral(dnsRemote)
+            var remoteDns = DNSServer(tag: "remote-dns", detour: "proxy", address: "tcp://\(dnsRemote)")
+            if !isIP { remoteDns.address_resolver = "local-dns" }
             singbox.dns = DNSConfig(
                 servers: [
-                    DNSServer(tag: "remote-dns", detour: "proxy", address: "tcp://8.8.8.8"),
+                    remoteDns,
                     DNSServer(tag: "local-dns", address: "udp://\(dnsChina)"),
                 ],
                 rules: [
@@ -140,24 +146,11 @@ enum TunConfigHandler {
         if useSniffRuleAction {
             tunRules.append(RouteRule(action: "sniff"))
         }
-        // 阻止已知的有问题流量（NetBIOS、mDNS、多播）+ QUIC（强制浏览器回退 TCP）
-        let useNewBlock = SingboxVersionCheck.blockOutboundRemoved()
-        let rejectAction: String? = useNewBlock ? "reject" : nil
-        let blockOutbound: String? = useNewBlock ? nil : "block"
-        tunRules.append(RouteRule(outbound: blockOutbound, action: rejectAction, network: ["udp"], port: [135, 137, 138, 139, 5353]))
-        tunRules.append(RouteRule(outbound: blockOutbound, action: rejectAction, ip_cidr: ["224.0.0.0/3", "ff00::/8"]))
-        // 阻止 QUIC（HTTP/3），强制浏览器回退 TCP HTTPS — SOCKS5 UDP 代理常见问题
-        tunRules.append(RouteRule(outbound: blockOutbound, action: rejectAction, protocol: ["quic"]))
         // 代理核心（xray/sing-box）直连，避免回路
         tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
         // 代理服务器域名直连（不依赖 process_name，通过 sniff SNI 匹配）
         if useSniffRuleAction, !item.address.isEmpty {
             tunRules.append(RouteRule(outbound: "direct", domain_suffix: [item.address]))
-        }
-        // 代理服务器 IP 直连（兜底：优先用已存储 serverIp，空则实时 DNS 解析）
-        let proxyIp = !item.serverIp.isEmpty ? item.serverIp : resolveServerIp(from: item.address)
-        if let proxyIp = proxyIp, !proxyIp.isEmpty {
-            tunRules.append(RouteRule(outbound: "direct", ip_cidr: [proxyIp + "/32"]))
         }
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(

@@ -335,9 +335,11 @@ class SingboxConfigHandler {
             return defaultDnsConfig()
         }
         do {
-            let config = try JSONDecoder().decode(DNSConfig.self, from: data)
+            var config = try JSONDecoder().decode(DNSConfig.self, from: data)
             if singboxSupportsNewDnsFormat() {
-                return migratingDnsServerIfNeeded(config)
+                config = migratingDnsServerIfNeeded(config)
+            } else {
+                config = migratingDnsServerToOldFormat(config)
             }
             return config
         } catch {
@@ -351,7 +353,8 @@ class SingboxConfigHandler {
             return DNSConfig(
                 servers: [
                     DNSServer(tag: "local-dns", type: "udp", server: defaultBootstrapDns),
-                    DNSServer(tag: "remote-dns", type: "https", server: "cloudflare-dns.com", domain_resolver: "local-dns", detour: "proxy"),
+                    DNSServer(tag: "direct-dns", type: "udp", server: defaultBootstrapDns),
+                    DNSServer(tag: "remote-dns", type: "https", server: "cloudflare-dns.com", domain_resolver: "local-dns", path: "/dns-query", detour: "proxy"),
                 ],
                 rules: [
                     DNSRule(server: "local-dns", domain: ["localhost", "local"]),
@@ -366,7 +369,10 @@ class SingboxConfigHandler {
         }
 
         return DNSConfig(
-            servers: [DNSServer(tag: "local-dns", address: "udp://\(defaultBootstrapDns)")],
+            servers: [
+                DNSServer(tag: "local-dns", address: "udp://\(defaultBootstrapDns)"),
+                DNSServer(tag: "direct-dns", address: "udp://\(defaultBootstrapDns)"),
+            ],
             rules: [],
             final: "local-dns"
         )
@@ -400,9 +406,11 @@ class SingboxConfigHandler {
                 case "https":
                     config.servers[i].type = "https"
                     config.servers[i].server = host
+                    config.servers[i].path = url.path.isEmpty || url.path == "/" ? nil : url.path
                 case "h3":
                     config.servers[i].type = "h3"
                     config.servers[i].server = host
+                    config.servers[i].path = url.path.isEmpty || url.path == "/" ? nil : url.path
                 default:
                     continue
                 }
@@ -416,8 +424,52 @@ class SingboxConfigHandler {
         return config
     }
 
+    private func migratingDnsServerToOldFormat(_ config: DNSConfig) -> DNSConfig {
+        var config = config
+        for i in config.servers.indices {
+            let server = config.servers[i]
+            guard server.address == nil, let type = server.type, let srv = server.server else { continue }
+            switch type {
+            case "local":
+                config.servers[i].address = "local"
+            case "fakeip":
+                config.servers[i].address = "fakeip"
+            case "dhcp":
+                let iface = server.interface ?? ""
+                config.servers[i].address = iface.isEmpty ? "dhcp://auto" : "dhcp://\(iface)"
+            case "udp", "tcp", "tls", "quic":
+                config.servers[i].address = "\(type)://\(srv)"
+            case "https":
+                let path = server.path ?? "/dns-query"
+                config.servers[i].address = "https://\(srv)\(path)"
+            case "h3":
+                let path = server.path ?? "/dns-query"
+                config.servers[i].address = "h3://\(srv)\(path)"
+            default:
+                continue
+            }
+            config.servers[i].address_resolver = server.domain_resolver
+            config.servers[i].type = nil
+            config.servers[i].server = nil
+            config.servers[i].path = nil
+            config.servers[i].domain_resolver = nil
+        }
+        return config
+    }
+
     private func dnsConfigWithProxyServerRules(outbounds: [SingboxOutbound]) -> DNSConfig {
         var config = getDnsConfig()
+
+        if !config.servers.contains(where: { $0.tag == "direct-dns" }) {
+            let directDnsServer: DNSServer
+            if singboxSupportsNewDnsFormat() {
+                directDnsServer = DNSServer(tag: "direct-dns", type: "udp", server: defaultBootstrapDns)
+            } else {
+                directDnsServer = DNSServer(tag: "direct-dns", address: "udp://\(defaultBootstrapDns)")
+            }
+            config.servers.insert(directDnsServer, at: 0)
+        }
+
         let domains = proxyServerDomains(from: outbounds)
         guard !domains.isEmpty else { return config }
 

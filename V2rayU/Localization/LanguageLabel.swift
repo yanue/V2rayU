@@ -118,13 +118,14 @@ enum LanguageLabel: String, CaseIterable {
     case CurrentConnectionTestURL
 
     // MARK: - TUN Settings
+    case TunDns
     case TunSettings
     case TunAddress
     case TunMtu
     case TunStack
-    case TunDefaultDns
+    case TunRemoteDns
+    case TunRemoteDnsTip
     case TunChinaDns
-    case TunFakeipRange
     case TunStrictRoute
     case TunStrictRouteTip
     case TunAutoRebuild

@@ -197,6 +197,6 @@ struct SystemPolicy: Codable {
 struct V2rayObservatory: Codable {
     var subjectSelector: [String] = ["proxy"]
     var probeUrl: String = "http://www.gstatic.com/generate_204"
-    var probeInterval: String = "5s"
+    var probeInterval: String = "2s"
     var enableConcurrency: Bool?
 }

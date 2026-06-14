@@ -69,6 +69,7 @@
 "Advanced" = "進階設定";
 "PAC" = "PAC 設定";
 "DNS" = "DNS 設定";
+"TunDns" = "TUN DNS";
 "Core" = "Core管理";
 "Tun" = "TUN 設定";
 
@@ -749,9 +750,9 @@
 "TunAddress" = "TUN 地址";
 "TunMtu" = "TUN MTU";
 "TunStack" = "TUN 協議棧";
-"TunDefaultDns" = "默認 DNS";
-"TunChinaDns" = "國內 DNS";
-"TunFakeipRange" = "FakeIP 範圍";
+"TunRemoteDns" = "Tun 國外 DNS";
+"TunRemoteDnsTip" = "啟動時覆蓋系統 DNS 以避免污染。TUN 模式下作為 remote-dns 通過隧道解析國外域名。";
+"TunChinaDns" = "Tun 國內 DNS";
 "TunStrictRoute" = "強制路由 (strict_route)";
 "TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";
 "TunAutoRebuild" = "網路變化後自動重建 TUN";

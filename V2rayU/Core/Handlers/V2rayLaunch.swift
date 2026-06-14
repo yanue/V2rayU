@@ -467,14 +467,14 @@ actor V2rayLaunch {
         return []
     }
 
-    /// 启动时设置系统 DNS 到 1.1.1.1（通过 V2rayUTool 提权）
+    /// 启动时覆盖系统 DNS 为防污染解析器（通过 V2rayUTool 提权）
     nonisolated static func setupTunDns() {
         let current = readCurrentDns()
-        // 保存原值（可能为空 = DHCP 自动获取，在中国会拿到 223.5.5.5）
         savedOriginalDns = current
 
-        if (try? runCommand(at: v2rayUTool, with: ["-dns-setup", "1.1.1.1"])) != nil {
-            logger.info("DNS set to 1.1.1.1")
+        let dnsServer = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+        if (try? runCommand(at: v2rayUTool, with: ["-dns-setup", dnsServer])) != nil {
+            logger.info("DNS set to \(dnsServer)")
         } else {
             logger.warning("DNS change failed")
         }
@@ -483,7 +483,6 @@ actor V2rayLaunch {
     /// 停止时恢复原始 DNS
     nonisolated static func restoreTunDns() {
         if savedOriginalDns.isEmpty {
-            // 原值空 = DHCP 自动获取，清空让 DHCP 恢复
             _ = try? runCommand(at: v2rayUTool, with: ["-dns-clear"])
         } else {
             if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {

@@ -7,8 +7,6 @@
 
 import Foundation
 
-let defaultDomesticDns = "119.29.29.29"
-let secondaryDomesticDns = "223.5.5.5"
 let defaultBootstrapDns = "223.5.5.5"
 let defaultDirectDns = "https://dns.alidns.com/dns-query"
 let defaultRemoteDns = "https://cloudflare-dns.com/dns-query"
@@ -18,6 +16,7 @@ let defaultSingboxDns = """
 {
     "servers": [
         {"tag": "local-dns", "address": "udp://223.5.5.5"},
+        {"tag": "direct-dns", "address": "udp://223.5.5.5"},
         {"tag": "remote-dns", "address": "https://cloudflare-dns.com/dns-query", "address_resolver": "local-dns", "detour": "proxy"}
     ],
     "rules": [
@@ -139,12 +138,29 @@ func buildDefaultSingboxDnsSetting() -> String {
 func buildDefaultSingboxDnsSetting(directDns directDnsValue: String, remoteDns remoteDnsValue: String, bootstrapDns bootstrapDnsValue: String) -> String {
     let bootstrapDns = bootstrapDnsValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultBootstrapDns : bootstrapDnsValue.trimmingCharacters(in: .whitespacesAndNewlines)
     let remoteDns = normalizedSingboxDoH(remoteDnsValue.trimmingCharacters(in: .whitespacesAndNewlines), defaultHost: "cloudflare-dns.com", defaultPath: "/dns-query")
-    let directDns = normalizedSingboxDoH(directDnsValue.trimmingCharacters(in: .whitespacesAndNewlines), defaultHost: "dns.alidns.com", defaultPath: "/dns-query")
 
+    let useNewFormat = SingboxVersionCheck.supportsNewDnsFormat()
+    if useNewFormat {
+        return """
+        {
+            "servers": [
+                {"tag": "local-dns", "type": "udp", "server": "\(bootstrapDns)"},
+                {"tag": "direct-dns", "type": "udp", "server": "\(bootstrapDns)"},
+                {"tag": "remote-dns", "type": "https", "server": "\(remoteDns.host)", "path": "\(remoteDns.path)", "domain_resolver": "local-dns", "detour": "proxy"}
+            ],
+            "rules": [
+                {"server": "local-dns", "domain": ["localhost", "local"]}
+            ],
+            "final": "remote-dns",
+            "independent_cache": true
+        }
+        """
+    }
     return """
     {
         "servers": [
             {"tag": "local-dns", "address": "udp://\(bootstrapDns)"},
+            {"tag": "direct-dns", "address": "udp://\(bootstrapDns)"},
             {"tag": "remote-dns", "address": "https://\(remoteDns.host)\(remoteDns.path)", "address_resolver": "local-dns", "detour": "proxy"}
         ],
         "rules": [
@@ -204,13 +220,13 @@ private func isLegacyBuiltinDns(_ dnsJson: String) -> Bool {
         if let server = server as? String {
             hasGoogle = hasGoogle || server == "8.8.8.8"
             hasCloudflare = hasCloudflare || server == "1.1.1.1"
-            hasTencentForCN = hasTencentForCN || server == defaultDomesticDns
-            hasAli = hasAli || server == secondaryDomesticDns
+            hasTencentForCN = hasTencentForCN || server == "119.29.29.29"
+            hasAli = hasAli || server == defaultBootstrapDns
             hasLocalhost = hasLocalhost || server == "localhost"
         } else if let server = server as? [String: Any],
                   let address = server["address"] as? String,
                   let domains = server["domains"] as? [String] {
-            hasTencentForCN = hasTencentForCN || (address == defaultDomesticDns && domains.contains("geosite:cn"))
+            hasTencentForCN = hasTencentForCN || (address == "119.29.29.29" && domains.contains("geosite:cn"))
         }
     }
 
@@ -570,14 +586,14 @@ class V2rayConfigHandler {
         for domain in domains {
             let exists = servers.contains { server in
                 if case .detailed(let detail) = server {
-                    return detail.address == defaultDomesticDns && detail.domains?.contains(domain) == true
+                    return detail.address == defaultBootstrapDns && detail.domains?.contains(domain) == true
                 }
                 return false
             }
             if exists { continue }
 
             let detail = V2rayDns.Server.ServerDetail(
-                address: defaultDomesticDns,
+                address: defaultBootstrapDns,
                 port: nil,
                 domains: [domain],
                 expectIPs: nil,

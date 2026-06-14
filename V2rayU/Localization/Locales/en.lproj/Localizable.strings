@@ -69,6 +69,7 @@
 "Advanced" = "Advanced";
 "PAC" = "PAC";
 "DNS" = "DNS";
+"TunDns" = "TUN DNS";
 "Core" = "Core";
 "Tun" = "TUN";
 
@@ -749,9 +750,9 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunAddress" = "TUN Address";
 "TunMtu" = "TUN MTU";
 "TunStack" = "TUN Stack";
-"TunDefaultDns" = "Default DNS";
-"TunChinaDns" = "China DNS";
-"TunFakeipRange" = "FakeIP Range";
+"TunRemoteDns" = "Tun Remote DNS";
+"TunRemoteDnsTip" = "Override system DNS to avoid pollution. Used as remote DNS resolver for foreign domains via tunnel in TUN mode.";
+"TunChinaDns" = "Tun China DNS";
 "TunStrictRoute" = "Strict route (strict_route)";
 "TunStrictRouteTip" = "Enabled by default. Try turning it off if the network occasionally breaks after switching networks.";
 "TunAutoRebuild" = "Auto rebuild TUN after network changes";

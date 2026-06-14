@@ -61,8 +61,7 @@ struct DnsConfigTests {
         #expect(!defaultDirectDns.isEmpty)
         #expect(!defaultRemoteDns.isEmpty)
         #expect(!defaultBootstrapDns.isEmpty)
-        #expect(!defaultDomesticDns.isEmpty)
-        #expect(!secondaryDomesticDns.isEmpty)
+
         #expect(!defaultDnsTargetStrategy.isEmpty)
 
         #expect(defaultDirectDns.hasPrefix("https://"))

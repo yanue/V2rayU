@@ -72,29 +72,33 @@ struct TunView: View {
 
             Divider()
 
-            Text(String(localized: .DNS))
+            Text(String(localized: .TunDns))
                 .font(.headline)
                 .foregroundColor(.secondary)
 
-            HStack {
-                getTextLabel(label: .TunDefaultDns, labelWidth: labelWidth)
-                TextField(String(localized: .TunDefaultDns), text: $settings.tunDnsDefault)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.leading, 7)
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    getTextLabel(label: .TunRemoteDns, labelWidth: labelWidth)
+                    Spacer()
+                    Picker("", selection: $settings.tunDnsRemote) {
+                        Text("1.1.1.1 (Cloudflare)").tag("1.1.1.1")
+                        Text("8.8.8.8 (Google)").tag("8.8.8.8")
+                        Text("9.9.9.9 (Quad9)").tag("9.9.9.9")
+                        Text("208.67.222.222 (OpenDNS)").tag("208.67.222.222")
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 220)
+                }
+                Label(String(localized: .TunRemoteDnsTip), systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.leading, labelWidth + 7)
             }
 
             HStack {
                 getTextLabel(label: .TunChinaDns, labelWidth: labelWidth)
                 TextField(String(localized: .TunChinaDns), text: $settings.tunDnsChina)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.leading, 7)
-                Spacer()
-            }
-
-            HStack {
-                getTextLabel(label: .TunFakeipRange, labelWidth: labelWidth)
-                TextField(String(localized: .TunFakeipRange), text: $settings.tunFakeipRange)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.leading, 7)
                 Spacer()
