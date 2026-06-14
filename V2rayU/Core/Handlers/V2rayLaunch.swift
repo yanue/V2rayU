@@ -563,15 +563,18 @@ actor V2rayLaunch {
         }
     }
 
-    /// 停止时恢复原始 DNS（仅在 TUN 模式设置过 DNS 时才需恢复）
+    /// 停止时恢复原始 DNS
     nonisolated static func restoreTunDns() {
-        guard !savedOriginalDns.isEmpty else {
-            logger.info("restoreTunDns: no DNS was saved, skipping")
-            return
+        defer { savedOriginalDns = [] }
+        if savedOriginalDns.isEmpty {
+            // 原始 DNS 为空（DHCP），清除手动设置恢复 DHCP
+            if (try? runCommand(at: v2rayUTool, with: ["-dns-clear"])) != nil {
+                logger.info("DNS cleared (was DHCP)")
+            }
+        } else {
+            if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {
+                logger.info("DNS restored to \(savedOriginalDns)")
+            }
         }
-        if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {
-            logger.info("DNS restored")
-        }
-        savedOriginalDns = []
     }
 }
