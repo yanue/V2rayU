@@ -44,12 +44,10 @@ func presentOpenPanel(_ panel: NSOpenPanel, attachedTo window: NSWindow? = nil) 
 /// - Parameters:
 ///   - title: 对话框标题
 ///   - message: 对话框内容
-func alertDialog(title: String, message: String) {
-    DispatchQueue.main.async {
-        // Prefer a non-blocking sheet when a window is available. This avoids
-        // nested modal run loops that can interfere with SwiftUI updates.
-        let alertWindow = MainWindowManager.shared.mainWindow ?? NSApp.mainWindow
-        if let window = alertWindow {
+func alertDialog(title: String, message: String, blocking: Bool = false) {
+    if blocking {
+        // 同步阻塞模式：用于安装/初始化等关键流程，调用者等待用户确认
+        let work = {
             let alert = NSAlert()
             alert.messageText = title
             alert.informativeText = message
@@ -58,14 +56,31 @@ func alertDialog(title: String, message: String) {
             if let icon = NSImage(named: "V2rayU") {
                 alert.icon = icon
             }
+            alert.runModal()
+        }
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.sync(execute: work)
+        }
+        return
+    }
+
+    // 默认非阻塞模式：sheet (有窗口) 或独立 alert (无窗口)
+    DispatchQueue.main.async {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        if let icon = NSImage(named: "V2rayU") {
+            alert.icon = icon
+        }
+        let alertWindow = MainWindowManager.shared.mainWindow ?? NSApp.mainWindow
+        if let window = alertWindow {
             alert.beginSheetModal(for: window) { _ in }
         } else {
-            // 如果没有可用窗口，回退到 Toast 显示
-            Task {
-                await MainActor.run {
-                    makeToast(message: title + "\n" + message, displayDuration: 5)
-                }
-            }
+            alert.runModal()
         }
     }
 }

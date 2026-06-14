@@ -104,7 +104,7 @@ actor LaunchAgent: NSObject {
             logger.info("startAgent: \(agentName) ok \(output)")
             return true
         } catch let error {
-            alertDialog(title: "startAgent failed.", message: error.localizedDescription)
+            alertDialog(title: "startAgent failed.", message: error.localizedDescription, blocking: true)
             return false
         }
     }
