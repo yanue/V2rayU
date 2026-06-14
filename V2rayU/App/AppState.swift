@@ -186,10 +186,31 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换运行模式
     func switchRunMode(mode: RunMode) async {
+        let oldMode = runMode
         runMode = mode
         v2rayTurnOn = true
-        logger.info("switchRunMode: \(mode.rawValue), \(self.runMode.rawValue)")
-        await setCoreRunning(v2rayTurnOn)
+        logger.info("switchRunMode: \(oldMode.rawValue) -> \(mode.rawValue)")
+        if launchState.isRunning || launchState == .starting {
+            // 从 TUN 切出时立即恢复 DNS（不等待后台 Task）
+            if oldMode == .tun {
+                V2rayLaunch.restoreTunDns()
+            }
+            // 后台重启，不阻塞 UI
+            Task {
+                await V2rayLaunch.shared.restart()
+                await MainActor.run {
+                    launchState = V2rayLaunch.launchState
+                    v2rayTurnOn = V2rayLaunch.launchState.isRunning
+                    AppMenuManager.shared.refreshBasicMenus()
+                }
+            }
+        } else {
+            // 从 TUN 切出且核心未运行：DNS 可能还是 TUN 残留的
+            if oldMode == .tun {
+                V2rayLaunch.restoreTunDns()
+            }
+            await setCoreRunning(v2rayTurnOn)
+        }
         AppMenuManager.shared.refreshBasicMenus()
     }
 
@@ -197,7 +218,12 @@ final class AppState: ObservableObject {
     func switchRouting(uuid: String) async {
         runningRouting = uuid
         v2rayTurnOn = true
-        await setCoreRunning(v2rayTurnOn)
+        if launchState.isRunning || launchState == .starting {
+            await V2rayLaunch.shared.restart()
+            launchState = V2rayLaunch.launchState
+        } else {
+            await setCoreRunning(v2rayTurnOn)
+        }
         logger.info("switchRouting: \(self.runningRouting)")
         AppMenuManager.shared.refreshRoutingItems()
     }
@@ -210,7 +236,12 @@ final class AppState: ObservableObject {
             runningProfile = ""
             runningServer = nil
             v2rayTurnOn = false
-            await setCoreRunning(false)
+            if launchState.isRunning || launchState == .starting {
+                await V2rayLaunch.shared.stop()
+                launchState = V2rayLaunch.launchState
+            } else {
+                await setCoreRunning(false)
+            }
             logger.info("switchCombination-deselect: \(uuid)")
             AppMenuManager.shared.refreshCombinedConfigItems()
             AppMenuManager.shared.refreshServerItems()
@@ -233,12 +264,16 @@ final class AppState: ObservableObject {
             runningServer = profile
         }
         v2rayTurnOn = true
-        await setCoreRunning(v2rayTurnOn)
+        if launchState.isRunning || launchState == .starting {
+            await V2rayLaunch.shared.restart()
+            launchState = V2rayLaunch.launchState
+        } else {
+            await setCoreRunning(v2rayTurnOn)
+        }
         AppMenuManager.shared.refreshCombinedConfigItems()
         AppMenuManager.shared.refreshServerItems()
         AppMenuManager.shared.refreshBasicMenus()
     }
-
     // MARK: - 切换配置
     func switchServer(uuid: String) async {
         // 点击已激活的服务器不做任何操作
@@ -248,7 +283,25 @@ final class AppState: ObservableObject {
         runningCombination = ""
         runningProfile = uuid
         v2rayTurnOn = true
-        await setCoreRunning(v2rayTurnOn)
+
+        if runMode == .tun, launchState.isRunning {
+            // TUN 快速路径：保留 TUN 守护进程，只重启核心
+            guard let item = ProfileStore.shared.getRunning() else {
+                v2rayTurnOn = false
+                return
+            }
+            let success = await V2rayLaunch.shared.switchCoreOnly(item: item)
+            launchState = V2rayLaunch.launchState
+            v2rayTurnOn = success
+        } else if launchState.isRunning || launchState == .starting {
+            // 非 TUN 模式且核心运行中：完全重启
+            await V2rayLaunch.shared.restart()
+            launchState = V2rayLaunch.launchState
+            v2rayTurnOn = V2rayLaunch.launchState.isRunning
+        } else {
+            await setCoreRunning(v2rayTurnOn)
+        }
+
         runningServer = ProfileStore.shared.getRunning()
         latency = Double(runningServer?.speed ?? 0)
         logger.info("switchServer-end: \(self.runningProfile)")

@@ -99,6 +99,46 @@ actor V2rayLaunch {
         await showAlert(title: titleText, message: messageText)
     }
 
+    /// TUN 模式下切换 server：保留 TUN 运行，只重启 core
+    /// 不碰 DNS、不重启 TUN daemon（tun.json 不依赖任何 profile 属性，无需更新）
+    func switchCoreOnly(item: ProfileEntity) async -> Bool {
+        Self.transition(to: .starting)
+
+        createJsonFile(item: item)
+        LogRotation.rotateSessionLog(at: coreLogFilePath)
+
+        await LaunchAgent.shared.stopAgent()
+
+        let coreDecision = item.resolveCoreCompatibility()
+        let started = await LaunchAgent.shared.startAgent(coreType: coreDecision.coreType)
+        guard started else {
+            await stop()
+            return false
+        }
+
+        let mode = await AppState.shared.runMode
+        guard await ensureLocalProxyReady(mode: mode, context: "switchCoreOnly") else {
+            await LaunchAgent.shared.stopAgent()
+            await stop()
+            return false
+        }
+
+        setSystemProxy(mode: mode)
+
+        Task {
+            await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
+            do {
+                try await PingRunning.shared.startPing()
+            } catch {
+                logger.error("PingRunning.startPing failed: \(error)")
+            }
+        }
+
+        self.lastCore = coreDecision.coreType
+        Self.transition(to: .running(coreType: coreDecision.coreType, mode: mode))
+        return true
+    }
+
     /// 完全重启（先停后启）
     func restart() async {
         let wasRunning = V2rayLaunch._launchState.isRunning || V2rayLaunch._launchState == .starting
@@ -178,6 +218,9 @@ actor V2rayLaunch {
         await TunHandler.shared.stop()
         await LaunchAgent.shared.stopAgent()
 
+        // 等待旧核心释放 SOCKS 端口（避免新核心 bind 失败）
+        _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
+
         createJsonFile(item: item)
 
         // 轮转日志
@@ -198,14 +241,38 @@ actor V2rayLaunch {
         }
         // 等待代理端口就绪
         let mode = await AppState.shared.runMode
-        guard await ensureLocalProxyReady(mode: mode, context: "start") else {
-            await LaunchAgent.shared.stopAgent()
-            setSystemProxy(mode: nil)
-            Self.transition(to: .stopped)
-            return false
+        if mode == .tun {
+            // TUN 模式：SOCKS 端口等待与 TUN daemon 启动并行执行
+            // TUN 不依赖 SOCKS 端口，即使核心未就绪也正常启动
+            async let socksReady = ensureLocalProxyReady(mode: mode, context: "start")
+            async let tunReady = TunHandler.shared.start()
+            let (socksOk, tunOk) = await (socksReady, tunReady)
+            guard tunOk else {
+                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
+                return false
+            }
+            guard socksOk else {
+                logger.error("start: SOCKS port not ready, TUN daemon is still running")
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
+                return false
+            }
+            // TUN 和核心都就绪后才配置 DNS，避免 DNS 被改成不可达地址
+            Self.setupTunDns()
+            setSystemProxy(mode: mode)
+        } else {
+            guard await ensureLocalProxyReady(mode: mode, context: "start") else {
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
+                return false
+            }
+            setSystemProxy(mode: mode)
         }
-        // 设置系统代理
-        setSystemProxy(mode: mode)
         logger.info("start v2ray-core ok: \(mode.rawValue)")
         // 后台统计 + ping（非关键，不阻塞）
         Task {
@@ -216,18 +283,6 @@ actor V2rayLaunch {
                 logger.error("PingRunning.startPing failed: \(error)")
             }
         }
-        // TUN 模式开启 tun-helper
-        if mode == .tun {
-            guard await TunHandler.shared.start(item: item) else {
-                await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
-                await LaunchAgent.shared.stopAgent()
-                setSystemProxy(mode: nil)
-                Self.transition(to: .stopped)
-                return false
-            }
-        }
-        // DNS 设置
-        Self.setupTunDns()
         self.lastCore = coreDecision.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -297,6 +352,9 @@ actor V2rayLaunch {
         await CoreTrafficStatsHandler.shared.resetData()
         await LaunchAgent.shared.stopAgent()
 
+        // 等待旧核心释放 SOCKS 端口
+        _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
+
         createJsonFile(combination: resolved)
         truncateLogFile(appLogFilePath)
         LogRotation.rotateSessionLog(at: coreLogFilePath)
@@ -313,29 +371,39 @@ actor V2rayLaunch {
             return false
         }
         let mode = await AppState.shared.runMode
-        guard await ensureLocalProxyReady(mode: mode, context: "start combined config") else {
-            await LaunchAgent.shared.stopAgent()
-            setSystemProxy(mode: nil)
-            Self.transition(to: .stopped)
-            return false
-        }
-        setSystemProxy(mode: mode)
-        logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
-        Task {
-            await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
-        }
-
         if mode == .tun {
-            guard await TunHandler.shared.start(item: firstProfile) else {
+            async let socksReady = ensureLocalProxyReady(mode: mode, context: "start combined config")
+            async let tunReady = TunHandler.shared.start()
+            let (socksOk, tunOk) = await (socksReady, tunReady)
+            guard tunOk else {
                 await noticeLocalized(title: .StartFailed, message: .TunServiceStartFailed)
                 await LaunchAgent.shared.stopAgent()
                 setSystemProxy(mode: nil)
                 Self.transition(to: .stopped)
                 return false
             }
+            guard socksOk else {
+                logger.error("startCombination: SOCKS port not ready, TUN daemon is still running")
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
+                return false
+            }
+            Self.setupTunDns()
+            setSystemProxy(mode: mode)
+        } else {
+            guard await ensureLocalProxyReady(mode: mode, context: "start combined config") else {
+                await LaunchAgent.shared.stopAgent()
+                setSystemProxy(mode: nil)
+                Self.transition(to: .stopped)
+                return false
+            }
+            setSystemProxy(mode: mode)
         }
-
-        Self.setupTunDns()
+        logger.info("start combined config ok: \(combination.displayName), core=\(resolved.coreType.rawValue), mode=\(mode.rawValue)")
+        Task {
+            await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
+        }
         self.lastCore = resolved.coreType
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
@@ -379,6 +447,21 @@ actor V2rayLaunch {
             }
             try? await Task.sleep(nanoseconds: 300_000_000)
         }
+        return false
+    }
+
+    /// 等待旧核心释放端口（端口从可连接变为不可连接）
+    private func waitForLocalTCPReleased(port: UInt16, timeout: TimeInterval) async -> Bool {
+        guard port > 0 else { return true }
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if !(await TCPConnectivity.canConnect(host: "127.0.0.1", port: port, timeout: 0.5)) {
+                return true
+            }
+            try? await Task.sleep(nanoseconds: 200_000_000)
+        }
+        // 超时后仍然继续（旧核心可能已死但端口未被占用，不影响新核心启动）
+        logger.info("waitForLocalTCPReleased: port \(port) still occupied after \(timeout)s, proceeding anyway")
         return false
     }
 
@@ -480,14 +563,14 @@ actor V2rayLaunch {
         }
     }
 
-    /// 停止时恢复原始 DNS
+    /// 停止时恢复原始 DNS（仅在 TUN 模式设置过 DNS 时才需恢复）
     nonisolated static func restoreTunDns() {
-        if savedOriginalDns.isEmpty {
-            _ = try? runCommand(at: v2rayUTool, with: ["-dns-clear"])
-        } else {
-            if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {
-                logger.info("DNS restored")
-            }
+        guard !savedOriginalDns.isEmpty else {
+            logger.info("restoreTunDns: no DNS was saved, skipping")
+            return
+        }
+        if (try? runCommand(at: v2rayUTool, with: ["-dns-restore"] + savedOriginalDns)) != nil {
+            logger.info("DNS restored")
         }
         savedOriginalDns = []
     }
