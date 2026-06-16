@@ -85,31 +85,42 @@ class Hysteria2Uri: BaseShareUri {
         guard let host = url.host else {
             return NSError(domain: "Hysteria2UriError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Missing host"])
         }
-        guard let port = url.port else {
+
+        let query = url.queryParams()
+        var port = url.port
+        var hopPortRange = query.getString(forKey: "mport", defaultValue: "")
+
+        // Handle port hopping range: if no port but mport is provided,
+        // extract the first port from the range (e.g. 20000 from "20000-30000")
+        if port == nil && !hopPortRange.isEmpty {
+            if let firstPort = Int(hopPortRange.components(separatedBy: "-").first ?? "") {
+                port = firstPort
+            }
+        }
+
+        guard let validPort = port else {
             return NSError(domain: "Hysteria2UriError", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Missing port"])
         }
         guard let password = url.user else {
             return NSError(domain: "Hysteria2UriError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Missing password"])
         }
-        
+
         logger.info("Parsed Hysteria2 URI: \(url)")
 
         profile.address = host
-        profile.port = port
+        profile.port = validPort
         profile.password = password
 
-        let query = url.queryParams()
-        
         // 基础设置
         profile.security = query.getEnum(forKey: "security", type: V2rayStreamSecurity.self, defaultValue: .tls)
         profile.sni = query.getString(forKey: "sni", defaultValue: profile.address)
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)
         profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
-        
+
         // Hysteria 2 特定参数 - 获取现有配置并更新
         var config = profile.getHysteria2Config()
         config.obfsPassword = query.getString(forKey: "obfs-password", defaultValue: "")
-        config.hopPortRange = query.getString(forKey: "mport", defaultValue: "")
+        config.hopPortRange = hopPortRange
         config.hopInterval = query.getInt(forKey: "hop", defaultValue: 0)
         config.bandwidthUp = query.getString(forKey: "up", defaultValue: "")
         config.bandwidthDown = query.getString(forKey: "down", defaultValue: "")

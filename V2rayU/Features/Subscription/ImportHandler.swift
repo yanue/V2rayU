@@ -267,11 +267,45 @@ class ImportUri {
         self.share_uri = share_uri
     }
 
+    /// Fix hysteria2 URL with port hopping range in authority (e.g. host:20000-30000).
+    /// Converts to host:firstPort and adds mport query param.
+    private func fixHysteria2PortRange(_ uri: String) -> String {
+        let pattern = #"^(hysteria2://[^@]+@[^:]+):(\d+-\d+)(.*)$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: uri, range: NSRange(uri.startIndex..., in: uri)) else {
+            return uri
+        }
+        let prefix = String(uri[Range(match.range(at: 1), in: uri)!])
+        let portRange = String(uri[Range(match.range(at: 2), in: uri)!])
+        let suffix = String(uri[Range(match.range(at: 3), in: uri)!])
+        let firstPort = portRange.components(separatedBy: "-").first ?? portRange
+
+        // Don't duplicate mport if already present
+        if suffix.contains("mport=") { return "\(prefix):\(firstPort)\(suffix)" }
+
+        // Split fragment, then handle path+query separately
+        let fragParts = suffix.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)
+        let basePart = String(fragParts[0])
+        let fragment = fragParts.count > 1 ? "#\(fragParts[1])" : ""
+        let mportParam = "mport=\(portRange)"
+
+        if let qi = basePart.firstIndex(of: "?") {
+            let path = String(basePart[..<qi])
+            let query = String(basePart[qi...])
+            return "\(prefix):\(firstPort)\(path)?\(mportParam)&\(query.dropFirst())\(fragment)"
+        }
+        return "\(prefix):\(firstPort)\(basePart)?\(mportParam)\(fragment)"
+    }
+
     func doImport() -> ProfileEntity? {
-        var url = URL(string: share_uri)
+        var processedUri = share_uri
+        if share_uri.hasPrefix("hysteria2://") {
+            processedUri = fixHysteria2PortRange(share_uri)
+        }
+        var url = URL(string: processedUri)
         if url == nil {
             // 标准url不支持非url-encoded
-            let aUri = self.share_uri.split(separator: "#")
+            let aUri = processedUri.split(separator: "#")
             guard !aUri.isEmpty else {
                 self.error = "invalid url"
                 return nil
