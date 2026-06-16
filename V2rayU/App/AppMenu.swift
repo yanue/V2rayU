@@ -707,9 +707,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func openTunLogs(_ sender: NSMenuItem) {
-        // 同时打开 tun.log（sing-box 结构化日志）和 run-tun.log（launchd stdout/stderr）
+        // 打开 tun.log（sing-box 结构化日志）
+        // run-tun.log（launchd stdout/stderr）仍会写入和轮转，仅在诊断中收集，不在此处弹出
         OpenLogs(logFilePath: tunLogFilePath)
-        OpenLogs(logFilePath: runTunLogFilePath)
     }
 
     @objc private func openHomeFolder(_ sender: NSMenuItem) {

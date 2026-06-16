@@ -53,7 +53,21 @@ struct V2rayUApp: App {
     var body: some Scene {
         // 必须设置 settings, 不然无法输入框复制粘贴
         Settings {
-            EmptyView()
+            SettingView()
+                .environment(\.locale, LanguageManager.shared.currentLocale)
+        }
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button {
+                    let year = Calendar.current.component(.year, from: Date())
+                    let copyright = "© 2018-\(year) V2rayU. All rights reserved."
+                    NSApplication.shared.orderFrontStandardAboutPanel(options: [
+                        .credits: NSAttributedString(string: copyright)
+                    ])
+                } label: {
+                    Text("About V2rayU")
+                }
+            }
         }
     }
 }
