@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 /// 管理 RoutingEntity 列表的 UI 状态
+@MainActor
 final class RoutingViewModel: ObservableObject {
     @Published var list: [RoutingEntity] = []
 

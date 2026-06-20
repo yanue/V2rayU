@@ -52,8 +52,8 @@ final class AppSettings: ObservableObject {
     @Published var dnsBootstrap: String = getDnsBootstrapSetting()
     @Published var dnsDirectStrategy: String = getDnsDirectStrategySetting()
     @Published var dnsProxyStrategy: String = getDnsProxyStrategySetting()
-    @Published var dnsJson = getDefaultDnsSetting()
-    @Published var dnsJsonSingbox: String = getDefaultSingboxDnsSetting()
+    @Published var dnsJson: String = UserDefaults.get(forKey: .dnsServers, defaultValue: "")
+    @Published var dnsJsonSingbox: String = UserDefaults.get(forKey: .dnsJsonSingbox, defaultValue: "")
     @Published var gfwPacListUrl: String = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
     @Published var latencyTestConcurrency: Int = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
     @Published var pingTestURL: String = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -90,6 +90,15 @@ final class AppSettings: ObservableObject {
         // 初始化应用外观,等待主线程完成后再执行
         DispatchQueue.main.async {
             self.setAppearance(self.selectedTheme)
+        }
+        // 延迟计算 DNS 默认值（会调用 shell() 查核心版本），避免在 init 期间阻塞主线程
+        DispatchQueue.main.async {
+            if self.dnsJson.isEmpty {
+                self.dnsJson = getDefaultDnsSetting()
+            }
+            if self.dnsJsonSingbox.isEmpty {
+                self.dnsJsonSingbox = getDefaultSingboxDnsSetting()
+            }
         }
     }
 
@@ -139,8 +148,11 @@ final class AppSettings: ObservableObject {
         dnsBootstrap = getDnsBootstrapSetting()
         dnsDirectStrategy = getDnsDirectStrategySetting()
         dnsProxyStrategy = getDnsProxyStrategySetting()
-        dnsJson = getDefaultDnsSetting()
-        dnsJsonSingbox = getDefaultSingboxDnsSetting()
+        // shell() 可能因重入保护返回空，保留原值避免 UI DNS 字段消失
+        let newDnsJson = getDefaultDnsSetting()
+        if !newDnsJson.isEmpty { dnsJson = newDnsJson }
+        let newDnsSingbox = getDefaultSingboxDnsSetting()
+        if !newDnsSingbox.isEmpty { dnsJsonSingbox = newDnsSingbox }
         gfwPacListUrl = UserDefaults.get(forKey: .gfwPacListUrl, defaultValue: GFWListURL)
         latencyTestConcurrency = UserDefaults.getInt(forKey: .latencyTestConcurrency, defaultValue: defaultLatencyTestConcurrency)
         pingTestURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
@@ -174,6 +186,10 @@ final class AppSettings: ObservableObject {
 
             // 先保存旧值
             let old = AppSettings() // 这里会从UserDefaults读取
+            // DNS 值在 init 中被延迟初始化（DispatchQueue.main.async），此时可能仍是空字符串。
+            // 如果是空，用实际默认值填充，避免第一次保存时因 DNS 值不同而误触发重启。
+            if old.dnsJson.isEmpty { old.dnsJson = getDefaultDnsSetting() }
+            if old.dnsJsonSingbox.isEmpty { old.dnsJsonSingbox = getDefaultSingboxDnsSetting() }
             // 保存当前设置
             self._save()
             // 处理设置变更

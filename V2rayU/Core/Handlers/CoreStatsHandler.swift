@@ -282,7 +282,7 @@ actor ClashApilatencyHandler: NSObject {
         return nil
     }
 
-    private func checkDelayByClashApi(proxyName: String) {
+    private func checkDelayByClashApi(proxyName: String) async {
         let timeoutMs = defaultLatencyTestTimeout * 1000
         let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
         var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay")
@@ -291,17 +291,14 @@ actor ClashApilatencyHandler: NSObject {
             URLQueryItem(name: "url", value: testURL)
         ]
         guard let url = components?.url else { return }
-        let task = URLSession.shared.dataTask(with: url) { data, _, error in
-            if let data = data,
-               let delay = parseClashDelay(from: data) {
-                 Task {
-                   await AppState.shared.setLatency(latency: delay)
-                 }
-            } else if let error = error {
-                logger.error("Delay check failed: \(error.localizedDescription)")
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let delay = parseClashDelay(from: data) {
+                await AppState.shared.setLatency(latency: delay)
             }
+        } catch {
+            logger.error("Delay check failed: \(error.localizedDescription)")
         }
-        task.resume()
     }
 
 }

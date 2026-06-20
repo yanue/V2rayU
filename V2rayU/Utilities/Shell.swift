@@ -7,11 +7,23 @@
 
 import Foundation
 
+// 防止 Process 重入崩溃：同一线程内 shell() 运行期间再次调用 shell() 会导致
+// libsystem_c 线程局部存储冲突而崩溃（常见于 AppSettings.init 期间 runloop 重入）。
+// 使用 threadDictionary 检测同线程重入，被拒绝时返回 nil，调用方应降级。
+private let shellReentrancyKey = "com.v2rayu.shell.inProgress"
+
 //  run custom shell
 // demo:
 // shell("/bin/bash",["-c","ls"])
 // shell("/bin/bash",["-c","cd ~ && ls -la"])
 func shell(launchPath: String, arguments: [String]) -> String? {
+    guard Thread.current.threadDictionary[shellReentrancyKey] == nil else {
+        logger.warning("shell: re-entrant call rejected on same thread")
+        return ""
+    }
+    Thread.current.threadDictionary[shellReentrancyKey] = true
+    defer { Thread.current.threadDictionary.removeObject(forKey: shellReentrancyKey) }
+
     do {
         let output = try runCommand(at: launchPath, with: arguments)
         return output

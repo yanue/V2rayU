@@ -9,12 +9,13 @@ import SwiftUI
 
 // MARK: - UI Model (SwiftUI 绑定)
 
-@dynamicMemberLookup
+@MainActor @dynamicMemberLookup
 final class RoutingModel: ObservableObject, Identifiable {
     @Published var entity: RoutingEntity
-    var id: String { entity.uuid }
+    let id: String
 
     init(from entity: RoutingEntity) {
+        self.id = entity.uuid
         self.entity = entity
     }
 

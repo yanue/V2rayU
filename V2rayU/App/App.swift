@@ -93,7 +93,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // 初始化网络变化监听(切换 Wi-Fi/网络中断恢复时自动重建 TUN)
             await NetworkMonitor.shared.start()
             // 启动设置(内部会初始化默认路由、同步状态并一次性刷新所有菜单)
-            AppState.shared.appDidLaunch()
+             await AppState.shared.appDidLaunch()
 
             // 检查并迁移旧版数据（首次启动时）
             _ = await LegacyMigrationHandler.shared.checkAndPromptForMigration()

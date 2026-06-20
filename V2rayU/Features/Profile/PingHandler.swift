@@ -4,7 +4,6 @@
 //
 //  Created by yanue on 2025/9/21.
 //
-import Combine
 import Foundation
 
 let NOTIFY_UPDATE_Ping = Notification.Name(rawValue: "NOTIFY_UPDATE_Ping")
@@ -14,7 +13,7 @@ actor PingAll {
 
     private(set) var inPing: Bool = false
 
-    private var cancellables = Set<AnyCancellable>()
+
     private var totalCount = 0
     private var finishedCount = 0
 
@@ -60,45 +59,36 @@ actor PingAll {
 
         let maxPublishers = await AppSettings.shared.safeLatencyTestConcurrency
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            items.publisher
-                .flatMap(maxPublishers: .max(maxPublishers)) { item in
-                    Future<Void, Never> { promise in
-                        Task {
-                            do {
-                                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-start: \(item.remark)")
-                                try await self.pingEachServer(item: item)
-                            } catch {
-                                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-fail: \(item.remark) - \(error.localizedDescription)")
-                            }
-                            // 无论成功失败都 resolve，不让单个失败终止 stream
-                            promise(.success(()))
-                        }
+        // 替代 Combine flatMap(maxPublishers:) + withCheckedContinuation，
+        // checked continuation 在 main queue 上恢复时触发了 actor 执行器检查失败（SIGABRT）。
+        // TaskGroup 直接使用结构化并发，无此问题。
+        await withTaskGroup(of: Void.self) { group in
+            var count = 0
+            for item in items {
+                if count >= maxPublishers {
+                    await group.next()
+                }
+                count += 1
+                group.addTask {
+                    NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-start: \(item.remark)")
+                    do {
+                        try await self.pingEachServer(item: item)
+                    } catch {
+                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-fail: \(item.remark) - \(error.localizedDescription)")
                     }
                 }
-                .collect()
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-all-done\n")
-                        logger.info("Ping completed")
-                        Task {
-                            await AppMenuManager.shared.refreshServerItems()
-                        }
-                    case .failure:
-                        break
-                    }
+            }
+        }
 
-                    Task { [weak self] in
-                        try? await Task.sleep(nanoseconds: 2000000000)
-                        killAllPing()
-                        await AppMenuManager.shared.refreshPingTip(pingTip: "")
-                        await self?.setInPingFalse()
-                    }
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-all-done\n")
+        logger.info("Ping completed")
+        await AppMenuManager.shared.refreshServerItems()
 
-                    continuation.resume()
-                }, receiveValue: { _ in })
-                .store(in: &self.cancellables)
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 2000000000)
+            killAllPing()
+            await AppMenuManager.shared.refreshPingTip(pingTip: "")
+            await self?.setInPingFalse()
         }
     }
 

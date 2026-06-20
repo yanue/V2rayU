@@ -378,7 +378,11 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
-        helpItem = NSMenuItem(title: String(localized: .Help)+" (Xray \(getCoreShortVersion()) | Singbox \(getSingboxShortVersion()))", action: #selector(goHelp), keyEquivalent: "")
+        helpItem = NSMenuItem(title: String(localized: .Help), action: #selector(goHelp), keyEquivalent: "")
+        // 异步填充版本号，避免在 setupMenu 中同步调用 shell()
+        Task { @MainActor in
+            helpItem.title = String(localized: .Help) + " (Xray \(getCoreShortVersion()) | Singbox \(getSingboxShortVersion()))"
+        }
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
@@ -738,8 +742,11 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func toggleRunning(_ sender: NSMenuItem) {
-        Task {
-            await AppState.shared.toggleCore()
+        // 延迟到菜单关闭后，避免 AttributeGraph 重入
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                await AppState.shared.toggleCore()
+            }
         }
     }
 
@@ -785,8 +792,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             return
         }
         logger.info("switchCombination: \(uuid)")
-        Task {
-            await AppState.shared.switchCombination(uuid: uuid)
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                await AppState.shared.switchCombination(uuid: uuid)
+            }
         }
     }
 
@@ -801,8 +810,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             return
         }
         logger.info("switchServer: \(uuid)")
-        Task {
-            await AppState.shared.switchServer(uuid: uuid)
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                await AppState.shared.switchServer(uuid: uuid)
+            }
         }
     }
 
@@ -812,8 +823,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             return
         }
         logger.info("switchRouting: \(uuid)")
-        Task {
-            await AppState.shared.switchRouting(uuid: uuid)
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                await AppState.shared.switchRouting(uuid: uuid)
+            }
         }
     }
 
@@ -830,8 +843,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             return
         }
         logger.info("switchRunMode: \(mode.rawValue)")
-        Task {
-            await AppState.shared.switchRunMode(mode: mode)
+        DispatchQueue.main.async {
+            Task { @MainActor in
+                await AppState.shared.switchRunMode(mode: mode)
+            }
         }
     }
 

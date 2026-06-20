@@ -135,11 +135,14 @@ final class AppState: ObservableObject {
     // MARK: - 更新速度
     func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
         if !self.v2rayTurnOn { return }
-        self.latency = latency
-        self.directUpSpeed = directUpSpeed
-        self.directDownSpeed = directDownSpeed
-        self.proxyUpSpeed = proxyUpSpeed
-        self.proxyDownSpeed = proxyDownSpeed
+        // 延迟到下一 runloop，避免在 AppKit 菜单/事件处理期间触发 AttributeGraph 重入
+        Task { @MainActor in
+            self.latency = latency
+            self.directUpSpeed = directUpSpeed
+            self.directDownSpeed = directDownSpeed
+            self.proxyUpSpeed = proxyUpSpeed
+            self.proxyDownSpeed = proxyDownSpeed
+        }
         // 组合模式下, 各 profile 的 speed 已由 XrayApiStatsHandler.parseV2RayStats 单独更新
         guard runningCombination.isEmpty else { return }
         ProfileStore.shared.updateSpeed(uuid: self.runningProfile, speed: Int(latency))
@@ -269,7 +272,7 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - App 启动时调用
-    func appDidLaunch() {
+    func appDidLaunch() async {
         LogRotation.rotateIfNeeded()
         LogRotation.extractErrors()
         startHttpServer()
@@ -307,12 +310,10 @@ final class AppState: ObservableObject {
 
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
 
-        Task {
-            // 根据启动状态
-            await setCoreRunning(v2rayTurnOn)
-            // 刷新菜单必须在 setCoreRunning 之后,确保菜单反映实际状态
-            AppMenuManager.shared.refreshAllMenus()
-        }
+        // 根据启动状态
+        await setCoreRunning(v2rayTurnOn)
+        // 刷新菜单必须在 setCoreRunning 之后,确保菜单反映实际状态
+        AppMenuManager.shared.refreshAllMenus()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             Task {

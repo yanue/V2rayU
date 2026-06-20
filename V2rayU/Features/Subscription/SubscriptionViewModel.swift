@@ -9,6 +9,7 @@ import Combine
 import Foundation
 import GRDB
 
+@MainActor
 class SubscriptionViewModel: ObservableObject {
     @Published var list: [SubscriptionEntity] = []
     private let store = SubscriptionStore()

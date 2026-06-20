@@ -9,13 +9,15 @@ import SwiftUI
 
 // MARK: - UI Model (SwiftUI 绑定)
 
-@dynamicMemberLookup
+@MainActor @dynamicMemberLookup
 final class SubscriptionModel: ObservableObject, Identifiable {
     @Published var entity: SubscriptionEntity
+    let id: String
 
-    var id: String { entity.uuid }
-
-    init(from entity: SubscriptionEntity) { self.entity = entity }
+    init(from entity: SubscriptionEntity) {
+        self.id = entity.uuid
+        self.entity = entity
+    }
 
     // 动态代理属性访问
     subscript<T>(dynamicMember keyPath: KeyPath<SubscriptionEntity, T>) -> T {
