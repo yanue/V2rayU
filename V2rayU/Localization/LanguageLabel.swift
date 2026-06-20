@@ -630,7 +630,9 @@ enum LanguageLabel: String, CaseIterable {
     case DiagConfigValidOK
     case DiagConfigValidProblems
     case DiagSystemProxyOK
+    case DiagSystemProxyPACOK
     case DiagSystemProxyNotNeeded
+    case DiagProxyPacUrlMismatch
     case DiagReportCopied
     case DiagReportTooLong
     case DiagCategoryFiles

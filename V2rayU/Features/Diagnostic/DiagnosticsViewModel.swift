@@ -663,6 +663,10 @@ final class DiagnosticsViewModel: ObservableObject {
             return .pass(.systemProxy, String(localized: .DiagProxyNotNeededOff))
         }
 
+        if runMode == .pac {
+            return await checkPacProxy()
+        }
+
         let expectedSocks = localSocksPort
         let expectedHTTP  = localHTTPPort
 
@@ -688,6 +692,26 @@ final class DiagnosticsViewModel: ObservableObject {
         let expPort = socksEnabled ? expectedSocks : expectedHTTP
         let msg = String(format: String(localized: .DiagProxyPortMismatch), curPort, expPort)
         return .fail(.systemProxy, subtitle: msg, problem: msg, action: .openNetworkSettings)
+    }
+
+    private func checkPacProxy() async -> CheckResult {
+        let expectedUrl = getPacUrl()
+
+        let status = await runInBackground {
+            DiagnosticsViewModel.getPacProxyStatusSync()
+        }
+
+        guard status.enabled else {
+            return .fail(.systemProxy, subtitle: String(localized: .DiagProxyNotEnabled),
+                         problem: String(localized: .DiagProxyNotEnabled), action: .openNetworkSettings)
+        }
+
+        guard status.url == expectedUrl else {
+            let msg = String(format: String(localized: .DiagProxyPacUrlMismatch), status.url, expectedUrl)
+            return .fail(.systemProxy, subtitle: msg, problem: msg, action: .openNetworkSettings)
+        }
+
+        return .pass(.systemProxy, String(format: String(localized: .DiagSystemProxyPACOK), status.url))
     }
 
     private func checkLocalPortConflict() async -> CheckResult {
@@ -830,16 +854,16 @@ final class DiagnosticsViewModel: ObservableObject {
     // MARK: ── Log Check ──
 
     private func checkLogAnalysis() async -> CheckResult {
-        let problems = await LogAnalyzer.analyze(logPath: logPath, firstLines: 100)
-        let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, firstLines: 100, contextLines: 3)
+        let problems = await LogAnalyzer.analyze(logPath: logPath, lastLines: 200)
+        let log = await LogAnalyzer.getSurroundingLog(logPath: logPath, lastLines: 200, contextLines: 3)
 
         // Also check TUN logs when in TUN mode
         var tunProblems: [String] = []
         var tunLog = ""
         if appState.runMode == .tun {
-            tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, firstLines: 100, contextLines: 3)
+            tunLog = await LogAnalyzer.getSurroundingLog(logPath: tunLogFilePath, lastLines: 200, contextLines: 3)
             let runTunLog = await LogAnalyzer.getSurroundingLog(logPath: runTunLogFilePath, lastLines: 200, contextLines: 3)
-            tunProblems = await LogAnalyzer.analyze(logPath: tunLogFilePath, firstLines: 100)
+            tunProblems = await LogAnalyzer.analyze(logPath: tunLogFilePath, lastLines: 200)
             let runTunProblems = await LogAnalyzer.analyze(logPath: runTunLogFilePath, lastLines: 200)
             tunProblems += runTunProblems
             if !runTunLog.isEmpty {
@@ -896,6 +920,32 @@ final class DiagnosticsViewModel: ObservableObject {
             return (enabled, port)
         } catch {
             return (false, 0)
+        }
+    }
+
+    /// Read PAC proxy status synchronously (called from background)
+    nonisolated private static func getPacProxyStatusSync() -> (enabled: Bool, url: String) {
+        let task = Process()
+        task.launchPath = "/usr/sbin/networksetup"
+        let svc = DiagnosticsViewModel.getActiveNetworkServiceSync() ?? "Wi-Fi"
+        task.arguments = ["-getautoproxyurl", svc]
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = Pipe()
+        do {
+            try task.run()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            let enabled = output.lowercased().contains("enabled: yes")
+            let urlLine = output.split(separator: "\n").first { $0.lowercased().contains("url:") }
+            let url = urlLine.flatMap { line in
+                let parts = line.split(separator: " ", maxSplits: 1)
+                return parts.count >= 2 ? String(parts[1]).trimmingCharacters(in: .whitespaces) : nil
+            } ?? ""
+            return (enabled, url)
+        } catch {
+            return (false, "")
         }
     }
 

@@ -340,7 +340,7 @@ struct LogAnalyzer {
                     msg = "【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点"
                 } else if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
                     msg = "【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商"
-                } else if lowerLine.contains("connection reset by peer") || lowerLine.contains("connection closed") {
+                } else if lowerLine.contains("connection reset by peer") {
                     msg = "【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点"
                 } else if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
                     msg = "【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期"

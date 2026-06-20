@@ -660,7 +660,9 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagConfigFileMissing" = "Configuration file is missing";
 "DiagConfigFileEmpty" = "Configuration file is empty";
 "DiagSystemProxyOK" = "System proxy correctly configured (port %d)";
+"DiagSystemProxyPACOK" = "PAC proxy correctly configured (%@)";
 "DiagSystemProxyNotNeeded" = "System proxy not needed in current mode";
+"DiagProxyPacUrlMismatch" = "PAC URL mismatch (current: %@, expected: %@)";
 "DiagReportCopied" = "Report copied to clipboard. Please paste into the GitHub issue.";
 "DiagReportTooLong" = "Report too long for URL, copied to clipboard instead";
 "DiagCategoryFiles" = "File Checks";

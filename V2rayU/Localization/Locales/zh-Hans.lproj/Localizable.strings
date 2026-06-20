@@ -661,7 +661,9 @@
 "DiagConfigFileMissing" = "配置文件缺失";
 "DiagConfigFileEmpty" = "配置文件为空";
 "DiagSystemProxyOK" = "系统代理已正确配置（端口 %d）";
+"DiagSystemProxyPACOK" = "PAC 代理已正确配置（%@）";
 "DiagSystemProxyNotNeeded" = "当前模式不需要系统代理";
+"DiagProxyPacUrlMismatch" = "PAC URL 不匹配（当前: %@，应为: %@）";
 "DiagReportCopied" = "报告已复制到剪贴板，请粘贴到 GitHub Issue 中。";
 "DiagReportTooLong" = "报告超出 URL 长度限制，已复制到剪贴板";
 "DiagCategoryFiles" = "文件检查";
