@@ -632,7 +632,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "inbound.vless", displayName: "VLESS inbound", kind: .inboundProtocol, rule: .supported(note: "官方入站协议列表可见。"), docsPath: "/config/inbounds/vless.html"),
         XrayCapabilityDefinition(key: "inbound.vmess", displayName: "VMess inbound", kind: .inboundProtocol, rule: .supported(note: "官方入站协议列表可见。"), docsPath: "/config/inbounds/vmess.html"),
         XrayCapabilityDefinition(key: "inbound.wireguard", displayName: "WireGuard inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/wireguard.html"),
-        XrayCapabilityDefinition(key: "inbound.hysteria", displayName: "Hysteria inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/hysteria.html"),
+        XrayCapabilityDefinition(key: "inbound.hysteria", displayName: "Hysteria2 inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/hysteria.html"),
         XrayCapabilityDefinition(key: "inbound.tun", displayName: "TUN inbound", kind: .inboundProtocol, rule: .supported(note: "当前官方入站协议列表明确列出。"), docsPath: "/config/inbounds/tun.html"),
 
         XrayCapabilityDefinition(key: "inbound.mixed", displayName: "Mixed (HTTP+SOCKS) inbound", kind: .inboundProtocol, rule: .supported(note: "Xray-core 官方入站协议列表未列出 mixed 类型，但代码实现自 v24.12.31 起以 socks 别名形式支持（commit 5af9068）。经 Build/tests/test-mixed-inbound.sh 批量测试验证：v1.8.4～v24.12.18 报 unknown config id: mixed，v24.12.31+ 正常接受。", calendarMin: XrayVersion(24, 12, 31)), docsPath: nil),
@@ -651,7 +651,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
-        XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria outbound", kind: .outboundProtocol,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria outbound 支持。日历版本 < 26.1.23 不支持。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/outbounds/hysteria.html"),
+        XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria2 outbound", kind: .outboundProtocol,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria2 outbound 支持。日历版本 < 26.1.23 不支持。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/outbounds/hysteria.html"),
 
         // MARK: Transport methods
         XrayCapabilityDefinition(key: "transport.raw", displayName: "RAW transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表可见；RAW 为曾经 TCP transport 的新名称。"), docsPath: "/config/transports/raw.html"),
@@ -681,7 +681,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "transport.grpc", displayName: "gRPC transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/grpc.html"),
         XrayCapabilityDefinition(key: "transport.websocket", displayName: "WebSocket transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表仍明确列出，因此 V2rayU 不再将其视为已下架功能。"), docsPath: "/config/transports/websocket.html"),
         XrayCapabilityDefinition(key: "transport.httpupgrade", displayName: "HTTPUpgrade transport", kind: .transportMethod, rule: .supported(note: "当前官方 transport 主列表明确列出。"), docsPath: "/config/transports/httpupgrade.html"),
-        XrayCapabilityDefinition(key: "transport.hysteria", displayName: "Hysteria transport", kind: .transportMethod,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria transport 支持。日历版本 < 26.1.23 不支持。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/transports/hysteria.html"),
+        XrayCapabilityDefinition(key: "transport.hysteria", displayName: "Hysteria2 transport", kind: .transportMethod,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria2 transport 支持。日历版本 < 26.1.23 不支持。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/transports/hysteria.html"),
 
         // MARK: Legacy or compatibility items
         XrayCapabilityDefinition(key: "transport.h2", displayName: "HTTP/2 transport", kind: .transportMethod,             rule: .supported(note: "Xray-core v24.12.18 移除了 HTTP/2 transport，迁移至 XHTTP stream-one H2 & H3。旧版本（<24.12.18）仍支持 h2 transport。", removedAt: XrayVersion(24, 12, 18)), docsPath: "/config/transports/h2.html"),

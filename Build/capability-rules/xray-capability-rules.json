@@ -109,7 +109,7 @@
     },
     {
       "key": "inbound.hysteria",
-      "display_name": "Hysteria inbound",
+      "display_name": "Hysteria2 inbound",
       "kind": "Inbound",
       "docs_path": "/config/inbounds/hysteria.html",
       "rule": {
@@ -259,14 +259,14 @@
     },
     {
       "key": "outbound.hysteria",
-      "display_name": "Hysteria outbound",
+      "display_name": "Hysteria2 outbound",
       "kind": "Outbound",
       "docs_path": "/config/outbounds/hysteria.html",
       "rule": {
         "type": "supported",
         "legacy_min": "9.9.9",
         "calendar_min": "26.1.23",
-        "note": "Xray-core 在 v26.1.23 新增 hysteria outbound 支持。日历版本 < 26.1.23 不支持。"
+        "note": "Xray-core 在 v26.1.23 新增 hysteria2 outbound 支持。日历版本 < 26.1.23 不支持。"
       }
     },
     {
@@ -372,14 +372,14 @@
     },
     {
       "key": "transport.hysteria",
-      "display_name": "Hysteria transport",
+      "display_name": "Hysteria2 transport",
       "kind": "Transport",
       "docs_path": "/config/transports/hysteria.html",
       "rule": {
         "type": "supported",
         "legacy_min": "9.9.9",
         "calendar_min": "26.1.23",
-        "note": "Xray-core 在 v26.1.23 新增 hysteria transport 支持。日历版本 < 26.1.23 不支持。"
+        "note": "Xray-core 在 v26.1.23 新增 hysteria2 transport 支持。日历版本 < 26.1.23 不支持。"
       }
     },
     {

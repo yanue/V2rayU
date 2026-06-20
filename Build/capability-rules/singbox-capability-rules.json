@@ -130,6 +130,20 @@
       }
     },
     {
+      "key": "outbound.hysteria2",
+      "display_name": "Hysteria2 outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "Sing-Box 原生支持 hysteria2 出站。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 hysteria2 出站。"
+      }
+    },
+    {
       "key": "outbound.http",
       "display_name": "HTTP outbound",
       "kind": "Outbound",
@@ -263,6 +277,20 @@
       "app_support": {
         "level": "unsupported",
         "note": "当前生成器虽然会写入 type=xhttp，但还没有版本保障与完整字段映射校验。"
+      }
+    },
+    {
+      "key": "transport.hysteria2",
+      "display_name": "Hysteria2 transport",
+      "kind": "Transport",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "Hysteria2 使用自定义 QUIC 传输，Sing-Box 原生支持。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "Hysteria2 使用自定义 QUIC 传输，当前生成器已原生支持。"
       }
     },
     {
