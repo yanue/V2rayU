@@ -217,12 +217,16 @@ actor PingServer {
 
             final class ResumableHolder: @unchecked Sendable {
                 var done = false
+                var lock = os_unfair_lock()
             }
             let holder = ResumableHolder()
 
             let finish: @Sendable (String?) -> Void = { result in
-                guard !holder.done else { return }
-                holder.done = true
+                os_unfair_lock_lock(&holder.lock)
+                let already = holder.done
+                if !already { holder.done = true }
+                os_unfair_lock_unlock(&holder.lock)
+                guard !already else { return }
                 session.invalidateAndCancel()
                 continuation.resume(returning: result)
             }

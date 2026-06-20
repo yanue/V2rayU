@@ -90,24 +90,30 @@ struct ConfigFormView: View {
         )
         .onAppear {
             logger.info("ProfileFormView appeared with item: \(item.id)")
-            // ensure hysteria2 defaults
-            if item.selectedProtocol == .hysteria2 {
-                if item.security == .none { item.security = .tls }
-                if item.alpn == .h2h1 { item.alpn = .h3 }
-                if item.network != .hysteria2 { item.network = .hysteria2 }
-            } else if item.selectedProtocol == .anytls || item.selectedProtocol == .naive {
-                if item.security == .none { item.security = .tls }
-                if item.network != .tcp { item.network = .tcp }
+            // ⚠️ 推迟到下一轮 run loop，原因同下方的 onChange
+            DispatchQueue.main.async {
+                if item.selectedProtocol == .hysteria2 {
+                    if item.security == .none { item.security = .tls }
+                    if item.alpn == .h2h1 { item.alpn = .h3 }
+                    if item.network != .hysteria2 { item.network = .hysteria2 }
+                } else if item.selectedProtocol == .anytls || item.selectedProtocol == .naive {
+                    if item.security == .none { item.security = .tls }
+                    if item.network != .tcp { item.network = .tcp }
+                }
             }
         }
         .onChange(of: item.selectedProtocol) { _, newProtocol in
-            if newProtocol == .hysteria2 {
-                if item.security == .none { item.security = .tls }
-                if item.alpn == .h2h1 { item.alpn = .h3 }
-                if item.network != .hysteria2 { item.network = .hysteria2 }
-            } else if newProtocol == .anytls || newProtocol == .naive {
-                if item.security == .none { item.security = .tls }
-                if item.network != .tcp { item.network = .tcp }
+            // ⚠️ 推迟到下一轮 run loop，避免 SwiftUI 事务内修改属性
+            // 导致 FocusItem graph 状态不一致而崩溃
+            DispatchQueue.main.async {
+                if newProtocol == .hysteria2 {
+                    if item.security == .none { item.security = .tls }
+                    if item.alpn == .h2h1 { item.alpn = .h3 }
+                    if item.network != .hysteria2 { item.network = .hysteria2 }
+                } else if newProtocol == .anytls || newProtocol == .naive {
+                    if item.security == .none { item.security = .tls }
+                    if item.network != .tcp { item.network = .tcp }
+                }
             }
         }
     }
