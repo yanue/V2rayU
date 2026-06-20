@@ -21,7 +21,11 @@ func presentAlert(_ alert: NSAlert, attachedTo window: NSWindow? = nil) async ->
                 continuation.resume(returning: response)
             }
         } else {
-            continuation.resume(returning: alert.runModal())
+            // 推迟到下一轮 run loop，避免嵌套 run loop 中触发 SwiftUI
+            // display cycle 导致 AttributeGraph 崩溃
+            DispatchQueue.main.async {
+                continuation.resume(returning: alert.runModal())
+            }
         }
     }
 }
@@ -35,7 +39,9 @@ func presentOpenPanel(_ panel: NSOpenPanel, attachedTo window: NSWindow? = nil) 
                 continuation.resume(returning: response)
             }
         } else {
-            continuation.resume(returning: panel.runModal())
+            DispatchQueue.main.async {
+                continuation.resume(returning: panel.runModal())
+            }
         }
     }
 }
