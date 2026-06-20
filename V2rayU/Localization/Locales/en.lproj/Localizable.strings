@@ -760,6 +760,11 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunAutoRebuild" = "Auto rebuild TUN after network changes";
 "TunAutoRebuildTip" = "Automatically rebuild the tunnel after Wi-Fi changes or wake-up to avoid broken routes.";
 "TunLogLevel" = "TUN Log Level";
+"TunEnableIPv6" = "Enable IPv6";
+"TunEnableIPv6Tip" = "Add IPv6 address (fd00::1/64) to the TUN interface, allowing IPv6 traffic through the tunnel.";
+"TunEnableIPv6ChromeWarning" = "Chrome may not work properly when TUN IPv6 is enabled (e.g. ERR_CONNECTION_CLOSED). To turn off this reminder, uncheck \"Show reminder when starting TUN\" in TUN settings.";
+"TunEnableIPv6AlertTitle" = "TUN IPv6 Reminder";
+"TunShowIPv6Reminder" = "Show reminder when starting TUN";
 
 // MARK: - Combination / Profile Hints
 "CombinationCountFormat" = "%d combinations";

@@ -104,6 +104,10 @@ extension UserDefaults {
         case tunAutoRebuild
         // tun log level
         case tunLogLevel
+        // tun enable IPv6
+        case tunEnableIPv6
+        // tun IPv6 开启时是否弹 Chrome 提醒
+        case tunShowIPv6Reminder
 
         // sing-box dns json config
         case dnsJsonSingbox

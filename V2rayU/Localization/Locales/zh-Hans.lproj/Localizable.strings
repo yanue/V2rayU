@@ -761,6 +761,11 @@
 "TunAutoRebuild" = "网络变化后自动重建 TUN";
 "TunAutoRebuildTip" = "切换 Wi-Fi / 唤醒后自动重建隧道，避免路由失效导致断网";
 "TunLogLevel" = "TUN 日志级别";
+"TunEnableIPv6" = "启用 IPv6";
+"TunEnableIPv6Tip" = "为 TUN 接口添加 IPv6 地址 (fd00::1/64)，使 IPv6 流量通过隧道。";
+"TunEnableIPv6ChromeWarning" = "开启 TUN IPv6 后 Chrome 可能无法正常使用（例如 ERR_CONNECTION_CLOSED）。如需关闭此提醒，请在 TUN 设置中取消勾选「启动 TUN 时显示提醒」。";
+"TunEnableIPv6AlertTitle" = "TUN IPv6 提醒";
+"TunShowIPv6Reminder" = "启动 TUN 时显示提醒";
 
 // MARK: - 组合配置 / 核心提示
 "CombinationCountFormat" = "共 %d 个组合";

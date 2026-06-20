@@ -72,12 +72,17 @@ enum TunConfigHandler {
         let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
         let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+        let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: true)
         let useSniffRuleAction = SingboxVersionCheck.supportsSniffRuleAction()
 
+        var addresses = [tunAddr]
+        if tunEnableIPv6 {
+            addresses.append("fd00::1/64")
+        }
         let tunInbound = SingboxInbound(
             type: "tun",
             tag: "tun-in",
-            address: [tunAddr],
+            address: addresses,
             auto_route: true,
             strict_route: tunStrictRoute,
             mtu: tunMtu,

@@ -216,6 +216,13 @@ import Testing
             return result
         }
 
+        let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: true)
+        if tunEnableIPv6 {
+            if !address.contains("fd00::1/64") {
+                result.addVersionIssue("Expected IPv6 address fd00::1/64 in TUN inbound address list")
+            }
+        }
+
         guard tunInbound.auto_route == true else {
             result.status = .configError
             result.error = "TUN inbound auto_route should be true"

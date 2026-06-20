@@ -448,6 +448,21 @@ actor V2rayLaunch {
         if ok {
             Self.setupTunDns()
             logger.info("startTun ok")
+            let ipv6Enabled = await AppSettings.shared.tunEnableIPv6
+            let showReminder = await AppSettings.shared.tunShowIPv6Reminder
+            if ipv6Enabled && showReminder {
+                let title = await localized(.TunEnableIPv6AlertTitle)
+                let msg = await localized(.TunEnableIPv6ChromeWarning)
+                let settingsLabel = await localized(.Settings)
+                let okLabel = await localized(.OK)
+                if await showConfirmAlert(title: title, message: msg, confirmTitle: settingsLabel, cancelTitle: okLabel) {
+                    await MainActor.run {
+                        NavigationState.shared.mainTab = .setting
+                        NavigationState.shared.settingTab = .tun
+                        MainWindowManager.shared.openMainWindow()
+                    }
+                }
+            }
         } else {
             logger.warning("startTun: TUN daemon failed to start (continuing without teardown)")
         }

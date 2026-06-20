@@ -131,6 +131,11 @@ enum LanguageLabel: String, CaseIterable {
     case TunAutoRebuild
     case TunAutoRebuildTip
     case TunLogLevel
+    case TunEnableIPv6
+    case TunEnableIPv6Tip
+    case TunEnableIPv6ChromeWarning
+    case TunEnableIPv6AlertTitle
+    case TunShowIPv6Reminder
 
     // MARK: - PAC Settings
     case PacSettings

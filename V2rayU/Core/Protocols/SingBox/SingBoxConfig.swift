@@ -230,6 +230,7 @@ struct DNSConfig: Codable {
         self.rules = rules
         self.final = final
         self.independent_cache = independent_cache
+        self.strategy = strategy
     }
 }
 

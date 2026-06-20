@@ -79,6 +79,8 @@ final class AppSettings: ObservableObject {
     // 网络变化/唤醒后自动重建 TUN, 默认开启
     @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
     @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
+    @Published var tunEnableIPv6: Bool = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
+    @Published var tunShowIPv6Reminder: Bool = UserDefaults.getBool(forKey: .tunShowIPv6Reminder, default: true)
 
     init() {
         if let savedTheme = UserDefaults.standard.string(forKey: "AppleThemes"),
@@ -167,6 +169,8 @@ final class AppSettings: ObservableObject {
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
+        tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
+        tunShowIPv6Reminder = UserDefaults.getBool(forKey: .tunShowIPv6Reminder, default: true)
     }
 
     func saveSettings() {
@@ -242,6 +246,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
+        UserDefaults.setBool(forKey: .tunEnableIPv6, value: tunEnableIPv6)
+        UserDefaults.setBool(forKey: .tunShowIPv6Reminder, value: tunShowIPv6Reminder)
     }
 
     func handleChange(old: AppSettings) {
@@ -276,7 +282,8 @@ final class AppSettings: ObservableObject {
             old.tunDnsRemote != tunDnsRemote ||
             old.tunDnsChina != tunDnsChina ||
             old.tunStrictRoute != tunStrictRoute ||
-            old.tunLogLevel != tunLogLevel {
+            old.tunLogLevel != tunLogLevel ||
+            old.tunEnableIPv6 != tunEnableIPv6 {
             needRestartV2ray = true
         }
 

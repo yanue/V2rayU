@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TunView: View {
     @ObservedObject var settings = AppSettings.shared
+    @State private var showIPv6Warning = false
     private var labelWidth: CGFloat = 240
 
     var body: some View {
@@ -55,6 +56,29 @@ struct TunView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                Spacer()
+            }
+
+            HStack {
+                Toggle(isOn: $settings.tunEnableIPv6) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String(localized: .TunEnableIPv6))
+                        Text(String(localized: .TunEnableIPv6Tip))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+            }
+
+            HStack {
+                Toggle(isOn: $settings.tunShowIPv6Reminder) {
+                    Text(String(localized: .TunShowIPv6Reminder))
+                        .font(.subheadline)
+                        .foregroundColor(settings.tunEnableIPv6 ? .primary : .secondary)
+                }
+                .disabled(!settings.tunEnableIPv6)
+                .padding(.leading, 24)
                 Spacer()
             }
 
@@ -116,6 +140,16 @@ struct TunView: View {
         .padding()
         .onDisappear {
             AppSettings.shared.saveSettings()
+        }
+        .onChange(of: settings.tunEnableIPv6) { newValue in
+            if newValue {
+                showIPv6Warning = true
+            }
+        }
+        .alert(String(localized: .TunEnableIPv6), isPresented: $showIPv6Warning) {
+            Button(String(localized: .OK)) { }
+        } message: {
+            Text(String(localized: .TunEnableIPv6ChromeWarning))
         }
     }
 }

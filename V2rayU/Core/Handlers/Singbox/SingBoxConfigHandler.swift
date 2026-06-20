@@ -336,6 +336,9 @@ class SingboxConfigHandler {
         }
         do {
             var config = try JSONDecoder().decode(DNSConfig.self, from: data)
+            if config.strategy == nil {
+                config.strategy = "prefer_ipv4"
+            }
             if singboxSupportsNewDnsFormat() {
                 config = migratingDnsServerIfNeeded(config)
             } else {
@@ -359,7 +362,8 @@ class SingboxConfigHandler {
                 rules: [
                     DNSRule(server: "local-dns", domain: ["localhost", "local"]),
                 ],
-                final: "remote-dns"
+                final: "remote-dns",
+                strategy: "prefer_ipv4"
             )
         }
 
