@@ -20,6 +20,8 @@ struct SubscriptionListView: View {
     @State private var tableOpacity: Double = 1.0
     @State private var showDeleteConfirm = false
     @State private var pendingDeleteUUIDs: [String] = []
+    @State private var pendingDeleteServerCount: Int = 0
+    @State private var deleteServers: Bool = true
 
     private var filteredAndSortedItems: [SubscriptionEntity] {
         viewModel.list
@@ -108,19 +110,66 @@ struct SubscriptionListView: View {
         .sheet(isPresented: $syncingAll) {
             SubscriptionSyncView(subscription: nil, isAll: true) { syncingAll = false }
         }
-        .alert(localizedString(.DeleteConfirm), isPresented: $showDeleteConfirm) {
-            Button(String(localized: .Delete), role: .destructive) {
-                let uuids = pendingDeleteUUIDs
-                pendingDeleteUUIDs = []
-                for uuid in uuids {
-                    viewModel.delete(uuid: uuid)
+        .sheet(isPresented: $showDeleteConfirm) {
+            VStack(spacing: 0) {
+                VStack(spacing: 8) {
+                    Text(localizedString(.DeleteConfirm))
+                        .font(.headline)
+                    Text(deleteConfirmMessage)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.vertical, 16)
+                .padding(.horizontal, 20)
+
+                Divider()
+
+                Toggle(isOn: $deleteServers) {
+                    Text("\(localizedString(.DeleteServers)) (\(pendingDeleteServerCount))")
+                }
+                .toggleStyle(.switch)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+
+                Divider()
+
+                HStack {
+                    Button(String(localized: .Cancel), role: .cancel) {
+                        pendingDeleteUUIDs = []
+                        deleteServers = false
+                        showDeleteConfirm = false
+                    }
+                    .buttonStyle(.bordered)
+                    .keyboardShortcut(.cancelAction)
+                    .focusable(false)
+
+                    Spacer()
+
+                    Button(String(localized: .Delete), role: .destructive) {
+                        let uuids = pendingDeleteUUIDs
+                        let delServers = deleteServers
+                        pendingDeleteUUIDs = []
+                        deleteServers = false
+                        showDeleteConfirm = false
+                        for uuid in uuids {
+                            viewModel.delete(uuid: uuid, deleteServers: delServers)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .keyboardShortcut(.defaultAction)
+                    .focusable(false)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+            }
+            .frame(width: 300)
+            .background(Color(NSColor.windowBackgroundColor))
+            .onAppear {
+                pendingDeleteServerCount = pendingDeleteUUIDs.reduce(0) {
+                    $0 + ProfileStore.shared.getGroupProfiles(subid: $1).count
                 }
             }
-            Button(String(localized: .Cancel), role: .cancel) {
-                pendingDeleteUUIDs = []
-            }
-        } message: {
-            Text(deleteConfirmMessage)
         }
         .task { loadData() }
     }

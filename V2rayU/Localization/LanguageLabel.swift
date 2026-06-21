@@ -37,6 +37,7 @@ enum LanguageLabel: String, CaseIterable {
     case DeleteSelectedConfirm
     case DeleteTip
     case DeleteMultipleConfirm
+    case DeleteServers
     case OK
     case Add
     case Export

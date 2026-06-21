@@ -18,7 +18,19 @@ class SubscriptionViewModel: ObservableObject {
         list = store.fetchAll()
     }
 
-    func delete(uuid: String) {
+    func delete(uuid: String, deleteServers: Bool = false) {
+        if deleteServers {
+            let profiles = ProfileStore.shared.getGroupProfiles(subid: uuid)
+            for profile in profiles {
+                ProfileStore.shared.delete(uuid: profile.uuid)
+            }
+            if !profiles.isEmpty {
+                let uuids = profiles.map(\.uuid)
+                Task { @MainActor in
+                    uuids.forEach { CombinedConfigStore.removeProfile(uuid: $0) }
+                }
+            }
+        }
         store.delete(uuid: uuid)
         getList()
     }
