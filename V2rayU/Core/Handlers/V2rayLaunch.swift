@@ -542,7 +542,7 @@ actor V2rayLaunch {
             sockPort = String(getEffectiveSocksProxyPort())
         }
         if mode == .pac {
-            if !GeneratePACFile(rewrite: false) {
+            if !GeneratePACFile(rewrite: true) {
                 Task { @MainActor in
                     noticeTip(title: String(localized: .PacGenerateFailed), informativeText: String(localized: .PacGenerateFailedTip))
                 }

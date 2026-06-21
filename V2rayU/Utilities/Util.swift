@@ -7,6 +7,7 @@
 
 import Cocoa
 import Network
+import SystemConfiguration
 
 private let coreVersionCacheLock = NSLock()
 private nonisolated(unsafe) var cachedCoreVersion: String?
@@ -204,32 +205,18 @@ func checkFileIsCurrentArch(file: String) -> Bool {
 }
 
 
-// get ip address
+// 获取本机局域网 IP 地址
+// 通过 SystemConfiguration 读取系统网络偏好设置中主服务的 IP。
+// 即使 VPN 改变了默认路由，也能可靠返回物理网卡 IP（如 en0）。
 
 func GetIPAddresses() -> String? {
-    var addresses = [String]()
-
-    var ifaddr: UnsafeMutablePointer<ifaddrs>?
-    if getifaddrs(&ifaddr) == 0 {
-        var ptr = ifaddr
-        while ptr != nil {
-            let flags = Int32(ptr!.pointee.ifa_flags)
-            var addr = ptr!.pointee.ifa_addr.pointee
-            if (flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING) {
-                if addr.sa_family == UInt8(AF_INET) { // just ipv4
-                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                    if getnameinfo(&addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST) == 0 {
-                        let hostnameBytes = hostname.prefix { $0 != 0 }.map(UInt8.init(bitPattern:))
-                        if let address = String(bytes: hostnameBytes, encoding: .utf8) {
-                            addresses.append(address)
-                        }
-                    }
-                }
-            }
-            ptr = ptr!.pointee.ifa_next
-        }
-        freeifaddrs(ifaddr)
-    }
+    guard let store = SCDynamicStoreCreate(nil, "V2rayU" as CFString, nil, nil) else { return nil }
+    guard let global = SCDynamicStoreCopyValue(store, "State:/Network/Global/IPv4" as CFString) else { return nil }
+    guard let dict = global as? [CFString: Any] else { return nil }
+    guard let primaryInterface = dict["PrimaryInterface" as CFString] as? String else { return nil }
+    guard let interfaceState = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(primaryInterface)/IPv4" as CFString) else { return nil }
+    guard let interfaceDict = interfaceState as? [CFString: Any] else { return nil }
+    guard let addresses = interfaceDict["Addresses" as CFString] as? [String] else { return nil }
     return addresses.first
 }
 

@@ -168,6 +168,9 @@ struct DnsView: View {
                 }
                 .buttonStyle(.bordered)
                 .focusable(false)
+                Text("( {} = 使用系统 DNS )")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                 Button(action: { loadDefault() }) {
                     Label(String(localized: .DnsDefault), systemImage: "checkmark.circle")
