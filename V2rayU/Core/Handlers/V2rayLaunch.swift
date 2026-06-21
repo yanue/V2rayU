@@ -189,6 +189,8 @@ actor V2rayLaunch {
         if newMode == .tun && oldMode != .tun {
             if !(await startTun()) {
                 await notifyTunFailed()
+                logger.info("applyMode: TUN start failed, reverting")
+                return false
             }
         } else if oldMode == .tun && newMode != .tun {
             await stopTun()
@@ -234,9 +236,11 @@ actor V2rayLaunch {
         let mode = await MainActor.run { AppState.shared.runMode }
         if mode == .tun {
             // TUN 不依赖 SOCKS 端口就绪(sing-box 会自行重连上游), 立即启动, 不等待 SOCKS。
-            // 失败也不整体回滚（避免切换不稳定）, 仅以非阻塞 Toast 告知。
             if !(await startTun()) {
                 await notifyTunFailed()
+                // TUN 启动失败: 整体回滚, 避免状态不一致
+                await stopAll()
+                return false
             }
         } else {
             // 非 TUN: 尽力等 SOCKS 就绪再设系统代理, 缩短首次请求失败窗口(不就绪也继续)。
