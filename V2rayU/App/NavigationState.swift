@@ -6,8 +6,9 @@ enum MainTab: String, CaseIterable {
     case combination
     case subscription
     case routing
-    case setting
+    case core
     case diagnostic
+    case setting
     case about
 }
 
@@ -18,7 +19,6 @@ enum SettingsTab {
     case advance
     case dns
     case pac
-    case core
     case tun
 }
 

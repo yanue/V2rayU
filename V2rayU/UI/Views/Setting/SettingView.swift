@@ -32,8 +32,6 @@ struct SettingView: View {
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.settingTabDns.rawValue)
                 localized(.PAC).tag(SettingsTab.pac)
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.settingTabPac.rawValue)
-                localized(.Core).tag(SettingsTab.core)
-                    .accessibilityIdentifier(ViewAccessibilityIdentifier.settingTabCore.rawValue)
             }
             .pickerStyle(.segmented)
             .focusable(false)
@@ -54,8 +52,6 @@ struct SettingView: View {
                     DnsView()
                 case .pac:
                     PacView()
-                case .core:
-                    CoreView()
                 case .tun:
                     TunView()
                 }

@@ -63,7 +63,7 @@
 "SettingsSubHead" = "通用应用设置";
 "About" = "关于";
 "AboutSubHead" = "关于此应用";
-"AboutAppIntroduction" = "V2rayU 是一款 macOS VPN 客户端，支持 V2Ray、Sing-Box、Shadowsocks、Trojan 等多种协议。它提供直观的用户界面来管理代理连接、订阅和路由规则。";
+"AboutAppIntroduction" = "V2rayU 是一款 macOS 代理客户端，基于 Xray-core 和 Sing-Box 双核心引擎，支持 VMess、VLESS、Trojan、Shadowsocks、SSR、SOCKS5、Hysteria、Hysteria2、Tuic、AnyTLS、Naive 等多种协议。提供直观的用户界面来管理代理连接、订阅、路由规则和 TUN 模式。";
 
 // MARK: - 设置标签
 "General" = "通用设置";
@@ -534,11 +534,14 @@
 
 文件说明:
 ~/.V2rayU/config.json - 核心主要配置文件
-~/.V2rayU/V2rayUTool - 重要!!! 系统代理设置辅助工具，必须拥有 -rwsrwsrwx 1 root admin 权限
-~/.V2rayU/.V2rayU.db - 5.0 以上版本的 SQLite 数据库，存储订阅和服务器信息
-~/.V2rayU/v2ray-core/v2ray - 核心可执行文件，需对应系统架构 (x86_64 或 arm64)
+~/.V2rayU/tun.json - TUN 模式配置文件 (sing-box)
+~/.V2rayU/.V2rayU.db - SQLite 数据库，存储订阅和服务器信息
 ~/.V2rayU/proxy.js - PAC 模式下的自动代理配置文件
-~/.V2rayU/v2ray-core.log - 核心运行日志";
+~/.V2rayU/V2rayU.log - 应用程序日志
+~/.V2rayU/core.log - 核心引擎日志
+~/.V2rayU/tun.log - TUN 辅助日志
+/usr/local/v2rayu/V2rayUTool - 系统代理设置辅助工具，必须拥有 setuid root:admin 权限
+/usr/local/v2rayu/bin/ - 核心二进制目录 (xray-core / sing-box)";
 "FaqOperationModesDetail2" = "主要区别在于如何设置系统代理:
 
 • PAC 模式：设置系统 PAC 代理 (设置 → 网络 → Wi-Fi → 详情 → 代理 → 自动代理配置)
@@ -552,7 +555,7 @@
 "FaqTrueGlobalProxyDetail2" = "使用 Tun 模式！V2rayU 通过 sing-box 的 TUN 功能（网络扩展）实现 Tun 模式，可以真正做到系统级全局代理。Mac 上的所有网络流量都会自动走代理，无需在各应用中单独配置。
 
 启用方法：点击菜单栏 V2rayU 图标 → 选择 Tun 模式，或使用快捷键切换。";
-"FaqManualCoreUpdateDetail2" = "可手动下载对应系统架构的 xray-core 或 sing-box 版本，替换到 ~/.V2rayU/v2ray-core/ 目录下。请注意需将核心文件重命名为 ~/.V2rayU/v2ray-core/v2ray";
+"FaqManualCoreUpdateDetail2" = "可手动下载对应系统架构的 xray-core 或 sing-box 版本。核心二进制文件位于 /usr/local/v2rayu/bin/ 目录下（如 xray-core/xray-arm64、sing-box/sing-box-arm64），替换对应文件后重启核心即可。";
 
 // MARK: - 诊断 - 检查项标题
 "DiagNetworkConnectivity" = "网络连接";

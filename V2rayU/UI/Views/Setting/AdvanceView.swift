@@ -62,8 +62,6 @@ struct AdvanceView: View {
                 .foregroundColor(.secondary)
             getNumFieldWithLabel(label: .LatencyTestConcurrency, num: $settings.latencyTestConcurrency, labelWidth: labelWidth)
             getTextFieldWithLabel(label: .PingTestURL, text: $settings.pingTestURL, labelWidth: labelWidth)
-            getTextFieldWithLabel(label: .UDPTestURL, text: $settings.udpTestURL, labelWidth: labelWidth)
-            getTextFieldWithLabel(label: .CurrentConnectionTestURL, text: $settings.currentConnectionTestURL, labelWidth: labelWidth)
 
             Divider()
 

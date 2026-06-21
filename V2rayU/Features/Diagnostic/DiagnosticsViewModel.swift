@@ -872,12 +872,12 @@ final class DiagnosticsViewModel: ObservableObject {
         }
 
         let allProblems = problems + tunProblems
-        let ok = allProblems.isEmpty || (allProblems.count == 1 && allProblems[0] == "未发现明显错误")
+        let realProblems = allProblems.filter { $0 != "未发现明显错误" }
         self.logContent = log + (tunLog.isEmpty ? "" : "\n--- TUN logs ---\n" + tunLog)
 
-        if ok { return .pass(.logAnalysis) }
+        if realProblems.isEmpty { return .pass(.logAnalysis) }
         return .fail(.logAnalysis, subtitle: String(localized: .DiagFailed),
-                     problem: allProblems.joined(separator: "\n"))
+                     problem: realProblems.joined(separator: "\n"))
     }
 
     // MARK: ── Background helper ──

@@ -9,35 +9,41 @@ import Foundation
 import SwiftUI
 
 enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
-    case type
     case rules
     case download
+    case type
 
     var id: String { rawValue }
 
     var titleLabel: LanguageLabel {
         switch self {
-        case .type: return .CoreTabType
         case .rules: return .CoreTabRules
         case .download: return .CoreTabDownload
+        case .type: return .CoreTabType
         }
     }
 
     var iconSystemName: String {
         switch self {
-        case .type: return "slider.horizontal.3"
         case .rules: return "checklist"
         case .download: return "arrow.down.app"
+        case .type: return "slider.horizontal.3"
         }
     }
 }
 
 struct CoreView: View {
     @ObservedObject private var vm = CoreViewModel.shared
-    @State private var selectedTab: CoreSettingTab = .type
+    @State private var selectedTab: CoreSettingTab = .rules
 
     var body: some View {
         VStack(spacing: 0) {
+            PageHeader(
+                icon: "cpu",
+                title: String(localized: .CoreSettingsTitle),
+                subtitle: String(localized: .CoreSettingsSubtitle)
+            )
+
             Picker("", selection: $selectedTab) {
                 ForEach(CoreSettingTab.allCases) { tab in
                     Label(String(localized: tab.titleLabel), systemImage: tab.iconSystemName)
@@ -46,24 +52,26 @@ struct CoreView: View {
             }
             .pickerStyle(.segmented)
             .focusable(false)
-            .padding(.horizontal, 12)
-            .padding(.top, 12)
-            .padding(.bottom, 12)
+            .padding(.vertical, 12)
+            .fixedSize()
+            .labelsHidden()
 
-            Divider()
-
-            ZStack {
+            VStack {
                 switch selectedTab {
-                case .type:
-                    CoreTypeSettingsView(vm: vm)
                 case .rules:
                     CoreCapabilityRulesView(vm: vm)
                 case .download:
                     CoreDownloadView(vm: vm)
+                case .type:
+                    CoreTypeSettingsView(vm: vm)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(.ultraThinMaterial)
+            .border(Color.gray.opacity(0.1), width: 1)
+            .cornerRadius(8)
         }
+        .padding(8)
         .onAppear {
             vm.loadCoreVersions()
             // Navigate to requested subtab (from compatibility alert)

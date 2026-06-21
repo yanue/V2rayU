@@ -299,8 +299,7 @@ actor V2rayLaunch {
                 let needDownload = await showDownloadAlert(title: await localized(.XrayCompatibilityWarningTitle), message: downloadMsg)
                 if needDownload {
                     await MainActor.run {
-                        NavigationState.shared.mainTab = .setting
-                        NavigationState.shared.settingTab = .core
+                        NavigationState.shared.mainTab = .core
                         NavigationState.shared.coreSettingTab = .download
                         MainWindowManager.shared.openMainWindow()
                     }
@@ -390,8 +389,7 @@ actor V2rayLaunch {
                 let needDownload = await showDownloadAlert(title: await localized(.CoreCompatibilityWarningTitle), message: downloadMsg)
                 if needDownload {
                     await MainActor.run {
-                        NavigationState.shared.mainTab = .setting
-                        NavigationState.shared.settingTab = .core
+                        NavigationState.shared.mainTab = .core
                         NavigationState.shared.coreSettingTab = .download
                         MainWindowManager.shared.openMainWindow()
                     }

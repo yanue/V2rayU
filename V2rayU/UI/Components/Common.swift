@@ -48,6 +48,7 @@ enum ViewAccessibilityIdentifier: String {
     case sidebarServer = "sidebar-server"
     case sidebarCombination = "sidebar-combination"
     case sidebarRouting = "sidebar-routing"
+    case sidebarCore = "sidebar-core"
     case sidebarSetting = "sidebar-setting"
     case sidebarDiagnostic = "sidebar-diagnostic"
     case sidebarAbout = "sidebar-about"

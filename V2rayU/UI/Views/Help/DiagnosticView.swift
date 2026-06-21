@@ -48,7 +48,7 @@ struct DiagnosticsView: View {
 
     private var headerView: some View {
         HStack(alignment: .center, spacing: 12) {
-            Image(systemName: "antenna.radiowaves.left.and.right")
+            Image(systemName: "exclamationmark.triangle")
                 .resizable()
                 .frame(width: 28, height: 28)
                 .foregroundColor(.accentColor)

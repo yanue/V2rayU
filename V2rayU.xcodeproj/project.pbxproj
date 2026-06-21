@@ -489,8 +489,6 @@
 				662CC3F32D1BED9B006E8450 /* AdvanceView.swift */,
 				660A63AF2E2CF9B700D84D5D /* PacView.swift */,
 				660A63AD2E2CF9AD00D84D5D /* DnsView.swift */,
-				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
-				66D525012E0000010000C001 /* Core */,
 				666BD1E52FB374DA009FC480 /* TunView.swift */,
 			);
 			path = Setting;
@@ -508,6 +506,7 @@
 				663814AB2E00657000F5FCF3 /* Routing */,
 				662CC3F22D1BED9B006E8450 /* Profile */,
 				662CC3F82D1BED9B006E8450 /* Setting */,
+				66D525012E0000010000C001 /* Core */,
 				66E94B362D26B971003745B5 /* AppContentView.swift */,
 			);
 			path = Views;
@@ -879,6 +878,7 @@
 		66D525012E0000010000C001 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				660A63AB2E2CF99600D84D5D /* CoreView.swift */,
 				66D525022E0000010000C001 /* CoreTypeSettingsView.swift */,
 				66D525042E0000010000C001 /* CoreCapabilityRulesView.swift */,
 				66D525062E0000010000C001 /* CoreDownloadView.swift */,
@@ -1410,7 +1410,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14;
-				MARKETING_VERSION = 5.0.3;
+				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1444,7 +1444,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14;
-				MARKETING_VERSION = 5.0.3;
+				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.yanue.V2rayU;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

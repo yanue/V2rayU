@@ -33,10 +33,12 @@ struct ContentView: View {
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarCombination.rawValue)
                 SidebarButton(tab: .routing, title: .Routings, icon: "arrow.triangle.branch")
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarRouting.rawValue)
+                SidebarButton(tab: .core, title: .Core, icon: "cpu")
+                    .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarCore.rawValue)
+                SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "exclamationmark.triangle")
+                    .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarDiagnostic.rawValue)
                 SidebarButton(tab: .setting, title: .Settings, icon: "gear")
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarSetting.rawValue)
-                SidebarButton(tab: .diagnostic, title: .Diagnostics, icon: "antenna.radiowaves.left.and.right")
-                    .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarDiagnostic.rawValue)
                 SidebarButton(tab: .about, title: .About, icon: "info.circle")
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.sidebarAbout.rawValue)
                 Spacer()
@@ -56,6 +58,8 @@ struct ContentView: View {
                     SubscriptionListView()
                 case .routing:
                     RoutingListView()
+                case .core:
+                    CoreView()
                 case .setting:
                     SettingView()
                 case .diagnostic:
