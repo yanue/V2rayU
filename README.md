@@ -25,13 +25,7 @@ macOS 平台下的代理客户端，基于 [Xray-core](https://github.com/XTLS/X
 
 ## 下载安装
 
-方式一：Homebrew
-
-```bash
-brew install --cask v2rayu
-```
-
-方式二：从 [Releases](https://github.com/yanue/V2rayU/releases) 下载最新 DMG 安装包
+从 [Releases](https://github.com/yanue/V2rayU/releases) 下载最新 DMG 安装包
 
 ## 功能预览
 
