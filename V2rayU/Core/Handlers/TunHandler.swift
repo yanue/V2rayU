@@ -119,14 +119,6 @@ actor TunHandler {
             logger.info("rebuildAfterNetworkChange skip: not running (\(reason))")
             return
         }
-        guard mode == .tun else {
-            logger.info("rebuildAfterNetworkChange skip: mode=\(mode.rawValue) (\(reason))")
-            return
-        }
-        guard UserDefaults.getBool(forKey: .tunAutoRebuild, default: true) else {
-            logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
-            return
-        }
 
         rebuildInProgress = true
         defer { rebuildInProgress = false }
@@ -140,13 +132,26 @@ actor TunHandler {
             logger.info("rebuildAfterNetworkChange: network not ready, proceeding with restart anyway (\(reason))")
         }
 
-        // 网络变化只会让 TUN 的自动路由失效, 代理核心的 SOCKS 服务不受影响,
-        // 因此只重建 TUN, 不重启核心（大幅降低切换/恢复时的不稳定）。
-        logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
-        await V2rayLaunch.shared.rebuildTun()
+        if mode == .tun {
+            guard UserDefaults.getBool(forKey: .tunAutoRebuild, default: true) else {
+                logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
+                return
+            }
+            // TUN 模式：只重建 TUN，不重启核心（SOCKS 不受网络变化影响）
+            logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
+            await V2rayLaunch.shared.rebuildTun()
+        } else {
+            guard await MainActor.run({ AppState.shared.v2rayTurnOn }) else {
+                logger.info("rebuildAfterNetworkChange skip: v2rayTurnOn became false (\(reason))")
+                return
+            }
+            // 非 TUN 模式：核心的 TCP 连接会因网卡切换而断开，需重启核心重建连接
+            logger.info("rebuildAfterNetworkChange: restarting core for non-TUN mode (\(reason))")
+            await V2rayLaunch.shared.restart()
+        }
         lastRebuildAt = Date()
 
-        // 重建后刷新 UI 状态，确保 runningServer / 菜单选中状态同步
+        // 重建后刷新 UI 状态
         await MainActor.run {
             if AppState.shared.runningCombination.isEmpty,
                let running = ProfileStore.shared.getRunning() {
@@ -154,7 +159,7 @@ actor TunHandler {
             }
             AppMenuManager.shared.refreshAllMenus()
         }
-        // 重新 ping 更新延迟显示，消除"无网络"假象
+        // 重新 ping 更新延迟显示
         await PingAll.shared.run()
     }
 
