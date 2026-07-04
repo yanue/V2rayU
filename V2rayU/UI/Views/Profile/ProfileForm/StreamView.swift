@@ -30,7 +30,7 @@ struct ConfigStreamView: View {
                 Group {
                     if item.network == .tcp  {
                         if item.network == .tcp {
-                            getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                            getPickerWithLabel(label: .HeaderType, selection: $item.headerType, ignore: [.srtp, .utp, .`wechat-video`, .dtls, .wireguard, .dns])
                         }
                         if item.headerType == .http {
                             getTextFieldWithLabel(label: .HttpHost, text: $item.host)
@@ -54,7 +54,7 @@ struct ConfigStreamView: View {
 
                     if item.network == .quic {
                         getTextFieldWithLabel(label: .Key, text: $item.path)
-                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
+                        getPickerWithLabel(label: .HeaderType, selection: $item.headerType, ignore: [.http, .dns])
                         getPickerWithLabel(label: .Security, selection: $item.security)
                     }
 
@@ -65,7 +65,6 @@ struct ConfigStreamView: View {
                     if item.network == .kcp {
                         getTextFieldWithLabel(label: .Seed, text: $item.path)
                         getPickerWithLabel(label: .HeaderType, selection: $item.headerType)
-                        getBoolFieldWithLabel(label: .Congestion, isOn: $item.allowInsecure)
                     }
 
                     if item.network == .xhttp {

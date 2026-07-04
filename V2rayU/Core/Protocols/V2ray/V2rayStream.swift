@@ -58,6 +58,12 @@ enum V2rayStreamFingerprint: String, Codable, CaseIterable, Identifiable {
 enum V2rayHeaderType: String, Codable, CaseIterable, Identifiable {
     case none
     case http
+    case srtp
+    case utp
+    case `wechat-video`
+    case dtls
+    case wireguard
+    case dns
     var id: Self { self }
 }
 
