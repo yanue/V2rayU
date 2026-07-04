@@ -141,7 +141,8 @@ actor TunHandler {
             logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
             await V2rayLaunch.shared.rebuildTun()
         } else {
-            guard await MainActor.run({ AppState.shared.v2rayTurnOn }) else {
+            let turnOnNow = await MainActor.run { AppState.shared.v2rayTurnOn }
+            guard turnOnNow else {
                 logger.info("rebuildAfterNetworkChange skip: v2rayTurnOn became false (\(reason))")
                 return
             }
