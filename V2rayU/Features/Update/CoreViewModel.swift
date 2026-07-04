@@ -130,9 +130,17 @@ final class CoreViewModel: ObservableObject {
     func loadCoreVersions() {
         clearCoreVersionCache()
         clearSingboxVersionCache()
-        xrayCoreVersion = getCoreVersion(refresh: true)
-        singboxCoreVersion = getSingboxVersion(refresh: true)
-        loadCapabilityRulesStatus()
+
+        Task.detached(priority: .utility) {
+            let xrayVer = getCoreVersion(refresh: true)
+            let singboxVer = getSingboxVersion(refresh: true)
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                self.xrayCoreVersion = xrayVer
+                self.singboxCoreVersion = singboxVer
+                self.loadCapabilityRulesStatus()
+            }
+        }
     }
 
     // MARK: - Capability Rules
