@@ -319,9 +319,10 @@ actor V2rayLaunch {
         await MainActor.run {
             if AppState.shared.runningProfile != item.uuid {
                 AppState.shared.runningProfile = item.uuid
-                AppState.shared.runningServer = item
                 logger.info("prepareAndStartCore: sync runningProfile to \(item.remark)")
             }
+            // 始终同步 runningServer，防止因 profile 编辑/重建导致内存态 stale
+            AppState.shared.runningServer = item
             AppMenuManager.shared.refreshServerItems()
         }
         await AppState.shared.resetSpeed()
@@ -411,6 +412,7 @@ actor V2rayLaunch {
             AppState.shared.runningServer = firstProfile
             AppMenuManager.shared.refreshCombinedConfigItems()
             AppMenuManager.shared.refreshServerItems()
+            logger.info("prepareAndStartCombinationCore: sync runningProfile to \(firstProfile.remark)")
         }
         await AppState.shared.resetSpeed()
         await CoreTrafficStatsHandler.shared.resetData()

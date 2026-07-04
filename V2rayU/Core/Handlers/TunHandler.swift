@@ -145,6 +145,17 @@ actor TunHandler {
         logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
         await V2rayLaunch.shared.rebuildTun()
         lastRebuildAt = Date()
+
+        // 重建后刷新 UI 状态，确保 runningServer / 菜单选中状态同步
+        await MainActor.run {
+            if AppState.shared.runningCombination.isEmpty,
+               let running = ProfileStore.shared.getRunning() {
+                AppState.shared.runningServer = running
+            }
+            AppMenuManager.shared.refreshAllMenus()
+        }
+        // 重新 ping 更新延迟显示，消除"无网络"假象
+        await PingAll.shared.run()
     }
 
     // MARK: - Network Readiness

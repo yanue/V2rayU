@@ -54,12 +54,11 @@ actor SystemSleepManager {
     private func handleSystemDidWake() {
         // 系统唤醒后的处理逻辑
         logger.info("onWakeNote")
-        if UserDefaults.getBool(forKey: .v2rayTurnOn) {
-            logger.info("V2rayLaunch rebuild after wake")
-            Task {
-                // 不直接 restart: 唤醒瞬间 Wi-Fi 仍在重连/DHCP, 过早重启会导致接口探测失败。
-                // rebuildAfterNetworkChange 内部会等待物理网络就绪后再重建(TUN 模式),
-                // 非 TUN 模式则回退为普通重启。
+        Task {
+            // 1. 恢复网络连接（按模式选择策略）
+            let turnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
+            if turnOn {
+                logger.info("V2rayLaunch rebuild after wake")
                 let mode = await MainActor.run { AppState.shared.runMode }
                 if mode == .tun {
                     await TunHandler.shared.rebuildAfterNetworkChange(reason: "system wake")
@@ -67,21 +66,32 @@ actor SystemSleepManager {
                     await V2rayLaunch.shared.restart()
                 }
             }
-        }
-        if UserDefaults.getBool(forKey: .autoCheckVersion) {
-            // 自动检查更新
-            Task {
+
+            // 2. 同步运行中服务器状态（runningServer 是内存态，需从 DB 刷新）
+            if turnOn {
+                await MainActor.run {
+                    if AppState.shared.runningCombination.isEmpty,
+                       let running = ProfileStore.shared.getRunning() {
+                        AppState.shared.runningServer = running
+                        if AppState.shared.runningProfile != running.uuid {
+                            AppState.shared.runningProfile = running.uuid
+                        }
+                    }
+                }
+            }
+
+            // 3. 刷新所有菜单 UI，确保选中状态一致
+            await MainActor.run {
+                AppMenuManager.shared.refreshAllMenus()
+            }
+
+            // 4. 后台任务
+            if UserDefaults.getBool(forKey: .autoCheckVersion) {
                 await AppMenuManager.shared.versionController.checkForUpdates(showWindow: false)
             }
-        }
-        if UserDefaults.getBool(forKey: .autoUpdateServers) {
-            // 自动更新订阅服务器
-            Task{
+            if UserDefaults.getBool(forKey: .autoUpdateServers) {
                 await SubscriptionHandler.shared.sync()
             }
-        }
-        // ping
-        Task {
             await PingAll.shared.run()
         }
     }
