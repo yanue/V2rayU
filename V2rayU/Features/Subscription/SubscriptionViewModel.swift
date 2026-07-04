@@ -19,6 +19,11 @@ class SubscriptionViewModel: ObservableObject {
     }
 
     func delete(uuid: String, deleteServers: Bool = false) {
+        // 先停止该订阅的自动同步定时器，防止 timer 回调用 upsert 重新插入已删除的订阅
+        Task {
+            await SubscriptionScheduler.shared.stop(for: uuid)
+        }
+
         if deleteServers {
             let profiles = ProfileStore.shared.getGroupProfiles(subid: uuid)
             for profile in profiles {

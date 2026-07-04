@@ -45,6 +45,12 @@ actor SubscriptionHandler {
                 self.refreshMenu()
             }
             do {
+                // 确保订阅仍然存在（防止定时器在删除后未取消导致重新插入）
+                guard SubscriptionStore.shared.fetchOne(uuid: item.uuid) != nil else {
+                    logger.info("syncOne: subscription \(item.uuid) has been deleted, skipping")
+                    return
+                }
+
                 let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                 logger.info("SubscriptionHandler syncOne success")
                 
@@ -66,6 +72,13 @@ actor SubscriptionHandler {
             Future<Void, Error> { promise in
                 Task {
                     do {
+                        // 确保订阅仍然存在
+                        guard SubscriptionStore.shared.fetchOne(uuid: item.uuid) != nil else {
+                            logger.info("syncTaskGroup: subscription \(item.uuid) has been deleted, skipping")
+                            promise(.success(()))
+                            return
+                        }
+
                         let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                         // 下载成功后更新 updateTime 并保存
                         var updated = item
