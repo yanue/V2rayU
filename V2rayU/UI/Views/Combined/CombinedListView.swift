@@ -173,10 +173,13 @@ struct CombinedConfigListView: View {
         }
         .alert(String(localized: .DeleteConfirm), isPresented: $showDeleteConfirm) {
             Button(String(localized: .Delete), role: .destructive) {
-                if let uuid = pendingDeleteUUID {
-                    viewModel.delete(uuid: uuid)
-                }
+                let uuid = pendingDeleteUUID
                 pendingDeleteUUID = nil
+                DispatchQueue.main.async {
+                    if let uuid = uuid {
+                        viewModel.delete(uuid: uuid)
+                    }
+                }
             }
             Button(String(localized: .Cancel), role: .cancel) {
                 pendingDeleteUUID = nil

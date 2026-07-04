@@ -28,6 +28,10 @@ class SubscriptionViewModel: ObservableObject {
             let profiles = ProfileStore.shared.getGroupProfiles(subid: uuid)
             for profile in profiles {
                 ProfileStore.shared.delete(uuid: profile.uuid)
+                if profile.uuid == AppState.shared.runningProfile {
+                    AppState.shared.runningProfile = ""
+                    AppState.shared.runningServer = nil
+                }
             }
             if !profiles.isEmpty {
                 let uuids = profiles.map(\.uuid)

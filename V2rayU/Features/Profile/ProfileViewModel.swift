@@ -50,6 +50,10 @@ final class ProfileViewModel: ObservableObject {
 
     func delete(uuid: String) {
         store.delete(uuid: uuid)
+        if uuid == AppState.shared.runningProfile {
+            AppState.shared.runningProfile = ""
+            AppState.shared.runningServer = nil
+        }
         removeProfileFromCombinedConfigs(uuid: uuid)
         getList()
     }
@@ -83,6 +87,11 @@ final class ProfileViewModel: ObservableObject {
 
         for uuid in toDelete {
             store.delete(uuid: uuid)
+            if uuid == AppState.shared.runningProfile {
+                AppState.shared.runningProfile = ""
+                AppState.shared.runningServer = nil
+            }
+            CombinedConfigStore.removeProfile(uuid: uuid)
         }
 
         getList()

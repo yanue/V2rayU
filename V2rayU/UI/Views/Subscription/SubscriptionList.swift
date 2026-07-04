@@ -152,8 +152,10 @@ struct SubscriptionListView: View {
                         pendingDeleteUUIDs = []
                         deleteServers = false
                         showDeleteConfirm = false
-                        for uuid in uuids {
-                            viewModel.delete(uuid: uuid, deleteServers: delServers)
+                        DispatchQueue.main.async {
+                            for uuid in uuids {
+                                viewModel.delete(uuid: uuid, deleteServers: delServers)
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)

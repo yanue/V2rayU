@@ -91,8 +91,10 @@ struct RoutingListView: View {
             Button(String(localized: .Delete), role: .destructive) {
                 let uuids = pendingDeleteUUIDs
                 pendingDeleteUUIDs = []
-                for uuid in uuids {
-                    viewModel.delete(uuid: uuid)
+                DispatchQueue.main.async {
+                    for uuid in uuids {
+                        viewModel.delete(uuid: uuid)
+                    }
                 }
             }
             Button(String(localized: .Cancel), role: .cancel) {

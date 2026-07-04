@@ -245,8 +245,12 @@ struct ProfileListView: View {
             Button(String(localized: .Delete), role: .destructive) {
                 let uuids = pendingDeleteUUIDs
                 pendingDeleteUUIDs = []
-                for uuid in uuids {
-                    viewModel.delete(uuid: uuid)
+                // Defer to avoid AttributeGraph crash during alert dismissal
+                DispatchQueue.main.async {
+                    selection = []
+                    for uuid in uuids {
+                        viewModel.delete(uuid: uuid)
+                    }
                 }
             }
             Button(String(localized: .Cancel), role: .cancel) {
@@ -257,11 +261,13 @@ struct ProfileListView: View {
         }
         .alert(String(localized: .RemoveDuplicateServers), isPresented: $showRemoveDuplicatesConfirm) {
             Button(String(localized: .RemoveDuplicateServers), role: .destructive) {
-                let count = viewModel.removeDuplicates()
-                alertDialog(
-                    title: String(localized: .RemoveDuplicateServers),
-                    message: String(localized: .RemoveDuplicateConfirm, arguments: count)
-                )
+                DispatchQueue.main.async {
+                    let count = viewModel.removeDuplicates()
+                    alertDialog(
+                        title: String(localized: .RemoveDuplicateServers),
+                        message: String(localized: .RemoveDuplicateConfirm, arguments: count)
+                    )
+                }
             }
             Button(String(localized: .Cancel), role: .cancel) {}
         } message: {
