@@ -17,12 +17,12 @@ func getTextField(name: LanguageLabel, text: Binding<String>) -> some View {
 
 // 公共的 getTextField 函数，接受 name
 @MainActor
-func getTextLabel(label: LanguageLabel, labelWidth: CGFloat = 100) -> some View {
+func getTextLabel(label: LanguageLabel, labelWidth: CGFloat = 150) -> some View {
     Text(String(localized: label)).frame(width: labelWidth, alignment: .trailing)
 }
 
 @MainActor
-func getTextFieldWithLabel(label: LanguageLabel, text: Binding<String>, labelWidth: CGFloat = 100) -> some View {
+func getTextFieldWithLabel(label: LanguageLabel, text: Binding<String>, labelWidth: CGFloat = 150) -> some View {
     HStack {
         LocalizedTextLabelView(label:label).frame(width: labelWidth, alignment: .trailing)
         Spacer()
@@ -33,7 +33,7 @@ func getTextFieldWithLabel(label: LanguageLabel, text: Binding<String>, labelWid
 }
 
 @MainActor
-func getNumFieldWithLabel(label: LanguageLabel, num: Binding<Int>, labelWidth: CGFloat = 100) -> some View {
+func getNumFieldWithLabel(label: LanguageLabel, num: Binding<Int>, labelWidth: CGFloat = 150) -> some View {
         HStack {
             LocalizedTextLabelView(label:label).frame(width: labelWidth, alignment: .trailing)
             Spacer()
@@ -73,7 +73,7 @@ enum ViewAccessibilityIdentifier: String {
 }
 
 @MainActor
-func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: LanguageLabel, selection: Binding<T>,ignore: [T] = [], labelWidth: CGFloat = 100) -> some View where T.RawValue == String, T.AllCases: RandomAccessCollection {
+func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: LanguageLabel, selection: Binding<T>,ignore: [T] = [], labelWidth: CGFloat = 150) -> some View where T.RawValue == String, T.AllCases: RandomAccessCollection {
     HStack {
         LocalizedTextLabelView(label:label).frame(width: labelWidth, alignment: .trailing)
         Spacer()
@@ -87,7 +87,7 @@ func getPickerWithLabel<T: CaseIterable & RawRepresentable & Hashable>(label: La
 }
 
 @MainActor
-func getBoolFieldWithLabel(label: LanguageLabel, isOn: Binding<Bool>, labelWidth: CGFloat = 100) -> some View {
+func getBoolFieldWithLabel(label: LanguageLabel, isOn: Binding<Bool>, labelWidth: CGFloat = 150) -> some View {
     HStack {
         LocalizedTextLabelView(label:label).frame(width: labelWidth, alignment: .trailing)
         Toggle("", isOn: isOn).frame(alignment: .leading)
@@ -99,7 +99,7 @@ func getBoolFieldWithLabel(label: LanguageLabel, isOn: Binding<Bool>, labelWidth
 
 
 @MainActor
-func getTextEditorWithLabel(label: LanguageLabel, text: Binding<String>, labelWidth: CGFloat = 100) -> some View {
+func getTextEditorWithLabel(label: LanguageLabel, text: Binding<String>, labelWidth: CGFloat = 150) -> some View {
     HStack {
         LocalizedTextLabelView(label:label).frame(width: labelWidth, alignment: .trailing)
         Spacer()

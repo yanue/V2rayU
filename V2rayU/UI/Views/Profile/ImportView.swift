@@ -119,7 +119,7 @@ struct ImportView: View {
                     VStack(spacing: 8) {
                         TextEditor(text: $inputText)
                             .font(.system(.body, design: .monospaced))
-                            .frame(minHeight: 80, maxHeight: 160)
+                            .frame(minHeight: 80, maxHeight: 150)
                             .padding(4)
                             .background(Color(NSColor.textBackgroundColor))
                             .cornerRadius(6)

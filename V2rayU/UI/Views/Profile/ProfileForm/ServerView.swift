@@ -29,7 +29,7 @@ struct ConfigServerView: View {
                 getPickerWithLabel(label: .`Protocol`, selection: $item.protocol,ignore: [.dns, .http, .blackhole, .freedom])
 
                 HStack {
-                    LocalizedTextLabelView(label: .Core).frame(width: 100, alignment: .trailing)
+                    LocalizedTextLabelView(label: .Core).frame(width: 150, alignment: .trailing)
                     Spacer()
                     Picker("", selection: $item.coreSelection) {
                         ForEach(ProfileCoreSelection.allCases) { selection in

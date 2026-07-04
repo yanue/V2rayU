@@ -115,7 +115,7 @@ struct ProfilePingView: View {
                         }
                     }
                 }
-                .frame(minHeight: 160, maxHeight: 220)
+                .frame(minHeight: 150, maxHeight: 220)
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 8)

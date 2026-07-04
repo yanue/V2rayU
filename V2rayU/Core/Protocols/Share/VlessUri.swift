@@ -177,6 +177,7 @@ class VlessUri: BaseShareUri {
             // security 参数缺失，默认为 tls（大多数 vless 使用 TLS）
             self.profile.security = .tls
         }
+        self.profile.encryption = query.getString(forKey: "encryption", defaultValue: "none")
         self.profile.flow = query.getString(forKey: "flow", defaultValue: "")
         self.profile.sni = query.getString(forKey: "sni", defaultValue: host)
         self.profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .chrome)

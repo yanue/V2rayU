@@ -119,7 +119,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 停止 V2ray / TUN helper 后再允许退出，避免 root tun-helper 残留导致系统路由黑洞
         Task {
+            // 停机会把 v2rayTurnOn 设为 false 并写入 UserDefaults，
+            // 提前保存原值，停止后恢复，确保下次启动能正确读取。
+            let wasRunning = await MainActor.run { AppState.shared.v2rayTurnOn }
             await V2rayLaunch.shared.stop()
+            if wasRunning {
+                await MainActor.run { AppState.shared.v2rayTurnOn = true }
+            }
             // 终止 V2ray 进程
             killSelfV2ray()
             logger.info("applicationShouldTerminate end")

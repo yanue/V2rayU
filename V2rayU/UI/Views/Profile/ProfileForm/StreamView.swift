@@ -78,12 +78,12 @@ struct ConfigStreamView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             HStack {
-                                LocalizedTextLabelView(label: .HopPortRange).frame(width: 100, alignment: .trailing)
+                                LocalizedTextLabelView(label: .HopPortRange).frame(width: 150, alignment: .trailing)
                                 TextField("1000-2000,3000,4000", text: $item.hysteria2HopPortRange)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                             }
                             HStack {
-                                Spacer().frame(width: 100)
+                                Spacer().frame(width: 150)
                                 Text(String(localized: .HopPortRangeTip))
                                     .font(.caption)
                                     .foregroundColor(.secondary)

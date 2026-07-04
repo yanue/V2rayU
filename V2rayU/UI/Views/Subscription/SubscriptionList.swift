@@ -321,7 +321,7 @@ struct SubscriptionListView: View {
                 TableColumn(String(localized: .TableFieldUpdateTime)) { (row: SubscriptionEntity) in
                     Text(row.updateTime.formattedDate)
                 }
-                .width(160)
+                .width(150)
 
             } rows: {
                 ForEach(viewModel.list) { row in
