@@ -111,8 +111,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func setStatusItem() {
-        // StatusBar自适应关键点: 需要 StatusItemView 设置 fixedSize 配合 statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        // 使用固定长度防止 NSStatusBarButton 在 NSTrackingSession 显示周期中因内容变化触发 Auto Layout 异常
+        statusItem = NSStatusBar.system.statusItem(withLength: 120)
 
         if let button = statusItem.button {
             // 创建 SwiftUI 视图的 HostingView

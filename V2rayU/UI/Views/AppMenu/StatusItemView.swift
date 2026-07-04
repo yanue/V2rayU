@@ -42,9 +42,9 @@ struct StatusItemView: View {
                 .foregroundColor(.primary)
             }
         }
-        .frame(height: 22, alignment: .center) // 固定高度确保居中
+        .frame(width: 120, height: 22, alignment: .trailing) // NSTrackingSession 固定宽度: 防止在 CA 显示周期中因文本变化触发布局异常
+        .clipped()
         .padding(.horizontal, 4)
-        .fixedSize()   // StatusBar自适应关键点: 需要 StatusItemView 设置 fixedSize 配合 statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     }
 }
 

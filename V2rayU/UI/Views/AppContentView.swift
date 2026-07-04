@@ -7,8 +7,9 @@
 import SwiftUI
 struct ContentView: View {
     @StateObject private var navigationState = NavigationState.shared
-    @ObservedObject private var coreViewModel = CoreViewModel.shared
-    @State private var version = getAppVersion() // 控制设置页面的显示
+    @State private var version = getAppVersion()
+    @State private var alertMessage: String = ""
+    @State private var showAlert = false
 
     var body: some View {
         HStack {
@@ -45,7 +46,6 @@ struct ContentView: View {
             }
             .frame(width: 136)
             .padding(.leading, 24)
-            
 
             // 右侧内容区，根据选中状态切换
             VStack {
@@ -69,23 +69,28 @@ struct ContentView: View {
                 }
                 Spacer()
             }
-            .padding() // 1. 内边距
-            .background() // 2. 然后背景
-            .clipShape(RoundedRectangle(cornerRadius: 10)) // 3. 内圆角
+            .padding()
+            .background()
+            .clipShape(RoundedRectangle(cornerRadius: 10))
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                     .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
-            ) // 4. 添加边框和阴影
-            .padding(.all, 16) // 5. 外边距
-            .frame(minWidth: 640) // 设置右侧内容区的宽度
-        }
-        .alert(isPresented: $coreViewModel.showAlert) {
-            Alert(
-                title: Text(String(localized: .DownloadHint)),
-                message: Text(coreViewModel.errorMsg),
-                dismissButton: .default(Text(String(localized: .Confirm)))
             )
+            .padding(.all, 16)
+            .frame(minWidth: 640)
+        }
+        .alert(String(localized: .DownloadHint), isPresented: $showAlert) {
+            Button(String(localized: .Confirm)) { }
+        } message: {
+            Text(alertMessage)
+        }
+        .onReceive(CoreViewModel.shared.$showAlert) { shouldShow in
+            if shouldShow {
+                alertMessage = CoreViewModel.shared.errorMsg
+                showAlert = true
+                CoreViewModel.shared.showAlert = false
+            }
         }
     }
   
