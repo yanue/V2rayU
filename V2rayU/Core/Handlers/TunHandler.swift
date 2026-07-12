@@ -137,9 +137,14 @@ actor TunHandler {
                 logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
                 return
             }
-            // TUN 模式：只重建 TUN，不重启核心（SOCKS 不受网络变化影响）
-            logger.info("rebuildAfterNetworkChange: rebuilding TUN only (\(reason))")
-            await V2rayLaunch.shared.rebuildTun()
+            // TUN 模式：重建 TUN（若核心已死会自动 fallback 到完整重启）
+            logger.info("rebuildAfterNetworkChange: rebuilding TUN (\(reason))")
+            let ok = await V2rayLaunch.shared.rebuildTun()
+            if !ok {
+                logger.warning("rebuildAfterNetworkChange: TUN rebuild failed (\(reason))")
+                let msg = await MainActor.run { String(localized: .TunServiceStartFailed) }
+                makeToast(message: msg, displayDuration: 4)
+            }
         } else {
             let turnOnNow = await MainActor.run { AppState.shared.v2rayTurnOn }
             guard turnOnNow else {

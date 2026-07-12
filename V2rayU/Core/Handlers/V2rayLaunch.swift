@@ -202,6 +202,7 @@ actor V2rayLaunch {
 
     /// 只重建 TUN（停 TUN → 重写 tun.json → 起 TUN → 重设 DNS）, 不重启核心。
     /// 适用于网络变化 / 系统唤醒后恢复。仅在 tun 模式且运行中时生效。
+    /// 若检测到代理核心已死亡（长时间睡眠后可能被系统回收）, 自动 fallback 到完整重启。
     @discardableResult
     func rebuildTun() async -> Bool {
         await lock(); defer { unlock() }
@@ -213,6 +214,14 @@ actor V2rayLaunch {
         guard mode == .tun else {
             logger.info("rebuildTun skip: mode=\(mode.rawValue)")
             return false
+        }
+        // 代理核心进程可能在长时间睡眠后被系统回收, 检查 SOCKS 端口是否可达
+        let socksPort = getEffectiveSocksProxyPort()
+        let coreAlive = await TCPConnectivity.canConnect(host: "127.0.0.1", port: socksPort, timeout: 1)
+        if !coreAlive {
+            logger.warning("rebuildTun: proxy core dead (SOCKS port \(socksPort) unreachable), falling back to full restart")
+            await stopTun()
+            return await startAll()
         }
         await stopTun()
         let ok = await startTun()
@@ -473,10 +482,10 @@ actor V2rayLaunch {
         return ok
     }
 
-    /// 先恢复 DNS, 再停止 TUN 守护进程。
+    /// 先停止 TUN 守护进程（移除路由）, 再恢复 DNS, 避免 DNS 已清除但路由仍指向失效 TUN 的中间状态。
     private func stopTun() async {
-        Self.restoreTunDns()
         await TunHandler.shared.stop()
+        Self.restoreTunDns()
     }
 
     // MARK: - 端口探测
