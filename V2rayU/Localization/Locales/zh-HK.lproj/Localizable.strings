@@ -753,7 +753,8 @@
 
 // MARK: - TUN 設置
 "TunSettings" = "TUN 設置";
-"TunAddress" = "TUN 地址";
+"TunAddress" = "TUN IPv4 地址";
+"TunAddressIPv6" = "TUN IPv6 地址";
 "TunMtu" = "TUN MTU";
 "TunStack" = "TUN 協議棧";
 "TunRemoteDns" = "Tun 國外 DNS";
@@ -767,10 +768,10 @@
 "TunAutoRebuildTip" = "切換 Wi-Fi / 喚醒後自動重建隧道，避免路由失效導致斷線";
 "TunLogLevel" = "TUN 日誌級別";
 "TunEnableIPv6" = "啟用 IPv6";
-"TunEnableIPv6Tip" = "為 TUN 介面添加 IPv6 位址 (fd00::1/64)，讓 IPv6 流量通過隧道。";
+"TunEnableIPv6Tip" = "為 TUN 介面添加 IPv6 位址讓 IPv6 流量通過隧道。";
 "TunEnableIPv6ChromeWarning" = "開啟 TUN IPv6 後 Chrome 可能無法正常使用（例如 ERR_CONNECTION_CLOSED）。如要關閉此提醒，請在 TUN 設定中取消勾選「啟動 TUN 時顯示提醒」。";
 "TunEnableIPv6AlertTitle" = "TUN IPv6 提醒";
-"TunShowIPv6Reminder" = "啟動 TUN 時顯示提醒";
+"TunShowIPv6Reminder" = "啟動 TUN IPv6 時顯示提醒";
 
 // MARK: - 組合設定 / 核心提示
 "CombinationCountFormat" = "共 %d 個組合";

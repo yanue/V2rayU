@@ -1,6 +1,37 @@
 import Foundation
 
 enum TunConfigHandler {
+    // MARK: - Address defaults
+
+    static let defaultTunAddress = "172.19.0.1/30"
+    static let defaultTunIPv6 = "fdfe:dcba:9876::1/126"
+
+    // MARK: - Legacy default migration
+
+    /// Check for old default TUN addresses and replace with safe defaults.
+    /// Returns true if any address was migrated.
+    static func migrateLegacyDefaults() -> Bool {
+        var migrated = false
+
+        // IPv4: old default 10.0.0.1/30 → new default 172.19.0.1/30
+        let ipv4 = UserDefaults.get(forKey: .tunAddress, defaultValue: defaultTunAddress)
+        if ipv4 == "10.0.0.1/30" {
+            UserDefaults.set(forKey: .tunAddress, value: defaultTunAddress)
+            migrated = true
+        }
+
+        // IPv6: old default fd00::1/64 → new default fdfe:dcba:9876::1/126
+        let ipv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: defaultTunIPv6)
+        if ipv6 == "fd00::1/64" {
+            UserDefaults.set(forKey: .tunAddressIPv6, value: defaultTunIPv6)
+            migrated = true
+        }
+
+        return migrated
+    }
+
+    // MARK: - Existing helpers
+
     private enum IPAddressKind {
         case ipv4
         case ipv6
@@ -176,7 +207,8 @@ enum TunConfigHandler {
             singbox.log.timestamp = true
         }
 
-        let tunAddr = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+        let tunAddr = UserDefaults.get(forKey: .tunAddress, defaultValue: defaultTunAddress)
+        let tunAddrIPv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: defaultTunIPv6)
         let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
         let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
@@ -187,7 +219,7 @@ enum TunConfigHandler {
 
         var addresses = [tunAddr]
         if tunEnableIPv6 {
-            addresses.append("fd00::1/64")
+            addresses.append(tunAddrIPv6)
         }
         let tunInbound = SingboxInbound(
             type: "tun",

@@ -200,6 +200,10 @@ final class AppState: ObservableObject {
             // 未运行: 直接按新模式拉起。
             let success = await V2rayLaunch.shared.start()
             v2rayTurnOn = success
+            if !success {
+                runMode = oldMode
+                logger.info("switchRunMode: start failed, reverted to \(oldMode.rawValue)")
+            }
         }
         AppMenuManager.shared.refreshBasicMenus()
     }

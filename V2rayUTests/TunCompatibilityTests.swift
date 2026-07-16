@@ -345,7 +345,7 @@ private actor TunStartupRecorder {
             return result
         }
 
-        guard let address = tunInbound.address, address.contains("10.0.0.1/30") else {
+        guard let address = tunInbound.address, address.contains("172.19.0.1/30") else {
             result.status = .configError
             result.error = "TUN inbound address missing or incorrect"
             return result
@@ -353,8 +353,8 @@ private actor TunStartupRecorder {
 
         let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: true)
         if tunEnableIPv6 {
-            if !address.contains("fd00::1/64") {
-                result.addVersionIssue("Expected IPv6 address fd00::1/64 in TUN inbound address list")
+            if !address.contains("fdfe:dcba:9876::1/126") {
+                result.addVersionIssue("Expected IPv6 address fdfe:dcba:9876::1/126 in TUN inbound address list")
             }
         }
 

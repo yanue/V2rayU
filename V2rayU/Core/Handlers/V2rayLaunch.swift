@@ -509,6 +509,15 @@ actor V2rayLaunch {
 
     /// 重写 tun.json、启动 TUN 守护进程、设置防污染 DNS。调用前必须确认 SOCKS 已就绪。
     private func startTun() async -> Bool {
+        // 检测并迁移旧版默认地址
+        let migrated = await TunConfigHandler.migrateLegacyDefaults()
+        if migrated {
+            await MainActor.run {
+                AppSettings.shared.tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: TunConfigHandler.defaultTunAddress)
+                AppSettings.shared.tunAddressIPv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: TunConfigHandler.defaultTunIPv6)
+            }
+        }
+
         LogRotation.rotateSessionLog(at: tunLogFilePath)
         LogRotation.rotateSessionLog(at: runTunLogFilePath)
         LogRotation.cleanSessionBackups(at: tunLogFilePath)

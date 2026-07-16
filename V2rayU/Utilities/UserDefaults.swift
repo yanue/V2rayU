@@ -90,6 +90,8 @@ extension UserDefaults {
         // MARK: - TUN settings
         // tun interface address
         case tunAddress
+        // tun IPv6 interface address
+        case tunAddressIPv6
         // tun mtu
         case tunMtu
         // tun stack (system/gvisor/mixed)

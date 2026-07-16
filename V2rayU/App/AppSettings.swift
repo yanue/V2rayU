@@ -69,7 +69,8 @@ final class AppSettings: ObservableObject {
     }
 
     // MARK: - TUN settings
-    @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+    @Published var tunAddress: String = UserDefaults.get(forKey: .tunAddress, defaultValue: TunConfigHandler.defaultTunAddress)
+    @Published var tunAddressIPv6: String = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: TunConfigHandler.defaultTunIPv6)
     @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
     @Published var tunDnsRemote: String = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
@@ -162,7 +163,8 @@ final class AppSettings: ObservableObject {
         udpTestURL = UserDefaults.get(forKey: .udpTestURL, defaultValue: defaultUDPTestURL)
         currentConnectionTestURL = UserDefaults.get(forKey: .currentConnectionTestURL, defaultValue: defaultCurrentConnectionTestURL)
         launchAtLogin = SMAppService.mainApp.status == .enabled
-        tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: "10.0.0.1/30")
+        tunAddress = UserDefaults.get(forKey: .tunAddress, defaultValue: TunConfigHandler.defaultTunAddress)
+        tunAddressIPv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: TunConfigHandler.defaultTunIPv6)
         tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
         tunDnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
@@ -241,6 +243,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .udpTestURL, value: udpTestURL)
         UserDefaults.set(forKey: .currentConnectionTestURL, value: currentConnectionTestURL)
         UserDefaults.set(forKey: .tunAddress, value: tunAddress)
+        UserDefaults.set(forKey: .tunAddressIPv6, value: tunAddressIPv6)
         UserDefaults.setInt(forKey: .tunMtu, value: tunMtu)
         UserDefaults.set(forKey: .tunStack, value: tunStack.rawValue)
         UserDefaults.set(forKey: .tunDnsRemote, value: tunDnsRemote)
@@ -280,6 +283,7 @@ final class AppSettings: ObservableObject {
             old.dnsJsonSingbox != dnsJsonSingbox ||
             old.pingTestURL != pingTestURL ||
             old.tunAddress != tunAddress ||
+            old.tunAddressIPv6 != tunAddressIPv6 ||
             old.tunMtu != tunMtu ||
             old.tunStack != tunStack ||
             old.tunDnsRemote != tunDnsRemote ||

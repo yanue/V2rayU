@@ -122,6 +122,7 @@ enum LanguageLabel: String, CaseIterable {
     case TunDns
     case TunSettings
     case TunAddress
+    case TunAddressIPv6
     case TunMtu
     case TunStack
     case TunRemoteDns
