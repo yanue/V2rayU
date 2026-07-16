@@ -72,6 +72,7 @@ struct SingboxInbound: Codable {
     var address: [String]?
     var auto_route: Bool?
     var strict_route: Bool?
+    var route_exclude_address: [String]?
     var mtu: Int?
     var stack: String?  // 对 tun 需要: system
     var sniff: Bool? // 对 tun 需要

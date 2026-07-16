@@ -100,6 +100,8 @@ extension UserDefaults {
         case tunDnsChina
         // tun strict_route (强制路由), 默认开启; 网络切换异常时可关闭
         case tunStrictRoute
+        // hosts, IP addresses, or CIDRs that bypass the TUN route
+        case tunRouteExcludeHosts
         // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
         case tunAutoRebuild
         // tun log level

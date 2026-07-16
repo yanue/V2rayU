@@ -1,11 +1,100 @@
 import Foundation
 
 enum TunConfigHandler {
-    /// 同步 DNS 解析域名到 IP，空则返回 nil
-    static func resolveServerIp(from address: String) -> String? {
-        guard !address.isEmpty else { return nil }
+    private enum IPAddressKind {
+        case ipv4
+        case ipv6
+
+        var routePrefix: Int {
+            switch self {
+            case .ipv4: return 32
+            case .ipv6: return 128
+            }
+        }
+
+        var maximumPrefix: Int { routePrefix }
+    }
+
+    static func resolveRouteExcludeAddresses(from rawValue: String) -> [String] {
+        resolveRouteExcludeAddresses(from: rawValue, resolver: resolveServerIps)
+    }
+
+    static func resolveRouteExcludeAddresses(
+        from rawValue: String,
+        resolver: (String) -> [String]
+    ) -> [String] {
+        let separators = CharacterSet.whitespacesAndNewlines
+            .union(CharacterSet(charactersIn: ",;"))
+        let entries = rawValue.components(separatedBy: separators).filter { !$0.isEmpty }
+
+        var result: [String] = []
+        var seen = Set<String>()
+
+        func append(_ address: String) {
+            guard let normalized = normalizeRouteAddress(address), seen.insert(normalized).inserted else {
+                return
+            }
+            result.append(normalized)
+        }
+
+        for entry in entries {
+            if entry.contains("/") || normalizedIPAddress(entry) != nil {
+                append(entry)
+                continue
+            }
+            // getaddrinfo also accepts legacy numeric forms that sing-box rejects.
+            guard !isNonCanonicalNumericAddress(entry) else { continue }
+            resolver(entry).forEach(append)
+        }
+
+        return result
+    }
+
+    private static func normalizeRouteAddress(_ address: String) -> String? {
+        let parts = address.split(separator: "/", omittingEmptySubsequences: false)
+        guard parts.count == 1 || parts.count == 2 else { return nil }
+
+        let host = String(parts[0])
+        guard let normalizedIP = normalizedIPAddress(host) else { return nil }
+
+        if parts.count == 2 {
+            guard let prefix = Int(parts[1]), (0 ... normalizedIP.kind.maximumPrefix).contains(prefix) else {
+                return nil
+            }
+            return "\(normalizedIP.address)/\(prefix)"
+        }
+        return "\(normalizedIP.address)/\(normalizedIP.kind.routePrefix)"
+    }
+
+    private static func normalizedIPAddress(_ address: String) -> (address: String, kind: IPAddressKind)? {
+        guard !address.contains("%") else { return nil }
+
+        var ipv4 = in_addr()
+        let ipv4Status = address.withCString { inet_pton(AF_INET, $0, &ipv4) }
+        if ipv4Status == 1 {
+            var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+            guard inet_ntop(AF_INET, &ipv4, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil else {
+                return nil
+            }
+            return (string(from: buffer), .ipv4)
+        }
+
+        var ipv6 = in6_addr()
+        let ipv6Status = address.withCString { inet_pton(AF_INET6, $0, &ipv6) }
+        if ipv6Status == 1 {
+            var buffer = [CChar](repeating: 0, count: Int(INET6_ADDRSTRLEN))
+            guard inet_ntop(AF_INET6, &ipv6, &buffer, socklen_t(INET6_ADDRSTRLEN)) != nil else {
+                return nil
+            }
+            return (string(from: buffer), .ipv6)
+        }
+
+        return nil
+    }
+
+    private static func isNonCanonicalNumericAddress(_ address: String) -> Bool {
         var hints = addrinfo(
-            ai_flags: AI_NUMERICHOST, // 先试是否为 IP
+            ai_flags: AI_NUMERICHOST,
             ai_family: AF_UNSPEC,
             ai_socktype: SOCK_STREAM,
             ai_protocol: 0,
@@ -14,39 +103,58 @@ enum TunConfigHandler {
             ai_addr: nil,
             ai_next: nil
         )
-        // 如果是合法 IP，直接返回
-        var res: UnsafeMutablePointer<addrinfo>?
-        if getaddrinfo(address, nil, &hints, &res) == 0 {
-            freeaddrinfo(res)
-            return address
-        }
-        // 否则做 DNS 解析
-        hints.ai_flags = 0
-        guard getaddrinfo(address, nil, &hints, &res) == 0, let first = res else {
-            freeaddrinfo(res)
-            return nil
+        var result: UnsafeMutablePointer<addrinfo>?
+        let status = getaddrinfo(address, nil, &hints, &result)
+        if let result { freeaddrinfo(result) }
+        return status == 0
+    }
+
+    private static func string(from buffer: [CChar]) -> String {
+        String(decoding: buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
+    }
+
+    private static func resolveServerIps(from address: String) -> [String] {
+        guard !address.isEmpty else { return [] }
+        var hints = addrinfo(
+            ai_flags: 0,
+            ai_family: AF_UNSPEC,
+            ai_socktype: SOCK_STREAM,
+            ai_protocol: 0,
+            ai_addrlen: 0,
+            ai_canonname: nil,
+            ai_addr: nil,
+            ai_next: nil
+        )
+        var result: UnsafeMutablePointer<addrinfo>?
+        guard getaddrinfo(address, nil, &hints, &result) == 0, let first = result else {
+            if let result { freeaddrinfo(result) }
+            return []
         }
         defer { freeaddrinfo(first) }
-        var ip: String?
+
+        var addresses: [String] = []
+        var seen = Set<String>()
         for ptr in sequence(first: first, next: { $0.pointee.ai_next }) {
             guard let addr = ptr.pointee.ai_addr else { continue }
+            var ip: String?
             if addr.pointee.sa_family == AF_INET {
                 addr.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { sin in
                     var str = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
                     inet_ntop(AF_INET, &sin.pointee.sin_addr, &str, socklen_t(INET_ADDRSTRLEN))
-                    ip = String(cString: str)
+                    ip = string(from: str)
                 }
-                break
             } else if addr.pointee.sa_family == AF_INET6 {
                 addr.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) { sin6 in
                     var str = [CChar](repeating: 0, count: Int(INET6_ADDRSTRLEN))
                     inet_ntop(AF_INET6, &sin6.pointee.sin6_addr, &str, socklen_t(INET6_ADDRSTRLEN))
-                    ip = String(cString: str)
+                    ip = string(from: str)
                 }
-                break
+            }
+            if let ip, seen.insert(ip).inserted {
+                addresses.append(ip)
             }
         }
-        return ip
+        return addresses
     }
 
     static func buildTunConfig() -> String {
@@ -72,6 +180,8 @@ enum TunConfigHandler {
         let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
         let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+        let tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
+        let routeExcludeAddresses = resolveRouteExcludeAddresses(from: tunRouteExcludeHosts)
         let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: true)
         let useSniffRuleAction = SingboxVersionCheck.supportsSniffRuleAction()
 
@@ -85,6 +195,7 @@ enum TunConfigHandler {
             address: addresses,
             auto_route: true,
             strict_route: tunStrictRoute,
+            route_exclude_address: routeExcludeAddresses.isEmpty ? nil : routeExcludeAddresses,
             mtu: tunMtu,
             stack: tunStack.rawValue,
             sniff: useSniffRuleAction ? nil : true,

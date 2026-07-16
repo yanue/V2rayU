@@ -761,6 +761,8 @@
 "TunChinaDns" = "Tun 國內 DNS";
 "TunStrictRoute" = "強制路由 (strict_route)";
 "TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";
+"TunRouteExcludeHosts" = "TUN 繞過位址";
+"TunRouteExcludeHostsTip" = "支援網域、IP 和 CIDR。每次重建 TUN 時重新解析網域，無法解析的項目會被忽略。";
 "TunAutoRebuild" = "網路變化後自動重建 TUN";
 "TunAutoRebuildTip" = "切換 Wi-Fi / 喚醒後自動重建隧道，避免路由失效導致斷線";
 "TunLogLevel" = "TUN 日誌級別";

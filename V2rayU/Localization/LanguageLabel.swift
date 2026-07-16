@@ -129,6 +129,8 @@ enum LanguageLabel: String, CaseIterable {
     case TunChinaDns
     case TunStrictRoute
     case TunStrictRouteTip
+    case TunRouteExcludeHosts
+    case TunRouteExcludeHostsTip
     case TunAutoRebuild
     case TunAutoRebuildTip
     case TunLogLevel
