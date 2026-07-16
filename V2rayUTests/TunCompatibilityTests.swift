@@ -2,6 +2,18 @@ import Foundation
 import Testing
 @testable import V2rayU
 
+private actor TunStartupRecorder {
+    private var events: [String] = []
+
+    func append(_ event: String) {
+        events.append(event)
+    }
+
+    func snapshot() -> [String] {
+        events
+    }
+}
+
 @Suite struct TunCompatibilityTests {
 
     private let configHandler = CoreConfigHandler()
@@ -14,6 +26,63 @@ import Testing
         network: .tcp,
         security: .tls
     )
+
+    @Test("TUN does not start before its SOCKS backend is ready")
+    func testTunWaitsForBackendReadiness() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return false
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return true
+            }
+        )
+
+        #expect(result == .backendUnavailable)
+        #expect(await recorder.snapshot() == ["wait"])
+    }
+
+    @Test("TUN starts after its SOCKS backend is ready")
+    func testTunStartsAfterBackendIsReady() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return true
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return true
+            }
+        )
+
+        #expect(result == .started)
+        #expect(await recorder.snapshot() == ["wait", "start"])
+    }
+
+    @Test("TUN reports a daemon failure after its SOCKS backend is ready")
+    func testTunReportsDaemonFailure() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return true
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return false
+            }
+        )
+
+        #expect(result == .daemonFailed)
+        #expect(await recorder.snapshot() == ["wait", "start"])
+    }
 
     @Test("TUN exclusion hosts resolve to stable IP prefixes")
     func testTunRouteExcludeHostResolution() {

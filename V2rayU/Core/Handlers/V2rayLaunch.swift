@@ -66,6 +66,23 @@ enum RunMode: String, CaseIterable {
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
+    private static let tunBackendReadyTimeout: TimeInterval = 12
+
+    enum TunStartResult: Equatable {
+        case started
+        case backendUnavailable
+        case daemonFailed
+    }
+
+    static func startTunWhenBackendReady(
+        waitForBackend: @Sendable () async -> Bool,
+        startDaemon: @Sendable () async -> Bool
+    ) async -> TunStartResult {
+        guard await waitForBackend() else {
+            return .backendUnavailable
+        }
+        return await startDaemon() ? .started : .daemonFailed
+    }
 
     /// 当前是否处于"已启动"状态（核心已拉起）。唯一的运行状态来源。
     private var running = false
@@ -187,7 +204,14 @@ actor V2rayLaunch {
             return true
         }
         if newMode == .tun && oldMode != .tun {
-            if !(await startTun()) {
+            switch await startTunWhenBackendReady() {
+            case .started:
+                break
+            case .backendUnavailable:
+                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
+                logger.info("applyMode: TUN backend unavailable, reverting")
+                return false
+            case .daemonFailed:
                 await notifyTunFailed()
                 logger.info("applyMode: TUN start failed, reverting")
                 return false
@@ -224,7 +248,7 @@ actor V2rayLaunch {
             return await startAll()
         }
         await stopTun()
-        let ok = await startTun()
+        let ok = await startTunWhenBackendReady() == .started
         logger.info("rebuildTun done: \(ok.description)")
         return ok
     }
@@ -244,8 +268,14 @@ actor V2rayLaunch {
 
         let mode = await MainActor.run { AppState.shared.runMode }
         if mode == .tun {
-            // TUN 不依赖 SOCKS 端口就绪(sing-box 会自行重连上游), 立即启动, 不等待 SOCKS。
-            if !(await startTun()) {
+            switch await startTunWhenBackendReady() {
+            case .started:
+                break
+            case .backendUnavailable:
+                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
+                await stopAll()
+                return false
+            case .daemonFailed:
                 await notifyTunFailed()
                 // TUN 启动失败: 整体回滚, 避免状态不一致
                 await stopAll()
@@ -340,7 +370,10 @@ actor V2rayLaunch {
         // 停止旧核心
         await LaunchAgent.shared.stopAgent()
         // 等待旧核心释放 SOCKS 端口（避免新核心 bind 失败）
-        _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
+        guard await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2) else {
+            await noticeLocalized(title: .StartFailed, message: .LocalProxyPortNotReady)
+            return nil
+        }
 
         createJsonFile(item: item)
 
@@ -356,8 +389,7 @@ actor V2rayLaunch {
             return nil
         }
 
-        // 注意: 这里不再等待 SOCKS 端口就绪。是否等待由调用方按模式决定:
-        // TUN 模式不依赖 SOCKS(sing-box 自行重连上游), 非 TUN 模式才在设系统代理前尽力等。
+        // 这里不等待 SOCKS 端口。调用方必须在启用 TUN 或系统代理前按模式协调就绪状态。
         // 后台统计 + ping（非关键, 不阻塞）
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
@@ -427,7 +459,10 @@ actor V2rayLaunch {
         await CoreTrafficStatsHandler.shared.resetData()
 
         await LaunchAgent.shared.stopAgent()
-        _ = await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2)
+        guard await waitForLocalTCPReleased(port: getEffectiveSocksProxyPort(), timeout: 2) else {
+            await noticeLocalized(title: .StartFailed, message: .LocalProxyPortNotReady)
+            return nil
+        }
 
         createJsonFile(combination: resolved)
         truncateLogFile(appLogFilePath)
@@ -440,7 +475,7 @@ actor V2rayLaunch {
             return nil
         }
 
-        // 同 prepareAndStartCore: 不在此等待 SOCKS, 由调用方按模式决定。
+        // 同 prepareAndStartCore: 不在此等待 SOCKS, 由调用方在启用下游转发前协调。
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: resolved.coreType)
         }
@@ -451,7 +486,28 @@ actor V2rayLaunch {
 
     // MARK: - TUN（守护进程 + DNS）
 
-    /// 重写 tun.json、启动 TUN 守护进程、设置防污染 DNS。尽力而为, 失败仅记录日志。
+    private func startTunWhenBackendReady() async -> TunStartResult {
+        let port = getEffectiveSocksProxyPort()
+        let result = await Self.startTunWhenBackendReady(
+            waitForBackend: {
+                await self.waitForLocalTCPReady(
+                    port: port,
+                    timeout: Self.tunBackendReadyTimeout
+                )
+            },
+            startDaemon: {
+                await self.startTun()
+            }
+        )
+        if result == .backendUnavailable {
+            logger.warning(
+                "startTun: SOCKS port \(port) not ready after \(Self.tunBackendReadyTimeout)s; TUN not started"
+            )
+        }
+        return result
+    }
+
+    /// 重写 tun.json、启动 TUN 守护进程、设置防污染 DNS。调用前必须确认 SOCKS 已就绪。
     private func startTun() async -> Bool {
         LogRotation.rotateSessionLog(at: tunLogFilePath)
         LogRotation.rotateSessionLog(at: runTunLogFilePath)
@@ -512,7 +568,7 @@ actor V2rayLaunch {
             }
             try? await Task.sleep(nanoseconds: 200_000_000)
         }
-        logger.info("waitForLocalTCPReleased: port \(port) still occupied after \(timeout)s, proceeding anyway")
+        logger.warning("waitForLocalTCPReleased: port \(port) still occupied after \(timeout)s")
         return false
     }
 

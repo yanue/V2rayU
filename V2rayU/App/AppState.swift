@@ -193,7 +193,7 @@ final class AppState: ObservableObject {
             if !(await V2rayLaunch.shared.applyMode(from: oldMode)) {
                 // TUN 启动失败: 回退到旧模式, 保证 UI 与实际一致
                 runMode = oldMode
-                v2rayTurnOn = false
+                v2rayTurnOn = true
                 logger.info("switchRunMode: applyMode failed, reverted to \(oldMode.rawValue)")
             }
         } else {
