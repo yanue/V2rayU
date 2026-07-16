@@ -294,6 +294,8 @@ enum TunConfigHandler {
         if useSniffRuleAction {
             tunRules.append(RouteRule(action: "sniff"))
         }
+        // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效
+        tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
         // 代理核心（xray/sing-box）直连，避免回路
         tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
