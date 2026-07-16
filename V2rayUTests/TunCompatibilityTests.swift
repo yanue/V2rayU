@@ -2,6 +2,18 @@ import Foundation
 import Testing
 @testable import V2rayU
 
+private actor TunStartupRecorder {
+    private var events: [String] = []
+
+    func append(_ event: String) {
+        events.append(event)
+    }
+
+    func snapshot() -> [String] {
+        events
+    }
+}
+
 @Suite struct TunCompatibilityTests {
 
     private let configHandler = CoreConfigHandler()
@@ -14,6 +26,129 @@ import Testing
         network: .tcp,
         security: .tls
     )
+
+    @Test("TUN does not start before its SOCKS backend is ready")
+    func testTunWaitsForBackendReadiness() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return false
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return true
+            }
+        )
+
+        #expect(result == .backendUnavailable)
+        #expect(await recorder.snapshot() == ["wait"])
+    }
+
+    @Test("TUN starts after its SOCKS backend is ready")
+    func testTunStartsAfterBackendIsReady() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return true
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return true
+            }
+        )
+
+        #expect(result == .started)
+        #expect(await recorder.snapshot() == ["wait", "start"])
+    }
+
+    @Test("TUN reports a daemon failure after its SOCKS backend is ready")
+    func testTunReportsDaemonFailure() async {
+        let recorder = TunStartupRecorder()
+
+        let result = await V2rayLaunch.startTunWhenBackendReady(
+            waitForBackend: {
+                await recorder.append("wait")
+                return true
+            },
+            startDaemon: {
+                await recorder.append("start")
+                return false
+            }
+        )
+
+        #expect(result == .daemonFailed)
+        #expect(await recorder.snapshot() == ["wait", "start"])
+    }
+
+    @Test("TUN exclusion hosts resolve to stable IP prefixes")
+    func testTunRouteExcludeHostResolution() {
+        let resolved = TunConfigHandler.resolveRouteExcludeAddresses(
+            from: """
+            vpn.example.test
+            198.51.100.20, 2001:db8::1
+            10.0.0.0/8
+            2001:0db8::3
+            127.1
+            2130706433
+            0x7f000001
+            fe80::1%lo0
+            192.0.2.1/33
+            2001:db8::1/129
+            invalid.example.test
+            """,
+            resolver: { host in
+                switch host {
+                case "vpn.example.test":
+                    return ["192.0.2.10", "2001:db8::2", "192.0.2.10"]
+                case "invalid.example.test":
+                    return []
+                default:
+                    return ["203.0.113.9"]
+                }
+            }
+        )
+
+        #expect(resolved == [
+            "192.0.2.10/32",
+            "2001:db8::2/128",
+            "198.51.100.20/32",
+            "2001:db8::1/128",
+            "10.0.0.0/8",
+            "2001:db8::3/128",
+        ])
+    }
+
+    @Test("Generated TUN config includes configured route exclusions")
+    func testTunConfigIncludesRouteExclusions() throws {
+        let key = UserDefaults.KEY.tunRouteExcludeHosts.rawValue
+        let previousValue = UserDefaults.standard.object(forKey: key)
+        defer {
+            if let previousValue {
+                UserDefaults.standard.set(previousValue, forKey: key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+
+        UserDefaults.set(
+            forKey: .tunRouteExcludeHosts,
+            value: "192.0.2.10/32\n198.51.100.20"
+        )
+
+        let jsonText = TunConfigHandler.buildTunConfig()
+        let data = try #require(jsonText.data(using: .utf8))
+        let parsed = try JSONDecoder().decode(SingboxStruct.self, from: data)
+        let tunInbound = try #require(parsed.inbounds.first(where: { $0.type == "tun" }))
+
+        #expect(tunInbound.route_exclude_address == [
+            "192.0.2.10/32",
+            "198.51.100.20/32",
+        ])
+    }
 
     @Test("TUN config generation and check syntax across all sing-box versions")
     func testTunConfigAcrossVersions() {

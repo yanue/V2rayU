@@ -76,6 +76,7 @@ final class AppSettings: ObservableObject {
     @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
     // strict_route: 强制路由, 默认开启
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+    @Published var tunRouteExcludeHosts: String = UserDefaults.get(forKey: .tunRouteExcludeHosts)
     // 网络变化/唤醒后自动重建 TUN, 默认开启
     @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
     @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
@@ -167,6 +168,7 @@ final class AppSettings: ObservableObject {
         tunDnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
+        tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
         tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
@@ -244,6 +246,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunDnsRemote, value: tunDnsRemote)
         UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
+        UserDefaults.set(forKey: .tunRouteExcludeHosts, value: tunRouteExcludeHosts)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
         UserDefaults.setBool(forKey: .tunEnableIPv6, value: tunEnableIPv6)
@@ -282,6 +285,7 @@ final class AppSettings: ObservableObject {
             old.tunDnsRemote != tunDnsRemote ||
             old.tunDnsChina != tunDnsChina ||
             old.tunStrictRoute != tunStrictRoute ||
+            old.tunRouteExcludeHosts != tunRouteExcludeHosts ||
             old.tunLogLevel != tunLogLevel ||
             old.tunEnableIPv6 != tunEnableIPv6 {
             needRestartV2ray = true

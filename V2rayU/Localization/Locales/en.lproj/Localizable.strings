@@ -761,6 +761,8 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunChinaDns" = "Tun China DNS";
 "TunStrictRoute" = "Strict route (strict_route)";
 "TunStrictRouteTip" = "Enabled by default. Try turning it off if the network occasionally breaks after switching networks.";
+"TunRouteExcludeHosts" = "TUN bypass destinations";
+"TunRouteExcludeHostsTip" = "Hostnames, IP addresses, and CIDRs. Hostnames are resolved whenever TUN is rebuilt; unresolved entries are skipped.";
 "TunAutoRebuild" = "Auto rebuild TUN after network changes";
 "TunAutoRebuildTip" = "Automatically rebuild the tunnel after Wi-Fi changes or wake-up to avoid broken routes.";
 "TunLogLevel" = "TUN Log Level";
