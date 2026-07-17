@@ -14,6 +14,55 @@ private actor TunStartupRecorder {
     }
 }
 
+@Suite struct TunProcessRoutingTests {
+    @Test("TUN process names preserve spaces and remove duplicates")
+    func testTunProcessNameParsing() {
+        let processNames = TunConfigHandler.parseProcessNames("""
+        WeChat
+        Google Chrome, ChatGPT
+        wechat;Google Chrome
+        """)
+
+        #expect(processNames == ["WeChat", "Google Chrome", "ChatGPT"])
+    }
+
+    @Test("Generated TUN config applies direct and proxy process precedence")
+    func testTunConfigIncludesProcessRoutingRules() throws {
+        let directKey = UserDefaults.KEY.tunDirectProcessNames.rawValue
+        let proxyKey = UserDefaults.KEY.tunProxyProcessNames.rawValue
+        let previousDirect = UserDefaults.standard.object(forKey: directKey)
+        let previousProxy = UserDefaults.standard.object(forKey: proxyKey)
+        defer {
+            if let previousDirect {
+                UserDefaults.standard.set(previousDirect, forKey: directKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: directKey)
+            }
+            if let previousProxy {
+                UserDefaults.standard.set(previousProxy, forKey: proxyKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: proxyKey)
+            }
+        }
+
+        UserDefaults.set(forKey: .tunDirectProcessNames, value: "WeChat\nShared App")
+        UserDefaults.set(forKey: .tunProxyProcessNames, value: "ChatGPT\nshared app\nxray-arm64")
+
+        let jsonText = TunConfigHandler.buildTunConfig()
+        let data = try #require(jsonText.data(using: .utf8))
+        let parsed = try JSONDecoder().decode(SingboxStruct.self, from: data)
+        let processRules = parsed.route.rules.filter { $0.process_name != nil }
+
+        #expect(processRules.count == 3)
+        #expect(processRules[0].outbound == "direct")
+        #expect(processRules[0].process_name?.contains("xray-arm64") == true)
+        #expect(processRules[1].outbound == "direct")
+        #expect(processRules[1].process_name == ["WeChat", "Shared App"])
+        #expect(processRules[2].outbound == "proxy")
+        #expect(processRules[2].process_name == ["ChatGPT"])
+    }
+}
+
 @Suite struct TunCompatibilityTests {
 
     private let configHandler = CoreConfigHandler()

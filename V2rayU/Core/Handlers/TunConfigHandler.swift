@@ -1,6 +1,12 @@
 import Foundation
 
 enum TunConfigHandler {
+    private static let coreDirectProcessNames = [
+        "xray", "xray-64", "xray-arm64",
+        "v2ray", "v2ray-core",
+        "sing-box", "sing-box-arm64", "sing-box-64",
+    ]
+
     // MARK: - Address defaults
 
     static let defaultTunAddress = "172.19.0.1/30"
@@ -48,6 +54,42 @@ enum TunConfigHandler {
 
     static func resolveRouteExcludeAddresses(from rawValue: String) -> [String] {
         resolveRouteExcludeAddresses(from: rawValue, resolver: resolveServerIps)
+    }
+
+    static func parseProcessNames(_ rawValue: String) -> [String] {
+        let separators = CharacterSet.newlines.union(CharacterSet(charactersIn: ",;"))
+        var processNames: [String] = []
+        var seen = Set<String>()
+
+        for entry in rawValue.components(separatedBy: separators) {
+            let processName = entry.trimmingCharacters(in: .whitespaces)
+            let comparisonKey = processName.lowercased()
+            guard !processName.isEmpty, seen.insert(comparisonKey).inserted else { continue }
+            processNames.append(processName)
+        }
+
+        return processNames
+    }
+
+    static func buildProcessRouteRules(directRawValue: String, proxyRawValue: String) -> [RouteRule] {
+        let coreProcessKeys = Set(coreDirectProcessNames.map { $0.lowercased() })
+        let directProcessNames = parseProcessNames(directRawValue).filter {
+            !coreProcessKeys.contains($0.lowercased())
+        }
+        let directProcessKeys = Set(directProcessNames.map { $0.lowercased() })
+        let proxyProcessNames = parseProcessNames(proxyRawValue).filter {
+            let key = $0.lowercased()
+            return !coreProcessKeys.contains(key) && !directProcessKeys.contains(key)
+        }
+
+        var rules = [RouteRule(outbound: "direct", process_name: coreDirectProcessNames)]
+        if !directProcessNames.isEmpty {
+            rules.append(RouteRule(outbound: "direct", process_name: directProcessNames))
+        }
+        if !proxyProcessNames.isEmpty {
+            rules.append(RouteRule(outbound: "proxy", process_name: proxyProcessNames))
+        }
+        return rules
     }
 
     static func resolveRouteExcludeAddresses(
@@ -296,8 +338,12 @@ enum TunConfigHandler {
         }
         // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效
         tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
-        // 代理核心（xray/sing-box）直连，避免回路
-        tunRules.append(RouteRule(outbound: "direct", process_name: ["xray", "xray-64", "xray-arm64", "v2ray", "v2ray-core", "sing-box", "sing-box-arm64", "sing-box-64"]))
+        let directProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
+        let proxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
+        tunRules.append(contentsOf: buildProcessRouteRules(
+            directRawValue: directProcessNames,
+            proxyRawValue: proxyProcessNames
+        ))
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(
             auto_detect_interface: true,

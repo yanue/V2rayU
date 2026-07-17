@@ -78,6 +78,8 @@ final class AppSettings: ObservableObject {
     // strict_route: 强制路由, 默认开启
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
     @Published var tunRouteExcludeHosts: String = UserDefaults.get(forKey: .tunRouteExcludeHosts)
+    @Published var tunDirectProcessNames: String = UserDefaults.get(forKey: .tunDirectProcessNames)
+    @Published var tunProxyProcessNames: String = UserDefaults.get(forKey: .tunProxyProcessNames)
     // 网络变化/唤醒后自动重建 TUN, 默认开启
     @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
     @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
@@ -171,6 +173,8 @@ final class AppSettings: ObservableObject {
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
+        tunDirectProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
+        tunProxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
         tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
@@ -250,6 +254,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
         UserDefaults.set(forKey: .tunRouteExcludeHosts, value: tunRouteExcludeHosts)
+        UserDefaults.set(forKey: .tunDirectProcessNames, value: tunDirectProcessNames)
+        UserDefaults.set(forKey: .tunProxyProcessNames, value: tunProxyProcessNames)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
         UserDefaults.setBool(forKey: .tunEnableIPv6, value: tunEnableIPv6)
@@ -290,6 +296,8 @@ final class AppSettings: ObservableObject {
             old.tunDnsChina != tunDnsChina ||
             old.tunStrictRoute != tunStrictRoute ||
             old.tunRouteExcludeHosts != tunRouteExcludeHosts ||
+            old.tunDirectProcessNames != tunDirectProcessNames ||
+            old.tunProxyProcessNames != tunProxyProcessNames ||
             old.tunLogLevel != tunLogLevel ||
             old.tunEnableIPv6 != tunEnableIPv6 {
             needRestartV2ray = true

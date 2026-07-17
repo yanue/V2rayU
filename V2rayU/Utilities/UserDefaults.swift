@@ -104,6 +104,9 @@ extension UserDefaults {
         case tunStrictRoute
         // hosts, IP addresses, or CIDRs that bypass the TUN route
         case tunRouteExcludeHosts
+        // executable process names that should bypass or use the proxy in TUN mode
+        case tunDirectProcessNames
+        case tunProxyProcessNames
         // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
         case tunAutoRebuild
         // tun log level
