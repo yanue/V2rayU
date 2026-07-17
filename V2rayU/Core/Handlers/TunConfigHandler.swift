@@ -63,28 +63,66 @@ enum TunConfigHandler {
 
         for entry in rawValue.components(separatedBy: separators) {
             let processName = entry.trimmingCharacters(in: .whitespaces)
-            let comparisonKey = processName.lowercased()
-            guard !processName.isEmpty, seen.insert(comparisonKey).inserted else { continue }
+            guard !processName.isEmpty, seen.insert(processName).inserted else { continue }
             processNames.append(processName)
         }
 
         return processNames
     }
 
-    static func buildProcessRouteRules(directRawValue: String, proxyRawValue: String) -> [RouteRule] {
-        let coreProcessKeys = Set(coreDirectProcessNames.map { $0.lowercased() })
-        let directProcessNames = parseProcessNames(directRawValue).filter {
-            !coreProcessKeys.contains($0.lowercased())
+    static func normalizeApplicationPaths(_ paths: [String]) -> [String] {
+        var normalizedPaths: [String] = []
+        var seen = Set<String>()
+
+        for path in paths where !path.isEmpty {
+            let normalizedPath = URL(fileURLWithPath: path).standardizedFileURL.path
+            guard normalizedPath.hasPrefix("/"), seen.insert(normalizedPath).inserted else { continue }
+            normalizedPaths.append(normalizedPath)
         }
-        let directProcessKeys = Set(directProcessNames.map { $0.lowercased() })
+
+        return normalizedPaths
+    }
+
+    static func applicationProcessPathRegex(for path: String) -> String {
+        "^\(NSRegularExpression.escapedPattern(for: path))/"
+    }
+
+    static func buildProcessRouteRules(
+        directRawValue: String,
+        proxyRawValue: String,
+        directApplicationPaths: [String] = [],
+        proxyApplicationPaths: [String] = []
+    ) -> [RouteRule] {
+        let coreProcessKeys = Set(coreDirectProcessNames)
+        let directProcessNames = parseProcessNames(directRawValue).filter {
+            !coreProcessKeys.contains($0)
+        }
+        let directProcessKeys = Set(directProcessNames)
         let proxyProcessNames = parseProcessNames(proxyRawValue).filter {
-            let key = $0.lowercased()
-            return !coreProcessKeys.contains(key) && !directProcessKeys.contains(key)
+            !coreProcessKeys.contains($0) && !directProcessKeys.contains($0)
+        }
+
+        let normalizedDirectApplicationPaths = normalizeApplicationPaths(directApplicationPaths)
+        let directApplicationPathKeys = Set(normalizedDirectApplicationPaths)
+        let normalizedProxyApplicationPaths = normalizeApplicationPaths(proxyApplicationPaths).filter {
+            !directApplicationPathKeys.contains($0)
         }
 
         var rules = [RouteRule(outbound: "direct", process_name: coreDirectProcessNames)]
+        if !normalizedDirectApplicationPaths.isEmpty {
+            rules.append(RouteRule(
+                outbound: "direct",
+                process_path_regex: normalizedDirectApplicationPaths.map(applicationProcessPathRegex)
+            ))
+        }
         if !directProcessNames.isEmpty {
             rules.append(RouteRule(outbound: "direct", process_name: directProcessNames))
+        }
+        if !normalizedProxyApplicationPaths.isEmpty {
+            rules.append(RouteRule(
+                outbound: "proxy",
+                process_path_regex: normalizedProxyApplicationPaths.map(applicationProcessPathRegex)
+            ))
         }
         if !proxyProcessNames.isEmpty {
             rules.append(RouteRule(outbound: "proxy", process_name: proxyProcessNames))
@@ -340,9 +378,13 @@ enum TunConfigHandler {
         tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
         let directProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
         let proxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
+        let directApplicationPaths = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
+        let proxyApplicationPaths = UserDefaults.getStringArray(forKey: .tunProxyApplicationPaths)
         tunRules.append(contentsOf: buildProcessRouteRules(
             directRawValue: directProcessNames,
-            proxyRawValue: proxyProcessNames
+            proxyRawValue: proxyProcessNames,
+            directApplicationPaths: directApplicationPaths,
+            proxyApplicationPaths: proxyApplicationPaths
         ))
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(

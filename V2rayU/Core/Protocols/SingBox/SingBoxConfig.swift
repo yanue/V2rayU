@@ -357,6 +357,7 @@ struct RouteRule: Codable {
     var rule_set: [String]?
     var invert: Bool?
     var process_name: [String]?
+    var process_path_regex: [String]?
     var inbound: [String]?
     var network: [String]?
     var port: [Int]?
@@ -377,6 +378,7 @@ struct RouteRule: Codable {
         rule_set: [String]? = nil,
         invert: Bool? = nil,
         process_name: [String]? = nil,
+        process_path_regex: [String]? = nil,
         inbound: [String]? = nil,
         network: [String]? = nil,
         port: [Int]? = nil,
@@ -396,6 +398,7 @@ struct RouteRule: Codable {
         self.rule_set = rule_set
         self.invert = invert
         self.process_name = process_name
+        self.process_path_regex = process_path_regex
         self.inbound = inbound
         self.network = network
         self.port = port

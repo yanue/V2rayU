@@ -15,7 +15,7 @@ private actor TunStartupRecorder {
 }
 
 @Suite struct TunProcessRoutingTests {
-    @Test("TUN process names preserve spaces and remove duplicates")
+    @Test("TUN process names preserve spaces, case, and remove exact duplicates")
     func testTunProcessNameParsing() {
         let processNames = TunConfigHandler.parseProcessNames("""
         WeChat
@@ -23,43 +23,113 @@ private actor TunStartupRecorder {
         wechat;Google Chrome
         """)
 
-        #expect(processNames == ["WeChat", "Google Chrome", "ChatGPT"])
+        #expect(processNames == ["WeChat", "Google Chrome", "ChatGPT", "wechat"])
     }
 
-    @Test("Generated TUN config applies direct and proxy process precedence")
+    @Test("Application route regex matches helper processes only inside its bundle")
+    func testApplicationProcessPathRegex() throws {
+        let pattern = TunConfigHandler.applicationProcessPathRegex(
+            for: "/Applications/ChatGPT (Beta).app"
+        )
+        let expression = try NSRegularExpression(pattern: pattern)
+
+        func matches(_ path: String) -> Bool {
+            expression.firstMatch(
+                in: path,
+                range: NSRange(path.startIndex..., in: path)
+            ) != nil
+        }
+
+        #expect(matches(
+            "/Applications/ChatGPT (Beta).app/Contents/Frameworks/Codex Framework.framework/Helpers/Codex (Service)"
+        ))
+        #expect(!matches(
+            "/Applications/ChatGPT (Beta) Helper.app/Contents/MacOS/ChatGPT"
+        ))
+    }
+
+    @Test("Generated TUN config applies application and process routing precedence")
     func testTunConfigIncludesProcessRoutingRules() throws {
-        let directKey = UserDefaults.KEY.tunDirectProcessNames.rawValue
-        let proxyKey = UserDefaults.KEY.tunProxyProcessNames.rawValue
-        let previousDirect = UserDefaults.standard.object(forKey: directKey)
-        let previousProxy = UserDefaults.standard.object(forKey: proxyKey)
+        let keys = [
+            UserDefaults.KEY.tunDirectProcessNames.rawValue,
+            UserDefaults.KEY.tunProxyProcessNames.rawValue,
+            UserDefaults.KEY.tunDirectApplicationPaths.rawValue,
+            UserDefaults.KEY.tunProxyApplicationPaths.rawValue,
+        ]
+        let previousValues = keys.map { UserDefaults.standard.object(forKey: $0) }
         defer {
-            if let previousDirect {
-                UserDefaults.standard.set(previousDirect, forKey: directKey)
-            } else {
-                UserDefaults.standard.removeObject(forKey: directKey)
-            }
-            if let previousProxy {
-                UserDefaults.standard.set(previousProxy, forKey: proxyKey)
-            } else {
-                UserDefaults.standard.removeObject(forKey: proxyKey)
+            for (key, previousValue) in zip(keys, previousValues) {
+                if let previousValue {
+                    UserDefaults.standard.set(previousValue, forKey: key)
+                } else {
+                    UserDefaults.standard.removeObject(forKey: key)
+                }
             }
         }
 
         UserDefaults.set(forKey: .tunDirectProcessNames, value: "WeChat\nShared App")
-        UserDefaults.set(forKey: .tunProxyProcessNames, value: "ChatGPT\nshared app\nxray-arm64")
+        UserDefaults.set(forKey: .tunProxyProcessNames, value: "ChatGPT\nshared app\nxray-arm64\nXRAY-ARM64")
+        UserDefaults.setStringArray(
+            forKey: .tunDirectApplicationPaths,
+            value: ["/Applications/ChatGPT.app"]
+        )
+        UserDefaults.setStringArray(
+            forKey: .tunProxyApplicationPaths,
+            value: ["/Applications/ChatGPT.app", "/Applications/WeChat (Beta).app"]
+        )
 
         let jsonText = TunConfigHandler.buildTunConfig()
         let data = try #require(jsonText.data(using: .utf8))
         let parsed = try JSONDecoder().decode(SingboxStruct.self, from: data)
-        let processRules = parsed.route.rules.filter { $0.process_name != nil }
+        let processRules = parsed.route.rules.filter {
+            $0.process_name != nil || $0.process_path_regex != nil
+        }
 
-        #expect(processRules.count == 3)
+        #expect(processRules.count == 5)
         #expect(processRules[0].outbound == "direct")
         #expect(processRules[0].process_name?.contains("xray-arm64") == true)
         #expect(processRules[1].outbound == "direct")
-        #expect(processRules[1].process_name == ["WeChat", "Shared App"])
-        #expect(processRules[2].outbound == "proxy")
-        #expect(processRules[2].process_name == ["ChatGPT"])
+        #expect(processRules[1].process_path_regex == [
+            TunConfigHandler.applicationProcessPathRegex(for: "/Applications/ChatGPT.app"),
+        ])
+        #expect(processRules[2].outbound == "direct")
+        #expect(processRules[2].process_name == ["WeChat", "Shared App"])
+        #expect(processRules[3].outbound == "proxy")
+        #expect(processRules[3].process_path_regex == [
+            TunConfigHandler.applicationProcessPathRegex(for: "/Applications/WeChat (Beta).app"),
+        ])
+        #expect(processRules[4].outbound == "proxy")
+        #expect(processRules[4].process_name == ["ChatGPT", "shared app", "XRAY-ARM64"])
+    }
+}
+
+@Suite struct TunHandlerStatusTests {
+    @Test("LaunchDaemon PID is parsed from launchctl service state")
+    func testLaunchDaemonPIDParsing() {
+        let runningState = """
+        system/yanue.v2rayu.tun-helper = {
+            state = running
+            path = /Library/LaunchDaemons/yanue.v2rayu.tun-helper.plist
+            pid = 97627
+            last exit code = 0
+        }
+        """
+
+        #expect(TunHandler.daemonPID(fromLaunchctlPrint: runningState) == 97627)
+    }
+
+    @Test("LaunchDaemon without a live PID is not reported as running")
+    func testStoppedLaunchDaemonPIDParsing() {
+        let stoppedState = """
+        system/yanue.v2rayu.tun-helper = {
+            state = exited
+            last exit code = 1
+        }
+        """
+
+        #expect(TunHandler.daemonPID(fromLaunchctlPrint: stoppedState) == nil)
+        #expect(TunHandler.daemonPID(fromLaunchctlPrint: "pid = invalid") == nil)
+        #expect(TunHandler.daemonPID(fromLaunchctlPrint: "pid = 0") == nil)
     }
 }
 

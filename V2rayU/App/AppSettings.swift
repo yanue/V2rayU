@@ -80,6 +80,8 @@ final class AppSettings: ObservableObject {
     @Published var tunRouteExcludeHosts: String = UserDefaults.get(forKey: .tunRouteExcludeHosts)
     @Published var tunDirectProcessNames: String = UserDefaults.get(forKey: .tunDirectProcessNames)
     @Published var tunProxyProcessNames: String = UserDefaults.get(forKey: .tunProxyProcessNames)
+    @Published var tunDirectApplicationPaths: [String] = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
+    @Published var tunProxyApplicationPaths: [String] = UserDefaults.getStringArray(forKey: .tunProxyApplicationPaths)
     // 网络变化/唤醒后自动重建 TUN, 默认开启
     @Published var tunAutoRebuild: Bool = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
     @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
@@ -175,6 +177,8 @@ final class AppSettings: ObservableObject {
         tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
         tunDirectProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
         tunProxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
+        tunDirectApplicationPaths = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
+        tunProxyApplicationPaths = UserDefaults.getStringArray(forKey: .tunProxyApplicationPaths)
         tunAutoRebuild = UserDefaults.getBool(forKey: .tunAutoRebuild, default: true)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
         tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
@@ -256,6 +260,8 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunRouteExcludeHosts, value: tunRouteExcludeHosts)
         UserDefaults.set(forKey: .tunDirectProcessNames, value: tunDirectProcessNames)
         UserDefaults.set(forKey: .tunProxyProcessNames, value: tunProxyProcessNames)
+        UserDefaults.setStringArray(forKey: .tunDirectApplicationPaths, value: tunDirectApplicationPaths)
+        UserDefaults.setStringArray(forKey: .tunProxyApplicationPaths, value: tunProxyApplicationPaths)
         UserDefaults.setBool(forKey: .tunAutoRebuild, value: tunAutoRebuild)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
         UserDefaults.setBool(forKey: .tunEnableIPv6, value: tunEnableIPv6)
@@ -298,6 +304,8 @@ final class AppSettings: ObservableObject {
             old.tunRouteExcludeHosts != tunRouteExcludeHosts ||
             old.tunDirectProcessNames != tunDirectProcessNames ||
             old.tunProxyProcessNames != tunProxyProcessNames ||
+            old.tunDirectApplicationPaths != tunDirectApplicationPaths ||
+            old.tunProxyApplicationPaths != tunProxyApplicationPaths ||
             old.tunLogLevel != tunLogLevel ||
             old.tunEnableIPv6 != tunEnableIPv6 {
             needRestartV2ray = true

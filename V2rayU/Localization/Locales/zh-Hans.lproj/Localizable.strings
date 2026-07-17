@@ -768,13 +768,14 @@
 "TunProcessRouting" = "进程路由";
 "TunDirectProcesses" = "直连应用";
 "TunProxyProcesses" = "代理应用";
-"TunProcessRoutingTip" = "仅在 TUN 模式生效。选择 .app 后会显示应用路径，但实际按可执行进程名匹配；规则冲突时直连优先。";
+"TunProcessRoutingTip" = "仅在 TUN 模式生效。应用规则会匹配所选 .app 包内的全部可执行进程；手动进程规则按名称精确匹配并区分大小写。规则冲突时直连优先。";
 "AddApplications" = "添加应用";
 "AddDirectApplication" = "添加直连应用 (.app)…";
 "AddProxyApplication" = "添加代理应用 (.app)…";
 "AddDirectProcess" = "添加直连进程…";
 "AddProxyProcess" = "添加代理进程…";
 "ProcessName" = "可执行进程名";
+"ApplicationBundleRule" = "匹配此应用内的全部进程";
 "ProcessOnlyRule" = "仅进程名：%@";
 "NoProcessRules" = "尚未添加应用或进程规则";
 "TunAutoRebuild" = "网络变化后自动重建 TUN";

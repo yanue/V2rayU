@@ -6,25 +6,29 @@ struct TunView: View {
     private enum ProcessRoute: Hashable {
         case direct
         case proxy
+    }
 
-        var label: LanguageLabel {
+    private enum ProcessRuleTarget: Hashable {
+        case application(path: String)
+        case process(name: String)
+
+        var id: String {
             switch self {
-            case .direct: return .Direct
-            case .proxy: return .Proxy
+            case let .application(path): return "application:\(path)"
+            case let .process(name): return "process:\(name)"
             }
         }
     }
 
     private struct ProcessRule: Identifiable {
-        let processName: String
+        let target: ProcessRuleTarget
         let route: ProcessRoute
 
-        var id: String { processName.lowercased() }
+        var id: String { target.id }
     }
 
     @ObservedObject var settings = AppSettings.shared
     @State private var showIPv6Warning = false
-    @State private var applicationURLs: [String: URL] = [:]
     @State private var showAddProcess = false
     @State private var pendingProcessName = ""
     @State private var pendingProcessRoute: ProcessRoute = .direct
@@ -279,9 +283,6 @@ struct TunView: View {
         .onDisappear {
             AppSettings.shared.saveSettings()
         }
-        .onAppear {
-            resolveApplicationURLs()
-        }
         .onChange(of: settings.tunEnableIPv6) { _, newValue in
             if newValue {
                 showIPv6Warning = true
@@ -303,13 +304,25 @@ struct TunView: View {
     }
 
     private var processRules: [ProcessRule] {
-        let direct = TunConfigHandler.parseProcessNames(settings.tunDirectProcessNames)
-        let directKeys = Set(direct.map { $0.lowercased() })
-        let proxy = TunConfigHandler.parseProcessNames(settings.tunProxyProcessNames)
-            .filter { !directKeys.contains($0.lowercased()) }
+        let directApplicationPaths = TunConfigHandler.normalizeApplicationPaths(settings.tunDirectApplicationPaths)
+        let directApplicationPathKeys = Set(directApplicationPaths)
+        let proxyApplicationPaths = TunConfigHandler.normalizeApplicationPaths(settings.tunProxyApplicationPaths)
+            .filter { !directApplicationPathKeys.contains($0) }
 
-        return direct.map { ProcessRule(processName: $0, route: .direct) }
-            + proxy.map { ProcessRule(processName: $0, route: .proxy) }
+        let directProcessNames = TunConfigHandler.parseProcessNames(settings.tunDirectProcessNames)
+        let directProcessNameKeys = Set(directProcessNames)
+        let proxyProcessNames = TunConfigHandler.parseProcessNames(settings.tunProxyProcessNames)
+            .filter { !directProcessNameKeys.contains($0) }
+
+        return directApplicationPaths.map {
+            ProcessRule(target: .application(path: $0), route: .direct)
+        } + directProcessNames.map {
+            ProcessRule(target: .process(name: $0), route: .direct)
+        } + proxyApplicationPaths.map {
+            ProcessRule(target: .application(path: $0), route: .proxy)
+        } + proxyProcessNames.map {
+            ProcessRule(target: .process(name: $0), route: .proxy)
+        }
     }
 
     private var processAlertTitle: String {
@@ -317,8 +330,24 @@ struct TunView: View {
     }
 
     private func processRuleRow(_ rule: ProcessRule) -> some View {
-        let applicationURL = applicationURLs[rule.id]
-        let displayName = applicationURL.flatMap(applicationDisplayName) ?? rule.processName
+        let applicationURL: URL?
+        let displayName: String
+        let subtitle: String
+        let detail: String
+
+        switch rule.target {
+        case let .application(path):
+            let url = URL(fileURLWithPath: path)
+            applicationURL = url
+            displayName = applicationDisplayName(for: url)
+            subtitle = String(localized: .ApplicationBundleRule)
+            detail = path
+        case let .process(name):
+            applicationURL = nil
+            displayName = name
+            subtitle = "\(String(localized: .ProcessName)): \(name)"
+            detail = String(format: String(localized: .ProcessOnlyRule), name)
+        }
 
         return HStack(spacing: 10) {
             Group {
@@ -339,16 +368,16 @@ struct TunView: View {
                 Text(displayName)
                     .fontWeight(.medium)
                     .lineLimit(1)
-                Text("\(String(localized: .ProcessName)): \(rule.processName)")
+                Text(subtitle)
                     .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
-                Text(applicationURL?.path ?? String(format: String(localized: .ProcessOnlyRule), rule.processName))
+                Text(detail)
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .help(applicationURL?.path ?? rule.processName)
+                    .help(detail)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -361,7 +390,7 @@ struct TunView: View {
             .frame(width: 132)
 
             Button {
-                removeProcessName(rule.processName)
+                removeRule(rule.target)
             } label: {
                 Image(systemName: "trash")
             }
@@ -375,7 +404,7 @@ struct TunView: View {
     private func processRouteBinding(for rule: ProcessRule) -> Binding<ProcessRoute> {
         Binding(
             get: { rule.route },
-            set: { addProcessNames([rule.processName], to: $0) }
+            set: { moveRule(rule.target, to: $0) }
         )
     }
 
@@ -391,14 +420,10 @@ struct TunView: View {
         panel.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
 
         guard await presentOpenPanel(panel) == .OK else { return }
-        let processNames = panel.urls.compactMap { applicationURL -> String? in
-            guard let processName = Bundle(url: applicationURL)?.executableURL?.lastPathComponent else {
-                return nil
-            }
-            applicationURLs[processName.lowercased()] = applicationURL
-            return processName
+        let applicationPaths = panel.urls.map { applicationURL in
+            applicationURL.resolvingSymlinksInPath().standardizedFileURL.path
         }
-        addProcessNames(processNames, to: route)
+        addApplicationPaths(applicationPaths, to: route)
     }
 
     private func beginAddingProcess(for route: ProcessRoute) {
@@ -413,16 +438,15 @@ struct TunView: View {
 
         let normalizedProcessNames = TunConfigHandler.parseProcessNames(processNames.joined(separator: "\n"))
         for processName in normalizedProcessNames {
-            let key = processName.lowercased()
             switch route {
             case .direct:
-                proxy.removeAll { $0.lowercased() == key }
-                if !direct.contains(where: { $0.lowercased() == key }) {
+                proxy.removeAll { $0 == processName }
+                if !direct.contains(processName) {
                     direct.append(processName)
                 }
             case .proxy:
-                direct.removeAll { $0.lowercased() == key }
-                if !proxy.contains(where: { $0.lowercased() == key }) {
+                direct.removeAll { $0 == processName }
+                if !proxy.contains(processName) {
                     proxy.append(processName)
                 }
             }
@@ -432,40 +456,53 @@ struct TunView: View {
         settings.tunProxyProcessNames = proxy.joined(separator: "\n")
     }
 
-    private func removeProcessName(_ processName: String) {
-        let key = processName.lowercased()
-        let direct = TunConfigHandler.parseProcessNames(settings.tunDirectProcessNames)
-            .filter { $0.lowercased() != key }
-        let proxy = TunConfigHandler.parseProcessNames(settings.tunProxyProcessNames)
-            .filter { $0.lowercased() != key }
+    private func addApplicationPaths(_ applicationPaths: [String], to route: ProcessRoute) {
+        var direct = TunConfigHandler.normalizeApplicationPaths(settings.tunDirectApplicationPaths)
+        var proxy = TunConfigHandler.normalizeApplicationPaths(settings.tunProxyApplicationPaths)
 
-        settings.tunDirectProcessNames = direct.joined(separator: "\n")
-        settings.tunProxyProcessNames = proxy.joined(separator: "\n")
-        applicationURLs.removeValue(forKey: key)
+        for path in TunConfigHandler.normalizeApplicationPaths(applicationPaths) {
+            switch route {
+            case .direct:
+                proxy.removeAll { $0 == path }
+                if !direct.contains(path) {
+                    direct.append(path)
+                }
+            case .proxy:
+                direct.removeAll { $0 == path }
+                if !proxy.contains(path) {
+                    proxy.append(path)
+                }
+            }
+        }
+
+        settings.tunDirectApplicationPaths = direct
+        settings.tunProxyApplicationPaths = proxy
     }
 
-    private func resolveApplicationURLs() {
-        let unresolvedKeys = Set(processRules.map(\.id)).subtracting(applicationURLs.keys)
-        guard !unresolvedKeys.isEmpty else { return }
+    private func moveRule(_ target: ProcessRuleTarget, to route: ProcessRoute) {
+        switch target {
+        case let .application(path):
+            addApplicationPaths([path], to: route)
+        case let .process(name):
+            addProcessNames([name], to: route)
+        }
+    }
 
-        let roots = [
-            URL(fileURLWithPath: "/Applications", isDirectory: true),
-            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications", isDirectory: true),
-            URL(fileURLWithPath: "/System/Applications", isDirectory: true),
-        ]
+    private func removeRule(_ target: ProcessRuleTarget) {
+        switch target {
+        case let .application(path):
+            settings.tunDirectApplicationPaths = TunConfigHandler.normalizeApplicationPaths(settings.tunDirectApplicationPaths)
+                .filter { $0 != path }
+            settings.tunProxyApplicationPaths = TunConfigHandler.normalizeApplicationPaths(settings.tunProxyApplicationPaths)
+                .filter { $0 != path }
+        case let .process(name):
+            let direct = TunConfigHandler.parseProcessNames(settings.tunDirectProcessNames)
+                .filter { $0 != name }
+            let proxy = TunConfigHandler.parseProcessNames(settings.tunProxyProcessNames)
+                .filter { $0 != name }
 
-        for root in roots {
-            guard let applications = try? FileManager.default.contentsOfDirectory(
-                at: root,
-                includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            ) else { continue }
-
-            for applicationURL in applications where applicationURL.pathExtension.lowercased() == "app" {
-                guard let processName = Bundle(url: applicationURL)?.executableURL?.lastPathComponent,
-                      unresolvedKeys.contains(processName.lowercased()) else { continue }
-                applicationURLs[processName.lowercased()] = applicationURL
-            }
+            settings.tunDirectProcessNames = direct.joined(separator: "\n")
+            settings.tunProxyProcessNames = proxy.joined(separator: "\n")
         }
     }
 

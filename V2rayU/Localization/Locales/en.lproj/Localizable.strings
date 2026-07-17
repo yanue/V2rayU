@@ -767,13 +767,14 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunProcessRouting" = "Process routing";
 "TunDirectProcesses" = "Direct applications";
 "TunProxyProcesses" = "Proxy applications";
-"TunProcessRoutingTip" = "TUN mode only. Selecting an .app shows its path, but routing matches the executable process name. Direct takes priority when rules conflict.";
+"TunProcessRoutingTip" = "TUN mode only. Application rules match every executable inside the selected .app bundle. Manual process rules match exact names, including letter case. Direct takes priority when rules conflict.";
 "AddApplications" = "Add Applications";
 "AddDirectApplication" = "Add Direct Application (.app)...";
 "AddProxyApplication" = "Add Proxy Application (.app)...";
 "AddDirectProcess" = "Add Direct Process...";
 "AddProxyProcess" = "Add Proxy Process...";
 "ProcessName" = "Executable process name";
+"ApplicationBundleRule" = "All processes in this application";
 "ProcessOnlyRule" = "Process name only: %@";
 "NoProcessRules" = "No application or process rules";
 "TunAutoRebuild" = "Auto rebuild TUN after network changes";

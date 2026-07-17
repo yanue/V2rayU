@@ -142,6 +142,7 @@ enum LanguageLabel: String, CaseIterable {
     case AddDirectProcess
     case AddProxyProcess
     case ProcessName
+    case ApplicationBundleRule
     case ProcessOnlyRule
     case NoProcessRules
     case TunAutoRebuild
