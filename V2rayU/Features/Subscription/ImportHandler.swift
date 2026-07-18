@@ -28,7 +28,7 @@ func importUri(url: String) {
         }
     }
 
-    AppMenuManager.shared.refreshServerItems()
+     Task { await AppMenuManager.shared.refreshServerItems() }
 
     if successCount > 0 {
         if successCount == 1 {
