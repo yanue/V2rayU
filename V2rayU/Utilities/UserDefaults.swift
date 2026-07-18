@@ -104,6 +104,12 @@ extension UserDefaults {
         case tunStrictRoute
         // hosts, IP addresses, or CIDRs that bypass the TUN route
         case tunRouteExcludeHosts
+        // executable process names that should bypass or use the proxy in TUN mode
+        case tunDirectProcessNames
+        case tunProxyProcessNames
+        // application bundle paths whose processes should bypass or use the proxy in TUN mode
+        case tunDirectApplicationPaths
+        case tunProxyApplicationPaths
         // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
         case tunAutoRebuild
         // tun log level
@@ -160,6 +166,14 @@ extension UserDefaults {
             return value
         }
         return defaultValue
+    }
+
+    static func setStringArray(forKey key: KEY, value: [String]) {
+        UserDefaults.standard.set(value, forKey: key.rawValue)
+    }
+
+    static func getStringArray(forKey key: KEY) -> [String] {
+        UserDefaults.standard.stringArray(forKey: key.rawValue) ?? []
     }
 
     // MARK: 获取枚举类型

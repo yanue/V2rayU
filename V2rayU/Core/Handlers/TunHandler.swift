@@ -79,10 +79,33 @@ actor TunHandler {
         isDaemonRunning()
     }
 
+    static func daemonPID(fromLaunchctlPrint output: String) -> Int? {
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard trimmed.hasPrefix("pid =") else { continue }
+
+            let value = trimmed
+                .dropFirst("pid =".count)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if let pid = Int(value), pid > 0 {
+                return pid
+            }
+        }
+        return nil
+    }
+
+    private func daemonPID() -> Int? {
+        guard let output = try? runCommand(
+            at: "/bin/launchctl",
+            with: ["print", "system/\(tunHelperDaemon)"]
+        ) else {
+            return nil
+        }
+        return Self.daemonPID(fromLaunchctlPrint: output)
+    }
+
     private func isDaemonRunning() -> Bool {
-        let pidStr = shell(launchPath: "/usr/bin/pgrep", arguments: ["-f", "sing-box.*tun.json"])
-        guard let pidStr, !pidStr.isEmpty else { return false }
-        return Int(pidStr.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
+        daemonPID() != nil
     }
 
     private func waitForDaemonRunning(timeout: TimeInterval = 8) async -> Bool {

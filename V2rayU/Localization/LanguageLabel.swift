@@ -132,6 +132,19 @@ enum LanguageLabel: String, CaseIterable {
     case TunStrictRouteTip
     case TunRouteExcludeHosts
     case TunRouteExcludeHostsTip
+    case TunProcessRouting
+    case TunDirectProcesses
+    case TunProxyProcesses
+    case TunProcessRoutingTip
+    case AddApplications
+    case AddDirectApplication
+    case AddProxyApplication
+    case AddDirectProcess
+    case AddProxyProcess
+    case ProcessName
+    case ApplicationBundleRule
+    case ProcessOnlyRule
+    case NoProcessRules
     case TunAutoRebuild
     case TunAutoRebuildTip
     case TunLogLevel
