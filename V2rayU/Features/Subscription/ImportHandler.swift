@@ -28,6 +28,8 @@ func importUri(url: String) {
         }
     }
 
+    AppMenuManager.shared.refreshServerItems()
+
     if successCount > 0 {
         if successCount == 1 {
             noticeTip(title: "import server success", informativeText: "Successfully imported 1 server")
