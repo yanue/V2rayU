@@ -76,6 +76,16 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             }
             .store(in: &cancellables)
 
+        // 监听 isCoreStarting 变化，同步禁用/启用 toggleCore 和模式切换菜单项
+        AppState.shared.$isCoreStarting
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isCoreStarting in
+                uiLogger.info("Combine.$isCoreStarting sink: isCoreStarting=\(isCoreStarting)")
+                self?.refreshBasicMenus()
+            }
+            .store(in: &cancellables)
+
         // 监听键盘快捷键变化
         NotificationCenter.default.addObserver(
             self,
@@ -152,12 +162,22 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func refreshBasicMenus() {
+        let isStarting = AppState.shared.isCoreStarting
         // 刷新模式状态
         toggleCoreItem?.title = coreTitle()
+        toggleCoreItem?.isEnabled = !isStarting
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
+        pacModeItem.isEnabled = !isStarting
         tunModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
+        tunModeItem.isEnabled = !isStarting
         globalModeItem.state = (.global == AppState.shared.runMode) ? .on : .off
+        globalModeItem.isEnabled = !isStarting
         manualModeItem.state = (.manual == AppState.shared.runMode) ? .on : .off
+        manualModeItem.isEnabled = !isStarting
+
+        // 禁用/启用路由和服务器子菜单
+        routingItem?.isEnabled = !isStarting
+        serverItem?.isEnabled = !isStarting
 
         // 刷新快捷键显示
         updateMenuKeyEquivalents()
@@ -184,6 +204,9 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     private func coreTitle() -> String {
+        if AppState.shared.isCoreStarting {
+            return String(localized: "Starting...")
+        }
         let onOff = AppState.shared.v2rayTurnOn ? String(localized: .TurnCoreOff) : String(localized: .TurnCoreOn)
         guard AppState.shared.v2rayTurnOn else { return onOff }
 
@@ -308,6 +331,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     private func setupMenu() {
         let menu = NSMenu()
+        menu.autoenablesItems = false
 
         // 基本菜单项
         coreStatusItem = getCoreStatusItem()
@@ -484,7 +508,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private func createRoutingMenuItem(routing: RoutingEntity) -> NSMenuItem {
         let item = NSMenuItem(title: routing.remark, action: #selector(switchRouting), keyEquivalent: "")
         item.representedObject = routing.uuid
-        item.isEnabled =  true
+        item.isEnabled = !AppState.shared.isCoreStarting
         item.target = self
         item.state = (routing.uuid == AppState.shared.runningRouting) ? .on : .off
         return item
@@ -496,7 +520,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         for combo in combos {
             let item = NSMenuItem(title: combo.displayName, action: #selector(switchCombination), keyEquivalent: "")
             item.representedObject = combo.uuid
-            item.isEnabled = true
+            item.isEnabled = !AppState.shared.isCoreStarting
             item.target = self
             item.state = (combo.uuid == AppState.shared.runningCombination) ? .on : .off
             let groupCount = combo.groups.count
@@ -537,7 +561,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             let item = NSMenuItem(title: "", action: #selector(switchCombination), keyEquivalent: "")
             item.attributedTitle = attrStr
             item.representedObject = combo.uuid
-            item.isEnabled = true
+            item.isEnabled = !AppState.shared.isCoreStarting
             item.target = self
             item.state = isActive ? .on : .off
             let groupCount = combo.groups.count
@@ -604,7 +628,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         item.action = #selector(switchServer)
         item.keyEquivalent = ""
         item.representedObject = profile.uuid
-        item.isEnabled = true
+        item.isEnabled = !AppState.shared.isCoreStarting
         item.target = self
         item.state = (AppState.shared.runningCombination.isEmpty && profile.uuid == AppState.shared.runningProfile) ? .on : .off
         item.toolTip = "\(profile.`protocol`)-\(profile.address):\(profile.port)-\(profile.uuid)"

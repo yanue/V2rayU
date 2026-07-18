@@ -85,6 +85,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ])
         // 初始化状态栏项目
         AppMenuManager.shared.setupStatusItem()
+        // 先设置状态再禁用菜单，防止 Combine 异步投递导致窗口期内可点击
+        AppState.shared.isCoreStarting = true
+        AppMenuManager.shared.refreshBasicMenus()
         Task{
             // 初始化helper（创建目录、修权限等）
             await AppInstaller.shared.checkInstall()
@@ -97,6 +100,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             // 检查并迁移旧版数据（首次启动时）
             _ = await LegacyMigrationHandler.shared.checkAndPromptForMigration()
+
+            // 启动流程完成, 恢复菜单可用
+            AppState.shared.isCoreStarting = false
+            AppMenuManager.shared.refreshBasicMenus()
         }
     }
 

@@ -57,13 +57,14 @@ final class AppState: ObservableObject {
         // 注册键盘快捷键处理
         KeyboardShortcuts.onKeyDown(for: .toggleV2rayOnOff) { [weak self] in
             Task { @MainActor in
+                guard self?.isCoreStarting == false else { return }
                 await self?.toggleCore()
             }
         }
 
         KeyboardShortcuts.onKeyDown(for: .switchProxyMode) { [weak self] in
             Task { @MainActor in
-                guard let self = self else { return }
+                guard let self = self, self.isCoreStarting == false else { return }
                 // 循环切换: pac -> manual -> global -> tun -> pac
                 let modes: [RunMode] = [.pac, .manual, .global, .tun]
                 if let currentIndex = modes.firstIndex(of: self.runMode) {
@@ -77,24 +78,28 @@ final class AppState: ObservableObject {
 
         KeyboardShortcuts.onKeyDown(for: .switchToTunnelMode) { [weak self] in
             Task { @MainActor in
+                guard self?.isCoreStarting == false else { return }
                 await self?.switchRunMode(mode: .tun)
             }
         }
 
         KeyboardShortcuts.onKeyDown(for: .switchToGlobalMode) { [weak self] in
             Task { @MainActor in
+                guard self?.isCoreStarting == false else { return }
                 await self?.switchRunMode(mode: .global)
             }
         }
 
         KeyboardShortcuts.onKeyDown(for: .switchToManualMode) { [weak self] in
             Task { @MainActor in
+                guard self?.isCoreStarting == false else { return }
                 await self?.switchRunMode(mode: .manual)
             }
         }
 
         KeyboardShortcuts.onKeyDown(for: .switchToPacMode) { [weak self] in
             Task { @MainActor in
+                guard self?.isCoreStarting == false else { return }
                 await self?.switchRunMode(mode: .pac)
             }
         }
@@ -130,6 +135,11 @@ final class AppState: ObservableObject {
         KeyboardShortcuts.onKeyDown(for: .copyHttpProxy) {
             AppMenuManager.shared.copyProxyExportCommand()
         }
+    }
+
+    /// 启动/切换核心过程中的 loading 状态，用于禁用 UI 交互防止状态不同步
+    @Published var isCoreStarting: Bool = false {
+        didSet { uiLogger.info("isCoreStarting.didSet: \(self.isCoreStarting)") }
     }
 
     // MARK: - 更新速度
@@ -169,6 +179,13 @@ final class AppState: ObservableObject {
     // 状态机收敛到 V2rayLaunch actor（内部串行锁 + running 标志）。
     // AppState 只负责: 更新可观察状态 → 调用 V2rayLaunch 的某个粒度操作 → 刷新菜单。
     func setCoreRunning(_ on: Bool) async {
+        guard !isCoreStarting else {
+            logger.info("setCoreRunning: isCoreStarting, return")
+            return
+        }
+        isCoreStarting = true
+        defer { isCoreStarting = false }
+
         if on {
             let success = await V2rayLaunch.shared.start()
             v2rayTurnOn = success
@@ -183,6 +200,10 @@ final class AppState: ObservableObject {
     // MARK: - 切换运行模式
     // 模式只影响"系统代理"与"TUN", 与核心配置无关 → 不重启核心。
     func switchRunMode(mode: RunMode) async {
+        guard !isCoreStarting else {
+            logger.info("switchRunMode: isCoreStarting, skip \(mode.rawValue)")
+            return
+        }
         let oldMode = runMode
         guard oldMode != mode else { return }
         runMode = mode
@@ -211,6 +232,10 @@ final class AppState: ObservableObject {
     // MARK: - 切换路由
     // 路由属于核心配置 → 只重载核心, 不动 TUN / 系统代理。
     func switchRouting(uuid: String) async {
+        guard !isCoreStarting else {
+            logger.info("switchRouting: isCoreStarting, skip \(uuid)")
+            return
+        }
         runningRouting = uuid
         v2rayTurnOn = true
         let success = await V2rayLaunch.shared.reloadCore()
@@ -222,6 +247,10 @@ final class AppState: ObservableObject {
 
     // MARK: - 切换组合配置 (toggle 行为)
     func switchCombination(uuid: String) async {
+        guard !isCoreStarting else {
+            logger.info("switchCombination: isCoreStarting, skip \(uuid)")
+            return
+        }
         // 已激活 → 取消选择 → 停止
         if runningCombination == uuid {
             runningCombination = ""
@@ -262,6 +291,10 @@ final class AppState: ObservableObject {
     // MARK: - 切换配置
     // 服务器属于核心配置 → 只重载核心, 不动 TUN / 系统代理。
     func switchServer(uuid: String) async {
+        guard !isCoreStarting else {
+            logger.info("switchServer: isCoreStarting, skip \(uuid)")
+            return
+        }
         // 点击已激活的单服务器不做任何操作
         if runningProfile == uuid, runningCombination.isEmpty {
             return
@@ -319,9 +352,17 @@ final class AppState: ObservableObject {
 
         logger.info("appDidLaunch: mode=\(self.runMode.rawValue),v2rayTurnOn=\(self.v2rayTurnOn.description),runningProfile=\(self.runningProfile)")
 
-        // 根据启动状态
-        await setCoreRunning(v2rayTurnOn)
-        // 刷新菜单必须在 setCoreRunning 之后,确保菜单反映实际状态
+        // 启动/停止核心 — isCoreStarting 由外层 Task 管理, 这里不触碰
+        if v2rayTurnOn {
+            let success = await V2rayLaunch.shared.start()
+            v2rayTurnOn = success
+            logger.info("appDidLaunch: started=\(success)")
+        } else {
+            await V2rayLaunch.shared.stop()
+            v2rayTurnOn = false
+            logger.info("appDidLaunch: stopped")
+        }
+        // 刷新菜单必须在核心启动之后,确保菜单反映实际状态
         AppMenuManager.shared.refreshAllMenus()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
@@ -346,18 +387,30 @@ final class AppState: ObservableObject {
 
     // MARK: - 菜单栏 Toggle
     func toggleCore() async {
+        guard !isCoreStarting else {
+            logger.info("toggleCore: isCoreStarting, skip")
+            return
+        }
         v2rayTurnOn.toggle()
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
 
     func turnOnCore() async {
+        guard !isCoreStarting else {
+            logger.info("turnOnCore: isCoreStarting, skip")
+            return
+        }
         v2rayTurnOn = true
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()
     }
 
     func turnOffCore() async {
+        guard !isCoreStarting else {
+            logger.info("turnOffCore: isCoreStarting, skip")
+            return
+        }
         v2rayTurnOn = false
         await setCoreRunning(v2rayTurnOn)
         AppMenuManager.shared.refreshBasicMenus()

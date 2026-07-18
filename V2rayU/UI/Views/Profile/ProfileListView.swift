@@ -307,6 +307,7 @@ struct ProfileListView: View {
                 Label(String(localized: .SetActive), systemImage: "checkmark.circle")
             }
             .focusable(false)
+            .disabled(AppState.shared.isCoreStarting)
 
             Button {
                 performAfterMenuDismiss {

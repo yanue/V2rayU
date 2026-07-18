@@ -23,13 +23,20 @@ struct StatusItemView: View {
                 .frame(height: 22, alignment: .center) // 确保图标垂直居中
             if settings.showLatencyOnTray {
                 HStack(spacing: 4) {
-                    Text("●")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
-                    // 延迟信息
-                    Text("\(String(format: "%.0f", appState.latency)) ms")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color(getSpeedColor(latency: appState.latency))) // 绿色
+                    if appState.isCoreStarting {
+                        ProgressView()
+                            .controlSize(.small)
+                            .frame(width: 8, height: 8)
+                            .padding(6)
+                    } else {
+                        Text("●")
+                            .font(.system(size: 10))
+                            .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
+                        // 延迟信息
+                        Text("\(String(format: "%.0f", appState.latency)) ms")
+                            .font(.system(size: 10))
+                            .foregroundColor(Color(getSpeedColor(latency: appState.latency)))
+                    }
                 }
             }
             if settings.showSpeedOnTray {
@@ -42,7 +49,7 @@ struct StatusItemView: View {
                 .foregroundColor(.primary)
             }
         }
-        .frame(width: 120, height: 22, alignment: .trailing) // NSTrackingSession 固定宽度: 防止在 CA 显示周期中因文本变化触发布局异常
+        .frame(width: 120, height: 22, alignment: .trailing)
         .clipped()
         .padding(.horizontal, 4)
     }

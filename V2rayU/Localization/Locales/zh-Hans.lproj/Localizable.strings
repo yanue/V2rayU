@@ -801,3 +801,4 @@
 "PingSuccessFormat" = "Ping 成功: %@ - %dms";
 "PingFailureRetryFormat" = "Ping 失败: %@ - 第%d次: %@";
 "PingCompleteSingleNodeFormat" = "完成单节点 Ping: %@";
+"Starting..." = "启动中...";

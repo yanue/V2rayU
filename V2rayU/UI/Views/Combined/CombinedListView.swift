@@ -206,6 +206,7 @@ struct CombinedConfigListView: View {
                       systemImage: isRunning ? "stop.circle" : "bolt")
             }
             .focusable(false)
+            .disabled(AppState.shared.isCoreStarting)
 
             Divider()
 
