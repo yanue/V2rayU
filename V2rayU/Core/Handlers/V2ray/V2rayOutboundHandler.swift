@@ -101,8 +101,8 @@ class V2rayOutboundHandler {
             user.id = self.profile.password
             user.flow = self.profile.flow
             user.encryption = self.profile.encryption
-            if user.encryption == "" {
-                user.encryption = "none" // vless 不支持空字符串
+            if user.encryption.isEmpty || user.encryption == "auto" {
+                user.encryption = "none" // vless 只支持 "none"
             }
             
             // vless
