@@ -55,16 +55,13 @@ actor SystemSleepManager {
         // 系统唤醒后的处理逻辑
         logger.info("onWakeNote")
         Task {
-            // 1. 恢复网络连接（按模式选择策略）
+            // 1. 恢复网络连接：唤醒后始终 full restart 核心。
+            //    睡眠期间核心进程虽存活，但上游 TCP 连接已失效（observatory dead），
+            //    仅重建 TUN 不够——TUN 把流量转给一个无法代理的核心，导致全网断联。
             let turnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
             if turnOn {
-                logger.info("V2rayLaunch rebuild after wake")
-                let mode = await MainActor.run { AppState.shared.runMode }
-                if mode == .tun {
-                    await TunHandler.shared.rebuildAfterNetworkChange(reason: "system wake")
-                } else {
-                    await V2rayLaunch.shared.restart()
-                }
+                logger.info("V2rayLaunch full restart after wake (core + TUN + proxy)")
+                await V2rayLaunch.shared.restart()
             }
 
             // 2. 同步运行中服务器状态（runningServer 是内存态，需从 DB 刷新）
