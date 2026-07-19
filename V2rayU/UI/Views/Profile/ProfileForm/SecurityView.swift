@@ -27,9 +27,6 @@ struct ConfigTransportView: View {
                 if item.selectedProtocol != .naive && item.selectedProtocol != .anytls {
                     getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
                 }
-                // Use .id(item.security) so SwiftUI fully tears down and recreates
-                // this Group (including TextField focus state) when security changes,
-                // preventing AttributeGraph / UpdateViewFocusItem crashes.
                 Group {
                     if item.security == .reality {
                         getTextFieldWithLabel(label: .PublicKey, text: $item.publicKey)
@@ -37,9 +34,9 @@ struct ConfigTransportView: View {
                         getTextFieldWithLabel(label: .SpiderX, text: $item.spiderX)
                     }
                 }
-                .id(item.security) // Force full subtree recreation on security change
                 getPickerWithLabel(label: .Alpn, selection: $item.alpn)
             }
+            .id(item.security) // Force full subtree recreation on security change
             .padding() // 1. 内边距
             .background() // 2. 然后背景
             .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角

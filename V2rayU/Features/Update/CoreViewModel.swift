@@ -131,10 +131,10 @@ final class CoreViewModel: ObservableObject {
         clearCoreVersionCache()
         clearSingboxVersionCache()
 
-        Task.detached(priority: .utility) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
             let xrayVer = getCoreVersion(refresh: true)
             let singboxVer = getSingboxVersion(refresh: true)
-            await MainActor.run { [weak self] in
+            DispatchQueue.main.async {
                 guard let self else { return }
                 self.xrayCoreVersion = xrayVer
                 self.singboxCoreVersion = singboxVer

@@ -44,6 +44,7 @@ struct ConfigFormView: View {
                                 ConfigTransportView(item: item)
                             }
                         }
+                        .id(item.protocol) // Force full left-column rebuild on protocol change
                         .padding(.all, 12)
                         .padding(.leading, 8)
                     }

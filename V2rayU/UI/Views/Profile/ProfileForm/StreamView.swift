@@ -101,8 +101,8 @@ struct ConfigStreamView: View {
                         getTextEditorWithLabel(label: .FinalMask, text: $item.hysteria2FinalMaskJson)
                     }
                 }
-                .id(item.network) // Force full subtree recreation on network change
             }
+            .id(item.network) // Force full subtree recreation on network change
             .padding() // 1. 内边距
             .background() // 2. 然后背景
             .clipShape(RoundedRectangle(cornerRadius: 8)) // 3. 内圆角
