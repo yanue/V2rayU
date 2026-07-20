@@ -403,9 +403,13 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
         helpItem = NSMenuItem(title: String(localized: .Help), action: #selector(goHelp), keyEquivalent: "")
-        // 异步填充版本号，避免在 setupMenu 中同步调用 shell()
-        Task { @MainActor in
-            helpItem.title = String(localized: .Help) + " (Xray \(getCoreShortVersion()) | Singbox \(getSingboxShortVersion()))"
+        // 异步填充版本号，避免在 setupMenu 中同步调用 shell() 阻塞主线程
+        DispatchQueue.global(qos: .utility).async {
+            let xrayVer = getCoreShortVersion()
+            let singboxVer = getSingboxShortVersion()
+            DispatchQueue.main.async { [weak self] in
+                self?.helpItem?.title = String(localized: .Help) + " (Xray \(xrayVer) | Singbox \(singboxVer))"
+            }
         }
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)

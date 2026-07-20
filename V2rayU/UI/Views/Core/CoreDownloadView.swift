@@ -77,7 +77,7 @@ struct CoreDownloadView: View {
                 Text("\(coreTab.displayName)  ·  \(coreTab.binaryName)")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("\(String(localized: .CoreDownloadCurrent)): v\(currentVersionText)")
+                Text("\(String(localized: .CoreDownloadCurrent)): \(currentVersionText)")
                     .font(.caption.monospaced())
                     .foregroundColor(.secondary)
             }

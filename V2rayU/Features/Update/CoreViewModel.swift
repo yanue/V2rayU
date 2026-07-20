@@ -128,9 +128,9 @@ final class CoreViewModel: ObservableObject {
     // MARK: - 加载本地状态
 
     func loadCoreVersions() {
-        clearCoreVersionCache()
-        clearSingboxVersionCache()
-
+        // 注意: 不能在后台 dispatch 之前 clear cache —— 此时 AppMenu.updateMenuTitles()
+        // 可能在主线程调用 getCoreShortVersion()，cache 为空会触发 shell() 阻塞主线程。
+        // getCoreVersion(refresh: true) 本身会绕过 cache 并重新写入，无需提前 clear。
         DispatchQueue.global(qos: .utility).async { [weak self] in
             let xrayVer = getCoreVersion(refresh: true)
             let singboxVer = getSingboxVersion(refresh: true)
@@ -337,26 +337,47 @@ final class CoreViewModel: ObservableObject {
 
     func onDownloadSuccess(filePath: String) {
         let kind = activeDownloadKind ?? .xray
-        do {
-            let script = AppBinRoot + "/" + kind.updateScriptName
-            let msg = try runCommand(at: "/usr/bin/sudo", with: ["-n", script, filePath])
-            Task { await V2rayLaunch.shared.restart() }
+        // 只把阻塞 I/O（shell 调用 + 版本刷新）移到后台线程，
+        // 其余状态更新和 restart 必须在主线程按原始顺序执行，
+        // 否则 restart 与 UI 状态更新会竞争，导致 toggle 后状态不一致。
+        DispatchQueue.global(qos: .userInitiated).async {
+            var resultMessage: String?
+            var resultError: Error?
+            do {
+                let script = AppBinRoot + "/" + kind.updateScriptName
+                let msg = try runCommand(at: "/usr/bin/sudo", with: ["-n", script, filePath])
+                resultMessage = msg
+            } catch {
+                resultError = error
+            }
+
+            var freshXrayVersion: String?
+            var freshSingboxVersion: String?
             switch kind {
             case .xray:
-                clearCoreVersionCache()
-                xrayCoreVersion = getCoreVersion(refresh: true)
+                freshXrayVersion = getCoreVersion(refresh: true)
             case .singbox:
-                clearSingboxVersionCache()
-                singboxCoreVersion = getSingboxVersion(refresh: true)
+                freshSingboxVersion = getSingboxVersion(refresh: true)
             }
-            AppMenuManager.shared.refreshAllMenus()
-            errorMsg = String(localized: .ReplaceSuccess) + "\n" + msg
-        } catch {
-            errorMsg = error.localizedDescription
+
+            // 回到主线程，按原始生命周期顺序执行所有后续操作
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if let error = resultError {
+                    self.errorMsg = error.localizedDescription
+                } else {
+                    if let ver = freshXrayVersion { self.xrayCoreVersion = ver }
+                    if let ver = freshSingboxVersion { self.singboxCoreVersion = ver }
+                    AppMenuManager.shared.refreshAllMenus()
+                    self.errorMsg = String(localized: .ReplaceSuccess) + "\n" + (resultMessage ?? "")
+                }
+                self.showAlert = true
+                self.showDownloadDialog = false
+                self.activeDownloadKind = nil
+                // restart 放在最后，与原始代码一致：先完成状态更新，再触发重启
+                Task { await V2rayLaunch.shared.restart() }
+            }
         }
-        showAlert = true
-        showDownloadDialog = false
-        activeDownloadKind = nil
     }
 
     func onDownloadFail(err: String) {
