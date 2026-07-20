@@ -27,6 +27,8 @@ struct CoreDownloadView: View {
                     .transition(.opacity)
             }
 
+            compatibilityBanner
+
             versionList
         }
         .padding(16)
@@ -188,6 +190,81 @@ struct CoreDownloadView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.secondary.opacity(0.25), lineWidth: 1)
         )
+    }
+
+    // MARK: - 兼容版本自动下载横幅（独立于分页状态）
+
+    @ViewBuilder
+    private var compatibilityBanner: some View {
+        switch vm.compatibilityAutoDownload {
+        case .idle:
+            EmptyView()
+        case .searching:
+            HStack(spacing: 10) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("正在搜索兼容版本…")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            .padding(10)
+            .background(Color.accentColor.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        case .found(let release, _):
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("找到兼容版本：\(release.tagName)")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text(release.formattedPublishedAt)
+                        .font(.caption.monospaced())
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Button(action: { vm.startCompatibilityDownload() }) {
+                    Label(String(localized: .UpdateCore), systemImage: "arrow.down.circle")
+                }
+                .buttonStyle(.bordered)
+                .focusable(false)
+                .disabled(vm.hasActiveDownload)
+                Button(action: { vm.dismissCompatibilityBanner() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .focusable(false)
+            }
+            .padding(10)
+            .background(Color.green.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        case .error(let message, _):
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+                Text(message)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                Spacer()
+                Button(action: { vm.retryCompatibilitySearch() }) {
+                    Label(String(localized: .Refresh), systemImage: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.bordered)
+                .focusable(false)
+                Button(action: { vm.dismissCompatibilityBanner() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .focusable(false)
+            }
+            .padding(10)
+            .background(Color.orange.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
     }
 
     // MARK: - 版本列表

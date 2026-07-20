@@ -69,7 +69,7 @@ struct ConfigServerView: View {
                         getTextFieldWithLabel(label: .ID, text: $item.password)
                         getNumFieldWithLabel(label: .AlterID, num: $item.alterId)
                         if item.alterId > 0 {
-                            Text("alterId > 0 与 sing-box 不兼容，建议改为 0")
+                            Text("alterId > 0 自 Xray-core v1.8.12 起已移除，建议改为 0 或使用 v1.8.5 旧版 Xray-core")
                                 .font(.caption)
                                 .foregroundColor(.orange)
                                 .padding(.leading, 107)

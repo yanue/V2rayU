@@ -114,6 +114,17 @@ final class CoreViewModel: ObservableObject {
     @Published var showDownloadDialog = false
     let downloadManager = DownloadViewModel()
 
+    // MARK: - 兼容版本自动下载（独立于下载页分页状态）
+    enum CompatibilityAutoDownload: Equatable {
+        case idle
+        case searching
+        case found(GithubRelease, CoreUpdateKind)
+        case error(String, CoreUpdateKind)
+    }
+    @Published var compatibilityAutoDownload: CompatibilityAutoDownload = .idle
+    private(set) var compatibilityMinVersion: String?
+    private(set) var compatibilityMaxVersion: String?
+
     let perPage: Int = 20
     private let service: GithubServiceProtocol
 
@@ -258,7 +269,9 @@ final class CoreViewModel: ObservableObject {
             // 没有版本信息就只导航到下载页
             return
         }
-        await fetchAndDownload(minVersion: minVersion, kind: kind)
+        compatibilityMinVersion = minVersion
+        compatibilityMaxVersion = decision.maximumCompatibleVersion
+        await searchCompatibilityVersion(kind: kind)
     }
 
     func downloadMinimumVersion(for resolved: CombinedConfigResolved) async {
@@ -266,36 +279,75 @@ final class CoreViewModel: ObservableObject {
         // 组合配置没有精确的最小版本, 导航到下载页由用户选择
     }
 
-    private func fetchAndDownload(minVersion: String, kind: CoreUpdateKind) async {
+    func retryCompatibilitySearch() {
+        guard case .error(_, let kind) = compatibilityAutoDownload else { return }
+        Task { await searchCompatibilityVersion(kind: kind) }
+    }
+
+    func dismissCompatibilityBanner() {
+        compatibilityAutoDownload = .idle
+    }
+
+    /// 独立分页搜索兼容版本，不依赖下载页的 fetchPage 逻辑
+    private func searchCompatibilityVersion(kind: CoreUpdateKind) async {
+        guard let minVersion = compatibilityMinVersion else { return }
+        let maxVersion = compatibilityMaxVersion
+
+        compatibilityAutoDownload = .searching
+        let perPage = 50
+        var page = 1
+        let maxPages = 10
+
         do {
-            let releases = try await service.fetchReleases(repo: kind.repo, page: 1, perPage: 20)
-            // 找到第一个 >= minVersion 的正式发布版(非 prerelease)
-            let candidates = releases.filter { !$0.prerelease }
-            let match: GithubRelease?
-            switch kind {
-            case .xray:
-                guard let min = XrayVersion(minVersion) else { return }
-                match = candidates.first { release in
-                    guard let v = XrayVersion(release.tagName) else { return false }
-                    return v >= min
+            while page <= maxPages {
+                let releases = try await service.fetchReleases(repo: kind.repo, page: page, perPage: perPage)
+                let candidates = releases.filter { !$0.prerelease }
+
+                let match: GithubRelease?
+                switch kind {
+                case .xray:
+                    guard let min = XrayVersion(minVersion) else { return }
+                    let upper = maxVersion.flatMap { XrayVersion($0) }
+                    match = candidates.first { release in
+                        guard let v = XrayVersion(release.tagName) else { return false }
+                        if let upper, v >= upper { return false }
+                        return v >= min
+                    }
+                case .singbox:
+                    guard let min = SingboxVersion(minVersion) else { return }
+                    let upper = maxVersion.flatMap { SingboxVersion($0) }
+                    match = candidates.first { release in
+                        guard let v = SingboxVersion(release.tagName) else { return false }
+                        if let upper, v >= upper { return false }
+                        return v >= min
+                    }
                 }
-            case .singbox:
-                guard let min = SingboxVersion(minVersion) else { return }
-                match = candidates.first { release in
-                    guard let v = SingboxVersion(release.tagName) else { return false }
-                    return v >= min
+
+                if let release = match {
+                    compatibilityAutoDownload = .found(release, kind)
+                    return
                 }
+
+                if releases.count < perPage { break }
+                page += 1
             }
-            guard let release = match else {
-                errorMsg = "未找到 \(kind.displayName) >= \(minVersion) 的发布版本"
-                showAlert = true
-                return
+
+            let msg: String
+            if let maxVersion {
+                msg = "未找到 \(kind.displayName) >= \(minVersion) 且 < \(maxVersion) 的发布版本"
+            } else {
+                msg = "未找到 \(kind.displayName) >= \(minVersion) 的发布版本"
             }
-            downloadAndReplace(version: release, for: kind)
+            compatibilityAutoDownload = .error(msg, kind)
         } catch {
-            errorMsg = String(localized: .OperationFailed, arguments: error.localizedDescription)
-            showAlert = true
+            let msg = String(localized: .OperationFailed, arguments: error.localizedDescription)
+            compatibilityAutoDownload = .error(msg, kind)
         }
+    }
+
+    func startCompatibilityDownload() {
+        guard case .found(let release, let kind) = compatibilityAutoDownload else { return }
+        downloadAndReplace(version: release, for: kind)
     }
 
     // MARK: - 下载 / 替换

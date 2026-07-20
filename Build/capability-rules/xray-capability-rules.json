@@ -228,6 +228,17 @@
       }
     },
     {
+      "key": "outbound.vmess.alterId",
+      "display_name": "VMess alterId > 0（旧版 MD5 认证）",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "removed",
+        "removed_at": "1.8.12",
+        "note": "Xray-core 自 v1.8.12 起移除了 Legacy VMess alterId（旧版 MD5 认证），仅支持 AEAD（alterId = 0）。如需使用 alterId > 0，请使用 v1.8.5 或更早版本。"
+      }
+    },
+    {
       "key": "outbound.anytls",
       "display_name": "AnyTLS outbound",
       "kind": "Outbound",

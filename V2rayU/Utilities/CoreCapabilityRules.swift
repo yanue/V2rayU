@@ -613,6 +613,13 @@ struct XrayCoreCompatibilityDecision {
             return versions.max()?.description
         }
     }
+
+    /// 已移除特性的最大兼容版本上限（取 blocking issues 中最小的 removedAt）
+    var maximumCompatibleVersion: String? {
+        let blocking = issues.filter { $0.isBlocking }
+        let removedAts = blocking.compactMap { $0.capability.rule.removedAt }
+        return removedAts.min()?.description
+    }
 }
 
 enum SingboxFallbackCompatibility {
@@ -648,6 +655,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.trojan", displayName: "Trojan outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/trojan.html"),
         XrayCapabilityDefinition(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vless.html"),
         XrayCapabilityDefinition(key: "outbound.vmess", displayName: "VMess outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vmess.html"),
+        XrayCapabilityDefinition(key: "outbound.vmess.alterId", displayName: "VMess alterId > 0（旧版 MD5 认证）", kind: .outboundProtocol, rule: .removed(note: "Xray-core 自 v1.8.12 起移除了 Legacy VMess alterId（旧版 MD5 认证），仅支持 AEAD（alterId = 0）。如需使用 alterId > 0，请使用 v1.8.5 或更早版本。", legacyMin: XrayVersion(1, 8, 5), removedAt: XrayVersion(1, 8, 12)), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
@@ -866,7 +874,7 @@ enum SingboxFallbackResolver {
         }
 
         if profile.protocol == .vmess && profile.alterId > 0 {
-            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），与 Sing-Box 不兼容，请将 alterId 改为 0（AEAD 模式）。")
+            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），sing-box 不支持，Xray-core 自 v1.8.12 起也已移除。请使用 v1.8.5 或更早版本的 Xray-core，或将 alterId 改为 0（AEAD 模式）。")
         }
 
         return unique(reasons)
@@ -1041,7 +1049,7 @@ enum SingboxFallbackResolver {
         }
 
         if profile.protocol == .vmess && profile.alterId > 0 {
-            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），与 Sing-Box 不兼容，请将 alterId 改为 0（AEAD 模式）。")
+            reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），sing-box 不支持，Xray-core 自 v1.8.12 起也已移除。请使用 v1.8.5 或更早版本的 Xray-core，或将 alterId 改为 0（AEAD 模式）。")
         }
 
         return reasons
@@ -1125,7 +1133,7 @@ enum XrayCompatibilityResolver {
     private static func singboxFallbackDecision(for profile: ProfileEntity, issues: [XrayCompatibilityIssue]) -> XrayCoreCompatibilityDecision {
         var warningMessage: String?
         if profile.protocol == .vmess && profile.alterId > 0 {
-            warningMessage = "VMess alterId > 0（旧版 MD5 认证）与 sing-box 不兼容，请将 alterId 改为 0（AEAD 模式）"
+            warningMessage = "VMess alterId > 0（旧版 MD5 认证）自 Xray-core v1.8.12 起已移除，sing-box 也不支持。请使用 v1.8.5 或更早版本的 Xray-core 以使用 alterId > 0，或将 alterId 改为 0（AEAD 模式）。"
         }
         return XrayCoreCompatibilityDecision(coreType: .SingBox, warningMessage: warningMessage, issues: issues, canLaunch: true)
     }
@@ -1201,6 +1209,14 @@ enum XrayCompatibilityResolver {
 
         if let issue = allowInsecureIssue(for: profile, version: version) {
             issues.append(issue)
+        }
+
+        if profile.protocol == .vmess && profile.alterId > 0,
+           let definition = XraySupportCatalog.capability(forKey: "outbound.vmess.alterId") {
+            issues.append(XrayCompatibilityIssue(
+                capability: definition,
+                availability: .unsupported(reason: "VMess alterId > 0（旧版 MD5 认证）自 Xray-core v1.8.12 起已移除，当前核心不支持。请使用 v1.8.5 或更早版本的 Xray-core 以使用 alterId > 0。")
+            ))
         }
 
         return issues
