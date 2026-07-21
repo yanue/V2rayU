@@ -70,6 +70,9 @@ chmod -R 755 "$XRAY_DIR"
 # ---------- 5. 去除 macOS 隔离标记 ----------
 /usr/bin/xattr -rd com.apple.quarantine "$BIN_ROOT" 2>/dev/null || true
 
+# 等待 macOS Gatekeeper 完成新二进制的验证，否则调用方立即执行会失败
+sleep 3
+
 # ---------- 6. 清理 ----------
 rm -rf "$XRAY_BAK" 2>/dev/null
 rm -f  "$ZIP_FILE"  2>/dev/null

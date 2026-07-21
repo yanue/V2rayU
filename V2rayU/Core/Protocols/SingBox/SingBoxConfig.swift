@@ -77,6 +77,7 @@ struct SingboxInbound: Codable {
     var stack: String?  // 对 tun 需要: system
     var sniff: Bool? // 对 tun 需要
     var sniff_override_destination: Bool? // 对 tun 需要, 很重要, 不然需要手动在设置界面上设置dns
+    var dns_mode: String? // sing-box >= 1.14.0: "disabled"|"native"|"hijack"
 }
 
 // Outbound

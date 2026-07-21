@@ -547,6 +547,16 @@ private actor TunStartupRecorder {
             }
         }
 
+        if let sv, sv >= SingboxVersion(1, 14, 0) {
+            if tunInbound.dns_mode != "disabled" {
+                result.addVersionIssue("Expected TUN dns_mode='disabled' for sing-box >= 1.14.0, got '\(tunInbound.dns_mode ?? "nil")'")
+            }
+        } else {
+            if tunInbound.dns_mode != nil {
+                result.addVersionIssue("Expected TUN dns_mode=nil for sing-box < 1.14.0, got '\(tunInbound.dns_mode!)'")
+            }
+        }
+
         guard parsed.route.auto_detect_interface == true else {
             result.status = .configError
             result.error = "Route auto_detect_interface should be true"

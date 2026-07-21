@@ -32,6 +32,11 @@ enum SingboxVersionCheck {
         guard let version = SingboxVersion(getSingboxVersion()) else { return true }
         return version >= SingboxVersion(1, 13, 0)
     }
+
+    static func supportsTunDnsMode() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 14, 0)
+    }
 }
 
 class SingboxConfigHandler {

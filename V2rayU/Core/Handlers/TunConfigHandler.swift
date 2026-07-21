@@ -301,6 +301,9 @@ enum TunConfigHandler {
         if tunEnableIPv6 {
             addresses.append(tunAddrIPv6)
         }
+        // sing-box >= 1.14.0 新增 dns_mode，默认 hijack 会劫持系统 DNS 并安装平台级规则，
+        // 在 macOS 上可能与系统安全策略冲突。设为 disabled 保持 1.13.x 的行为。
+        let tunDnsMode: String? = SingboxVersionCheck.supportsTunDnsMode() ? "disabled" : nil
         let tunInbound = SingboxInbound(
             type: "tun",
             tag: "tun-in",
@@ -311,7 +314,8 @@ enum TunConfigHandler {
             mtu: tunMtu,
             stack: tunStack.rawValue,
             sniff: useSniffRuleAction ? nil : true,
-            sniff_override_destination: useSniffRuleAction ? nil : true
+            sniff_override_destination: useSniffRuleAction ? nil : true,
+            dns_mode: tunDnsMode
         )
         singbox.inbounds = [tunInbound]
 

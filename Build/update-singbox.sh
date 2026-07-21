@@ -77,6 +77,9 @@ chmod -R 755 "$SINGBOX_DIR"
 
 /usr/bin/xattr -rd com.apple.quarantine "$BIN_ROOT" 2>/dev/null || true
 
+# 等待 macOS Gatekeeper 完成新二进制的验证，否则调用方立即执行会失败
+sleep 3
+
 rm -rf "$SINGBOX_BAK" 2>/dev/null
 rm -f "$TAR_FILE" 2>/dev/null
 
