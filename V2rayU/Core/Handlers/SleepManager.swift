@@ -10,10 +10,15 @@ import AppCenterAnalytics
 
 actor SystemSleepManager {
     static let shared = SystemSleepManager()
+
+    static var workspaceNotificationCenter: NotificationCenter {
+        NSWorkspace.shared.notificationCenter
+    }
     
     public func setup() {
+        let notificationCenter = Self.workspaceNotificationCenter
         // 监听系统即将睡眠的通知
-        NotificationCenter.default.addObserver(
+        notificationCenter.addObserver(
             forName: NSWorkspace.willSleepNotification,
             object: nil,
             queue: .main
@@ -26,7 +31,7 @@ actor SystemSleepManager {
         }
         
         // 监听系统唤醒的通知
-        NotificationCenter.default.addObserver(
+        notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification,
             object: nil,
             queue: .main
