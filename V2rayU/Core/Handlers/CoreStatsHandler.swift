@@ -33,7 +33,8 @@ actor CoreTrafficStatsHandler {
     private var proxyDownLink = 0
 
     var lastUpdate = Date()
-    
+    var lastTrafficUpdate = Date()
+
     init() {}
     
     func resetData() {
@@ -68,10 +69,12 @@ actor CoreTrafficStatsHandler {
         }
     }
 
-    func setTraffic(upLink: Double,downLink: Double) {
+    func setTraffic(upLink: Double, downLink: Double) {
+        let now = Date()
+        guard now.timeIntervalSince(lastTrafficUpdate) >= 1 else { return }
+        lastTrafficUpdate = now
         Task {
-            // 更新到 UI
-            await AppState.shared.setTraffic(upSpeed: upLink/1024, downSpeed: downLink/1024 )
+            await AppState.shared.setTraffic(upSpeed: upLink / 1024, downSpeed: downLink / 1024)
         }
     }
 

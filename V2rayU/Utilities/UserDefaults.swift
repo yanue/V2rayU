@@ -38,6 +38,8 @@ extension UserDefaults {
         case showLatencyOnTray
         // show country flag icon
         case showCountryFlag
+        // status bar refresh interval (seconds)
+        case statusBarRefreshInterval
         // base settings
         // allowLAN
         case allowLAN

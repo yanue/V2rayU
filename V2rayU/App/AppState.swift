@@ -159,8 +159,10 @@ final class AppState: ObservableObject {
     }
 
     func setTraffic(upSpeed: Double, downSpeed: Double) {
-        self.proxyUpSpeed = upSpeed
-        self.proxyDownSpeed = downSpeed
+        Task { @MainActor in
+            self.proxyUpSpeed = upSpeed
+            self.proxyDownSpeed = downSpeed
+        }
     }
 
     func setLatency(latency: Double) {

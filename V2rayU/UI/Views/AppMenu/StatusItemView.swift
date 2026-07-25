@@ -15,12 +15,11 @@ struct StatusItemView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 4) {
-            // 应用图标
             Image(appState.icon)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 18, height: 18)
-                .frame(height: 22, alignment: .center) // 确保图标垂直居中
+                .frame(height: 22, alignment: .center)
             if settings.showLatencyOnTray {
                 HStack(spacing: 4) {
                     if appState.isCoreStarting {
@@ -32,7 +31,6 @@ struct StatusItemView: View {
                         Text("●")
                             .font(.system(size: 10))
                             .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
-                        // 延迟信息
                         Text("\(String(format: "%.0f", appState.latency)) ms")
                             .font(.system(size: 10))
                             .foregroundColor(Color(getSpeedColor(latency: appState.latency)))
@@ -40,7 +38,6 @@ struct StatusItemView: View {
                 }
             }
             if settings.showSpeedOnTray {
-                // 速度信息（两行显示）
                 VStack(alignment: .leading, spacing: 1) {
                     Text("↓ \(String(format: "%.0f", appState.proxyDownSpeed)) KB/s")
                     Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
@@ -49,8 +46,8 @@ struct StatusItemView: View {
                 .foregroundColor(.primary)
             }
         }
-        .frame(width: 120, height: 22, alignment: .trailing)
-        .clipped()
+        .frame(height: 22, alignment: .center)
+        .fixedSize()
         .padding(.horizontal, 4)
     }
 }
@@ -63,14 +60,13 @@ struct CoreStatusItemView: View {
             HStack(spacing: 0) {
                 Image(systemName: appState.v2rayTurnOn ? "wifi" : "wifi.slash")
                     .foregroundColor(Color(appState.v2rayTurnOn ? NSColor.systemGreen : NSColor.systemGray))
-                // 延迟信息
                 Text(" \(String(format: "%.0f", appState.latency)) ms")
                     .font(.system(size: 11))
                     .foregroundColor(Color(appState.v2rayTurnOn ? getSpeedColor(latency: appState.latency) : .systemGray))
             }
-            
+
             Spacer()
-            
+
             HStack{
                 Text("↑ \(String(format: "%.0f", appState.proxyUpSpeed)) KB/s")
                     .font(.system(size: 11))

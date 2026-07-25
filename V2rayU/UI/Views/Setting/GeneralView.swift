@@ -43,7 +43,17 @@ struct GeneralView: View {
             Toggle(String(localized: .AutoUpdateServersFromSubscriptions), isOn: $settings.autoUpdateServers)
             Toggle(String(localized: .AutomaticallySelectFastestServer), isOn: $settings.selectFastestServer)
             Toggle(String(localized: .ShowProxySpeedOnTrayIcon), isOn: $settings.showSpeedOnTray)
-            Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
+            HStack {
+                Toggle(String(localized: .ShowLatencyOnTrayIcon), isOn: $settings.showLatencyOnTray)
+                Picker("", selection: $settings.statusBarRefreshInterval) {
+                    Text("1 s").tag(1)
+                    Text("2 s").tag(2)
+                    Text("3 s").tag(3)
+                    Text("5 s").tag(5)
+                }
+                .menuStyle(.borderlessButton)
+                .frame(width: 60)
+            }
             Toggle(String(localized: .ShowCountryFlagIcon), isOn: $settings.showCountryFlag)
             Toggle(String(localized: .EnableProxyStatistics), isOn: $settings.enableStat)
         }
