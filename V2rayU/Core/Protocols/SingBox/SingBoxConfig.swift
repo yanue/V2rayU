@@ -103,7 +103,7 @@ struct SingboxOutbound: Codable {
     var up_mbps: Int?
     var down_mbps: Int?
     var obfs: Hysteria2ObfsConfig?
-    var hop_interval: Int?
+    var hop_interval: String?
     var outbounds: [String]?
     var `default`: String?
 
@@ -128,7 +128,7 @@ struct SingboxOutbound: Codable {
         up_mbps: Int? = nil,
         down_mbps: Int? = nil,
         obfs: Hysteria2ObfsConfig? = nil,
-        hop_interval: Int? = nil,
+        hop_interval: String? = nil,
         outbounds: [String]? = nil,
         default: String? = nil
     ) {

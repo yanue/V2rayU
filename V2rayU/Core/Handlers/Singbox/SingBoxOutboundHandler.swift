@@ -217,7 +217,7 @@ class SingboxOutboundHandler {
             up_mbps: upMbps,
             down_mbps: downMbps,
             obfs: obfs,
-            hop_interval: hyConfig.hopInterval > 0 ? hyConfig.hopInterval : nil
+            hop_interval: hyConfig.hopInterval > 0 ? "\(hyConfig.hopInterval)s" : nil
         )
     }
 
