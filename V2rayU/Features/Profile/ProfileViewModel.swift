@@ -65,6 +65,7 @@ final class ProfileViewModel: ObservableObject {
     func upsert(item: ProfileEntity) {
         store.upsert(item)
         getList()
+        AppMenuManager.shared.refreshServerItems()
     }
 
     func updateSortOrderInDBAsync() {
@@ -95,6 +96,7 @@ final class ProfileViewModel: ObservableObject {
         }
 
         getList()
+        AppMenuManager.shared.refreshServerItems()
         return toDelete.count
     }
 }

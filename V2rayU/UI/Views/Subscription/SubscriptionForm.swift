@@ -123,6 +123,7 @@ struct SubscriptionFormView: View {
                     item.url = item.url.trimmingCharacters(in: .whitespacesAndNewlines)
                     Task {
                         item.entity.upsert()
+                        AppMenuManager.shared.refreshServerItems()
                         if let callback = onSaveAndSync {
                             callback()
                         }

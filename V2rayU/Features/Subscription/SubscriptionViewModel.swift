@@ -42,11 +42,13 @@ class SubscriptionViewModel: ObservableObject {
         }
         store.delete(uuid: uuid)
         getList()
+        AppMenuManager.shared.refreshServerItems()
     }
 
     func upsert(item: SubscriptionEntity) {
         store.upsert(item)
         getList()
+        AppMenuManager.shared.refreshServerItems()
     }
 
     func updateSortOrderInDBAsync() {

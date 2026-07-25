@@ -251,6 +251,7 @@ class RoutingManager {
         let hasChanges = oldEntity != entity
 
         RoutingStore.shared.upsert(entity)
+        AppMenuManager.shared.refreshRoutingItems()
 
         guard hasChanges,
               AppState.shared.runningRouting == entity.uuid,

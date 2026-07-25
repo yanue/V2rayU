@@ -28,11 +28,13 @@ final class RoutingViewModel: ObservableObject {
     func delete(uuid: String) {
         store.delete(uuid: uuid)
         getList()
+        AppMenuManager.shared.refreshRoutingItems()
     }
 
     func upsert(item: RoutingModel) {
         store.upsert(item.toEntity())
         getList()
+        AppMenuManager.shared.refreshRoutingItems()
     }
 
     func updateSortOrderInDBAsync() {

@@ -561,6 +561,7 @@ struct ImportView: View {
                 resultMessage = String(localized: .ImportSuccessCount, arguments: successCount)
                 resultIsError = false
                 inputText = ""
+                AppMenuManager.shared.refreshServerItems()
             } else {
                 resultMessage = String(localized: .ImportFailedDetail, arguments: "No valid servers found")
                 resultIsError = true
@@ -596,6 +597,7 @@ struct ImportView: View {
             resultMessage = String(localized: .ImportSuccessCount, arguments: successCount)
             resultIsError = false
             inputText = ""
+            AppMenuManager.shared.refreshServerItems()
         } else {
             let errorMsg = errors.first ?? "unknown error"
             resultMessage = String(localized: .ImportFailedDetail, arguments: errorMsg)
@@ -611,6 +613,7 @@ struct ImportView: View {
             resultMessage = String(localized: .ImportSuccessCount, arguments: 1)
             resultIsError = false
             inputText = ""
+            AppMenuManager.shared.refreshServerItems()
         } else {
             isImporting = false
             resultMessage = String(localized: .ImportFailedDetail, arguments: "Invalid JSON config or no proxy outbound found")
@@ -664,6 +667,7 @@ struct ImportView: View {
                         resultMessage = String(localized: .ImportSuccessCount, arguments: successCount)
                         resultIsError = false
                         inputText = ""
+                        AppMenuManager.shared.refreshServerItems()
                     } else {
                         resultMessage = String(localized: .ImportFailedDetail, arguments: "No servers found in subscription")
                         resultIsError = true
