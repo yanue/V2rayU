@@ -27,7 +27,9 @@ final class GithubService: GithubServiceProtocol {
         let url = URL(string: "https://api.github.com/repos/\(repo)/releases?page=\(page)&per_page=\(perPage)")!
         logger.info("fetchReleases: \(url)")
 
-        let (data, _) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 15
+        let (data, _) = try await URLSession.shared.data(for: request)
         
         do {
             let decoder = JSONDecoder()

@@ -800,3 +800,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "PingSuccessFormat" = "Ping succeeded: %@ - %dms";
 "PingFailureRetryFormat" = "Ping failed: %@ - attempt %d: %@";
 "PingCompleteSingleNodeFormat" = "Completed single-node ping: %@";
+"SearchingCompatibleVersion" = "Searching for compatible version…";
+"CompatibleVersionFound" = "Compatible version found: %@";
+"NoCompatibleVersionFound" = "No compatible version of %@ >= %@ found";
+"NoCompatibleVersionFoundRange" = "No compatible version of %@ >= %@ and < %@ found";

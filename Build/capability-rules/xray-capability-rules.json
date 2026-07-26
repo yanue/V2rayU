@@ -455,6 +455,31 @@
       }
     },
     {
+      "key": "security.tls.allowInsecure",
+      "display_name": "TLS allowInsecure",
+      "kind": "Security",
+      "docs_path": "/config/transports/tls.html",
+      "rule": {
+        "type": "removed",
+        "removed_at": "26.1.31",
+        "note": "Xray-core 自 26.1.31 移除 allowInsecure，并于 UTC 2026-06-01 00:00 起硬禁用；请改用 pinnedPeerCertSha256（应用会自动获取证书指纹），获取失败或 Hysteria2 将回退 Sing-Box。"
+      },
+      "evidence": [
+        {
+          "id": "release-v26.2.6-allowinsecure-removed",
+          "kind": "releaseNote",
+          "statement": "Xray-core v26.2.6 release note 明确移除 allowInsecure，迁移到 pinnedPeerCertSha256 / verifyPeerCertByName，并设延时自动禁用至 UTC 2026-06-01。",
+          "source_title": "Xray-core v26.2.6 release notes",
+          "source_url": "https://github.com/XTLS/Xray-core/releases/tag/v26.2.6",
+          "source_version": "26.2.6",
+          "source_date": "2026-02-06",
+          "quote": "TLS 移除了 allowInsecure 配置项，请使用 pinnedPeerCertSha256 和 verifyPeerCertByName 代替",
+          "reviewed_at": "2026-06-01",
+          "note": "首次移除见 v26.1.31；hy2 自签 + pinnedPeerCertSha256 失效见 issue #5655。"
+        }
+      ]
+    },
+    {
       "key": "additional.finalmask",
       "display_name": "FinalMask",
       "kind": "Additional",

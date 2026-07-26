@@ -334,9 +334,9 @@ final class CoreViewModel: ObservableObject {
 
             let msg: String
             if let maxVersion {
-                msg = "未找到 \(kind.displayName) >= \(minVersion) 且 < \(maxVersion) 的发布版本"
+                msg = String(format: String(localized: "NoCompatibleVersionFoundRange"), kind.displayName, minVersion, maxVersion)
             } else {
-                msg = "未找到 \(kind.displayName) >= \(minVersion) 的发布版本"
+                msg = String(format: String(localized: "NoCompatibleVersionFound"), kind.displayName, minVersion)
             }
             compatibilityAutoDownload = .error(msg, kind)
         } catch {

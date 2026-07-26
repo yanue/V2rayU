@@ -221,7 +221,7 @@ struct CoreDownloadView: View {
             HStack(spacing: 10) {
                 ProgressView()
                     .controlSize(.small)
-                Text("正在搜索兼容版本…")
+                Text(String(localized: "SearchingCompatibleVersion"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -234,7 +234,7 @@ struct CoreDownloadView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("找到兼容版本：\(release.tagName)")
+                    Text(String(format: String(localized: "CompatibleVersionFound"), release.tagName))
                         .font(.subheadline)
                         .fontWeight(.medium)
                     Text(release.formattedPublishedAt)

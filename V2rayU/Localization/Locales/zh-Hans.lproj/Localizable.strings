@@ -802,3 +802,7 @@
 "PingFailureRetryFormat" = "Ping 失败: %@ - 第%d次: %@";
 "PingCompleteSingleNodeFormat" = "完成单节点 Ping: %@";
 "Starting..." = "启动中...";
+"SearchingCompatibleVersion" = "正在搜索兼容版本…";
+"CompatibleVersionFound" = "找到兼容版本：%@";
+"NoCompatibleVersionFound" = "未找到 %@ >= %@ 的发布版本";
+"NoCompatibleVersionFoundRange" = "未找到 %@ >= %@ 且 < %@ 的发布版本";
