@@ -26,7 +26,9 @@ final class DownloadViewModel: ObservableObject {
     }
     
     func startDownload(from urlStr: String, version: String, totalSize: Int64? = nil, timeout: Double = 120) {
-        if downloadingUrl == urlStr, downloadingVersion == version, session != nil || isFinished {
+        // 同一 URL/版本 + 下载仍在进行中（session 存活），跳过重复启动。
+        // 已完成或已取消/失败的下载不拦截，允许重试（下面会重置所有状态）。
+        if downloadingUrl == urlStr, downloadingVersion == version, session != nil {
             return
         }
 
