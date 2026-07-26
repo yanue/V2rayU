@@ -26,8 +26,16 @@ final class DownloadViewModel: ObservableObject {
     }
     
     func startDownload(from urlStr: String, version: String, totalSize: Int64? = nil, timeout: Double = 120) {
-        // 同一 URL/版本 + 下载仍在进行中（session 存活），跳过重复启动。
-        // 已完成或已取消/失败的下载不拦截，允许重试（下面会重置所有状态）。
+        // [Fix] #1679 — 只拦截"正在下载中"的重复请求，允许取消/失败后重试。
+        //
+        // 原逻辑: session != nil || isFinished
+        //   问题: 用户取消下载后 isFinished=true、session=nil，
+        //         再次点击下载时 guard 条件为 true，直接 return，
+        //         下面的状态重置代码永远不会执行，导致无法重新下载。
+        //
+        // 修复后: 仅当 session 仍存活（下载进行中）时才跳过，
+        //         已取消/已失败/已完成的下载都会落入下方重置逻辑，
+        //         重新创建 session 并启动下载。
         if downloadingUrl == urlStr, downloadingVersion == version, session != nil {
             return
         }

@@ -32,8 +32,26 @@ struct CoreDownloadView: View {
             versionList
         }
         .padding(16)
-        .onAppear { ensureLoaded(coreTab) }
+        .onAppear {
+            if let activeDownloadKind = vm.activeDownloadKind {
+                selectCore(activeDownloadKind)
+            } else {
+                ensureLoaded(coreTab)
+            }
+        }
         .onChange(of: coreTab) { _, newValue in ensureLoaded(newValue) }
+        .onChange(of: vm.activeDownloadKind) { _, newValue in
+            guard let kind = newValue else { return }
+            selectCore(kind)
+        }
+        .onChange(of: vm.compatibilityAutoDownload) { _, newValue in
+            switch newValue {
+            case .found(_, let kind), .error(_, let kind):
+                selectCore(kind)
+            case .idle, .searching:
+                break
+            }
+        }
     }
 
     // MARK: - 头部
@@ -338,6 +356,13 @@ struct CoreDownloadView: View {
         guard !hasLoaded.contains(kind) else { return }
         hasLoaded.insert(kind)
         vm.fetchPage(1, for: kind)
+    }
+
+    private func selectCore(_ kind: CoreUpdateKind) {
+        if coreTab != kind {
+            coreTab = kind
+        }
+        ensureLoaded(kind)
     }
 }
 

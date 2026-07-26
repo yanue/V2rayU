@@ -358,6 +358,10 @@ final class CoreViewModel: ObservableObject {
             return
         }
 
+        // [Fix] 清除上一次下载/取消/失败残留的 errorMsg 和 showAlert，
+        // 否则用户取消后再次点击下载时，旧的错误弹窗会干扰本次操作。
+        errorMsg = ""
+        showAlert = false
         selectedVersion = version
         activeDownloadKind = kind
         showDownloadDialog = true
@@ -389,10 +393,29 @@ final class CoreViewModel: ObservableObject {
 
     func onDownloadSuccess(filePath: String) {
         let kind = activeDownloadKind ?? .xray
-        // 只把阻塞 I/O（shell 调用 + 版本刷新）移到后台线程，
-        // 其余状态更新和 restart 必须在主线程按原始顺序执行，
-        // 否则 restart 与 UI 状态更新会竞争，导致 toggle 后状态不一致。
-        DispatchQueue.global(qos: .userInitiated).async {
+        // [Fix] #1679 — 核心下载完成后，先停再替换再启动（stop → replace → start）。
+        //
+        // 原流程: 直接在核心运行时替换二进制文件，然后 fire-and-forget 调用 restart()。
+        //   问题: TUN 模式下 TUN 守护进程以 root LaunchDaemon 运行 sing-box，
+        //         替换时旧进程仍在执行，可能导致新版本不生效或版本信息缺失。
+        //
+        // 新流程:
+        //   1) 记录 wasRunning（stop 会将 running 置 false，必须先记录）
+        //   2) stop() 停止核心 + TUN 守护进程，确保无进程占用二进制
+        //   3) 执行 sudo update-*.sh 替换二进制
+        //   4) 刷新版本信息
+        //   5) 若之前在运行，调用 start() 重新拉起核心 + TUN
+        //
+        // 使用 Task.detached 而非 DispatchQueue.global().async，因为步骤 2/4/5 均需
+        // await actor 方法（V2rayLaunch.shared），DispatchQueue 闭包不支持 async。
+        Task.detached { [weak self] in
+            // 1. 先记录运行状态（stop 会将 running 置 false，必须在 stop 之前读取）
+            let wasRunning = await V2rayLaunch.shared.isRunning
+
+            // 2. 停止核心 + TUN，确保没有进程正在使用待替换的二进制
+            await V2rayLaunch.shared.stop()
+
+            // 3. 执行替换脚本（阻塞 I/O，以 root 权限运行）
             var resultMessage: String?
             var resultError: Error?
             do {
@@ -403,6 +426,7 @@ final class CoreViewModel: ObservableObject {
                 resultError = error
             }
 
+            // 4. 刷新版本信息（阻塞 I/O，从新二进制读取版本号）
             var freshXrayVersion: String?
             var freshSingboxVersion: String?
             switch kind {
@@ -412,8 +436,13 @@ final class CoreViewModel: ObservableObject {
                 freshSingboxVersion = getSingboxVersion(refresh: true)
             }
 
-            // 回到主线程，按原始生命周期顺序执行所有后续操作
-            DispatchQueue.main.async { [weak self] in
+            // 5. 重新启动核心（仅在替换前处于运行状态时）
+            if wasRunning {
+                await V2rayLaunch.shared.start()
+            }
+
+            // 5. 回到主线程更新 UI
+            await MainActor.run { [weak self] in
                 guard let self else { return }
                 if let error = resultError {
                     self.errorMsg = error.localizedDescription
@@ -426,8 +455,6 @@ final class CoreViewModel: ObservableObject {
                 self.showAlert = true
                 self.showDownloadDialog = false
                 self.activeDownloadKind = nil
-                // restart 放在最后，与原始代码一致：先完成状态更新，再触发重启
-                Task { await V2rayLaunch.shared.restart() }
             }
         }
     }

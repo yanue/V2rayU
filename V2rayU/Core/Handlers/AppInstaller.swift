@@ -196,6 +196,7 @@ actor AppInstaller: NSObject {
         let coreUpdateScripts = ["update-xray.sh", "update-singbox.sh"]
         for scriptName in coreUpdateScripts {
             let updateScript = AppBinRoot + "/" + scriptName
+            let bundledScript = AppResourcesPath + "/" + scriptName
             if !needRunInstall && !fileMgr.fileExists(atPath: updateScript) {
                 logger.info("\(updateScript) not exists")
                 installReason = "\(scriptName) missing"
@@ -204,6 +205,11 @@ actor AppInstaller: NSObject {
             if !needRunInstall && !fileMgr.isExecutableFile(atPath: updateScript) {
                 logger.info("\(updateScript) not executable")
                 installReason = "\(scriptName) not executable"
+                needRunInstall = true
+            }
+            if !needRunInstall && fileMgr.fileExists(atPath: bundledScript) && !fileMgr.contentsEqual(atPath: bundledScript, andPath: updateScript) {
+                logger.info("\(updateScript) differs from bundled \(scriptName)")
+                installReason = "\(scriptName) out of date"
                 needRunInstall = true
             }
         }

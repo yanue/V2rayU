@@ -38,9 +38,11 @@ rollback() {
 }
 
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/v2rayu-singbox.XXXXXX")" || die "mktemp failed"
+NEW_BIN=""
 
 cleanup() {
     rm -rf "$TMP_DIR" 2>/dev/null
+    [ -n "$NEW_BIN" ] && rm -f "$NEW_BIN" 2>/dev/null
 }
 
 trap cleanup EXIT INT TERM
@@ -55,13 +57,17 @@ SRC="$(find "$TMP_DIR" -type f -name sing-box 2>/dev/null | head -n 1)"
 [ -n "$SRC" ] && [ -f "$SRC" ] || rollback "binary not found after untar"
 
 DST="${SINGBOX_DIR}/${SINGBOX_BIN}"
-cp -f "$SRC" "$DST" || rollback "replace binary failed"
+NEW_BIN="${SINGBOX_DIR}/${SINGBOX_BIN}.new.$$"
 
-[ -f "$DST" ] || rollback "binary not found after replace: $DST"
-chmod 755 "$DST" || rollback "chmod binary failed"
+# Do not write into DST directly. In TUN mode the root LaunchDaemon may still be
+# executing this file, and macOS can reject in-place writes with ETXTBSY.
+cp -f "$SRC" "$NEW_BIN" || rollback "stage binary failed"
+[ -f "$NEW_BIN" ] || rollback "staged binary not found: $NEW_BIN"
+chmod 755 "$NEW_BIN" || rollback "chmod staged binary failed"
+chown root:wheel "$NEW_BIN" || rollback "chown staged binary failed"
 
 if command -v file >/dev/null 2>&1; then
-    FILE_INFO="$(file "$DST" 2>/dev/null)"
+    FILE_INFO="$(file "$NEW_BIN" 2>/dev/null)"
     case "$(uname -m)" in
         arm64)
             echo "$FILE_INFO" | grep -q "arm64" || rollback "binary arch mismatch: $FILE_INFO"
@@ -71,6 +77,10 @@ if command -v file >/dev/null 2>&1; then
             ;;
     esac
 fi
+
+mv -f "$NEW_BIN" "$DST" || rollback "replace binary failed"
+
+[ -f "$DST" ] || rollback "binary not found after replace: $DST"
 
 chown -R root:wheel "$SINGBOX_DIR"
 chmod -R 755 "$SINGBOX_DIR"
