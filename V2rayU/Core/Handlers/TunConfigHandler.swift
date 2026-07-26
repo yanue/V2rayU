@@ -1,6 +1,29 @@
 import Foundation
 
+/// TUN 配置生成器。
+///
+/// ## 流量路径
+///
+/// ```
+/// 应用 → TUN → 路由分流
+///              ├─ process_name (xray/sing-box) → direct（绕过 TUN）
+///              ├─ hijack-dns → DNS 分流（代理域名/cn → 直连，其他 → 代理）
+///              ├─ sniff → 协议检测（提取 SNI/Host，使域名路由生效）
+///              └─ default → SOCKS proxy
+/// ```
+///
+/// ## DNS 死锁防护
+///
+/// 代理核心（xray）用域名连远端时需要 DNS。若 DNS 被 hijack-dns 劫持走代理
+/// （remote-dns），而 xray 就是那个代理 → 循环死锁。
+///
+/// 防护（任一生效即可）：
+/// 1. route.process_name → direct（macOS 上 UDP 匹配不可靠）
+/// 2. DNS.proxyServerDomains → local-dns 直连（兜底）
+/// 3. 系统 DNS 1.1.1.1（绕过 TUN 的流量）
 enum TunConfigHandler {
+    /// 核心进程名（xray/sing-box），始终走 direct 出站。
+    /// 这些进程的流量必须绕过 TUN，否则其 DNS 查询会被 hijack-dns 劫持形成死锁。
     private static let coreDirectProcessNames = [
         "xray", "xray-64", "xray-arm64",
         "v2ray", "v2ray-core",
@@ -87,6 +110,16 @@ enum TunConfigHandler {
         "^\(NSRegularExpression.escapedPattern(for: path))/"
     }
 
+    /// 构建进程级路由规则。
+    ///
+    /// 规则顺序：
+    ///   1. coreDirectProcessNames → direct（核心进程始终直连，防 DNS 死锁）
+    ///   2. directApplicationPaths → direct（用户指定直连的应用路径）
+    ///   3. directProcessNames → direct（用户指定直连的进程名）
+    ///   4. proxyApplicationPaths → proxy（用户指定走代理的应用路径）
+    ///   5. proxyProcessNames → proxy（用户指定走代理的进程名）
+    ///
+    /// 注意：coreDirectProcessNames 会自动排除用户在 direct 列表中重复配置的进程名。
     static func buildProcessRouteRules(
         directRawValue: String,
         proxyRawValue: String,
@@ -268,6 +301,26 @@ enum TunConfigHandler {
         return addresses
     }
 
+    /// 收集所有 profile 的代理服务器域名（排除 IP 地址），用于 TUN DNS 分流。
+    ///
+    /// 这些域名会被添加到 DNS 规则中，优先走 local-dns（直连解析），
+    /// 确保代理核心的 DNS 查询不被 hijack-dns 劫持走 remote-dns（通过代理），避免循环死锁。
+    ///
+    /// 规则顺序：proxyServerDomains > geosite:cn > localhost > final:remote-dns
+    static func proxyServerDomains() -> [String] {
+        let profiles = ProfileStore.shared.fetchAll()
+        var domains: [String] = []
+        var seen = Set<String>()
+        for profile in profiles {
+            let server = profile.address.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !server.isEmpty,
+                  !isIPAddressLiteral(server),
+                  seen.insert(server).inserted else { continue }
+            domains.append(server)
+        }
+        return domains
+    }
+
     static func buildTunConfig() -> String {
         var singbox = SingboxStruct()
 
@@ -334,24 +387,40 @@ enum TunConfigHandler {
             singbox.outbounds = [socksOutbound, directOutbound]
         }
 
-        // DNS 分流: 国内域名走 local-dns, 海外域名走 remote-dns（通过代理）
+        // MARK: - DNS 配置
+        //
+        // TUN 捕获所有 DNS 查询（UDP:53），hijack-dns 交给 sing-box DNS 引擎分流：
+        //   代理服务器域名 → local-dns（直连，防死锁）
+        //   geosite:cn     → local-dns（国内域名，低延迟）
+        //   其他            → remote-dns（通过代理，海外域名）
+        //
+        // 系统 DNS 设为 1.1.1.1，仅对绕过 TUN 的流量生效（process_name direct 匹配的流量）。
         let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
         let dnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
         let useNewDns = SingboxVersionCheck.supportsNewDnsFormat()
+        let proxyDomains = TunConfigHandler.proxyServerDomains()
 
         if useNewDns {
             let isIP = isIPAddressLiteral(dnsRemote)
             var remoteDns = DNSServer(tag: "remote-dns", type: "tcp", server: dnsRemote, detour: "proxy")
             if !isIP { remoteDns.domain_resolver = "local-dns" }
+            var dnsRules = [DNSRule]()
+            // DNS 规则按优先级从高到低排列（顺序匹配，第一条命中即停）：
+            // 1. 代理服务器域名 → local-dns：防死锁（即使被 hijack-dns 劫持也能直连解析）
+            // 2. geosite:cn → local-dns：国内域名直连，低延迟
+            // 3. localhost/local → local-dns：本地域名直连
+            // 4. final: remote-dns：其他域名走代理（海外域名）
+            if !proxyDomains.isEmpty {
+                dnsRules.append(DNSRule(server: "local-dns", domain: proxyDomains))
+            }
+            dnsRules.append(DNSRule(server: "local-dns", geosite: ["cn"], strategy: "prefer_ipv4"))
+            dnsRules.append(DNSRule(server: "local-dns", domain: ["localhost", "local"]))
             singbox.dns = DNSConfig(
                 servers: [
                     remoteDns,
                     DNSServer(tag: "local-dns", type: "udp", server: dnsChina),
                 ],
-                rules: [
-                    DNSRule(server: "local-dns", geosite: ["cn"], strategy: "prefer_ipv4"),
-                    DNSRule(server: "local-dns", domain: ["localhost", "local"]),
-                ],
+                rules: dnsRules,
                 final: "remote-dns",
                 independent_cache: true,
                 strategy: "prefer_ipv4"
@@ -360,26 +429,40 @@ enum TunConfigHandler {
             let isIP = isIPAddressLiteral(dnsRemote)
             var remoteDns = DNSServer(tag: "remote-dns", detour: "proxy", address: "tcp://\(dnsRemote)")
             if !isIP { remoteDns.address_resolver = "local-dns" }
+            var dnsRules = [DNSRule]()
+            if !proxyDomains.isEmpty {
+                dnsRules.append(DNSRule(server: "local-dns", domain: proxyDomains))
+            }
+            dnsRules.append(DNSRule(server: "local-dns", geosite: ["cn"]))
+            dnsRules.append(DNSRule(server: "local-dns", domain: ["localhost", "local"]))
             singbox.dns = DNSConfig(
                 servers: [
                     remoteDns,
                     DNSServer(tag: "local-dns", address: "udp://\(dnsChina)"),
                 ],
-                rules: [
-                    DNSRule(server: "local-dns", geosite: ["cn"]),
-                    DNSRule(server: "local-dns", domain: ["localhost", "local"]),
-                ],
+                rules: dnsRules,
                 final: "remote-dns",
                 independent_cache: true
             )
         }
 
+        // MARK: - Route 规则(这里主要针对tun)
+        //
+        // 路由规则按顺序匹配，第一条命中即停：
+        //   1. process_name → direct：核心进程（xray/sing-box）的流量绕过 TUN，避免 DNS 死锁
+        //   2. hijack-dns：劫持所有 DNS 查询，交给 sing-box DNS 引擎按上述 DNS rules 分流
+        //   3. sniff：协议检测（TLS/HTTP），用于更精确的路由匹配
+        //   4. default：其余流量走 SOCKS proxy（默认出站）
+        //
+        // 为什么 process_name 必须在 hijack-dns 之前？
+        //   如果顺序反过来，xray 的 DNS 查询会被 hijack-dns 劫持 → 走 remote-dns (via proxy) →
+        //   但 xray 就是那个 proxy，还没连上远端，无法转发 → 死锁。
+        //
+        // 为什么还需要 DNS.proxyServerDomains 兜底？
+        //   macOS 上 process_name 对 UDP DNS 包的匹配不可靠，xray 的 DNS 查询可能跳过
+        //   process_name 规则直接命中 hijack-dns。DNS 规则确保即使被劫持，代理服务器域名
+        //   也能走 local-dns 直连解析，打破循环。
         var tunRules: [RouteRule] = []
-        if useSniffRuleAction {
-            tunRules.append(RouteRule(action: "sniff"))
-        }
-        // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效
-        tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
         let directProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
         let proxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
         let directApplicationPaths = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
@@ -390,6 +473,12 @@ enum TunConfigHandler {
             directApplicationPaths: directApplicationPaths,
             proxyApplicationPaths: proxyApplicationPaths
         ))
+        // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效（仅影响非核心进程）
+        tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
+        // sniff
+        if useSniffRuleAction {
+            tunRules.append(RouteRule(action: "sniff"))
+        }
         // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(
             auto_detect_interface: true,

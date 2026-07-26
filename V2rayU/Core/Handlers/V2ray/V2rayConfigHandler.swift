@@ -601,7 +601,7 @@ class V2rayConfigHandler {
                 clientIP: nil,
                 queryStrategy: nil
             )
-            servers.append(.detailed(detail))
+            servers.insert(.detailed(detail), at: 0)
         }
         dns.servers = servers
     }
