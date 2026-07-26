@@ -13,6 +13,9 @@ import GRDB
 final class ProfileViewModel: ObservableObject {
     @Published var list: [ProfileEntity] = []
     @Published var groups: [String] = []
+    /// 预计算的分组名称映射：profile.uuid → 分组显示名。
+    /// 在 getList() 中一次性构建，后续过滤/排序无需逐条查询数据库。
+    @Published var groupNameMap: [String: String] = [:]
 
     private let store = ProfileStore.shared
     private let subscriptionStore = SubscriptionStore.shared
@@ -23,28 +26,32 @@ final class ProfileViewModel: ObservableObject {
 
     @MainActor
     func getList() {
-        list = store.fetchAll()
-        computeGroups()
-    }
-
-    @MainActor
-    private func computeGroups() {
+        // 批量查询订阅和服务器列表，后续不再逐条查询数据库
         let subscriptions = subscriptionStore.fetchAll()
-        var groupNames: [String: String] = [:]
+        let subNameLookup: [String: String] = Dictionary(
+            subscriptions.map { ($0.uuid, $0.remark.isEmpty ? $0.url : $0.remark) },
+            uniquingKeysWith: { first, _ in first }
+        )
 
-        for sub in subscriptions {
-            groupNames[sub.uuid] = sub.remark.isEmpty ? sub.url : sub.remark
-        }
+        list = store.fetchAll()
 
+        // 构建 groupNameMap，替代旧的逐条 SubscriptionStore.fetchOne 查询
+        var map: [String: String] = [:]
         var uniqueGroups: Set<String> = []
+        let defaultGroup = String(localized: .DefaultGroup)
         for profile in list {
             if profile.subid.isEmpty {
-                uniqueGroups.insert(String(localized: .DefaultGroup))
-            } else if let name = groupNames[profile.subid], !name.isEmpty {
+                map[profile.uuid] = defaultGroup
+                uniqueGroups.insert(defaultGroup)
+            } else if let name = subNameLookup[profile.subid], !name.isEmpty {
+                map[profile.uuid] = name
                 uniqueGroups.insert(name)
+            } else {
+                map[profile.uuid] = profile.subid
+                uniqueGroups.insert(profile.subid)
             }
         }
-
+        groupNameMap = map
         groups = Array(uniqueGroups).sorted()
     }
 

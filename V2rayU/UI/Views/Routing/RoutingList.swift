@@ -35,7 +35,8 @@ struct RoutingListView: View {
     }
 
     private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
-        // Avoid mutating SwiftUI view state while AppKit context menu is dismissing.
+        // 避免在 AppKit 右键菜单关闭过程中修改 SwiftUI 状态，
+        // 否则可能触发 AttributeGraph 崩溃。
         DispatchQueue.main.async(execute: action)
     }
 
@@ -222,7 +223,11 @@ struct RoutingListView: View {
                         }
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
-                    .onTapGesture() { selectedRow = RoutingModel(from: row) }
+                    .onTapGesture() {
+                        performAfterMenuDismiss {
+                            selectedRow = RoutingModel(from: row)
+                        }
+                    }
                     .onHover { inside in
                         if inside {
                             NSCursor.pointingHand.push()

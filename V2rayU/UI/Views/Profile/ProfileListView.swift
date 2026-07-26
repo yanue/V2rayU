@@ -54,7 +54,7 @@ struct ProfileListView: View {
 
     var filteredAndSortedItems: [ProfileEntity] {
         let filteredItems = viewModel.list.filter { item in
-            let itemGroupName = getGroupName(for: item)
+            let itemGroupName = viewModel.groupNameMap[item.uuid] ?? item.subid
             return (selectGroup.isEmpty || selectGroup == itemGroupName) &&
                 (searchText.isEmpty ||
                  item.address.lowercased().contains(searchText.lowercased()) ||
@@ -65,16 +65,6 @@ struct ProfileListView: View {
         return filteredItems.sorted(using: sortOrder)
     }
 
-    private func getGroupName(for item: ProfileEntity) -> String {
-        if item.subid.isEmpty {
-            return String(localized: .DefaultGroup)
-        }
-        if let sub = SubscriptionStore.shared.fetchOne(uuid: item.subid) {
-            return sub.remark.isEmpty ? sub.url : sub.remark
-        }
-        return item.subid
-    }
-
     private func resolveSelectedItems(for item: ProfileEntity) -> [ProfileEntity] {
         if selection.contains(item.uuid) && selection.count > 1 {
             return filteredAndSortedItems.filter { selection.contains($0.uuid) }
@@ -83,8 +73,8 @@ struct ProfileListView: View {
     }
 
     private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
-        // Avoid mutating SwiftUI state while AppKit menus/context menus are
-        // still dismissing. Doing so can trigger AttributeGraph crashes.
+        // 避免在 AppKit 菜单/右键菜单关闭过程中修改 SwiftUI 状态，
+        // 否则可能触发 AttributeGraph 崩溃。
         DispatchQueue.main.async(execute: action)
     }
 
@@ -290,11 +280,9 @@ struct ProfileListView: View {
 
     @ViewBuilder
     private func contextMenuProvider(item: ProfileEntity) -> some View {
-        // NOTE: Avoid creating ObservableObject (ProfileModel) or doing heavy
-        // computation in the contextMenu view builder — SwiftUI may re-evaluate
-        // it during AttributeGraph updates, which causes crashes when new
-        // ObservableObject instances are created each time.  Defer all such
-        // work into the Button actions instead.
+        // 注意：避免在 contextMenu 的 view builder 中创建 ObservableObject（ProfileModel）
+        // 或执行大量计算 — SwiftUI 可能在 AttributeGraph 更新过程中重新求值，
+        // 每次创建新的 ObservableObject 实例会导致崩溃。将此类操作延迟到 Button 的 action 中执行。
         let isMultiSelect = selection.contains(item.uuid) && selection.count > 1
 
         Group {
@@ -473,7 +461,11 @@ struct ProfileListView: View {
                         }
                     }
                     .contentShape(Rectangle())
-                    .onTapGesture { activeSheet = .edit(ProfileModel(from: row)) }
+                    .onTapGesture {
+                        performAfterMenuDismiss {
+                            activeSheet = .edit(ProfileModel(from: row))
+                        }
+                    }
                     .onHover { inside in
                         if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
                     }

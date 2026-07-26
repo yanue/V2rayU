@@ -285,7 +285,11 @@ struct CombinedConfigListView: View {
                     }
                 }
                 .contentShape(Rectangle())
-                .onTapGesture { editingItem = row }
+                .onTapGesture {
+                    performAfterMenuDismiss {
+                        editingItem = row
+                    }
+                }
                 .onHover { inside in
                     if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
                 }

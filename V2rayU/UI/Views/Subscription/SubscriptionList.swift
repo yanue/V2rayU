@@ -35,8 +35,8 @@ struct SubscriptionListView: View {
     }
 
     private func performAfterMenuDismiss(_ action: @escaping () -> Void) {
-        // Avoid mutating SwiftUI state while AppKit context menus are still
-        // dismissing. Doing so can trigger AttributeGraph crashes.
+        // 避免在 AppKit 右键菜单关闭过程中修改 SwiftUI 状态，
+        // 否则可能触发 AttributeGraph 崩溃。
         DispatchQueue.main.async(execute: action)
     }
 
@@ -273,7 +273,11 @@ struct SubscriptionListView: View {
                         Text(row.remark)
                     }
                     .contentShape(Rectangle())   // 扩大点击/拖拽区域
-                    .onTapGesture() { selectedRow = SubscriptionModel(from: row) }
+                    .onTapGesture() {
+                        performAfterMenuDismiss {
+                            selectedRow = SubscriptionModel(from: row)
+                        }
+                    }
                     .onHover { inside in
                         if inside {
                             NSCursor.pointingHand.push()

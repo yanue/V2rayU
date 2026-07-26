@@ -59,6 +59,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var cancellables = Set<AnyCancellable>()
     private weak var statusMenu: NSMenu?
 
+    // 缓存：避免在 updateMenuTitles / coreTitle 等热路径中重复执行同步 DB 查询
+    private var cachedServerCount: Int = 0
+    private var cachedCombos: [CombinedConfigEntity] = []
+
     override private init() {
         super.init()
         // 监听窗口失去焦点时重置状态栏高亮（修复多显示器下高亮状态卡住问题 #1636）
@@ -149,6 +153,10 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         guard inited else { return }
         serverSubMenu = getServerSubMenus()
         serverItem.submenu = serverSubMenu
+        // getServerSubMenus() 内部已获取完整数据，此处缓存 count 供 updateMenuTitles 使用
+        cachedServerCount = ProfileStore.shared.fetchAll().count
+        let title = cachedServerCount > 0 ? "\(String(localized: .ServerList)) (\(cachedServerCount))" : String(localized: .ServerList)
+        serverItem.title = title
     }
 
     func refreshRoutingItems() {
@@ -190,16 +198,14 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         updateMenuTitles()
     }
 
-    /// Populate server & routing menus from database.
-    /// Must be called AFTER AppInstaller.checkInstall() so that the
-    /// database directory exists and has correct permissions.
+    /// 从数据库加载服务器和路由菜单。
+    /// 必须在 AppInstaller.checkInstall() 之后调用，确保数据库目录已创建且权限正确。
     func loadDatabaseMenus() {
         refreshServerItems()
         refreshRoutingItems()
-        // Update server count in title
-        let count = ProfileStore.shared.fetchAll().count
-        if count > 0 {
-            serverItem.title = "\(String(localized: .ServerList)) (\(count))"
+        // 刷新后 cachedServerCount 已更新，直接使用缓存值
+        if cachedServerCount > 0 {
+            serverItem.title = "\(String(localized: .ServerList)) (\(cachedServerCount))"
         }
     }
 
@@ -212,7 +218,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         let coreName: String
         if !AppState.shared.runningCombination.isEmpty,
-           let combo = CombinedConfigStore.shared.fetchOne(uuid: AppState.shared.runningCombination) {
+           let combo = cachedCombos.first(where: { $0.uuid == AppState.shared.runningCombination }) {
             if let forced = combo.coreType?.forcedCoreType {
                 coreName = forced.displayName
             } else {
@@ -324,8 +330,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         helpItem?.title = String(localized: .Help)+" (Xray \(xrayVer) | Singbox \(singBoxVer))"
         quitItem?.title = String(localized: .Quit)
         routingItem?.title = String(localized: .RoutingList)
-        let serverCount = ProfileStore.shared.fetchAll().count
-        serverItem?.title = serverCount > 0 ? "\(String(localized: .ServerList)) (\(serverCount))" : String(localized: .ServerList)
+        serverItem?.title = cachedServerCount > 0 ? "\(String(localized: .ServerList)) (\(cachedServerCount))" : String(localized: .ServerList)
     }
 
 
@@ -537,8 +542,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     func getServerItem() -> NSMenuItem {
         serverSubMenu = getServerSubMenus()
-        let count = ProfileStore.shared.fetchAll().count
-        let title = count > 0 ? "\(String(localized: .ServerList)) (\(count))" : String(localized: .ServerList)
+        let title = cachedServerCount > 0 ? "\(String(localized: .ServerList)) (\(cachedServerCount))" : String(localized: .ServerList)
         let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = serverSubMenu
         return item
@@ -550,6 +554,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
         // 组合配置列表放在顶部
         let combos = CombinedConfigStore.shared.fetchAll()
+        cachedCombos = combos  // 缓存供 coreTitle() 使用，避免重复查询
         for combo in combos {
             let isActive = combo.uuid == AppState.shared.runningCombination
             let comboColor = CombinationColor(rawValue: combo.colorName) ?? .blue
