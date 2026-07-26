@@ -33,11 +33,32 @@ func shell(launchPath: String, arguments: [String]) -> String? {
     }
 }
 
-enum CommandExecutionError: Error {
+enum CommandExecutionError: Error, LocalizedError, CustomStringConvertible {
     case fileNotFound(String)
     case insufficientPermissions(String)
     case executionFailed(String, Int32) // stderr + exit code
     case unknown(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .fileNotFound(let path):
+            return "Command not found: \(path)"
+        case .insufficientPermissions(let path):
+            return "Insufficient permissions to run command: \(path)"
+        case .executionFailed(let output, let exitCode):
+            let message = output.trimmingCharacters(in: .whitespacesAndNewlines)
+            if message.isEmpty {
+                return "Command failed with exit code \(exitCode)"
+            }
+            return "Command failed with exit code \(exitCode): \(message)"
+        case .unknown(let error):
+            return error.localizedDescription
+        }
+    }
+
+    var description: String {
+        errorDescription ?? "Command execution failed"
+    }
 }
 
 func runCommand(at path: String, with arguments: [String]) throws -> String {
@@ -66,6 +87,8 @@ func runCommand(at path: String, with arguments: [String]) throws -> String {
         }
 
         return output
+    } catch let error as CommandExecutionError {
+        throw error
     } catch {
         if (error as NSError).domain == NSCocoaErrorDomain {
             switch (error as NSError).code {
