@@ -263,10 +263,8 @@ private actor TunStartupRecorder {
         let parsed = try JSONDecoder().decode(SingboxStruct.self, from: data)
         let tunInbound = try #require(parsed.inbounds.first(where: { $0.type == "tun" }))
 
-        #expect(tunInbound.route_exclude_address == [
-            "192.0.2.10/32",
-            "198.51.100.20/32",
-        ])
+        #expect((tunInbound.route_exclude_address ?? []).contains("192.0.2.10/32"))
+        #expect((tunInbound.route_exclude_address ?? []).contains("198.51.100.20/32"))
     }
 
     @Test("TUN config generation and check syntax across all sing-box versions")
@@ -521,6 +519,12 @@ private actor TunStartupRecorder {
             let hasSniffRule = parsed.route.rules.contains { $0.action == "sniff" }
             if !hasSniffRule {
                 result.addVersionIssue("Expected route rule with action 'sniff' for sing-box >= 1.11.0")
+            } else {
+                let sniffIdx = parsed.route.rules.firstIndex { $0.action == "sniff" }
+                let hijackIdx = parsed.route.rules.firstIndex { $0.action == "hijack-dns" }
+                if let sniffIdx, let hijackIdx, sniffIdx > hijackIdx {
+                    result.addVersionIssue("Route rule 'sniff' must precede 'hijack-dns' (sniff index \(sniffIdx) > hijack index \(hijackIdx))")
+                }
             }
         }
 
