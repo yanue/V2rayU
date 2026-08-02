@@ -449,12 +449,31 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         let item = NSMenuItem()
         // 创建一个 HostingView 并赋给 menu item 的 view
         let coreHosting = NSHostingView(rootView: CoreStatusItemView())
+        // 提前触发 SwiftUI 首次布局+渲染，否则首次打开菜单时顶部该项空白：
+        // NSHostingView 的内容直到第一次真实显示才会 materialize（第二次点击才恢复），
+        // macOS 26+ 的新菜单渲染让该问题更明显。
+        prerenderForMenu(coreHosting)
         // 给 hosting view 一个合理的固有大小（根据视图内容微调）
         coreHosting.translatesAutoresizingMaskIntoConstraints = false
-        coreHosting.frame = NSRect(x: 0, y: 0, width: 220, height: 40)
         item.view = coreHosting
         item.isEnabled = false
         return item
+    }
+
+    /// 在离屏窗口中强制完成 NSHostingView 的首次布局与渲染，
+    /// 避免菜单项首次显示时内容为空。
+    private func prerenderForMenu(_ hosting: NSHostingView<CoreStatusItemView>) {
+        let frame = hosting.frame
+        // 根据内容计算理想尺寸，触发 SwiftUI 布局
+        let fittingSize = hosting.fittingSize
+        hosting.frame = NSRect(x: 0, y: 0, width: max(frame.width, fittingSize.width), height: max(frame.height, fittingSize.height))
+        // 放入离屏窗口走一遍完整的布局+绘制流程，生成 layer 内容
+        let window = NSWindow(contentRect: hosting.frame, styleMask: .borderless, backing: .buffered, defer: false)
+        window.contentView = hosting
+        window.layoutIfNeeded()
+        hosting.layoutSubtreeIfNeeded()
+        hosting.displayIfNeeded()
+        window.contentView = nil
     }
 
     func getViewFilesMenu() -> NSMenuItem {
