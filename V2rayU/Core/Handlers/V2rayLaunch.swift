@@ -162,6 +162,13 @@ actor V2rayLaunch {
         await stopAll()
     }
 
+    /// 睡眠前停止 TUN（daemon + 恢复 DNS）。与 start/stop/restart 共用串行锁,
+    /// 避免唤醒时 restart() 与 DNS 恢复操作交错; 唤醒后由 restart() 重建。
+    func stopTunForSleep() async {
+        await lock(); defer { unlock() }
+        await stopTun()
+    }
+
     /// 完整重启（先全停后全启）。供端口/核心二进制等"影响全部"的设置变更使用。
     @discardableResult
     func restart() async -> Bool {
@@ -644,6 +651,9 @@ actor V2rayLaunch {
     // MARK: - DNS management
 
     nonisolated(unsafe) private static var savedOriginalDns: [String] = []
+    /// 本进程内是否真正设置过 TUN DNS。只有设置过才允许恢复/清除，
+    /// 避免非 TUN 模式启动/停止时误清用户手动配置的 DNS。
+    nonisolated(unsafe) private static var tunDnsWasSet = false
 
     /// 读取当前系统 DNS
     nonisolated private static func readCurrentDns() -> [String] {
@@ -660,10 +670,16 @@ actor V2rayLaunch {
 
     /// 启动时覆盖系统 DNS 为防污染解析器（通过 V2rayUTool 提权）
     nonisolated static func setupTunDns() {
-        let current = readCurrentDns()
-        savedOriginalDns = current
-
         let dnsServer = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+        var current = readCurrentDns()
+        // 若当前 DNS 恰好等于我们上次设置的 tunDnsRemote（崩溃残留），
+        // 无法恢复原始值，视为"原始=DHCP"，停止时恢复为 DHCP 兜底。
+        if current == [dnsServer] {
+            current = []
+        }
+        savedOriginalDns = current
+        tunDnsWasSet = true
+
         if (try? runCommand(at: v2rayUTool, with: ["-dns-setup", dnsServer])) != nil {
             logger.info("DNS set to \(dnsServer)")
         } else {
@@ -671,8 +687,14 @@ actor V2rayLaunch {
         }
     }
 
-    /// 停止时恢复原始 DNS
+    /// 停止时恢复原始 DNS。仅当本进程内确实设置过 TUN DNS 时才生效，
+    /// 否则直接跳过，防止误清用户手动 DNS。
     nonisolated static func restoreTunDns() {
+        guard tunDnsWasSet else {
+            logger.info("restoreTunDns skip: no TUN DNS was set in this session")
+            return
+        }
+        tunDnsWasSet = false
         defer { savedOriginalDns = [] }
         if savedOriginalDns.isEmpty {
             // 原始 DNS 为空（DHCP），清除手动设置恢复 DHCP

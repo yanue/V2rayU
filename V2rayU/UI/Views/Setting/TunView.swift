@@ -138,19 +138,6 @@ struct TunView: View {
                     }
                 }
 
-                HStack {
-                    Spacer().frame(width: labelWidth)
-                    Toggle(isOn: $settings.tunAutoRebuild) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: .TunAutoRebuild))
-                            Text(String(localized: .TunAutoRebuildTip))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    Spacer()
-                }
-
                 HStack(alignment: .top) {
                     getTextLabel(label: .TunRouteExcludeHosts, labelWidth: labelWidth)
                     VStack(alignment: .leading, spacing: 4) {

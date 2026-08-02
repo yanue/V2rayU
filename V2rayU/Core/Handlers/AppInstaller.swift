@@ -227,10 +227,12 @@ actor AppInstaller: NSObject {
             // 使用 sudo -n -l <command> 验证具体命令是否被 NOPASSWD 授权
             let testStart = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", "/bin/launchctl", "start", "yanue.v2rayu.tun-helper"])
             let testStop = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", "/bin/launchctl", "stop", "yanue.v2rayu.tun-helper"])
+            let testKill = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "-l", "/bin/launchctl", "kill", "SIGKILL", "system/yanue.v2rayu.tun-helper"])
             let startOk = testStart != nil && testStart!.contains("/bin/launchctl")
             let stopOk = testStop != nil && testStop!.contains("/bin/launchctl")
-            if !startOk || !stopOk {
-                logger.info("sudoers NOPASSWD not effective for launchctl: start=\(startOk), stop=\(stopOk)")
+            let killOk = testKill != nil && testKill!.contains("/bin/launchctl")
+            if !startOk || !stopOk || !killOk {
+                logger.info("sudoers NOPASSWD not effective for launchctl: start=\(startOk), stop=\(stopOk), kill=\(killOk)")
                 installReason = "sudoers rules incorrect"
                 needRunInstall = true
             }

@@ -777,8 +777,6 @@
 "ApplicationBundleRule" = "匹配此應用程式內的全部程序";
 "ProcessOnlyRule" = "僅程序名稱：%@";
 "NoProcessRules" = "尚未加入應用程式或程序規則";
-"TunAutoRebuild" = "網路變化後自動重建 TUN";
-"TunAutoRebuildTip" = "切換 Wi-Fi / 喚醒後自動重建隧道，避免路由失效導致斷線";
 "TunLogLevel" = "TUN 日誌級別";
 "TunEnableIPv6" = "啟用 IPv6";
 "TunEnableIPv6Tip" = "為 TUN 介面添加 IPv6 位址讓 IPv6 流量通過隧道。";

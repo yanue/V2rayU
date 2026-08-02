@@ -55,8 +55,8 @@ actor SystemSleepManager {
         let turnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
         let mode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .tun)
         if turnOn && mode == .tun {
-            logger.info("willSleep: stop tun-helper to avoid stale route on wake")
-            await TunHandler.shared.stop()
+            logger.info("willSleep: stop tun-helper + restore DNS to avoid stale route on wake")
+            await V2rayLaunch.shared.stopTunForSleep()
         }
         // 记录睡眠
         logEvent(source: "sleep")

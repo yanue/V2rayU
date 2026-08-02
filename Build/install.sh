@@ -149,6 +149,8 @@ cat > "$TMPFILE" << 'SUDOERS_EOF'
 # tun-helper daemon 控制 (LaunchAgent.swift: startTunHelper / stopTunHelper)
 __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl start yanue.v2rayu.tun-helper
 __USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl stop yanue.v2rayu.tun-helper
+# tun-helper 卡死时的 SIGKILL 兜底
+__USERNAME__ ALL=(root) NOPASSWD: /bin/launchctl kill *
 # xray-core 更新脚本 (CoreViewModel.swift: onDownloadSuccess)
 __USERNAME__ ALL=(root) NOPASSWD: __APP_BIN_ROOT__/update-xray.sh *
 # sing-box 更新脚本 (CoreViewModel.swift: onDownloadSuccess)

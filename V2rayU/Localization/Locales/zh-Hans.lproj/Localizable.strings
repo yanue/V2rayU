@@ -778,8 +778,6 @@
 "ApplicationBundleRule" = "匹配此应用内的全部进程";
 "ProcessOnlyRule" = "仅进程名：%@";
 "NoProcessRules" = "尚未添加应用或进程规则";
-"TunAutoRebuild" = "网络变化后自动重建 TUN";
-"TunAutoRebuildTip" = "切换 Wi-Fi / 唤醒后自动重建隧道，避免路由失效导致断网";
 "TunLogLevel" = "TUN 日志级别";
 "TunEnableIPv6" = "启用 IPv6";
 "TunEnableIPv6Tip" = "为 TUN 接口添加 IPv6 地址使 IPv6 流量通过隧道。";

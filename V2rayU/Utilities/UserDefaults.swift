@@ -112,8 +112,6 @@ extension UserDefaults {
         // application bundle paths whose processes should bypass or use the proxy in TUN mode
         case tunDirectApplicationPaths
         case tunProxyApplicationPaths
-        // tun 自动重建: 网络变化/唤醒后自动重建 TUN, 默认开启
-        case tunAutoRebuild
         // tun log level
         case tunLogLevel
         // tun enable IPv6

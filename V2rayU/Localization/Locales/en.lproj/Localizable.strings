@@ -777,8 +777,6 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "ApplicationBundleRule" = "All processes in this application";
 "ProcessOnlyRule" = "Process name only: %@";
 "NoProcessRules" = "No application or process rules";
-"TunAutoRebuild" = "Auto rebuild TUN after network changes";
-"TunAutoRebuildTip" = "Automatically rebuild the tunnel after Wi-Fi changes or wake-up to avoid broken routes.";
 "TunLogLevel" = "TUN Log Level";
 "TunEnableIPv6" = "Enable IPv6";
 "TunEnableIPv6Tip" = "Add IPv6 address to the TUN interface, allowing IPv6 traffic through the tunnel.";

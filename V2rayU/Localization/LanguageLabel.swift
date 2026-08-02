@@ -145,8 +145,6 @@ enum LanguageLabel: String, CaseIterable {
     case ApplicationBundleRule
     case ProcessOnlyRule
     case NoProcessRules
-    case TunAutoRebuild
-    case TunAutoRebuildTip
     case TunLogLevel
     case TunEnableIPv6
     case TunEnableIPv6Tip

@@ -12,7 +12,7 @@ actor TunHandler {
     // MARK: - Start
 
     func start() async -> Bool {
-        stop()
+        await stop()
         do {
             let jsonText = TunConfigHandler.buildTunConfig()
             try jsonText.write(to: URL(fileURLWithPath: TunConfigFilePath), atomically: true, encoding: .utf8)
@@ -50,7 +50,7 @@ actor TunHandler {
 
     // MARK: - Stop
 
-    func stop() {
+    func stop() async {
         guard isDaemonRunning() else {
             logger.info("stopTunHelper: not running, skip")
             return
@@ -66,10 +66,15 @@ actor TunHandler {
                 logger.info("stopTunHelper failed: \(error)")
             }
         }
-        waitForDaemonExit()
+        await waitForDaemonExit()
         if isDaemonRunning() {
-            logger.warning("stopTunHelper: process still running, sending SIGKILL")
-            _ = shell(launchPath: "/usr/bin/sudo", arguments: ["-n", "/usr/bin/killall", "-9", "sing-box"])
+            logger.warning("stopTunHelper: process still running, sending SIGKILL via launchctl")
+            do {
+                _ = try runCommand(at: "/usr/bin/sudo", with: ["-n", "/bin/launchctl", "kill", "SIGKILL", "system/\(tunHelperDaemon)"])
+                await waitForDaemonExit()
+            } catch {
+                logger.info("stopTunHelper: launchctl kill failed: \(error)")
+            }
         }
     }
 
@@ -117,11 +122,11 @@ actor TunHandler {
         return isDaemonRunning()
     }
 
-    private func waitForDaemonExit(timeout: TimeInterval = 6) {
+    private func waitForDaemonExit(timeout: TimeInterval = 6) async {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
             if !isDaemonRunning() { return }
-            Thread.sleep(forTimeInterval: 0.2)
+            try? await Task.sleep(nanoseconds: 200_000_000)
         }
     }
 
@@ -147,7 +152,7 @@ actor TunHandler {
         defer { rebuildInProgress = false }
 
         logger.info("rebuildAfterNetworkChange: \(reason), stopping stale TUN before waiting for network...")
-        stop()
+        await stop()
 
         logger.info("rebuildAfterNetworkChange: \(reason), waiting for network...")
         let ready = await waitForNetworkReady()
@@ -156,10 +161,6 @@ actor TunHandler {
         }
 
         if mode == .tun {
-            guard UserDefaults.getBool(forKey: .tunAutoRebuild, default: true) else {
-                logger.info("rebuildAfterNetworkChange skip: tunAutoRebuild disabled (\(reason))")
-                return
-            }
             // TUN 模式：重建 TUN（若核心已死会自动 fallback 到完整重启）
             logger.info("rebuildAfterNetworkChange: rebuilding TUN (\(reason))")
             let ok = await V2rayLaunch.shared.rebuildTun()
