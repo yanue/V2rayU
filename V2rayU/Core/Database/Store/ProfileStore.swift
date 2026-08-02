@@ -120,6 +120,7 @@ struct ProfileStore: StoreProtocol {
                 updatedDto.todayUp = oldDto.todayUp
                 updatedDto.todayDown = oldDto.todayDown
                 updatedDto.lastUpdate = oldDto.lastUpdate
+                updatedDto.coreType = oldDto.coreType
                 try updatedDto.update(db)
             }
             return true
