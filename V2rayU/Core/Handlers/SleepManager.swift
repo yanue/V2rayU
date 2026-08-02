@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import FirebaseAnalytics
 import AppCenterAnalytics
 
 actor SystemSleepManager {
@@ -42,6 +43,9 @@ actor SystemSleepManager {
                 await self.handleSystemDidWake()
             }
         }
+
+        // 记录启动
+        logEvent(source: "launch")
     }
     
     private func handleSystemWillSleep() async {
@@ -54,6 +58,8 @@ actor SystemSleepManager {
             logger.info("willSleep: stop tun-helper to avoid stale route on wake")
             await TunHandler.shared.stop()
         }
+        // 记录睡眠
+        logEvent(source: "sleep")
     }
     
     private func handleSystemDidWake() {
@@ -95,6 +101,15 @@ actor SystemSleepManager {
                 await SubscriptionHandler.shared.sync()
             }
             await PingAll.shared.run()
+            // 记录唤醒
+            self.logEvent(source: "wake")
         }
+    }
+
+    /// logEvent
+    func logEvent(source: String) {
+        logger.info("record app open, source=\(source)")
+        FirebaseAnalytics.Analytics.logEvent("app_open", parameters: ["source": source])
+        AppCenterAnalytics.Analytics.trackEvent("app_open", withProperties: ["source": source])
     }
 }
