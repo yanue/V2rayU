@@ -218,6 +218,24 @@ struct TunView: View {
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
+                HStack(alignment: .top) {
+                    getTextLabel(label: .TunDefaultOutbound, labelWidth: labelWidth)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Picker(String(localized: .TunDefaultOutbound), selection: $settings.tunDefaultOutbound) {
+                            Text(String(localized: .Proxy)).tag(TunDefaultOutbound.proxy)
+                            Text(String(localized: .Direct)).tag(TunDefaultOutbound.direct)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(width: 220, alignment: .leading)
+                        Text(String(localized: .TunDefaultOutboundTip))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.leading, 7)
+                }
+
                 Divider()
 
                 // MARK: - DNS
