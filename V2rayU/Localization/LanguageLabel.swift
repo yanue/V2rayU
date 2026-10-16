@@ -136,6 +136,8 @@ enum LanguageLabel: String, CaseIterable {
     case TunDirectProcesses
     case TunProxyProcesses
     case TunProcessRoutingTip
+    case TunDefaultOutbound
+    case TunDefaultOutboundTip
     case AddApplications
     case AddDirectApplication
     case AddProxyApplication
