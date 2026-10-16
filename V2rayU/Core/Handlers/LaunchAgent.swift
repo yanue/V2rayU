@@ -55,7 +55,7 @@ actor LaunchAgent: NSObject {
         if #available(macOS 11.0, *) {
             dictAgent["AbandonProcessGroup"] = true
         }
-        dictAgent["ProcessType"] = "Background"
+        dictAgent["ProcessType"] = "Standard"
 
         dictAgent.write(toFile: plistPath, atomically: true)
         unloadAgent(agentName: agentName)
