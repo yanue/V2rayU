@@ -768,6 +768,8 @@
 "TunDirectProcesses" = "直連應用程式";
 "TunProxyProcesses" = "代理應用程式";
 "TunProcessRoutingTip" = "僅在 TUN 模式生效。應用程式規則會匹配所選 .app 套件內的全部可執行程序；手動程序規則按名稱精確匹配並區分大小寫。規則衝突時直連優先。";
+"TunDefaultOutbound" = "未匹配流量";
+"TunDefaultOutboundTip" = "未匹配上述應用程式或程序規則的流量使用此出口。預設選擇代理，仍按核心路由規則分流。DNS 另按 TUN DNS 策略處理，部分查詢仍會透過代理。";
 "AddApplications" = "加入應用程式";
 "AddDirectApplication" = "加入直連應用程式 (.app)…";
 "AddProxyApplication" = "加入代理應用程式 (.app)…";
