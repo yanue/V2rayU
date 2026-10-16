@@ -9,7 +9,7 @@ import Foundation
 ///              ├─ process_name (xray/sing-box) → direct（绕过 TUN）
 ///              ├─ hijack-dns → DNS 分流（代理域名/cn → 直连，其他 → 代理）
 ///              ├─ sniff → 协议检测（提取 SNI/Host，使域名路由生效）
-///              └─ default → SOCKS proxy
+///              └─ default → selected outbound (proxy or direct)
 /// ```
 ///
 /// ## DNS 死锁防护
@@ -430,6 +430,7 @@ enum TunConfigHandler {
         let tunAddrIPv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: defaultTunIPv6)
         let tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         let tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
+        let tunDefaultOutbound = UserDefaults.getEnum(forKey: .tunDefaultOutbound, type: TunDefaultOutbound.self, defaultValue: .proxy)
         let tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         let tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
         let userExcludeAddresses = resolveRouteExcludeAddresses(from: tunRouteExcludeHosts)
@@ -539,7 +540,7 @@ enum TunConfigHandler {
         //   1. process_name → direct：核心进程（xray/sing-box）的流量绕过 TUN，避免 DNS 死锁
         //   2. sniff：协议检测（TLS/HTTP），为后续 protocol 规则提供匹配依据
         //   3. hijack-dns：劫持所有 DNS 查询，交给 sing-box DNS 引擎按上述 DNS rules 分流
-        //   4. default：其余流量走 SOCKS proxy（默认出站）
+        //   4. default: unmatched traffic uses the selected outbound (proxy by default)
         //
         // 为什么 process_name 必须在 hijack-dns 之前？
         //   如果顺序反过来，xray 的 DNS 查询会被 hijack-dns 劫持 → 走 remote-dns (via proxy) →
@@ -577,11 +578,11 @@ enum TunConfigHandler {
         }
         // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效（仅影响非核心进程）
         tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
-        // 其余全部走 SOCKS（默认第一条出站就是 proxy）
         singbox.route = RouteConfig(
             auto_detect_interface: true,
             default_domain_resolver: "local-dns",
-            rules: tunRules
+            rules: tunRules,
+            final: tunDefaultOutbound.rawValue
         )
 
         // 将 geosite/geoip 规则转为 rule_set 引用（附带 .srs 文件注册）
