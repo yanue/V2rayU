@@ -55,6 +55,7 @@ private actor TunStartupRecorder {
             UserDefaults.KEY.tunProxyProcessNames.rawValue,
             UserDefaults.KEY.tunDirectApplicationPaths.rawValue,
             UserDefaults.KEY.tunProxyApplicationPaths.rawValue,
+            UserDefaults.KEY.tunDefaultOutbound.rawValue,
         ]
         let previousValues = keys.map { UserDefaults.standard.object(forKey: $0) }
         defer {
@@ -78,9 +79,11 @@ private actor TunStartupRecorder {
             value: ["/Applications/ChatGPT.app", "/Applications/WeChat (Beta).app"]
         )
 
+        UserDefaults.del(forKey: .tunDefaultOutbound)
         let jsonText = TunConfigHandler.buildTunConfig()
         let data = try #require(jsonText.data(using: .utf8))
         let parsed = try JSONDecoder().decode(SingboxStruct.self, from: data)
+        #expect(parsed.route.final == "proxy")
         let processRules = parsed.route.rules.filter {
             $0.process_name != nil || $0.process_path_regex != nil
         }
@@ -100,6 +103,17 @@ private actor TunStartupRecorder {
         ])
         #expect(processRules[4].outbound == "proxy")
         #expect(processRules[4].process_name == ["ChatGPT", "shared app", "XRAY-ARM64"])
+
+        for outbound in TunDefaultOutbound.allCases {
+            UserDefaults.set(forKey: .tunDefaultOutbound, value: outbound.rawValue)
+            let config = try JSONDecoder().decode(
+                SingboxStruct.self,
+                from: Data(TunConfigHandler.buildTunConfig().utf8)
+            )
+            #expect(config.route.final == outbound.rawValue)
+            #expect(config.route.rules.first?.outbound == "direct")
+            #expect(config.dns.final == "remote-dns")
+        }
     }
 }
 
