@@ -768,6 +768,8 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunDirectProcesses" = "Direct applications";
 "TunProxyProcesses" = "Proxy applications";
 "TunProcessRoutingTip" = "TUN mode only. Application rules match every executable inside the selected .app bundle. Manual process rules match exact names, including letter case. Direct takes priority when rules conflict.";
+"TunDefaultOutbound" = "Unmatched traffic";
+"TunDefaultOutboundTip" = "Traffic that matches no application or process rule uses this outbound. Proxy is the default and follows the core routing rules. DNS follows the separate TUN DNS rules; some queries still use the proxy.";
 "AddApplications" = "Add Applications";
 "AddDirectApplication" = "Add Direct Application (.app)...";
 "AddProxyApplication" = "Add Proxy Application (.app)...";
