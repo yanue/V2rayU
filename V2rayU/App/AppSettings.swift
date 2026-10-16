@@ -83,6 +83,7 @@ final class AppSettings: ObservableObject {
     @Published var tunProxyProcessNames: String = UserDefaults.get(forKey: .tunProxyProcessNames)
     @Published var tunDirectApplicationPaths: [String] = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
     @Published var tunProxyApplicationPaths: [String] = UserDefaults.getStringArray(forKey: .tunProxyApplicationPaths)
+    @Published var tunDefaultOutbound: TunDefaultOutbound = UserDefaults.getEnum(forKey: .tunDefaultOutbound, type: TunDefaultOutbound.self, defaultValue: .proxy)
     @Published var tunLogLevel: V2rayLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
     @Published var tunEnableIPv6: Bool = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
     @Published var tunShowIPv6Reminder: Bool = UserDefaults.getBool(forKey: .tunShowIPv6Reminder, default: true)
@@ -179,6 +180,7 @@ final class AppSettings: ObservableObject {
         tunProxyProcessNames = UserDefaults.get(forKey: .tunProxyProcessNames)
         tunDirectApplicationPaths = UserDefaults.getStringArray(forKey: .tunDirectApplicationPaths)
         tunProxyApplicationPaths = UserDefaults.getStringArray(forKey: .tunProxyApplicationPaths)
+        tunDefaultOutbound = UserDefaults.getEnum(forKey: .tunDefaultOutbound, type: TunDefaultOutbound.self, defaultValue: .proxy)
         tunLogLevel = UserDefaults.getEnum(forKey: .tunLogLevel, type: V2rayLogLevel.self, defaultValue: .warning)
         tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
         tunShowIPv6Reminder = UserDefaults.getBool(forKey: .tunShowIPv6Reminder, default: true)
@@ -262,6 +264,7 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunProxyProcessNames, value: tunProxyProcessNames)
         UserDefaults.setStringArray(forKey: .tunDirectApplicationPaths, value: tunDirectApplicationPaths)
         UserDefaults.setStringArray(forKey: .tunProxyApplicationPaths, value: tunProxyApplicationPaths)
+        UserDefaults.set(forKey: .tunDefaultOutbound, value: tunDefaultOutbound.rawValue)
         UserDefaults.set(forKey: .tunLogLevel, value: tunLogLevel.rawValue)
         UserDefaults.setBool(forKey: .tunEnableIPv6, value: tunEnableIPv6)
         UserDefaults.setBool(forKey: .tunShowIPv6Reminder, value: tunShowIPv6Reminder)
@@ -305,6 +308,7 @@ final class AppSettings: ObservableObject {
             old.tunProxyProcessNames != tunProxyProcessNames ||
             old.tunDirectApplicationPaths != tunDirectApplicationPaths ||
             old.tunProxyApplicationPaths != tunProxyApplicationPaths ||
+            old.tunDefaultOutbound != tunDefaultOutbound ||
             old.tunLogLevel != tunLogLevel ||
             old.tunEnableIPv6 != tunEnableIPv6 {
             needRestartV2ray = true
