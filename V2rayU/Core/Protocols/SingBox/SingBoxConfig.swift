@@ -329,12 +329,18 @@ enum TunStack: String, Codable, CaseIterable {
     case mixed
 }
 
+enum TunDefaultOutbound: String, CaseIterable {
+    case proxy
+    case direct
+}
+
 // Route
 struct RouteConfig: Codable {
     var auto_detect_interface: Bool = true
     var default_domain_resolver: String = "direct-dns"
     var rules: [RouteRule] = []
     var rule_set: [RuleSetConfig]? = nil
+    var final: String? = nil
 }
 
 struct RuleSetConfig: Codable {

@@ -112,6 +112,7 @@ extension UserDefaults {
         // application bundle paths whose processes should bypass or use the proxy in TUN mode
         case tunDirectApplicationPaths
         case tunProxyApplicationPaths
+        case tunDefaultOutbound
         // tun log level
         case tunLogLevel
         // tun enable IPv6
