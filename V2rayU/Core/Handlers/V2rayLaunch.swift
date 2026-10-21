@@ -66,7 +66,7 @@ enum RunMode: String, CaseIterable {
 // MARK: - 核心启动器
 actor V2rayLaunch {
     static let shared = V2rayLaunch()
-    private static let tunBackendReadyTimeout: TimeInterval = 12
+    private static let tunBackendReadyTimeout: TimeInterval = 30
 
     enum TunStartResult: Equatable {
         case started
@@ -279,8 +279,8 @@ actor V2rayLaunch {
             case .started:
                 break
             case .backendUnavailable:
-                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
                 await stopAll()
+                await noticeLocalized(title: .StartFailed, message: .SocksPortNotReadyForTun)
                 return false
             case .daemonFailed:
                 await notifyTunFailed()
