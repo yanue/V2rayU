@@ -602,6 +602,9 @@ final class DiagnosticsViewModel: ObservableObject {
             if runMode == .tun {
                 agentNames.append(TunHandler.shared.tunHelperDaemon)
             }
+            // 不能在第一个已加载的 agent 处直接返回：切换核心后另一个核心的 agent 可能仍残留加载（无 PID），
+            // 会把正在运行的核心误判为未运行。优先返回有 PID 的 agent。
+            var anyLoaded = false
             for name in agentNames {
                 let task = Process()
                 task.launchPath = "/bin/launchctl"
@@ -627,11 +630,14 @@ final class DiagnosticsViewModel: ObservableObject {
                                 }
                             }
                         }
-                        return (true, pid)
+                        if let pid, !pid.isEmpty, pid != "0" {
+                            return (true, pid)
+                        }
+                        anyLoaded = true
                     }
                 } catch { }
             }
-            return (false, nil)
+            return (anyLoaded, nil)
         }
 
         if !result.loaded {
