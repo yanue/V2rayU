@@ -55,46 +55,61 @@ struct VmessShare: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        v   = try container.decodeIfPresent(String.self, forKey: .v) ?? "2"
-        ps  = try container.decodeIfPresent(String.self, forKey: .ps) ?? ""
-        add = try container.decodeIfPresent(String.self, forKey: .add) ?? ""
-        id  = try container.decodeIfPresent(String.self, forKey: .id) ?? ""
-        net = try container.decodeIfPresent(String.self, forKey: .net) ?? ""
-        type = try container.decodeIfPresent(String.self, forKey: .type) ?? "none"
-        host = try container.decodeIfPresent(String.self, forKey: .host) ?? ""
-        path = try container.decodeIfPresent(String.self, forKey: .path) ?? ""
-        tls  = try container.decodeIfPresent(String.self, forKey: .tls) ?? ""
-        alpn = try container.decodeIfPresent(String.self, forKey: .alpn) ?? ""
-        sni  = try container.decodeIfPresent(String.self, forKey: .sni) ?? ""
-        scy  = try container.decodeIfPresent(String.self, forKey: .scy) ?? "auto"
-        security = try container.decodeIfPresent(String.self, forKey: .security) ?? "auto"
-        fp   = try container.decodeIfPresent(String.self, forKey: .fp) ?? ""
-        serviceName = try container.decodeIfPresent(String.self, forKey: .serviceName) ?? ""
-        seed = try container.decodeIfPresent(String.self, forKey: .seed) ?? ""
-        pcks = try container.decodeIfPresent(String.self, forKey: .pcks) ?? ""
+        // 机场下发的 JSON 字段类型不统一（如 "v": 2、"port": 443、"tls": false），
+        // 统一按字符串宽松解码，避免整体解码失败后误走 type1 解析
+        v    = container.lenientString(forKey: .v) ?? "2"
+        ps   = container.lenientString(forKey: .ps) ?? ""
+        add  = container.lenientString(forKey: .add) ?? ""
+        port = container.lenientString(forKey: .port) ?? ""
+        id   = container.lenientString(forKey: .id) ?? ""
+        aid  = container.lenientString(forKey: .aid) ?? ""
+        net  = container.lenientString(forKey: .net) ?? ""
+        type = container.lenientString(forKey: .type) ?? "none"
+        host = container.lenientString(forKey: .host) ?? ""
+        path = container.lenientString(forKey: .path) ?? ""
+        tls  = container.lenientString(forKey: .tls) ?? ""
+        alpn = container.lenientString(forKey: .alpn) ?? ""
+        sni  = container.lenientString(forKey: .sni) ?? ""
+        scy  = container.lenientString(forKey: .scy) ?? "auto"
+        security = container.lenientString(forKey: .security) ?? "auto"
+        fp   = container.lenientString(forKey: .fp) ?? ""
+        serviceName = container.lenientString(forKey: .serviceName) ?? ""
+        seed = container.lenientString(forKey: .seed) ?? ""
+        pcks = container.lenientString(forKey: .pcks) ?? ""
+    }
+}
 
-        // 处理 port 字段的类型不确定性
-        if let portValue = try? container.decode(Int.self, forKey: .port) {
-            port = String(portValue)
-        } else if let portValue = try? container.decode(String.self, forKey: .port) {
-            port = portValue
-        } else {
-            port = ""
+private extension KeyedDecodingContainer {
+    /// 宽松解码：兼容 String / Int / Double / Bool，null 或缺失返回 nil
+    func lenientString(forKey key: Key) -> String? {
+        if let value = try? decodeIfPresent(String.self, forKey: key) {
+            return value
         }
-
-        // 处理 aid 字段的类型不确定性
-        if let aidValue = try? container.decode(Int.self, forKey: .aid) {
-            aid = String(aidValue)
-        } else if let aidValue = try? container.decode(String.self, forKey: .aid) {
-            aid = aidValue
-        } else {
-            aid = ""
+        if let value = try? decodeIfPresent(Int.self, forKey: key) {
+            return String(value)
         }
+        if let value = try? decodeIfPresent(Double.self, forKey: key) {
+            // Int(exactly:) 对超出范围或非整数返回 nil，避免 Int(1e20) 溢出崩溃
+            return Int(exactly: value).map(String.init) ?? String(value)
+        }
+        if let value = try? decodeIfPresent(Bool.self, forKey: key) {
+            return String(value)
+        }
+        return nil
     }
 }
 
 // see: https://github.com/v2ray/v2ray-core/issues/1139
 class VmessUri: BaseShareUri {
+    /// 统一解析 tls 字段：兼容 "tls"/"TLS"、"1"、"true"（订阅中常见的布尔/数字写法）
+    static func parseSecurity(_ raw: String) -> V2rayStreamSecurity {
+        let value = raw.trimmingCharacters(in: .whitespaces).lowercased()
+        if value == "1" || value == "true" {
+            return .tls
+        }
+        return V2rayStreamSecurity(rawValue: value) ?? .none
+    }
+
     private var profile: ProfileEntity
     private var error: String = ""
 
@@ -192,24 +207,27 @@ class VmessUri: BaseShareUri {
             profile.password = uuid_security[1]
         }
 
-        let host_port = host_.components(separatedBy: ":")
-        if host_port.count > 1 {
-            profile.address = host_port[0]
-            profile.port = Int(host_port[1]) ?? 0
+        // 按最后一个 ':' 拆分，兼容 IPv6 地址如 [2001:db8::1]:443
+        if let sep = host_.lastIndex(of: ":") {
+            profile.address = String(host_[..<sep]).trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+            profile.port = Int(host_[host_.index(after: sep)...]) ?? 0
+        }
+        // 非 type1 格式（如 JSON 解码失败的 type2 内容）不能静默生成空节点
+        guard !profile.password.isEmpty, !profile.address.isEmpty, profile.port > 0 else {
+            error = "invalid vmess url: missing uuid/address/port"
+            return
         }
 
         // params
         let query = url.queryParams()
         profile.network = query.getEnum(forKey: "network", type: V2rayStreamNetwork.self, defaultValue: .tcp)
-        // vmess type1 tls 参数: "1" 表示 tls, 其他值表示 none
-        let tlsStr = query.getString(forKey: "tls")
-        if tlsStr == "1" {
-            profile.security = .tls
-        } else if !tlsStr.isEmpty {
-            profile.security = V2rayStreamSecurity(rawValue: tlsStr) ?? .none
-        } else {
-            profile.security = .none
+        // vmess type1 tls 参数: "1" 表示 tls, 其他值表示 none；
+        // 部分客户端改用 security=tls 表示，tls 参数缺失时兜底读取
+        var tlsStr = query.getString(forKey: "tls")
+        if tlsStr.isEmpty {
+            tlsStr = query.getString(forKey: "security")
         }
+        profile.security = VmessUri.parseSecurity(tlsStr)
         profile.sni = query.getString(forKey: "tlsServer", defaultValue:  query.getString(forKey: "sni", defaultValue: profile.address))
         profile.fingerprint = query.getEnum(forKey: "fp", type: V2rayStreamFingerprint.self, defaultValue: .none)
         profile.pinnedPeerCertSha256 = query.getString(forKey: "pcks", defaultValue: "")
@@ -367,18 +385,23 @@ class VmessUri: BaseShareUri {
             // 将解析结果赋值到 profile
             profile.remark = vmess.ps.urlDecoded()
             profile.address = vmess.add
-            profile.port = Int(vmess.port) ?? 0
+            profile.port = Int(vmess.port.trimmingCharacters(in: .whitespaces)) ?? 0
             profile.password = vmess.id
-            profile.alterId = Int(vmess.aid) ?? 0
+            profile.alterId = Int(vmess.aid.trimmingCharacters(in: .whitespaces)) ?? 0
             profile.encryption = vmess.scy == "auto" && vmess.security != "auto" ? vmess.security : vmess.scy
             profile.alpn = V2rayStreamAlpn(rawValue: vmess.alpn.replacingOccurrences(of: "http/1.1", with: "http1.1")) ?? .none
             profile.sni = !vmess.sni.isEmpty ? vmess.sni : vmess.host
             profile.network = V2rayStreamNetwork(rawValue: vmess.net) ?? .tcp
             profile.host = vmess.host
             profile.path = vmess.path
-            profile.security = V2rayStreamSecurity(rawValue: vmess.tls) ?? .none
+            profile.security = VmessUri.parseSecurity(vmess.tls)
             profile.fingerprint = V2rayStreamFingerprint(rawValue: vmess.fp) ?? .none
             profile.headerType = V2rayHeaderType(rawValue: vmess.type) ?? .none
+            // 宽松解码后几乎任何 JSON 都能解码成功，必须校验必填字段，避免导入空节点
+            guard !profile.password.isEmpty, !profile.address.isEmpty, profile.port > 0 else {
+                self.error = "invalid vmess json: missing id/add/port"
+                return
+            }
 
             if profile.network == .grpc {
                 profile.path = vmess.serviceName

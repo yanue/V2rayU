@@ -14,7 +14,7 @@ struct ProtocolParserTests {
 
         #expect(error == nil)
         let profile = uri.getProfile()
-        #expect(profile.remark == "测试服务器")
+        #expect(profile.remark == "测试服务员")
         #expect(profile.address == "123.45.67.89")
         #expect(profile.port == 443)
         #expect(profile.password == "1386f85e-657b-4d6e-9d56-78bad")
@@ -85,6 +85,64 @@ struct ProtocolParserTests {
         let profile = uri.getProfile()
         #expect(profile.network == .ws)
         #expect(profile.path == "/")
+    }
+
+    @Test func vmessType2WithNumericFields() throws {
+        // #1699: 部分机场下发 "v": 2、"port": 443、"aid": 0 等数字字段，不能误走 type1 解析
+        let json = #"{"v":2,"ps":"airport-node","add":"node.example.com","port":443,"id":"e2c7199d-964b-4321-9d33-842b6fcec068","aid":0,"net":"ws","type":"none","host":"node.example.com","path":"/ws","tls":"tls"}"#
+        let link = "vmess://" + Data(json.utf8).base64EncodedString()
+        let uri = VmessUri()
+        let error = uri.parse(url: URL(string: link)!)
+
+        #expect(error == nil)
+        let profile = uri.getProfile()
+        #expect(profile.remark == "airport-node")
+        #expect(profile.address == "node.example.com")
+        #expect(profile.port == 443)
+        #expect(profile.password == "e2c7199d-964b-4321-9d33-842b6fcec068")
+        #expect(profile.network == .ws)
+        #expect(profile.security == .tls)
+    }
+
+    @Test func vmessInvalidPayloadReturnsError() throws {
+        // 既不是合法 JSON 也不是 security:uuid@host:port 时应报错，而不是生成空节点
+        let link = "vmess://" + Data("not-a-vmess-payload".utf8).base64EncodedString()
+        let uri = VmessUri()
+        let error = uri.parse(url: URL(string: link)!)
+
+        #expect(error != nil)
+    }
+
+    @Test func vmessType2NumericTlsAndHugeNumber() throws {
+        // "tls": 1 视为启用 TLS；超大数字不能导致 Int 溢出崩溃
+        let json = #"{"v":2,"ps":"n","add":"node.example.com","port":443,"id":"e2c7199d-964b-4321-9d33-842b6fcec068","aid":1e20,"net":"tcp","tls":1}"#
+        let uri = VmessUri()
+        let error = uri.parse(url: URL(string: "vmess://" + Data(json.utf8).base64EncodedString())!)
+
+        #expect(error == nil)
+        #expect(uri.getProfile().security == .tls)
+        #expect(uri.getProfile().alterId == 0)
+    }
+
+    @Test func vmessType2MissingRequiredFieldsReturnsError() throws {
+        let json = #"{"v":2,"ps":"empty"}"#
+        let uri = VmessUri()
+        let error = uri.parse(url: URL(string: "vmess://" + Data(json.utf8).base64EncodedString())!)
+
+        #expect(error != nil)
+    }
+
+    @Test func vmessType1Ipv6AndUppercaseSecurity() throws {
+        let userInfo = "auto:e2c7199d-964b-4321-9d33-842b6fcec068@[2001:db8::1]:443"
+        let link = "vmess://\(Data(userInfo.utf8).base64EncodedString())?security=TLS"
+        let uri = VmessUri()
+        let error = uri.parse(url: URL(string: link)!)
+
+        #expect(error == nil)
+        let profile = uri.getProfile()
+        #expect(profile.address == "2001:db8::1")
+        #expect(profile.port == 443)
+        #expect(profile.security == .tls)
     }
 
     // MARK: - VLESS
