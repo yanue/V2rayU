@@ -244,7 +244,7 @@
       "docs_path": null,
       "rule": {
         "type": "supported",
-        "note": "当前回退功能支持规则按 sing-box 常规 QUIC transport 处理。"
+        "note": "当前回退功能支持规则按 sing-box 常规 QUIC transport 处理；sing-box 的 QUIC transport 必须启用 TLS，未启用 TLS 的节点由应用内置规则拦截。"
       },
       "app_support": {
         "level": "supported",

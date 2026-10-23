@@ -410,8 +410,9 @@
       "kind": "Transport",
       "docs_path": "/config/transports/quic.html",
       "rule": {
-        "type": "legacy",
-        "note": "QUIC 不在当前官方 transport 主列表中，但站点仍保留历史页面；V2rayU 仅作历史兼容映射。"
+        "type": "supported",
+        "removed_at": "24.9.30",
+        "note": "Xray-core v24.9.30 移除了 QUIC transport，迁移至 XHTTP stream-one H3。旧版本（<24.9.30）仍支持 quic transport。"
       }
     },
     {

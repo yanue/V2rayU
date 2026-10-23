@@ -175,7 +175,7 @@
 | 功能 | 当前主列表 | 处理建议 |
 |---|---|---|
 | HTTP/2 (`h2`) | 不在当前主列表 | 按历史/兼容功能处理，不直接写“Never” |
-| QUIC | 不在当前主列表 | 按历史/兼容功能处理，不直接写“Never” |
+| QUIC | 不在当前主列表 | Xray-core v24.9.30 起移除（`removed_at: 24.9.30`），迁移至 XHTTP stream-one H3；sing-box 的 QUIC transport 必须启用标准 TLS，未启用时不能回退 |
 | 旧 `tcp` transport 名称 | 已被 `RAW` 取代 | 在客户端模型中应映射为 `RAW` |
 | `domainsocket` | 当前主列表未单列 | 作为现有模型兼容项处理 |
 
@@ -204,7 +204,7 @@
 | `xhttp` | `XHTTP` | 视为当前官方主列表支持 |
 | `kcp` | `mKCP` | 视为当前官方主列表支持 |
 | `h2` | `HTTP/2` | 视为历史/兼容 transport |
-| `quic` | `QUIC` | 视为历史/兼容 transport |
+| `quic` | `QUIC` | Xray-core < 24.9.30 支持；之后仅 sing-box + TLS 可用 |
 | `domainsocket` | Domain Socket | 视为现有模型兼容项 |
 
 ### 7.2 `ProfileEntity.security` 映射

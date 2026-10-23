@@ -200,6 +200,34 @@ struct CoreCapabilityRulesTests {
         let hasHeaderReason = reasons.contains { $0.contains("HTTP") || $0.contains("伪装") }
         #expect(hasHeaderReason)
     }
+
+    @Test func singboxFallbackForQuicWithoutTls() {
+        // #1700: sing-box 的 QUIC transport 必须启用 TLS
+        let profile = ProfileEntity(protocol: .vmess, address: "x.com", port: 443, password: "uuid", network: .quic, security: .none)
+        let reasons = SingboxFallbackResolver.incompatibilityReasons(for: profile)
+        #expect(reasons.contains { $0.contains("QUIC") })
+    }
+
+    @Test func singboxFallbackForQuicWithTls() {
+        let profile = ProfileEntity(protocol: .vmess, address: "x.com", port: 443, password: "uuid", network: .quic, security: .tls)
+        let reasons = SingboxFallbackResolver.incompatibilityReasons(for: profile)
+        #expect(!reasons.contains { $0.contains("QUIC") })
+    }
+
+    @Test func singboxFallbackForQuicWithReality() {
+        let profile = ProfileEntity(protocol: .vless, address: "x.com", port: 443, password: "uuid", network: .quic, security: .reality)
+        let reasons = SingboxFallbackResolver.incompatibilityReasons(for: profile)
+        #expect(reasons.contains { $0.contains("仅支持标准 TLS") })
+    }
+
+    @Test func xrayQuicRemovedAt24930() {
+        // 用内置规则校验，避免受本机 ~/.V2rayU 下旧版覆盖文件影响
+        let def = XraySupportCatalog.builtInCapabilities.first { $0.key == "transport.quic" }
+        #expect(def != nil)
+        guard let def else { return }
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(24, 9, 19)) == nil)
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(26, 1, 18))?.isBlocking == true)
+    }
 }
 
 // Helper to check if XrayFeatureAvailability is "supported"

@@ -693,7 +693,7 @@ enum XraySupportCatalog {
 
         // MARK: Legacy or compatibility items
         XrayCapabilityDefinition(key: "transport.h2", displayName: "HTTP/2 transport", kind: .transportMethod,             rule: .supported(note: "Xray-core v24.12.18 移除了 HTTP/2 transport，迁移至 XHTTP stream-one H2 & H3。旧版本（<24.12.18）仍支持 h2 transport。", removedAt: XrayVersion(24, 12, 18)), docsPath: "/config/transports/h2.html"),
-        XrayCapabilityDefinition(key: "transport.quic", displayName: "QUIC transport", kind: .transportMethod, rule: .legacy(note: "QUIC 不在当前官方 transport 主列表中，但站点仍保留历史页面；V2rayU 仅作历史兼容映射。"), docsPath: "/config/transports/quic.html"),
+        XrayCapabilityDefinition(key: "transport.quic", displayName: "QUIC transport", kind: .transportMethod, rule: .supported(note: "Xray-core v24.9.30 移除了 QUIC transport，迁移至 XHTTP stream-one H3。旧版本（<24.9.30）仍支持 quic transport。", removedAt: XrayVersion(24, 9, 30)), docsPath: "/config/transports/quic.html"),
         XrayCapabilityDefinition(key: "transport.domainsocket", displayName: "Domain Socket transport", kind: .transportMethod, rule: .compatibility(note: "当前官方 transport 主列表未单列 Domain Socket；V2rayU 仅按现有模型做兼容保留。"), docsPath: nil),
 
         // MARK: Transport security / additional config
@@ -873,6 +873,10 @@ enum SingboxFallbackResolver {
             reasons.append("当前节点使用 KCP 传输，Sing-Box 不支持 KCP 协议，不能自动回退。")
         }
 
+        if let reason = quicWithoutTlsReason(for: profile) {
+            reasons.append(reason)
+        }
+
         if profile.protocol == .vmess && profile.alterId > 0 {
             reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），sing-box 不支持，Xray-core 自 v1.8.12 起也已移除。请使用 v1.8.5 或更早版本的 Xray-core，或将 alterId 改为 0（AEAD 模式）。")
         }
@@ -1019,6 +1023,19 @@ enum SingboxFallbackResolver {
         return reasons.filter { seen.insert($0).inserted }
     }
 
+    /// sing-box 的 V2Ray QUIC transport 强制要求标准 TLS（否则报 "quic: TLS required"）
+    private static func quicWithoutTlsReason(for profile: ProfileEntity) -> String? {
+        guard profile.network == .quic else { return nil }
+        switch profile.security {
+        case .tls:
+            return nil
+        case .none:
+            return "当前节点使用 QUIC 传输但未启用 TLS，Sing-Box 的 QUIC 传输必须启用 TLS，不能自动回退。"
+        default:
+            return "当前节点使用 QUIC 传输 + \(profile.security.rawValue)，Sing-Box 的 QUIC 传输仅支持标准 TLS，不能自动回退。"
+        }
+    }
+
     private static func legacyFallbackReasons(for profile: ProfileEntity) -> [String] {
         var reasons: [String] = []
 
@@ -1038,6 +1055,10 @@ enum SingboxFallbackResolver {
             reasons.append("当前节点使用 KCP 传输，Sing-Box 不支持 KCP 协议，不能自动回退。")
         default:
             break
+        }
+
+        if let reason = quicWithoutTlsReason(for: profile) {
+            reasons.append(reason)
         }
 
         if profile.security == .xtls {
