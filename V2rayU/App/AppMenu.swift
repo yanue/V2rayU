@@ -18,7 +18,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     private var inited = false
     private var statusItem: NSStatusItem!
-    private var hostingView: NSHostingView<StatusItemView>!
+    private let statusItemView = StatusItemView()
+    private let coreStatusView = CoreStatusItemView()
     // menu items
     private var coreStatusItem: NSMenuItem!
     private var toggleCoreItem: NSMenuItem!
@@ -90,6 +91,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
             }
             .store(in: &cancellables)
 
+        // 状态栏与菜单顶部状态行：objectWillChange 在赋值前发出，切到下一轮主队列再读取新值
+        AppState.shared.objectWillChange
+            .merge(with: AppSettings.shared.objectWillChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshStatusViews()
+            }
+            .store(in: &cancellables)
+
         // 监听键盘快捷键变化
         NotificationCenter.default.addObserver(
             self,
@@ -125,24 +135,25 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func setStatusItem() {
-        // 使用 variableLength 配合 StatusItemView.fixedSize 实现自适应宽度
+        // 使用 variableLength 配合 StatusItemView 的固有尺寸实现自适应宽度
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            // 创建 SwiftUI 视图的 HostingView
-            let statusItemView = StatusItemView()
-            hostingView = NSHostingView(rootView: statusItemView)
-            button.addSubview(hostingView)
-            // 只给垂直方向撑满，水平方向让尺寸自行决定
-            hostingView.translatesAutoresizingMaskIntoConstraints = false
-            // 设置约束
+            button.addSubview(statusItemView)
+            statusItemView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                hostingView.leadingAnchor.constraint(equalTo: button.leadingAnchor),
-                hostingView.trailingAnchor.constraint(equalTo: button.trailingAnchor),
-                hostingView.topAnchor.constraint(equalTo: button.topAnchor),
-                hostingView.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+                statusItemView.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+                statusItemView.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+                statusItemView.topAnchor.constraint(equalTo: button.topAnchor),
+                statusItemView.bottomAnchor.constraint(equalTo: button.bottomAnchor),
             ])
         }
+        refreshStatusViews()
+    }
+
+    private func refreshStatusViews() {
+        statusItemView.update(appState: AppState.shared, settings: AppSettings.shared)
+        coreStatusView.update(appState: AppState.shared)
     }
 
     func refreshPingTip(pingTip: String) {
@@ -300,7 +311,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         if !inited {
             return
         }
-        // coreStatusItem 使用 SwiftUI CoreStatusItemView 自动观察 AppState，无需手动更新 title
+        // coreStatusItem 由 refreshStatusViews() 跟随 AppState 刷新，无需手动更新 title
         pingItem?.title = String(localized: .LatencyTest) + " \(self.pingTip)"
         diagnosticsItem?.title = String(localized: .Diagnostics)
         toggleCoreItem?.title = coreTitle()
@@ -445,35 +456,13 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func getCoreStatusItem() -> NSMenuItem {
-        // 使用 SwiftUI 视图替换原始的 title-only 菜单项，CoreStatusItemView 会观察 AppState 自动刷新
         let item = NSMenuItem()
-        // 创建一个 HostingView 并赋给 menu item 的 view
-        let coreHosting = NSHostingView(rootView: CoreStatusItemView())
-        // 提前触发 SwiftUI 首次布局+渲染，否则首次打开菜单时顶部该项空白：
-        // NSHostingView 的内容直到第一次真实显示才会 materialize（第二次点击才恢复），
-        // macOS 26+ 的新菜单渲染让该问题更明显。
-        prerenderForMenu(coreHosting)
-        // 给 hosting view 一个合理的固有大小（根据视图内容微调）
-        coreHosting.translatesAutoresizingMaskIntoConstraints = false
-        item.view = coreHosting
+        coreStatusView.update(appState: AppState.shared)
+        let size = coreStatusView.fittingSize
+        coreStatusView.frame = NSRect(x: 0, y: 0, width: max(size.width, 280), height: size.height)
+        item.view = coreStatusView
         item.isEnabled = false
         return item
-    }
-
-    /// 在离屏窗口中强制完成 NSHostingView 的首次布局与渲染，
-    /// 避免菜单项首次显示时内容为空。
-    private func prerenderForMenu(_ hosting: NSHostingView<CoreStatusItemView>) {
-        let frame = hosting.frame
-        // 根据内容计算理想尺寸，触发 SwiftUI 布局
-        let fittingSize = hosting.fittingSize
-        hosting.frame = NSRect(x: 0, y: 0, width: max(frame.width, fittingSize.width), height: max(frame.height, fittingSize.height))
-        // 放入离屏窗口走一遍完整的布局+绘制流程，生成 layer 内容
-        let window = NSWindow(contentRect: hosting.frame, styleMask: .borderless, backing: .buffered, defer: false)
-        window.contentView = hosting
-        window.layoutIfNeeded()
-        hosting.layoutSubtreeIfNeeded()
-        hosting.displayIfNeeded()
-        window.contentView = nil
     }
 
     func getViewFilesMenu() -> NSMenuItem {
