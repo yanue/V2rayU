@@ -260,7 +260,16 @@ import Testing
         #expect(XrayApiStatsHandler.comboLatency(["proxy": observation(true, 20)]).display == 0)
     }
 
-    // MARK: - 诊断
+    // MARK: - 测速地址
+
+    @Test("Only the old default test URL is migrated")
+    func migratesLegacyPingURL() {
+        #expect(migratedPingTestURL(legacyDefaultPingTestURL) == defaultPingTestURL)
+        #expect(migratedPingTestURL(defaultPingTestURL) == nil)
+        #expect(migratedPingTestURL("http://cp.cloudflare.com/generate_204") == nil)
+        #expect(migratedPingTestURL("") == nil)
+        #expect(URL(string: defaultPingTestURL)?.scheme == "https")
+    }
 
     @Test("Diagnostics curl lets the proxy resolve the hostname")
     func diagnosticsCurlUsesRemoteDNS() {

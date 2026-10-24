@@ -3,11 +3,15 @@ import SwiftUI
 
 let defaultLatencyTestConcurrency = 10
 let defaultLatencyTestTimeout = 5
-// 选用 gstatic 的原因:
-// 1) 始终直接返回 204, 不会 301/302
-// 2) HTTP 即可, 避免 TLS 握手把延迟数字撑大
-// 3) 国内代理出口后访问普遍稳定
-let defaultPingTestURL = "http://www.gstatic.com/generate_204"
+// 与 v2rayN 默认一致, 始终直接返回 204。测速在复用的连接上进行, TLS 握手不计入延迟。
+// 旧默认的 www.gstatic.com 实测常有整条连接落到较远的 Google 服务器(固定多出 100~340ms)
+let defaultPingTestURL = "https://www.google.com/generate_204"
+let legacyDefaultPingTestURL = "http://www.gstatic.com/generate_204"
+
+/// 仍是旧默认测速地址时返回新默认值, 否则 nil(用户自定义的地址不动)
+func migratedPingTestURL(_ stored: String) -> String? {
+    stored == legacyDefaultPingTestURL ? defaultPingTestURL : nil
+}
 let defaultUDPTestURL = "ntp.pool.ntp.org"
 let defaultCurrentConnectionTestURL = ""
 
@@ -94,6 +98,11 @@ final class AppSettings: ObservableObject {
             selectedTheme = theme
         } else {
             selectedTheme = .System
+        }
+        // 仍是旧默认测速地址的迁移到新默认值
+        if let migrated = migratedPingTestURL(pingTestURL) {
+            UserDefaults.del(forKey: .pingTestURL)
+            pingTestURL = migrated
         }
         // 初始化应用外观,等待主线程完成后再执行
         DispatchQueue.main.async {
