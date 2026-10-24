@@ -415,11 +415,25 @@ enum CombinedInboundType: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// 组合出站模式: balance=每个分组的多个出站负载均衡, chain=每个分组的出站按顺序串联为链式代理(第一个为入口,最后一个为出口)
+enum CombinedOutboundMode: String, Codable, CaseIterable, Identifiable {
+    case balance
+    case chain
+
+    var id: Self { self }
+}
+
 struct CombinedInboundOutboundGroup: Codable, Identifiable, Equatable, Hashable {
     var id: String = UUID().uuidString
     var inboundType: CombinedInboundType = .mixed
     var port: Int = 1080
     var outboundProfileUUIDs: [String] = []
+}
+
+/// 组合配置出站 tag: 链式节点使用独立前缀，统计时不把整条链的延迟写回单个节点
+func combinedOutboundTag(isChain: Bool, groupIndex: Int, profileIndex: Int, uuid: String) -> String {
+    let prefix = isChain ? "combo-chain" : "combo-out"
+    return "\(prefix)-\(groupIndex)-\(profileIndex)-\(uuid)"
 }
 
 struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transferable, TableRecord, FetchableRecord, PersistableRecord, IdColumnProtocol {
@@ -430,6 +444,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
     var coreType: ProfileCoreSelection?
     var colorName: String
     var balancerStrategy: String
+    var outboundMode: CombinedOutboundMode
     var lastUpdate: Date
 
     static let draggableType = UTType(exportedAs: "net.yanue.V2rayU")
@@ -442,7 +457,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
     static var databaseTableName: String { "combined_config" }
 
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, sort, groupsJson, coreType, colorName, balancerStrategy, lastUpdate
+        case uuid, remark, sort, groupsJson, coreType, colorName, balancerStrategy, outboundMode, lastUpdate
     }
 
     enum Columns {
@@ -453,6 +468,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
         static let coreType = Column(CodingKeys.coreType)
         static let colorName = Column(CodingKeys.colorName)
         static let balancerStrategy = Column(CodingKeys.balancerStrategy)
+        static let outboundMode = Column(CodingKeys.outboundMode)
         static let lastUpdate = Column(CodingKeys.lastUpdate)
     }
 
@@ -464,6 +480,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
         coreType: ProfileCoreSelection? = .auto,
         colorName: String = CombinationColor.blue.rawValue,
         balancerStrategy: String = "roundRobin",
+        outboundMode: CombinedOutboundMode = .balance,
         lastUpdate: Date = Date()
     ) {
         self.uuid = uuid
@@ -472,6 +489,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
         self.coreType = coreType
         self.colorName = colorName
         self.balancerStrategy = balancerStrategy
+        self.outboundMode = outboundMode
         self.lastUpdate = lastUpdate
         self.groupsJson = CombinedConfigEntity.encodeGroups(groups)
     }
@@ -483,6 +501,11 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
 
     var displayName: String {
         remark.isEmpty ? "组合配置" : remark
+    }
+
+    /// 分组是否按链式代理生成（至少两个节点，否则等同普通单出站）
+    func isChain(_ group: CombinedInboundOutboundGroup) -> Bool {
+        outboundMode == .chain && group.outboundProfileUUIDs.count > 1
     }
 
     static func encodeGroups(_ groups: [CombinedInboundOutboundGroup]) -> String {
@@ -522,6 +545,14 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
             if try !db.columns(in: databaseTableName).contains(where: { $0.name == "balancerStrategy" }) {
                 try db.alter(table: databaseTableName) { t in
                     t.add(column: Columns.balancerStrategy.name, .text).defaults(to: "roundRobin")
+                }
+            }
+        }
+        migrator.registerMigration("addOutboundModeToCombinedConfig") { db in
+            if try !db.tableExists(databaseTableName) { return }
+            if try !db.columns(in: databaseTableName).contains(where: { $0.name == "outboundMode" }) {
+                try db.alter(table: databaseTableName) { t in
+                    t.add(column: Columns.outboundMode.name, .text).notNull().defaults(to: CombinedOutboundMode.balance.rawValue)
                 }
             }
         }

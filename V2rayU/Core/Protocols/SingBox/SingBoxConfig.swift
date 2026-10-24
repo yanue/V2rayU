@@ -106,6 +106,7 @@ struct SingboxOutbound: Codable {
     var hop_interval: String?
     var outbounds: [String]?
     var `default`: String?
+    var detour: String? // 经由指定 tag 的出站拨号(链式代理)
 
     init(
         type: String,

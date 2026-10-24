@@ -177,16 +177,20 @@ actor XrayApiStatsHandler: NSObject {
             let isComboMode = !runningCombination.isEmpty
 
             if isComboMode, let observatory = vars.observatory {
-                // 组合模式: 遍历所有 combo-out-* 条目, 提取 UUID 更新每个 profile 的延迟
+                // 组合模式: 遍历 combo-out-* / combo-chain-* 条目, 提取 UUID 更新每个 profile 的延迟
+                // (链式只观测出口，其延迟是整条链的延迟，只计入整体显示，不写回单个节点)
                 var delays: [Double] = []
-                for (tag, obs) in observatory where tag.hasPrefix("combo-out-") {
+                for (tag, obs) in observatory where tag.hasPrefix("combo-out-") || tag.hasPrefix("combo-chain-") {
                     let parts = tag.components(separatedBy: "-")
                     guard parts.count >= 5 else { continue }
                     let uuid = parts[4...].joined(separator: "-")
                     let delay = obs.delay
                     if delay > 0 {
                         delays.append(delay)
-                        ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
+                        // 链式出口的延迟是整条链的延迟，不写回单个节点
+                        if tag.hasPrefix("combo-out-") {
+                            ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
+                        }
                     }
                 }
                 // 使用最低延迟作为整体显示值
@@ -248,8 +252,17 @@ actor ClashApilatencyHandler: NSObject {
         var allDelays: [Double] = []
 
         for (groupIndex, group) in combo.groups.enumerated() {
+            let isChain = combo.isChain(group)
+            if isChain, let exitUUID = group.outboundProfileUUIDs.last {
+                // 链式只测出口(即整条链)，延迟不写回单个节点
+                let exitTag = combinedOutboundTag(isChain: true, groupIndex: groupIndex, profileIndex: group.outboundProfileUUIDs.count - 1, uuid: exitUUID)
+                if let delay = await queryDelay(proxyName: exitTag) {
+                    allDelays.append(delay)
+                }
+                continue
+            }
             for (profileIndex, uuid) in group.outboundProfileUUIDs.enumerated() {
-                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(uuid)"
+                let outboundTag = combinedOutboundTag(isChain: false, groupIndex: groupIndex, profileIndex: profileIndex, uuid: uuid)
                 if let delay = await queryDelay(proxyName: outboundTag) {
                     ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
                     allDelays.append(delay)

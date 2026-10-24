@@ -22,6 +22,21 @@ struct CombinedConfigResolved {
     var firstProfile: ProfileEntity? {
         groups.flatMap { $0.profiles }.first
     }
+
+    func isChain(_ resolvedGroup: CombinedConfigResolvedGroup) -> Bool {
+        combination.isChain(resolvedGroup.group)
+    }
+
+    func outboundTag(groupIndex: Int, profileIndex: Int) -> String {
+        let resolvedGroup = groups[groupIndex]
+        return combinedOutboundTag(isChain: isChain(resolvedGroup), groupIndex: groupIndex, profileIndex: profileIndex, uuid: resolvedGroup.profiles[profileIndex].uuid)
+    }
+
+    /// 首组为链式时，出口的上一跳 tag（"proxy" 复制出口并经由它拨号，同样走整条链）；否则返回 nil
+    var chainProxyPreviousTag: String? {
+        guard let firstGroup = groups.first, isChain(firstGroup) else { return nil }
+        return outboundTag(groupIndex: 0, profileIndex: firstGroup.profiles.count - 2)
+    }
 }
 
 class CoreConfigHandler {

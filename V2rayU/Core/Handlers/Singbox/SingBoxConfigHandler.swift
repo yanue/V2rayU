@@ -138,14 +138,25 @@ class SingboxConfigHandler {
                 listen_port: resolvedGroup.group.port
             ))
 
+            let isChain = resolved.isChain(resolvedGroup)
             var outboundTags: [String] = []
             for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
                 var outbound = SingboxOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
-                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(profile.uuid)"
+                let outboundTag = resolved.outboundTag(groupIndex: groupIndex, profileIndex: profileIndex)
                 outbound.tag = outboundTag
                 outbound.domain_resolver = domain_resolver
+                // 链式代理: 当前节点经由上一个节点拨号；不设 domain_resolver，服务器域名交给上一跳解析，不在本机查询
+                if isChain, let previousTag = outboundTags.last {
+                    outbound.detour = previousTag
+                    outbound.domain_resolver = nil
+                }
                 outbounds.append(outbound)
                 outboundTags.append(outboundTag)
+            }
+
+            if isChain, let exitTag = outboundTags.last {
+                comboRules.append(RouteRule(outbound: exitTag, domain: nil, process_name: nil, inbound: [inboundTag]))
+                continue
             }
 
             let routeOutbound = "combo-selector-\(groupIndex)"
@@ -165,7 +176,13 @@ class SingboxConfigHandler {
             comboRules.append(RouteRule(outbound: routeOutbound, domain: nil, process_name: nil, inbound: [inboundTag]))
         }
 
-        if let firstProfile = resolved.firstProfile {
+        if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
+            // 首组为链式时，"proxy"(路由规则/远程 DNS 使用)同样走整条链: 复制出口节点并经由出口的上一跳拨号
+            var proxyFallback = SingboxOutboundHandler(from: ProfileModel(from: exitProfile)).getOutbound()
+            proxyFallback.tag = "proxy"
+            proxyFallback.detour = previousTag
+            outbounds.append(proxyFallback)
+        } else if let firstProfile = resolved.firstProfile {
             var proxyFallback = SingboxOutboundHandler(from: ProfileModel(from: firstProfile)).getOutbound()
             proxyFallback.tag = "proxy"
             proxyFallback.domain_resolver = domain_resolver
@@ -497,7 +514,9 @@ class SingboxConfigHandler {
 
     private func proxyServerDomains(from outbounds: [SingboxOutbound]) -> [String] {
         var domains: [String] = []
-        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true {
+        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true || outbound.tag?.hasPrefix("combo-chain-") == true {
+            // 链式代理的后续节点由上一跳解析服务器域名
+            if outbound.detour != nil { continue }
             guard let server = outbound.server?.trimmingCharacters(in: .whitespacesAndNewlines),
                   !server.isEmpty,
                   isDomain(str: server),

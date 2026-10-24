@@ -44,14 +44,23 @@ struct CombinedConfigListView: View {
         return core.displayName
     }
 
-    private func strategyLabel(_ strategy: String) -> String {
-        guard !strategy.isEmpty else { return "roundRobin" }
-        return strategy
+    private func strategyLabel(_ item: CombinedConfigEntity) -> String {
+        if item.outboundMode == .chain { return String(localized: .OutboundModeChain) }
+        switch item.balancerStrategy {
+        case "leastPing": return String(localized: .BalancerLeastPing)
+        case "random": return String(localized: .BalancerRandom)
+        case "leastLoad": return String(localized: .BalancerLeastLoad)
+        case "", "roundRobin": return String(localized: .BalancerRoundRobin)
+        default: return item.balancerStrategy
+        }
     }
 
-    private func inboundSummary(_ item: CombinedConfigEntity) -> String {
+    private func inboundSummary(_ item: CombinedConfigEntity, names: [String: String]) -> String {
         item.groups.map { group in
-            "\(group.inboundType.rawValue.uppercased()):\(group.port)(\(group.outboundProfileUUIDs.count))"
+            let inbound = "\(group.inboundType.rawValue.uppercased()):\(group.port)"
+            // 链式代理显示链路走向: 入口 → … → 出口
+            guard item.isChain(group) else { return "\(inbound)(\(group.outboundProfileUUIDs.count))" }
+            return "\(inbound) " + group.outboundProfileUUIDs.map { names[$0] ?? "?" }.joined(separator: " → ")
         }
         .joined(separator: ", ")
     }
@@ -68,6 +77,14 @@ struct CombinedConfigListView: View {
                         editingItem = CombinedConfigEntity()
                     }) {
                         Label(String(localized: .Add), systemImage: "plus")
+                    }
+                    .buttonStyle(.bordered)
+                    .focusable(false)
+
+                    Button(action: {
+                        editingItem = CombinedConfigEntity(outboundMode: .chain)
+                    }) {
+                        Label(String(localized: .NewChainProxy), systemImage: "link")
                     }
                     .buttonStyle(.bordered)
                     .focusable(false)
@@ -111,10 +128,14 @@ struct CombinedConfigListView: View {
 
             // Default ports & current node
             HStack(spacing: 12) {
-                Label("SOCKS:\(getSocksProxyPort())", systemImage: "rectangle.connected.to.line.below")
-                Label("HTTP:\(getHttpProxyPort())", systemImage: "rectangle.connected.to.line.below")
+                Label { Text(verbatim: "SOCKS:\(getSocksProxyPort())") } icon: { Image(systemName: "rectangle.connected.to.line.below") }
+                Label { Text(verbatim: "HTTP:\(getHttpProxyPort())") } icon: { Image(systemName: "rectangle.connected.to.line.below") }
                 Spacer()
-                if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
+                if AppState.shared.v2rayTurnOn, let combo = viewModel.list.first(where: { $0.uuid == AppState.shared.runningCombination }) {
+                    // 运行组合时显示组合名，而不是组合内的第一个节点
+                    Label(combo.displayName, systemImage: "point.3.connected.trianglepath.dotted")
+                        .foregroundColor(.accentColor)
+                } else if AppState.shared.v2rayTurnOn, let server = AppState.shared.runningServer {
                     Label(server.remark.isEmpty ? server.address : server.remark,
                           systemImage: "point.3.connected.trianglepath.dotted")
                         .foregroundColor(.accentColor)
@@ -202,7 +223,7 @@ struct CombinedConfigListView: View {
                     }
                 }
             } label: {
-                Label(isRunning ? "Deactivate" : String(localized: .SetActive),
+                Label(isRunning ? String(localized: .CombinedDeactivate) : String(localized: .SetActive),
                       systemImage: isRunning ? "stop.circle" : "bolt")
             }
             .focusable(false)
@@ -237,7 +258,8 @@ struct CombinedConfigListView: View {
     }
 
     private var tableView: some View {
-        Table(of: CombinedConfigEntity.self, sortOrder: $sortOrder) {
+        let names = Dictionary(uniqueKeysWithValues: viewModel.profiles.map { ($0.uuid, $0.remark.isEmpty ? $0.address : $0.remark) })
+        return Table(of: CombinedConfigEntity.self, sortOrder: $sortOrder) {
             TableColumn("#") { (row: CombinedConfigEntity) in
                 HStack(spacing: 4) {
                     if isRunningRow(row) {
@@ -296,14 +318,14 @@ struct CombinedConfigListView: View {
             }
             .width(min: 120, max: 300)
 
-            TableColumn("Color") { (row: CombinedConfigEntity) in
+            TableColumn(String(localized: .CombinedColor)) { (row: CombinedConfigEntity) in
                 Circle()
                     .fill(comboColor(row))
                     .frame(width: 10, height: 10)
             }
             .width(36)
 
-            TableColumn("Core") { (row: CombinedConfigEntity) in
+            TableColumn(String(localized: .Core)) { (row: CombinedConfigEntity) in
                 let badge = coreBadge(row)
                 if !badge.isEmpty {
                     Text(badge)
@@ -317,17 +339,26 @@ struct CombinedConfigListView: View {
             }
             .width(60)
 
-            TableColumn("Combinations") { (row: CombinedConfigEntity) in
-                Text(inboundSummary(row))
+            TableColumn(String(localized: .Combinations)) { (row: CombinedConfigEntity) in
+                let summary = inboundSummary(row, names: names)
+                Text(summary)
                     .font(.caption.monospaced())
+                    .lineLimit(1)
+                    .help(summary)
             }
-            .width(min: 100, max: 200)
+            .width(min: 100, max: 400)
 
-            TableColumn("Strategy") { (row: CombinedConfigEntity) in
-                Text(strategyLabel(row.balancerStrategy))
-                    .font(.caption)
+            TableColumn(String(localized: .CombinedStrategy)) { (row: CombinedConfigEntity) in
+                if row.outboundMode == .chain {
+                    Label(strategyLabel(row), systemImage: "link")
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                } else {
+                    Text(strategyLabel(row))
+                        .font(.caption)
+                }
             }
-            .width(70)
+            .width(80)
         } rows: {
             ForEach(filteredAndSortedItems) { row in
                 TableRow(row)

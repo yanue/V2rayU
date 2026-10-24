@@ -260,6 +260,7 @@ struct V2rayStreamSettingSockopt: Codable {
     var tproxy: tproxy? // 是否开启透明代理 (仅适用于 Linux)。
     var domainStrategy: String? // 用 xray 内置 DNS 解析目标域名(UseIP/UseIPv4/UseIPv4v6...)，v1.8.0+
     var interface: String? // 绑定出站网卡(macOS: IP_BOUND_IF)，v1.8.0+
+    var dialerProxy: String? // 经由指定 tag 的出站拨号(链式代理)
 }
 
 

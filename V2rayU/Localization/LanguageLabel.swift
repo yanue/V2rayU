@@ -539,6 +539,34 @@ enum LanguageLabel: String, CaseIterable {
     case InvalidCombinationTip
     case InvalidCombinationStartTip
     case CombinationNoAvailableOutbounds
+    case NewChainProxy
+    case OutboundMode
+    case OutboundModeBalance
+    case OutboundModeChain
+    case ChainOrderTip
+    case ChainSelectTip
+    case ChainEntry
+    case ChainExit
+    case ChainNeedTwoProfiles
+    case IncompatibleWithCore
+    case IncompatibleProfilesFormat
+    case CombinedColor
+    case CombinedInbound
+    case CombinedStrategy
+    case CombinedDeactivate
+    case CombinedOutboundProfiles
+    case CombinedAvailableFormat
+    case CombinedAvailableOfFormat
+    case CombinedNoCompatibleProfiles
+    case CombinedPortRangeError
+    case CombinedDuplicatePort
+    case CombinedPortConflictFormat
+    case CombinedNeedOneProfile
+    case CombinedProfilesMissing
+    case BalancerRoundRobin
+    case BalancerLeastPing
+    case BalancerRandom
+    case BalancerLeastLoad
     case XrayCompatibilityWarningTitle
     case CoreCompatibilityWarningTitle
     case DownloadCompatVersion

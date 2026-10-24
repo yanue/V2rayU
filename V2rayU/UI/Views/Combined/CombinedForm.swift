@@ -16,6 +16,8 @@ struct CombinedConfigFormView: View {
 
     @State private var groups: [CombinedInboundOutboundGroup] = []
 
+    private var mode: CombinedOutboundMode { item.outboundMode }
+
     /// 根据当前选中的核心类型过滤兼容的 profile
     private var filteredProfiles: [ProfileEntity] {
         guard let coreType = item.coreType, let forcedType = coreType.forcedCoreType else {
@@ -26,6 +28,16 @@ struct CombinedConfigFormView: View {
             copy.coreType = forcedType == .XrayCore ? .xray : .singbox
             return copy.resolveCoreCompatibility().canLaunch
         }
+    }
+
+    /// 节点在所选核心下不兼容的原因；兼容返回 nil
+    private func incompatibleReason(_ p: ProfileEntity) -> String? {
+        guard let coreType = item.coreType, let forcedType = coreType.forcedCoreType else { return nil }
+        var copy = p
+        copy.coreType = forcedType == .XrayCore ? .xray : .singbox
+        let decision = copy.resolveCoreCompatibility()
+        guard !decision.canLaunch else { return nil }
+        return decision.warningMessage ?? String(localized: .IncompatibleWithCore)
     }
 
     private var conflictPorts: Set<Int> {
@@ -49,23 +61,28 @@ struct CombinedConfigFormView: View {
 
         for group in groups {
             guard (1...65535).contains(group.port) else {
-                return "Port must be between 1 and 65535."
+                return String(localized: .CombinedPortRangeError)
             }
             guard !ports.contains(group.port) else {
-                return "Duplicate inbound ports are not allowed."
+                return String(localized: .CombinedDuplicatePort)
             }
             guard !conflictPorts.contains(group.port) else {
                 let conflictDesc = conflictPorts.sorted().map(String.init).joined(separator: ", ")
-                return "Port \(group.port) conflicts with default proxy port (\(conflictDesc))."
+                return String(localized: .CombinedPortConflictFormat, arguments: group.port, conflictDesc)
+            }
+            guard mode != .chain || group.outboundProfileUUIDs.count >= 2 else {
+                return String(localized: .ChainNeedTwoProfiles)
             }
             guard !group.outboundProfileUUIDs.isEmpty else {
-                return "Each inbound group must select at least one outbound profile."
+                return String(localized: .CombinedNeedOneProfile)
             }
             guard group.outboundProfileUUIDs.allSatisfy({ profileUUIDs.contains($0) }) else {
-                return "Some selected outbound profiles no longer exist."
+                return String(localized: .CombinedProfilesMissing)
             }
-            guard group.outboundProfileUUIDs.allSatisfy({ filteredUUIDs.contains($0) }) else {
-                return "Some selected outbound profiles are incompatible with the selected core."
+            let incompatible = group.outboundProfileUUIDs.filter { !filteredUUIDs.contains($0) }
+            guard incompatible.isEmpty else {
+                let names = profiles.filter { incompatible.contains($0.uuid) }.map { $0.remark.isEmpty ? $0.address : $0.remark }
+                return String(localized: .IncompatibleProfilesFormat, arguments: names.joined(separator: ", "))
             }
             ports.insert(group.port)
         }
@@ -76,7 +93,7 @@ struct CombinedConfigFormView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(item.remark.isEmpty ? String(localized: .Add) : String(localized: .Edit))
+                Text(item.remark.isEmpty ? String(localized: mode == .chain ? .NewChainProxy : .Add) : String(localized: .Edit))
                     .font(.headline)
                 Spacer()
             }
@@ -94,7 +111,7 @@ struct CombinedConfigFormView: View {
                     }
 
                     HStack(spacing: 0) {
-                        Text("Color")
+                        Text(String(localized: .CombinedColor))
                             .frame(width: 80, alignment: .leading)
                         HStack(spacing: 8) {
                             ForEach(CombinationColor.allCases) { color in
@@ -123,15 +140,26 @@ struct CombinedConfigFormView: View {
                     }
 
                     HStack(spacing: 0) {
-                        Text("Balancer")
+                        Text(String(localized: .OutboundMode))
                             .frame(width: 80, alignment: .leading)
-                        Picker(selection: $item.balancerStrategy, label: EmptyView()) {
-                            Text("Round Robin").tag("roundRobin")
-                            Text("Least Ping").tag("leastPing")
-                            Text("Random").tag("random")
-                            Text("Least Load").tag("leastLoad")
+                        Picker(selection: $item.outboundMode, label: EmptyView()) {
+                            Text(String(localized: .OutboundModeBalance)).tag(CombinedOutboundMode.balance)
+                            Text(String(localized: .OutboundModeChain)).tag(CombinedOutboundMode.chain)
                         }
-                        .pickerStyle(.menu)
+                        .pickerStyle(.segmented)
+                        .fixedSize()
+                        // 负载均衡策略只对负载均衡模式有意义
+                        if mode == .balance {
+                            Picker(selection: $item.balancerStrategy, label: EmptyView()) {
+                                Text(String(localized: .BalancerRoundRobin)).tag("roundRobin")
+                                Text(String(localized: .BalancerLeastPing)).tag("leastPing")
+                                Text(String(localized: .BalancerRandom)).tag("random")
+                                Text(String(localized: .BalancerLeastLoad)).tag("leastLoad")
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 140)
+                            .padding(.leading, 12)
+                        }
                         Spacer()
                     }
 
@@ -205,6 +233,12 @@ struct CombinedConfigFormView: View {
                 groups[i].outboundProfileUUIDs.removeAll { !validUUIDs.contains($0) }
             }
             groups.removeAll { $0.outboundProfileUUIDs.isEmpty }
+            // 新建时直接给出一个空分组，免去再点「添加」
+            if groups.isEmpty {
+                var newGroup = CombinedInboundOutboundGroup()
+                newGroup.port = nextAvailablePort(from: newGroup.port, usedPorts: [])
+                groups = [newGroup]
+            }
         }
     }
 
@@ -217,7 +251,7 @@ struct CombinedConfigFormView: View {
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Inbound")
+                Text(String(localized: .CombinedInbound))
                     .frame(width: 80, alignment: .leading)
                 Picker(selection: binding.inboundType, label: EmptyView()) {
                     ForEach(CombinedInboundType.allCases) { kind in
@@ -227,7 +261,7 @@ struct CombinedConfigFormView: View {
                 .pickerStyle(.segmented)
                 .frame(width: 180)
 
-                Text("Port")
+                Text(String(localized: .Port))
                 TextField("port", value: binding.port, formatter: NumberFormatter())
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 90)
@@ -257,30 +291,35 @@ struct CombinedConfigFormView: View {
             }
 
             HStack {
-                Text("Outbound profiles:")
+                Text(String(localized: .CombinedOutboundProfiles))
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
                 let totalCount = profiles.count
                 let filteredCount = filteredProfiles.count
                 if filteredCount < totalCount {
-                    Text("\(filteredCount)/\(totalCount) available")
+                    Text(String(localized: .CombinedAvailableOfFormat, arguments: filteredCount, totalCount))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 } else {
-                    Text("\(totalCount) available")
+                    Text(String(localized: .CombinedAvailableFormat, arguments: totalCount))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }
 
             if filteredProfiles.isEmpty {
-                Text("(no compatible profiles for the selected core)")
+                Text(String(localized: .CombinedNoCompatibleProfiles))
                     .font(.caption)
                     .foregroundColor(.secondary)
+            } else if mode == .chain {
+                chainEditor(idx: idx)
             } else {
+                // 已勾选但与所选核心不兼容的节点不在 filteredProfiles 中，单独置顶显示以便取消勾选
+                let filteredUUIDs = Set(filteredProfiles.map { $0.uuid })
+                let incompatibleSelected = profiles.filter { groups[idx].outboundProfileUUIDs.contains($0.uuid) && !filteredUUIDs.contains($0.uuid) }
                 VStack(alignment: .leading, spacing: 1) {
-                    ForEach(filteredProfiles) { p in
+                    ForEach(incompatibleSelected + filteredProfiles) { p in
                         HStack(spacing: 6) {
                             Toggle(isOn: outboundBinding(idx: idx, uuid: p.uuid)) {
                                 EmptyView()
@@ -288,31 +327,7 @@ struct CombinedConfigFormView: View {
                             .toggleStyle(.checkbox)
                             .labelsHidden()
 
-                            if !p.serverRegion.isEmpty {
-                                Text(countryCodeToEmoji(p.serverRegion))
-                            }
-
-                            Text(p.remark.isEmpty ? p.address : p.remark)
-                                .lineLimit(1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                            Text(p.protocol.rawValue)
-                                .font(.caption2.bold())
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .background(Color.accentColor.opacity(0.8))
-                                .cornerRadius(3)
-
-                            Text("\(p.address):\(p.port)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-
-                            Text(p.speed > 0 ? "[\(p.speed)ms]" : "[-]")
-                                .font(.caption2)
-                                .foregroundColor(p.speed > 0 ? Color(getSpeedColor(latency: Double(p.speed))) : .secondary)
-                                .frame(width: 60, alignment: .trailing)
+                            profileInfo(p, compatible: filteredUUIDs.contains(p.uuid))
                         }
                         .padding(.vertical, 3)
                         .padding(.horizontal, 4)
@@ -323,6 +338,133 @@ struct CombinedConfigFormView: View {
                         )
                         .cornerRadius(4)
                     }
+                }
+            }
+        }
+    }
+
+    /// 节点信息: 国旗、名称、协议、地址、延迟；不兼容时标红并在悬停时显示原因
+    /// (compatible 由调用方根据 filteredProfiles 传入，避免每行重复跑兼容性规则)
+    @ViewBuilder
+    private func profileInfo(_ p: ProfileEntity, compatible: Bool = true) -> some View {
+        let reason = compatible ? nil : incompatibleReason(p)
+        if !p.serverRegion.isEmpty {
+            Text(countryCodeToEmoji(p.serverRegion))
+        }
+
+        HStack(spacing: 4) {
+            if let reason {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.red)
+                    .help(reason)
+            }
+            Text(p.remark.isEmpty ? p.address : p.remark)
+                .lineLimit(1)
+                .foregroundColor(reason == nil ? .primary : .red)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .help(reason ?? "")
+
+        Text(p.protocol.rawValue)
+            .font(.caption2.bold())
+            .foregroundColor(.white)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 1)
+            .background(Color.accentColor.opacity(0.8))
+            .cornerRadius(3)
+
+        Text(verbatim: "\(p.address):\(p.port)")
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .lineLimit(1)
+
+        Text(verbatim: p.speed > 0 ? "[\(p.speed)ms]" : "[-]")
+            .font(.caption2)
+            .foregroundColor(p.speed > 0 ? Color(getSpeedColor(latency: Double(p.speed))) : .secondary)
+            .frame(width: 60, alignment: .trailing)
+    }
+
+    /// 链式节点列表: 已选节点按链路顺序在上(第一个为入口，最后一个为出口)，未选节点在下，点击追加到链路末尾
+    @ViewBuilder
+    private func chainEditor(idx: Int) -> some View {
+        let uuids = groups[idx].outboundProfileUUIDs
+        let profilesByUUID = Dictionary(uniqueKeysWithValues: profiles.map { ($0.uuid, $0) })
+        let compatibleProfiles = filteredProfiles
+        let compatibleUUIDs = Set(compatibleProfiles.map { $0.uuid })
+
+        VStack(alignment: .leading, spacing: 1) {
+            Text(String(localized: .ChainOrderTip))
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 3)
+
+            ForEach(Array(uuids.enumerated()), id: \.element) { pos, uuid in
+                if let p = profilesByUUID[uuid] {
+                    HStack(spacing: 6) {
+                        Text("\(pos + 1)")
+                            .font(.caption.bold().monospacedDigit())
+                            .foregroundColor(.white)
+                            .frame(width: 16, height: 16)
+                            .background(Circle().fill(Color.accentColor))
+
+                        profileInfo(p, compatible: compatibleUUIDs.contains(p.uuid))
+
+                        Text(pos == 0 ? String(localized: .ChainEntry) : (pos == uuids.count - 1 ? String(localized: .ChainExit) : ""))
+                            .font(.caption2.bold())
+                            .foregroundColor(.accentColor)
+                            .frame(width: 30)
+
+                        Button {
+                            groups[idx].outboundProfileUUIDs.swapAt(pos, pos - 1)
+                        } label: {
+                            Image(systemName: "chevron.up")
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(pos == 0)
+                        Button {
+                            groups[idx].outboundProfileUUIDs.swapAt(pos, pos + 1)
+                        } label: {
+                            Image(systemName: "chevron.down")
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(pos == uuids.count - 1)
+                        Button {
+                            groups[idx].outboundProfileUUIDs.remove(at: pos)
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                        .buttonStyle(.borderless)
+                    }
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 4)
+                    .background(Color.accentColor.opacity(0.08))
+                    .cornerRadius(4)
+                }
+            }
+
+            if uuids.count < 2 {
+                Text(String(localized: .ChainSelectTip))
+                    .font(.caption)
+                    .foregroundColor(.orange)
+                    .padding(.vertical, 3)
+            }
+
+            Divider()
+                .padding(.vertical, 4)
+
+            ForEach(compatibleProfiles.filter { !uuids.contains($0.uuid) }) { p in
+                HStack(spacing: 6) {
+                    Image(systemName: "plus.circle")
+                        .foregroundColor(.accentColor)
+                        .frame(width: 16)
+
+                    profileInfo(p)
+                }
+                .padding(.vertical, 3)
+                .padding(.horizontal, 4)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    groups[idx].outboundProfileUUIDs.append(p.uuid)
                 }
             }
         }

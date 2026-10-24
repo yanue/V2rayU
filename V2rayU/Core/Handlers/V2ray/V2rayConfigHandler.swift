@@ -457,6 +457,8 @@ class V2rayConfigHandler {
                 stream.sockopt = sockopt
                 outbound.streamSettings = stream
             default:
+                // 链式代理的后续节点经由上一跳拨号，不直接连网卡，也不在本地解析服务器域名
+                if outbound.streamSettings?.sockopt?.dialerProxy != nil { continue }
                 var stream = outbound.streamSettings ?? V2rayStreamSettings()
                 var sockopt = stream.sockopt ?? V2rayStreamSettingSockopt()
                 sockopt.domainStrategy = proxyStrategy
@@ -535,14 +537,22 @@ class V2rayConfigHandler {
             )
             inbounds.append(inbound)
 
+            let isChain = resolved.isChain(resolvedGroup)
             var outboundTags: [String] = []
             for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
-                let outboundTag = "combo-out-\(groupIndex)-\(profileIndex)-\(profile.uuid)"
+                let outboundTag = resolved.outboundTag(groupIndex: groupIndex, profileIndex: profileIndex)
                 let outbound = V2rayOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
                 outbound.tag = outboundTag
+                // 链式代理: 当前节点经由上一个节点拨号
+                if isChain, let previousTag = outboundTags.last {
+                    Self.setDialerProxy(outbound, tag: previousTag)
+                }
                 outbounds.append(outbound)
                 outboundTags.append(outboundTag)
-                subjectSelector.append(outboundTag)
+                // 链式只观测出口(即整条链)
+                if !isChain || profileIndex == resolvedGroup.profiles.count - 1 {
+                    subjectSelector.append(outboundTag)
+                }
             }
 
             var rule = V2rayRoutingRule()
@@ -551,7 +561,9 @@ class V2rayConfigHandler {
             rule.domain = nil
             rule.ip = nil
 
-            if outboundTags.count == 1 {
+            if isChain {
+                rule.outboundTag = outboundTags.last
+            } else if outboundTags.count == 1 {
                 rule.outboundTag = outboundTags[0]
             } else {
                 let balancerTag = "combo-balancer-\(groupIndex)"
@@ -568,7 +580,13 @@ class V2rayConfigHandler {
             comboRules.append(rule)
         }
 
-        if let firstProfile = resolved.firstProfile {
+        if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
+            // 首组为链式时，"proxy"(路由规则/远程 DNS 使用)同样走整条链: 复制出口节点并经由出口的上一跳拨号
+            let proxyFallback = V2rayOutboundHandler(from: ProfileModel(from: exitProfile)).getOutbound()
+            proxyFallback.tag = "proxy"
+            Self.setDialerProxy(proxyFallback, tag: previousTag)
+            outbounds.append(proxyFallback)
+        } else if let firstProfile = resolved.firstProfile {
             let proxyFallback = V2rayOutboundHandler(from: ProfileModel(from: firstProfile)).getOutbound()
             proxyFallback.tag = "proxy"
             outbounds.append(proxyFallback)
@@ -683,7 +701,9 @@ class V2rayConfigHandler {
             domains.append(value)
         }
 
-        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true {
+        for outbound in outbounds where outbound.tag == "proxy" || outbound.tag?.hasPrefix("combo-out-") == true || outbound.tag?.hasPrefix("combo-chain-") == true {
+            // 链式代理的后续节点由上一跳解析服务器域名
+            if outbound.streamSettings?.sockopt?.dialerProxy != nil { continue }
             switch outbound.settings {
             case let settings as V2rayOutboundTrojan:
                 settings.servers.forEach { appendIfDomain($0.address) }
@@ -705,6 +725,15 @@ class V2rayConfigHandler {
         }
 
         return domains
+    }
+
+    /// 链式代理: 让 outbound 经由指定 tag 的出站拨号(sockopt.dialerProxy，保留自身传输层配置)
+    static func setDialerProxy(_ outbound: V2rayOutbound, tag: String) {
+        var stream = outbound.streamSettings ?? V2rayStreamSettings()
+        var sockopt = stream.sockopt ?? V2rayStreamSettingSockopt()
+        sockopt.dialerProxy = tag
+        stream.sockopt = sockopt
+        outbound.streamSettings = stream
     }
 
     func getInbound(`protocol`: V2rayProtocolInbound, listen: String, port: String, enableSniffing:Bool, tag: String? = nil) -> V2rayInbound {
