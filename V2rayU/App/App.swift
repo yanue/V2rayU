@@ -88,6 +88,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 先设置状态再禁用菜单，防止 Combine 异步投递导致窗口期内可点击
         AppState.shared.isCoreStarting = true
         AppMenuManager.shared.refreshBasicMenus()
+        // 同步刷新状态栏显示转圈，避免异步刷新排在启动任务之后、主线程忙时转圈不出现
+        AppMenuManager.shared.refreshStatusViews()
         Task{
             // 初始化helper（创建目录、修权限等）
             await AppInstaller.shared.checkInstall()

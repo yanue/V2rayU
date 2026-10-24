@@ -135,8 +135,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func setStatusItem() {
-        // 使用 variableLength 配合 StatusItemView 的固有尺寸实现自适应宽度
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        // 宽度由 refreshStatusViews 按 StatusItemView 内容显式设置，避免 variableLength 推算宽度留出空隙
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem.button {
             button.addSubview(statusItemView)
@@ -151,8 +151,11 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         refreshStatusViews()
     }
 
-    private func refreshStatusViews() {
-        statusItemView.update(appState: AppState.shared, settings: AppSettings.shared)
+    func refreshStatusViews() {
+        let width = statusItemView.update(appState: AppState.shared, settings: AppSettings.shared)
+        if let statusItem, statusItem.length != width {
+            statusItem.length = width
+        }
         coreStatusView.update(appState: AppState.shared)
     }
 

@@ -23,12 +23,88 @@ private func speedText(_ prefix: String, _ value: Double) -> String {
     "\(prefix) \(String(format: "%.0f", value)) KB/s"
 }
 
+// MARK: - 加载指示器
+
+// 启动期间主线程忙于初始化，NSProgressIndicator 依赖主线程 runloop 驱动动画会卡住不转。
+// 这里用 CAReplicatorLayer 画系统风格的花瓣转圈（8 根短线依次渐隐），
+// 动画由渲染服务驱动，主线程阻塞时也能持续转动。
+private final class LoadingSpinnerView: NSView {
+    private let replicator = CAReplicatorLayer()
+    private let spoke = CALayer()
+    private static let spokeCount = 8
+    private static let duration: CFTimeInterval = 0.8
+    private static let animationKey = "fade"
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+        replicator.instanceCount = Self.spokeCount
+        replicator.instanceTransform = CATransform3DMakeRotation(-2 * .pi / CGFloat(Self.spokeCount), 0, 0, 1)
+        replicator.instanceDelay = Self.duration / CFTimeInterval(Self.spokeCount)
+        spoke.opacity = 0.25
+        replicator.addSublayer(spoke)
+        layer?.addSublayer(replicator)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layout() {
+        super.layout()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        replicator.frame = bounds
+        // 短线位于圆环上半部：宽 1.5pt，从半径 30% 延伸到边缘，副本绕中心旋转
+        let size = min(bounds.width, bounds.height)
+        let width: CGFloat = 1.5
+        let length = size * 0.3
+        spoke.bounds = CGRect(x: 0, y: 0, width: width, height: length)
+        spoke.cornerRadius = width / 2
+        spoke.position = CGPoint(x: bounds.midX, y: bounds.midY + size / 2 - length / 2)
+        CATransaction.commit()
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        updateColor()
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        // 移出/移入窗口时 layer 动画可能被移除，按当前状态补上
+        if !isHidden { start() }
+    }
+
+    private func updateColor() {
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            spoke.backgroundColor = NSColor.labelColor.cgColor
+        }
+    }
+
+    func start() {
+        updateColor()
+        guard spoke.animation(forKey: Self.animationKey) == nil else { return }
+        let fade = CABasicAnimation(keyPath: "opacity")
+        fade.fromValue = 1
+        fade.toValue = 0.25
+        fade.duration = Self.duration
+        fade.repeatCount = .infinity
+        fade.isRemovedOnCompletion = false
+        spoke.add(fade, forKey: Self.animationKey)
+    }
+
+    func stop() {
+        spoke.removeAnimation(forKey: Self.animationKey)
+    }
+}
+
 // MARK: - 状态栏视图
 
 final class StatusItemView: NSView {
     private let iconView = NSImageView()
+    private let spinner = LoadingSpinnerView()
     private let latencyStack = NSStackView()
-    private let spinner = NSProgressIndicator()
     private let dotLabel = makeLabel(size: 10)
     private let latencyLabel = makeLabel(size: 10)
     private let speedStack = NSStackView()
@@ -47,25 +123,25 @@ final class StatusItemView: NSView {
             iconView.heightAnchor.constraint(equalToConstant: 18),
         ])
 
-        spinner.style = .spinning
-        spinner.controlSize = .small
-        spinner.isDisplayedWhenStopped = false
+        spinner.isHidden = true
         spinner.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             spinner.widthAnchor.constraint(equalToConstant: 12),
             spinner.heightAnchor.constraint(equalToConstant: 12),
         ])
+
         dotLabel.stringValue = "●"
         latencyStack.orientation = .horizontal
         latencyStack.spacing = 4
-        latencyStack.setViews([spinner, dotLabel, latencyLabel], in: .leading)
+        latencyStack.setViews([dotLabel, latencyLabel], in: .leading)
 
         speedStack.orientation = .vertical
         speedStack.alignment = .leading
         speedStack.spacing = 1
         speedStack.setViews([downLabel, upLabel], in: .top)
 
-        let stack = NSStackView(views: [iconView, latencyStack, speedStack])
+        // NSStackView 默认 detachesHiddenViews，隐藏的子视图不占宽度也不留间距
+        let stack = NSStackView(views: [iconView, spinner, latencyStack, speedStack])
         stack.orientation = .horizontal
         stack.alignment = .centerY
         stack.spacing = 4
@@ -89,37 +165,43 @@ final class StatusItemView: NSView {
     // 点击交给底下的 NSStatusBarButton 处理
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 
-    func update(appState: AppState, settings: AppSettings) {
+    /// 刷新内容，返回内容所需宽度（由调用方设置为状态栏项宽度）
+    @discardableResult
+    func update(appState: AppState, settings: AppSettings) -> CGFloat {
         if iconView.image?.name() != appState.icon {
             iconView.image = NSImage(named: appState.icon)
         }
 
-        latencyStack.isHidden = !settings.showLatencyOnTray
-        if settings.showLatencyOnTray {
-            let starting = appState.isCoreStarting
-            // NSStackView 只会收起 isHidden 的视图，停止的 spinner 也要隐藏，否则会留出空白
-            spinner.isHidden = !starting
-            dotLabel.isHidden = starting
-            latencyLabel.isHidden = starting
-            if starting {
-                spinner.startAnimation(nil)
-            } else {
-                spinner.stopAnimation(nil)
-                dotLabel.textColor = appState.v2rayTurnOn ? .systemGreen : .systemGray
-                latencyLabel.stringValue = "\(String(format: "%.0f", appState.latency)) ms"
-                latencyLabel.textColor = getSpeedColor(latency: appState.latency)
-            }
+        // 加载中只显示图标 + 转圈；停止状态只显示图标；运行中才按设置显示延迟和速度
+        // 只有目标是开启时才转圈：启动时上次为停止、或正在停止，都不转
+        let starting = appState.isCoreStarting && appState.v2rayTurnOn
+        spinner.isHidden = !starting
+        if starting {
+            spinner.start()
         } else {
-            spinner.stopAnimation(nil)
+            spinner.stop()
         }
 
-        speedStack.isHidden = !settings.showSpeedOnTray
-        if settings.showSpeedOnTray {
+        let running = !starting && appState.v2rayTurnOn
+        let showLatency = running && settings.showLatencyOnTray
+        latencyStack.isHidden = !showLatency
+        if showLatency {
+            dotLabel.textColor = .systemGreen
+            latencyLabel.stringValue = "\(String(format: "%.0f", appState.latency)) ms"
+            latencyLabel.textColor = getSpeedColor(latency: appState.latency)
+        }
+
+        let showSpeed = running && settings.showSpeedOnTray
+        speedStack.isHidden = !showSpeed
+        if showSpeed {
             downLabel.stringValue = speedText("↓", appState.proxyDownSpeed)
             upLabel.stringValue = speedText("↑", appState.proxyUpSpeed)
         }
+
+        return ceil(fittingSize.width)
     }
 }
+
 
 // MARK: - 菜单顶部状态行
 
