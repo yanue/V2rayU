@@ -71,7 +71,14 @@ actor SystemSleepManager {
             //    仅重建 TUN 不够——TUN 把流量转给一个无法代理的核心，导致全网断联。
             let turnOn = UserDefaults.getBool(forKey: .v2rayTurnOn)
             if turnOn {
-                logger.info("V2rayLaunch full restart after wake (core + TUN + proxy)")
+                // 先等物理网络就绪（Wi-Fi 唤醒后需数秒重新关联）: TUN 模式下 xray 出站要绑定当时的物理网卡,
+                // 网络未就绪时取不到网卡, 会失去绑定。超时仍继续重启, 之后的网络变化会再触发重建。
+                // 只有 TUN + xray 需要绑定网卡; 其他情况不等待, 保持原有的立即重启
+                let mode = UserDefaults.getEnum(forKey: .runMode, type: RunMode.self, defaultValue: .tun)
+                let lastCore = await V2rayLaunch.shared.lastCore
+                let needsInterface = mode == .tun && lastCore == .XrayCore
+                let ready = needsInterface ? await TunHandler.shared.waitForNetworkReady(timeout: 10) : true
+                logger.info("V2rayLaunch full restart after wake (core + TUN + proxy), mode=\(mode.rawValue), networkReady=\(ready)")
                 await V2rayLaunch.shared.restart()
             }
 

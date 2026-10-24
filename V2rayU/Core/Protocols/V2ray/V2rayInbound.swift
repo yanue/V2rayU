@@ -147,6 +147,8 @@ struct V2rayInboundSniffing: Codable {
 
     var enabled: Bool = true
     var destOverride: [dest] = [.tls, .http]
+    /// 仅用嗅探到的域名做路由匹配，不替换实际连接目标（TUN 链路下保持原 IP，避免二次解析）
+    var routeOnly: Bool?
 }
 
 struct ProxySettings: Codable {

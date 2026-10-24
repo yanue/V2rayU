@@ -268,9 +268,10 @@ class V2rayConfigHandler {
     var mux = 8
     var forPing = false
     var enableTun = false // (暂时不用)这里是xray的tun功能, 但需要单独设置系统路由,需要涉及到代理服务器ip,比较麻烦,因此用sing-box的tun功能->xray的socks作为替换
+    var tunChainMode = false // 运行在 sing-box TUN 之后（TUN → socks → xray），见 applyTunChainOptions
 
     // Initialization
-    init(enableTun: Bool = false) {
+    init(enableTun: Bool = false, tunChainMode: Bool = false) {
         self.enableMux = UserDefaults.getBool(forKey: .enableMux)
         self.enableUdp = UserDefaults.getBool(forKey: .enableUdp)
         self.enableSniffing = UserDefaults.getBool(forKey: .enableSniffing)
@@ -282,6 +283,7 @@ class V2rayConfigHandler {
 
         self.mux = UserDefaults.getInt(forKey: .muxConcurrent ,defaultValue: 8)
         self.enableTun = enableTun
+        self.tunChainMode = tunChainMode
 
         self.logLevel = UserDefaults.getEnum(forKey: .v2rayLogLevel, type: V2rayLogLevel.self, defaultValue: .info)
 
@@ -403,8 +405,73 @@ class V2rayConfigHandler {
             var observatory = V2rayObservatory() // 观察者
             observatory.probeUrl = getLatencyTestURLString()
             self.v2ray.observatory = observatory
+            self.applyTunChainOptions()
         }
         // ------------------------------------- routing end ----------------------------------------------
+    }
+
+    /// TUN 模式下 xray 位于 sing-box TUN 之后，TUN 交给 socks 的目标只有 IP。针对这条链路：
+    /// 1. 入站 sniffing routeOnly：用嗅探到的域名匹配 geosite 规则，但仍连接原 IP。
+    ///    TUN 下必须开启（否则所有域名规则失效）；routeOnly 不改连接目标，保留用户其余嗅探设置。
+    ///    （override 方式会让 freedom 用域名重新走系统解析器，国内网站显著变慢）
+    /// 2. 代理出站 sockopt.domainStrategy：用 xray 内置 DNS 解析服务器域名，不走 macOS 系统解析器
+    ///    （系统解析器在 TUN/DNS 切换期间会卡住，xray 拨号超时 16s 并重试）。
+    /// 3. 代理/直连出站 sockopt.interface：绑定物理网卡，出站流量不再进入 TUN，
+    ///    不依赖 TUN 启动后数秒才生效的 process_name 匹配（否则会形成路由环路）。
+    ///    网卡变化时由 V2rayLaunch 重新生成配置并重启核心。
+    /// 4. DNS 去掉 "localhost"（即 macOS 系统解析器）：其余服务器失败时不再回退到系统解析器。
+    func applyTunChainOptions() {
+        guard self.tunChainMode else { return }
+        if var inbounds = self.v2ray.inbounds {
+            for i in inbounds.indices where inbounds[i].protocol != .dokodemoDoor {
+                var sniffing = inbounds[i].sniffing ?? V2rayInboundSniffing()
+                sniffing.enabled = true
+                sniffing.routeOnly = true
+                inbounds[i].sniffing = sniffing
+            }
+            self.v2ray.inbounds = inbounds
+        }
+        if var dns = self.v2ray.dns, let servers = dns.servers {
+            let filtered = servers.filter { server in
+                switch server {
+                case .address(let address): return address != "localhost"
+                case .detailed(let detail): return detail.address != "localhost"
+                }
+            }
+            if !filtered.isEmpty {
+                dns.servers = filtered
+                self.v2ray.dns = dns
+            }
+        }
+        let bindInterface = TunConfigHandler.physicalDefaultInterface()
+        let proxyStrategy = xrayProxyDomainStrategy()
+        for outbound in self.v2ray.outbounds ?? [] {
+            switch outbound.protocol {
+            case .blackhole, .dns:
+                continue
+            case .freedom:
+                guard let bindInterface else { continue }
+                var stream = outbound.streamSettings ?? V2rayStreamSettings()
+                var sockopt = stream.sockopt ?? V2rayStreamSettingSockopt()
+                sockopt.interface = bindInterface
+                stream.sockopt = sockopt
+                outbound.streamSettings = stream
+            default:
+                var stream = outbound.streamSettings ?? V2rayStreamSettings()
+                var sockopt = stream.sockopt ?? V2rayStreamSettingSockopt()
+                sockopt.domainStrategy = proxyStrategy
+                if let bindInterface { sockopt.interface = bindInterface }
+                stream.sockopt = sockopt
+                outbound.streamSettings = stream
+            }
+        }
+        logger.info("applyTunChainOptions: interface=\(bindInterface ?? "nil"), domainStrategy=\(proxyStrategy)")
+    }
+
+    /// UseIPv4v6 自 Xray v1.8.6 起支持（IPv6-only 服务器可回退 IPv6），更早版本用 UseIPv4。
+    private func xrayProxyDomainStrategy() -> String {
+        guard let version = XrayVersion(getCoreVersion()) else { return "UseIPv4" }
+        return version >= XrayVersion(1, 8, 6) ? "UseIPv4v6" : "UseIPv4"
     }
 
     private func xraySupportsMixedProtocol() -> Bool {
@@ -560,6 +627,7 @@ class V2rayConfigHandler {
         observatory.subjectSelector = subjectSelector.isEmpty ? ["proxy"] : subjectSelector
         observatory.probeUrl = getLatencyTestURLString()
         self.v2ray.observatory = observatory
+        self.applyTunChainOptions()
 
         return self.v2ray.toJSON()
     }

@@ -91,6 +91,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Task{
             // 初始化helper（创建目录、修权限等）
             await AppInstaller.shared.checkInstall()
+            // 上次异常退出可能残留 TUN 期间设置的系统 DNS, 恢复为用户原始 DNS（后台执行, 不阻塞主线程）
+            await Task.detached {
+                V2rayLaunch.migrateLegacyTunDns()
+                V2rayLaunch.restoreTunDns()
+            }.value
             // 初始化睡眠管理器
             await SystemSleepManager.shared.setup()
             // 初始化网络变化监听(切换 Wi-Fi/网络中断恢复时自动重建 TUN)

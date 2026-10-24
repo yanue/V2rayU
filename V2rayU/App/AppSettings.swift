@@ -74,7 +74,7 @@ final class AppSettings: ObservableObject {
     @Published var tunAddressIPv6: String = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: TunConfigHandler.defaultTunIPv6)
     @Published var tunMtu: Int = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-    @Published var tunDnsRemote: String = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+    @Published var tunDnsRemote: String = TunConfigHandler.tunRemoteDns()
     @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
     // strict_route: 强制路由, 默认开启
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
@@ -172,7 +172,7 @@ final class AppSettings: ObservableObject {
         tunAddressIPv6 = UserDefaults.get(forKey: .tunAddressIPv6, defaultValue: TunConfigHandler.defaultTunIPv6)
         tunMtu = UserDefaults.getInt(forKey: .tunMtu, defaultValue: 1500)
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
-        tunDnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+        tunDnsRemote = TunConfigHandler.tunRemoteDns()
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)

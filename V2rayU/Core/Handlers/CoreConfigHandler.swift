@@ -26,14 +26,16 @@ struct CombinedConfigResolved {
 
 class CoreConfigHandler {
 
-    public func toJSON(item: ProfileEntity) -> String {
+    /// - Parameter tunMode: 当前是否为 TUN 模式（sing-box TUN → socks → 核心）。
+    ///   xray 需要据此调整嗅探/出站解析/网卡绑定；sing-box 核心自带嗅探与 auto_detect_interface，无需区分。
+    public func toJSON(item: ProfileEntity, tunMode: Bool = false) -> String {
         // 目前架构: sing-box的tun服务(daemon) -> socks(sing-box|xray-core) ,因此这里agent端不需要内部的tun功能了
         switch item.AdaptCore() {
         case .SingBox:
             let cfg = SingboxConfigHandler()
             return cfg.toJSON(item: item)
         case .XrayCore:
-            let vCfg = V2rayConfigHandler(enableTun: false) // 这里不需要xray内部的tun功能
+            let vCfg = V2rayConfigHandler(enableTun: false, tunChainMode: tunMode) // 这里不需要xray内部的tun功能
             return vCfg.toJSON(item: item)
         }
     }
@@ -110,13 +112,13 @@ class CoreConfigHandler {
         )
     }
 
-    public func toJSON(combination resolved: CombinedConfigResolved) -> String {
+    public func toJSON(combination resolved: CombinedConfigResolved, tunMode: Bool = false) -> String {
         switch resolved.coreType {
         case .SingBox:
             let cfg = SingboxConfigHandler()
             return cfg.toJSON(combination: resolved)
         case .XrayCore:
-            let cfg = V2rayConfigHandler(enableTun: false)
+            let cfg = V2rayConfigHandler(enableTun: false, tunChainMode: tunMode)
             return cfg.toJSON(combination: resolved)
         }
     }

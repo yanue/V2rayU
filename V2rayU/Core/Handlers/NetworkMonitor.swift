@@ -20,6 +20,9 @@ actor NetworkMonitor {
     private var hasBaseline = false
     private var lastInterfaceKey = ""
     private var wasSatisfied = false
+    /// 启动时网络尚未就绪（开机自启时常见）: TUN 模式下 xray 启动时取不到物理网卡, 未绑定;
+    /// 网络首次就绪时需重建一次, 不能只当作基线。
+    private var startedOffline = false
 
     // 去抖任务: 网络切换瞬间会有多次回调, 合并为一次重建
     private var debounceTask: Task<Void, Never>?
@@ -45,6 +48,7 @@ actor NetworkMonitor {
         monitor = nil
         started = false
         hasBaseline = false
+        startedOffline = false
         wasSatisfied = false
         lastInterfaceKey = ""
     }
@@ -53,16 +57,22 @@ actor NetworkMonitor {
         if path.status != .satisfied {
             // 网络中断中: 记录状态, 等待恢复后再处理
             wasSatisfied = false
+            if !hasBaseline { startedOffline = true }
             return
         }
 
         let key = Self.interfaceKey(path)
 
-        // 首次建立基线, 不触发重建(避免启动即重启)
+        // 首次建立基线, 不触发重建(避免启动即重启); 但启动时离线、此刻首次就绪时需重建一次
         if !hasBaseline {
             hasBaseline = true
             lastInterfaceKey = key
             wasSatisfied = true
+            if startedOffline {
+                startedOffline = false
+                logger.info("NetworkMonitor: network became ready after offline start, schedule rebuild probe")
+                scheduleRebuild()
+            }
             return
         }
 
@@ -96,14 +106,15 @@ actor NetworkMonitor {
         }
     }
 
-    /// 用可用接口的 类型+名称 组合作为标识, 判断接口集合是否变化
+    /// 用"首选接口 + 可用接口集合"作为标识, 判断网络是否变化。
+    /// 首选接口单独计入: 同时连着 Wi-Fi 和有线时切换默认出口, 接口集合不变但首选接口变了,
+    /// TUN 模式下 xray 绑定的网卡名需随之重建。
     /// 过滤掉 utun/lo（TUN 和 loopback 接口变化不应触发重建）
     private static func interfaceKey(_ path: NWPath) -> String {
-        path.availableInterfaces
-            .filter { !$0.name.hasPrefix("utun") && $0.name != "lo0" }
-            .map { "\($0.type):\($0.name)" }
-            .sorted()
-            .joined(separator: ",")
+        let physical = path.availableInterfaces.filter { !$0.name.hasPrefix("utun") && $0.name != "lo0" }
+        let primary = physical.first.map { "\($0.type):\($0.name)" } ?? ""
+        let all = physical.map { "\($0.type):\($0.name)" }.sorted().joined(separator: ",")
+        return "primary=\(primary)|\(all)"
     }
 }
 

@@ -488,6 +488,9 @@
 "LocalProxyPortNotReady" = "Local proxy port is not ready. The core may have failed to start or the port is occupied.";
 "SocksPortNotReadyForTun" = "SOCKS port is not ready. TUN service was not started.";
 "TunServiceStartFailed" = "Unable to start TUN service";
+"TunHelperExitedStopped" = "TUN service kept exiting unexpectedly and could not be recovered; proxy stopped";
+"CaptivePortalTunPaused" = "This Wi-Fi requires a web login. TUN is paused and will resume automatically after you log in";
+"CaptivePortalTunResumed" = "Wi-Fi login detected, TUN resumed";
 "InvalidCombination" = "Invalid Combination";
 "InvalidCombinationTip" = "Please check whether ports, outbound settings, and linked servers still exist.";
 "InvalidCombinationStartTip" = "Invalid combination. Please check the ports and outbound servers.";
@@ -758,7 +761,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunMtu" = "TUN MTU";
 "TunStack" = "TUN Stack";
 "TunRemoteDns" = "Tun Remote DNS";
-"TunRemoteDnsTip" = "Override system DNS to avoid pollution. Used as remote DNS resolver for foreign domains via tunnel in TUN mode.";
+"TunRemoteDnsTip" = "Used in TUN mode as the remote DNS, resolving foreign domains via DoH through the proxy. System DNS is temporarily set to a domestic public resolver (e.g. 114.114.114.114) so TUN can split DNS (domestic domains use domestic DNS); it is restored on stop.";
 "TunChinaDns" = "Tun China DNS";
 "TunStrictRoute" = "Strict route (strict_route)";
 "TunStrictRouteTip" = "Enabled by default. Try turning it off if the network occasionally breaks after switching networks.";

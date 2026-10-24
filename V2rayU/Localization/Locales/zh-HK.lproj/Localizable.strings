@@ -488,6 +488,9 @@
 "LocalProxyPortNotReady" = "本機代理連接埠尚未就緒，核心可能啟動失敗或連接埠被佔用";
 "SocksPortNotReadyForTun" = "SOCKS 連接埠尚未就緒，未啟動 TUN 服務";
 "TunServiceStartFailed" = "無法啟動 TUN 服務";
+"TunHelperExitedStopped" = "TUN 服務反覆異常退出且無法恢復，已停止代理";
+"CaptivePortalTunPaused" = "目前 Wi-Fi 需要網頁登入，TUN 已暫停，登入成功後自動恢復";
+"CaptivePortalTunResumed" = "Wi-Fi 已登入，TUN 已恢復";
 "InvalidCombination" = "組合設定無效";
 "InvalidCombinationTip" = "請檢查連接埠、出站設定和關聯的伺服器是否仍然存在";
 "InvalidCombinationStartTip" = "組合設定無效，請檢查連接埠和出站伺服器";
@@ -758,7 +761,7 @@
 "TunMtu" = "TUN MTU";
 "TunStack" = "TUN 協議棧";
 "TunRemoteDns" = "Tun 國外 DNS";
-"TunRemoteDnsTip" = "啟動時覆蓋系統 DNS 以避免污染。TUN 模式下作為 remote-dns 通過隧道解析國外域名。";
+"TunRemoteDnsTip" = "TUN 模式下作為 remote-dns，經代理以 DoH 解析國外域名。系統 DNS 會臨時設為國內公共 DNS（如 114.114.114.114），由 TUN 統一分流（國內域名走國內 DNS），停止時恢復。";
 "TunChinaDns" = "Tun 國內 DNS";
 "TunStrictRoute" = "強制路由 (strict_route)";
 "TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";

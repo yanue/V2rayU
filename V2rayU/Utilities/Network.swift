@@ -418,3 +418,109 @@ struct LogAnalyzer {
         }.value
     }
 }
+
+// MARK: - 公共 Wi-Fi 网页登录检测
+//
+// 登录前代理和外部 DNS 均不可用, TUN 接管全部流量会使登录页无法打开、macOS 也检测不到需要登录。
+// 因此 TUN 启动前及运行期间按 macOS 相同方式检测, 需要登录时暂停 TUN, 登录成功后自动恢复。
+
+enum CaptivePortal {
+    enum Status: Equatable {
+        case online   // 可正常上网
+        case captive  // 需要网页登录
+        case unknown  // 无法判断（无网络/无 DHCP DNS/超时等）, 不做任何处理
+    }
+
+    static let probeHost = "captive.apple.com"
+    static let probeURL = "http://captive.apple.com/hotspot-detect.html"
+
+    /// macOS 及常见浏览器/系统的联网检测域名。TUN 中这些域名用 Wi-Fi 下发的 DNS 解析并直连,
+    /// 使 TUN 运行中出现登录（登录过期、中途换网）时系统仍能检测到并弹出登录窗口。
+    static let detectionDomains = [
+        "captive.apple.com",
+        "connectivitycheck.gstatic.com",
+        "www.msftconnecttest.com",
+        "detectportal.firefox.com",
+        "neverssl.com",
+    ]
+
+    /// 当前物理网卡由 DHCP 下发的 DNS（如路由器 192.168.2.1）。不受系统 DNS 被改写影响。
+    /// 登录前公共 Wi-Fi 通常只放行这个 DNS。
+    static func dhcpDns(interface: String? = TunConfigHandler.physicalDefaultInterface()) -> String? {
+        guard let interface,
+              let output = try? runCommand(at: "/usr/sbin/ipconfig", with: ["getoption", interface, "domain_name_server"])
+        else { return nil }
+        let value = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        var addr = in_addr()
+        return value.withCString({ inet_pton(AF_INET, $0, &addr) }) == 1 ? value : nil
+    }
+
+    /// 与 macOS 相同的检测: 用 DHCP DNS 解析检测域名, 经物理网卡直接请求（不经 TUN/代理/系统 DNS）。
+    /// 返回内容为 Success 则可上网; 返回其他内容或被重定向说明需要登录。
+    static func probe() async -> Status {
+        await Task.detached { probeSync() }.value
+    }
+
+    private static func probeSync() -> Status {
+        let debugURL = UserDefaults.get(forKey: .debugCaptiveProbeURL)
+        if !debugURL.isEmpty {
+            let output = try? runCommand(at: "/usr/bin/curl", with: ["-s", "-m", "5", "--noproxy", "*", "-o", "-", "-w", "\n%{http_code}", debugURL])
+            return output.map(classify(curlOutput:)) ?? .unknown
+        }
+        guard let interface = TunConfigHandler.physicalDefaultInterface(),
+              let dns = dhcpDns(interface: interface) else { return .unknown }
+        guard let digOutput = try? runCommand(at: "/usr/bin/dig", with: ["+short", "+time=2", "+tries=1", "@\(dns)", probeHost, "A"]),
+              let ip = digOutput.split(separator: "\n").map(String.init).first(where: { isIPv4($0) })
+        else { return .unknown }
+        guard let output = try? runCommand(at: "/usr/bin/curl", with: [
+            "-s", "-m", "3", "--noproxy", "*", "--interface", interface,
+            "--resolve", "\(probeHost):80:\(ip)",
+            "-o", "-", "-w", "\n%{http_code}", probeURL,
+        ]) else { return .unknown }
+        return classify(curlOutput: output)
+    }
+
+    /// 是否需要暂停 TUN 等待网页登录: 检测页被拦截, 且经代理也无法访问外网。
+    /// 后者排除误判（如透明代理改写了检测页但代理可用）: 真正的登录前网络里代理服务器同样连不上。
+    static func loginRequired() async -> Bool {
+        guard await probe() == .captive else { return false }
+        return !(await proxyReachesInternet())
+    }
+
+    /// 经本地 SOCKS（代理核心）访问外网检测地址
+    static func proxyReachesInternet() async -> Bool {
+        let debugURL = UserDefaults.get(forKey: .debugCaptiveProbeURL)
+        if !debugURL.isEmpty {
+            // 调试: 由模拟服务器决定"经代理能否访问外网"
+            let code = try? runCommand(at: "/usr/bin/curl", with: ["-s", "-m", "5", "--noproxy", "*", "-o", "/dev/null", "-w", "%{http_code}", debugURL + "?via=proxy"])
+            return code == "204"
+        }
+        let port = getEffectiveSocksProxyPort()
+        return await Task.detached {
+            let code = try? runCommand(at: "/usr/bin/curl", with: [
+                "-s", "-m", "5", "-o", "/dev/null", "-w", "%{http_code}",
+                "-x", "socks5h://127.0.0.1:\(port)", "http://www.gstatic.com/generate_204",
+            ])
+            return code == "204"
+        }.value
+    }
+
+    /// curl 输出 = 响应体 + "\n" + 状态码
+    static func classify(curlOutput output: String) -> Status {
+        let lines = output.split(separator: "\n", omittingEmptySubsequences: false)
+        guard let codeLine = lines.last, let code = Int(codeLine.trimmingCharacters(in: .whitespaces)), code > 0 else {
+            return .unknown
+        }
+        let body = lines.dropLast().joined(separator: "\n")
+        if code == 200 && body.contains("<TITLE>Success</TITLE>") {
+            return .online
+        }
+        // 被登录系统拦截: 重定向(30x) 或返回登录页内容(200 但不是 Success)
+        return (200 ..< 400).contains(code) ? .captive : .unknown
+    }
+
+    private static func isIPv4(_ value: String) -> Bool {
+        var addr = in_addr()
+        return value.withCString { inet_pton(AF_INET, $0, &addr) } == 1
+    }
+}

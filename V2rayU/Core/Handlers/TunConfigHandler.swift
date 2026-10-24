@@ -22,7 +22,7 @@ import Foundation
 ///    （xray 的 DNS 查询与到服务器的数据连接都在路由表层面绕过 TUN，从根上避免死锁）
 /// 2. route.process_name → direct（核心进程直连，兜底）
 /// 3. DNS.proxyServerDomains → local-dns 直连（兜底）
-/// 4. 系统 DNS 1.1.1.1（绕过 TUN 的流量）
+/// 4. 代理核心(xray)出站绑定物理网卡 + 自行解析服务器域名（见 V2rayConfigHandler.applyTunChainOptions）
 enum TunConfigHandler {
     /// 核心进程名（xray/sing-box），始终走 direct 出站。
     /// 这些进程的流量必须绕过 TUN，否则其 DNS 查询会被 hijack-dns 劫持形成死锁。
@@ -36,6 +36,66 @@ enum TunConfigHandler {
 
     static let defaultTunAddress = "172.19.0.1/30"
     static let defaultTunIPv6 = "fdfe:dcba:9876::1/126"
+
+    // MARK: - System DNS
+
+    /// TUN 运行期间写入系统 DNS 的占位地址候选（参考 clash-verge-rev 的 PLACEHOLDER_DNS）。
+    ///
+    /// 系统 DNS 的作用只是让查询进入 TUN 被 hijack-dns 接管（任何经 TUN 路由的地址都行），
+    /// 但地址必须满足：
+    /// 1. 不是局域网地址：on-link 路由优先于 TUN 的分段路由，查询不进 TUN，会被污染。
+    /// 2. 不支持 DDR（_dns.resolver.arpa 无 SVCB）：1.1.1.1/8.8.8.8/9.9.9.9/OpenDNS 均支持，
+    ///    macOS 会自动升级为加密 DNS（443/853），绕过 hijack-dns 走代理，国内网站解析到海外（#1690）。
+    /// 3. 不在 TUN route_exclude 中：tunDnsChina / bootstrap DNS（默认 223.5.5.5、119.29.29.29）被排除，查询会绕过 TUN。
+    /// 4. 异常退出残留时仍是可用的公共 DNS（不能用 TUN 网段地址，否则残留即断网）。
+    static let systemDnsPlaceholders = ["114.114.114.114", "114.114.115.115", "180.76.76.76", "1.2.4.8"]
+
+    /// "Tun 国外 DNS"可选的上游（经代理 DoH 查询）。旧版本的 208.67.222.222 (OpenDNS) 已移除,
+    /// 已保存的不在列表中的值回退到默认 1.1.1.1。
+    static let tunRemoteDnsOptions = ["1.1.1.1", "8.8.8.8", "9.9.9.9"]
+    static let tunRemoteDnsLabels = ["1.1.1.1": "Cloudflare", "8.8.8.8": "Google", "9.9.9.9": "Quad9"]
+    static let defaultTunRemoteDns = "1.1.1.1"
+
+    static func tunRemoteDns() -> String {
+        let saved = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: defaultTunRemoteDns)
+        return tunRemoteDnsOptions.contains(saved) ? saved : defaultTunRemoteDns
+    }
+
+    static func systemDnsAddress() -> String {
+        let bypassed = [
+            UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns),
+            getDnsBootstrapSetting(),
+        ].map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        // 只看字面 IP/CIDR，避免为选占位地址做域名解析
+        let userExcluded = resolveRouteExcludeAddresses(from: UserDefaults.get(forKey: .tunRouteExcludeHosts), resolver: { _ in [] })
+        return systemDnsPlaceholders.first { candidate in
+            !bypassed.contains(candidate) && !userExcluded.contains { ipv4(candidate, isInside: $0) }
+        } ?? systemDnsPlaceholders[0]
+    }
+
+    private static func ipv4(_ address: String, isInside cidr: String) -> Bool {
+        let parts = cidr.split(separator: "/")
+        guard parts.count == 2, let prefix = Int(parts[1]), (0 ... 32).contains(prefix) else { return false }
+        var a = in_addr(), n = in_addr()
+        guard address.withCString({ inet_pton(AF_INET, $0, &a) }) == 1,
+              String(parts[0]).withCString({ inet_pton(AF_INET, $0, &n) }) == 1 else { return false }
+        let mask: UInt32 = prefix == 0 ? 0 : ~UInt32(0) << UInt32(32 - prefix)
+        return UInt32(bigEndian: a.s_addr) & mask == UInt32(bigEndian: n.s_addr) & mask
+    }
+
+    /// 当前物理默认网卡（如 en0）。TUN 只安装分段路由、不替换 0/0，因此 TUN 运行时仍返回物理网卡。
+    /// 返回 nil 表示无可用物理默认路由。
+    static func physicalDefaultInterface() -> String? {
+        guard let output = try? runCommand(at: "/sbin/route", with: ["-n", "get", "default"]) else { return nil }
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard trimmed.hasPrefix("interface:") else { continue }
+            let name = trimmed.replacingOccurrences(of: "interface:", with: "").trimmingCharacters(in: .whitespaces)
+            if name.isEmpty || name.hasPrefix("utun") || name.hasPrefix("lo") { return nil }
+            return name
+        }
+        return nil
+    }
 
     // MARK: - Legacy default migration
 
@@ -482,15 +542,24 @@ enum TunConfigHandler {
         //   geosite:cn     → local-dns（国内域名，低延迟）
         //   其他            → remote-dns（通过代理，海外域名）
         //
-        // 系统 DNS 设为 1.1.1.1，仅对绕过 TUN 的流量生效（process_name direct 匹配的流量）。
+        // 系统 DNS 设为不支持 DDR 的公共 DNS 占位地址（见 systemDnsAddress），保证系统查询必进 TUN 被 hijack-dns 接管。
+        //
+        // remote-dns 用 DoH：tcp 传输每次查询新建一条经代理的连接（无复用，10s 超时），
+        // https 传输复用 HTTP/2 连接。可选的上游（tunRemoteDnsOptions）均支持 IP 直连 DoH。
+        //
+        // TUN 未启用 IPv6 时不会接管任何 IPv6 路由，若仍返回 AAAA，应用会走 IPv6 直连绕过代理，
+        // 因此改为 ipv4_only。
+        let dnsStrategy = tunEnableIPv6 ? "prefer_ipv4" : "ipv4_only"
         let dnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
-        let dnsRemote = UserDefaults.get(forKey: .tunDnsRemote, defaultValue: "1.1.1.1")
+        let dnsRemote = TunConfigHandler.tunRemoteDns()
         let useNewDns = SingboxVersionCheck.supportsNewDnsFormat()
         let proxyDomains = TunConfigHandler.proxyServerDomains()
+        // 联网检测域名用 Wi-Fi 下发的 DNS 解析（公共 Wi-Fi 登录前通常只放行它）, 使系统能检测到需要网页登录
+        let dhcpDns = CaptivePortal.dhcpDns()
 
         if useNewDns {
             let isIP = isIPAddressLiteral(dnsRemote)
-            var remoteDns = DNSServer(tag: "remote-dns", type: "tcp", server: dnsRemote, detour: "proxy")
+            var remoteDns = DNSServer(tag: "remote-dns", type: "https", server: dnsRemote, path: "/dns-query", detour: "proxy")
             if !isIP { remoteDns.domain_resolver = "local-dns" }
             var dnsRules = [DNSRule]()
             // DNS 规则按优先级从高到低排列（顺序匹配，第一条命中即停）：
@@ -498,26 +567,33 @@ enum TunConfigHandler {
             // 2. geosite:cn → local-dns：国内域名直连，低延迟
             // 3. localhost/local → local-dns：本地域名直连
             // 4. final: remote-dns：其他域名走代理（海外域名）
+            if dhcpDns != nil {
+                dnsRules.append(DNSRule(server: "dhcp-dns", domain: CaptivePortal.detectionDomains))
+            }
             if !proxyDomains.isEmpty {
                 dnsRules.append(DNSRule(server: "local-dns", domain: proxyDomains))
             }
-            dnsRules.append(DNSRule(server: "local-dns", geosite: ["cn"], strategy: "prefer_ipv4"))
+            dnsRules.append(DNSRule(server: "local-dns", geosite: ["cn"], strategy: dnsStrategy))
             dnsRules.append(DNSRule(server: "local-dns", domain: ["localhost", "local"]))
             singbox.dns = DNSConfig(
                 servers: [
                     remoteDns,
                     DNSServer(tag: "local-dns", type: "udp", server: dnsChina),
-                ],
+                ] + (dhcpDns.map { [DNSServer(tag: "dhcp-dns", type: "udp", server: $0)] } ?? []),
                 rules: dnsRules,
                 final: "remote-dns",
                 independent_cache: true,
-                strategy: "prefer_ipv4"
+                strategy: dnsStrategy
             )
         } else {
             let isIP = isIPAddressLiteral(dnsRemote)
-            var remoteDns = DNSServer(tag: "remote-dns", detour: "proxy", address: "tcp://\(dnsRemote)")
+            let dohHost = dnsRemote.contains(":") ? "[\(dnsRemote)]" : dnsRemote
+            var remoteDns = DNSServer(tag: "remote-dns", detour: "proxy", address: "https://\(dohHost)/dns-query")
             if !isIP { remoteDns.address_resolver = "local-dns" }
             var dnsRules = [DNSRule]()
+            if dhcpDns != nil {
+                dnsRules.append(DNSRule(server: "dhcp-dns", domain: CaptivePortal.detectionDomains))
+            }
             if !proxyDomains.isEmpty {
                 dnsRules.append(DNSRule(server: "local-dns", domain: proxyDomains))
             }
@@ -527,10 +603,11 @@ enum TunConfigHandler {
                 servers: [
                     remoteDns,
                     DNSServer(tag: "local-dns", address: "udp://\(dnsChina)"),
-                ],
+                ] + (dhcpDns.map { [DNSServer(tag: "dhcp-dns", address: "udp://\($0)")] } ?? []),
                 rules: dnsRules,
                 final: "remote-dns",
-                independent_cache: true
+                independent_cache: true,
+                strategy: dnsStrategy
             )
         }
 
@@ -578,6 +655,8 @@ enum TunConfigHandler {
         }
         // 劫持 DNS 流量，使 dns.servers/rules 对应用流量生效（仅影响非核心进程）
         tunRules.append(RouteRule(action: "hijack-dns", protocol: ["dns"]))
+        // 联网检测请求直连（登录前代理不可用）, 使 macOS 能检测到公共 Wi-Fi 需要网页登录并弹出登录窗口
+        tunRules.append(RouteRule(outbound: "direct", domain: CaptivePortal.detectionDomains))
         singbox.route = RouteConfig(
             auto_detect_interface: true,
             default_domain_resolver: "local-dns",

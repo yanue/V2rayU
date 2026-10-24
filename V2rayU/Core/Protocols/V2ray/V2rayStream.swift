@@ -255,9 +255,11 @@ struct V2rayStreamSettingSockopt: Codable {
         case off
     }
 
-    var mark: Int = 0
-    var tcpFastOpen: Bool = false // 是否启用 TCP Fast Open。
-    var tproxy: tproxy = .off // 是否开启透明代理 (仅适用于 Linux)。
+    var mark: Int?
+    var tcpFastOpen: Bool? // 是否启用 TCP Fast Open。
+    var tproxy: tproxy? // 是否开启透明代理 (仅适用于 Linux)。
+    var domainStrategy: String? // 用 xray 内置 DNS 解析目标域名(UseIP/UseIPv4/UseIPv4v6...)，v1.8.0+
+    var interface: String? // 绑定出站网卡(macOS: IP_BOUND_IF)，v1.8.0+
 }
 
 

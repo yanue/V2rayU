@@ -532,6 +532,9 @@ enum LanguageLabel: String, CaseIterable {
     case LocalProxyPortNotReady
     case SocksPortNotReadyForTun
     case TunServiceStartFailed
+    case TunHelperExitedStopped
+    case CaptivePortalTunPaused
+    case CaptivePortalTunResumed
     case InvalidCombination
     case InvalidCombinationTip
     case InvalidCombinationStartTip

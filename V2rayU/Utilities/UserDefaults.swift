@@ -102,6 +102,14 @@ extension UserDefaults {
         case tunDnsRemote
         // tun china dns server
         case tunDnsChina
+        // TUN 期间本程序写入的系统 DNS 值, 及写入前用户的原始 DNS(空格分隔, 空=DHCP)。
+        // 持久化以便异常退出后仍能准确恢复。
+        case tunDnsSetValue
+        case tunDnsOriginal
+        // 旧版本残留系统 DNS 的一次性迁移是否已完成
+        case tunDnsLegacyMigrated
+        // 调试用: 网页登录检测改为请求该 URL（模拟登录页）。正常为空
+        case debugCaptiveProbeURL
         // tun strict_route (强制路由), 默认开启; 网络切换异常时可关闭
         case tunStrictRoute
         // hosts, IP addresses, or CIDRs that bypass the TUN route

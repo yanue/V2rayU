@@ -248,10 +248,9 @@ struct TunView: View {
                     HStack {
                         getTextLabel(label: .TunRemoteDns, labelWidth: labelWidth)
                         Picker("", selection: $settings.tunDnsRemote) {
-                            Text("1.1.1.1 (Cloudflare)").tag("1.1.1.1")
-                            Text("8.8.8.8 (Google)").tag("8.8.8.8")
-                            Text("9.9.9.9 (Quad9)").tag("9.9.9.9")
-                            Text("208.67.222.222 (OpenDNS)").tag("208.67.222.222")
+                            ForEach(TunConfigHandler.tunRemoteDnsOptions, id: \.self) { dns in
+                                Text("\(dns) (\(TunConfigHandler.tunRemoteDnsLabels[dns] ?? ""))").tag(dns)
+                            }
                         }
                         .pickerStyle(.menu)
                         .frame(width: 220)

@@ -8,6 +8,27 @@ actor TunHandler {
     private var rebuildInProgress = false
     private var lastRebuildAt: Date?
     private let minRebuildInterval: TimeInterval = 8
+    /// 被去抖/并发跳过的网络变化不能直接丢弃: xray 出站绑定了物理网卡名（TUN 模式）,
+    /// 丢弃会导致一直绑在已失效的旧网卡上。改为延后补做一次。
+    private var deferredRebuild: Task<Void, Never>?
+    private var rebuildRequestedDuringRun = false
+
+    /// tun-helper 存活检测: LaunchDaemon 为 KeepAlive=false, 意外退出后无人拉起,
+    /// 表现为 UI 显示 TUN 运行而流量不再走代理。仅在 start 成功后到 stop 之间运行。
+    private var watchdogTask: Task<Void, Never>?
+    private let watchdogInterval: TimeInterval = 5
+    /// 短时间内反复退出视为无法恢复, 停止重试并关闭代理, 避免无限重启
+    private var recoveryTimes: [Date] = []
+    /// 代理核心 SOCKS 端口连续不可达的检测次数。需连续 2 次（≥5s）才判定退出,
+    /// 避免切换服务器等主动重启核心的几秒内误判。
+    private var coreUnreachableTicks = 0
+    /// 每次开启/停止检测递增; 已取消的旧检测任务在 await 之后恢复执行时据此退出
+    private var watchdogGeneration = 0
+    /// 每隔若干次存活检测做一次网页登录检测（约 60s）: 发现登录过期等情况时暂停 TUN
+    private var captiveTick = 0
+    private let captiveCheckEveryTicks = 12
+    private let maxRecoveries = 3
+    private let recoveryWindow: TimeInterval = 120
 
     // MARK: - Start
 
@@ -45,12 +66,15 @@ actor TunHandler {
             return false
         }
         logger.info("startTunHelper: process confirmed running")
+        startWatchdog()
         return true
     }
 
     // MARK: - Stop
 
     func stop() async {
+        // 主动停止（模式切换/睡眠/重建/退出）前先停检测, 避免误判为意外退出
+        stopWatchdog()
         guard isDaemonRunning() else {
             logger.info("stopTunHelper: not running, skip")
             return
@@ -130,17 +154,121 @@ actor TunHandler {
         }
     }
 
+    // MARK: - Watchdog
+
+    private func startWatchdog() {
+        coreUnreachableTicks = 0
+        captiveTick = 0
+        watchdogTask?.cancel()
+        watchdogGeneration += 1
+        let generation = watchdogGeneration
+        watchdogTask = Task { [watchdogInterval] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(watchdogInterval * 1_000_000_000))
+                if Task.isCancelled { return }
+                if await self.checkHealth(generation: generation) { return }
+            }
+        }
+    }
+
+    private func stopWatchdog() {
+        watchdogTask?.cancel()
+        watchdogTask = nil
+        watchdogGeneration += 1
+    }
+
+    /// 检测任务仍是当前这一轮, 且没有重建在进行
+    private func isCurrentWatchdog(_ generation: Int) -> Bool {
+        generation == watchdogGeneration && watchdogTask != nil && !rebuildInProgress
+    }
+
+    private func resetRecoveryHistory() {
+        recoveryTimes = []
+    }
+
+    /// 检查 tun-helper 与代理核心是否存活。
+    /// 核心退出后 TUN 仍在, 但流量转给不存在的 SOCKS 端口, 同样表现为全部断网。
+    /// 返回 true 表示检测到意外退出并已触发恢复（检测循环随之结束, 恢复成功后由 start 重新开启）
+    private func checkHealth(generation: Int) async -> Bool {
+        guard isCurrentWatchdog(generation) else { return false }
+        captiveTick += 1
+        if captiveTick >= captiveCheckEveryTicks, isDaemonRunning() {
+            captiveTick = 0
+            if await CaptivePortal.loginRequired(), isCurrentWatchdog(generation) {
+                watchdogTask = nil
+                Task.detached { await V2rayLaunch.shared.pauseTunForCaptivePortal() }
+                return true
+            }
+        }
+        let what: String
+        if isDaemonRunning() {
+            // 切换服务器/路由等主动重载核心期间端口会短暂不可达, 不计入
+            if await V2rayLaunch.shared.isBusy {
+                coreUnreachableTicks = 0
+                return false
+            }
+            let coreAlive = await TCPConnectivity.canConnect(host: "127.0.0.1", port: getEffectiveSocksProxyPort(), timeout: 1)
+            coreUnreachableTicks = coreAlive ? 0 : coreUnreachableTicks + 1
+            guard coreUnreachableTicks >= 2, isCurrentWatchdog(generation), !(await V2rayLaunch.shared.isBusy) else { return false }
+            what = "proxy core"
+        } else {
+            // 二次确认, 排除 launchctl 状态瞬时抖动
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard isCurrentWatchdog(generation), !isDaemonRunning() else { return false }
+            what = "tun-helper"
+        }
+        let (turnOn, mode) = await MainActor.run { (AppState.shared.v2rayTurnOn, AppState.shared.runMode) }
+        guard turnOn, mode == .tun else {
+            stopWatchdog()
+            return true
+        }
+
+        watchdogTask = nil
+        let now = Date()
+        recoveryTimes = recoveryTimes.filter { now.timeIntervalSince($0) < recoveryWindow } + [now]
+        let attempt = recoveryTimes.count
+        // 恢复放到独立任务: 恢复过程会 stop() 本检测任务, 若在被取消的任务里执行, 其中的 sleep 会立即返回
+        Task.detached { [maxRecoveries, recoveryWindow] in
+            if attempt > maxRecoveries {
+                logger.error("\(what) exited \(attempt) times within \(Int(recoveryWindow))s, giving up and stopping")
+                await TunHandler.shared.resetRecoveryHistory()
+                await V2rayLaunch.shared.stop()
+                let msg = await MainActor.run { String(localized: .TunHelperExitedStopped) }
+                makeToast(message: msg, displayDuration: 6)
+                return
+            }
+            logger.warning("\(what) exited unexpectedly, recovering (attempt \(attempt)/\(maxRecoveries))")
+            // 网络未变化, 不需要重新生成 xray 配置; 核心已退出时 rebuildTun 会自动完整重启
+            let ok = await V2rayLaunch.shared.rebuildTun(reloadXray: false)
+            logger.info("\(what) recovery done: \(ok)")
+            if !ok {
+                // 重建失败（TUN 未起来）: 重新开启检测, 下次检测会再次尝试, 直至超过次数上限后停止
+                await TunHandler.shared.restartWatchdogAfterFailedRecovery()
+            }
+        }
+        return true
+    }
+
+    private func restartWatchdogAfterFailedRecovery() {
+        startWatchdog()
+    }
+
     // MARK: - Network Recovery
 
     func rebuildAfterNetworkChange(reason: String) async {
         if rebuildInProgress {
-            logger.info("rebuildAfterNetworkChange skip: rebuild already in progress (\(reason))")
+            logger.info("rebuildAfterNetworkChange: rebuild in progress, will rebuild again afterwards (\(reason))")
+            rebuildRequestedDuringRun = true
             return
         }
         if let lastRebuildAt = lastRebuildAt, Date().timeIntervalSince(lastRebuildAt) < minRebuildInterval {
-            logger.info("rebuildAfterNetworkChange skip: too soon after previous rebuild (\(reason))")
+            let delay = minRebuildInterval - Date().timeIntervalSince(lastRebuildAt)
+            logger.info("rebuildAfterNetworkChange: too soon after previous rebuild, deferred \(Int(delay.rounded(.up)))s (\(reason))")
+            deferRebuild(after: delay, reason: reason)
             return
         }
+        deferredRebuild?.cancel()
+        deferredRebuild = nil
 
         let (turnOn, mode) = await MainActor.run { (AppState.shared.v2rayTurnOn, AppState.shared.runMode) }
         guard turnOn else {
@@ -149,7 +277,14 @@ actor TunHandler {
         }
 
         rebuildInProgress = true
-        defer { rebuildInProgress = false }
+        rebuildRequestedDuringRun = false
+        defer {
+            rebuildInProgress = false
+            if rebuildRequestedDuringRun {
+                rebuildRequestedDuringRun = false
+                deferRebuild(after: minRebuildInterval, reason: "network changed during rebuild")
+            }
+        }
 
         logger.info("rebuildAfterNetworkChange: \(reason), stopping stale TUN before waiting for network...")
         await stop()
@@ -193,6 +328,22 @@ actor TunHandler {
         await PingAll.shared.run()
     }
 
+    private func deferRebuild(after delay: TimeInterval, reason: String) {
+        deferredRebuild?.cancel()
+        deferredRebuild = Task {
+            try? await Task.sleep(nanoseconds: UInt64(max(delay, 0.5) * 1_000_000_000))
+            if Task.isCancelled { return }
+            await self.runDeferredRebuild(reason: reason)
+        }
+    }
+
+    /// 先清掉自身引用再进入重建: rebuildAfterNetworkChange 会取消 deferredRebuild,
+    /// 若仍指向当前任务会把自己取消, 之后所有 sleep 立即返回, 等待循环空转。
+    private func runDeferredRebuild(reason: String) async {
+        deferredRebuild = nil
+        await rebuildAfterNetworkChange(reason: "deferred: \(reason)")
+    }
+
     // MARK: - Network Readiness
 
     private func currentDefaultRoute() -> (gateway: String?, interface: String?) {
@@ -227,6 +378,8 @@ actor TunHandler {
     }
 
     func waitForNetworkReady(timeout: TimeInterval = 15) async -> Bool {
+        // 两个阶段共用同一截止时间（最长 timeout, 而非 2×timeout）
+        let deadline = Date().addingTimeInterval(timeout)
         let ready = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
             let monitor = NWPathMonitor()
             let flag = ResumeFlag()
@@ -248,7 +401,6 @@ actor TunHandler {
         }
         guard ready else { return false }
 
-        let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
             if hasPhysicalDefaultRoute() {
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
