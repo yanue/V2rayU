@@ -129,7 +129,8 @@ if [ -n "$LATEST_REPORT" ]; then
     if [ "$MISMATCHES" -gt 0 ]; then
         echo ""
         warn "Rule mismatches detected:"
-        jq -r '.ruleMismatches[] | "  [\(.coreType) \(.coreVersion)] \(.profileRemark): predicted=\(.rulePredicted), actual=\(.actualStatus)"' "$LATEST_REPORT" | head -20
+        # 用 jq 截取前 20 条; 不用 `| head`: pipefail 下 head 提前关闭管道会让 jq 收到 SIGPIPE, 脚本以 141 退出
+        jq -r '.ruleMismatches[:20][] | "  [\(.coreType) \(.coreVersion)] \(.profileRemark): predicted=\(.rulePredicted), actual=\(.actualStatus)"' "$LATEST_REPORT"
         echo ""
     fi
 else

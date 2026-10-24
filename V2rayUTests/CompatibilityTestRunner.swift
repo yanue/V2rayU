@@ -187,6 +187,11 @@ import Testing
         process.arguments = ["-c", "cd \(AppHomePath) && \(binaryPath) run -c \(configFile) &>\(coreLogFile)"]
         process.standardOutput = nil
         process.standardError = nil
+        if coreType == .XrayCore {
+            var environment = ProcessInfo.processInfo.environment
+            environment["XRAY_LOCATION_ASSET"] = CompatibilityTestConfig.xrayAssetDir(binaryPath: binaryPath)
+            process.environment = environment
+        }
 
         do {
             try process.run()

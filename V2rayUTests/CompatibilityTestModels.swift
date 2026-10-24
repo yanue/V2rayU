@@ -62,6 +62,16 @@ struct CompatibilityTestConfig {
         return "\(binDir)/\(subDir)/\(version)/\(binaryName)"
     }
 
+    /// xray 的 geoip.dat / geosite.dat 所在目录: 版本目录自带则用之, 否则用 App 安装目录的那份。
+    /// 配置的 DNS / 路由规则会引用 geosite, xray 默认只在可执行文件所在目录查找, 缺失时直接启动失败。
+    static func xrayAssetDir(binaryPath: String) -> String {
+        let dir = (binaryPath as NSString).deletingLastPathComponent
+        if FileManager.default.fileExists(atPath: "\(dir)/geosite.dat") {
+            return dir
+        }
+        return xrayCorePath
+    }
+
     static func versionsInRange(coreDir: String, min: String, max: String) -> [String] {
         let fm = FileManager.default
         guard let entries = try? fm.contentsOfDirectory(atPath: coreDir) else {

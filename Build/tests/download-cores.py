@@ -233,6 +233,11 @@ def download_core(repo: str, tag: str, version_dir: Path, pattern: AssetPattern,
 
         version_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(binary, dest_bin)
+        # xray 压缩包自带 geoip.dat / geosite.dat, 一并保存(配置的 geosite 规则依赖它们)
+        for name in ("geoip.dat", "geosite.dat"):
+            data = binary.parent / name
+            if data.is_file():
+                shutil.copy2(data, version_dir / name)
         dest_bin.chmod(dest_bin.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
         subprocess.run(["xattr", "-rd", "com.apple.quarantine", str(dest_bin)], capture_output=True)
