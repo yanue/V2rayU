@@ -332,6 +332,27 @@ struct ProfileEntityTests {
         #expect(fetched?.remark == "my-combo")
     }
 
+    @Test func lastUpdateDefaultsToCurrentTimestamp() throws {
+        let dbQueue = try DatabaseQueue()
+        var migrator = DatabaseMigrator()
+        ProfileEntity.registerMigrations(in: &migrator)
+        CombinedConfigEntity.registerMigrations(in: &migrator)
+        try migrator.migrate(dbQueue)
+
+        try dbQueue.read { db in
+            for table in [ProfileEntity.databaseTableName, CombinedConfigEntity.databaseTableName] {
+                let column = try db.columns(in: table).first { $0.name == "lastUpdate" }
+                #expect(column?.defaultValueSQL == "CURRENT_TIMESTAMP")
+            }
+        }
+        // 未显式写入 lastUpdate 时，默认值可正常解码为 Date
+        try dbQueue.write { db in
+            try db.execute(sql: "INSERT INTO combined_config (uuid, remark, sort, groupsJson) VALUES ('d', 'd', 0, '[]')")
+        }
+        let fetched = try dbQueue.read { db in try CombinedConfigEntity.fetchOne(db, key: "d") }
+        #expect(fetched != nil)
+    }
+
     // MARK: - SubscriptionEntity
 
     @Test func subscriptionEntityDefaults() {

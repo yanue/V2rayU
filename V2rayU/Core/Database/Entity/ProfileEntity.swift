@@ -335,7 +335,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
                 t.column(Columns.totalDown.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.todayUp.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.todayDown.name, .integer).notNull().defaults(to: 0)
-                t.column(Columns.lastUpdate.name, .datetime).defaults(to: "CURRENT_DATETIME")
+                t.column(Columns.lastUpdate.name, .datetime).defaults(sql: "CURRENT_TIMESTAMP")
             }
         }
 
@@ -509,7 +509,7 @@ struct CombinedConfigEntity: Codable, Identifiable, Equatable, Hashable, Transfe
                 t.column(Columns.sort.name, .integer).notNull().defaults(to: 0)
                 t.column(Columns.groupsJson.name, .text).notNull().defaults(to: "[]")
                 t.column(Columns.coreType.name, .text).defaults(to: ProfileCoreSelection.auto.rawValue)
-                t.column(Columns.lastUpdate.name, .datetime).defaults(to: "CURRENT_DATETIME")
+                t.column(Columns.lastUpdate.name, .datetime).defaults(sql: "CURRENT_TIMESTAMP")
             }
         }
         migrator.registerMigration("addColorAndBalancerToCombinedConfig") { db in
