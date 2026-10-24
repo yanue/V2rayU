@@ -144,23 +144,13 @@ struct SubscriptionSyncView: View {
         )
         .onAppear {
             logs.removeAll()
-            subscribeNotification()
         }
-        .onDisappear {
-            NotificationCenter.default.removeObserver(self)
-        }
-    }
-
-    func subscribeNotification() {
-        NotificationCenter.default.addObserver(forName: NOTIFY_UPDATE_SubSync, object: nil, queue: .main) { notif in
+        // 通知由后台 actor 发出，切回主线程后再写 @State；随视图生命周期自动取消订阅
+        .onReceive(NotificationCenter.default.publisher(for: NOTIFY_UPDATE_SubSync).receive(on: DispatchQueue.main)) { notif in
             if let msg = notif.object as? String {
-                DispatchQueue.main.async {
-                    logs.append(msg)
-                }
+                logs.append(msg)
             }
-            DispatchQueue.main.async {
-                isSyncing = false
-            }
+            isSyncing = false
         }
     }
 
