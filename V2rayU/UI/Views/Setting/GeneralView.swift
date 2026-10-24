@@ -10,8 +10,8 @@ import SwiftUI
 
 struct GeneralView: View {
 
-    @StateObject private var languageManager = LanguageManager.shared
-    @StateObject private var settings = AppSettings.shared
+    @ObservedObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
         ScrollView {

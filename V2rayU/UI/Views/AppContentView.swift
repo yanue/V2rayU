@@ -6,7 +6,7 @@
 //
 import SwiftUI
 struct ContentView: View {
-    @StateObject private var navigationState = NavigationState.shared
+    @ObservedObject private var navigationState = NavigationState.shared
     @State private var version = getAppVersion()
     @State private var alertMessage: String = ""
     @State private var showAlert = false

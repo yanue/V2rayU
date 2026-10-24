@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingView: View {
-    @StateObject private var navigationState = NavigationState.shared
+    @ObservedObject private var navigationState = NavigationState.shared
 
     var body: some View {
         VStack {

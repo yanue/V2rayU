@@ -25,7 +25,7 @@ enum DnsCoreTab: String, CaseIterable, Identifiable, Hashable {
 }
 
 struct DnsView: View {
-    @StateObject private var settings = AppSettings.shared
+    @ObservedObject private var settings = AppSettings.shared
     @State private var dnsJson: String = ""
     @State private var tips: String = ""
     @State private var showAlert: Bool = false
