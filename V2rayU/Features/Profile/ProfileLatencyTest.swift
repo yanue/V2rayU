@@ -1,18 +1,19 @@
 //
-//  PingHandler.swift
+//  ProfileLatencyTest.swift
 //  V2rayU
 //
 //  Created by yanue on 2025/9/21.
 //
 import Foundation
 
-let NOTIFY_UPDATE_Ping = Notification.Name(rawValue: "NOTIFY_UPDATE_Ping")
+let NOTIFY_UPDATE_LATENCY_TEST = Notification.Name(rawValue: "NOTIFY_UPDATE_LATENCY_TEST")
 
-actor PingAll {
-    static let shared = PingAll()
+actor LatencyTestRunner {
+    static let shared = LatencyTestRunner()
 
     private(set) var inPing: Bool = false
-
+    /// 每轮测速的编号; 结束后的延迟清理只在期间没有开始新一轮时执行
+    private var runID = 0
 
     private var totalCount = 0
     private var finishedCount = 0
@@ -23,10 +24,10 @@ actor PingAll {
         return String(format: format, arguments: arguments)
     }
 
-    func run() async {
+    func runAll() async {
         guard !inPing else {
             logger.info("Ping is already running.")
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingAlreadyRunning))
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingAlreadyRunning))
             return
         }
         inPing = true
@@ -37,7 +38,7 @@ actor PingAll {
         guard !items.isEmpty else {
             logger.info("No items to ping.")
             inPing = false
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingNoNodes))
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingNoNodes))
             return
         }
 
@@ -48,7 +49,7 @@ actor PingAll {
         }
 
         logger.info("Ping started.")
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartAll))
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingStartAll))
         await pingTaskGroup(items: items)
     }
 
@@ -57,6 +58,8 @@ actor PingAll {
     private func pingTaskGroup(items: [ProfileEntity]) async {
         // MARK: - Fix 6: pingOne 也需要设置 inPing，统一通过此函数
 
+        runID += 1
+        let currentRun = runID
         let maxPublishers = await AppSettings.shared.safeLatencyTestConcurrency
 
         // 替代 Combine flatMap(maxPublishers:) + withCheckedContinuation，
@@ -70,36 +73,42 @@ actor PingAll {
                 }
                 count += 1
                 group.addTask {
-                    NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-start: \(item.remark)")
+                    NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-start: \(item.remark)")
                     do {
                         try await self.pingEachServer(item: item)
                     } catch {
-                        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-fail: \(item.remark) - \(error.localizedDescription)")
+                        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-fail: \(item.remark) - \(error.localizedDescription)")
                     }
                 }
             }
         }
 
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-all-done\n")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-all-done\n")
         logger.info("Ping completed")
         await AppMenuManager.shared.refreshServerItems()
 
         Task { [weak self] in
             try? await Task.sleep(nanoseconds: 2000000000)
-            killAllPing()
-            await AppMenuManager.shared.refreshPingTip(pingTip: "")
-            await self?.setInPingFalse()
+            await self?.cleanUp(after: currentRun)
         }
     }
 
-    private func setInPingFalse() async {
+    /// 清理测速残留的核心进程; 这 2 秒内若已开始新一轮(如 runOne 结束后紧接着测下一个), 不能杀掉新一轮的进程
+    private func cleanUp(after run: Int) async {
+        guard run == runID else { return }
+        killAllPing()
+        await AppMenuManager.shared.refreshPingTip(pingTip: "")
+        setInPingFalse()
+    }
+
+    private func setInPingFalse() {
         logger.info("setInPingFalse")
         inPing = false
     }
 
     private func pingEachServer(item: ProfileEntity) async throws {
-        let ping = PingServer(uuid: item.uuid)
-        try await ping.doPing()
+        let ping = ProfileLatencyTest(uuid: item.uuid)
+        try await ping.run()
         let speed = await ping.getSpeed()
 
         // MARK: - Fix 2: 在任务完成后再递增计数，进度条有实际意义
@@ -110,33 +119,34 @@ actor PingAll {
             await AppMenuManager.shared.refreshPingTip(pingTip: " - " + String(localized: .Testing) + "(\(finishedCount)/\(totalCount))")
         }
 
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-done: \(item.remark) - \(speed) ms")
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-done: \(item.remark) - \(speed) ms")
     }
 
     // MARK: - Fix 6: pingOne 检查 inPing 状态，防止与 run() 并发
 
-    func pingOne(item: ProfileEntity) async {
+    func runOne(item: ProfileEntity) async {
         guard !inPing else {
             logger.info("Ping is already running, skip pingOne.")
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingSingleAlreadyRunning))
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingSingleAlreadyRunning))
             return
         }
         inPing = true
         defer {
             Task { await self.setInPingFalse() }
         }
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartNode))
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingStartNode))
         await pingTaskGroup(items: [item])
     }
 }
 
-actor PingServer {
+actor ProfileLatencyTest {
     private var uuid: String = ""
     private var item: ProfileEntity = ProfileEntity()
     private var process: Process = Process()
     private var jsonFile: String = ""
     private var bindPort: UInt16 = 0
-    private var apiPort: UInt16 = 0
+    /// 测速用的 latency-in SOCKS 入站端口
+    private var latencyPort: UInt16 = 0
     private var coreType: CoreType = .XrayCore
 
     private var serverIpCache: [String: String] = [:]
@@ -149,17 +159,17 @@ actor PingServer {
         return item.speed
     }
 
-    func doPing() async throws {
+    func run() async throws {
         guard let fetched = ProfileStore.shared.fetchOne(uuid: uuid) else {
-            throw NSError(domain: "PingServerError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Item not found"])
+            throw NSError(domain: "ProfileLatencyTestError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Item not found"])
         }
         // 测试前自动获取证书指纹（allowInsecure 已被新 Xray-core 移除）；失败则由 AdaptCore 回退 Sing-Box。
         let item = await CertPinningCoordinator.ensurePinnedCert(for: fetched)
         self.item = item
         bindPort = getRandomPort()
         repeat {
-            apiPort = getRandomPort()
-        } while apiPort == bindPort
+            latencyPort = getRandomPort()
+        } while latencyPort == bindPort
         coreType = item.AdaptCore()
         jsonFile = "\(AppHomePath)/.config.\(item.uuid).json"
 
@@ -175,7 +185,7 @@ actor PingServer {
             ProfileStore.shared.updateSpeed(uuid: self.item.uuid, speed: self.item.speed)
         }
         do {
-            let pingTime = try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort, proxyPort: bindPort)
+            let pingTime = try await LatencyTester.test(socksPort: latencyPort)
             item.speed = pingTime
 
             if let serverIp = await fetchServerIp(port: bindPort), !serverIp.isEmpty {
@@ -189,19 +199,11 @@ actor PingServer {
                 }
             }
 
-            let runningProfile = await AppState.shared.runningProfile
-            if item.uuid == runningProfile {
-                await AppState.shared.setLatency(latency: Double(pingTime))
-            }
             logger.info("Ping success: \(self.item.remark), \(self.item.uuid) \(pingTime)ms")
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-success: \(self.item.remark) - \(pingTime)ms")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-success: \(self.item.remark) - \(pingTime)ms")
         } catch {
             item.speed = -1
-            let runningProfile = await AppState.shared.runningProfile
-            if item.uuid == runningProfile {
-                await AppState.shared.setLatency(latency: -1)
-            }
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: "Ping-error: \(self.item.remark) - \(error)")
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: "Ping-error: \(self.item.remark) - \(error)")
             logger.info("Ping error: \(self.item.remark), \(self.item.uuid) \(error)")
         }
     }
@@ -320,7 +322,7 @@ actor PingServer {
 
     private func createV2rayJsonFileForPing() {
         let vCfg = CoreConfigHandler()
-        let jsonText = vCfg.toJSON(item: item, httpPort: String(bindPort), apiPort: String(apiPort))
+        let jsonText = vCfg.toJSON(item: item, httpPort: String(bindPort), latencyPort: String(latencyPort))
         do {
             try jsonText.write(to: URL(fileURLWithPath: jsonFile), atomically: true, encoding: .utf8)
         } catch {
@@ -352,12 +354,12 @@ actor PingServer {
         let ready = await waitForPortReady(bindPort, timeout: 2)
         if !ready {
             terminate()
-            throw NSError(domain: "PingServerError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Port \(bindPort) not ready after timeout"])
+            throw NSError(domain: "ProfileLatencyTestError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Port \(bindPort) not ready after timeout"])
         }
-        let apiReady = await waitForPortReady(apiPort, timeout: 2)
-        if !apiReady {
+        let latencyReady = await waitForPortReady(latencyPort, timeout: 2)
+        if !latencyReady {
             terminate()
-            throw NSError(domain: "PingServerError", code: -1, userInfo: [NSLocalizedDescriptionKey: "API port \(apiPort) not ready after timeout"])
+            throw NSError(domain: "ProfileLatencyTestError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Latency port \(latencyPort) not ready after timeout"])
         }
     }
 
@@ -371,8 +373,8 @@ actor PingServer {
     }
 }
 
-actor PingRunning {
-    static let shared = PingRunning()
+actor RunningProfileCheck {
+    static let shared = RunningProfileCheck()
 
     private let maxRetries = 3
     private let maxFailures = 3
@@ -388,7 +390,7 @@ actor PingRunning {
     }
 
     /// 开始 Ping 流程
-    func startPing() async throws {
+    func check() async throws {
         guard !isExecuting else {
             logger.info("Ping task is already running.")
             return
@@ -400,7 +402,7 @@ actor PingRunning {
             return
         }
         self.item = item
-        NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingStartSingleNodeFormat, item.remark))
+        NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingStartSingleNodeFormat, item.remark))
         // 睡眠
         try await Task.sleep(nanoseconds: 2 * 1000000000) // Wait for 2 seconds
         // 替换
@@ -408,19 +410,22 @@ actor PingRunning {
         isExecuting = true
         defer { isExecuting = false }
 
+        guard let port = LatencyTester.runningInboundPort() else {
+            logger.info("RunningProfileCheck: no \(latencyInboundTag) inbound in config, skip")
+            return
+        }
         var retries = 0
         var success = false
-        let port = getEffectiveHttpProxyPort()
         while retries < maxRetries && !success {
             do {
-                let pingTime = try await testLatencyByProxyPort(port: port)
+                let pingTime = try await LatencyTester.test(socksPort: port)
                 logger.info("Ping success, time: \(pingTime)ms")
-                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingSuccessFormat, item.remark, pingTime))
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingSuccessFormat, item.remark, pingTime))
                 resetFailureCount()
                 success = true
             } catch {
                 retries += 1
-                NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingFailureRetryFormat, item.remark, retries, error.localizedDescription))
+                NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingFailureRetryFormat, item.remark, retries, error.localizedDescription))
                 logger.info("Ping failed (\(retries)/\(self.maxRetries)): \(error)")
             }
         }
@@ -428,7 +433,7 @@ actor PingRunning {
         if !success {
             await handleFailure()
         } else {
-            NotificationCenter.default.post(name: NOTIFY_UPDATE_Ping, object: await localized(.PingCompleteSingleNodeFormat, item.remark))
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_LATENCY_TEST, object: await localized(.PingCompleteSingleNodeFormat, item.remark))
         }
     }
 
@@ -499,311 +504,5 @@ actor PingRunning {
             await V2rayLaunch.shared.restart()
             await AppMenuManager.shared.refreshServerItems()
         }
-    }
-}
-
-func testLatencyByCoreApi(coreType: CoreType, apiPort: UInt16) async throws -> Int {
-    try await testLatencyByCoreApi(coreType: coreType, apiPort: apiPort, proxyPort: nil)
-}
-
-func testLatencyByCoreApi(coreType: CoreType, apiPort: UInt16, proxyPort: UInt16?) async throws -> Int {
-    switch coreType {
-    case .XrayCore:
-        async let observatoryLatency = optionalLatency("xray-observatory") {
-            try await testXrayObservatoryLatency(apiPort: apiPort)
-        }
-        async let proxyLatency = optionalLatency("xray-http-proxy") {
-            guard let proxyPort else { throw URLError(.badURL) }
-            return try await testLatencyByProxyPort(port: proxyPort, warmup: false)
-        }
-        let results = await [observatoryLatency, proxyLatency].compactMap { $0 }
-        if let best = results.min() {
-            logger.info("Xray best latency: \(best)ms from \(results)")
-            return best
-        }
-        throw NSError(domain: "PingServerError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Xray latency unavailable"])
-    case .SingBox:
-        return try await testSingBoxApiLatency(apiPort: apiPort)
-    }
-}
-
-private func optionalLatency(_ label: String, operation: @escaping () async throws -> Int) async -> Int? {
-    do {
-        return try await operation()
-    } catch {
-        logger.info("Latency path failed [\(label)]: \(error)")
-        return nil
-    }
-}
-
-private func coreApiSessionConfiguration(timeout: TimeInterval) -> URLSessionConfiguration {
-    let configuration = URLSessionConfiguration.default
-    configuration.connectionProxyDictionary = [:]
-    configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-    configuration.urlCache = nil
-    configuration.timeoutIntervalForRequest = timeout
-    configuration.timeoutIntervalForResource = timeout
-    return configuration
-}
-
-private func testXrayObservatoryLatency(apiPort: UInt16) async throws -> Int {
-    let timeout = TimeInterval(defaultLatencyTestTimeout)
-    let deadline = Date().addingTimeInterval(timeout)
-    let configuration = coreApiSessionConfiguration(timeout: timeout)
-    let session = URLSession(configuration: configuration)
-    defer { session.finishTasksAndInvalidate() }
-
-    guard let url = URL(string: "http://127.0.0.1:\(apiPort)/debug/vars") else {
-        throw URLError(.badURL)
-    }
-
-    var lastError: Error?
-    while Date() < deadline {
-        do {
-            let (data, response) = try await session.data(for: URLRequest(url: url))
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw URLError(.badServerResponse)
-            }
-
-            let vars = try JSONDecoder().decode(V2rayMetricsVars.self, from: data)
-            if let delay = vars.observatory?["proxy"]?.delay, delay > 0 {
-                let latency = Int(delay.rounded())
-                logger.info("Xray observatory latency: \(latency)ms")
-                return latency
-            }
-        } catch {
-            lastError = error
-        }
-        try await Task.sleep(nanoseconds: 300_000_000)
-    }
-
-    throw lastError ?? NSError(domain: "PingServerError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Xray observatory latency unavailable"])
-}
-
-private func testSingBoxApiLatency(apiPort: UInt16) async throws -> Int {
-    let timeoutMs = defaultLatencyTestTimeout * 1000
-    let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
-    var components = URLComponents(string: "http://127.0.0.1:\(apiPort)/proxies/proxy/delay")
-    components?.queryItems = [
-        URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
-        URLQueryItem(name: "url", value: testURL)
-    ]
-    guard let url = components?.url else {
-        throw URLError(.badURL)
-    }
-
-    let timeout = TimeInterval(defaultLatencyTestTimeout)
-    let configuration = coreApiSessionConfiguration(timeout: timeout)
-    let session = URLSession(configuration: configuration)
-    defer { session.finishTasksAndInvalidate() }
-
-    let (data, response) = try await session.data(for: URLRequest(url: url))
-    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-        throw URLError(.badServerResponse)
-    }
-    guard let delay = parseClashDelay(from: data) else {
-        throw NSError(domain: "PingServerError", code: -3, userInfo: [NSLocalizedDescriptionKey: "Sing-Box delay unavailable"])
-    }
-
-    let latency = Int(delay.rounded())
-    logger.info("Sing-Box API latency: \(latency)ms")
-    return latency
-}
-
-// MARK: - Fix 7: 预热和采样共享同一个 session，确保连接池复用真正生效
-
-func testLatencyByProxyPort(port: UInt16, warmup: Bool = true) async throws -> Int {
-    logger.info("testLatencyByProxyPort: \(port)")
-    let configuration = getProxyUrlSessionConfigure(httpProxyPort: port)
-    let timeoutInterval = TimeInterval(defaultLatencyTestTimeout)
-    configuration.timeoutIntervalForRequest = timeoutInterval
-    configuration.timeoutIntervalForResource = timeoutInterval
-    configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-
-    // 预热：用同一个 session 暖化连接池
-    // 用 NoRedirectSessionDelegate 阻断 3xx，避免:
-    // 1) 跟随 301/302 让 latency 数字虚高
-    // 2) HSTS/区域跳转后 statusCode 不再是 204 导致校验失败
-    if warmup {
-        let warmupSession = URLSession(configuration: configuration, delegate: NoRedirectSessionDelegate(), delegateQueue: nil)
-        defer { warmupSession.finishTasksAndInvalidate() }
-        _ = try await performLatencyRequest(session: warmupSession)
-    }
-
-    // 采样：复用相同 configuration，共享连接
-    var samples: [Int] = []
-    for _ in 0 ..< 1 {
-        let pingTime = try await performLatencyRequestWithMetrics(configuration: configuration)
-        samples.append(pingTime)
-    }
-
-    let pingTime = samples.min() ?? -1
-    logger.info("testLatencyByProxyPort-end: \(port) - \(pingTime)ms")
-    return pingTime
-}
-
-private func makeLatencyRequest(timeout: TimeInterval) async -> URLRequest {
-    let url = await AppSettings.shared.pingURL
-    var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeout)
-    request.httpMethod = "GET"
-    return request
-}
-
-private func performLatencyRequest(session: URLSession) async throws -> HTTPURLResponse {
-    let request = await makeLatencyRequest(timeout: TimeInterval(defaultLatencyTestTimeout))
-    let (_, response) = try await session.data(for: request)
-
-    guard let httpResponse = response as? HTTPURLResponse else {
-        throw URLError(.badServerResponse)
-    }
-    // 测速 URL 必须直接返回 204；遇到 200 / 3xx 一律视为非法（可能是被劫持或被跳转）
-    guard httpResponse.statusCode == 204 else {
-        throw URLError(.badServerResponse)
-    }
-    return httpResponse
-}
-
-// MARK: - Fix 7: 接收 configuration 而非 session，内部自行创建带 delegate 的 session
-
-private func performLatencyRequestWithMetrics(configuration: URLSessionConfiguration) async throws -> Int {
-    let timeoutInterval = TimeInterval(defaultLatencyTestTimeout)
-    let request = await makeLatencyRequest(timeout: timeoutInterval)
-
-    return try await withCheckedThrowingContinuation { continuation in
-        let delegate = LatencyMetricsDelegate(continuation: continuation)
-        // session 由 delegate 持有引用，在 invalidate 后自动释放
-        let metricsSession = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
-        delegate.session = metricsSession // 弱持有 session 以便超时时主动 invalidate
-
-        let task = metricsSession.dataTask(with: request)
-        task.resume()
-
-        // MARK: - Fix 4: 超时后 cancel task 并 invalidateAndCancel session，防止泄漏
-
-        DispatchQueue.global().asyncAfter(deadline: .now() + timeoutInterval) {
-            guard !delegate.hasResumed else { return }
-            task.cancel()
-            metricsSession.invalidateAndCancel()
-            // hasResumed 由 delegate 内部用 os_unfair_lock 保护，此处无需再设
-            delegate.resumeWithError(NSError(domain: "Timeout", code: -1, userInfo: [NSLocalizedDescriptionKey: "Ping timeout"]))
-        }
-    }
-}
-
-private func intervalMs(from start: Date?, to end: Date?) -> Int? {
-    guard let start = start, let end = end else { return nil }
-    return max(0, Int(end.timeIntervalSince(start) * 1000))
-}
-
-private func formatMetric(_ name: String, _ value: Int?) -> String {
-    guard let value = value else { return "\(name)=-" }
-    return "\(name)=\(value)ms"
-}
-
-private func latencyMetricBreakdown(_ metrics: URLSessionTaskMetrics) -> String {
-    metrics.transactionMetrics.enumerated().map { index, metric in
-        let dns = intervalMs(from: metric.domainLookupStartDate, to: metric.domainLookupEndDate)
-        let connect = intervalMs(from: metric.connectStartDate, to: metric.connectEndDate)
-        let tls = intervalMs(from: metric.secureConnectionStartDate, to: metric.secureConnectionEndDate)
-        let request = intervalMs(from: metric.requestStartDate, to: metric.requestEndDate)
-        let response = intervalMs(from: metric.responseStartDate, to: metric.responseEndDate)
-        let total = intervalMs(from: metric.fetchStartDate, to: metric.responseEndDate)
-        return "#\(index) \(formatMetric("total", total)) \(formatMetric("dns", dns)) \(formatMetric("connect", connect)) \(formatMetric("tls", tls)) \(formatMetric("request", request)) \(formatMetric("response", response)) reused=\(metric.isReusedConnection) proto=\(metric.networkProtocolName ?? "-")"
-    }.joined(separator: "; ")
-}
-
-// MARK: - Fix 3 & 4: 用 os_unfair_lock 保护 hasResumed，消除数据竞争；Fix 4: 持有 session 以便超时 invalidate
-
-final class LatencyMetricsDelegate: NSObject, URLSessionDataDelegate, @unchecked Sendable {
-    var latencyMs: Int = -1
-    private var continuation: CheckedContinuation<Int, Error>?
-
-    // MARK: - Fix 3: 用锁保护共享状态，消除多线程数据竞争
-
-    private var lock = os_unfair_lock()
-    private(set) var hasResumed = false
-    /// 弱引用 session，用于超时时 invalidate（session 强持有 delegate，不能强引用 session）
-    weak var session: URLSession?
-
-    init(continuation: CheckedContinuation<Int, Error>?) {
-        self.continuation = continuation
-        super.init()
-    }
-
-    func resumeWithLatency(_ latency: Int) {
-        os_unfair_lock_lock(&lock)
-        defer { os_unfair_lock_unlock(&lock) }
-        guard !hasResumed else { return }
-        hasResumed = true
-        session?.finishTasksAndInvalidate()
-        continuation?.resume(returning: latency)
-        continuation = nil
-    }
-
-    func resumeWithError(_ error: Error) {
-        os_unfair_lock_lock(&lock)
-        defer { os_unfair_lock_unlock(&lock) }
-        guard !hasResumed else { return }
-        hasResumed = true
-        continuation?.resume(throwing: error)
-        continuation = nil
-    }
-
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        // 不需要处理 body
-    }
-
-    // MARK: - Fix 3: error == nil 时也检查，避免 metrics 未触发时 continuation 永久挂起
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if let error = error {
-            resumeWithError(error)
-        }
-        // error == nil 时由 didFinishCollecting 负责 resume；
-        // 若 metrics 也未触发，超时逻辑兜底，不会永久挂起。
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        logger.info("LatencyMetricsBreakdown: \(latencyMetricBreakdown(metrics))")
-        // 校验最终响应必须是 204; 拒绝跟随重定向时这里会拿到 3xx, 视为失败避免上报伪造延迟
-        if let http = task.response as? HTTPURLResponse, http.statusCode != 204 {
-            resumeWithError(NSError(domain: "LatencyMetrics", code: http.statusCode,
-                                    userInfo: [NSLocalizedDescriptionKey: "Unexpected status \(http.statusCode)"]))
-            return
-        }
-        guard let transactionMetrics = metrics.transactionMetrics.last(where: { $0.responseEndDate != nil }) ?? metrics.transactionMetrics.first,
-              let fetchStart = transactionMetrics.requestStartDate ?? transactionMetrics.fetchStartDate,
-              let responseEnd = transactionMetrics.responseEndDate else {
-            // metrics 数据不完整时用错误兜底，避免 continuation 泄漏
-            resumeWithError(NSError(domain: "LatencyMetrics", code: -1, userInfo: [NSLocalizedDescriptionKey: "Incomplete metrics"]))
-            return
-        }
-
-        let duration = responseEnd.timeIntervalSince(fetchStart)
-        let latency = Int(duration * 1000)
-        latencyMs = latency
-        logger.info("LatencyMetrics: \(latency)ms")
-        resumeWithLatency(latency)
-    }
-
-    // MARK: - 禁止跟随 3xx 跳转，避免测速被 301/302 拉长
-    func urlSession(_ session: URLSession,
-                    task: URLSessionTask,
-                    willPerformHTTPRedirection response: HTTPURLResponse,
-                    newRequest request: URLRequest,
-                    completionHandler: @escaping (URLRequest?) -> Void) {
-        logger.info("LatencyMetrics: refuse redirect status=\(response.statusCode) -> \(request.url?.absoluteString ?? "-")")
-        completionHandler(nil)
-    }
-}
-
-/// 用于 warmup session：阻断任何 3xx 跳转，让 generate_204 类目标必须直返 204
-final class NoRedirectSessionDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    func urlSession(_ session: URLSession,
-                    task: URLSessionTask,
-                    willPerformHTTPRedirection response: HTTPURLResponse,
-                    newRequest request: URLRequest,
-                    completionHandler: @escaping (URLRequest?) -> Void) {
-        completionHandler(nil)
     }
 }

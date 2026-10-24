@@ -142,7 +142,7 @@ import Testing
         if coreType == .XrayCore {
             V2rayOutboundHandler.testCoreVersionOverride = XrayVersion(version)
         }
-        let jsonText = configHandler.toJSON(item: testProfile, httpPort: String(bindPort), apiPort: nil)
+        let jsonText = configHandler.toJSON(item: testProfile, httpPort: String(bindPort), latencyPort: nil)
         V2rayOutboundHandler.testCoreVersionOverride = nil
 
         return launchAndTest(

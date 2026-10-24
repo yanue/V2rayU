@@ -143,18 +143,21 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - 更新速度
-    func setSpeed(latency: Double, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
+    /// latency 为 nil 时不更新延迟(单节点模式由 RealtimeLatencyMonitor 负责)
+    func setSpeed(latency: Double?, directUpSpeed: Double, directDownSpeed: Double, proxyUpSpeed: Double, proxyDownSpeed: Double) {
         if !self.v2rayTurnOn { return }
         // 延迟到下一 runloop，避免在 AppKit 菜单/事件处理期间触发 AttributeGraph 重入
         Task { @MainActor in
-            self.latency = latency
+            if let latency {
+                self.latency = latency
+            }
             self.directUpSpeed = directUpSpeed
             self.directDownSpeed = directDownSpeed
             self.proxyUpSpeed = proxyUpSpeed
             self.proxyDownSpeed = proxyDownSpeed
         }
         // 组合模式下, 各 profile 的 speed 已由 XrayApiStatsHandler.parseV2RayStats 单独更新
-        guard runningCombination.isEmpty else { return }
+        guard runningCombination.isEmpty, let latency else { return }
         ProfileStore.shared.updateSpeed(uuid: self.runningProfile, speed: Int(latency))
     }
 

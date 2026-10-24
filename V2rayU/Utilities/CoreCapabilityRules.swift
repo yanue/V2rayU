@@ -194,7 +194,7 @@ enum CapabilityRulesLoader {
     private static let primaryOverrideDirectoryName = "capability-rules"
     private static let supportedSchemaVersions: Set<Int> = [1, 2, 3, 4]
 
-    // 多线程安全: PingAll 并发调用 loadDetailed，用 NSLock 保护 cache 避免 Dictionary 数据竞争
+    // 多线程安全: LatencyTestRunner 并发调用 loadDetailed，用 NSLock 保护 cache 避免 Dictionary 数据竞争
     private static let cacheLock = NSLock()
     private static nonisolated(unsafe) var cache: [CapabilityRulesCore: (document: CapabilityRulesDocument, url: URL, sourceKind: CapabilityRulesSourceKind)] = [:]
 

@@ -1,5 +1,5 @@
 //
-//  ProfilePing.swift
+//  LatencyTestView.swift
 //  V2rayU
 //
 //  Created by yanue on 2024/11/30.
@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct ProfilePingView: View {
+struct LatencyTestView: View {
     var profile: ProfileEntity?
     var profiles: [ProfileEntity]?
     var isAll: Bool
     var onClose: () -> Void
     @State private var logs: [String] = []
-    @State private var isPinging: Bool = false
+    @State private var isTesting: Bool = false
     @State private var scrollProxy: ScrollViewProxy? = nil
 
     var body: some View {
@@ -22,18 +22,18 @@ struct ProfilePingView: View {
                 Text(pingTitle)
                     .font(.title2).bold()
                 Spacer()
-                Button(isPinging ? "Pinging..." : "Ping Now") {
-                    isPinging = true
+                Button(isTesting ? "Pinging..." : "Ping Now") {
+                    isTesting = true
                     logs.removeAll()
                     if isAll {
-                        doPingAll()
+                        testAll()
                     } else if let p = profile {
-                        doPingItem(item: p)
+                        testItem(item: p)
                     } else if let items = profiles {
-                        doPingMultiple(items: items)
+                        testMultiple(items: items)
                     }
                 }
-                .disabled(isPinging)
+                .disabled(isTesting)
                 .buttonStyle(.borderedProminent)
                 .focusable(false)
                 
@@ -142,31 +142,31 @@ struct ProfilePingView: View {
             logs.removeAll()
         }
         // 通知由后台 actor 发出，切回主线程后再写 @State；随视图生命周期自动取消订阅
-        .onReceive(NotificationCenter.default.publisher(for: NOTIFY_UPDATE_Ping).receive(on: DispatchQueue.main)) { notif in
+        .onReceive(NotificationCenter.default.publisher(for: NOTIFY_UPDATE_LATENCY_TEST).receive(on: DispatchQueue.main)) { notif in
             if let msg = notif.object as? String {
                 logs.append(msg)
             }
-            isPinging = false
+            isTesting = false
         }
     }
 
-    func doPingItem(item: ProfileEntity) {
+    func testItem(item: ProfileEntity) {
         Task {
-            await PingAll.shared.pingOne(item: item)
+            await LatencyTestRunner.shared.runOne(item: item)
         }
     }
 
-    func doPingMultiple(items: [ProfileEntity]) {
+    func testMultiple(items: [ProfileEntity]) {
         Task {
             for item in items {
-                await PingAll.shared.pingOne(item: item)
+                await LatencyTestRunner.shared.runOne(item: item)
             }
         }
     }
 
-    func doPingAll() {
+    func testAll() {
         Task {
-            await PingAll.shared.run()
+            await LatencyTestRunner.shared.runAll()
         }
     }
 

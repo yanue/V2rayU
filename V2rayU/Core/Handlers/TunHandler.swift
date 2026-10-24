@@ -325,7 +325,7 @@ actor TunHandler {
             AppMenuManager.shared.refreshAllMenus()
         }
         // 重新 ping 更新延迟显示
-        await PingAll.shared.run()
+        await LatencyTestRunner.shared.runAll()
     }
 
     private func deferRebuild(after delay: TimeInterval, reason: String) {

@@ -119,6 +119,7 @@
 		66A7B0022FA2000100A00002 /* AnyTlsUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0012FA2000100A00001 /* AnyTlsUri.swift */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		66C0DE012F9B00020000A001 /* LatencyTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C0DE012F9B00010000A001 /* LatencyTester.swift */; };
 		66C944762FCDB353003A9774 /* CertFingerprintFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C944752FCDB353003A9774 /* CertFingerprintFetcher.swift */; };
 		66D27AE52E098E3A004C600D /* ShareQrCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE42E098E3A004C600D /* ShareQrCode.swift */; };
 		66D27AE62E098E3A004C600E /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D27AE72E098E3A004C600E /* ExportView.swift */; };
@@ -323,6 +324,7 @@
 		66B1B5672D297B590032DD09 /* icon.sketch */ = {isa = PBXFileReference; lastKnownFileType = file; path = icon.sketch; sourceTree = "<group>"; };
 		66B1B56F2D297B590032DD09 /* V2rayU.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = V2rayU.icns; sourceTree = "<group>"; };
 		66B1B5702D297B590032DD09 /* V2rayU-dmg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "V2rayU-dmg@2x.png"; sourceTree = "<group>"; };
+		66C0DE012F9B00010000A001 /* LatencyTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatencyTester.swift; sourceTree = "<group>"; };
 		66C944752FCDB353003A9774 /* CertFingerprintFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertFingerprintFetcher.swift; sourceTree = "<group>"; };
 		66CBCED72C63B16400313949 /* V2rayU.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = V2rayU.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D27AE42E098E3A004C600D /* ShareQrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrCode.swift; sourceTree = "<group>"; };
@@ -663,6 +665,7 @@
 				66078E372F6838E5002E64AE /* NetworkMonitor.swift */,
 				667464212F0E894700D3D1E9 /* CoreConfigHandler.swift */,
 				667464252F1526B700D3D1E9 /* CoreStatsHandler.swift */,
+				66C0DE012F9B00010000A001 /* LatencyTester.swift */,
 				66078E2F2F6838E5002E64AE /* AppInstaller.swift */,
 				66078E302F6838E5002E64AE /* LaunchAgent.swift */,
 				66078E322F6838E5002E64AE /* V2rayLaunch.swift */,
@@ -1188,6 +1191,7 @@
 				662CC44E2D1C4D38006E8450 /* SubscriptionViewModel.swift in Sources */,
 				662CC42B2D1BED9B006E8450 /* ProfileForm.swift in Sources */,
 				667464262F1526BC00D3D1E9 /* CoreStatsHandler.swift in Sources */,
+				66C0DE012F9B00020000A001 /* LatencyTester.swift in Sources */,
 				662CC42C2D1BED9B006E8450 /* ProfileShow.swift in Sources */,
 				663814AF2E01938400F5FCF3 /* SubscriptionForm.swift in Sources */,
 				66E0AF3D2E7DABB3004E44FF /* MainWindow.swift in Sources */,

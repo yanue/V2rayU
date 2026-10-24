@@ -107,7 +107,7 @@ actor SystemSleepManager {
             if UserDefaults.getBool(forKey: .autoUpdateServers) {
                 await SubscriptionHandler.shared.sync()
             }
-            await PingAll.shared.run()
+            await LatencyTestRunner.shared.runAll()
             // 记录唤醒
             self.logEvent(source: "wake")
         }

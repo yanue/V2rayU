@@ -205,15 +205,15 @@ struct ProfileListView: View {
                     loadData()
                 }
             case .ping(let model):
-                ProfilePingView(profile: model.toEntity(), isAll: false) {
+                LatencyTestView(profile: model.toEntity(), isAll: false) {
                     activeSheet = nil
                 }
             case .pingAll:
-                ProfilePingView(profile: nil, isAll: true) {
+                LatencyTestView(profile: nil, isAll: true) {
                     activeSheet = nil
                 }
             case .pingMultiple(let items):
-                ProfilePingView(profiles: items, isAll: false) {
+                LatencyTestView(profiles: items, isAll: false) {
                     activeSheet = nil
                 }
             case .share(let model):

@@ -72,23 +72,19 @@ class SingboxConfigHandler {
 
     // ping配置
     func toJSON(item: ProfileEntity, httpPort: String) -> String {
-        toJSON(item: item, httpPort: httpPort, apiPort: nil)
+        toJSON(item: item, httpPort: httpPort, latencyPort: nil)
     }
 
-    // ping配置
-    func toJSON(item: ProfileEntity, httpPort: String, apiPort: String?) -> String {
+    // ping配置: latencyPort 为测速用的 latency-in SOCKS 入站端口
+    func toJSON(item: ProfileEntity, httpPort: String, latencyPort: String?) -> String {
         self.forPing = true
         self.httpPort = httpPort
         var outbound = SingboxOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         outbound.domain_resolver = domain_resolver
         self.combine(_outbounds: [outbound])
-        if let apiPort {
-            self.singbox.experimental = ExperimentalConfig(
-                clash_api: ClashAPIConfig(
-                    external_controller: "127.0.0.1:\(apiPort)",
-                    secret: ""
-                )
-            )
+        if let latencyPort, let port = Int(latencyPort) {
+            // ping 配置没有路由规则, 默认走第一个出站 proxy
+            self.singbox.inbounds.append(latencyInbound(port: port))
         }
         return self.singbox.toJSON()
     }
@@ -269,6 +265,9 @@ class SingboxConfigHandler {
                 inbounds.append(socksInbound)
             }
 
+            // 实时延迟: 由 RealtimeLatencyMonitor 经此入站保持长连接测速, 路由规则里强制走 proxy
+            inbounds.append(latencyInbound(port: Int(findFreePort())))
+
             let clashConfig = ExperimentalConfig(
                 clash_api: ClashAPIConfig(
                     external_controller: "127.0.0.1:\(coreApiPort)",
@@ -300,11 +299,17 @@ class SingboxConfigHandler {
                 migrateBlockOutboundToAction(&routeRules)
                 self.singbox.outbounds.removeAll { $0.type == "block" }
             }
+            routeRules.insert(RouteRule(outbound: "proxy", inbound: [latencyInboundTag]), at: 0)
             routeRules.append(RouteRule(outbound: "proxy", rule_set: ["geoip-cn"], invert: true))
             self.singbox.route.rules = routeRules
             self.singbox.applyBundledRuleSets()
         }
         logger.debug("_outbounds: \(self.forPing) \(self.singbox.toJSON())")
+    }
+
+    /// 测速专用 SOCKS 入站(latency-in)
+    private func latencyInbound(port: Int) -> SingboxInbound {
+        SingboxInbound(type: "socks", tag: latencyInboundTag, listen: "127.0.0.1", listen_port: port)
     }
 
     private func migrateBlockOutboundToAction(_ rules: inout [RouteRule]) {

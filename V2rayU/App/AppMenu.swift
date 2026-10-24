@@ -706,7 +706,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
 
     func pingSpeedTest() {
         Task {
-            await PingAll.shared.run()
+            await LatencyTestRunner.shared.runAll()
         }
     }
 

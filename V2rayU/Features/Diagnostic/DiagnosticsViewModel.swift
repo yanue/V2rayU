@@ -844,8 +844,9 @@ final class DiagnosticsViewModel: ObservableObject {
                          problem: String(localized: .DiagNodeNotSelected))
         }
 
-        await PingAll.shared.pingOne(item: item)
-        let latency = appState.latency
+        await LatencyTestRunner.shared.runOne(item: item)
+        // 测速结果写在节点上; appState.latency 是菜单栏实时延迟, 不代表这次测速
+        let latency = Double(ProfileStore.shared.fetchOne(uuid: uuid)?.speed ?? -1)
 
         if latency > 0 {
             let sub = latency < 300 ? "\(Int(latency))ms"
@@ -1090,6 +1091,17 @@ final class DiagnosticsViewModel: ObservableObject {
         }
     }
 
+    /// 经本地 SOCKS 端口请求测速地址的 curl 参数, 输出 HTTP 状态码
+    nonisolated static func proxyCheckCurlArguments(socksPort: UInt16, testURL: String, timeout: String) -> [String] {
+        [
+            // 域名交给代理解析, 本地 DNS 可能被污染(如 www.google.com)
+            "--socks5-hostname", "127.0.0.1:\(socksPort)",
+            "--connect-timeout", timeout, "--max-time", timeout,
+            "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            testURL
+        ]
+    }
+
     private func testProxyConnectivity(socksPort: UInt16) async -> Bool {
         let portOK = await runInBackground { ProcessChecker.isPortListening(Int(socksPort)) }
         guard portOK else { return false }
@@ -1099,12 +1111,7 @@ final class DiagnosticsViewModel: ObservableObject {
             let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
             let task = Process()
             task.launchPath = "/usr/bin/curl"
-            task.arguments = [
-                "--socks5", "127.0.0.1:\(socksPort)",
-                "--connect-timeout", timeout, "--max-time", timeout,
-                "-s", "-o", "/dev/null", "-w", "%{http_code}",
-                testURL
-            ]
+            task.arguments = Self.proxyCheckCurlArguments(socksPort: socksPort, testURL: testURL, timeout: timeout)
             let pipe = Pipe()
             task.standardOutput = pipe
             task.standardError = Pipe()
@@ -1199,7 +1206,7 @@ final class DiagnosticsViewModel: ObservableObject {
     private func doPingNow() {
         checkTask?.cancel()
         checkTask = Task { @MainActor in
-            await PingAll.shared.run()
+            await LatencyTestRunner.shared.runAll()
             try? await Task.sleep(nanoseconds: 300_000_000)
             self.runSequentialChecks()
         }

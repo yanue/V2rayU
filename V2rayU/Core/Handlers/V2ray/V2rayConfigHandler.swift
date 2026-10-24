@@ -293,18 +293,18 @@ class V2rayConfigHandler {
 
     // ping配置
     func toJSON(item: ProfileEntity, httpPort: String) -> String {
-        toJSON(item: item, httpPort: httpPort, apiPort: nil)
+        toJSON(item: item, httpPort: httpPort, latencyPort: nil)
     }
 
-    // ping配置
-    func toJSON(item: ProfileEntity, httpPort: String, apiPort: String?) -> String {
+    // ping配置: latencyPort 为测速用的 latency-in SOCKS 入站端口
+    func toJSON(item: ProfileEntity, httpPort: String, latencyPort: String?) -> String {
         self.forPing = true
         self.enableSocks = false
         self.httpPort = String(httpPort)
         let outbound = V2rayOutboundHandler(from: ProfileModel(from: item)).getOutbound()
         self.combine(_outbounds: [outbound])
-        if let apiPort {
-            addPingMetrics(apiPort: apiPort)
+        if let latencyPort {
+            addLatencyInbound(port: latencyPort)
         }
         return self.v2ray.toJSON()
     }
@@ -402,9 +402,8 @@ class V2rayConfigHandler {
             self.v2ray.stats = V2rayStats() // 开启统计
             self.v2ray.metrics = v2rayMetrics() // 启用 metrics,用于请求统计数据
             self.v2ray.policy = V2rayPolicy() // 统计规则
-            var observatory = V2rayObservatory() // 观察者
-            observatory.probeUrl = getLatencyTestURLString()
-            self.v2ray.observatory = observatory
+            // 实时延迟: 由 RealtimeLatencyMonitor 经此入站保持长连接测速(替代每次新建连接的 observatory)
+            self.addLatencyInbound(port: String(findFreePort()))
             self.applyTunChainOptions()
         }
         // ------------------------------------- routing end ----------------------------------------------
@@ -483,32 +482,16 @@ class V2rayConfigHandler {
         return version >= XrayVersion(24, 12, 31)
     }
 
-    private func addPingMetrics(apiPort: String) {
-        let inApi = getInbound(protocol: .dokodemoDoor, listen: "127.0.0.1", port: apiPort, enableSniffing: false, tag: "metrics_in")
-        self.v2ray.inbounds?.append(inApi)
-
-        let outboundFreedom = V2rayOutbound()
-        outboundFreedom.protocol = .freedom
-        outboundFreedom.tag = "direct"
-        outboundFreedom.settings = V2rayOutboundFreedom(domainStrategy: getFreedomDomainStrategySetting())
-        self.v2ray.outbounds?.append(outboundFreedom)
-
-        var apiRule = V2rayRoutingRule()
-        apiRule.type = "field"
-        apiRule.inboundTag = ["metrics_in"]
-        apiRule.outboundTag = "metrics_out"
-        apiRule.domain = nil
-        apiRule.ip = nil
-        self.v2ray.routing.rules = [apiRule]
-        self.v2ray.stats = V2rayStats()
-        self.v2ray.metrics = v2rayMetrics()
-        self.v2ray.policy = V2rayPolicy()
-        var observatory = V2rayObservatory()
-        observatory.subjectSelector = ["proxy"]
-        observatory.probeUrl = getLatencyTestURLString()
-        observatory.probeInterval = "300ms"
-        observatory.enableConcurrency = true
-        self.v2ray.observatory = observatory
+    /// 测速专用 SOCKS 入站(latency-in), 路由第一条规则强制走 proxy, 不受分流规则影响
+    private func addLatencyInbound(port: String) {
+        let inLatency = getInbound(protocol: .socks, listen: "127.0.0.1", port: port, enableSniffing: false, tag: latencyInboundTag)
+        self.v2ray.inbounds?.append(inLatency)
+        var latencyRule = V2rayRoutingRule()
+        latencyRule.inboundTag = [latencyInboundTag]
+        latencyRule.outboundTag = "proxy"
+        latencyRule.domain = nil
+        latencyRule.ip = nil
+        self.v2ray.routing.rules.insert(latencyRule, at: 0)
     }
 
     func toJSON(combination resolved: CombinedConfigResolved) -> String {

@@ -448,9 +448,9 @@ actor V2rayLaunch {
         Task {
             await CoreTrafficStatsHandler.shared.startTask(coreType: coreDecision.coreType)
             do {
-                try await PingRunning.shared.startPing()
+                try await RunningProfileCheck.shared.check()
             } catch {
-                logger.error("PingRunning.startPing failed: \(error)")
+                logger.error("RunningProfileCheck.check failed: \(error)")
             }
         }
         self.lastCore = coreDecision.coreType

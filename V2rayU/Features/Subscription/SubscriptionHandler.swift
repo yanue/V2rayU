@@ -128,7 +128,7 @@ actor SubscriptionHandler {
             Task {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 // do ping
-                await PingAll.shared.run()
+                await LatencyTestRunner.shared.runAll()
             }
         }
     }

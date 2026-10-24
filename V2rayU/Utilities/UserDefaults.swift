@@ -39,7 +39,7 @@ extension UserDefaults {
         // show country flag icon
         case showCountryFlag
         // status bar refresh interval (seconds)
-        case statusBarRefreshInterval
+        case latencyCheckInterval
         // base settings
         // allowLAN
         case allowLAN

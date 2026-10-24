@@ -37,36 +37,37 @@ actor CoreTrafficStatsHandler {
 
     init() {}
     
-    func resetData() {
+    func resetData() async {
         self.directDownLink = 0
         self.directUpLink = 0
         self.proxyDownLink = 0
         self.proxyUpLink = 0
-        self.stopTask()
-    }
-    
-    func startTask(coreType: CoreType) {
-        self.stopTask()
-        Task {
-            // 判断coreType
-            switch coreType {
-            case .SingBox:
-                // api stream 模式(更新流量统计)
-                ClashApiStreamHandler.shared.startTask()
-                // api request 模式(更新延迟)
-                await ClashApilatencyHandler.shared.startTask()
-            case .XrayCore:
-                await XrayApiStatsHandler.shared.startTask()
-            }
-        }
+        await self.stopTask()
     }
 
-    func stopTask() {
-        Task {
-            ClashApiStreamHandler.shared.stopTask()
-            await ClashApilatencyHandler.shared.stopTask()
-            await XrayApiStatsHandler.shared.stopTask()
+    /// 先停后启, 按顺序 await: 若各自放进独立 Task, 停止可能晚于启动执行, 把刚启动的任务停掉
+    func startTask(coreType: CoreType) async {
+        await self.stopTask()
+        switch coreType {
+        case .SingBox:
+            // api stream 模式(更新流量统计)
+            ClashApiStreamHandler.shared.startTask()
+            // api request 模式: 只有组合模式(配置无 latency-in)需要经 clash API 取延迟
+            if LatencyTester.runningInboundPort() == nil {
+                await ClashApiLatencyHandler.shared.startTask()
+            }
+        case .XrayCore:
+            await XrayApiStatsHandler.shared.startTask()
         }
+        // 实时延迟(单节点模式), 组合模式配置无 latency-in 时自动跳过
+        await RealtimeLatencyMonitor.shared.start()
+    }
+
+    func stopTask() async {
+        ClashApiStreamHandler.shared.stopTask()
+        await ClashApiLatencyHandler.shared.stopTask()
+        await XrayApiStatsHandler.shared.stopTask()
+        await RealtimeLatencyMonitor.shared.stop()
     }
 
     func setTraffic(upLink: Double, downLink: Double) {
@@ -78,7 +79,8 @@ actor CoreTrafficStatsHandler {
         }
     }
 
-    func setSpeed(latency: Double, directUpLink: Int, directDownLink: Int, proxyUpLink: Int, proxyDownLink: Int) {
+    /// latency 为 nil 时不更新延迟(单节点模式由 RealtimeLatencyMonitor 负责)
+    func setSpeed(latency: Double?, directUpLink: Int, directDownLink: Int, proxyUpLink: Int, proxyDownLink: Int) {
         let now = Date()
         let timeInterval = now.timeIntervalSince(lastUpdate)
         lastUpdate = now
@@ -162,7 +164,7 @@ actor XrayApiStatsHandler: NSObject {
             decoder.dateDecodingStrategy = .iso8601 // 解析日期
             // try decode data
             let vars: V2rayMetricsVars = try decoder.decode(V2rayMetricsVars.self, from: jsonData)
-            var latency = 0.0
+            var latency: Double?
             var directUpLink = 0
             var directDownLink = 0
             var proxyUpLink = 0
@@ -177,26 +179,11 @@ actor XrayApiStatsHandler: NSObject {
             let isComboMode = !runningCombination.isEmpty
 
             if isComboMode, let observatory = vars.observatory {
-                // 组合模式: 遍历 combo-out-* / combo-chain-* 条目, 提取 UUID 更新每个 profile 的延迟
-                // (链式只观测出口，其延迟是整条链的延迟，只计入整体显示，不写回单个节点)
-                var delays: [Double] = []
-                for (tag, obs) in observatory where tag.hasPrefix("combo-out-") || tag.hasPrefix("combo-chain-") {
-                    let parts = tag.components(separatedBy: "-")
-                    guard parts.count >= 5 else { continue }
-                    let uuid = parts[4...].joined(separator: "-")
-                    let delay = obs.delay
-                    if delay > 0 {
-                        delays.append(delay)
-                        // 链式出口的延迟是整条链的延迟，不写回单个节点
-                        if tag.hasPrefix("combo-out-") {
-                            ProfileStore.shared.updateSpeed(uuid: uuid, speed: Int(delay.rounded()))
-                        }
-                    }
+                let combo = Self.comboLatency(observatory)
+                for (uuid, speed) in combo.speeds {
+                    ProfileStore.shared.updateSpeed(uuid: uuid, speed: speed)
                 }
-                // 使用最低延迟作为整体显示值
-                latency = delays.min() ?? 0
-            } else if let latencyValue = vars.observatory?["proxy"] {
-                latency = latencyValue.delay
+                latency = combo.display
             }
 
             if let directUpLinkValue = stats.outbound["direct"] {
@@ -214,10 +201,35 @@ actor XrayApiStatsHandler: NSObject {
             logger.error("Failed to parse JSON: \(error.localizedDescription)")
         }
     }
+
+    /// 组合模式: 遍历 combo-out-* / combo-chain-* 条目, 取整体显示延迟与各节点延迟(按 UUID)。
+    /// 链式只观测出口, 其延迟是整条链的延迟, 只计入整体显示, 不写回单个节点。
+    /// 整体取最低延迟; 已探测但全部失败时为 -1, 尚未探测时为 0。
+    static func comboLatency(_ observatory: [String: V2rayMetricObservatory]) -> (display: Double, speeds: [String: Int]) {
+        var delays: [Double] = []
+        var speeds: [String: Int] = [:]
+        var probed = false
+        for (tag, obs) in observatory where tag.hasPrefix("combo-out-") || tag.hasPrefix("combo-chain-") {
+            let parts = tag.components(separatedBy: "-")
+            guard parts.count >= 5 else { continue }
+            let uuid = parts[4...].joined(separator: "-")
+            probed = true
+            // 探测失败时 alive=false, delay 为极大值, 不能当作延迟
+            let delay: Double? = obs.alive && obs.delay > 0 ? obs.delay : nil
+            if let delay {
+                delays.append(delay)
+            }
+            if tag.hasPrefix("combo-out-") {
+                speeds[uuid] = delay.map { Int($0.rounded()) } ?? -1
+            }
+        }
+        return (delays.min() ?? (probed ? -1 : 0), speeds)
+    }
 }
 
-actor ClashApilatencyHandler: NSObject {
-    static let shared = ClashApilatencyHandler()
+/// sing-box 组合模式下经 clash API 获取各出站延迟; 单节点模式的实时延迟由 RealtimeLatencyMonitor 负责
+actor ClashApiLatencyHandler: NSObject {
+    static let shared = ClashApiLatencyHandler()
     private var timer: DispatchSourceTimer?
 
     // MARK: - 延迟测试
@@ -229,10 +241,9 @@ actor ClashApilatencyHandler: NSObject {
             Task { [weak self] in
                 // 检测组合模式
                 let runningCombination = await MainActor.run { AppState.shared.runningCombination }
+                // 单节点模式的实时延迟由 RealtimeLatencyMonitor 负责
                 if !runningCombination.isEmpty {
                     await self?.checkDelayForCombination(comboUuid: runningCombination)
-                } else {
-                    await self?.checkDelayByClashApi(proxyName: "proxy")
                 }
             }
         }
@@ -296,25 +307,6 @@ actor ClashApilatencyHandler: NSObject {
             logger.error("Delay query failed for \(proxyName): \(error.localizedDescription)")
         }
         return nil
-    }
-
-    private func checkDelayByClashApi(proxyName: String) async {
-        let timeoutMs = defaultLatencyTestTimeout * 1000
-        let testURL = UserDefaults.get(forKey: .pingTestURL, defaultValue: defaultPingTestURL)
-        var components = URLComponents(string: "\(coreApiBaseUrl)/proxies/\(proxyName)/delay")
-        components?.queryItems = [
-            URLQueryItem(name: "timeout", value: "\(timeoutMs)"),
-            URLQueryItem(name: "url", value: testURL)
-        ]
-        guard let url = components?.url else { return }
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let delay = parseClashDelay(from: data) {
-                await AppState.shared.setLatency(latency: delay)
-            }
-        } catch {
-            logger.error("Delay check failed: \(error.localizedDescription)")
-        }
     }
 
 }
