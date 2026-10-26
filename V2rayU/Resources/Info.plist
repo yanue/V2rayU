@@ -11,6 +11,8 @@
 	<true/>
 	<key>LSUIElement</key>
 	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleURLTypes</key>
