@@ -97,15 +97,13 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
 
 extension SubscriptionEntity {
     func upsert() {
+        var toSave = self
+        toSave.remark = toSave.remark.trimmingCharacters(in: .whitespacesAndNewlines)
+        toSave.url = toSave.url.trimmingCharacters(in: .whitespacesAndNewlines)
+        toSave.notes = toSave.notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 更新周期: <=0 用默认 1 小时, 过大截到上限
+        toSave.updateInterval = SubscriptionScheduler.normalizedInterval(toSave.updateInterval)
         do {
-            var toSave = self
-            toSave.remark = toSave.remark.trimmingCharacters(in: .whitespacesAndNewlines)
-            toSave.url = toSave.url.trimmingCharacters(in: .whitespacesAndNewlines)
-            toSave.notes = toSave.notes.trimmingCharacters(in: .whitespacesAndNewlines)
-            // 如果 updateInterval 为 0，默认设置为 3600
-            if toSave.updateInterval == 0 {
-                toSave.updateInterval = 3600
-            }
             
             let dbWriter = AppDatabase.shared.dbWriter
             try dbWriter.write { db in
@@ -115,9 +113,9 @@ extension SubscriptionEntity {
             logger.error("upsert error: \(error)")
         }
         
-        // 更新后，触发订阅更新任务调度
-        Task {
-            await SubscriptionScheduler.shared.startOrUpdate(for: self)
+        // 更新后，触发订阅更新任务调度(用校正后的值)
+        Task { [toSave] in
+            await SubscriptionScheduler.shared.startOrUpdate(for: toSave)
         }
     }
 }

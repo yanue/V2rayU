@@ -58,11 +58,20 @@ actor SubscriptionScheduler {
         }
     }
 
+    /// 订阅更新周期上限: 365 天
+    static let maxUpdateInterval = 365 * 86400
+
+    /// 校正更新周期(秒): <=0 用默认 1 小时, 过大截到上限。
+    /// 负数或过大的周期传给 DispatchSource.schedule 会直接崩溃(SIGTRAP), 数据库里存了异常值的用户每次启动都会崩
+    static func normalizedInterval(_ seconds: Int) -> Int {
+        seconds <= 0 ? 3600 : min(seconds, maxUpdateInterval)
+    }
+
     // 启动或更新指定订阅的计时器
     func startOrUpdate(for sub: SubscriptionEntity) {
         // 若已存在且周期相同，保持；若不同，则重建
         let existing = timers[sub.uuid]
-        let desiredInterval = TimeInterval(sub.updateInterval)
+        let desiredInterval = TimeInterval(Self.normalizedInterval(sub.updateInterval))
         if let timer = existing {
             // 无法直接读取 schedule 参数，这里简化为重建，保证正确
             timer.cancel()

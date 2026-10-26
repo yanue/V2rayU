@@ -31,11 +31,16 @@ struct SubscriptionFormView: View {
                 }
             },
             set: { newValue in
+                let unit: Double
                 switch intervalUnit {
-                case .hour: item.updateInterval = Int(newValue * 3600)
-                case .minute: item.updateInterval = Int(newValue * 60)
-                case .day :item.updateInterval = Int(newValue * 86400)
+                case .hour: unit = 3600
+                case .minute: unit = 60
+                case .day: unit = 86400
                 }
+                // 负数、非数字或过大的值不接受: Int(Double) 超出范围会直接崩溃
+                let seconds = newValue * unit
+                guard seconds.isFinite, seconds > 0 else { return }
+                item.updateInterval = Int(min(seconds, Double(SubscriptionScheduler.maxUpdateInterval)))
             }
         )
     }
