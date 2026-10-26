@@ -23,6 +23,66 @@ private func speedText(_ prefix: String, _ value: Double) -> String {
     "\(prefix) \(String(format: "%.0f", value)) KB/s"
 }
 
+// MARK: - 状态栏自绘文字 / 图标
+
+// 状态栏按钮里不能放 NSTextField：macOS 27 下（单屏也会）系统给菜单栏图标画快照时会切换外观，
+// NSTextField 随之重绘又触发下一次快照，主线程空转、CPU 常驻 60% 以上 (#1705)。
+// 这里在 draw(_:) 里自己画，颜色在绘制时按当前外观解析，快照也能跟随非活动屏幕变暗 (#1704)。
+private final class StatusTextView: NSView {
+    private let font: NSFont
+    var text = "" {
+        didSet {
+            guard text != oldValue else { return }
+            invalidateIntrinsicContentSize()
+            needsDisplay = true
+        }
+    }
+    var textColor: NSColor = .labelColor {
+        didSet { if textColor != oldValue { needsDisplay = true } }
+    }
+
+    init(size: CGFloat) {
+        font = .monospacedDigitSystemFont(ofSize: size, weight: .regular)
+        super.init(frame: .zero)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private var attributes: [NSAttributedString.Key: Any] {
+        [.font: font, .foregroundColor: textColor]
+    }
+
+    override var intrinsicContentSize: NSSize {
+        let size = (text as NSString).size(withAttributes: [.font: font])
+        return NSSize(width: ceil(size.width), height: ceil(font.ascender - font.descender))
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        let height = ceil(font.ascender - font.descender)
+        (text as NSString).draw(at: NSPoint(x: 0, y: (bounds.height - height) / 2), withAttributes: attributes)
+    }
+}
+
+private final class StatusIconView: NSView {
+    var image: NSImage? {
+        didSet { if image !== oldValue { needsDisplay = true } }
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let image else { return }
+        // template 图标按文字颜色着色
+        let tinted = NSImage(size: bounds.size, flipped: false) { rect in
+            image.draw(in: rect)
+            NSColor.labelColor.set()
+            rect.fill(using: .sourceAtop)
+            return true
+        }
+        tinted.draw(in: bounds)
+    }
+}
+
 // MARK: - 加载指示器
 
 // 启动期间主线程忙于初始化，NSProgressIndicator 依赖主线程 runloop 驱动动画会卡住不转。
@@ -102,21 +162,18 @@ private final class LoadingSpinnerView: NSView {
 // MARK: - 状态栏视图
 
 final class StatusItemView: NSView {
-    private let iconView = NSImageView()
+    private let iconView = StatusIconView()
     private let spinner = LoadingSpinnerView()
     private let latencyStack = NSStackView()
-    private let dotLabel = makeLabel(size: 10)
-    private let latencyLabel = makeLabel(size: 10)
+    private let dotLabel = StatusTextView(size: 10)
+    private let latencyLabel = StatusTextView(size: 10)
     private let speedStack = NSStackView()
-    private let downLabel = makeLabel(size: 9)
-    private let upLabel = makeLabel(size: 9)
+    private let downLabel = StatusTextView(size: 9)
+    private let upLabel = StatusTextView(size: 9)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        iconView.imageScaling = .scaleProportionallyUpOrDown
-        // template 图标按文字颜色着色，与原 SwiftUI Image 的 .primary 一致
-        iconView.contentTintColor = .labelColor
         iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             iconView.widthAnchor.constraint(equalToConstant: 18),
@@ -130,7 +187,7 @@ final class StatusItemView: NSView {
             spinner.heightAnchor.constraint(equalToConstant: 12),
         ])
 
-        dotLabel.stringValue = "●"
+        dotLabel.text = "●"
         latencyStack.orientation = .horizontal
         latencyStack.spacing = 4
         latencyStack.setViews([dotLabel, latencyLabel], in: .leading)
@@ -187,15 +244,15 @@ final class StatusItemView: NSView {
         latencyStack.isHidden = !showLatency
         if showLatency {
             dotLabel.textColor = .systemGreen
-            latencyLabel.stringValue = "\(String(format: "%.0f", appState.latency)) ms"
+            latencyLabel.text = "\(String(format: "%.0f", appState.latency)) ms"
             latencyLabel.textColor = getSpeedColor(latency: appState.latency)
         }
 
         let showSpeed = running && settings.showSpeedOnTray
         speedStack.isHidden = !showSpeed
         if showSpeed {
-            downLabel.stringValue = speedText("↓", appState.proxyDownSpeed)
-            upLabel.stringValue = speedText("↑", appState.proxyUpSpeed)
+            downLabel.text = speedText("↓", appState.proxyDownSpeed)
+            upLabel.text = speedText("↑", appState.proxyUpSpeed)
         }
 
         return ceil(fittingSize.width)
