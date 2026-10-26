@@ -82,7 +82,6 @@ struct DnsConfigTests {
         let data = defaultDns.data(using: .utf8)!
         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         #expect(json != nil)
-        #expect(json?["hosts"] != nil)
         #expect(json?["servers"] != nil)
     }
 

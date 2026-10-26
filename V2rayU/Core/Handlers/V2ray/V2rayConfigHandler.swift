@@ -29,9 +29,6 @@ let defaultSingboxDns = """
 
 let defaultDns = """
 {
-    "hosts": {
-      "geosite:category-ads-all": ["127.0.0.1"]
-    },
     "servers": [
       {
         "address": "https://cloudflare-dns.com/dns-query",
@@ -98,9 +95,6 @@ func buildDefaultDnsSetting(directDns: String, remoteDns: String, bootstrapDns: 
 
     return """
     {
-        "hosts": {
-          "geosite:category-ads-all": ["127.0.0.1"]
-        },
         "servers": [
           {
             "address": "\(remoteDns)",

@@ -84,9 +84,9 @@ class RoutingManager {
 
     let defaultRules = Dictionary(uniqueKeysWithValues: [
        (RoutingRuleGlobal, RoutingEntity(name: RoutingRuleGlobal, remark: "🌏 Global")),
-       (RoutingRuleLAN, RoutingEntity(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", block:"geosite:category-ads-all", direct: "geoip:private\nlocalhost")),
-       (RoutingRuleCn, RoutingEntity(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeosite:cn")),
-       (RoutingRuleLANAndCn, RoutingEntity(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
+       (RoutingRuleLAN, RoutingEntity(name: RoutingRuleLAN, remark: "🌏 Bypassing the LAN Address", direct: "geoip:private\nlocalhost")),
+       (RoutingRuleCn, RoutingEntity(name: RoutingRuleCn, remark: "🌏 Bypassing mainland address", domainStrategy: "IPOnDemand", direct: "geoip:cn\ngeosite:cn")),
+       (RoutingRuleLANAndCn, RoutingEntity(name: RoutingRuleLANAndCn, remark: "🌏 Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")),
     ])
 
     // 获取正在运行路由规则, 优先级: 用户选择 > 默认规则
@@ -242,7 +242,7 @@ class RoutingManager {
         if let first = all.first {
             return first
         }
-        return defaultRules[RoutingRuleLANAndCn] ?? RoutingEntity(name: RoutingRuleLANAndCn, remark: "Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", block:"geosite:category-ads-all", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")
+        return defaultRules[RoutingRuleLANAndCn] ?? RoutingEntity(name: RoutingRuleLANAndCn, remark: "Bypassing LAN and mainland address", domainStrategy: "IPOnDemand", direct: "geoip:cn\ngeoip:private\ngeosite:cn\nlocalhost")
     }
 
     @MainActor
