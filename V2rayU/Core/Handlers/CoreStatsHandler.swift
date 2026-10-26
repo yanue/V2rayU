@@ -114,23 +114,22 @@ actor CoreTrafficStatsHandler {
 actor XrayApiStatsHandler: NSObject {
     static let shared = XrayApiStatsHandler()
 
-    private var timer: DispatchSourceTimer?
+    private var task: Task<Void, Never>?
 
+    /// 上一次请求完成后再等 interval 发下一次, 核心卡住时不会叠加请求
     func startTask(interval: TimeInterval = 2) {
-        let queue = DispatchQueue.global()
-        timer = DispatchSource.makeTimerSource(queue: queue)
-        timer?.schedule(deadline: .now(), repeating: interval)
-        timer?.setEventHandler { [weak self] in
-            Task { [weak self] in
-                await self?.fetchV2RayStats()
+        task?.cancel()
+        task = Task {
+            while !Task.isCancelled {
+                await self.fetchV2RayStats()
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             }
         }
-        timer?.resume()
     }
 
     func stopTask() {
-        timer?.cancel()
-        timer = nil
+        task?.cancel()
+        task = nil
     }
 
     // 将 fetchV2RayStats 改为异步函数
@@ -141,7 +140,9 @@ actor XrayApiStatsHandler: NSObject {
         }
 
         do {
-            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url, timeoutInterval: 3))
+            // 已停止(切换节点/关闭): 不再把旧数据写入界面和数据库
+            guard !Task.isCancelled else { return }
 
             guard let httpResponse = response as? HTTPURLResponse else {
                 logger.error("Invalid response")
@@ -230,29 +231,28 @@ actor XrayApiStatsHandler: NSObject {
 /// sing-box 组合模式下经 clash API 获取各出站延迟; 单节点模式的实时延迟由 RealtimeLatencyMonitor 负责
 actor ClashApiLatencyHandler: NSObject {
     static let shared = ClashApiLatencyHandler()
-    private var timer: DispatchSourceTimer?
+    private var task: Task<Void, Never>?
 
     // MARK: - 延迟测试
+    /// 一轮测完再等 interval 测下一轮: 节点慢或不通时一轮会超过 interval, 不能按固定时钟叠加
     func startTask(interval: TimeInterval = 2) {
-        let queue = DispatchQueue.global()
-        timer = DispatchSource.makeTimerSource(queue: queue)
-        timer?.schedule(deadline: .now(), repeating: interval)
-        timer?.setEventHandler { [weak self] in
-            Task { [weak self] in
+        task?.cancel()
+        task = Task {
+            while !Task.isCancelled {
                 // 检测组合模式
                 let runningCombination = await MainActor.run { AppState.shared.runningCombination }
                 // 单节点模式的实时延迟由 RealtimeLatencyMonitor 负责
                 if !runningCombination.isEmpty {
-                    await self?.checkDelayForCombination(comboUuid: runningCombination)
+                    await self.checkDelayForCombination(comboUuid: runningCombination)
                 }
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             }
         }
-        timer?.resume()
     }
 
     func stopTask() {
-        timer?.cancel()
-        timer = nil
+        task?.cancel()
+        task = nil
     }
 
     /// 组合模式：逐个查询组合中每个出站的延迟
@@ -281,7 +281,8 @@ actor ClashApiLatencyHandler: NSObject {
             }
         }
 
-        if !allDelays.isEmpty {
+        // 已停止(切换配置/关闭): 不再用旧结果覆盖界面
+        if !allDelays.isEmpty, !Task.isCancelled {
             let minDelay = allDelays.min() ?? 0
             await AppState.shared.setLatency(latency: minDelay)
         }
@@ -299,7 +300,9 @@ actor ClashApiLatencyHandler: NSObject {
         guard let url = components?.url else { return nil }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            // clash API 按 timeout 参数返回, 这里多留 2 秒余量, 避免 API 无响应时一直挂着
+            let request = URLRequest(url: url, timeoutInterval: TimeInterval(defaultLatencyTestTimeout + 2))
+            let (data, _) = try await URLSession.shared.data(for: request)
             if let delay = parseClashDelay(from: data) {
                 return delay
             }
@@ -315,8 +318,11 @@ final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked 
     static let shared = ClashApiStreamHandler()
     
     private var clashApiSession: URLSession?
+    // clashApiTask / running 会在调用方线程和 URLSession 回调线程上读写, 用锁保护
+    private let lock = NSLock()
     private var clashApiTask: URLSessionDataTask?
-    
+    private var running = false
+
     override init() {
         super.init()
         let config = URLSessionConfiguration.default
@@ -327,14 +333,33 @@ final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked 
     
    // MARK: - 流量监听
    func startTask() {
-       guard let url = URL(string: "\(coreApiBaseUrl)/traffic") else { return }
-       let request = URLRequest(url: url)
-       clashApiTask = clashApiSession?.dataTask(with: request)
-       clashApiTask?.resume()
+       lock.lock(); defer { lock.unlock() }
+       running = true
+       connectLocked()
    }
 
    func stopTask() {
+       lock.lock(); defer { lock.unlock() }
+       running = false
        clashApiTask?.cancel()
+       clashApiTask = nil
+   }
+
+   /// 始终只保留一条连接: 先关掉旧的再建新的
+   private func connectLocked() {
+       clashApiTask?.cancel()
+       clashApiTask = nil
+       guard let url = URL(string: "\(coreApiBaseUrl)/traffic") else { return }
+       let task = clashApiSession?.dataTask(with: URLRequest(url: url))
+       clashApiTask = task
+       task?.resume()
+   }
+
+   private func reconnectIfNeeded() {
+       lock.lock(); defer { lock.unlock() }
+       // 等待期间已停止或已有新连接(重新启动), 不再重连
+       guard running, clashApiTask == nil else { return }
+       connectLocked()
    }
 
     // MARK: - URLSession Delegate
@@ -353,11 +378,17 @@ final class ClashApiStreamHandler: NSObject, URLSessionDataDelegate, @unchecked 
     }
 
     func urlSession(_ clashApiSession: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        // 主动 cancel 也会带着错误(-999)回调: 只处理当前这条连接的意外断开, 否则停止/切换后会被重新拉起, 连接越积越多
+        lock.lock()
+        let isCurrent = running && task === clashApiTask
+        if isCurrent { clashApiTask = nil }
+        lock.unlock()
+        guard isCurrent else { return }
         if let error = error {
             logger.error("Traffic stream ended with error: \(error.localizedDescription)")
             // 自动重连
             DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                self.startTask()
+                self.reconnectIfNeeded()
             }
         } else {
             print("Traffic stream closed normally")
