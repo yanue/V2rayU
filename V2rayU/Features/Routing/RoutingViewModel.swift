@@ -40,5 +40,6 @@ final class RoutingViewModel: ObservableObject {
     func updateSortOrderInDBAsync() {
         store.updateSortOrder(list)
         getList()
+        AppMenuManager.shared.refreshRoutingItems()
     }
 }

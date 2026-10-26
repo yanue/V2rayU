@@ -185,19 +185,14 @@ struct SubscriptionListView: View {
     // @State private var list: [SubscriptionEntity] = []
 
     func handleDrop(index: Int, rows: [SubscriptionEntity]) {
-        let uuids = rows.map(\.uuid)
-
-        // 先移除拖拽的元素
-        viewModel.list.removeAll { uuids.contains($0.uuid) }
-
-        // 计算安全的插入位置
-        let safeIndex = min(max(index, 0), viewModel.list.count)
-
-        // 插入拖拽的元素
-        viewModel.list.insert(contentsOf: rows, at: safeIndex)
-
-        logger.info("handleDrop: \(index) \(rows.count)")
-        viewModel.updateSortOrderInDBAsync()
+        // 放下回调在系统拖动流程里执行, 此时替换列表会把正在拖动的表格行整个换掉, 表格的鼠标跟踪会乱(之后点击像被粘住);
+        // 等拖动流程结束后再更新
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let reordered = reorderedAfterDrop(viewModel.list, displayed: viewModel.list, index: index, moved: rows)
+            guard reordered.map(\.uuid) != viewModel.list.map(\.uuid) else { return }
+            viewModel.list = reordered
+            viewModel.updateSortOrderInDBAsync()
+        }
     }
 
     private func contextMenuProvider(item: SubscriptionEntity) -> some View {

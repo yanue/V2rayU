@@ -192,9 +192,9 @@ struct ProfileListView: View {
                 tableView
                     .opacity(tableOpacity)
             }
-            .background(.ultraThinMaterial)
-            .border(Color.gray.opacity(0.1), width: 1)
-            .cornerRadius(8)
+            // 不用 cornerRadius 裁剪: 外层有裁剪时列表的拖动排序放不下去
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.1), lineWidth: 1))
         }
         .padding(8)
         .sheet(item: $activeSheet) { sheet in
@@ -270,15 +270,14 @@ struct ProfileListView: View {
     }
 
     func handleDrop(index: Int, rows: [ProfileEntity]) {
-        guard let firstRow = rows.first,
-              let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid })
-        else { return }
-
-        viewModel.list.removeAll(where: { row in
-            rows.contains(where: { $0.uuid == row.uuid })
-        })
-        viewModel.list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
-        viewModel.updateSortOrderInDBAsync()
+        // 放下回调在系统拖动流程里执行, 此时替换列表会把正在拖动的表格行整个换掉, 表格的鼠标跟踪会乱(之后点击像被粘住);
+        // 等拖动流程结束后再更新
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let reordered = reorderedAfterDrop(viewModel.list, displayed: filteredAndSortedItems, index: index, moved: rows)
+            guard reordered.map(\.uuid) != viewModel.list.map(\.uuid) else { return }
+            viewModel.list = reordered
+            viewModel.updateSortOrderInDBAsync()
+        }
     }
 
     @ViewBuilder

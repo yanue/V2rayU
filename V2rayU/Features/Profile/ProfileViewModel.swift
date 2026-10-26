@@ -78,6 +78,7 @@ final class ProfileViewModel: ObservableObject {
     func updateSortOrderInDBAsync() {
         store.updateSortOrder(list)
         getList()
+        AppMenuManager.shared.refreshServerItems()
     }
 
     func removeDuplicates() -> Int {

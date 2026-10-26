@@ -371,14 +371,13 @@ struct CombinedConfigListView: View {
     }
 
     func handleDrop(index: Int, rows: [CombinedConfigEntity]) {
-        guard let firstRow = rows.first,
-              let firstRemoveIndex = viewModel.list.firstIndex(where: { $0.uuid == firstRow.uuid })
-        else { return }
-
-        viewModel.list.removeAll(where: { row in
-            rows.contains(where: { $0.uuid == row.uuid })
-        })
-        viewModel.list.insert(contentsOf: rows, at: index > firstRemoveIndex ? (index - 1) : index)
-        viewModel.updateSortOrderInDB()
+        // 放下回调在系统拖动流程里执行, 此时替换列表会把正在拖动的表格行整个换掉, 表格的鼠标跟踪会乱(之后点击像被粘住);
+        // 等拖动流程结束后再更新
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let reordered = reorderedAfterDrop(viewModel.list, displayed: filteredAndSortedItems, index: index, moved: rows)
+            guard reordered.map(\.uuid) != viewModel.list.map(\.uuid) else { return }
+            viewModel.list = reordered
+            viewModel.updateSortOrderInDB()
+        }
     }
 }

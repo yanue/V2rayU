@@ -70,8 +70,8 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .background()
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            // 圆角用背景形状画出来, 不裁剪内容: 外层有裁剪时(clipShape/cornerRadius), 列表的拖动排序放不下去
+            .background(.background, in: RoundedRectangle(cornerRadius: 10))
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.secondary.opacity(0.2), lineWidth: 1)

@@ -648,3 +648,29 @@ extension View {
             .onDisappear { V2rayU.crashBreadcrumb("hide \(name)") }
     }
 }
+
+// MARK: - 表格拖拽排序
+
+/// 把拖动的行移到表格显示列表的 index 处, 返回新的完整列表。
+/// index 是显示列表(可能经过分组筛选/搜索/排序)里的位置, 不能直接当完整列表的下标用:
+/// 多选拖到末尾时, 删掉拖动的行后再按原位置插入会越界崩溃。这里按"插到哪一行前面"换算。
+func reorderedAfterDrop<T: Identifiable>(_ list: [T], displayed: [T], index: Int, moved: [T]) -> [T] {
+    let movedIds = Set(moved.map(\.id))
+    // 用列表里的当前数据; 不在列表里的(从别处拖进来的)忽略
+    let movedItems = list.filter { movedIds.contains($0.id) }
+    guard !movedItems.isEmpty else { return list }
+    var result = list.filter { !movedIds.contains($0.id) }
+    let position = min(max(index, 0), displayed.count)
+    if let anchor = displayed[position...].first(where: { !movedIds.contains($0.id) }),
+       let i = result.firstIndex(where: { $0.id == anchor.id }) {
+        // 插到落点下面第一个未拖动的行前面
+        result.insert(contentsOf: movedItems, at: i)
+    } else if let anchor = displayed[..<position].last(where: { !movedIds.contains($0.id) }),
+              let i = result.firstIndex(where: { $0.id == anchor.id }) {
+        // 拖到显示列表末尾: 插到最后一个未拖动的行后面
+        result.insert(contentsOf: movedItems, at: i + 1)
+    } else {
+        result.append(contentsOf: movedItems)
+    }
+    return result
+}
