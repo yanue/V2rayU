@@ -105,7 +105,8 @@ actor CoreTrafficStatsHandler {
             await AppState.shared.setSpeed(latency: latency, directUpSpeed: directUpSpeed, directDownSpeed: directDownSpeed, proxyUpSpeed: proxyUpSpeed, proxyDownSpeed: proxyDownSpeed)
             let uuid = await AppState.shared.runningProfile
 //             logger.info("setSpeed:\(now) - \(uuid) - \(up) - \(down) - \(latency) - \(timeInterval)")
-            // 更新到数据库
+            // 更新到数据库: 无新增流量时累加的是 0, 跳过以免每 2 秒空写一次
+            guard up > 0 || down > 0 else { return }
             try ProfileStore.shared.updateStat(uuid: uuid, up: up, down: down, lastUpdate: now)
         }
     }
