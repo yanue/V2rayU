@@ -245,9 +245,6 @@ actor RealtimeLatencyMonitor {
     }
 
     private var task: Task<Void, Never>?
-    private var session: URLSession?
-    private var sessionCreatedAt = Date.distantPast
-    private var sampler = LatencySampler()
     private var lastPublished: Int?
 
     /// 按当前运行的核心配置启动; 组合模式配置没有 latency-in, 不启动
@@ -266,11 +263,11 @@ actor RealtimeLatencyMonitor {
         task = Task { await self.run(port: port) }
     }
 
+    /// 只取消任务, 不在这里作废 session: 旧任务可能正停在测速中途(取测速地址、两次请求之间),
+    /// 回来后用已作废的 session 发请求会抛 NSGenericException 直接崩溃; session 由所属任务退出时自行作废
     func stop() {
         task?.cancel()
         task = nil
-        resetSession()
-        sampler = LatencySampler()
         lastPublished = nil
     }
 
@@ -280,40 +277,46 @@ actor RealtimeLatencyMonitor {
         while !isPortOpen(port), Date() < deadline, !Task.isCancelled {
             try? await Task.sleep(nanoseconds: 200_000_000)
         }
+        // session / sampler 只归本轮任务所有, 停止或重启都不会被别处改动
+        var session: URLSession?
+        var sessionCreatedAt = Date.distantPast
+        var sampler = LatencySampler()
+        defer { session?.invalidateAndCancel() }
         while !Task.isCancelled {
-            await probe(port: port)
+            if session == nil || Date().timeIntervalSince(sessionCreatedAt) > reconnectInterval {
+                session?.invalidateAndCancel()
+                session = LatencyTester.makeSession(socksPort: port)
+                sessionCreatedAt = Date()
+            }
+            if let current = session, let outcome = await probe(session: current, sampler: &sampler) {
+                if let reason = outcome.reconnect {
+                    if reason == .slow {
+                        logger.info("RealtimeLatencyMonitor: current connection slow, switch")
+                    }
+                    session?.invalidateAndCancel()
+                    session = nil
+                }
+                if let display = outcome.display {
+                    await publish(display)
+                }
+            }
             let interval = sampler.needsQuickRetry ? environment.quickRetryInterval : environment.interval()
             try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
         }
     }
 
-    private func probe(port: UInt16) async {
-        if session == nil || Date().timeIntervalSince(sessionCreatedAt) > reconnectInterval {
-            resetSession()
-            session = LatencyTester.makeSession(socksPort: port)
-            sessionCreatedAt = Date()
-        }
-        guard let session else { return }
+    /// 在 session 上测一次并记入 sampler; 任务已取消(停止/重启)时返回 nil, 不记录也不发布
+    private func probe(session: URLSession, sampler: inout LatencySampler) async -> LatencySampler.Outcome? {
         let url = await environment.url()
-        let outcome: LatencySampler.Outcome
+        guard !Task.isCancelled else { return nil }
         do {
             let ms = try await LatencyTester.measure(session: session, url: url)
-            guard !Task.isCancelled else { return }
-            outcome = sampler.recordSuccess(ms)
+            guard !Task.isCancelled else { return nil }
+            return sampler.recordSuccess(ms)
         } catch {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled else { return nil }
             logger.info("RealtimeLatencyMonitor: failed: \(error.localizedDescription)")
-            outcome = sampler.recordFailure()
-        }
-        // 先换连接再 publish: publish 期间 actor 可能重入(停止/重启), 之后不能再改动状态
-        if let reason = outcome.reconnect {
-            if reason == .slow {
-                logger.info("RealtimeLatencyMonitor: current connection slow, switch")
-            }
-            resetSession()
-        }
-        if let display = outcome.display {
-            await publish(display)
+            return sampler.recordFailure()
         }
     }
 
@@ -323,10 +326,5 @@ actor RealtimeLatencyMonitor {
         guard value != lastPublished else { return }
         lastPublished = value
         await environment.publish(value)
-    }
-
-    private func resetSession() {
-        session?.invalidateAndCancel()
-        session = nil
     }
 }

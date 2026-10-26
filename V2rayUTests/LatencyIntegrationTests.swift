@@ -114,6 +114,36 @@ import Testing
         #expect(await recorder.values == [-1])
     }
 
+    /// 切换节点时 monitor 被反复重启/停止: 重启发生在测速进行中(取测速地址、两次请求之间)时,
+    /// 旧的 session 不能被别处作废后再用来发请求(会抛 NSGenericException 直接崩溃)
+    @Test("Restarting the monitor mid-probe does not reuse an invalidated session")
+    func monitorRestartMidProbe() async throws {
+        let http = try await LocalHTTPServer.start(status: 204)
+        defer { http.stop() }
+        let socks = try await LocalSOCKS5Server.start()
+        defer { socks.stop() }
+        let recorder = PublishRecorder()
+        let url = http.url(host: host)
+        let monitor = RealtimeLatencyMonitor(environment: .init(
+            // 取地址时让出执行权, 与正式环境切到主线程取设置一样
+            url: { try? await Task.sleep(nanoseconds: 20_000_000); return url },
+            interval: { 0.01 },
+            quickRetryInterval: 0.01,
+            publish: { await recorder.record($0) }
+        ))
+
+        for i in 0..<60 {
+            await monitor.start(port: socks.port)
+            try await Task.sleep(nanoseconds: UInt64(5_000_000 + (i % 6) * 5_000_000))
+            if i % 10 == 9 {
+                await monitor.stop()
+            }
+        }
+        await monitor.start(port: socks.port)
+        #expect(await waitUntil { await recorder.values.contains { $0 > 0 } })
+        await monitor.stop()
+    }
+
     // MARK: - 诊断
 
     @Test("Diagnostics curl reaches the target through SOCKS with remote DNS")
