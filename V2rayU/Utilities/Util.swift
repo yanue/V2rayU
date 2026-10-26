@@ -6,7 +6,9 @@
 //  Copyright © 2024 yanue. All rights reserved.
 
 import Cocoa
+import FirebaseCrashlytics
 import Network
+import SwiftUI
 import SystemConfiguration
 
 private let coreVersionCacheLock = NSLock()
@@ -629,4 +631,20 @@ enum CoreSelectionDefaults {
     let url = URL(fileURLWithPath: expandedPath)
     NSApp.activate(ignoringOtherApps: true)
     NSWorkspace.shared.activateFileViewerSelecting([url])
+}
+
+// MARK: - 崩溃线索
+
+/// 记录窗口 / 页面 / 弹窗的切换, 崩溃时随报告上传到 Crashlytics。
+/// SwiftUI 内部崩溃(如 AttributeGraph)的调用栈里没有 App 自身代码, 只能靠这些记录判断当时在哪个界面。
+func crashBreadcrumb(_ message: String) {
+    Crashlytics.crashlytics().log(message)
+}
+
+extension View {
+    /// 视图出现 / 消失时记录崩溃线索, 用于弹窗等没有独立窗口的界面
+    func crashBreadcrumb(_ name: String) -> some View {
+        onAppear { V2rayU.crashBreadcrumb("show \(name)") }
+            .onDisappear { V2rayU.crashBreadcrumb("hide \(name)") }
+    }
 }

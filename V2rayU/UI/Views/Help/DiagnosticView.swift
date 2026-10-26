@@ -41,6 +41,7 @@ struct DiagnosticsView: View {
         }
         .sheet(isPresented: $viewModel.showFAQ) {
             FAQSheetView { viewModel.showFAQ = false }
+                .crashBreadcrumb("faq")
         }
     }
 

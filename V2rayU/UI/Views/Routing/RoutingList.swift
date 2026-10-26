@@ -87,6 +87,7 @@ struct RoutingListView: View {
                 selectedRow = nil
                 loadData()
             })
+            .crashBreadcrumb("routing form")
         }
         .alert(String(localized: .DeleteSelectedConfirm), isPresented: $showDeleteConfirm) {
             Button(String(localized: .Delete), role: .destructive) {

@@ -198,38 +198,41 @@ struct ProfileListView: View {
         }
         .padding(8)
         .sheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .edit(let model):
-                ConfigFormView(item: model) {
-                    activeSheet = nil
-                    loadData()
-                }
-            case .ping(let model):
-                LatencyTestView(profile: model.toEntity(), isAll: false) {
-                    activeSheet = nil
-                }
-            case .pingAll:
-                LatencyTestView(profile: nil, isAll: true) {
-                    activeSheet = nil
-                }
-            case .pingMultiple(let items):
-                LatencyTestView(profiles: items, isAll: false) {
-                    activeSheet = nil
-                }
-            case .share(let model):
-                ShareQrCodeView(profile: model) {
-                    activeSheet = nil
-                }
-            case .export(let items):
-                ExportView(items: items) {
-                    activeSheet = nil
-                }
-            case .importServers:
-                ImportView {
-                    activeSheet = nil
-                    loadData()
+            Group {
+                switch sheet {
+                case .edit(let model):
+                    ConfigFormView(item: model) {
+                        activeSheet = nil
+                        loadData()
+                    }
+                case .ping(let model):
+                    LatencyTestView(profile: model.toEntity(), isAll: false) {
+                        activeSheet = nil
+                    }
+                case .pingAll:
+                    LatencyTestView(profile: nil, isAll: true) {
+                        activeSheet = nil
+                    }
+                case .pingMultiple(let items):
+                    LatencyTestView(profiles: items, isAll: false) {
+                        activeSheet = nil
+                    }
+                case .share(let model):
+                    ShareQrCodeView(profile: model) {
+                        activeSheet = nil
+                    }
+                case .export(let items):
+                    ExportView(items: items) {
+                        activeSheet = nil
+                    }
+                case .importServers:
+                    ImportView {
+                        activeSheet = nil
+                        loadData()
+                    }
                 }
             }
+            .crashBreadcrumb("profile sheet \(sheet.id.prefix { $0 != "-" })")
         }
         .alert(String(localized: .DeleteSelectedConfirm), isPresented: $showDeleteConfirm) {
             Button(String(localized: .Delete), role: .destructive) {

@@ -103,12 +103,15 @@ struct SubscriptionListView: View {
                     loadData()
                 }
             }
+            .crashBreadcrumb("subscription form")
         }
         .sheet(item: $syncingRow) { row in
             SubscriptionSyncView(subscription: row.entity, isAll: false) { syncingRow = nil }
+                .crashBreadcrumb("subscription sync")
         }
         .sheet(isPresented: $syncingAll) {
             SubscriptionSyncView(subscription: nil, isAll: true) { syncingAll = false }
+                .crashBreadcrumb("subscription sync all")
         }
         .sheet(isPresented: $showDeleteConfirm) {
             VStack(spacing: 0) {

@@ -191,6 +191,7 @@ struct CombinedConfigListView: View {
                 },
                 onCancel: { editingItem = nil }
             )
+            .crashBreadcrumb("combined form")
         }
         .alert(String(localized: .DeleteConfirm), isPresented: $showDeleteConfirm) {
             Button(String(localized: .Delete), role: .destructive) {

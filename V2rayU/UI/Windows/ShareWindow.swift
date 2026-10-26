@@ -33,9 +33,14 @@ class ShareWindowManager {
             hostingVC.sizingOptions = []
         }
 
-        if let windowController = windowController {
-            // 复用窗口：替换 contentViewController
-            windowController.window?.contentViewController = hostingVC
+        crashBreadcrumb("open share window")
+        if let windowController = windowController, let window = windowController.window {
+            // 复用窗口：替换 contentViewController。
+            // 先放掉输入焦点并移出旧界面, 避免 SwiftUI 在旧界面被拆掉后仍去处理它的焦点(疑似 AttributeGraph 崩溃的触发点)
+            window.makeFirstResponder(nil)
+            window.contentViewController = nil
+            window.contentViewController = hostingVC
+            window.setContentSize(NSSize(width: 760, height: 600))
         } else {
             // 第一次：初始化自定义窗口
             let window = BaseWindow(

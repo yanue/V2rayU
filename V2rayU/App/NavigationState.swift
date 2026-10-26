@@ -26,9 +26,15 @@ enum SettingsTab {
 final class NavigationState: ObservableObject {
     static let shared = NavigationState()
 
-    @Published var mainTab: MainTab = .server
-    @Published var settingTab: SettingsTab = .general
-    @Published var coreSettingTab: CoreSettingTab?
+    @Published var mainTab: MainTab = .server {
+        didSet { crashBreadcrumb("tab \(mainTab)") }
+    }
+    @Published var settingTab: SettingsTab = .general {
+        didSet { crashBreadcrumb("setting tab \(settingTab)") }
+    }
+    @Published var coreSettingTab: CoreSettingTab? {
+        didSet { crashBreadcrumb("core setting tab \(coreSettingTab.map { "\($0)" } ?? "nil")") }
+    }
 
     private init() {}
 }

@@ -40,6 +40,7 @@ class BaseWindow: NSWindow, NSWindowDelegate {
     
     // 监听窗口关闭事件, 所有窗口关闭时,隐藏 dock 图标
     func windowWillClose(_ notification: Notification) {
+        crashBreadcrumb("close window \(title)")
         // 延迟检查剩余的窗口
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             // 当前已打开的窗口

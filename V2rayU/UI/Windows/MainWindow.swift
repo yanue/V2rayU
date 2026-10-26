@@ -17,6 +17,7 @@ class MainWindowManager {
     var mainWindow: NSWindow? { windowController?.window }
     
     public func openMainWindow() {
+        crashBreadcrumb("open main window")
         // 1. 切回常规模式（显示 Dock 图标、主菜单）
         NSApp.setActivationPolicy(.regular)
 

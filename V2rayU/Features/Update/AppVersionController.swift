@@ -58,6 +58,7 @@ class AppVersionController: NSWindowController {
     
     func showWindow() {
         guard let window = window else { return }
+        crashBreadcrumb("open update window")
         // 更新win title
         window.title = String(localized: .V2rayUUpdateTitle)
         // 1. 确保在主线程
