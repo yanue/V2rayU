@@ -155,4 +155,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             await LocalHttpServer.shared.stop()
         }
     }
+
+    // 菜单栏图标被刘海或其它图标挤掉时用户没有入口：再次打开 App（双击/启动台/Spotlight）时显示主窗口 (#1621)
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainWindowManager.shared.openMainWindow()
+        return true
+    }
 }
