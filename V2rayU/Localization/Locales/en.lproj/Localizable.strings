@@ -734,7 +734,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "ImportLegacyDataTitle" = "Import Data from v4";
 "ImportLegacyDataTip" = "Import servers and subscriptions from V2rayU v4 (UserDefaults version)";
 "LegacyDataMigrated" = "Data has already been migrated";
-"LegacyDataMigrationSuccess" = "Migration completed: %d servers, %d subscriptions imported";
+"LegacyDataMigrationSuccess" = "Migration completed: %d servers, %d subscriptions, %d routings imported";
 "LegacyDataMigrationFailed" = "Migration failed: %@";
 "LegacyDataMigrationNoData" = "No legacy data found to import";
 "ImportLegacyDataMigrating" = "Migrating data...";
@@ -756,6 +756,7 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "ImportLegacyV2raySubList" = "v2raySubList: ";
 "ImportLegacySuccessServers" = "Successfully imported %d servers";
 "ImportLegacySuccessSubscriptions" = "Successfully imported %d subscriptions";
+"ImportLegacySuccessRoutings" = "Successfully imported %d routings";
 "RemoveDuplicateServers" = "Remove Duplicate Servers";
 "RemoveDuplicateConfirm" = "Removed %d duplicate servers";
 "RemoveDuplicateConfirmTip" = "This will remove duplicate servers. This action cannot be undone.";

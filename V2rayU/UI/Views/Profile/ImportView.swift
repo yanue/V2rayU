@@ -381,14 +381,14 @@ struct ImportView: View {
     @ViewBuilder
     private func legacyResultView(result: LegacyMigrationResult) -> some View {
         switch result {
-        case .success(let profiles, let subscriptions):
+        case .success(let profiles, let subscriptions, let routings):
             VStack(spacing: 16) {
                 Spacer()
 
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
                     .foregroundStyle(.green)
-                Text(String(localized: .LegacyDataMigrationSuccess, arguments: profiles, subscriptions))
+                Text(String(localized: .LegacyDataMigrationSuccess, arguments: profiles, subscriptions, routings))
                     .font(.title3)
                     .multilineTextAlignment(.center)
 
@@ -493,10 +493,11 @@ struct ImportView: View {
                 showResult = true
 
                 switch result {
-                case .success(let profiles, let subscriptions):
+                case .success(let profiles, let subscriptions, let routings):
                     legacyDebugInfo = String(localized: .ImportLegacyMigratingComplete) + "\n\n"
                     legacyDebugInfo += String(localized: .ImportLegacySuccessServers, arguments: profiles) + "\n"
-                    legacyDebugInfo += String(localized: .ImportLegacySuccessSubscriptions, arguments: subscriptions)
+                    legacyDebugInfo += String(localized: .ImportLegacySuccessSubscriptions, arguments: subscriptions) + "\n"
+                    legacyDebugInfo += String(localized: .ImportLegacySuccessRoutings, arguments: routings)
                 case .noData:
                     legacyDebugInfo = String(localized: .ImportLegacyNoDataFound)
                 case .error(let message):
@@ -514,7 +515,7 @@ struct ImportView: View {
             await MainActor.run {
                 isImporting = false
                 switch result {
-                case .success(let profiles, let subs):
+                case .success(let profiles, _, _):
                     resultMessage = String(localized: .ImportSuccessCount, arguments: profiles)
                     resultIsError = false
                     legacyServerCount = 0

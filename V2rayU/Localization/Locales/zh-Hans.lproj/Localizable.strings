@@ -735,7 +735,7 @@
 "ImportLegacyDataTitle" = "从 v4 版本导入数据";
 "ImportLegacyDataTip" = "从 V2rayU v4（UserDefaults 版本）导入服务器和订阅";
 "LegacyDataMigrated" = "数据已经迁移完成";
-"LegacyDataMigrationSuccess" = "迁移完成：导入了 %d 个服务器，%d 个订阅";
+"LegacyDataMigrationSuccess" = "迁移完成：导入了 %d 个服务器，%d 个订阅，%d 个路由";
 "LegacyDataMigrationFailed" = "迁移失败：%@";
 "LegacyDataMigrationNoData" = "没有找到需要导入的旧版数据";
 "ImportLegacyDataMigrating" = "正在迁移数据...";
@@ -757,6 +757,7 @@
 "ImportLegacyV2raySubList" = "v2raySubList: ";
 "ImportLegacySuccessServers" = "成功导入 %d 个服务器";
 "ImportLegacySuccessSubscriptions" = "成功导入 %d 个订阅";
+"ImportLegacySuccessRoutings" = "成功导入 %d 个路由";
 "RemoveDuplicateServers" = "删除重复服务器";
 "RemoveDuplicateConfirm" = "已删除 %d 个重复服务器";
 "RemoveDuplicateConfirmTip" = "即将删除重复服务器，此操作不可撤销。";

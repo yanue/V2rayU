@@ -9,8 +9,9 @@
 //  v4 版本使用 NSKeyedArchiver 存储 V2rayItem 和 V2raySubItem 对象
 //
 
-import GRDB
 import AppKit
+import CryptoKit
+import GRDB
 
 // MARK: - 旧版数据模型
 
@@ -192,11 +193,152 @@ class LegacyV2raySubItem: NSObject, NSCoding {
     }
 }
 
+/// 对应 UserDefaults 中 key 为 "routing.xxx" 的数据 (v4 RoutingItem)
+/// - 内置路由(routing.global / routing.lan / routing.cn / routing.lanAndCn): 用户可编辑 block / proxy / direct 列表
+/// - 自定义路由(routing.<UUID>): 规则写在 json 里(xray 路由格式)
+class LegacyRoutingItem: NSObject, NSCoding {
+    var name: String = ""
+    var remark: String = ""
+    var json: String = ""
+    var domainStrategy: String = "AsIs"
+    var block: String = ""
+    var proxy: String = ""
+    var direct: String = ""
+
+    required override init() {
+        super.init()
+    }
+
+    required init(coder decoder: NSCoder) {
+        self.name = decoder.decodeObject(forKey: "Name") as? String ?? ""
+        self.remark = decoder.decodeObject(forKey: "Remark") as? String ?? ""
+        self.json = decoder.decodeObject(forKey: "Json") as? String ?? ""
+        self.domainStrategy = decoder.decodeObject(forKey: "DomainStrategy") as? String ?? "AsIs"
+        self.block = decoder.decodeObject(forKey: "Block") as? String ?? ""
+        self.proxy = decoder.decodeObject(forKey: "Proxy") as? String ?? ""
+        self.direct = decoder.decodeObject(forKey: "Direct") as? String ?? ""
+    }
+
+    func encode(with coder: NSCoder) {
+        coder.encode(name, forKey: "Name")
+        coder.encode(remark, forKey: "Remark")
+        coder.encode(json, forKey: "Json")
+        coder.encode(domainStrategy, forKey: "DomainStrategy")
+        coder.encode(block, forKey: "Block")
+        coder.encode(proxy, forKey: "Proxy")
+        coder.encode(direct, forKey: "Direct")
+    }
+
+    static func load(name: String, defaults: UserDefaults) -> LegacyRoutingItem? {
+        guard let data = defaults.data(forKey: name) else { return nil }
+        do {
+            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
+            unarchiver.requiresSecureCoding = false
+            unarchiver.setClass(LegacyRoutingItem.self, forClassName: "V2rayU.RoutingItem")
+            unarchiver.setClass(LegacyRoutingItem.self, forClassName: "RoutingItem")
+            let item = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? LegacyRoutingItem
+            unarchiver.finishDecoding()
+            return item
+        } catch {
+            logger.error("LegacyRoutingItem.load: Failed to load '\(name)': \(error)")
+            return nil
+        }
+    }
+
+    static let builtinNames: Set<String> = [RoutingRuleGlobal, RoutingRuleLAN, RoutingRuleCn, RoutingRuleLANAndCn]
+
+    /// 转成 v5 路由 (v5 只有 block / proxy / direct 三个列表)
+    /// - 自定义路由: json 里每条规则按 outboundTag 把 domain / ip 拆进对应列表;
+    ///   带端口、网络、入站等其他匹配条件的规则无法表示, 跳过(只取 domain/ip 会扩大匹配范围, 改变分流结果)
+    /// - 内置路由: 用户没改过(三个列表都为空)时返回 nil, 由 v5 自带的内置路由覆盖;
+    ///   改过时生成一条同名(保留内置行为)的新路由, 列表 = v5 内置默认 + 用户添加, 不改动 v5 已有的内置路由
+    /// - Returns: (路由, 跳过的规则数); 没有可迁移的内容时返回 nil
+    func toEntity(uuid: String, defaultRules: [String: RoutingEntity]) -> (entity: RoutingEntity, skippedRules: Int)? {
+        var block = Self.lines(block)
+        var proxy = Self.lines(proxy)
+        var direct = Self.lines(direct)
+        var strategy = domainStrategy
+        var skipped = 0
+
+        if let data = json.data(using: .utf8),
+           let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            if let s = root["domainStrategy"] as? String, !s.isEmpty {
+                strategy = s
+            }
+            let allowedKeys: Set<String> = ["type", "domain", "ip", "outboundTag"]
+            for rule in root["rules"] as? [[String: Any]] ?? [] {
+                let tag = rule["outboundTag"] as? String ?? ""
+                let values = (rule["domain"] as? [String] ?? []) + (rule["ip"] as? [String] ?? [])
+                guard ["block", "proxy", "direct"].contains(tag), !values.isEmpty,
+                      Set(rule.keys).isSubset(of: allowedKeys) else {
+                    skipped += 1
+                    continue
+                }
+                switch tag {
+                case "block": block += values
+                case "proxy": proxy += values
+                default: direct += values
+                }
+            }
+        }
+
+        if V2rayRouting.domainStrategy(rawValue: strategy) == nil {
+            strategy = "AsIs"
+        }
+
+        let isBuiltin = Self.builtinNames.contains(name)
+        if isBuiltin {
+            guard !(block.isEmpty && proxy.isEmpty && direct.isEmpty), let base = defaultRules[name] else { return nil }
+            block = Self.lines(base.block) + block
+            proxy = Self.lines(base.proxy) + proxy
+            direct = Self.lines(base.direct) + direct
+            if strategy == "AsIs" {
+                strategy = base.domainStrategy
+            }
+        } else if block.isEmpty && proxy.isEmpty && direct.isEmpty {
+            return nil
+        }
+
+        let builtinRemark = (isMainland ? defaultRuleCn[name] : defaultRuleEn[name]) ?? ""
+        let baseRemark = remark.isEmpty ? (builtinRemark.isEmpty ? name : builtinRemark) : remark
+        let entity = RoutingEntity(
+            uuid: uuid,
+            name: isBuiltin ? name : (name.isEmpty ? "routing.\(uuid)" : name),
+            remark: isBuiltin ? "\(baseRemark) (v4)" : baseRemark,
+            domainStrategy: strategy,
+            block: Self.unique(block).joined(separator: "\n"),
+            proxy: Self.unique(proxy).joined(separator: "\n"),
+            direct: Self.unique(direct).joined(separator: "\n")
+        )
+        return (entity, skipped)
+    }
+
+    private static func lines(_ text: String) -> [String] {
+        text.components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
+    private static func unique(_ items: [String]) -> [String] {
+        var seen = Set<String>()
+        return items.filter { seen.insert($0).inserted }
+    }
+
+    /// v4 路由在 v5 中的 uuid: 自定义路由沿用 "routing.<UUID>" 里的 UUID; 其他(内置)按名称生成固定 uuid, 重复迁移不会重复插入
+    static func migratedUuid(for name: String) -> String {
+        if name.hasPrefix("routing."), UUID(uuidString: String(name.dropFirst("routing.".count))) != nil {
+            return String(name.dropFirst("routing.".count))
+        }
+        let digest = Array(Insecure.MD5.hash(data: Data("v2rayu-v4-\(name)".utf8)))
+        return NSUUID(uuidBytes: digest).uuidString
+    }
+}
+
 // MARK: - 迁移结果枚举
 
 /// 迁移操作的结果
 enum LegacyMigrationResult {
-    case success(profiles: Int, subscriptions: Int)  // 迁移成功
+    case success(profiles: Int, subscriptions: Int, routings: Int)  // 迁移成功
     case noData                                          // 没有旧数据
     case error(String)                                   // 迁移失败
 }
@@ -293,8 +435,8 @@ actor LegacyMigrationHandler {
             logger.info("Legacy migration: User chose to migrate")
             let result = await migrate()
             switch result {
-            case .success(let profiles, let subs):
-                logger.info("Legacy migration: Success - \(profiles) profiles, \(subs) subscriptions")
+            case .success(let profiles, let subs, let routings):
+                logger.info("Legacy migration: Success - \(profiles) profiles, \(subs) subscriptions, \(routings) routings")
                 return true
             case .noData:
                 logger.info("Legacy migration: No data to migrate")
@@ -327,11 +469,12 @@ actor LegacyMigrationHandler {
         let defaults = getLegacyDefaults()
         let serverList = defaults.array(forKey: "v2rayServerList") as? [String] ?? []
         let subList = defaults.array(forKey: "v2raySubList") as? [String] ?? []
+        let routingList = defaults.array(forKey: "routingCustomList") as? [String] ?? []
 
-        logger.info("Legacy migration: Found \(serverList.count) servers, \(subList.count) subscriptions")
+        logger.info("Legacy migration: Found \(serverList.count) servers, \(subList.count) subscriptions, \(routingList.count) routings")
 
         // 如果没有旧数据，直接返回
-        guard !serverList.isEmpty || !subList.isEmpty else {
+        guard !serverList.isEmpty || !subList.isEmpty || !routingList.isEmpty else {
             logger.info("Legacy migration: No legacy data found")
             return .noData
         }
@@ -453,11 +596,14 @@ actor LegacyMigrationHandler {
                 }
             }
 
+            // 第三步：迁移路由 (#1613)
+            let routingCount = await migrateRoutings(names: routingList, defaults: defaults)
+
             // 标记迁移完成
             markAsMigrated()
-            logger.info("Legacy migration: Completed: \(profileCount) servers, \(subCount) subscriptions")
+            logger.info("Legacy migration: Completed: \(profileCount) servers, \(subCount) subscriptions, \(routingCount) routings")
 
-            return .success(profiles: profileCount, subscriptions: subCount)
+            return .success(profiles: profileCount, subscriptions: subCount, routings: routingCount)
 
         } catch {
             logger.error("Legacy migration: Failed with error: \(error)")
@@ -634,6 +780,61 @@ actor LegacyMigrationHandler {
                 continuation.resume(returning: false)
             }
         }
+    }
+
+    /// 迁移 v4 路由: 只插入 v5 中不存在的, 不修改 v5 已有路由; v4 选中的路由迁移过来时恢复为当前路由
+    /// - Returns: 新迁移的路由数
+    private func migrateRoutings(names: [String], defaults: UserDefaults) async -> Int {
+        guard !names.isEmpty else { return 0 }
+        let defaultRules = await MainActor.run { () -> [String: RoutingEntity] in
+            let manager = RoutingManager()
+            // 先确保 v5 内置路由已生成(路由表为空时才会生成, 先插入旧路由会导致内置路由缺失)
+            _ = manager.getRunningEntity()
+            return manager.defaultRules
+        }
+        let existing = RoutingStore.shared.fetchAll()
+        var sort = (existing.map(\.sort).max() ?? 0) + 1
+        var migrated: [String: String] = [:] // v4 名称 -> v5 uuid
+
+        for name in names {
+            guard let legacy = LegacyRoutingItem.load(name: name, defaults: defaults) else {
+                logger.warning("Legacy migration: Failed to load routing '\(name)'")
+                continue
+            }
+            if legacy.name.isEmpty { legacy.name = name }
+            let uuid = LegacyRoutingItem.migratedUuid(for: name)
+            if RoutingStore.shared.fetchOne(uuid: uuid) != nil {
+                logger.info("Legacy migration: Routing '\(name)' already migrated, skipping")
+                continue
+            }
+            guard let converted = legacy.toEntity(uuid: uuid, defaultRules: defaultRules) else {
+                logger.info("Legacy migration: Routing '\(name)' has nothing to migrate, skipping")
+                continue
+            }
+            if converted.skippedRules > 0 {
+                logger.warning("Legacy migration: Routing '\(name)' skipped \(converted.skippedRules) rules that v5 cannot represent")
+            }
+            var item = converted.entity
+            item.sort = sort
+            if RoutingStore.shared.insert(item) {
+                migrated[name] = uuid
+                sort += 1
+                logger.info("Legacy migration: Migrated routing '\(item.remark)'")
+            }
+        }
+
+        // 恢复 v4 选中的路由(仅当它是这次新迁移过来的)
+        if let selected = defaults.string(forKey: "routingSelectedRule"), let uuid = migrated[selected] {
+            await MainActor.run {
+                AppState.shared.runningRouting = uuid
+                AppMenuManager.shared.refreshRoutingItems()
+            }
+            // 代理正在运行时重载核心使路由生效; 未运行则下次启动生效(不主动开启代理)
+            if await V2rayLaunch.shared.isRunning {
+                await V2rayLaunch.shared.reloadCore()
+            }
+        }
+        return migrated.count
     }
 
     /// 检查指定 uuid 的订阅是否已存在

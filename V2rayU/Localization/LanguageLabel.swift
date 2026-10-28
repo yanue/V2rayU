@@ -784,6 +784,7 @@ enum LanguageLabel: String, CaseIterable {
     case ImportLegacyV2raySubList
     case ImportLegacySuccessServers
     case ImportLegacySuccessSubscriptions
+    case ImportLegacySuccessRoutings
     case RemoveDuplicateServers
     case RemoveDuplicateConfirm
     case RemoveDuplicateConfirmTip
