@@ -1,4 +1,5 @@
 import Testing
+import Yams
 import Foundation
 @testable import V2rayU
 
@@ -452,7 +453,83 @@ struct ProtocolParserTests {
         #expect(profile?.password == "abc-def-ghi")
         #expect(profile?.flow == "xtls-rprx-vision")
         #expect(profile?.sni == "sni.example.com")
-        #expect(profile?.security == .tls)
+        // tls: true + reality-opts 是 reality 节点，公钥等字段不能丢
+        #expect(profile?.security == .reality)
+        #expect(profile?.publicKey == "pubKey123")
+        #expect(profile?.shortId == "sid456")
+        #expect(profile?.allowInsecure == true)
+    }
+
+    /// mihomo 标准写法(连字符字段名)：ws-opts / grpc-opts / skip-cert-verify / client-fingerprint 都要读到
+    @Test func clashKebabCaseYaml() throws {
+        let yaml = """
+        mode: rule
+        proxies:
+          - name: ws
+            type: vmess
+            server: cdn.example.com
+            port: "443"
+            uuid: b831381d-6324-4d53-ad4f-8cda48b30811
+            alterId: "0"
+            cipher: auto
+            tls: true
+            skip-cert-verify: false
+            network: ws
+            ws-opts:
+              path: /ray
+              headers:
+                Host: real.example.com
+          - name: grpc
+            type: vless
+            server: 1.2.3.4
+            port: 443
+            uuid: b831381d-6324-4d53-ad4f-8cda48b30811
+            tls: true
+            network: grpc
+            client-fingerprint: safari
+            grpc-opts:
+              grpc-service-name: mygrpc
+        """
+        let decoded = try YAMLDecoder().decode(Clash.self, from: yaml)
+        let profiles = decoded.proxies.compactMap { $0.toProfile() }
+        #expect(profiles.count == 2)
+        #expect(profiles[0].port == 443)
+        #expect(profiles[0].alterId == 0)
+        #expect(profiles[0].allowInsecure == false)
+        #expect(profiles[0].path == "/ray")
+        #expect(profiles[0].host == "real.example.com")
+        #expect(profiles[1].path == "mygrpc")
+        #expect(profiles[1].fingerprint == .safari)
+    }
+
+    @Test func clashVlessEncryptionParser() throws {
+        // #1675: mihomo 的 vless 用 encryption 字段，导入时不能丢
+        let json = """
+        {"type":"vless","name":"clash-vless-enc","server":"1.2.3.4","port":443,"uuid":"abc-def-ghi","network":"tcp","tls":true,"encryption":"mlkem768x25519plus.native.0rtt.abcdef"}
+        """
+        let proxy = try JSONDecoder().decode(clashProxy.self, from: json.data(using: .utf8)!)
+        let profile = proxy.toProfile()
+        #expect(profile?.protocol == .vless)
+        #expect(profile?.encryption == "mlkem768x25519plus.native.0rtt.abcdef")
+        #expect(profile?.usesVlessEncryption == true)
+    }
+
+    @Test func clashVlessEncryptionYaml() throws {
+        let yaml = """
+        mode: rule
+        proxies:
+          - {name: enc, type: vless, server: 1.2.3.4, port: 443, uuid: abc-def-ghi, network: tcp, tls: true, encryption: mlkem768x25519plus.native.1rtt.xyz}
+          - {name: plain, type: vless, server: 1.2.3.4, port: 443, uuid: abc-def-ghi, network: tcp, tls: true}
+          - {name: empty, type: vless, server: 1.2.3.4, port: 443, uuid: abc-def-ghi, network: tcp, tls: true, encryption: ""}
+        """
+        let decoded = try YAMLDecoder().decode(Clash.self, from: yaml)
+        let profiles = decoded.proxies.compactMap { $0.toProfile() }
+        #expect(profiles.count == 3)
+        #expect(profiles[0].encryption == "mlkem768x25519plus.native.1rtt.xyz")
+        #expect(profiles[1].encryption == "none")
+        #expect(profiles[2].encryption == "none")
+        #expect(!profiles[1].usesVlessEncryption)
+        #expect(!profiles[2].usesVlessEncryption)
     }
 
     @Test func clashSsParser() throws {

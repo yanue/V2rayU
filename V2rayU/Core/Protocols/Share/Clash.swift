@@ -47,11 +47,86 @@ struct clashProxy: Codable {
     var fingerprint: String? // vmess
     var security: String? // vmess
     var flow: String? // vless
+    var encryption: String? // vless: mihomo 用 encryption（如 mlkem768x25519plus...），默认 none
     var wsOpts: clashWsOpts? // vmess
     var httpOpts: clashHttpOpts? // vmess
     var h2Opts: clashH2Opts? // vmess
     var grpcOpts: grpcOpts? // vmess
     var realityOpts: realityOpts? // vless
+}
+
+// Clash / mihomo 的字段名是连字符写法(ws-opts、skip-cert-verify、reality-opts 等)，
+// 原来按属性名(wsOpts)解码，这些字段全部读不到：ws 路径/Host、reality 公钥、跳过证书验证都丢了。
+// 这里同时认连字符和驼峰两种写法；可选字段类型不符(如 alterId: "0")时忽略该字段，不让整个订阅解析失败
+struct ClashKey: CodingKey {
+    var stringValue: String
+    var intValue: Int? { nil }
+    init(_ string: String) { stringValue = string }
+    init?(stringValue: String) { self.stringValue = stringValue }
+    init?(intValue: Int) { nil }
+}
+
+extension KeyedDecodingContainer where K == ClashKey {
+    /// 依次按 names 取值，取不到或类型不符返回 nil
+    func clashValue<T: Decodable>(_ type: T.Type, _ names: String...) -> T? {
+        for name in names {
+            if let value = try? decodeIfPresent(T.self, forKey: ClashKey(name)) {
+                return value
+            }
+        }
+        return nil
+    }
+
+    /// 数字字段兼容字符串写法(port: "443")
+    func clashInt(_ names: String...) -> Int? {
+        for name in names {
+            if let value = try? decodeIfPresent(Int.self, forKey: ClashKey(name)) {
+                return value
+            }
+            if let text = try? decodeIfPresent(String.self, forKey: ClashKey(name)), let value = Int(text.trimmingCharacters(in: .whitespaces)) {
+                return value
+            }
+        }
+        return nil
+    }
+}
+
+extension clashProxy {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        guard let type = c.clashValue(String.self, "type"), let server = c.clashValue(String.self, "server"),
+              let port = c.clashInt("port") else {
+            throw DecodingError.dataCorrupted(.init(codingPath: c.codingPath, debugDescription: "clash proxy missing type/server/port"))
+        }
+        self.type = type
+        self.name = c.clashValue(String.self, "name") ?? server
+        self.server = server
+        self.port = port
+        self.username = c.clashValue(String.self, "username")
+        self.password = c.clashValue(String.self, "password")
+        self.sni = c.clashValue(String.self, "sni")
+        self.skipCERTVerify = c.clashValue(Bool.self, "skip-cert-verify", "skipCertVerify", "skipCERTVerify")
+        self.cipher = c.clashValue(String.self, "cipher")
+        self.uuid = c.clashValue(String.self, "uuid")
+        self.alterId = c.clashInt("alterId", "alter-id")
+        self.tls = c.clashValue(Bool.self, "tls")
+        self.fp = c.clashValue(String.self, "fp")
+        self.protocol = c.clashValue(String.self, "protocol")
+        self.obfs = c.clashValue(String.self, "obfs")
+        self.udp = c.clashValue(Bool.self, "udp")
+        self.network = c.clashValue(String.self, "network")
+        self.servername = c.clashValue(String.self, "servername")
+        self.clientFingerprint = c.clashValue(String.self, "client-fingerprint", "clientFingerprint")
+        self.fingerprint = c.clashValue(String.self, "fingerprint")
+        self.security = c.clashValue(String.self, "security")
+        self.flow = c.clashValue(String.self, "flow")
+        self.encryption = c.clashValue(String.self, "encryption")
+        self.wsOpts = c.clashValue(clashWsOpts.self, "ws-opts", "wsOpts")
+        self.httpOpts = c.clashValue(clashHttpOpts.self, "http-opts", "httpOpts")
+        self.h2Opts = c.clashValue(clashH2Opts.self, "h2-opts", "h2Opts")
+        self.grpcOpts = c.clashValue(V2rayU.grpcOpts.self, "grpc-opts", "grpcOpts")
+        self.realityOpts = c.clashValue(V2rayU.realityOpts.self, "reality-opts", "realityOpts")
+    }
 }
 
 extension clashProxy {
@@ -90,7 +165,7 @@ extension clashProxy {
             profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
             
             if profile.network == .ws {
-                profile.host = self.servername ?? self.server
+                profile.host = self.wsOpts?.host ?? self.servername ?? self.server
                 profile.path = self.wsOpts?.path ?? "/"
             } else if profile.network == .h2 {
                 profile.host = self.h2Opts?.host?.first ?? self.servername ?? self.server
@@ -102,7 +177,9 @@ extension clashProxy {
         case "vless":
             profile.protocol = .vless
             profile.password = self.uuid ?? ""
-            profile.encryption = self.cipher ?? "none"
+            // mihomo 的 vless 用 `encryption` 字段（不是 cipher）；空值视为 none (#1675)
+            let encryption = self.encryption?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            profile.encryption = encryption.isEmpty ? "none" : encryption
             profile.fingerprint = self.clientFingerprint.flatMap { V2rayStreamFingerprint(rawValue: $0) } ?? .chrome
             profile.network = self.network.flatMap { V2rayStreamNetwork(rawValue: $0) } ?? .tcp
             
@@ -110,13 +187,15 @@ extension clashProxy {
                 profile.sni = servername
             }
 
-            if self.security == "reality" {
+            // mihomo 的 reality 节点是 tls: true + reality-opts，没有 security 字段
+            if self.security == "reality" || !(self.realityOpts?.publicKey ?? "").isEmpty {
+                profile.security = .reality
                 profile.publicKey = self.realityOpts?.publicKey ?? ""
                 profile.shortId = self.realityOpts?.shortId ?? ""
             }
             
             if profile.network == .ws {
-                profile.host = self.servername ?? self.server
+                profile.host = self.wsOpts?.host ?? self.servername ?? self.server
                 profile.path = self.wsOpts?.path ?? "/"
             } else if profile.network == .h2 {
                 profile.host = self.h2Opts?.host?.first ?? self.servername ?? self.server
@@ -175,6 +254,18 @@ extension clashProxy {
 
 struct clashWsOpts: Codable {
     var path: String?
+    var headers: [String: String]?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        path = c.clashValue(String.self, "path")
+        headers = c.clashValue([String: String].self, "headers")
+    }
+
+    /// headers 里的 Host（键名大小写不固定）
+    var host: String? {
+        headers?.first { $0.key.lowercased() == "host" }?.value
+    }
 }
 
 struct clashHttpOpts: Codable {
@@ -184,14 +275,31 @@ struct clashHttpOpts: Codable {
 struct clashH2Opts: Codable {
     var path: String?
     var host: [String]?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        path = c.clashValue(String.self, "path")
+        host = c.clashValue([String].self, "host") ?? c.clashValue(String.self, "host").map { [$0] }
+    }
 }
 
 struct grpcOpts: Codable {
     var grpcServiceName: String?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        grpcServiceName = c.clashValue(String.self, "grpc-service-name", "grpcServiceName")
+    }
 }
 
 struct realityOpts: Codable {
     var publicKey: String?
     var shortId: String?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        publicKey = c.clashValue(String.self, "public-key", "publicKey")
+        shortId = c.clashValue(String.self, "short-id", "shortId")
+    }
 }
 
