@@ -228,6 +228,74 @@ struct CoreCapabilityRulesTests {
         #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(24, 9, 19)) == nil)
         #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(26, 1, 18))?.isBlocking == true)
     }
+
+    // MARK: - VLESS Encryption (#1675)
+
+    private func vlessProfile(encryption: String) -> ProfileEntity {
+        ProfileEntity(protocol: .vless, address: "x.com", port: 443, password: "uuid", encryption: encryption, network: .tcp, security: .none)
+    }
+
+    @Test func vlessEncryptionNormalization() {
+        // 从 vmess 改成 vless 后残留的 chacha20-poly1305 等也不算 VLESS Encryption
+        for value in ["", "none", "NONE", "auto", " auto ", "chacha20-poly1305", "aes-128-gcm"] {
+            let profile = vlessProfile(encryption: value)
+            #expect(profile.normalizedVlessEncryption == "none", "\(value)")
+            #expect(!profile.usesVlessEncryption, "\(value)")
+        }
+        let enc = vlessProfile(encryption: "mlkem768x25519plus.native.0rtt.Key")
+        #expect(enc.normalizedVlessEncryption == "mlkem768x25519plus.native.0rtt.Key")
+        #expect(enc.usesVlessEncryption)
+        // vmess 的 encryption 是 security，不算 VLESS Encryption
+        let vmess = ProfileEntity(protocol: .vmess, address: "x.com", port: 443, password: "uuid", encryption: "aes-128-gcm")
+        #expect(!vmess.usesVlessEncryption)
+    }
+
+    @Test func singboxFallbackRejectsVlessEncryption() {
+        let reasons = SingboxFallbackResolver.incompatibilityReasons(for: vlessProfile(encryption: "mlkem768x25519plus.native.0rtt.Key"))
+        #expect(reasons.contains { $0.contains("VLESS Encryption") })
+    }
+
+    @Test func singboxFallbackAllowsVlessWithoutEncryption() {
+        for value in ["", "none", "auto"] {
+            let reasons = SingboxFallbackResolver.incompatibilityReasons(for: vlessProfile(encryption: value))
+            #expect(!reasons.contains { $0.contains("VLESS Encryption") }, "\(value)")
+        }
+    }
+
+    @Test func xrayVlessEncryptionMinVersion() {
+        // 用内置规则校验，避免受本机 ~/.V2rayU 下旧版覆盖文件影响
+        let def = XraySupportCatalog.builtInCapabilities.first { $0.key == "outbound.vless.encryption" }
+        #expect(def != nil)
+        guard let def else { return }
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(25, 8, 3))?.isBlocking == true)
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(1, 8, 24))?.isBlocking == true)
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(25, 8, 31)) == nil)
+        #expect(XraySupportCatalog.evaluate(definition: def, version: XrayVersion(26, 3, 27)) == nil)
+    }
+
+    @Test func vlessEncryptionNeverLaunchesWithSingbox() {
+        // 不论本机 xray 版本和默认核心设置：带 encryption 的 vless 不能用 sing-box 启动
+        for core in [ProfileCoreSelection.auto, .xray, .singbox] {
+            var profile = vlessProfile(encryption: "mlkem768x25519plus.native.0rtt.Key")
+            profile.coreType = core
+            let decision = profile.resolveCoreCompatibility()
+            #expect(!(decision.coreType == .SingBox && decision.canLaunch), "\(core)")
+        }
+        var forced = vlessProfile(encryption: "mlkem768x25519plus.native.0rtt.Key")
+        forced.coreType = .singbox
+        #expect(forced.resolveCoreCompatibility().canLaunch == false)
+    }
+
+    @Test func xrayOutboundKeepsVlessEncryption() {
+        let enc = V2rayOutboundHandler(from: ProfileModel(from: vlessProfile(encryption: "mlkem768x25519plus.native.0rtt.Key")))
+        _ = enc.getOutbound()
+        #expect(enc.serverVless.users.first?.encryption == "mlkem768x25519plus.native.0rtt.Key")
+        for value in ["", "auto", "none"] {
+            let handler = V2rayOutboundHandler(from: ProfileModel(from: vlessProfile(encryption: value)))
+            _ = handler.getOutbound()
+            #expect(handler.serverVless.users.first?.encryption == "none", "\(value)")
+        }
+    }
 }
 
 // Helper to check if XrayFeatureAvailability is "supported"

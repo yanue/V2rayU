@@ -108,6 +108,7 @@
 | SOCKS outbound | 当前主列表支持 | `/config/outbounds/socks.html` |
 | Trojan outbound | 当前主列表支持 | `/config/outbounds/trojan.html` |
 | VLESS outbound | 当前主列表支持 | `/config/outbounds/vless.html` |
+| VLESS Encryption（`encryption` 非 `none`） | Xray-core >= 25.8.31；sing-box 不支持 | `/config/outbounds/vless.html`、Xray-core v25.8.29 release note（PR #5067，v25.8.31 调整参数格式） |
 | VMess outbound | 当前主列表支持 | `/config/outbounds/vmess.html` |
 | WireGuard outbound | 当前主列表支持 | `/config/outbounds/wireguard.html` |
 | Hysteria outbound | 当前主列表支持 | `/config/outbounds/hysteria.html` |
@@ -240,6 +241,7 @@
 | 功能 | 当前校验策略 |
 |---|---|
 | `XHTTP` | 保留现有 `V2rayU` 兼容阈值：旧语义版本 `>= 1.8.24`，日期版本 `>= 24.9.30`；不满足则回退 `Sing-Box` |
+| VLESS Encryption（`encryption` 非 `none`，如 `mlkem768x25519plus...`，#1675） | 规则 `outbound.vless.encryption`：Xray-core 日期版本 `>= 25.8.31`（v25.8.29 首次引入，PR #5067；v25.8.31 调整 1-RTT padding 参数格式），旧语义版本不支持；sing-box 不支持 VLESS Encryption，不能回退（应用内置规则拦截）。空值 / `auto` / `none` 统一视为 `none`，不触发该规则 |
 | `ws` / `grpc` | **不再**因为“文档误判为已下架”而自动回退 `Sing-Box` |
 | `h2` | 作为历史/兼容 transport，只做提示，不再直接依据错误文档强制判死 |
 

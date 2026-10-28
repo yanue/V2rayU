@@ -87,6 +87,20 @@
       }
     },
     {
+      "key": "outbound.vless.encryption",
+      "display_name": "VLESS Encryption（encryption 非 none）",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "unsupported",
+        "note": "sing-box 的 VLESS 出站只支持 encryption=none，不支持 VLESS Encryption（如 mlkem768x25519plus...）；该类节点只能使用 Xray-core v25.8.31 及以上版本，由应用内置规则拦截回退。"
+      },
+      "app_support": {
+        "level": "unsupported",
+        "note": "当前生成器的 vless 出站不输出 encryption 字段。"
+      }
+    },
+    {
       "key": "outbound.trojan",
       "display_name": "Trojan outbound",
       "kind": "Outbound",

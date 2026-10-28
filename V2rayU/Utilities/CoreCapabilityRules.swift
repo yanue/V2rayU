@@ -655,6 +655,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.trojan", displayName: "Trojan outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/trojan.html"),
         XrayCapabilityDefinition(key: "outbound.vless", displayName: "VLESS outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vless.html"),
         XrayCapabilityDefinition(key: "outbound.vmess", displayName: "VMess outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表可见。"), docsPath: "/config/outbounds/vmess.html"),
+        XrayCapabilityDefinition(key: "outbound.vless.encryption", displayName: "VLESS Encryption（encryption 非 none）", kind: .outboundProtocol, rule: .supported(note: "VLESS Encryption（ML-KEM-768 抗量子加密，如 mlkem768x25519plus...）由 Xray-core v25.8.29 首次引入（PR #5067），v25.8.31 调整了 1-RTT padding 参数格式，按 v25.8.31 作为最低版本；旧语义版本不支持。sing-box 不支持 VLESS Encryption，不能回退。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(25, 8, 31)), docsPath: "/config/outbounds/vless.html"),
         XrayCapabilityDefinition(key: "outbound.vmess.alterId", displayName: "VMess alterId > 0（旧版 MD5 认证）", kind: .outboundProtocol, rule: .removed(note: "Xray-core 自 v1.8.12 起移除了 Legacy VMess alterId（旧版 MD5 认证），仅支持 AEAD（alterId = 0）。如需使用 alterId > 0，请使用 v1.8.5 或更早版本。", legacyMin: XrayVersion(1, 8, 5), removedAt: XrayVersion(1, 8, 12)), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
@@ -877,6 +878,10 @@ enum SingboxFallbackResolver {
             reasons.append(reason)
         }
 
+        if let reason = vlessEncryptionReason(for: profile) {
+            reasons.append(reason)
+        }
+
         if profile.protocol == .vmess && profile.alterId > 0 {
             reasons.append("当前节点使用 VMess alterId > 0（旧版 MD5 认证），sing-box 不支持，Xray-core 自 v1.8.12 起也已移除。请使用 v1.8.5 或更早版本的 Xray-core，或将 alterId 改为 0（AEAD 模式）。")
         }
@@ -1036,6 +1041,13 @@ enum SingboxFallbackResolver {
         }
     }
 
+    /// sing-box 的 VLESS 出站只支持 encryption=none，不支持 VLESS Encryption（#1675）。
+    /// 写在内置规则里：已安装用户的本地规则文件在远程更新前不含该项，仍需立即生效。
+    private static func vlessEncryptionReason(for profile: ProfileEntity) -> String? {
+        guard profile.usesVlessEncryption else { return nil }
+        return "当前节点使用 VLESS Encryption（encryption 非 none），Sing-Box 不支持，不能自动回退；请使用 Xray-core v25.8.31 及以上版本。"
+    }
+
     private static func legacyFallbackReasons(for profile: ProfileEntity) -> [String] {
         var reasons: [String] = []
 
@@ -1058,6 +1070,10 @@ enum SingboxFallbackResolver {
         }
 
         if let reason = quicWithoutTlsReason(for: profile) {
+            reasons.append(reason)
+        }
+
+        if let reason = vlessEncryptionReason(for: profile) {
             reasons.append(reason)
         }
 
@@ -1228,6 +1244,13 @@ enum XrayCompatibilityResolver {
             }
         }
 
+        // VLESS Encryption 有最低版本要求；capability(forKey:) 会回退内置规则，旧的本地规则文件不含该项也能生效
+        if profile.usesVlessEncryption,
+           let definition = XraySupportCatalog.capability(forKey: "outbound.vless.encryption"),
+           let issue = XraySupportCatalog.evaluate(definition: definition, version: version) {
+            issues.append(issue)
+        }
+
         if let issue = allowInsecureIssue(for: profile, version: version) {
             issues.append(issue)
         }
@@ -1277,5 +1300,25 @@ extension ProfileEntity {
 
     func resolveCoreCompatibility() -> XrayCoreCompatibilityDecision {
         XrayCompatibilityResolver.decision(for: self)
+    }
+
+    /// VLESS 实际下发给核心的 encryption：空 / "auto" / "none"（不区分大小写）统一为 "none"，其余原样保留（如 mlkem768x25519plus...）
+    var normalizedVlessEncryption: String {
+        Self.normalizeVlessEncryption(encryption)
+    }
+
+    static func normalizeVlessEncryption(_ encryption: String) -> String {
+        let value = encryption.trimmingCharacters(in: .whitespacesAndNewlines)
+        // VLESS Encryption 的值都以 mlkem768x25519plus 开头；其他值（空 / auto / none，
+        // 或从 vmess 改成 vless 后残留的 chacha20-poly1305 等）都按 none 处理，xray 本来也不接受这些值
+        guard value.lowercased().hasPrefix("mlkem768x25519plus") else {
+            return "none"
+        }
+        return value
+    }
+
+    /// 是否启用了 VLESS Encryption（#1675）：仅 Xray-core >= 25.8.31 支持，sing-box 不支持
+    var usesVlessEncryption: Bool {
+        `protocol` == .vless && normalizedVlessEncryption != "none"
     }
 }

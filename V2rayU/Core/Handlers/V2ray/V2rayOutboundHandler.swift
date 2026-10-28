@@ -100,10 +100,8 @@ class V2rayOutboundHandler {
             var user = V2rayOutboundVLessUser()
             user.id = self.profile.password
             user.flow = self.profile.flow
-            user.encryption = self.profile.encryption
-            if user.encryption.isEmpty || user.encryption == "auto" {
-                user.encryption = "none" // vless 只支持 "none"
-            }
+            // 空 / auto 归一为 none；非 none 为 VLESS Encryption（Xray-core >= 25.8.31），原样保留
+            user.encryption = ProfileEntity.normalizeVlessEncryption(self.profile.encryption)
             
             // vless
             serverVless = V2rayOutboundVLessItem()

@@ -218,6 +218,18 @@
       }
     },
     {
+      "key": "outbound.vless.encryption",
+      "display_name": "VLESS Encryption（encryption 非 none）",
+      "kind": "Outbound",
+      "docs_path": "/config/outbounds/vless.html",
+      "rule": {
+        "type": "supported",
+        "legacy_min": "9.9.9",
+        "calendar_min": "25.8.31",
+        "note": "VLESS Encryption（ML-KEM-768 抗量子加密，如 mlkem768x25519plus...）由 Xray-core v25.8.29 首次引入（PR #5067），v25.8.31 调整了 1-RTT padding 参数格式，按 v25.8.31 作为最低版本；旧语义版本不支持。sing-box 不支持 VLESS Encryption，不能回退。"
+      }
+    },
+    {
       "key": "outbound.vmess",
       "display_name": "VMess outbound",
       "kind": "Outbound",

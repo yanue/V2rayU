@@ -226,7 +226,7 @@ struct V2rayOutboundVLessUser: Codable {
     // xtls-rprx-vision-udp443：同 xtls-rprx-vision, 但是不会拦截目标为 443 端口的 UDP 流量
     // 此外，目前 XTLS 仅支持 TCP+TLS/Reality。
     var flow: String = ""
-    var encryption: String = "none" // 必填,不能为空字符串,默认 none, 暂时只支持 none
+    var encryption: String = "none" // 必填,不能为空字符串,默认 none; 非 none 为 VLESS Encryption(Xray-core >= 25.8.31)
     var level: Int? // 选填,默认 0
 }
 
