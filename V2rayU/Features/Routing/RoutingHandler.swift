@@ -66,8 +66,9 @@ func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) 
     return (domains, ips)
 }
 
+// 可带网段前缀 /0~/32：原来只认两位数，10.0.0.0/8 会被当成域名规则 (#1695)
 func isIp(str: String) -> Bool {
-    let pattern = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/[0-9]{2})?$"
+    let pattern = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-9]|[12][0-9]|3[0-2]))?$"
     return str.range(of: pattern, options: .regularExpression) != nil
 }
 
@@ -77,7 +78,8 @@ func isDomain(str: String) -> Bool {
 }
 
 func isIPv6Literal(_ str: String) -> Bool {
-    return str.contains(":") && str.range(of: "^[0-9a-fA-F:]+$", options: .regularExpression) != nil
+    // 可带网段前缀（如 2001:db8::/32）
+    return str.contains(":") && str.range(of: "^[0-9a-fA-F:]+(/([0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?$", options: .regularExpression) != nil
 }
 
 class RoutingManager {
