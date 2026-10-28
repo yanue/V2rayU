@@ -79,7 +79,10 @@ actor SystemSleepManager {
                 let needsInterface = mode == .tun && lastCore == .XrayCore
                 let ready = needsInterface ? await TunHandler.shared.waitForNetworkReady(timeout: 10) : true
                 logger.info("V2rayLaunch full restart after wake (core + TUN + proxy), mode=\(mode.rawValue), networkReady=\(ready)")
-                await V2rayLaunch.shared.restart()
+                if !(await V2rayLaunch.shared.restart()) {
+                    // 另起任务等待重试，不拖慢下面的状态同步、菜单刷新等
+                    Task { await self.retryRestartAfterWake() }
+                }
             }
 
             // 2. 同步运行中服务器状态（runningServer 是内存态，需从 DB 刷新）
@@ -111,6 +114,28 @@ actor SystemSleepManager {
             // 记录唤醒
             self.logEvent(source: "wake")
         }
+    }
+
+    /// 唤醒后重启失败(多为网络还没恢复, 核心 30s 内未就绪)时代理会被整体关闭, 之后不会再自动开启 (#1691 #1701)。
+    /// 等一会儿再重试一次; 只重试一次, 避免同一个失败反复弹提示。
+    /// 期间用户已手动开启、或当前节点缺少必填项(重试也没用)时不重试。
+    private func retryRestartAfterWake() async {
+        logger.warning("restart after wake failed, retry once later")
+        try? await Task.sleep(nanoseconds: 15_000_000_000)
+        guard !(await V2rayLaunch.shared.isRunning), !UserDefaults.getBool(forKey: .v2rayTurnOn) else {
+            logger.info("retry after wake skipped: already running")
+            return
+        }
+        let invalidProfile = await MainActor.run {
+            AppState.shared.runningCombination.isEmpty
+                && ProfileStore.shared.getRunning().map { ProfileValidator.problem(of: $0) != nil } == true
+        }
+        guard !invalidProfile else {
+            logger.info("retry after wake skipped: running profile is not launchable")
+            return
+        }
+        let ok = await V2rayLaunch.shared.restart()
+        logger.info("retry restart after wake: \(ok)")
     }
 
     /// logEvent
