@@ -18,8 +18,11 @@ struct CombinedConfigListView: View {
     @State private var pendingDeleteUUID: String?
     @State private var showDeleteConfirm = false
 
+    // 只订阅运行中的组合字段, 不观察整个 AppState(网速每秒更新会让表格重绘)
+    @State private var runningCombination: String = AppState.shared.runningCombination
+
     private var isRunningRow: (CombinedConfigEntity) -> Bool {
-        { $0.uuid == AppState.shared.runningCombination }
+        { $0.uuid == runningCombination }
     }
 
     private var filteredAndSortedItems: [CombinedConfigEntity] {
@@ -210,6 +213,7 @@ struct CombinedConfigListView: View {
             Text(String(localized: .DeleteTip))
         }
         .task { viewModel.getList() }
+        .onReceive(AppState.shared.$runningCombination.removeDuplicates()) { runningCombination = $0 }
     }
 
     @ViewBuilder

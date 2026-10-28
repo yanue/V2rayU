@@ -19,8 +19,11 @@ struct RoutingListView: View {
     @State private var showDeleteConfirm = false
     @State private var pendingDeleteUUIDs: [String] = []
 
+    // 只订阅运行中的路由字段, 不观察整个 AppState(网速每秒更新会让表格重绘)
+    @State private var runningRouting: String = AppState.shared.runningRouting
+
     private var isRunningRow: (RoutingEntity) -> Bool {
-        { $0.uuid == AppState.shared.runningRouting }
+        { $0.uuid == runningRouting }
     }
     
     private var filteredAndSortedItems: [RoutingEntity] {
@@ -110,6 +113,7 @@ struct RoutingListView: View {
         .task {
             loadData()
         }
+        .onReceive(AppState.shared.$runningRouting.removeDuplicates()) { runningRouting = $0 }
     }
     
     // 处理拖拽排序逻辑:

@@ -47,9 +47,12 @@ struct ProfileListView: View {
     @State private var showDeleteConfirm = false
     @State private var pendingDeleteUUIDs: [String] = []
     @State private var showRemoveDuplicatesConfirm = false
+    // 只订阅运行中的服务器/组合两个字段: 整个 AppState 里有每秒更新的网速, 观察整个对象会让表格每秒重绘
+    @State private var runningProfile: String = AppState.shared.runningProfile
+    @State private var runningCombination: String = AppState.shared.runningCombination
 
     private var isRunningRow: (ProfileEntity) -> Bool {
-        { AppState.shared.runningCombination.isEmpty && $0.uuid == AppState.shared.runningProfile }
+        { runningCombination.isEmpty && $0.uuid == runningProfile }
     }
 
     var filteredAndSortedItems: [ProfileEntity] {
@@ -270,6 +273,8 @@ struct ProfileListView: View {
             Text(String(localized: .RemoveDuplicateConfirmTip))
         }
         .task { loadData() }
+        .onReceive(AppState.shared.$runningProfile.removeDuplicates()) { runningProfile = $0 }
+        .onReceive(AppState.shared.$runningCombination.removeDuplicates()) { runningCombination = $0 }
     }
 
     func handleDrop(index: Int, rows: [ProfileEntity]) {
