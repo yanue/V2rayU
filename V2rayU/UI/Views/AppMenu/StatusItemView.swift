@@ -23,66 +23,6 @@ private func speedText(_ prefix: String, _ value: Double) -> String {
     "\(prefix) \(String(format: "%.0f", value)) KB/s"
 }
 
-// MARK: - 状态栏自绘文字 / 图标
-
-// 状态栏按钮里不能放 NSTextField：macOS 27 下（单屏也会）系统给菜单栏图标画快照时会切换外观，
-// NSTextField 随之重绘又触发下一次快照，主线程空转、CPU 常驻 60% 以上 (#1705)。
-// 这里在 draw(_:) 里自己画，颜色在绘制时按当前外观解析，快照也能跟随非活动屏幕变暗 (#1704)。
-private final class StatusTextView: NSView {
-    private let font: NSFont
-    var text = "" {
-        didSet {
-            guard text != oldValue else { return }
-            invalidateIntrinsicContentSize()
-            needsDisplay = true
-        }
-    }
-    var textColor: NSColor = .labelColor {
-        didSet { if textColor != oldValue { needsDisplay = true } }
-    }
-
-    init(size: CGFloat) {
-        font = .monospacedDigitSystemFont(ofSize: size, weight: .regular)
-        super.init(frame: .zero)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private var attributes: [NSAttributedString.Key: Any] {
-        [.font: font, .foregroundColor: textColor]
-    }
-
-    override var intrinsicContentSize: NSSize {
-        let size = (text as NSString).size(withAttributes: [.font: font])
-        return NSSize(width: ceil(size.width), height: ceil(font.ascender - font.descender))
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        let height = ceil(font.ascender - font.descender)
-        (text as NSString).draw(at: NSPoint(x: 0, y: (bounds.height - height) / 2), withAttributes: attributes)
-    }
-}
-
-private final class StatusIconView: NSView {
-    var image: NSImage? {
-        didSet { if image !== oldValue { needsDisplay = true } }
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        guard let image else { return }
-        // template 图标按文字颜色着色
-        let tinted = NSImage(size: bounds.size, flipped: false) { rect in
-            image.draw(in: rect)
-            NSColor.labelColor.set()
-            rect.fill(using: .sourceAtop)
-            return true
-        }
-        tinted.draw(in: bounds)
-    }
-}
-
 // MARK: - 加载指示器
 
 // 启动期间主线程忙于初始化，NSProgressIndicator 依赖主线程 runloop 驱动动画会卡住不转。
@@ -161,58 +101,38 @@ private final class LoadingSpinnerView: NSView {
 
 // MARK: - 状态栏视图
 
+// 图标、延迟、网速合成一张图交给 NSStatusBarButton 自己画 (button.image)，不在按钮上叠加自绘子视图：
+// - 系统只对按钮自己画的图片做“非活动屏幕变暗”，叠加的子视图（NSTextField 或自绘 NSView）都不会变暗 (#1704)
+// - 按钮里放 NSTextField 时，macOS 27 给菜单栏截图切换外观会让它重绘、又触发下一次截图，CPU 常驻 60% (#1705)
+// 只有图标 / 网速时用 template 图，与其它菜单栏图标一致；显示彩色延迟时用普通图片。
+// 本视图只承载启动时的转圈动画（动画无法放进图片），盖在按钮上、不接收点击。
 final class StatusItemView: NSView {
-    private let iconView = StatusIconView()
+    private struct Content: Equatable {
+        var icon: String
+        var starting: Bool
+        var latency: String?
+        var latencyColor: NSColor?
+        var down: String?
+        var up: String?
+    }
+
+    private static let height: CGFloat = 22
+    private static let padding: CGFloat = 4
+    private static let spacing: CGFloat = 4
+    private static let iconSize: CGFloat = 18
+    private static let spinnerSize: CGFloat = 12
+    private static let latencyFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .regular)
+    private static let speedFont = NSFont.monospacedDigitSystemFont(ofSize: 9, weight: .regular)
+    private static let speedLineSpacing: CGFloat = 1
+
     private let spinner = LoadingSpinnerView()
-    private let latencyStack = NSStackView()
-    private let dotLabel = StatusTextView(size: 10)
-    private let latencyLabel = StatusTextView(size: 10)
-    private let speedStack = NSStackView()
-    private let downLabel = StatusTextView(size: 9)
-    private let upLabel = StatusTextView(size: 9)
+    private var content: Content?
+    private var width: CGFloat = NSStatusItem.squareLength
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-
-        iconView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            iconView.widthAnchor.constraint(equalToConstant: 18),
-            iconView.heightAnchor.constraint(equalToConstant: 18),
-        ])
-
         spinner.isHidden = true
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            spinner.widthAnchor.constraint(equalToConstant: 12),
-            spinner.heightAnchor.constraint(equalToConstant: 12),
-        ])
-
-        dotLabel.text = "●"
-        latencyStack.orientation = .horizontal
-        latencyStack.spacing = 4
-        latencyStack.setViews([dotLabel, latencyLabel], in: .leading)
-
-        speedStack.orientation = .vertical
-        speedStack.alignment = .leading
-        speedStack.spacing = 1
-        speedStack.setViews([downLabel, upLabel], in: .top)
-
-        // NSStackView 默认 detachesHiddenViews，隐藏的子视图不占宽度也不留间距
-        let stack = NSStackView(views: [iconView, spinner, latencyStack, speedStack])
-        stack.orientation = .horizontal
-        stack.alignment = .centerY
-        stack.spacing = 4
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 4),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -4),
-            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
-        // 提供 22pt 的期望高度撑起状态栏项；非 required，避免与不同高度的状态栏按钮约束冲突
-        let height = heightAnchor.constraint(equalToConstant: 22)
-        height.priority = .defaultHigh
-        height.isActive = true
+        addSubview(spinner)
     }
 
     required init?(coder: NSCoder) {
@@ -222,13 +142,16 @@ final class StatusItemView: NSView {
     // 点击交给底下的 NSStatusBarButton 处理
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 
+    override func layout() {
+        super.layout()
+        let size = Self.spinnerSize
+        spinner.frame = NSRect(x: Self.padding + Self.iconSize + Self.spacing,
+                               y: (bounds.height - size) / 2, width: size, height: size)
+    }
+
     /// 刷新内容，返回内容所需宽度（由调用方设置为状态栏项宽度）
     @discardableResult
     func update(appState: AppState, settings: AppSettings) -> CGFloat {
-        if iconView.image?.name() != appState.icon {
-            iconView.image = NSImage(named: appState.icon)
-        }
-
         // 加载中只显示图标 + 转圈；停止状态只显示图标；运行中才按设置显示延迟和速度
         // 只有目标是开启时才转圈：启动时上次为停止、或正在停止，都不转
         let starting = appState.isCoreStarting && appState.v2rayTurnOn
@@ -240,25 +163,103 @@ final class StatusItemView: NSView {
         }
 
         let running = !starting && appState.v2rayTurnOn
-        let showLatency = running && settings.showLatencyOnTray
-        latencyStack.isHidden = !showLatency
-        if showLatency {
-            dotLabel.textColor = .systemGreen
-            latencyLabel.text = "\(String(format: "%.0f", appState.latency)) ms"
-            latencyLabel.textColor = getSpeedColor(latency: appState.latency)
+        var next = Content(icon: appState.icon, starting: starting)
+        if running && settings.showLatencyOnTray {
+            next.latency = "\(String(format: "%.0f", appState.latency)) ms"
+            next.latencyColor = getSpeedColor(latency: appState.latency)
+        }
+        if running && settings.showSpeedOnTray {
+            next.down = speedText("↓", appState.proxyDownSpeed)
+            next.up = speedText("↑", appState.proxyUpSpeed)
+        }
+        if next != content {
+            render(next)
+        }
+        return width
+    }
+
+    private func render(_ content: Content) {
+        self.content = content
+        let latencyFont = Self.latencyFont
+        let speedFont = Self.speedFont
+        let dot = "●"
+        let latencyWidth = content.latency.map {
+            ceil(textWidth(dot, latencyFont) + Self.spacing + textWidth($0, latencyFont))
+        }
+        let speedWidth: CGFloat? = content.down.flatMap { down in
+            content.up.map { ceil(max(textWidth(down, speedFont), textWidth($0, speedFont))) }
         }
 
-        let showSpeed = running && settings.showSpeedOnTray
-        speedStack.isHidden = !showSpeed
-        if showSpeed {
-            downLabel.text = speedText("↓", appState.proxyDownSpeed)
-            upLabel.text = speedText("↑", appState.proxyUpSpeed)
-        }
+        var segments: [CGFloat] = [Self.iconSize]
+        if content.starting { segments.append(Self.spinnerSize) }
+        if let latencyWidth { segments.append(latencyWidth) }
+        if let speedWidth { segments.append(speedWidth) }
+        let contentWidth = segments.reduce(0, +) + Self.spacing * CGFloat(segments.count - 1)
+        let size = NSSize(width: Self.padding * 2 + contentWidth, height: Self.height)
 
-        return ceil(fittingSize.width)
+        // template 图由系统着色，画成黑色即可；普通图片的 labelColor 在每次绘制时按当前外观解析
+        // （drawingHandler 图片随外观重绘，不需要也不能在外观变化时重设 button.image，否则又会引发 #1705 的循环）
+        let template = content.latency == nil
+        let iconImage = NSImage(named: content.icon)
+        let image = NSImage(size: size, flipped: false) { rect in
+            let textColor: NSColor = template ? .black : .labelColor
+            var x = Self.padding
+            if let iconImage {
+                let iconRect = NSRect(x: x, y: (rect.height - Self.iconSize) / 2,
+                                      width: Self.iconSize, height: Self.iconSize)
+                if template {
+                    iconImage.draw(in: iconRect)
+                } else {
+                    // template 图标按文字颜色着色
+                    let tinted = NSImage(size: iconRect.size, flipped: false) { r in
+                        iconImage.draw(in: r)
+                        textColor.set()
+                        r.fill(using: .sourceAtop)
+                        return true
+                    }
+                    tinted.draw(in: iconRect)
+                }
+            }
+            x += Self.iconSize + Self.spacing
+            if content.starting {
+                x += Self.spinnerSize + Self.spacing
+            }
+            if let latency = content.latency, let latencyWidth {
+                let y = (rect.height - lineHeight(latencyFont)) / 2
+                (dot as NSString).draw(at: NSPoint(x: x, y: y),
+                                       withAttributes: [.font: latencyFont, .foregroundColor: NSColor.systemGreen])
+                let dotWidth = textWidth(dot, latencyFont) + Self.spacing
+                (latency as NSString).draw(at: NSPoint(x: x + dotWidth, y: y),
+                                           withAttributes: [.font: latencyFont, .foregroundColor: content.latencyColor ?? textColor])
+                x += latencyWidth + Self.spacing
+            }
+            if let down = content.down, let up = content.up {
+                let line = lineHeight(speedFont)
+                let top = (rect.height + line * 2 + Self.speedLineSpacing) / 2
+                let attributes: [NSAttributedString.Key: Any] = [.font: speedFont, .foregroundColor: textColor]
+                (down as NSString).draw(at: NSPoint(x: x, y: top - line), withAttributes: attributes)
+                (up as NSString).draw(at: NSPoint(x: x, y: top - line * 2 - Self.speedLineSpacing), withAttributes: attributes)
+            }
+            return true
+        }
+        image.isTemplate = template
+
+        width = size.width
+        if let button = superview as? NSButton {
+            button.imagePosition = .imageOnly
+            button.imageScaling = .scaleNone
+            button.image = image
+        }
     }
 }
 
+private func textWidth(_ text: String, _ font: NSFont) -> CGFloat {
+    (text as NSString).size(withAttributes: [.font: font]).width
+}
+
+private func lineHeight(_ font: NSFont) -> CGFloat {
+    ceil(font.ascender - font.descender)
+}
 
 // MARK: - 菜单顶部状态行
 
