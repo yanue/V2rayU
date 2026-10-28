@@ -238,11 +238,12 @@ struct ProfileListView: View {
             Button(String(localized: .Delete), role: .destructive) {
                 let uuids = pendingDeleteUUIDs
                 pendingDeleteUUIDs = []
-                // Defer to avoid AttributeGraph crash during alert dismissal
+                // 等弹窗关闭后再改状态, 避免 AttributeGraph 崩溃;
+                // 先清空选中让表格处理完, 再下一轮一次性删除并只重载一次列表 (#1674)
                 DispatchQueue.main.async {
                     selection = []
-                    for uuid in uuids {
-                        viewModel.delete(uuid: uuid)
+                    DispatchQueue.main.async {
+                        viewModel.delete(uuids: uuids)
                     }
                 }
             }
@@ -255,6 +256,8 @@ struct ProfileListView: View {
         .alert(String(localized: .RemoveDuplicateServers), isPresented: $showRemoveDuplicatesConfirm) {
             Button(String(localized: .RemoveDuplicateServers), role: .destructive) {
                 DispatchQueue.main.async {
+                    // 被删的行可能正被选中, 先清空选中
+                    selection = []
                     let count = viewModel.removeDuplicates()
                     alertDialog(
                         title: String(localized: .RemoveDuplicateServers),

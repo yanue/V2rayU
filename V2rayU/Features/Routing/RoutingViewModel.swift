@@ -26,7 +26,13 @@ final class RoutingViewModel: ObservableObject {
     }
 
     func delete(uuid: String) {
-        store.delete(uuid: uuid)
+        delete(uuids: [uuid])
+    }
+
+    /// 批量删除: 一个事务删完, 列表只重新加载一次, 菜单只刷新一次
+    func delete(uuids: [String]) {
+        guard !uuids.isEmpty else { return }
+        store.delete(uuids: uuids)
         getList()
         AppMenuManager.shared.refreshRoutingItems()
     }

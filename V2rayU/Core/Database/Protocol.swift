@@ -74,7 +74,22 @@ extension StoreProtocol {
             return false
         }
     }
-    
+
+    /// 批量删除: 在同一个事务里删掉全部, 要么全删要么都不删
+    @discardableResult
+    func delete(uuids: [Entity.ID]) -> Bool {
+        guard !uuids.isEmpty else { return true }
+        do {
+            _ = try dbWriter.write { db in
+                try Entity.filter(uuids.contains(Entity.idColumn)).deleteAll(db)
+            }
+            return true
+        } catch {
+            logger.error("delete(uuids:) error: \(error)")
+            return false
+        }
+    }
+
     // filter: ["id": 1,"conlumn":"value"]
     func delete(filter: [String: (any DatabaseValueConvertible)?]?) {
         guard let filter = filter else { return }

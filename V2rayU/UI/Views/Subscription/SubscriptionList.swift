@@ -155,9 +155,11 @@ struct SubscriptionListView: View {
                         pendingDeleteUUIDs = []
                         deleteServers = false
                         showDeleteConfirm = false
+                        // 先清空选中让表格处理完, 再下一轮一次性删除并只重载一次列表 (#1674)
                         DispatchQueue.main.async {
-                            for uuid in uuids {
-                                viewModel.delete(uuid: uuid, deleteServers: delServers)
+                            selection = []
+                            DispatchQueue.main.async {
+                                viewModel.delete(uuids: uuids, deleteServers: delServers)
                             }
                         }
                     }

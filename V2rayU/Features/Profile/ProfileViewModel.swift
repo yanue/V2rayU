@@ -56,17 +56,21 @@ final class ProfileViewModel: ObservableObject {
     }
 
     func delete(uuid: String) {
-        store.delete(uuid: uuid)
-        if uuid == AppState.shared.runningProfile {
+        delete(uuids: [uuid])
+    }
+
+    /// 批量删除: 一个事务删完, 列表只重新加载一次, 菜单只刷新一次。
+    /// 逐条删除时每条都会 getList() 让表格反复重载, 菜单也不刷新, 点到已删除的服务器会出错 (#1674)
+    func delete(uuids: [String]) {
+        guard !uuids.isEmpty else { return }
+        store.delete(uuids: uuids)
+        if uuids.contains(AppState.shared.runningProfile) {
             AppState.shared.runningProfile = ""
             AppState.shared.runningServer = nil
         }
-        removeProfileFromCombinedConfigs(uuid: uuid)
+        // 从组合配置中移除, 内部会刷新菜单栏服务器列表
+        CombinedConfigStore.removeProfiles(uuids: Set(uuids))
         getList()
-    }
-
-    private func removeProfileFromCombinedConfigs(uuid: String) {
-        CombinedConfigStore.removeProfile(uuid: uuid)
     }
 
     func upsert(item: ProfileEntity) {
@@ -94,17 +98,7 @@ final class ProfileViewModel: ObservableObject {
             }
         }
 
-        for uuid in toDelete {
-            store.delete(uuid: uuid)
-            if uuid == AppState.shared.runningProfile {
-                AppState.shared.runningProfile = ""
-                AppState.shared.runningServer = nil
-            }
-            CombinedConfigStore.removeProfile(uuid: uuid)
-        }
-
-        getList()
-        AppMenuManager.shared.refreshServerItems()
+        delete(uuids: toDelete)
         return toDelete.count
     }
 }

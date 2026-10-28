@@ -624,6 +624,12 @@ struct CombinedConfigStore: StoreProtocol {
     /// 当 outbound profile 被删除时，从所有组合配置中移除该 UUID
     /// 如果某个 group 变空则移除该 group，如果所有 group 都空了则删除整个组合
     @MainActor static func removeProfile(uuid: String) {
+        removeProfiles(uuids: [uuid])
+    }
+
+    /// 批量版本: 一次遍历处理所有被删除的 profile, 只刷新一次菜单
+    @MainActor static func removeProfiles(uuids: Set<String>) {
+        guard !uuids.isEmpty else { return }
         let store = CombinedConfigStore.shared
         for var combo in store.fetchAll() {
             var changed = false
@@ -631,7 +637,7 @@ struct CombinedConfigStore: StoreProtocol {
 
             for index in groups.indices {
                 let originalCount = groups[index].outboundProfileUUIDs.count
-                groups[index].outboundProfileUUIDs.removeAll { $0 == uuid }
+                groups[index].outboundProfileUUIDs.removeAll { uuids.contains($0) }
                 changed = changed || groups[index].outboundProfileUUIDs.count != originalCount
             }
 
@@ -649,6 +655,7 @@ struct CombinedConfigStore: StoreProtocol {
                 store.upsert(combo)
             }
         }
+        // 组合和服务器共用一个菜单, 这里会顺带刷新服务器菜单(此时被删的 profile 已不在库里)
         AppMenuManager.shared.refreshCombinedConfigItems()
     }
 

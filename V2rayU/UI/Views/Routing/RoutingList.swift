@@ -93,9 +93,11 @@ struct RoutingListView: View {
             Button(String(localized: .Delete), role: .destructive) {
                 let uuids = pendingDeleteUUIDs
                 pendingDeleteUUIDs = []
+                // 先清空选中让表格处理完, 再下一轮一次性删除并只重载一次列表 (#1674)
                 DispatchQueue.main.async {
-                    for uuid in uuids {
-                        viewModel.delete(uuid: uuid)
+                    selection = []
+                    DispatchQueue.main.async {
+                        viewModel.delete(uuids: uuids)
                     }
                 }
             }
