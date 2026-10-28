@@ -484,6 +484,11 @@
 "OperationFailed" = "操作失敗: %@";
 "StartFailed" = "啟動失敗";
 "NoAvailableServerConfig" = "沒有可用的伺服器設定，請先新增伺服器或訂閱";
+"ProfileMissingFieldFormat" = "伺服器「%@」缺少%@，請編輯伺服器補全後再啟動。";
+"ProfileInvalidPortFormat" = "伺服器「%@」的連接埠無效（%d），連接埠應在 1-65535 之間。";
+"ProfileFieldUUID" = " UUID（id）";
+"ProfileFieldPassword" = "密碼";
+"ProfileFieldAddress" = "伺服器地址";
 "LaunchDaemonStartFailed" = "無法啟動 LaunchDaemon";
 "LocalProxyPortNotReady" = "本機代理連接埠尚未就緒，核心可能啟動失敗或連接埠被佔用";
 "SocksPortNotReadyForTun" = "SOCKS 連接埠尚未就緒，未啟動 TUN 服務";
@@ -679,6 +684,9 @@
 "DiagGeositeMissing" = "缺失，點擊「一鍵修復」自動下載";
 "DiagLatencyHigh" = "延遲較高（%dms），可能影響上網體驗。建議更換延遲更低的節點。";
 "DiagLatencyFailed" = "無法連線到節點進行測速。節點可能不可用或網路被阻擋，請嘗試更換節點。";
+"DiagLogCorePanic" = "【核心崩潰】核心程序崩潰退出（panic / SIGSEGV / 空指標）。可能原因：\n1. 節點的某些設定目前核心版本不支援\n2. 核心本身的 bug\n\n請嘗試升級或切換核心（Xray / sing-box），或更換節點";
+"DiagLogInvalidUUID" = "【UUID 無效】節點的 UUID（id）為空或格式錯誤，核心拒絕啟動。請編輯節點填寫正確的 UUID，或更新訂閱";
+"DiagLogCoreStartFailed" = "【核心啟動失敗】核心無法載入設定（failed to load config / build outbound / FATAL）。可能原因：\n1. 節點有欄位缺失或填寫錯誤\n2. 目前核心版本不支援該協定或傳輸方式\n\n請檢查節點設定，或升級/切換核心";
 "DiagBasicNetworkFailed" = "無法存取網際網路（apple.com 不可達），請檢查網路連線。";
 "DiagProxyConnectFailed" = "無法透過本機代理存取外網，代理可能未正常運作。";
 "DiagProxyConnectOK" = "代理連線正常";

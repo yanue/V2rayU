@@ -323,53 +323,109 @@ struct LogAnalyzer {
         let lineNumber: Int
     }
     
+    /// 分析结果: 旧规则直接是中文提示, 核心启动失败类规则用多语言 key（需在主线程取文案）
+    enum Finding: Hashable {
+        case text(String)
+        case label(LanguageLabel)
+    }
+
+    /// 核心启动失败/崩溃类日志扫描的行数上限。
+    /// 每次启动核心都会轮转 core.log（LogRotation.rotateSessionLog），文件里只有本次会话的日志,
+    /// 不会因为上次会话的崩溃一直报错; Go panic 后面跟着很长的协程栈, 只看最后 200 行会漏掉 "panic:" 那一行。
+    static let fatalScanLines = 5000
+
     static func analyze(logPath: String, lastLines: Int = 500, firstLines: Int? = nil) async -> [String] {
-        return await Task.detached(priority: .userInitiated) {
+        let findings: [Finding] = await Task.detached(priority: .userInitiated) {
             guard let content = try? String(contentsOfFile: logPath, encoding: .utf8) else { return [] }
             let lines = content.components(separatedBy: .newlines)
-            let recentLines = firstLines.map { Array(lines.prefix($0)) } ?? Array(lines.suffix(lastLines))
-            
-            var problems: [String] = []
-            var addedMessages: Set<String> = []
-            
-            for (index, line) in recentLines.enumerated() {
-                let lowerLine = line.lowercased()
-                var msg: String? = nil
-                
-                if lowerLine.contains("failed to dial") || lowerLine.contains("connect: cannot assign requested address") {
-                    msg = "【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点"
-                } else if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
-                    msg = "【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商"
-                } else if lowerLine.contains("connection reset by peer") {
-                    msg = "【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点"
-                } else if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
-                    msg = "【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期"
-                } else if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
-                    msg = "【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点"
-                } else if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
-                    msg = "【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复"
-                } else if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                    msg = "【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议"
-                } else if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
-                    msg = "【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点"
-                } else if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
-                    msg = "【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU"
-                } else if lowerLine.contains("port") && lowerLine.contains("in use") {
-                    msg = "【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口"
-                }
-                
-                if let m = msg, !addedMessages.contains(m) {
-                    addedMessages.insert(m)
-                    problems.append(m)
-                }
-            }
-            
-            if problems.isEmpty {
-                problems.append("未发现明显错误")
-            }
-            
-            return problems
+            return analyze(lines: lines, lastLines: lastLines, firstLines: firstLines)
         }.value
+        guard !findings.isEmpty else { return [] }
+        return await MainActor.run {
+            findings.map { finding in
+                switch finding {
+                case .text(let text): return text
+                case .label(let label): return String(localized: label)
+                }
+            }
+        }
+    }
+
+    /// 核心启动失败 / 崩溃（xray、sing-box、Go 运行时）。按优先级匹配: 崩溃 > UUID 无效 > 配置加载失败
+    static func fatalFinding(lowerLine: String) -> LanguageLabel? {
+        if lowerLine.contains("panic:") || lowerLine.contains("sigsegv")
+            || lowerLine.contains("nil pointer dereference") || lowerLine.hasPrefix("fatal error:") {
+            return .DiagLogCorePanic
+        }
+        if lowerLine.contains("invalid uuid") || lowerLine.contains("failed to parse uuid")
+            || lowerLine.contains("invalid \"id\"") {
+            return .DiagLogInvalidUUID
+        }
+        // xray: "Failed to start: main: failed to load config files: ..." / "failed to build outbound handler"
+        // sing-box: "FATAL[0000] start service: initialize outbound[0]: ..." / "FATAL[0000] decode config at ..."
+        if lowerLine.contains("failed to start") || lowerLine.contains("failed to load config")
+            || lowerLine.contains("failed to build outbound handler") || lowerLine.contains("failed to build inbound handler")
+            || lowerLine.contains("fatal[") || lowerLine.contains("[fatal]")
+            || lowerLine.contains("start service:") || lowerLine.contains("initialize outbound")
+            || lowerLine.contains("decode config") {
+            return .DiagLogCoreStartFailed
+        }
+        return nil
+    }
+
+    /// 纯函数版本, 便于测试。没有发现问题时返回 [.text("未发现明显错误")]
+    static func analyze(lines: [String], lastLines: Int = 500, firstLines: Int? = nil) -> [Finding] {
+        let recentLines = firstLines.map { Array(lines.prefix($0)) } ?? Array(lines.suffix(lastLines))
+        let fatalLines = firstLines.map { Array(lines.prefix(max($0, fatalScanLines))) } ?? Array(lines.suffix(max(lastLines, fatalScanLines)))
+
+        var problems: [Finding] = []
+        var addedMessages: Set<Finding> = []
+
+        // 先查核心启动失败/崩溃: 这类错误核心已退出, 其余连接类错误都是次要的
+        for line in fatalLines {
+            if let label = fatalFinding(lowerLine: line.lowercased()), !addedMessages.contains(.label(label)) {
+                addedMessages.insert(.label(label))
+                problems.append(.label(label))
+            }
+        }
+
+        for (index, line) in recentLines.enumerated() {
+            let lowerLine = line.lowercased()
+            var msg: String? = nil
+            
+            if lowerLine.contains("failed to dial") || lowerLine.contains("connect: cannot assign requested address") {
+                msg = "【连接失败】无法连接到远程服务器。可能原因：节点服务器不可用、被墙、或网络被限制。请尝试更换节点"
+            } else if lowerLine.contains("tls handshake error") || (lowerLine.contains("tls:") && lowerLine.contains("error")) {
+                msg = "【TLS 错误】TLS 握手失败。可能原因：\n1. 服务器 TLS 配置问题\n2. SNI 不匹配\n3. 证书过期\n\n请尝试更换节点或联系服务商"
+            } else if lowerLine.contains("connection reset by peer") {
+                msg = "【连接被拒】服务器主动断开连接。可能原因：\n1. 账号已过期或被封\n2. 端口号错误\n3. 连接次数超限\n\n请检查节点配置或更换节点"
+            } else if lowerLine.contains("invalid user") || lowerLine.contains("user not found") || lowerLine.contains("authentication error") {
+                msg = "【认证失败】用户名或密码（UUID）错误。请检查：\n1. UUID 是否正确\n2. 密码是否正确\n3. 账号是否已过期"
+            } else if lowerLine.contains("remote_addr not found") || (lowerLine.contains("dial tcp") && lowerLine.contains("no such host")) {
+                msg = "【域名解析失败】无法解析节点域名。可能是：\n1. DNS 服务器无法解析\n2. 节点域名已失效\n\n请尝试更换网络或更换节点"
+            } else if lowerLine.contains("i/o timeout") || lowerLine.contains("timeout") || lowerLine.contains("deadline exceeded") {
+                msg = "【连接超时】连接响应超时。可能原因：\n1. 网络延迟太高\n2. 节点负载过高\n3. 网络不稳定\n\n请尝试更换节点或等待网络恢复"
+            } else if lowerLine.contains("quic") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                msg = "【QUIC 错误】QUIC 协议连接失败。可能原因：\n1. 服务器不支持 QUIC\n2. UDP 被阻断\n\n请尝试更换节点或切换到 TCP 协议"
+            } else if lowerLine.contains("websocket") && (lowerLine.contains("error") || lowerLine.contains("failed")) {
+                msg = "【WebSocket 错误】WebSocket 连接失败。请检查节点配置或更换节点"
+            } else if lowerLine.contains("permission denied") || lowerLine.contains("access denied") {
+                msg = "【权限不足】程序权限被拒绝。请以管理员权限运行 V2rayU"
+            } else if lowerLine.contains("port") && lowerLine.contains("in use") {
+                msg = "【端口占用】代理端口被其他程序占用。请关闭占用端口的程序或更换端口"
+            }
+            
+            if let m = msg, !addedMessages.contains(.text(m)) {
+                addedMessages.insert(.text(m))
+                problems.append(.text(m))
+            }
+        }
+
+        if problems.isEmpty {
+            problems.append(.text("未发现明显错误"))
+        }
+
+        return problems
     }
     
     static func getSurroundingLog(logPath: String, lastLines: Int = 500, firstLines: Int? = nil, contextLines: Int = 3) async -> String {
@@ -385,7 +441,8 @@ struct LogAnalyzer {
                 let hasError = lowerLine.contains("[error]") || lowerLine.contains("[warning]")
                 let isErrorPattern = lowerLine.contains("failed") || lowerLine.contains("error") || 
                                     lowerLine.contains("timeout") || lowerLine.contains("reset") || 
-                                    lowerLine.contains("denied") || lowerLine.contains("reject")
+                                    lowerLine.contains("denied") || lowerLine.contains("reject") ||
+                                    fatalFinding(lowerLine: lowerLine) != nil
                 if hasError || isErrorPattern {
                     matchIndices.insert(index)
                 }

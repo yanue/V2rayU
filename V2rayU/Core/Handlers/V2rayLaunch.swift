@@ -385,6 +385,7 @@ actor V2rayLaunch {
             }
             return nil
         }
+        guard await ProfileValidator.ensureLaunchable([running]) else { return nil }
         // 启动前自动获取证书指纹
         let item = await CertPinningCoordinator.ensurePinnedCert(for: running)
         let coreDecision = item.resolveCoreCompatibility()
@@ -467,6 +468,7 @@ actor V2rayLaunch {
 
         let memberUUIDs = Set(combination.groups.flatMap { $0.outboundProfileUUIDs })
         let memberProfiles = ProfileStore.shared.fetchAll().filter { memberUUIDs.contains($0.uuid) }
+        guard await ProfileValidator.ensureLaunchable(memberProfiles) else { return nil }
         let pinningResults = await CertPinningCoordinator.ensurePinnedCerts(for: memberProfiles)
         let profileOverrides = pinningResults.map(\.profile)
         let forceSingboxUUIDs = Set(pinningResults.filter { $0.forceSingBox }.map { $0.profile.uuid })

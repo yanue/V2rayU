@@ -484,6 +484,11 @@
 "OperationFailed" = "Operation Failed: %@";
 "StartFailed" = "Start Failed";
 "NoAvailableServerConfig" = "No available server configuration. Please add a server or subscription first.";
+"ProfileMissingFieldFormat" = "Server \"%@\" is missing %@. Edit the server and fill it in, then start again.";
+"ProfileInvalidPortFormat" = "Server \"%@\" has an invalid port (%d). The port must be between 1 and 65535.";
+"ProfileFieldUUID" = "UUID (id)";
+"ProfileFieldPassword" = "password";
+"ProfileFieldAddress" = "server address";
 "LaunchDaemonStartFailed" = "Unable to start LaunchDaemon";
 "LocalProxyPortNotReady" = "Local proxy port is not ready. The core may have failed to start or the port is occupied.";
 "SocksPortNotReadyForTun" = "SOCKS port is not ready. TUN service was not started.";
@@ -679,6 +684,9 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "DiagGeositeMissing" = "missing, click 'Fix Now' to auto-download";
 "DiagLatencyHigh" = "High latency (%dms), may affect browsing experience. Try switching to a node with lower latency";
 "DiagLatencyFailed" = "Cannot connect to node for latency test. Node may be unavailable or blocked. Try switching nodes";
+"DiagLogCorePanic" = "[Core crashed] The core process crashed (panic / SIGSEGV / nil pointer). Possible reasons:\n1. A node setting is not supported by this core version\n2. A bug in the core\n\nTry upgrading or switching the core (Xray / sing-box), or switch to another node";
+"DiagLogInvalidUUID" = "[Invalid UUID] The node UUID (id) is empty or malformed, so the core refused to start. Edit the node and fill in the correct UUID, or update the subscription";
+"DiagLogCoreStartFailed" = "[Core failed to start] The core could not load the configuration (failed to load config / build outbound / FATAL). Possible reasons:\n1. A node field is missing or invalid\n2. The protocol or transport is not supported by this core version\n\nCheck the node settings, or upgrade/switch the core";
 "DiagBasicNetworkFailed" = "Cannot access the internet (apple.com unreachable). Check your network connection";
 "DiagProxyConnectFailed" = "Cannot access external sites via local proxy. The proxy may not be working properly";
 "DiagProxyConnectOK" = "Proxy connectivity OK";

@@ -528,6 +528,11 @@ enum LanguageLabel: String, CaseIterable {
     case OperationFailed
     case StartFailed
     case NoAvailableServerConfig
+    case ProfileMissingFieldFormat
+    case ProfileInvalidPortFormat
+    case ProfileFieldUUID
+    case ProfileFieldPassword
+    case ProfileFieldAddress
     case LaunchDaemonStartFailed
     case LocalProxyPortNotReady
     case SocksPortNotReadyForTun
@@ -670,6 +675,9 @@ enum LanguageLabel: String, CaseIterable {
     case DiagGeoipMissing
     case DiagLatencyHigh
     case DiagLatencyFailed
+    case DiagLogCorePanic
+    case DiagLogInvalidUUID
+    case DiagLogCoreStartFailed
     case DiagBasicNetworkFailed
     case DiagProxyConnectFailed
     case DiagProxyConnectOK
