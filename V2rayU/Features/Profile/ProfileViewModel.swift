@@ -9,6 +9,10 @@ import Combine
 import Foundation
 import GRDB
 
+/// 服务器列表数据有变化(导入、订阅同步、测速、切换服务器等)。
+/// 由 AppMenuManager.refreshServerItems() 统一发出, 菜单栏和服务器窗口列表据此保持一致
+let NOTIFY_PROFILES_CHANGED = Notification.Name(rawValue: "NOTIFY_PROFILES_CHANGED")
+
 @MainActor
 final class ProfileViewModel: ObservableObject {
     @Published var list: [ProfileEntity] = []
@@ -19,9 +23,16 @@ final class ProfileViewModel: ObservableObject {
 
     private let store = ProfileStore.shared
     private let subscriptionStore = SubscriptionStore.shared
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         getList()
+        // 主窗口会复用, 列表不会重新创建; 导入/订阅同步后跟着菜单一起刷新 (#1684)
+        // receive(on:) 让刷新放到下一轮主循环, 不在菜单/弹窗回调过程中替换表格数据
+        NotificationCenter.default.publisher(for: NOTIFY_PROFILES_CHANGED)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.getList() }
+            .store(in: &cancellables)
     }
 
     @MainActor

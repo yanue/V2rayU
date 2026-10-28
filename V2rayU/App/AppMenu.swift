@@ -164,6 +164,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     }
 
     func refreshServerItems() {
+        // 通知服务器窗口列表同步刷新(菜单未初始化时也要发)
+        NotificationCenter.default.post(name: NOTIFY_PROFILES_CHANGED, object: nil)
         guard inited else { return }
         serverSubMenu = getServerSubMenus()
         serverItem.submenu = serverSubMenu
