@@ -330,11 +330,11 @@ class V2rayConfigHandler {
         }
         // ------------------------------------- inbound start ---------------------------------------------
 
-        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun && xraySupportsMixedProtocol()
+        let useMixedInbound = !self.forPing && self.enableMixedPort && !self.enableTun && xraySocksInboundAcceptsHttp()
 
         var inbounds: [V2rayInbound] = []
         if useMixedInbound {
-            // Xray v24.12.31+ 支持 mixed 协议别名，旧版用独立 HTTP + SOCKS
+            // 混合端口用 socks 入站实现(v1.8.24+ 同时处理 HTTP 代理请求)，旧版用独立 HTTP + SOCKS
             let inMixed = getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: self.enableSniffing, tag: "mixed-in")
             inbounds.append(inMixed)
         } else {
@@ -476,6 +476,16 @@ class V2rayConfigHandler {
         return version >= XrayVersion(24, 12, 31)
     }
 
+    /// socks 入站是否同时处理 HTTP 代理请求：Xray v1.8.24 起支持（实测 v1.8.23 不支持）。
+    /// 主混合端口生成的是 socks 入站，不依赖 mixed 别名；原来按 v24.12.31 判断，
+    /// 中间版本会退回独立 HTTP + SOCKS 端口，而系统代理仍指向混合端口，导致 HTTP 代理连不上 (#1649)
+    private func xraySocksInboundAcceptsHttp() -> Bool {
+        guard let version = XrayVersion(getCoreVersion()) else {
+            return false
+        }
+        return version >= XrayVersion(1, 8, 24)
+    }
+
     /// 测速专用 SOCKS 入站(latency-in), 路由第一条规则强制走 proxy, 不受分流规则影响
     private func addLatencyInbound(port: String) {
         let inLatency = getInbound(protocol: .socks, listen: "127.0.0.1", port: port, enableSniffing: false, tag: latencyInboundTag)
@@ -570,8 +580,8 @@ class V2rayConfigHandler {
         }
 
         // Add default proxy inbounds
-        if self.enableMixedPort && xraySupportsMixedProtocol() {
-            // Xray v24.12.31+ 支持 mixed 协议别名，旧版用独立 HTTP + SOCKS
+        if self.enableMixedPort && xraySocksInboundAcceptsHttp() {
+            // 混合端口用 socks 入站实现(v1.8.24+ 同时处理 HTTP 代理请求)，旧版用独立 HTTP + SOCKS
             inbounds.append(getInbound(protocol: .socks, listen: self.httpHost, port: self.mixedPort, enableSniffing: enableSniffing, tag: "mixed-in"))
         } else {
             if self.httpPort == self.socksPort {
