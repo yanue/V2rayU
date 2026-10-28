@@ -495,7 +495,8 @@ enum TunConfigHandler {
         let tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
         let userExcludeAddresses = resolveRouteExcludeAddresses(from: tunRouteExcludeHosts)
         let routeExcludeAddresses = mergedRouteExcludeAddresses(userConfigured: userExcludeAddresses)
-        let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: true)
+        // 默认值与设置界面(AppSettings)一致：默认关闭 (#1661)
+        let tunEnableIPv6 = UserDefaults.getBool(forKey: .tunEnableIPv6, default: false)
         let useSniffRuleAction = SingboxVersionCheck.supportsSniffRuleAction()
 
         var addresses = [tunAddr]
