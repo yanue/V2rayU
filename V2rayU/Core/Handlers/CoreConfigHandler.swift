@@ -200,4 +200,11 @@ extension ProfileEntity {
             return self.shareUri
         }
     }
+
+    /// 服务器本身的标识(不含备注): 订阅更新时分享链接对不上, 再用它认出同一个节点。
+    /// 含 host/path/sni: 走 CDN 的订阅里很多节点地址/端口/密码相同, 只差 host 或 path
+    func serverKey() -> String {
+        [self.protocol.rawValue, self.address.lowercased(), String(self.port), self.password,
+         self.network.rawValue, self.security.rawValue, self.host, self.path, self.sni].joined(separator: "|")
+    }
 }

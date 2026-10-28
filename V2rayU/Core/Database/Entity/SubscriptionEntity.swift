@@ -118,4 +118,19 @@ extension SubscriptionEntity {
             await SubscriptionScheduler.shared.startOrUpdate(for: toSave)
         }
     }
+
+    /// 同步成功后只更新 updateTime / configType；订阅已被删除时不做任何事 (#1668)
+    static func markSynced(uuid: String, configType: String) {
+        do {
+            _ = try AppDatabase.shared.dbWriter.write { db in
+                try SubscriptionEntity
+                    .filter(Columns.uuid == uuid)
+                    .updateAll(db,
+                               Columns.updateTime.set(to: Int(Date().timeIntervalSince1970)),
+                               Columns.configType.set(to: configType))
+            }
+        } catch {
+            logger.error("markSynced error: \(error)")
+        }
+    }
 }

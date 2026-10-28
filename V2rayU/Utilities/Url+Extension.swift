@@ -125,6 +125,14 @@ func getProxyUrlSessionConfigure() -> URLSessionConfiguration {
     return configuration
 }
 
+/// 拉取订阅的请求：部分面板按 User-Agent 判断客户端，不认识系统默认的 "V2rayU/1 CFNetwork/..." 会直接拒绝 (#1707)；
+/// 带上各面板都认识的 v2rayN 标识(放在最前面)，返回标准分享链接格式
+func subscriptionRequest(url: URL) -> URLRequest {
+    var request = URLRequest(url: url)
+    request.setValue("v2rayN/7.0 V2rayU/\(getAppVersion())", forHTTPHeaderField: "User-Agent")
+    return request
+}
+
 func getProxyUrlSessionConfigure(httpProxyPort: uint16) -> URLSessionConfiguration {
     // Create a URLSessionConfiguration with proxy settings
     let configuration = URLSessionConfiguration.default

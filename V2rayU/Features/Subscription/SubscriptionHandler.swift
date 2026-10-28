@@ -54,11 +54,8 @@ actor SubscriptionHandler {
                 let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                 logger.info("SubscriptionHandler syncOne success")
                 
-                // 下载成功后更新 updateTime 并保存
-                var updated = item
-                updated.updateTime = Int(Date().timeIntervalSince1970)
-                updated.configType = configType
-                updated.upsert()
+                // 下载成功后只更新 updateTime / configType；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
+                SubscriptionEntity.markSynced(uuid: item.uuid, configType: configType)
             } catch {
                 logger.info("SubscriptionHandler syncOne error: \(error)")
                 logTip(title: "syncOne fail: ", uri: item.url, informativeText: error.localizedDescription)
@@ -80,15 +77,14 @@ actor SubscriptionHandler {
                         }
 
                         let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
-                        // 下载成功后更新 updateTime 并保存
-                        var updated = item
-                        updated.updateTime = Int(Date().timeIntervalSince1970)
-                        updated.configType = configType
-                        updated.upsert()
-                        promise(.success(()))
+                        // 下载成功后只更新 updateTime / configType；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
+                        SubscriptionEntity.markSynced(uuid: item.uuid, configType: configType)
                     } catch {
-                        promise(.failure(error))
+                        // 单个订阅失败(如过期返回 403)只记录，不能让整批中断、后面的订阅都不更新
+                        logger.info("SubscriptionHandler sync \(item.remark) error: \(error)")
+                        self.logTip(title: "sync fail: ", uri: item.url, informativeText: error.localizedDescription)
                     }
+                    promise(.success(()))
                 }
             }
         }
@@ -145,7 +141,13 @@ actor SubscriptionHandler {
         let configuration: URLSessionConfiguration = useProxy ? getProxyUrlSessionConfigure() : .default
         let session = URLSession(configuration: configuration)
         do {
-            let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
+            let (data, response) = try await session.data(for: subscriptionRequest(url: reqUrl))
+            // 服务器返回错误时直接报错，不把错误页当节点解析（解析不出节点会把旧节点全删掉）
+            if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                let body = String(data: data.prefix(200), encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                logTip(title: "loading fail: ", uri: url, informativeText: "HTTP \(http.statusCode) \(body)")
+                throw NSError(domain: "SubscriptionHandler", code: 1003, userInfo: [NSLocalizedDescriptionKey: "HTTP \(http.statusCode): \(body)"])
+            }
             if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
                 return handle(base64Str: outputStr, sub: sub, url: url)
             } else {
@@ -160,23 +162,31 @@ actor SubscriptionHandler {
     }
 
     func handle(base64Str: String, sub: SubscriptionEntity, url: String) -> String {
+        // 下载期间订阅可能已被删除，此时不再导入节点 (#1668)
+        guard SubscriptionStore.shared.fetchOne(uuid: sub.uuid) != nil else {
+            logTip(title: "skip: ", uri: url, informativeText: "subscription has been deleted")
+            return sub.configType
+        }
         let trimmed = base64Str.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // 如果用户手动指定了 configType，则强制使用对应解析方式
+        // configType 是指定或上次识别出的格式；按它解析不出节点时（如面板改了返回格式）再按另一种试，
+        // 不然会一直保留旧节点、看起来却是"更新成功"。仍返回原 configType，不改用户的选择
         if sub.configType == "clash" {
             if let strTmp = trimmed.base64Decoded() {
                 if importByYaml(strTmp: strTmp, sub: sub) { return "clash" }
             }
             if importByYaml(strTmp: trimmed, sub: sub) { return "clash" }
-            logTip(title: "clash parse fail: ", uri: url, informativeText: "forced clash mode but no valid proxies found")
+            logTip(title: "clash parse fail: ", uri: url, informativeText: "no valid clash proxies found, try share links")
+            importByNormal(strTmp: trimmed.base64Decoded() ?? trimmed, sub: sub)
             return "clash"
         }
         if sub.configType == "normal" {
-            if let strTmp = trimmed.base64Decoded() {
-                importByNormal(strTmp: strTmp, sub: sub)
-            } else {
-                importByNormal(strTmp: trimmed, sub: sub)
+            if importByNormal(strTmp: trimmed.base64Decoded() ?? trimmed, sub: sub) {
+                return "normal"
             }
+            if let strTmp = trimmed.base64Decoded(), importByYaml(strTmp: strTmp, sub: sub) { return "normal" }
+            _ = importByYaml(strTmp: trimmed, sub: sub)
             return "normal"
         }
 
@@ -225,49 +235,7 @@ actor SubscriptionHandler {
             }
 
             logTip(title: "importByYaml: ", informativeText: "old=\(getOldCount(sub: sub)) - new=\(list.count)")
-
-            // 使用 diff 模式：按 uniqueKey 对比，保留旧 profile 的 metadata（速度、流量等）
-            let olds = ProfileStore.shared.getGroupProfiles(subid: sub.uuid)
-            var oldMap = [String: ProfileEntity]()
-            for item in olds {
-                let key = item.uniqueKey()
-                oldMap[key] = item
-            }
-
-            var adds = [ProfileEntity]()
-            var dels = [ProfileEntity]()
-            var exists = Set<String>()
-            var seenKeys = Set<String>()
-
-            for item in list {
-                let key = item.uniqueKey()
-                guard seenKeys.insert(key).inserted else { continue }
-                if let old = oldMap[key] {
-                    exists.insert(key)
-                    ProfileStore.shared.updateProfile(oldDto: old, newDto: item)
-                } else {
-                    adds.append(item)
-                }
-            }
-
-            for (key, item) in oldMap where !exists.contains(key) {
-                dels.append(item)
-            }
-
-            if !adds.isEmpty {
-                ProfileStore.shared.insertMany(adds)
-            }
-            for del in dels {
-                ProfileStore.shared.delete(uuid: del.uuid)
-            }
-
-            if !dels.isEmpty {
-                let uuids = dels.map(\.uuid)
-                Task { @MainActor in
-                    uuids.forEach { CombinedConfigStore.removeProfile(uuid: $0) }
-                }
-            }
-
+            applyProfiles(list, sub: sub)
             return true
         } catch {
             logger.info("parseYaml \(error)")
@@ -276,7 +244,9 @@ actor SubscriptionHandler {
         return false
     }
 
-    func importByNormal(strTmp: String, sub: SubscriptionEntity) {
+    /// - Returns: 是否解析出了节点
+    @discardableResult
+    func importByNormal(strTmp: String, sub: SubscriptionEntity) -> Bool {
         var list: [ProfileEntity] = []
         
         // 文本按行拆分
@@ -296,22 +266,30 @@ actor SubscriptionHandler {
             }
         }
 
-        // 查询旧的
+        // 一个节点都没解析出来（多半是服务器返回了错误内容），保留旧节点
+        guard !list.isEmpty else {
+            logTip(title: "importByNormal: ", informativeText: "\(sub.remark), \(sub.url) no valid profile, keep old profiles")
+            return false
+        }
+        applyProfiles(list, sub: sub)
+        return true
+    }
+
+    /// 按新旧节点对比更新订阅下的节点：保留旧节点的 uuid 和测速、流量等数据
+    private func applyProfiles(_ list: [ProfileEntity], sub: SubscriptionEntity) {
         let olds = ProfileStore.shared.getGroupProfiles(subid: sub.uuid)
 
-        // 组合旧的 unique key 集合
+        // 先按完整分享链接对比
         var oldMap = [String: ProfileEntity]()
         for item in olds {
-            let key = item.uniqueKey()
-            oldMap[key] = item
+            oldMap[item.uniqueKey()] = item
         }
 
-        var adds = [ProfileEntity]()
-        var dels = [ProfileEntity]()
-        var exists = Set<String>()
+        var matched = [(old: ProfileEntity, new: ProfileEntity)]()
+        var pending = [ProfileEntity]()
+        var usedOld = Set<String>()
         var seenKeys = Set<String>()
 
-        // 遍历新的列表
         for item in list {
             let key = item.uniqueKey()
             // 跳过同一批次中重复的 key（订阅内容里相同的 URI 可能出现多次）
@@ -319,45 +297,51 @@ actor SubscriptionHandler {
                 logTip(title: "skip duplicate: ", informativeText: "\(item.remark), \(item.address):\(item.port)")
                 continue
             }
-            logTip(title: "正在处理 \(key)", informativeText: "\(item.remark), \(item.address):\(item.port)")
-            if let old = oldMap[key] {
-                exists.insert(key)
-                // 更新旧的
-                ProfileStore.shared.updateProfile(oldDto:  old, newDto: item)
-                logTip(title: "update existing profile: ", informativeText: "\(sub.remark), \(item.remark), \(item.address):\(item.port)")
+            if let old = oldMap[key], !usedOld.contains(old.uuid) {
+                usedOld.insert(old.uuid)
+                matched.append((old, item))
             } else {
-                // 新增
-                logTip(title: "add new profile: ", informativeText: "\(sub.remark), \(item.remark), \(item.address):\(item.port)")
+                pending.append(item)
+            }
+        }
+
+        // 分享链接对不上时再按服务器本身对比：备注里常带剩余流量等每次都变的内容，
+        // 只按链接对比会删旧建新、uuid 改变，正在使用的节点就丢了 (#1669)
+        var oldByServer = [String: [ProfileEntity]]()
+        for item in olds where !usedOld.contains(item.uuid) {
+            oldByServer[item.serverKey(), default: []].append(item)
+        }
+        var adds = [ProfileEntity]()
+        for item in pending {
+            if var candidates = oldByServer[item.serverKey()], !candidates.isEmpty {
+                let old = candidates.removeFirst()
+                oldByServer[item.serverKey()] = candidates
+                usedOld.insert(old.uuid)
+                matched.append((old, item))
+            } else {
                 adds.append(item)
             }
         }
+        let dels = olds.filter { !usedOld.contains($0.uuid) }
 
-        // 找出需要删除的（旧的但不在新的里）
-        for (key, item) in oldMap {
-            if !exists.contains(key) {
-                logTip(title: "delete old profile: ", informativeText: "\(sub.remark), \(sub.url) - \(item.remark), \(item.address):\(item.port)")
-                dels.append(item)
-            }
+        for (old, item) in matched {
+            ProfileStore.shared.updateProfile(oldDto: old, newDto: item)
         }
-
-        // 插入新的
         if !adds.isEmpty {
             ProfileStore.shared.insertMany(adds)
         }
-        
-        // 删除旧的
         for del in dels {
-            ProfileStore.shared.delete(uuid: del.uuid)
+            logTip(title: "delete old profile: ", informativeText: "\(sub.remark) - \(del.remark), \(del.address):\(del.port)")
         }
-
         if !dels.isEmpty {
             let uuids = dels.map(\.uuid)
+            ProfileStore.shared.delete(uuids: uuids)
             Task { @MainActor in
-                uuids.forEach { CombinedConfigStore.removeProfile(uuid: $0) }
+                CombinedConfigStore.removeProfiles(uuids: Set(uuids))
             }
         }
 
-        logTip(title: "importByNormal: ", informativeText: "\(sub.remark), \(sub.url) added=\(adds.count), deleted=\(dels.count), exists=\(exists.count)")
+        logTip(title: "import: ", informativeText: "\(sub.remark), \(sub.url) added=\(adds.count), deleted=\(dels.count), exists=\(matched.count)")
     }
 
     func logTip(title: String = "", uri: String = "", informativeText: String = "") {

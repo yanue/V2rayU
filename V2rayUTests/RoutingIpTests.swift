@@ -27,3 +27,21 @@ struct RoutingIpTests {
         #expect(parsed.domains == ["example.com"])
     }
 }
+
+/// 订阅更新时按服务器认出同一个节点：备注变化不影响 (#1669)
+struct ProfileServerKeyTests {
+    @Test func remarkDoesNotAffectServerKey() {
+        let a = ProfileEntity(remark: "香港 01 | 剩余 10G", protocol: .vmess, address: "Example.com", port: 443, password: "uuid-1")
+        var b = a
+        b.remark = "香港 01 | 剩余 9G"
+        b.address = "example.com"
+        #expect(a.serverKey() == b.serverKey())
+    }
+
+    @Test func differentServerDiffers() {
+        let a = ProfileEntity(remark: "a", protocol: .vmess, address: "example.com", port: 443, password: "uuid-1")
+        var b = a
+        b.port = 8443
+        #expect(a.serverKey() != b.serverKey())
+    }
+}

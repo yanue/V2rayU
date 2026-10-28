@@ -80,8 +80,14 @@ actor SubscriptionScheduler {
 
         let timer = DispatchSource.makeTimerSource(queue: .global(qos: .utility))
         timer.schedule(deadline: .now() + desiredInterval, repeating: desiredInterval)
-        timer.setEventHandler { [sub] in
+        timer.setEventHandler { [uuid = sub.uuid] in
             Task {
+                // 每次按 uuid 取最新的订阅：定时器里的副本是创建时的旧值（改过地址/备注后会用旧值同步），
+                // 订阅已被删除时停掉定时器 (#1668)
+                guard let sub = SubscriptionStore.shared.fetchOne(uuid: uuid) else {
+                    await SubscriptionScheduler.shared.stop(for: uuid)
+                    return
+                }
                 // 如果未启用，直接返回
                 if !sub.enable {
                     return

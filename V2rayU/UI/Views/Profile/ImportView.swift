@@ -635,7 +635,16 @@ struct ImportView: View {
             do {
                 // 下载订阅内容
                 let session = URLSession(configuration: getProxyUrlSessionConfigure())
-                let (data, _) = try await session.data(for: URLRequest(url: reqUrl))
+                let (data, response) = try await session.data(for: subscriptionRequest(url: reqUrl))
+                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                    let body = String(data: data.prefix(200), encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    await MainActor.run {
+                        isImporting = false
+                        resultMessage = String(localized: .ImportFailedDetail, arguments: "HTTP \(http.statusCode) \(body)")
+                        resultIsError = true
+                    }
+                    return
+                }
                 guard let content = String(data: data, encoding: .utf8) else {
                     await MainActor.run {
                         isImporting = false
