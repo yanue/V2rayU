@@ -161,13 +161,21 @@ actor V2rayLaunch {
             logger.info("start skipped: already running")
             return true
         }
-        return await startAll()
+        let ok = await startAll()
+        await recordStartResult(ok)
+        return ok
+    }
+
+    /// 启动结果记到 AppState, 菜单据此决定诊断入口是否露出
+    private func recordStartResult(_ ok: Bool) async {
+        await MainActor.run { AppState.shared.lastStartFailed = !ok }
     }
 
     /// 完整停止: 系统代理 + TUN + 核心。
     func stop() async {
         await lock(); defer { unlock() }
         await stopAll()
+        await recordStartResult(true)
     }
 
     /// 睡眠前停止 TUN（daemon + 恢复 DNS）。与 start/stop/restart 共用串行锁,
@@ -182,7 +190,9 @@ actor V2rayLaunch {
     func restart() async -> Bool {
         await lock(); defer { unlock() }
         await stopAll()
-        return await startAll()
+        let ok = await startAll()
+        await recordStartResult(ok)
+        return ok
     }
 
     /// 只重载代理核心（重写 config.json + 重启 LaunchAgent）, 不动 TUN 与系统代理。
@@ -192,17 +202,31 @@ actor V2rayLaunch {
     func reloadCore() async -> Bool {
         await lock(); defer { unlock() }
         if !running {
-            return await startAll()
+            let ok = await startAll()
+            await recordStartResult(ok)
+            return ok
         }
         guard await prepareAndStartCore() != nil else {
             // 核心重载失败: 回到安全的全停状态
             await stopAll()
+            await recordStartResult(false)
             return false
         }
         // TUN 仍指向同一个固定 SOCKS 端口, 系统代理也不变, 无需触碰。
         running = true
         await syncTurnOn(true)
+        await recordStartResult(true)
         return true
+    }
+
+    /// 路由变了: tun.json 里也有路由的按进程分流规则, TUN 模式下要整体重启; 其它模式只重载核心。
+    @discardableResult
+    func reloadRouting() async -> Bool {
+        let tun = await MainActor.run { AppState.shared.runMode == .tun }
+        if tun, running {
+            return await restart()
+        }
+        return await reloadCore()
     }
 
     /// 只调整运行模式相关部分（TUN 启停 + 系统代理）。

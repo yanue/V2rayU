@@ -211,6 +211,7 @@ class SingboxConfigHandler {
         routeRules.append(RouteRule(outbound: "proxy", rule_set: ["geoip-cn"], invert: true))
         self.singbox.route.rules = routeRules
         self.singbox.applyBundledRuleSets()
+        self.singbox.route.find_process = true
         self.singbox.experimental = ExperimentalConfig(
             clash_api: ClashAPIConfig(
                 external_controller: "127.0.0.1:\(coreApiPort)",
@@ -276,6 +277,7 @@ class SingboxConfigHandler {
             )
 
             singbox.experimental = clashConfig
+            singbox.route.find_process = true
         }
 
         self.singbox.inbounds = inbounds

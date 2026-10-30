@@ -186,7 +186,9 @@ enum TunConfigHandler {
         directRawValue: String,
         proxyRawValue: String,
         directApplicationPaths: [String] = [],
-        proxyApplicationPaths: [String] = []
+        proxyApplicationPaths: [String] = [],
+        routing: RoutingEntity? = nil,
+        blockAsReject: Bool = false
     ) -> [RouteRule] {
         let coreProcessKeys = Set(coreDirectProcessNames)
         let directProcessNames = parseProcessNames(directRawValue).filter {
@@ -221,6 +223,10 @@ enum TunConfigHandler {
         }
         if !proxyProcessNames.isEmpty {
             rules.append(RouteRule(outbound: "proxy", process_name: proxyProcessNames))
+        }
+        // 路由规则里的 process: 行 (TUN 下只有这里能看到进程, 转发给代理核心后就看不到了)
+        if let routing {
+            rules.append(contentsOf: RoutingManager.processRouteRules(for: routing, blockAsReject: blockAsReject))
         }
         return rules
     }
@@ -648,7 +654,9 @@ enum TunConfigHandler {
             directRawValue: directProcessNames,
             proxyRawValue: proxyProcessNames,
             directApplicationPaths: directApplicationPaths,
-            proxyApplicationPaths: proxyApplicationPaths
+            proxyApplicationPaths: proxyApplicationPaths,
+            routing: RoutingManager().getRunningEntity(),
+            blockAsReject: SingboxVersionCheck.blockOutboundRemoved()
         ))
         // 协议检测必须先于 hijack-dns：protocol: ["dns"] 依赖 sniff 结果才能匹配
         if useSniffRuleAction {

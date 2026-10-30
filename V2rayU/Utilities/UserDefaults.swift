@@ -75,6 +75,14 @@ extension UserDefaults {
         case capabilityRulesBaseURL
         // capability rules last successful update date (yyyy-MM-dd)
         case capabilityRulesUpdateDate
+        // rule-set (geoip/geosite/.srs) auto update
+        case ruleSetSources
+        case ruleSetAutoUpdate
+        case ruleSetUpdateInterval
+        case ruleSetUpdateDate
+        // download speed test url
+        case speedTestUrl
+        case backupLastExport
 
         // MARK: - Test settings
         case latencyTestConcurrency

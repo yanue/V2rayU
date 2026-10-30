@@ -2,11 +2,14 @@ import SwiftUI
 
 @MainActor
 enum MainTab: String, CaseIterable {
+    case status
     case server
     case combination
     case subscription
     case routing
     case core
+    case connections
+    case logs
     case diagnostic
     case setting
     case about
@@ -20,6 +23,7 @@ enum SettingsTab {
     case dns
     case pac
     case tun
+    case backup
 }
 
 @MainActor

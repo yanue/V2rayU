@@ -253,15 +253,22 @@ func getRandomPort() -> UInt16 {
 }
 
 
+/// 字节数转 "1.2 MB" 这种, 单位固定英文不跟系统语言走 (ByteCountFormatter 会翻成 "字节")
+/// - base: 1000 (网速/文件, 和以前一致) 或 1024 (机场面板算流量的习惯)
+func formatBytesFixed(_ bytes: Double, base: Double = 1000) -> String {
+    let units = ["B", "KB", "MB", "GB", "TB"]
+    var value = max(0, bytes)
+    var i = 0
+    while value >= base && i < units.count - 1 {
+        value /= base
+        i += 1
+    }
+    if i == 0 { return "\(Int(value)) B" }
+    return String(format: value < 10 ? "%.2f %@" : (value < 100 ? "%.1f %@" : "%.0f %@"), value, units[i])
+}
+
 func formatByte(_ bytesPerSecond: Double) -> String {
-    let formatter = ByteCountFormatter()
-    formatter.allowedUnits = .useAll
-    formatter.countStyle = .file
-
-    let speedInBytesPerSecond = max(0, Int64(bytesPerSecond))
-    let formatted = formatter.string(fromByteCount: speedInBytesPerSecond)
-
-    return formatted
+    formatBytesFixed(bytesPerSecond, base: 1000)
 }
 
 

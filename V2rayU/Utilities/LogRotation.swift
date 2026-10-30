@@ -128,13 +128,22 @@ struct LogRotation {
         }
     }
 
+    /// 原地截断: 核心 / launchd / 本 App 都开着这些文件在写, 原子写会换成新 inode, 它们继续往旧文件写, 这边就一直是空的
+    static func truncate(path: String) {
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        if let handle = FileHandle(forWritingAtPath: path) {
+            try? handle.truncate(atOffset: 0)
+            try? handle.close()
+        } else {
+            try? "".write(toFile: path, atomically: false, encoding: .utf8)
+        }
+    }
+
     static func clearAllLogs() {
         // 所有日志文件现在都在用户目录下，直接清空
         let userPaths = [coreLogFilePath, recentErrorLogFilePath, tunLogFilePath, runTunLogFilePath]
         for path in userPaths {
-            if FileManager.default.fileExists(atPath: path) {
-                try? "".write(toFile: path, atomically: true, encoding: .utf8)
-            }
+            truncate(path: path)
         }
 
         for i in 1...maxBackupCount {

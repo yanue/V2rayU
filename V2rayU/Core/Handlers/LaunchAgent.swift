@@ -56,6 +56,10 @@ actor LaunchAgent: NSObject {
             dictAgent["AbandonProcessGroup"] = true
         }
         dictAgent["ProcessType"] = "Standard"
+        // 用户目录里有更新过的 geoip/geosite 时让 xray 用那份, 否则用安装目录(二进制同目录)的
+        if coreType == .XrayCore, let assetDir = RuleSetLocator.xrayAssetDirectory() {
+            dictAgent["EnvironmentVariables"] = ["XRAY_LOCATION_ASSET": assetDir]
+        }
 
         dictAgent.write(toFile: plistPath, atomically: true)
         unloadAgent(agentName: agentName)

@@ -131,6 +131,21 @@ struct ProfileStore: StoreProtocol {
     }
 
     @discardableResult
+    func updateDownloadSpeed(uuid: String, speed: Int) -> Bool {
+        do {
+            _ = try dbWriter.write { db in
+                try ProfileEntity
+                    .filter(ProfileEntity.Columns.uuid == uuid)
+                    .updateAll(db, [ProfileEntity.Columns.downloadSpeed.set(to: speed)])
+            }
+            return true
+        } catch {
+            logger.error("ProfileStore.updateDownloadSpeed error: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
     func updateSpeed(uuid: String, speed: Int) -> Bool {
         do {
             _ = try dbWriter.write { db in
@@ -225,6 +240,8 @@ struct ProfileStore: StoreProtocol {
                     sql: sql,
                     arguments: [up, down, up, down, lastUpdate, uuid]
                 )
+                // 同时按天记一份, 给概览页的历史流量图用
+                try TrafficHistoryStore.add(db: db, profileUuid: uuid, up: up, down: down, at: lastUpdate)
             }
         } catch {
             logger.error("updateStat error: \(error)")

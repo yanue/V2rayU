@@ -82,6 +82,7 @@ struct RoutingListView: View {
 
             Spacer()
             routingTable
+                .fullWidthTable()
                 .opacity(tableOpacity)
         }
         .padding(8)

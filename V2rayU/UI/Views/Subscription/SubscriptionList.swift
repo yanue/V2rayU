@@ -88,6 +88,7 @@ struct SubscriptionListView: View {
 
             // 将复杂的 Table 表达式提取到单独的计算属性以降低类型检查复杂度
             subscriptionTable
+                .fullWidthTable()
                 .opacity(tableOpacity)
 
         }
@@ -327,6 +328,16 @@ struct SubscriptionListView: View {
                 }
                 .width(150)
 
+                TableColumn(String(localized: .TableFieldTraffic)) { (row: SubscriptionEntity) in
+                    SubscriptionTrafficCell(info: row.userInfo)
+                }
+                .width(min: 120, max: 200)
+
+                TableColumn(String(localized: .TableFieldExpire)) { (row: SubscriptionEntity) in
+                    SubscriptionExpireCell(info: row.userInfo)
+                }
+                .width(90)
+
             } rows: {
                 ForEach(viewModel.list) { row in
                     TableRow(row)
@@ -337,6 +348,65 @@ struct SubscriptionListView: View {
                 }
 
             }
+        }
+    }
+}
+
+// MARK: - 流量 / 到期单元格
+
+/// "已用 / 总量" 加进度条; 总量未知只显示已用, 没有数据显示 "-"
+struct SubscriptionTrafficCell: View {
+    let info: SubscriptionUserInfo
+
+    private var barColor: Color {
+        guard let ratio = info.usedRatio else { return .accentColor }
+        if ratio >= 0.9 { return .red }
+        if ratio >= 0.7 { return .orange }
+        return .accentColor
+    }
+
+    var body: some View {
+        if info.hasTraffic {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(info.trafficText)
+                    .font(.caption)
+                    .lineLimit(1)
+                if let ratio = info.usedRatio {
+                    ProgressView(value: ratio)
+                        .progressViewStyle(.linear)
+                        .tint(barColor)
+                        .frame(height: 4)
+                }
+            }
+            .help(trafficHelp)
+        } else {
+            Text("-").foregroundColor(.secondary)
+        }
+    }
+
+    private var trafficHelp: String {
+        "↑ \(SubscriptionUserInfo.formatBytes(info.upload))  ↓ \(SubscriptionUserInfo.formatBytes(info.download))"
+    }
+}
+
+/// 到期日期: 已过期红色并标注, 7 天内橙色
+struct SubscriptionExpireCell: View {
+    let info: SubscriptionUserInfo
+
+    var body: some View {
+        if let days = info.daysLeft {
+            if info.isExpired {
+                Text(localizedString(.Expired))
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .help(info.expireText)
+            } else {
+                Text(info.expireText)
+                    .font(.caption)
+                    .foregroundColor(days <= 7 ? .orange : .primary)
+            }
+        } else {
+            Text("-").foregroundColor(.secondary)
         }
     }
 }

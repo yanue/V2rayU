@@ -51,11 +51,11 @@ actor SubscriptionHandler {
                     return
                 }
 
-                let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
+                let result = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
                 logger.info("SubscriptionHandler syncOne success")
                 
-                // 下载成功后只更新 updateTime / configType；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
-                SubscriptionEntity.markSynced(uuid: item.uuid, configType: configType)
+                // 下载成功后只更新 updateTime / configType / 用量；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
+                SubscriptionEntity.markSynced(uuid: item.uuid, configType: result.configType, userInfo: result.userInfo)
             } catch {
                 logger.info("SubscriptionHandler syncOne error: \(error)")
                 logTip(title: "syncOne fail: ", uri: item.url, informativeText: error.localizedDescription)
@@ -76,9 +76,9 @@ actor SubscriptionHandler {
                             return
                         }
 
-                        let configType = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
-                        // 下载成功后只更新 updateTime / configType；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
-                        SubscriptionEntity.markSynced(uuid: item.uuid, configType: configType)
+                        let result = try await self.dlFromUrl(url: item.url, sub: item, useProxy: useProxy)
+                        // 下载成功后只更新 updateTime / configType / 用量；不用 upsert，避免把同步期间删掉的订阅插回去 (#1668)
+                        SubscriptionEntity.markSynced(uuid: item.uuid, configType: result.configType, userInfo: result.userInfo)
                     } catch {
                         // 单个订阅失败(如过期返回 403)只记录，不能让整批中断、后面的订阅都不更新
                         logger.info("SubscriptionHandler sync \(item.remark) error: \(error)")
@@ -129,7 +129,14 @@ actor SubscriptionHandler {
         }
     }
 
-    public func dlFromUrl(url: String, sub: SubscriptionEntity, useProxy: Bool = true) async throws -> String {
+    struct DownloadResult {
+        /// 识别出的订阅格式 ("clash" / "normal")
+        var configType: String
+        /// 响应头里的流量用量, 机场没返回时为 nil
+        var userInfo: SubscriptionUserInfo?
+    }
+
+    public func dlFromUrl(url: String, sub: SubscriptionEntity, useProxy: Bool = true) async throws -> DownloadResult {
         let trimmedUrl = url.trimmingCharacters(in: .whitespacesAndNewlines)
         logTip(title: "loading from : ", uri: "", informativeText: trimmedUrl + "\n\n")
 
@@ -149,7 +156,12 @@ actor SubscriptionHandler {
                 throw NSError(domain: "SubscriptionHandler", code: 1003, userInfo: [NSLocalizedDescriptionKey: "HTTP \(http.statusCode): \(body)"])
             }
             if let outputStr = String(data: data, encoding: String.Encoding.utf8) {
-                return handle(base64Str: outputStr, sub: sub, url: url)
+                let userInfo = SubscriptionUserInfo.parse(response: response)
+                if let userInfo {
+                    logTip(title: "userinfo: ", informativeText: "used=\(SubscriptionUserInfo.formatBytes(userInfo.used)) total=\(SubscriptionUserInfo.formatBytes(userInfo.total)) expire=\(userInfo.expireText)")
+                }
+                let configType = handle(base64Str: outputStr, sub: sub, url: url)
+                return DownloadResult(configType: configType, userInfo: userInfo)
             } else {
                 logTip(title: "loading fail: ", uri: url, informativeText: "data is nil")
                 throw NSError(domain: "SubscriptionHandler", code: 1002, userInfo: [NSLocalizedDescriptionKey: "subscription data is not valid UTF-8"])
@@ -352,3 +364,4 @@ actor SubscriptionHandler {
         }
     }
 }
+

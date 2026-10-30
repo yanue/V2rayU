@@ -10,6 +10,17 @@ import Foundation
 
 // 自定义窗口: 监听快捷键及窗口关闭事件
 class BaseWindow: NSWindow, NSWindowDelegate {
+    /// 内容区最小尺寸. NSHostingController 会改写 contentMinSize, 单设它拦不住拖拽缩小, 这里在缩放时再卡一次
+    var minimumContentSize: NSSize = .zero {
+        didSet { contentMinSize = minimumContentSize }
+    }
+
+    func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize {
+        guard minimumContentSize != .zero else { return frameSize }
+        let minFrame = frameRect(forContentRect: NSRect(origin: .zero, size: minimumContentSize)).size
+        return NSSize(width: max(frameSize.width, minFrame.width), height: max(frameSize.height, minFrame.height))
+    }
+
     // 因使用 NSStatusItem 自定义显示tray, 导致打开窗口无法自动监听相关快捷键, 这种手动监听对应的快捷键
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         guard event.type == .keyDown,

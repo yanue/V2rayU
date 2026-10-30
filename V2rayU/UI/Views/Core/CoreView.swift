@@ -11,6 +11,7 @@ import SwiftUI
 enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
     case rules
     case download
+    case ruleSets
     case type
 
     var id: String { rawValue }
@@ -19,6 +20,7 @@ enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .rules: return .CoreTabRules
         case .download: return .CoreTabDownload
+        case .ruleSets: return .CoreTabRuleSets
         case .type: return .CoreTabType
         }
     }
@@ -27,6 +29,7 @@ enum CoreSettingTab: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .rules: return "checklist"
         case .download: return "arrow.down.app"
+        case .ruleSets: return "doc.badge.arrow.up"
         case .type: return "slider.horizontal.3"
         }
     }
@@ -62,6 +65,8 @@ struct CoreView: View {
                     CoreCapabilityRulesView(vm: vm)
                 case .download:
                     CoreDownloadView(vm: vm)
+                case .ruleSets:
+                    CoreRuleSetView()
                 case .type:
                     CoreTypeSettingsView(vm: vm)
                 }

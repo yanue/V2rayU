@@ -126,7 +126,6 @@ struct CombinedConfigListView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            .padding(.horizontal, 10)
             .padding(.bottom, 6)
 
             // Default ports & current node
@@ -152,7 +151,6 @@ struct CombinedConfigListView: View {
             .padding(.vertical, 6)
             .background(Color.secondary.opacity(0.06))
             .cornerRadius(6)
-            .padding(.horizontal, 8)
 
             if viewModel.profiles.isEmpty {
                 Spacer()
@@ -179,7 +177,7 @@ struct CombinedConfigListView: View {
                 Spacer()
             } else {
                 tableView
-                    .padding(.horizontal, 8)
+                    .fullWidthTable()
                     .padding(.top, 4)
             }
         }

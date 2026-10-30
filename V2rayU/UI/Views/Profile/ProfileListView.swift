@@ -193,6 +193,7 @@ struct ProfileListView: View {
                     )
                 }.padding(.horizontal, 10)
                 tableView
+                    .fullWidthTable()
                     .opacity(tableOpacity)
             }
             // 不用 cornerRadius 裁剪: 外层有裁剪时列表的拖动排序放不下去
@@ -318,6 +319,20 @@ struct ProfileListView: View {
                 }
             } label: {
                 Label(String(localized: .LatencyTest), systemImage: "gauge.with.dots.needle.67percent")
+            }
+            .focusable(false)
+
+            Button {
+                performAfterMenuDismiss {
+                    let uuids = isMultiSelect ? resolveSelectedItems(for: item).map(\.uuid) : [item.uuid]
+                    noticeTip(title: String(localized: .SpeedTest), informativeText: String(localized: .SpeedTestRunning))
+                    Task {
+                        await SpeedTestRunner.shared.run(uuids: uuids)
+                        await MainActor.run { loadData() }
+                    }
+                }
+            } label: {
+                Label(String(localized: .SpeedTest), systemImage: "speedometer")
             }
             .focusable(false)
 
@@ -492,6 +507,13 @@ struct ProfileListView: View {
                     }
                 }
                 .width(60)
+
+                TableColumn(String(localized: .TableFieldDownloadSpeed)) { (row: ProfileEntity) in
+                    Text(formatDownloadSpeed(row.downloadSpeed))
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(row.downloadSpeed > 0 ? .primary : .secondary)
+                }
+                .width(80)
 
                 TableColumn(String(localized: .TableFieldType)) { row in
                     Text(row.protocol == .shadowsocks ? "ss" : row.protocol.rawValue)

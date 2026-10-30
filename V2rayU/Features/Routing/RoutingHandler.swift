@@ -55,6 +55,8 @@ func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) 
     for item in all {
         let tmp = item.trimmingCharacters(in: .whitespacesAndNewlines)
         if tmp.isEmpty { continue }
+        // process: 行是按进程分流 (见 parseProcessRules), 不是域名也不是 IP
+        if tmp.lowercased().hasPrefix("process:") { continue }
         let normalized = tmp == "category-ads-all" ? "geosite:category-ads-all" : tmp
 
         if isIp(str: normalized) || normalized.contains("geoip:") || isIPv6Literal(normalized) {
@@ -64,6 +66,32 @@ func parseDomainOrIp(domainIpStr: String) -> (domains: [String], ips: [String]) 
         }
     }
     return (domains, ips)
+}
+
+/// 按进程分流: 每行 "process:进程名" 或 "process:/完整/路径" (仅 sing-box 生效, xray 没有进程匹配)
+/// 返回 (进程名列表, 路径列表)
+func parseProcessRules(_ text: String) -> (names: [String], paths: [String]) {
+    var names: [String] = []
+    var paths: [String] = []
+    for raw in text.split(separator: "\n") {
+        let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard line.lowercased().hasPrefix("process:") else { continue }
+        let value = line.dropFirst("process:".count).trimmingCharacters(in: .whitespaces)
+        guard !value.isEmpty else { continue }
+        if value.hasPrefix("/") {
+            if !paths.contains(value) { paths.append(value) }
+        } else if !names.contains(value) {
+            names.append(value)
+        }
+    }
+    return (names, paths)
+}
+
+/// 路径转 sing-box process_path_regex: 精确匹配该路径 (或 .app 包内的可执行文件)
+func processPathRegex(_ path: String) -> String {
+    // escapedPattern 连 "/" 也转义, 读起来难看, 还原
+    let escaped = NSRegularExpression.escapedPattern(for: path).replacingOccurrences(of: "\\/", with: "/")
+    return path.hasSuffix(".app") ? "^\(escaped)/" : "^\(escaped)$"
 }
 
 // 可带网段前缀 /0~/32：原来只认两位数，10.0.0.0/8 会被当成域名规则 (#1695)
@@ -141,6 +169,8 @@ class RoutingManager {
         
         rules.append(RouteRule(action: "sniff"))
         rules.append(RouteRule(action: "reject", network: ["udp"], port: [443]))
+        // 按进程分流放最前: 进程规则比域名规则优先
+        rules.append(contentsOf: Self.processRouteRules(for: routingEntity))
         appendSingboxRouteRules(to: &rules, outbound: "block", domains: blockDomains, ips: blockIps)
 
         appendSingboxRouteRules(to: &rules, outbound: "proxy", domains: proxyDomains, ips: proxyIps)
@@ -198,8 +228,27 @@ class RoutingManager {
         return rules
     }
 
+    /// 路由里的 process: 行转成 sing-box 进程规则 (block / proxy / direct 顺序)
+    /// blockAsReject: sing-box >= 1.13 没有 block 出站, 用 action reject
+    static func processRouteRules(for entity: RoutingEntity, blockAsReject: Bool = false) -> [RouteRule] {
+        var rules: [RouteRule] = []
+        for (outbound, text) in [("block", entity.block), ("proxy", entity.proxy), ("direct", entity.direct)] {
+            let (names, paths) = parseProcessRules(text)
+            let reject = blockAsReject && outbound == "block"
+            if !names.isEmpty {
+                rules.append(reject ? RouteRule(action: "reject", process_name: names) : RouteRule(outbound: outbound, process_name: names))
+            }
+            if !paths.isEmpty {
+                let regexes = paths.map(processPathRegex)
+                rules.append(reject ? RouteRule(action: "reject", process_path_regex: regexes) : RouteRule(outbound: outbound, process_path_regex: regexes))
+            }
+        }
+        return rules
+    }
+
     private func appendSingboxRouteRules(to rules: inout [RouteRule], outbound: String, domains: [String], ips: [String]) {
         var plainDomains: [String] = []
+        var suffixDomains: [String] = []
         var geosites: [String] = []
         var geoips: [String] = []
         var ipCidrs: [String] = []
@@ -209,7 +258,8 @@ class RoutingManager {
             if domain.hasPrefix("geosite:") {
                 geosites.append(String(domain.dropFirst("geosite:".count)))
             } else if domain.hasPrefix("domain:") {
-                plainDomains.append(String(domain.dropFirst("domain:".count)))
+                // xray 的 domain: 是后缀匹配, sing-box 对应 domain_suffix (原来转成 domain 只能精确匹配, 子域名漏掉)
+                suffixDomains.append(String(domain.dropFirst("domain:".count)))
             } else {
                 plainDomains.append(domain)
             }
@@ -226,6 +276,7 @@ class RoutingManager {
         }
 
         if !plainDomains.isEmpty { rules.append(RouteRule(outbound: outbound, domain: plainDomains)) }
+        if !suffixDomains.isEmpty { rules.append(RouteRule(outbound: outbound, domain_suffix: suffixDomains)) }
         if !geosites.isEmpty { rules.append(RouteRule(outbound: outbound, geosite: geosites)) }
         if routePrivateIps { rules.append(RouteRule(outbound: outbound, ip_is_private: true)) }
         if !geoips.isEmpty { rules.append(RouteRule(outbound: outbound, geoip: geoips)) }
@@ -262,9 +313,9 @@ class RoutingManager {
             return
         }
 
-        logger.info("RoutingManager.saveAndReloadIfNeeded: running routing changed, reload core only")
+        logger.info("RoutingManager.saveAndReloadIfNeeded: running routing changed, reload")
         Task {
-            await V2rayLaunch.shared.reloadCore()
+            await V2rayLaunch.shared.reloadRouting()
         }
     }
     

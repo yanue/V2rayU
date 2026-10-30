@@ -39,6 +39,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var routingItem: NSMenuItem!
     private var routingSubMenu: NSMenu!
     private var goRoutingSettingItem: NSMenuItem!
+    /// 路由子菜单里快捷分流段的起点(分隔线), 打开时从它后面重建
+    private var quickRoutingAnchor: NSMenuItem?
     private var goCombinationSettingItem: NSMenuItem!
     private var serverItem: NSMenuItem!
     private var serverSubMenu: NSMenu!
@@ -52,6 +54,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     private var shareQRCodeItem: NSMenuItem!
     private var copyHttpProxyItem: NSMenuItem!
     private var goPreferencesItem: NSMenuItem!
+    private var openMainWindowItem: NSMenuItem!
+    private var importShareItem: NSMenuItem!
     private var checkForUpdatesItem: NSMenuItem!
     private var helpItem: NSMenuItem!
     private var quitItem: NSMenuItem!
@@ -190,6 +194,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         // 刷新模式状态
         toggleCoreItem?.title = coreTitle()
         toggleCoreItem?.isEnabled = !isStarting
+        diagnosticsItem?.isHidden = !(AppState.shared.v2rayTurnOn || AppState.shared.lastStartFailed)
         pacModeItem.state = (.pac == AppState.shared.runMode) ? .on : .off
         pacModeItem.isEnabled = !isStarting
         tunModeItem.state = (.tun == AppState.shared.runMode) ? .on : .off
@@ -335,6 +340,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         goServerSettingItem?.title = String(localized: .GoServerSettings)
         goCombinationSettingItem?.title = String(localized: .GoCombinationSettings)
         goPreferencesItem?.title = String(localized: .GoPreferences)
+        openMainWindowItem?.title = String(localized: .OpenMainWindow)
+        importShareItem?.title = String(localized: .ImportAndShare)
         pacSettingsItem?.title = String(localized: .PAC)
         importServersItem?.title = String(localized: .ImportServersFromClipboard)
         scanQRCodeItem?.title = String(localized: .ScanQRCodeFromScreen)
@@ -368,11 +375,14 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         clearLogFilesItem = NSMenuItem(title: String(localized: .ClearAllLogs), action: #selector(clearLogs), keyEquivalent: "")
         openHomeFolderItem = NSMenuItem(title: String(localized: .OpenHomeFolder), action: #selector(openHomeFolder), keyEquivalent: "")
         viewFilesItem = getViewFilesMenu()
-        // 配置查看
         menu.addItem(toggleCoreItem)
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(viewFilesItem)
+        // 诊断紧跟启停: 核心开着显示; 关着但上次启动失败也显示(正是需要诊断的时候); 用户主动关掉才隐藏
+        diagnosticsItem.isHidden = !(AppState.shared.v2rayTurnOn || AppState.shared.lastStartFailed)
         menu.addItem(diagnosticsItem)
+        menu.addItem(NSMenuItem.separator())
+        openMainWindowItem = NSMenuItem(title: String(localized: .OpenMainWindow), action: #selector(openMainWindowFromMenu), keyEquivalent: "o")
+        menu.addItem(openMainWindowItem)
+        menu.addItem(viewFilesItem)
         menu.addItem(NSMenuItem.separator())
         // 模式切换
         pacModeItem = getRunModeItem(mode: .pac, title: String(localized: .PacMode))
@@ -392,9 +402,8 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         serverItem.submenu = NSMenu()
         // 预先初始化一次
         pingItem = NSMenuItem(title: String(localized: .LatencyTest) + "\(self.pingTip)", action: #selector(pingSpeed), keyEquivalent: "")
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(routingItem)
         menu.addItem(serverItem)
+        menu.addItem(routingItem)
         menu.addItem(pingItem)
         // 预先初始化一次
         goRoutingSettingItem = NSMenuItem(title: String(localized: .GoRoutingSettings), action: #selector(openRoutingTab), keyEquivalent: "")
@@ -402,24 +411,22 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         goServerSettingItem = NSMenuItem(title: String(localized: .GoServerSettings), action: #selector(openServerTab), keyEquivalent: "")
         goCombinationSettingItem = NSMenuItem(title: String(localized: .GoCombinationSettings), action: #selector(openCombinationTab), keyEquivalent: "")
         goPreferencesItem = NSMenuItem(title: String(localized: .GoPreferences), action: #selector(openPreferenceGeneral), keyEquivalent: ",")
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(goSubscriptionsItem)
-        menu.addItem(goServerSettingItem)
-        menu.addItem(goCombinationSettingItem)
-        menu.addItem(goRoutingSettingItem)
-        menu.addItem(goPreferencesItem)
-        menu.addItem(NSMenuItem.separator())
+        // 订阅 / 服务器 / 组合 / 路由四个入口都是主窗口里的页, 合成一个"打开主窗口"(放在诊断下面)
 
-        // 导入与分享
+        // 导入与分享: 不常用, 收进子菜单
         importServersItem = NSMenuItem(title: String(localized: .ImportServersFromClipboard), action: #selector(ImportFromPasteboard), keyEquivalent: "")
         scanQRCodeItem = NSMenuItem(title: String(localized: .ScanQRCodeFromScreen), action: #selector(scanQrcode), keyEquivalent: "")
         shareQRCodeItem = NSMenuItem(title: String(localized: .ShareQrCode), action: #selector(generateQrcode), keyEquivalent: "")
         copyHttpProxyItem = NSMenuItem(title: String(localized: .CopyHttpProxyShellExportLine), action: #selector(copyExportCommand), keyEquivalent: "")
-        menu.addItem(importServersItem)
-        menu.addItem(scanQRCodeItem)
-        menu.addItem(shareQRCodeItem)
-        menu.addItem(copyHttpProxyItem)
-        menu.addItem(NSMenuItem.separator())
+        let importShareMenu = NSMenu()
+        for item in [importServersItem!, scanQRCodeItem!, shareQRCodeItem!, copyHttpProxyItem!] {
+            item.target = self
+            importShareMenu.addItem(item)
+        }
+        importShareItem = NSMenuItem(title: String(localized: .ImportAndShare), action: nil, keyEquivalent: "")
+        importShareItem.submenu = importShareMenu
+        // 放在服务器操作那一组后面
+        menu.insertItem(importShareItem, at: menu.index(of: pingItem) + 1)
 
         // 设置与帮助
         checkForUpdatesItem = NSMenuItem(title: String(localized: .CheckForUpdates)+" (V2rayU v\(appVersion))", action: #selector(checkForUpdate), keyEquivalent: "")
@@ -432,6 +439,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
                 self?.helpItem?.title = String(localized: .Help) + " (Xray \(xrayVer) | Singbox \(singboxVer))"
             }
         }
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(checkForUpdatesItem)
         menu.addItem(helpItem)
         menu.addItem(NSMenuItem.separator())
@@ -453,7 +461,96 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
     // MARK: - NSMenuDelegate
 
     func menuDidClose(_ menu: NSMenu) {
-        statusItem.button?.isHighlighted = false
+        if menu === statusMenu {
+            statusItem.button?.isHighlighted = false
+        }
+    }
+
+    func menuWillOpen(_ menu: NSMenu) {
+        guard menu === routingSubMenu else { return }
+        populateQuickRoutingMenu()
+    }
+
+    // MARK: - 快捷分流
+
+    private func populateQuickRoutingMenu() {
+        guard let menu = routingSubMenu, let anchor = quickRoutingAnchor, menu.items.contains(anchor) else { return }
+        // 只重建分隔线后面的部分, 路由列表不动
+        while menu.items.last !== anchor, let last = menu.items.last { menu.removeItem(last) }
+        let header = disabledItem(String(localized: .QuickRouting))
+        menu.addItem(header)
+
+        guard AppState.shared.v2rayTurnOn else {
+            menu.addItem(disabledItem(String(localized: .CoreNotRunning)))
+            return
+        }
+        let loading = disabledItem(String(localized: .Loading))
+        menu.addItem(loading)
+        Task { @MainActor in
+            guard await V2rayLaunch.shared.lastCore == .SingBox else {
+                // 菜单可能已被再次打开重建过, loading 不在了就别动
+                guard menu.items.contains(loading) else { return }
+                menu.removeItem(loading)
+                menu.addItem(disabledItem(String(localized: .ConnectionsSingboxOnly)))
+                return
+            }
+            let hosts = (try? await ClashConnectionsHandler.shared.fetch().list)
+                .map { Self.recentHosts($0) } ?? []
+            guard menu.items.contains(loading) else { return }
+            menu.removeItem(loading)
+            if hosts.isEmpty {
+                menu.addItem(disabledItem(String(localized: .QuickRoutingNoConnections)))
+                return
+            }
+            for host in hosts {
+                let item = NSMenuItem(title: host, action: nil, keyEquivalent: "")
+                let sub = NSMenu()
+                for target in QuickRuleTarget.allCases {
+                    let t = NSMenuItem(title: String(localized: target.label), action: #selector(addQuickRule), keyEquivalent: "")
+                    t.target = self
+                    t.representedObject = [host, target.rawValue]
+                    sub.addItem(t)
+                }
+                item.submenu = sub
+                menu.addItem(item)
+            }
+        }
+    }
+
+    /// 最近连接的域名, 新的在前, 去重, 最多 15 个; 只收域名不收 IP
+    static func recentHosts(_ connections: [ClashConnection], limit: Int = 15) -> [String] {
+        var seen = Set<String>()
+        var hosts: [String] = []
+        let sorted = connections.sorted { $0.start > $1.start }
+        for c in sorted {
+            guard !c.metadata.host.isEmpty, let host = QuickRouting.normalizeHost(c.metadata.host),
+                  !isIp(str: host), !isIPv6Literal(host), seen.insert(host).inserted else { continue }
+            hosts.append(host)
+            if hosts.count >= limit { break }
+        }
+        return hosts
+    }
+
+    private func disabledItem(_ title: String) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.isEnabled = false
+        return item
+    }
+
+    @objc private func addQuickRule(_ sender: NSMenuItem) {
+        guard let pair = sender.representedObject as? [String], pair.count == 2,
+              let target = QuickRuleTarget(rawValue: pair[1]) else { return }
+        QuickRouting.add(host: pair[0], target: target)
+    }
+
+    @objc private func openMainWindowFromMenu(_ sender: Any?) {
+        NavigationState.shared.mainTab = .status
+        MainWindowManager.shared.openMainWindow()
+    }
+
+    @objc private func openConnectionsTab(_ sender: Any?) {
+        NavigationState.shared.mainTab = .connections
+        MainWindowManager.shared.openMainWindow()
     }
 
     @objc private func resetHighlight() {
@@ -515,15 +612,20 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         return menu
     }
 
+    /// 路由子菜单: 上半是路由列表(切换用哪套), 分隔线下是快捷分流(最近域名一键加进当前路由), 打开时再填
     func getRoutingSubMenus() -> NSMenu {
-
         let menu = NSMenu()
-
         let routings = RoutingStore.shared.fetchAll()
         for routing in routings {
             let item = createRoutingMenuItem(routing: routing)
             menu.addItem(item)
         }
+        let anchor = NSMenuItem.separator()
+        menu.addItem(anchor)
+        quickRoutingAnchor = anchor
+        let header = disabledItem(String(localized: .QuickRouting))
+        menu.addItem(header)
+        menu.delegate = self
         return menu
     }
 
@@ -624,6 +726,15 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
                     menu.addItem(item)
                 }
             }
+        }
+        // 一个节点都没有: 给出添加入口, 不然子菜单是空的不知道该干嘛
+        if combos.isEmpty && groupedServers.allSatisfy({ $0.1.isEmpty }) {
+            let addServer = NSMenuItem(title: String(localized: .AddServer), action: #selector(openServerTab), keyEquivalent: "")
+            addServer.target = self
+            let addSub = NSMenuItem(title: String(localized: .AddSubscription), action: #selector(openPreferenceSubscribe), keyEquivalent: "")
+            addSub.target = self
+            menu.addItem(addServer)
+            menu.addItem(addSub)
         }
         return menu
     }

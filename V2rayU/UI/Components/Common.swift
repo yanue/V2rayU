@@ -50,6 +50,9 @@ enum ViewAccessibilityIdentifier: String {
     case sidebarRouting = "sidebar-routing"
     case sidebarCore = "sidebar-core"
     case sidebarSetting = "sidebar-setting"
+    case sidebarStatus = "sidebar-status"
+    case sidebarConnections = "sidebar-connections"
+    case sidebarLogs = "sidebar-logs"
     case sidebarDiagnostic = "sidebar-diagnostic"
     case sidebarAbout = "sidebar-about"
 
@@ -173,5 +176,55 @@ struct RunDiagnosticButton: View {
             }
         }
         .focusable(false)
+    }
+}
+
+// MARK: - 表格铺满样式
+
+extension View {
+    /// 表格固定用铺满样式。
+    /// 系统默认是两边缩进的圆角行, 只有列宽超出、出现横向滚动时才变成铺满,
+    /// 结果列多的页面(路由/订阅)和列少的页面(组合)样子不一样, 切换时能看出来。
+    func fullWidthTable() -> some View {
+        background(TableStyleProbe())
+    }
+}
+
+/// 挂在表格背景上: 找到和自己重叠的那个 NSTableView, 改成 .fullWidth
+private struct TableStyleProbe: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView { Probe() }
+    func updateNSView(_ nsView: NSView, context: Context) { (nsView as? Probe)?.apply() }
+
+    final class Probe: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            apply()
+        }
+
+        func apply() {
+            // 等表格挂进窗口后再找
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let root = self.window?.contentView else { return }
+                let mine = self.convert(self.bounds, to: nil)
+                var tables: [NSTableView] = []
+                Self.collect(root, into: &tables)
+                // 探针和表格同一个 frame, 取重叠面积最大的, 不会改到别的表格
+                guard let table = tables.max(by: { Self.overlap($0, mine) < Self.overlap($1, mine) }),
+                      Self.overlap(table, mine) > 0,
+                      table.style != .fullWidth else { return }
+                table.style = .fullWidth
+            }
+        }
+
+        static func overlap(_ table: NSTableView, _ rect: NSRect) -> CGFloat {
+            guard let sv = table.enclosingScrollView else { return 0 }
+            let i = sv.convert(sv.bounds, to: nil).intersection(rect)
+            return i.isNull ? 0 : i.width * i.height
+        }
+
+        static func collect(_ view: NSView, into out: inout [NSTableView]) {
+            if let t = view as? NSTableView { out.append(t) }
+            for sub in view.subviews { collect(sub, into: &out) }
+        }
     }
 }

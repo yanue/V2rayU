@@ -36,7 +36,7 @@ class MainWindowManager {
             // 2.2 初始化自定义窗口
             let window = BaseWindow(
                 contentRect: .zero,
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered,
                 defer: false
             )
@@ -46,15 +46,28 @@ class MainWindowManager {
 
             // 2.4 配置窗口内容和大小
             window.contentViewController = hostingVC
-            window.setContentSize(NSSize(width: 760, height: 600))
-            window.contentMinSize = NSSize(width: 760, height: 600)
+            // 默认和最小尺寸都控制在笔记本屏幕的一半以内; 内容区放不下的页面自己滚动
+            window.setContentSize(NSSize(width: 820, height: 620))
+            window.minimumContentSize = NSSize(width: 800, height: 600)
             window.animationBehavior = .none
-            window.title = "V2rayU"
+            window.title = "V2rayU" // 窗口菜单里用, 标题栏不显示
+            // 标题栏透明, 内容铺到顶部; 红绿灯浮在侧边栏左上角
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
             window.center()
             window.isReleasedWhenClosed = false
 
             // 2.5 包装成 NSWindowController
             windowController = NSWindowController(window: window)
+        }
+
+        // 2.6 已有窗口比最小尺寸还小(比如旧版本留下的), 打开时撑回最小尺寸
+        if let win = windowController?.window as? BaseWindow {
+            let cur = win.contentRect(forFrameRect: win.frame).size
+            let min = win.minimumContentSize
+            if cur.width < min.width || cur.height < min.height {
+                win.setContentSize(NSSize(width: max(cur.width, min.width), height: max(cur.height, min.height)))
+            }
         }
 
         // 3. 先激活应用（必须同步，确保窗口能正确接收焦点）

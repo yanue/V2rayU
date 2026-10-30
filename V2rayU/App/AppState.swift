@@ -40,6 +40,8 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.set(forKey: .runningCombination, value: runningCombination) }
     }
     @Published var runningServer: ProfileEntity? = nil
+    /// 上次启动 / 重载核心失败 (节点异常等): 核心关着也要露出诊断入口
+    @Published var lastStartFailed = false
 
     @Published var latency = 0.0
     @Published var directUpSpeed = 0.0
@@ -235,7 +237,7 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - 切换路由
-    // 路由属于核心配置 → 只重载核心, 不动 TUN / 系统代理。
+    // 路由属于核心配置 → 重载核心; TUN 模式下 tun.json 也带路由的进程规则, 整体重启。
     func switchRouting(uuid: String) async {
         guard !isCoreStarting else {
             logger.info("switchRouting: isCoreStarting, skip \(uuid)")
@@ -243,7 +245,7 @@ final class AppState: ObservableObject {
         }
         runningRouting = uuid
         v2rayTurnOn = true
-        let success = await V2rayLaunch.shared.reloadCore()
+        let success = await V2rayLaunch.shared.reloadRouting()
         v2rayTurnOn = success
         logger.info("switchRouting: \(self.runningRouting)")
         AppMenuManager.shared.refreshRoutingItems()
@@ -387,6 +389,11 @@ final class AppState: ObservableObject {
             CapabilityRulesLoader.seedOverrideIfNeeded()
             // 检查远程更新（1 天一次）
             CapabilityRulesLoader.checkForUpdatesIfNeeded()
+            // 路由规则集 (geoip/geosite/.srs) 到期自动更新, 之后每小时检查一次
+            Task {
+                await RuleSetUpdater.shared.start()
+                await RuleSetUpdater.shared.updateIfDue()
+            }
         }
     }
 

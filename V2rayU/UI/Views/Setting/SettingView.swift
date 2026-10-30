@@ -32,11 +32,13 @@ struct SettingView: View {
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.settingTabDns.rawValue)
                 localized(.PAC).tag(SettingsTab.pac)
                     .accessibilityIdentifier(ViewAccessibilityIdentifier.settingTabPac.rawValue)
+                localized(.BackupTab).tag(SettingsTab.backup)
             }
             .pickerStyle(.segmented)
             .focusable(false)
             .padding(.vertical, 12)
-            .fixedSize()
+            // 7 个分段: 窗口窄时按可用宽度均分, 不固定宽度, 否则会把整页顶出右边界
+            .frame(maxWidth: 640)
             .labelsHidden()
 
             VStack {
@@ -54,6 +56,8 @@ struct SettingView: View {
                     PacView()
                 case .tun:
                     TunView()
+                case .backup:
+                    BackupView()
                 }
             }
             .background(.ultraThinMaterial)

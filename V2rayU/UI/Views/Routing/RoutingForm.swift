@@ -106,6 +106,9 @@ struct RoutingFormView: View {
                         
                         Divider()
                         
+                        Text(String(localized: .RoutingRuleHint))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                         getTextEditorWithLabel(label: .Direct, text: $item.direct)
                         getTextEditorWithLabel(label: .Block, text: $item.block)
                         getTextEditorWithLabel(label: .Proxy, text: $item.proxy)

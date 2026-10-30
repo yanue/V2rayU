@@ -75,6 +75,19 @@ struct V2rayUApp: App {
 /// AppDelegate - 应用
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var isTerminating = false
+    /// 启动流程没走完前收到的 URL 先攒着 (数据库 / 菜单还没就绪)
+    private var launchCompleted = false
+    private var pendingUrls: [URL] = []
+
+    /// URL Scheme 拉起: 分享链接导入节点, clash:// v2rayu:// 一键添加订阅
+    func application(_ application: NSApplication, open urls: [URL]) {
+        logger.info("open urls: \(urls.map(\.absoluteString))")
+        if launchCompleted {
+            UrlSchemeHandler.handle(urls)
+        } else {
+            pendingUrls.append(contentsOf: urls)
+        }
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         logger.info("Application did finish launching.")
@@ -111,6 +124,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // 启动流程完成, 恢复菜单可用
             AppState.shared.isCoreStarting = false
             AppMenuManager.shared.refreshBasicMenus()
+            self.launchCompleted = true
+            if !self.pendingUrls.isEmpty {
+                let urls = self.pendingUrls
+                self.pendingUrls = []
+                UrlSchemeHandler.handle(urls)
+            }
         }
     }
 

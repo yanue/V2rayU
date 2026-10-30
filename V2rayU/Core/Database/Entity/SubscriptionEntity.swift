@@ -21,6 +21,11 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
     var updateTime: Int
     var notes: String
     var configType: String
+    /// 订阅响应头 subscription-userinfo 里的用量, 没有时都是 0
+    var upload: Int
+    var download: Int
+    var total: Int
+    var expire: Int
 
     var id: String {
         return uuid
@@ -42,7 +47,11 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         updateInterval: Int = 3600,
         updateTime: Int = Int(Date().timeIntervalSince1970),
         notes: String = "",
-        configType: String = ""
+        configType: String = "",
+        upload: Int = 0,
+        download: Int = 0,
+        total: Int = 0,
+        expire: Int = 0
     ) {
         self.uuid = uuid
         self.remark = remark
@@ -53,6 +62,14 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         self.updateTime = updateTime
         self.notes = notes
         self.configType = configType
+        self.upload = upload
+        self.download = download
+        self.total = total
+        self.expire = expire
+    }
+
+    var userInfo: SubscriptionUserInfo {
+        SubscriptionUserInfo(upload: upload, download: download, total: total, expire: expire)
     }
 
     // 自定义表名
@@ -68,6 +85,10 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
         static let updateTime = Column(CodingKeys.updateTime)
         static let notes = Column(CodingKeys.notes)
         static let configType = Column(CodingKeys.configType)
+        static let upload = Column(CodingKeys.upload)
+        static let download = Column(CodingKeys.download)
+        static let total = Column(CodingKeys.total)
+        static let expire = Column(CodingKeys.expire)
     }
 
     // 定义迁移
@@ -90,6 +111,16 @@ struct SubscriptionEntity: Codable, Identifiable, Equatable, Hashable, Transfera
             try db.alter(table: databaseTableName) { t in
                 t.add(column: Columns.notes.name, .text).notNull().defaults(to: "")
                 t.add(column: Columns.configType.name, .text).notNull().defaults(to: "")
+            }
+        }
+
+        // 订阅流量用量和到期时间 (subscription-userinfo 响应头)
+        migrator.registerMigration("addUserInfoToSub") { db in
+            try db.alter(table: databaseTableName) { t in
+                t.add(column: Columns.upload.name, .integer).notNull().defaults(to: 0)
+                t.add(column: Columns.download.name, .integer).notNull().defaults(to: 0)
+                t.add(column: Columns.total.name, .integer).notNull().defaults(to: 0)
+                t.add(column: Columns.expire.name, .integer).notNull().defaults(to: 0)
             }
         }
     }
@@ -119,15 +150,21 @@ extension SubscriptionEntity {
         }
     }
 
-    /// 同步成功后只更新 updateTime / configType；订阅已被删除时不做任何事 (#1668)
-    static func markSynced(uuid: String, configType: String) {
+    /// 同步成功后只更新 updateTime / configType / 用量；订阅已被删除时不做任何事 (#1668)
+    /// 这次响应没带 subscription-userinfo 头时清掉旧用量, 不然会一直显示过时的数字
+    static func markSynced(uuid: String, configType: String, userInfo: SubscriptionUserInfo? = nil) {
+        let info = userInfo ?? SubscriptionUserInfo()
         do {
             _ = try AppDatabase.shared.dbWriter.write { db in
                 try SubscriptionEntity
                     .filter(Columns.uuid == uuid)
                     .updateAll(db,
                                Columns.updateTime.set(to: Int(Date().timeIntervalSince1970)),
-                               Columns.configType.set(to: configType))
+                               Columns.configType.set(to: configType),
+                               Columns.upload.set(to: info.upload),
+                               Columns.download.set(to: info.download),
+                               Columns.total.set(to: info.total),
+                               Columns.expire.set(to: info.expire))
             }
         } catch {
             logger.error("markSynced error: \(error)")

@@ -9,6 +9,7 @@ import SwiftUI
 import AppKit
 
 struct DiagnosticsView: View {
+    var showHeader = true
     @StateObject private var viewModel = DiagnosticsViewModel(
         nodeHostProvider: {
             AppState.shared.runningServer?.address
@@ -21,7 +22,7 @@ struct DiagnosticsView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            headerView
+            if showHeader { headerView }
             // Summary card
             summaryCard
             
@@ -48,50 +49,37 @@ struct DiagnosticsView: View {
     // MARK: - Header
 
     private var headerView: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Image(systemName: "exclamationmark.triangle")
-                .resizable()
-                .frame(width: 28, height: 28)
-                .foregroundColor(.accentColor)
+        PageHeader(icon: "stethoscope", title: String(localized: .Diagnostics), subtitle: String(localized: .DiagnosticSubHead)) {
+            HStack(spacing: 8) {
+                if viewModel.checking {
+                    Text(viewModel.progressText)
+                        .font(.caption).foregroundColor(.secondary)
+                        .lineLimit(1).truncationMode(.tail)
+                        .frame(maxWidth: 160)
+                }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: .Diagnostics))
-                    .font(.title2).fontWeight(.bold)
-                Text(String(localized: .DiagnosticSubHead))
-                    .font(.caption).foregroundColor(.secondary)
+                RunDiagnosticButton(checking: $viewModel.checking) {
+                    viewModel.runSequentialChecks()
+                }
+                .buttonStyle(.bordered).focusable(false)
+
+                Button {
+                    viewModel.submitToGitHub()
+                } label: {
+                    Image(systemName: "paperplane")
+                }
+                .help(String(localized: .SubmitIssue))
+                .buttonStyle(.bordered).focusable(false)
+                .disabled(viewModel.checking || (!viewModel.hasFailures) || AppState.shared.latency > 0)
+
+                Button {
+                    viewModel.showFAQ = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                }
+                .buttonStyle(.bordered).focusable(false)
             }
-
-            Spacer()
-
-            if viewModel.checking {
-                Text(viewModel.progressText)
-                    .font(.caption).foregroundColor(.secondary)
-                    .lineLimit(1).truncationMode(.tail)
-            }
-
-            RunDiagnosticButton(checking: $viewModel.checking) {
-                viewModel.runSequentialChecks()
-            }
-            .buttonStyle(.bordered).focusable(false)
-
-            Button {
-                viewModel.submitToGitHub()
-            } label: {
-                Image(systemName: "paperplane")
-                Text(String(localized: .SubmitIssue))
-            }
-            .buttonStyle(.bordered).focusable(false)
-            .disabled(viewModel.checking || (!viewModel.hasFailures) || AppState.shared.latency > 0)
-
-            Button {
-                viewModel.showFAQ = true
-            } label: {
-                Image(systemName: "questionmark.circle")
-            }
-            .buttonStyle(.bordered).focusable(false)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
     }
 
     // MARK: - Content

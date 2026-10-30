@@ -41,6 +41,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
     var shareUri: String = "" // 原始分享链接(判断订阅是否更新)
     var serverIp: String = "" // 服务器IP
     var serverRegion: String = "" // 服务器IP归宿(国家代码)
+    var downloadSpeed: Int = 0 // 下载测速结果, 字节/秒; 0 = 未测或失败
     var coreType: ProfileCoreSelection? = .auto // 核心选择: auto/xray/sing-box
     // 统计
     var totalUp: Int64 = 0 // 总上传
@@ -63,7 +64,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
 
     // 对应编码的 `CodingKeys` 枚举
     enum CodingKeys: String, CodingKey {
-        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, pinnedPeerCertSha256, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
+        case uuid, remark, speed, sort, `protocol`, subid, address, port, password, alterId, encryption, network, headerType, host, path, security, allowInsecure, pinnedPeerCertSha256, flow, sni, alpn, fingerprint, publicKey, shortId, spiderX, extra, shareUri, serverIp, serverRegion, downloadSpeed, coreType, totalUp, totalDown, todayUp, todayDown, lastUpdate
     }
 
     // 安全的 decode 辅助：支持 NULL 回退 + 未知枚举值回退
@@ -121,6 +122,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         shareUri = Self.safeDecode(from: container, forKey: .shareUri, fallback: "")
         serverIp = Self.safeDecode(from: container, forKey: .serverIp, fallback: "")
         serverRegion = Self.safeDecode(from: container, forKey: .serverRegion, fallback: "")
+        downloadSpeed = Self.safeDecode(from: container, forKey: .downloadSpeed, fallback: 0)
         if let raw = try? container.decodeIfPresent(String.self, forKey: .coreType) {
             coreType = ProfileCoreSelection(rawValue: raw) ?? .auto
         } else {
@@ -164,6 +166,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         shareUri: String = "",
         serverIp: String = "",
         serverRegion: String = "",
+        downloadSpeed: Int = 0,
         coreType: ProfileCoreSelection? = .auto
     ) {
         self.uuid = uuid
@@ -195,6 +198,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         self.shareUri = shareUri
         self.serverIp = serverIp
         self.serverRegion = serverRegion
+        self.downloadSpeed = downloadSpeed
         self.coreType = coreType
         self.totalUp = 0
         self.totalDown = 0
@@ -269,6 +273,7 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         static let shareUri = Column(CodingKeys.shareUri)
         static let serverIp = Column(CodingKeys.serverIp)
         static let serverRegion = Column(CodingKeys.serverRegion)
+        static let downloadSpeed = Column(CodingKeys.downloadSpeed)
         static let coreType = Column(CodingKeys.coreType)
         // 统计
         static let totalUp = Column(CodingKeys.totalUp)
@@ -366,6 +371,14 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
             guard !hasColumn else { return }
             try db.alter(table: databaseTableName) { t in
                 t.add(column: Columns.pinnedPeerCertSha256.name, .text).notNull().defaults(to: "")
+            }
+        }
+        // 下载测速结果
+        migrator.registerMigration("addProfileDownloadSpeed") { db in
+            let hasColumn = try db.columns(in: databaseTableName).contains { $0.name == Columns.downloadSpeed.name }
+            guard !hasColumn else { return }
+            try db.alter(table: databaseTableName) { t in
+                t.add(column: Columns.downloadSpeed.name, .integer).notNull().defaults(to: 0)
             }
         }
     }

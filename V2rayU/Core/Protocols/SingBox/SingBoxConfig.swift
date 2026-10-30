@@ -338,6 +338,9 @@ enum TunDefaultOutbound: String, CaseIterable {
 // Route
 struct RouteConfig: Codable {
     var auto_detect_interface: Bool = true
+    /// 查连接所属进程, 连接面板按进程显示要用; 只在主核心配置里打开 (测延迟等临时配置不需要, 每个连接都查有开销)。
+    /// TUN 的 process_name 规则 sing-box 会自己开启查找, 不靠这个
+    var find_process: Bool? = nil
     var default_domain_resolver: String = "direct-dns"
     var rules: [RouteRule] = []
     var rule_set: [RuleSetConfig]? = nil
@@ -503,7 +506,7 @@ enum SingboxBundledRuleSet {
                 type: "local",
                 tag: tag,
                 format: "binary",
-                path: "\(singboxRuleSetPath)/\(tag).srs"
+                path: RuleSetLocator.singboxRuleSetFile(tag: tag)
             )
         }
     }

@@ -23,6 +23,7 @@ extension AppDatabase {
         CombinedConfigEntity.registerMigrations(in: &migrator)
         SubscriptionEntity.registerMigrations(in: &migrator)
         RoutingEntity.registerMigrations(in: &migrator)
+        TrafficDaily.registerMigrations(in: &migrator)
         
         return migrator
     }

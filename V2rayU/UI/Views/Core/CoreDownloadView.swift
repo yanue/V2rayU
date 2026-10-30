@@ -22,6 +22,10 @@ struct CoreDownloadView: View {
             
             currentVersionCard
 
+            if coreTab == .xray {
+                xrayGeoCard
+            }
+
             if vm.showDownloadDialog, let version = vm.selectedVersion, vm.activeDownloadKind == coreTab {
                 downloadDialog(version: version)
                     .transition(.opacity)
@@ -88,6 +92,79 @@ struct CoreDownloadView: View {
     }
 
     // MARK: - 当前版本卡片
+
+    // MARK: - xray 的 geoip / geosite 数据
+
+    @State private var geoUpdating = false
+    @State private var geoResult: String? = nil
+
+    /// xray 页下面显示 geoip.dat / geosite.dat 的版本, 可以直接下载; 来源和周期在"分流数据"页设置
+    private var xrayGeoCard: some View {
+        let sources = RuleSetUpdater.sources.filter { $0.core == .xray }
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                Image(systemName: "globe.asia.australia")
+                    .foregroundColor(.accentColor)
+                Text(String(localized: .XrayGeoData))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Spacer()
+                if let r = geoResult {
+                    Text(r).font(.caption).foregroundColor(.secondary).lineLimit(1)
+                }
+                Button(action: downloadGeo) {
+                    if geoUpdating {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Label(String(localized: .RuleSetUpdateNow), systemImage: "arrow.down.circle")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(geoUpdating)
+                .focusable(false)
+                Button(String(localized: .XrayGeoMore)) {
+                    NavigationState.shared.coreSettingTab = .ruleSets
+                }
+                .buttonStyle(.borderless)
+                .focusable(false)
+            }
+            ForEach(sources) { s in
+                HStack {
+                    Text(s.fileName).font(.caption.monospaced())
+                    Text(CoreRuleSetView.description(for: s)).font(.caption).foregroundColor(.secondary)
+                    Spacer()
+                    Text(geoStatus(s)).font(.caption.monospaced()).foregroundColor(.secondary)
+                }
+                .padding(.leading, 26)
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(Color.secondary.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func geoStatus(_ s: RuleSetSource) -> String {
+        // 用户目录有更新过的就显示它, 否则显示安装目录自带的
+        let fm = FileManager.default
+        let path = fm.fileExists(atPath: s.localPath) ? s.localPath : s.bundledPath
+        guard let attrs = try? fm.attributesOfItem(atPath: path) else { return String(localized: .RuleSetNotDownloaded) }
+        let size = (attrs[.size] as? NSNumber)?.doubleValue ?? 0
+        let date = (attrs[.modificationDate] as? Date).map { Int($0.timeIntervalSince1970).formattedDate } ?? ""
+        return "\(formatBytesFixed(size, base: 1024))  \(date)"
+    }
+
+    private func downloadGeo() {
+        geoUpdating = true
+        geoResult = nil
+        Task {
+            let r = await RuleSetUpdater.shared.update(only: .xray)
+            await MainActor.run {
+                geoUpdating = false
+                geoResult = CoreRuleSetView.friendly(r)
+            }
+        }
+    }
 
     private var currentVersionCard: some View {
         HStack(spacing: 10) {
