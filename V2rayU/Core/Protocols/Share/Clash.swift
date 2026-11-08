@@ -23,6 +23,39 @@ struct Clash: Codable {
     var rules: [String]?
 }
 
+extension Clash {
+    /// 单个节点格式不对(缺 server/port、类型不符等)只跳过该节点, 不让整份订阅解析失败。
+    /// 全部节点都坏时 proxies 为空, 调用方按"没有节点"处理, 和以前解析失败一样; 没有 proxies 字段仍然解析失败
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        port = try? c.decodeIfPresent(Int.self, forKey: .port)
+        socksPort = try? c.decodeIfPresent(Int.self, forKey: .socksPort)
+        redirPort = try? c.decodeIfPresent(Int.self, forKey: .redirPort)
+        mixedPort = try? c.decodeIfPresent(Int.self, forKey: .mixedPort)
+        allowLAN = try? c.decodeIfPresent(Bool.self, forKey: .allowLAN)
+        // 只有 proxies 的节点列表文件(proxy-provider)没有 mode
+        mode = (try? c.decodeIfPresent(String.self, forKey: .mode)) ?? "rule"
+        logLevel = try? c.decodeIfPresent(String.self, forKey: .logLevel)
+        externalController = try? c.decodeIfPresent(String.self, forKey: .externalController)
+        proxies = (try c.decode([LossyClashProxy].self, forKey: .proxies)).compactMap(\.proxy)
+        rules = try? c.decodeIfPresent([String].self, forKey: .rules)
+    }
+}
+
+/// 解码失败时 proxy 为 nil, 数组其余元素照常解码
+private struct LossyClashProxy: Decodable {
+    let proxy: clashProxy?
+
+    init(from decoder: Decoder) throws {
+        do {
+            proxy = try clashProxy(from: decoder)
+        } catch {
+            logger.info("skip invalid clash proxy: \(error)")
+            proxy = nil
+        }
+    }
+}
+
 // MARK: - ClashProxy
 struct clashProxy: Codable {
     var type: String

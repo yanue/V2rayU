@@ -470,6 +470,37 @@ struct ProtocolParserTests {
         #expect(try JSONDecoder().decode(clashProxy.self, from: v4.data(using: .utf8)!).toProfile() == nil)
     }
 
+    /// 单个节点缺 server/port 只跳过它, 其他节点照常导入; 没有 mode 的节点列表文件也能解析
+    @Test func clashSkipsInvalidProxy() throws {
+        let yaml = """
+        proxies:
+          - name: ok1
+            type: trojan
+            server: a.example.com
+            port: 443
+            password: pw
+          - name: broken
+            type: vmess
+            uuid: abc
+          - name: ok2
+            type: ss
+            server: b.example.com
+            port: "8388"
+            cipher: aes-256-gcm
+            password: pw
+        """
+        let decoded = try YAMLDecoder().decode(Clash.self, from: yaml)
+        #expect(decoded.mode == "rule")
+        #expect(decoded.proxies.map(\.name) == ["ok1", "ok2"])
+        #expect(decoded.proxies.compactMap { $0.toProfile() }.count == 2)
+
+        // 全部是坏节点: proxies 为空, 调用方按"没有节点"处理
+        let allBroken = try YAMLDecoder().decode(Clash.self, from: "proxies:\n  - name: x\n    type: vmess\n")
+        #expect(allBroken.proxies.isEmpty)
+        // 不是 Clash 配置(没有 proxies)仍然解析失败, 交给其他格式
+        #expect(throws: (any Error).self) { try YAMLDecoder().decode(Clash.self, from: "foo: bar\n") }
+    }
+
     // MARK: - Clash Proxy Parsing
 
     @Test func clashVmessParser() throws {
