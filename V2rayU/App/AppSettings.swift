@@ -80,6 +80,7 @@ final class AppSettings: ObservableObject {
     @Published var tunStack: TunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
     @Published var tunDnsRemote: String = TunConfigHandler.tunRemoteDns()
     @Published var tunDnsChina: String = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
+    @Published var tunDnsSystemPlaceholder: String = UserDefaults.get(forKey: .tunDnsSystemPlaceholder, defaultValue: TunConfigHandler.defaultSystemDnsPlaceholder)
     // strict_route: 强制路由, 默认开启
     @Published var tunStrictRoute: Bool = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
     @Published var tunRouteExcludeHosts: String = UserDefaults.get(forKey: .tunRouteExcludeHosts)
@@ -183,6 +184,7 @@ final class AppSettings: ObservableObject {
         tunStack = UserDefaults.getEnum(forKey: .tunStack, type: TunStack.self, defaultValue: .system)
         tunDnsRemote = TunConfigHandler.tunRemoteDns()
         tunDnsChina = UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns)
+        tunDnsSystemPlaceholder = UserDefaults.get(forKey: .tunDnsSystemPlaceholder, defaultValue: TunConfigHandler.defaultSystemDnsPlaceholder)
         tunStrictRoute = UserDefaults.getBool(forKey: .tunStrictRoute, default: true)
         tunRouteExcludeHosts = UserDefaults.get(forKey: .tunRouteExcludeHosts)
         tunDirectProcessNames = UserDefaults.get(forKey: .tunDirectProcessNames)
@@ -267,6 +269,11 @@ final class AppSettings: ObservableObject {
         UserDefaults.set(forKey: .tunStack, value: tunStack.rawValue)
         UserDefaults.set(forKey: .tunDnsRemote, value: tunDnsRemote)
         UserDefaults.set(forKey: .tunDnsChina, value: tunDnsChina)
+        // 先去空格再比较和保存, 多打一个空格不算修改, 不触发重启
+        tunDnsSystemPlaceholder = tunDnsSystemPlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 清空即恢复默认, 界面上直接显示默认值
+        if tunDnsSystemPlaceholder.isEmpty { tunDnsSystemPlaceholder = TunConfigHandler.defaultSystemDnsPlaceholder }
+        UserDefaults.set(forKey: .tunDnsSystemPlaceholder, value: tunDnsSystemPlaceholder)
         UserDefaults.setBool(forKey: .tunStrictRoute, value: tunStrictRoute)
         UserDefaults.set(forKey: .tunRouteExcludeHosts, value: tunRouteExcludeHosts)
         UserDefaults.set(forKey: .tunDirectProcessNames, value: tunDirectProcessNames)
@@ -311,6 +318,7 @@ final class AppSettings: ObservableObject {
             old.tunStack != tunStack ||
             old.tunDnsRemote != tunDnsRemote ||
             old.tunDnsChina != tunDnsChina ||
+            old.tunDnsSystemPlaceholder != tunDnsSystemPlaceholder ||
             old.tunStrictRoute != tunStrictRoute ||
             old.tunRouteExcludeHosts != tunRouteExcludeHosts ||
             old.tunDirectProcessNames != tunDirectProcessNames ||

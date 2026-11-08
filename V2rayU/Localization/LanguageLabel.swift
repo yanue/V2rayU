@@ -128,6 +128,9 @@ enum LanguageLabel: String, CaseIterable {
     case TunRemoteDns
     case TunRemoteDnsTip
     case TunChinaDns
+    case TunSystemDns
+    case TunSystemDnsTip
+    case TunSystemDnsInvalid
     case TunStrictRoute
     case TunStrictRouteTip
     case TunRouteExcludeHosts

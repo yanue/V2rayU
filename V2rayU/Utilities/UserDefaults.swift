@@ -110,6 +110,8 @@ extension UserDefaults {
         case tunDnsRemote
         // tun china dns server
         case tunDnsChina
+        // TUN 期间写入系统 DNS 的占位地址, 默认 114.114.114.114, 清空即恢复默认 (见 TunConfigHandler.systemDnsAddress)
+        case tunDnsSystemPlaceholder
         // TUN 期间本程序写入的系统 DNS 值, 及写入前用户的原始 DNS(空格分隔, 空=DHCP)。
         // 持久化以便异常退出后仍能准确恢复。
         case tunDnsSetValue

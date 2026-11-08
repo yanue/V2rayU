@@ -19,7 +19,8 @@ import Testing
 
     @Test("System DNS placeholder is a non-DDR public resolver that is routed into TUN")
     func systemDnsPlaceholder() {
-        withDefaults([.tunDnsChina, .dnsBootstrap, .tunRouteExcludeHosts]) {
+        withDefaults([.tunDnsChina, .dnsBootstrap, .tunRouteExcludeHosts, .tunDnsSystemPlaceholder]) {
+            UserDefaults.del(forKey: .tunDnsSystemPlaceholder)
             UserDefaults.set(forKey: .tunDnsChina, value: "223.5.5.5")
             UserDefaults.set(forKey: .dnsBootstrap, value: "223.5.5.5")
             UserDefaults.set(forKey: .tunRouteExcludeHosts, value: "")
@@ -33,6 +34,30 @@ import Testing
             for ddr in ["1.1.1.1", "8.8.8.8", "9.9.9.9", "208.67.222.222"] {
                 #expect(!TunConfigHandler.systemDnsPlaceholders.contains(ddr))
             }
+        }
+    }
+
+    @Test("User-specified system DNS placeholder is used when routable, otherwise falls back (#1710)")
+    func customSystemDnsPlaceholder() {
+        withDefaults([.tunDnsChina, .dnsBootstrap, .tunRouteExcludeHosts, .tunDnsSystemPlaceholder]) {
+            UserDefaults.set(forKey: .tunDnsChina, value: "223.5.5.5")
+            UserDefaults.set(forKey: .dnsBootstrap, value: "223.5.5.5")
+            UserDefaults.set(forKey: .tunRouteExcludeHosts, value: "")
+            UserDefaults.set(forKey: .tunDnsSystemPlaceholder, value: " 119.28.28.28 ")
+            #expect(TunConfigHandler.systemDnsAddress() == "119.28.28.28")
+            // 局域网 / 非 IPv4 / 被排除的地址都回退自动选择
+            // 支持 DDR 的公共 DNS 会被 macOS 升级为加密 DNS 绕过 TUN（#1690）, 也不能用
+            for bad in ["192.168.1.1", "10.0.0.1", "abc", "2400:3200::1", "223.5.5.5", "1.1.1.1", "1.0.0.1", "8.8.8.8", "9.9.9.9"] {
+                UserDefaults.set(forKey: .tunDnsSystemPlaceholder, value: bad)
+                #expect(TunConfigHandler.systemDnsAddress() == "114.114.114.114")
+            }
+            UserDefaults.set(forKey: .tunDnsSystemPlaceholder, value: "119.28.28.28")
+            UserDefaults.set(forKey: .tunRouteExcludeHosts, value: "119.28.28.0/24")
+            #expect(TunConfigHandler.systemDnsAddress() == "114.114.114.114")
+            // 清空即恢复默认 114
+            UserDefaults.set(forKey: .tunRouteExcludeHosts, value: "")
+            UserDefaults.set(forKey: .tunDnsSystemPlaceholder, value: "")
+            #expect(TunConfigHandler.systemDnsAddress() == TunConfigHandler.defaultSystemDnsPlaceholder)
         }
     }
 

@@ -899,6 +899,9 @@ To enable Tun mode: Click the V2rayU icon in the menu bar -> Select Tun mode, or
 "TunRemoteDns" = "Tun Remote DNS";
 "TunRemoteDnsTip" = "Used in TUN mode as the remote DNS, resolving foreign domains via DoH through the proxy. System DNS is temporarily set to a domestic public resolver (e.g. 114.114.114.114) so TUN can split DNS (domestic domains use domestic DNS); it is restored on stop.";
 "TunChinaDns" = "Tun China DNS";
+"TunSystemDns" = "Tun System DNS";
+"TunSystemDnsTip" = "Placeholder written to system DNS while TUN is on, only so queries enter TUN and get hijacked; real resolving uses the DNS above. Must be a public IPv4 outside the excluded hosts (invalid or conflicting values fall back to 114.114.114.114 etc.; clear to restore the default). 1.1.1.1 / 8.8.8.8 / 9.9.9.9 etc. are rejected: macOS upgrades them to encrypted DNS, which bypasses TUN.";
+"TunSystemDnsInvalid" = "This address cannot be used (must be a public IPv4 that does not upgrade to encrypted DNS); 114.114.114.114 or another fallback will be used instead.";
 "TunStrictRoute" = "Strict route (strict_route)";
 "TunStrictRouteTip" = "Enabled by default. Try turning it off if the network occasionally breaks after switching networks.";
 "TunRouteExcludeHosts" = "TUN bypass destinations";

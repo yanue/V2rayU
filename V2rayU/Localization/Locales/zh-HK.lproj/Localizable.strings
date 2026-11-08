@@ -899,6 +899,9 @@
 "TunRemoteDns" = "Tun 國外 DNS";
 "TunRemoteDnsTip" = "TUN 模式下作為 remote-dns，經代理以 DoH 解析國外域名。系統 DNS 會臨時設為國內公共 DNS（如 114.114.114.114），由 TUN 統一分流（國內域名走國內 DNS），停止時恢復。";
 "TunChinaDns" = "Tun 國內 DNS";
+"TunSystemDns" = "Tun 系統 DNS";
+"TunSystemDnsTip" = "TUN 開啟時臨時寫入系統 DNS 的佔位地址，只用來讓系統查詢進入 TUN 被接管，實際解析仍由上面的 DNS 完成。需填公網 IPv4 且不在排除地址中，填錯或衝突時自動改用 114 等備選地址，清空即恢復預設。1.1.1.1 / 8.8.8.8 / 9.9.9.9 等會被 macOS 自動升級為加密 DNS 繞過 TUN，不能使用。";
+"TunSystemDnsInvalid" = "這個地址不能用（需是公網 IPv4，且不能是 1.1.1.1、8.8.8.8 這類會自動升級加密的 DNS），實際會改用 114.114.114.114 等備選地址。";
 "TunStrictRoute" = "強制路由 (strict_route)";
 "TunStrictRouteTip" = "預設開啟。網路切換後偶發斷線時可嘗試關閉";
 "TunRouteExcludeHosts" = "TUN 繞過位址";

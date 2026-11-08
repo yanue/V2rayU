@@ -49,6 +49,7 @@ enum TunConfigHandler {
     /// 3. 不在 TUN route_exclude 中：tunDnsChina / bootstrap DNS（默认 223.5.5.5、119.29.29.29）被排除，查询会绕过 TUN。
     /// 4. 异常退出残留时仍是可用的公共 DNS（不能用 TUN 网段地址，否则残留即断网）。
     static let systemDnsPlaceholders = ["114.114.114.114", "114.114.115.115", "180.76.76.76", "1.2.4.8"]
+    static let defaultSystemDnsPlaceholder = systemDnsPlaceholders[0]
 
     /// "Tun 国外 DNS"可选的上游（经代理 DoH 查询）。旧版本的 208.67.222.222 (OpenDNS) 已移除,
     /// 已保存的不在列表中的值回退到默认 1.1.1.1。
@@ -61,6 +62,10 @@ enum TunConfigHandler {
         return tunRemoteDnsOptions.contains(saved) ? saved : defaultTunRemoteDns
     }
 
+    /// 不能作占位的网段: 局域网/本机/链路本地/CGNAT 等（on-link 路由优先于 TUN，查询不进 TUN）
+    private static let nonRoutedRanges = ["0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16",
+                                          "172.16.0.0/12", "192.168.0.0/16", "198.18.0.0/15", "224.0.0.0/3"]
+
     static func systemDnsAddress() -> String {
         let bypassed = [
             UserDefaults.get(forKey: .tunDnsChina, defaultValue: defaultBootstrapDns),
@@ -68,9 +73,27 @@ enum TunConfigHandler {
         ].map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         // 只看字面 IP/CIDR，避免为选占位地址做域名解析
         let userExcluded = resolveRouteExcludeAddresses(from: UserDefaults.get(forKey: .tunRouteExcludeHosts), resolver: { _ in [] })
-        return systemDnsPlaceholders.first { candidate in
+        func usable(_ candidate: String) -> Bool {
             !bypassed.contains(candidate) && !userExcluded.contains { ipv4(candidate, isInside: $0) }
-        } ?? systemDnsPlaceholders[0]
+        }
+        // 用户指定的占位地址（#1710，默认 114.114.114.114，清空即恢复默认）: 必须是公网 IPv4 且会经过 TUN，否则回退自动选择
+        let custom = UserDefaults.get(forKey: .tunDnsSystemPlaceholder, defaultValue: defaultSystemDnsPlaceholder)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if isValidSystemDnsPlaceholder(custom), usable(custom) {
+            return custom
+        }
+        return systemDnsPlaceholders.first(where: usable) ?? systemDnsPlaceholders[0]
+    }
+
+    /// 支持 DDR 的常见公共 DNS: macOS 会自动升级为加密 DNS 绕过 hijack-dns（#1690），不能作占位
+    static let ddrResolvers: Set<String> = ["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4", "9.9.9.9", "149.112.112.112",
+                                            "208.67.222.222", "208.67.220.220"]
+
+    static func isValidSystemDnsPlaceholder(_ address: String) -> Bool {
+        var addr = in_addr()
+        guard address.withCString({ inet_pton(AF_INET, $0, &addr) }) == 1 else { return false }
+        guard !ddrResolvers.contains(address) else { return false }
+        return !nonRoutedRanges.contains { ipv4(address, isInside: $0) }
     }
 
     private static func ipv4(_ address: String, isInside cidr: String) -> Bool {

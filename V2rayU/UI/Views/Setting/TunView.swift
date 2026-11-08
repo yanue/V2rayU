@@ -73,6 +73,8 @@ struct TunView: View {
                             Text(pick.rawValue)
                         }
                     }
+                    .labelsHidden()
+                    .frame(width: 220, alignment: .leading)
                     .padding(.leading, 7)
                     Spacer()
                 }
@@ -84,6 +86,8 @@ struct TunView: View {
                             Text(pick.rawValue)
                         }
                     }
+                    .labelsHidden()
+                    .frame(width: 220, alignment: .leading)
                     .padding(.leading, 7)
                     Spacer()
                 }
@@ -252,8 +256,11 @@ struct TunView: View {
                                 Text("\(dns) (\(TunConfigHandler.tunRemoteDnsLabels[dns] ?? ""))").tag(dns)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.menu)
-                        .frame(width: 220)
+                        .frame(width: 220, alignment: .leading)
+                        .padding(.leading, 7)
+                        Spacer()
                     }
                     Label(String(localized: .TunRemoteDnsTip), systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
@@ -268,6 +275,29 @@ struct TunView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.leading, 7)
                     Spacer()
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        getTextLabel(label: .TunSystemDns, labelWidth: labelWidth)
+                        TextField(TunConfigHandler.defaultSystemDnsPlaceholder, text: $settings.tunDnsSystemPlaceholder)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.leading, 7)
+                        Spacer()
+                    }
+                    // 填的地址用不了时当场提示, 免得用户以为生效了
+                    if !settings.tunDnsSystemPlaceholder.trimmingCharacters(in: .whitespaces).isEmpty,
+                       !TunConfigHandler.isValidSystemDnsPlaceholder(settings.tunDnsSystemPlaceholder.trimmingCharacters(in: .whitespaces)) {
+                        Label(String(localized: .TunSystemDnsInvalid), systemImage: "xmark.octagon.fill")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.leading, labelWidth + 7)
+                    }
+                    Label(String(localized: .TunSystemDnsTip), systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.leading, labelWidth + 7)
                 }
 
                 Divider()
