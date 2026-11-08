@@ -144,6 +144,34 @@
       }
     },
     {
+      "key": "outbound.tuic",
+      "display_name": "TUIC outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "sing-box 支持 TUIC v5 出站（不支持 v4 token 形式）。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 tuic 出站。"
+      }
+    },
+    {
+      "key": "outbound.wireguard",
+      "display_name": "WireGuard outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "supported",
+        "note": "sing-box 1.11 起 WireGuard 改为 endpoint，旧 outbound 写法 1.13 删除；生成器按版本自动选择写法。"
+      },
+      "app_support": {
+        "level": "supported",
+        "note": "当前生成器已实现 wireguard（>= 1.11 生成 endpoint）。"
+      }
+    },
+    {
       "key": "outbound.hysteria2",
       "display_name": "Hysteria2 outbound",
       "kind": "Outbound",

@@ -135,6 +135,38 @@ struct ConfigServerView: View {
                         getTextFieldWithLabel(label: .Username, text: $item.host)
                         getTextFieldWithLabel(label: .Password, text: $item.password)
                     }
+
+                    if item.protocol == .wireguard {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .PrivateKey, text: $item.password) // 用 password 存储本地私钥
+                        getTextFieldWithLabel(label: .PeerPublicKey, text: $item.publicKey)
+                        getTextFieldWithLabel(label: .LocalAddress, text: $item.wireGuardLocalAddress)
+                        getTextFieldWithLabel(label: .PreSharedKey, text: $item.wireGuardPreSharedKey)
+                        getTextFieldWithLabel(label: .Reserved, text: $item.wireGuardReserved)
+                        getNumFieldWithLabel(label: .MTU, num: $item.wireGuardMtu)
+                    }
+
+                    if item.protocol == .tuic {
+                        getTextFieldWithLabel(label: .Address, text: $item.address)
+                        getNumFieldWithLabel(label: .Port, num: $item.port)
+                        getTextFieldWithLabel(label: .ID, text: $item.host) // 用 host 存储 tuic uuid
+                        getTextFieldWithLabel(label: .Password, text: $item.password)
+                        HStack {
+                            getTextLabel(label: .CongestionControl)
+                            Picker("", selection: $item.encryption) { // 用 encryption 存储拥塞控制
+                                Text("default").tag("")
+                                ForEach(TuicUri.congestionControls, id: \.self) { Text($0).tag($0) }
+                            }
+                        }
+                        HStack {
+                            getTextLabel(label: .UdpRelayMode)
+                            Picker("", selection: $item.path) { // 用 path 存储 UDP 转发模式
+                                Text("default").tag("")
+                                ForEach(TuicUri.udpRelayModes, id: \.self) { Text($0).tag($0) }
+                            }
+                        }
+                    }
                 }
                 .id(item.protocol) // Force full subtree recreation on protocol change
             }

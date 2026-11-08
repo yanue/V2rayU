@@ -53,6 +53,34 @@ struct clashProxy: Codable {
     var h2Opts: clashH2Opts? // vmess
     var grpcOpts: grpcOpts? // vmess
     var realityOpts: realityOpts? // vless
+    var alpn: [String]? // tuic
+    var congestionController: String? // tuic
+    var udpRelayMode: String? // tuic
+    var privateKey: String? // wireguard
+    var publicKey: String? // wireguard
+    var preSharedKey: String? // wireguard
+    var ip: String? // wireguard
+    var ipv6: String? // wireguard
+    var reserved: String? // wireguard: "1,2,3" 或 base64, 数组写法转成逗号分隔
+    var mtu: Int? // wireguard
+    var peers: [clashWireGuardPeer]? // wireguard 多 peer 写法, 只取第一个
+}
+
+struct clashWireGuardPeer: Codable {
+    var server: String?
+    var port: Int?
+    var publicKey: String?
+    var preSharedKey: String?
+    var reserved: String?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: ClashKey.self)
+        server = c.clashValue(String.self, "server")
+        port = c.clashInt("port")
+        publicKey = c.clashValue(String.self, "public-key", "publicKey")
+        preSharedKey = c.clashValue(String.self, "pre-shared-key", "preSharedKey")
+        reserved = c.clashReserved()
+    }
 }
 
 // Clash / mihomo 的字段名是连字符写法(ws-opts、skip-cert-verify、reality-opts 等)，
@@ -77,6 +105,14 @@ extension KeyedDecodingContainer where K == ClashKey {
         return nil
     }
 
+    /// wireguard reserved: 数组 [1, 2, 3] 或字符串 "1,2,3" / base64
+    func clashReserved() -> String? {
+        if let values = try? decodeIfPresent([Int].self, forKey: ClashKey("reserved")) {
+            return values.map(String.init).joined(separator: ",")
+        }
+        return clashValue(String.self, "reserved")
+    }
+
     /// 数字字段兼容字符串写法(port: "443")
     func clashInt(_ names: String...) -> Int? {
         for name in names {
@@ -94,8 +130,12 @@ extension KeyedDecodingContainer where K == ClashKey {
 extension clashProxy {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: ClashKey.self)
-        guard let type = c.clashValue(String.self, "type"), let server = c.clashValue(String.self, "server"),
-              let port = c.clashInt("port") else {
+        // wireguard 的 peers 写法可以只在 peer 里写 server/port, 顶层没有时从第一个 peer 取;
+        // 不能直接抛错: proxies 里任何一个节点解码失败都会让整份订阅解析失败
+        let peers = c.clashValue([clashWireGuardPeer].self, "peers")
+        guard let type = c.clashValue(String.self, "type"),
+              let server = c.clashValue(String.self, "server") ?? peers?.first?.server,
+              let port = c.clashInt("port") ?? peers?.first?.port else {
             throw DecodingError.dataCorrupted(.init(codingPath: c.codingPath, debugDescription: "clash proxy missing type/server/port"))
         }
         self.type = type
@@ -126,6 +166,17 @@ extension clashProxy {
         self.h2Opts = c.clashValue(clashH2Opts.self, "h2-opts", "h2Opts")
         self.grpcOpts = c.clashValue(V2rayU.grpcOpts.self, "grpc-opts", "grpcOpts")
         self.realityOpts = c.clashValue(V2rayU.realityOpts.self, "reality-opts", "realityOpts")
+        self.alpn = c.clashValue([String].self, "alpn")
+        self.congestionController = c.clashValue(String.self, "congestion-controller", "congestion-control", "congestionController")
+        self.udpRelayMode = c.clashValue(String.self, "udp-relay-mode", "udpRelayMode")
+        self.privateKey = c.clashValue(String.self, "private-key", "privateKey")
+        self.publicKey = c.clashValue(String.self, "public-key", "publicKey")
+        self.preSharedKey = c.clashValue(String.self, "pre-shared-key", "preSharedKey")
+        self.ip = c.clashValue(String.self, "ip")
+        self.ipv6 = c.clashValue(String.self, "ipv6")
+        self.reserved = c.clashReserved()
+        self.mtu = c.clashInt("mtu")
+        self.peers = peers
     }
 }
 
@@ -243,6 +294,38 @@ extension clashProxy {
             profile.sni = self.servername ?? self.sni ?? self.server
             // uTLS is not supported on naive outbound
             profile.fingerprint = .none
+
+        case "tuic":
+            // 只支持 v5 (uuid + password), v4 的 token 形式 sing-box 不支持
+            guard let uuid = self.uuid, !uuid.isEmpty else { return nil }
+            profile.protocol = .tuic
+            profile.network = .tcp
+            profile.security = .tls
+            profile.host = uuid
+            profile.password = self.password ?? ""
+            profile.sni = self.servername ?? self.sni ?? self.server
+            profile.fingerprint = .none
+            profile.encryption = TuicUri.normalizedCongestionControl(self.congestionController ?? "")
+            profile.path = TuicUri.normalizedUdpRelayMode(self.udpRelayMode ?? "")
+            profile.alpn = TuicUri.normalizedAlpn((self.alpn ?? []).joined(separator: ","))
+
+        case "wireguard":
+            let peer = self.peers?.first
+            guard let privateKey = self.privateKey, !privateKey.isEmpty,
+                  let publicKey = peer?.publicKey ?? self.publicKey, !publicKey.isEmpty else { return nil }
+            profile.protocol = .wireguard
+            profile.network = .tcp
+            profile.security = .none
+            profile.address = peer?.server ?? self.server
+            profile.port = peer?.port ?? self.port
+            profile.password = privateKey
+            profile.publicKey = publicKey
+            var wg = ProfileEntity.WireGuardConfig()
+            wg.localAddress = WireGuardUri.joinList([self.ip, self.ipv6].compactMap { $0 }.flatMap { WireGuardUri.localAddresses($0) })
+            wg.preSharedKey = peer?.preSharedKey ?? self.preSharedKey ?? ""
+            wg.reserved = WireGuardUri.normalizedReserved(peer?.reserved ?? self.reserved ?? "")
+            if let mtu = self.mtu, mtu > 0 { wg.mtu = mtu }
+            profile.setWireGuardConfig(wg)
 
         default:
             return nil

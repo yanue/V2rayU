@@ -132,4 +132,78 @@ import Testing
         #expect(outbounds.allSatisfy { $0["detour"] == nil })
         #expect(outbound(config, tag: "combo-selector-0") != nil)
     }
+
+    /// WireGuard 作为 "proxy" 时不能复制一份(同一私钥两个设备会抢会话), 用 selector 指向已有的那个
+    @Test("sing-box combination does not duplicate WireGuard as proxy")
+    func singboxWireGuardNotDuplicated() throws {
+        var wg = ProfileEntity(uuid: "wg-uuid", protocol: .wireguard, address: "wg.example.com", port: 51820, password: "priv")
+        wg.publicKey = "pub"
+        wg.setWireGuardConfig(ProfileEntity.WireGuardConfig(localAddress: "172.16.0.2/32"))
+        let group = CombinedInboundOutboundGroup(id: "g1", inboundType: .mixed, port: 18080, outboundProfileUUIDs: [wg.uuid, exit.uuid])
+        let resolved = CombinedConfigResolved(
+            combination: CombinedConfigEntity(uuid: "combo", groups: [group], outboundMode: .balance),
+            groups: [CombinedConfigResolvedGroup(group: group, profiles: [wg, exit])],
+            coreType: .SingBox, warningMessage: nil, canLaunch: true
+        )
+        let config = try parse(SingboxConfigHandler().toJSON(combination: resolved))
+        let all = (config["outbounds"] as? [[String: Any]] ?? []) + (config["endpoints"] as? [[String: Any]] ?? [])
+        #expect(all.filter { $0["type"] as? String == "wireguard" }.count == 1)
+        let proxy = try #require(all.first { $0["tag"] as? String == "proxy" })
+        #expect(proxy["type"] as? String == "selector")
+        let wgTag = resolved.outboundTag(groupIndex: 0, profileIndex: 0)
+        #expect(proxy["outbounds"] as? [String] == [wgTag])
+    }
+
+    /// xray 没有 selector: 不复制 WireGuard, 路由规则里的 "proxy" 改指向已有的那个
+    @Test("xray combination does not duplicate WireGuard as proxy")
+    func xrayWireGuardNotDuplicated() throws {
+        var wg = ProfileEntity(uuid: "wg-uuid", protocol: .wireguard, address: "wg.example.com", port: 51820, password: "priv")
+        wg.publicKey = "pub"
+        wg.setWireGuardConfig(ProfileEntity.WireGuardConfig(localAddress: "172.16.0.2/32"))
+        let group = CombinedInboundOutboundGroup(id: "g1", inboundType: .mixed, port: 18080, outboundProfileUUIDs: [wg.uuid, exit.uuid])
+        let resolved = CombinedConfigResolved(
+            combination: CombinedConfigEntity(uuid: "combo", groups: [group], outboundMode: .balance),
+            groups: [CombinedConfigResolvedGroup(group: group, profiles: [wg, exit])],
+            coreType: .XrayCore, warningMessage: nil, canLaunch: true
+        )
+        let config = try parse(V2rayConfigHandler().toJSON(combination: resolved))
+        let outbounds = config["outbounds"] as? [[String: Any]] ?? []
+        #expect(outbounds.filter { $0["protocol"] as? String == "wireguard" }.count == 1)
+        #expect(outbound(config, tag: "proxy") == nil)
+        let wgTag = resolved.outboundTag(groupIndex: 0, profileIndex: 0)
+        let rules = ((config["routing"] as? [String: Any])?["rules"] as? [[String: Any]]) ?? []
+        #expect(!rules.contains { $0["outboundTag"] as? String == "proxy" })
+        #expect(resolved.wireGuardProxyTag == wgTag)
+    }
+
+    /// 同一 WireGuard 节点放进两个分组: 只生成一份, 第二个分组复用它的 tag
+    @Test("combination reuses one WireGuard across groups", arguments: [CoreType.SingBox, CoreType.XrayCore])
+    func wireGuardSharedAcrossGroups(coreType: CoreType) throws {
+        var wg = ProfileEntity(uuid: "wg-uuid", protocol: .wireguard, address: "wg.example.com", port: 51820, password: "priv")
+        wg.publicKey = "pub"
+        wg.setWireGuardConfig(ProfileEntity.WireGuardConfig(localAddress: "172.16.0.2/32"))
+        let g1 = CombinedInboundOutboundGroup(id: "g1", inboundType: .mixed, port: 18080, outboundProfileUUIDs: [wg.uuid])
+        let g2 = CombinedInboundOutboundGroup(id: "g2", inboundType: .mixed, port: 18081, outboundProfileUUIDs: [exit.uuid, wg.uuid, wg.uuid])
+        let resolved = CombinedConfigResolved(
+            combination: CombinedConfigEntity(uuid: "combo", groups: [g1, g2], outboundMode: .balance),
+            groups: [CombinedConfigResolvedGroup(group: g1, profiles: [wg]), CombinedConfigResolvedGroup(group: g2, profiles: [exit, wg, wg])],
+            coreType: coreType, warningMessage: nil, canLaunch: true
+        )
+        let json = coreType == .SingBox ? SingboxConfigHandler().toJSON(combination: resolved) : V2rayConfigHandler().toJSON(combination: resolved)
+        let config = try parse(json)
+        let all = (config["outbounds"] as? [[String: Any]] ?? []) + (config["endpoints"] as? [[String: Any]] ?? [])
+        let typeKey = coreType == .SingBox ? "type" : "protocol"
+        #expect(all.filter { $0[typeKey] as? String == "wireguard" }.count == 1)
+
+        let wgTag = resolved.outboundTag(groupIndex: 0, profileIndex: 0)
+        let exitTag2 = resolved.outboundTag(groupIndex: 1, profileIndex: 0)
+        if coreType == .SingBox {
+            let selector = try #require(all.first { $0["tag"] as? String == "combo-selector-1" })
+            #expect(selector["outbounds"] as? [String] == [exitTag2, wgTag])
+        } else {
+            let balancers = ((config["routing"] as? [String: Any])?["balancers"] as? [[String: Any]]) ?? []
+            let balancer = try #require(balancers.first { $0["tag"] as? String == "combo-balancer-1" })
+            #expect(balancer["selector"] as? [String] == [exitTag2, wgTag])
+        }
+    }
 }

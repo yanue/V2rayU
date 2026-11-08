@@ -12,7 +12,7 @@ protocol V2rayOutboundSettings: Codable {}
 
 // MARK: - Protocol Definitions
 enum V2rayProtocolOutbound: String, Codable, CaseIterable, Identifiable {
-    case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom, anytls, naive
+    case trojan, vmess, vless, shadowsocks, socks, dns, http, blackhole, freedom, anytls, naive, tuic, wireguard
     case hysteria2 = "hysteria"
     var id: Self { self }
     
@@ -66,7 +66,8 @@ final class V2rayOutbound: Codable {
         case .vless: settings = try? container.decode(V2rayOutboundVLess.self, forKey: .settings)
         case .trojan: settings = try? container.decode(V2rayOutboundTrojan.self, forKey: .settings)
         case .hysteria2: settings = try? container.decode(V2rayOutboundHysteria2.self, forKey: .settings)
-        case .anytls, .naive: settings = nil
+        case .wireguard: settings = try? container.decode(V2rayOutboundWireGuard.self, forKey: .settings)
+        case .anytls, .naive, .tuic: settings = nil
         }
     }
 
@@ -93,6 +94,7 @@ final class V2rayOutbound: Codable {
         case let value as V2rayOutboundVLess: try container.encode(value, forKey: .settings)
         case let value as V2rayOutboundTrojan: try container.encode(value, forKey: .settings)
         case let value as V2rayOutboundHysteria2: try container.encode(value, forKey: .settings)
+        case let value as V2rayOutboundWireGuard: try container.encode(value, forKey: .settings)
         default: break
         }
     }
@@ -205,6 +207,22 @@ struct V2rayOutboundHttpServer: Codable {
 struct V2rayOutboundHttpUser: Codable {
     var user: String = ""
     var pass: String = ""
+}
+
+// WireGuard: https://xtls.github.io/config/outbounds/wireguard.html
+struct V2rayOutboundWireGuard: V2rayOutboundSettings {
+    var secretKey: String = ""
+    var address: [String] = []
+    var peers: [V2rayOutboundWireGuardPeer] = []
+    var mtu: Int?
+    var reserved: [Int]?
+}
+
+struct V2rayOutboundWireGuardPeer: Codable {
+    var publicKey: String = ""
+    var preSharedKey: String?
+    var endpoint: String = "" // host:port, IPv6 需加 []
+    var allowedIPs: [String]?
 }
 
 struct V2rayOutboundVLess: V2rayOutboundSettings {

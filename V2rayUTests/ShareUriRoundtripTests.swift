@@ -205,10 +205,40 @@ struct ShareUriRoundtripTests {
         #expect(result.password == original.password)
     }
 
+    // MARK: - TUIC Roundtrip
+
+    @Test func tuicRoundtrip() throws {
+        var original = makeProfile(
+            protocol: .tuic, remark: "tuic-rt", address: "tuic.example.com",
+            port: 443, password: "tuicPass",
+            security: .tls, sni: "sni.example.com"
+        )
+        original.host = "2dd61d93-75d8-4da4-ac0e-6aece7eac365"
+        original.encryption = "bbr"
+        original.path = "quic"
+        original.alpn = .h3
+        let encoded = TuicUri(from: original).encode()
+        #expect(encoded.hasPrefix("tuic://"))
+
+        let decoded = TuicUri()
+        #expect(decoded.parse(url: URL(string: encoded)!) == nil)
+
+        let result = decoded.getProfile()
+        #expect(result.remark == original.remark)
+        #expect(result.address == original.address)
+        #expect(result.port == original.port)
+        #expect(result.host == original.host)
+        #expect(result.password == original.password)
+        #expect(result.encryption == "bbr")
+        #expect(result.path == "quic")
+        #expect(result.alpn == .h3)
+        #expect(result.sni == original.sni)
+    }
+
     // MARK: - ShareUri Factory
 
     @Test func shareUriFactoryAllProtocols() throws {
-        let protocols: [V2rayProtocolOutbound] = [.vmess, .vless, .trojan, .shadowsocks, .hysteria2, .anytls, .naive]
+        let protocols: [V2rayProtocolOutbound] = [.vmess, .vless, .trojan, .shadowsocks, .hysteria2, .anytls, .naive, .tuic]
         for proto in protocols {
             let profile = makeProfile(protocol: proto, remark: "factory-\(proto.rawValue)")
             let uri = ShareUri.generateShareUri(item: profile)

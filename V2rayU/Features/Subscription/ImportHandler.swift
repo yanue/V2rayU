@@ -40,7 +40,7 @@ func importUri(url: String) {
 }
 
 func supportProtocol(uri: String) -> Bool {
-    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") || uri.hasPrefix("naive://") || uri.hasPrefix("naive+https://") {
+    if uri.hasPrefix("ss://") || uri.hasPrefix("ssr://") || uri.hasPrefix("vmess://") || uri.hasPrefix("vless://") || uri.hasPrefix("trojan://") || uri.hasPrefix("hysteria2://") || uri.hasPrefix("anytls://") || uri.hasPrefix("naive://") || uri.hasPrefix("naive+https://") || uri.hasPrefix("tuic://") || uri.hasPrefix("wireguard://") || uri.hasPrefix("wg://") {
         return true
     }
     return false
@@ -58,13 +58,14 @@ func importFromJson(json: String) -> ProfileEntity? {
     }
 
     do {
-        guard let jsonObj = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let outbounds = jsonObj["outbounds"] as? [[String: Any]] else {
+        guard let jsonObj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return nil
         }
+        // sing-box >= 1.11 的 WireGuard 在 endpoints 里, 一起找
+        let outbounds = (jsonObj["outbounds"] as? [[String: Any]] ?? []) + (jsonObj["endpoints"] as? [[String: Any]] ?? [])
 
         // 找到第一个代理协议的 outbound（跳过 freedom/blackhole/dns 等）
-        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2", "anytls", "naive"])
+        let proxyProtocols = Set(["vmess", "vless", "trojan", "shadowsocks", "hysteria2", "anytls", "naive", "tuic", "wireguard"])
         guard let proxyOutbound = outbounds.first(where: {
             let proto = ($0["protocol"] as? String) ?? ($0["type"] as? String)
             return proto.map { proxyProtocols.contains($0.lowercased()) } ?? false
@@ -191,6 +192,69 @@ private func parseOutboundToProfile(protocolStr: String, outbound: [String: Any]
                 profile.alpn = V2rayStreamAlpn(rawValue: alpnStr) ?? .h2h1
             }
         }
+
+    case "tuic":
+        profile.protocol = .tuic
+        profile.network = .tcp
+        profile.security = .tls
+        profile.fingerprint = .none
+        profile.address = outbound["address"] as? String ?? outbound["server"] as? String ?? ""
+        profile.port = outbound["port"] as? Int ?? outbound["server_port"] as? Int ?? 0
+        profile.host = outbound["uuid"] as? String ?? ""
+        profile.password = outbound["password"] as? String ?? ""
+        profile.encryption = TuicUri.normalizedCongestionControl(outbound["congestion_control"] as? String ?? "")
+        profile.path = TuicUri.normalizedUdpRelayMode(outbound["udp_relay_mode"] as? String ?? "")
+        profile.alpn = .h3
+        if let tls = outbound["tls"] as? [String: Any] {
+            profile.sni = tls["server_name"] as? String ?? profile.address
+            profile.allowInsecure = tls["insecure"] as? Bool ?? false
+            profile.alpn = TuicUri.normalizedAlpn((tls["alpn"] as? [String] ?? []).joined(separator: ","))
+        }
+
+    case "wireguard":
+        // 三种写法: Xray settings / sing-box 旧 outbound / sing-box endpoint(peers)
+        profile.protocol = .wireguard
+        profile.network = .tcp
+        profile.security = .none
+        var wg = ProfileEntity.WireGuardConfig()
+        var reserved: Any?
+        if let settings = outbound["settings"] as? [String: Any] {
+            profile.password = settings["secretKey"] as? String ?? ""
+            wg.localAddress = WireGuardUri.joinList(WireGuardUri.localAddresses(WireGuardUri.joinList(settings["address"] as? [String] ?? [])))
+            wg.mtu = settings["mtu"] as? Int ?? wg.mtu
+            reserved = settings["reserved"]
+            if let peer = (settings["peers"] as? [[String: Any]])?.first {
+                profile.publicKey = peer["publicKey"] as? String ?? ""
+                wg.preSharedKey = peer["preSharedKey"] as? String ?? ""
+                let endpoint = peer["endpoint"] as? String ?? ""
+                profile.address = WireGuardUri.host(ofEndpoint: endpoint)
+                profile.port = Int(endpoint.split(separator: ":").last ?? "") ?? 0
+            }
+        } else {
+            profile.password = outbound["private_key"] as? String ?? ""
+            let addresses = outbound["address"] as? [String] ?? outbound["local_address"] as? [String] ?? []
+            wg.localAddress = WireGuardUri.joinList(WireGuardUri.localAddresses(WireGuardUri.joinList(addresses)))
+            wg.mtu = outbound["mtu"] as? Int ?? wg.mtu
+            if let peer = (outbound["peers"] as? [[String: Any]])?.first {
+                profile.address = peer["address"] as? String ?? ""
+                profile.port = peer["port"] as? Int ?? 0
+                profile.publicKey = peer["public_key"] as? String ?? ""
+                wg.preSharedKey = peer["pre_shared_key"] as? String ?? ""
+                reserved = peer["reserved"]
+            } else {
+                profile.address = outbound["server"] as? String ?? ""
+                profile.port = outbound["server_port"] as? Int ?? 0
+                profile.publicKey = outbound["peer_public_key"] as? String ?? ""
+                wg.preSharedKey = outbound["pre_shared_key"] as? String ?? ""
+                reserved = outbound["reserved"]
+            }
+        }
+        if let values = reserved as? [Int] {
+            wg.reserved = WireGuardUri.normalizedReserved(values.map(String.init).joined(separator: ","))
+        } else if let text = reserved as? String {
+            wg.reserved = WireGuardUri.normalizedReserved(text)
+        }
+        profile.setWireGuardConfig(wg)
 
     default:
         return nil
@@ -349,6 +413,15 @@ class ImportUri {
                 url = normalizedUrl
             }
             uriHandler = NaiveUri()
+        } else if share_uri.hasPrefix("tuic://") {
+            uriHandler = TuicUri()
+        } else if share_uri.hasPrefix("wireguard://") || share_uri.hasPrefix("wg://") {
+            // wg:// 是 wireguard:// 的简写
+            let normalizedUri = share_uri.replacingOccurrences(of: "wg://", with: "wireguard://", options: .anchored)
+            if let normalizedUrl = URL(string: normalizedUri) {
+                url = normalizedUrl
+            }
+            uriHandler = WireGuardUri()
         }
 
         // 解析 URI

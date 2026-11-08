@@ -149,13 +149,28 @@ class V2rayOutboundHandler {
             outboundTrojan.servers = [serverTrojan]
             outbound.settings = outboundTrojan
 
+        case .wireguard:
+            let wg = self.profile.entity.getWireGuardConfig()
+            var peer = V2rayOutboundWireGuardPeer()
+            peer.publicKey = self.profile.publicKey
+            peer.preSharedKey = wg.preSharedKey.isEmpty ? nil : wg.preSharedKey
+            peer.endpoint = WireGuardUri.endpoint(host: self.profile.address, port: self.profile.port)
+            peer.allowedIPs = ["0.0.0.0/0", "::/0"]
+            var settings = V2rayOutboundWireGuard()
+            settings.secretKey = self.profile.password
+            settings.address = WireGuardUri.localAddresses(wg.localAddress)
+            settings.peers = [peer]
+            settings.mtu = wg.mtu > 0 ? wg.mtu : nil
+            settings.reserved = WireGuardUri.parseReserved(wg.reserved)
+            outbound.settings = settings
+
         default:
             break
         }
     }
 
     private func updateStreamSettings() {
-        if self.profile.protocol == .socks || self.profile.protocol == .hysteria2 || self.profile.protocol == .shadowsocks {
+        if self.profile.protocol == .socks || self.profile.protocol == .hysteria2 || self.profile.protocol == .shadowsocks || self.profile.protocol == .wireguard {
             return
         }
 

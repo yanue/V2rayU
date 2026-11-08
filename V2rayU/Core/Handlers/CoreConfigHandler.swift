@@ -32,6 +32,17 @@ struct CombinedConfigResolved {
         return combinedOutboundTag(isChain: isChain(resolvedGroup), groupIndex: groupIndex, profileIndex: profileIndex, uuid: resolvedGroup.profiles[profileIndex].uuid)
     }
 
+    /// "proxy" 本应复制的那个节点(首组链式取出口, 否则取第一个节点)是 WireGuard 时, 返回它已有的 tag。
+    /// WireGuard 不能复制: 两个设备用同一私钥连同一对端会互相抢会话, "proxy" 要改为指向已有的那个
+    var wireGuardProxyTag: String? {
+        if chainProxyPreviousTag != nil, let group = groups.first, let exit = group.profiles.last {
+            return exit.protocol == .wireguard ? outboundTag(groupIndex: 0, profileIndex: group.profiles.count - 1) : nil
+        }
+        guard let groupIndex = groups.firstIndex(where: { !$0.profiles.isEmpty }),
+              groups[groupIndex].profiles[0].protocol == .wireguard else { return nil }
+        return outboundTag(groupIndex: groupIndex, profileIndex: 0)
+    }
+
     /// 首组为链式时，出口的上一跳 tag（"proxy" 复制出口并经由它拨号，同样走整条链）；否则返回 nil
     var chainProxyPreviousTag: String? {
         guard let firstGroup = groups.first, isChain(firstGroup) else { return nil }

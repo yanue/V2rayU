@@ -229,6 +229,13 @@
 "DsPath" = "Domain Socket 路径";
 "WsHeaders" = "WebSocket 请求头";
 "Flow" = "流控(flow)";
+"CongestionControl" = "拥塞控制";
+"UdpRelayMode" = "UDP 转发模式";
+"PrivateKey" = "私钥";
+"PeerPublicKey" = "对端公钥";
+"LocalAddress" = "本地地址";
+"PreSharedKey" = "预共享密钥";
+"Reserved" = "Reserved";
 "TcpFastOpen" = "TCP 快速打开";
 "EnableTls" = "启用 TLS";
 "SkipCertVerify" = "跳过证书验证";

@@ -12,14 +12,19 @@ struct SingboxStruct: Codable {
     var log: LogConfig = LogConfig(level: "info")
     var inbounds: [SingboxInbound] = []
     var outbounds: [SingboxOutbound] = []
+    var endpoints: [SingboxEndpoint]? = nil // sing-box >= 1.11: WireGuard 只能作为 endpoint
     var dns: DNSConfig = DNSConfig()
     var route: RouteConfig = RouteConfig()
     var experimental: ExperimentalConfig? = nil   // 新增字段
 
     func toJSON() -> String {
+        var config = self
+        if SingboxVersionCheck.supportsWireGuardEndpoint() {
+            config.moveWireGuardToEndpoints()
+        }
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
-        guard let jsonData = try? encoder.encode(self),
+        guard let jsonData = try? encoder.encode(config),
               let jsonString = String(data: jsonData, encoding: .utf8) else {
             return "{}"
         }
@@ -107,6 +112,15 @@ struct SingboxOutbound: Codable {
     var outbounds: [String]?
     var `default`: String?
     var detour: String? // 经由指定 tag 的出站拨号(链式代理)
+    var congestion_control: String? // tuic
+    var udp_relay_mode: String? // tuic
+    // wireguard (旧版 outbound 写法, sing-box >= 1.11 转成 endpoint)
+    var local_address: [String]?
+    var private_key: String?
+    var peer_public_key: String?
+    var pre_shared_key: String?
+    var reserved: [Int]?
+    var mtu: Int?
 
     init(
         type: String,
@@ -156,6 +170,59 @@ struct SingboxOutbound: Codable {
         self.hop_interval = hop_interval
         self.outbounds = outbounds
         self.`default` = `default`
+    }
+}
+
+// WireGuard endpoint (sing-box >= 1.11)
+struct SingboxEndpoint: Codable {
+    var type: String = "wireguard"
+    var tag: String?
+    var address: [String]?
+    var private_key: String?
+    var mtu: Int?
+    var peers: [SingboxWireGuardPeer]?
+    var detour: String?
+    var domain_resolver: String?
+}
+
+struct SingboxWireGuardPeer: Codable {
+    var address: String?
+    var port: Int?
+    var public_key: String?
+    var pre_shared_key: String?
+    var allowed_ips: [String]?
+    var reserved: [Int]?
+}
+
+extension SingboxStruct {
+    /// 旧版 wireguard outbound 在 1.11 废弃、1.13 删除, 改写成 endpoint。
+    /// endpoint 不在 outbounds 里, 原来排第一(默认出站)时要显式设 route.final, 否则默认走 direct
+    mutating func moveWireGuardToEndpoints() {
+        guard outbounds.contains(where: { $0.type == "wireguard" }) else { return }
+        if route.final == nil, let first = outbounds.first, first.type == "wireguard" {
+            route.final = first.tag
+        }
+        var converted: [SingboxEndpoint] = endpoints ?? []
+        for outbound in outbounds where outbound.type == "wireguard" {
+            converted.append(SingboxEndpoint(
+                tag: outbound.tag,
+                address: outbound.local_address,
+                private_key: outbound.private_key,
+                mtu: outbound.mtu,
+                peers: [SingboxWireGuardPeer(
+                    address: outbound.server,
+                    port: outbound.server_port,
+                    public_key: outbound.peer_public_key,
+                    pre_shared_key: outbound.pre_shared_key,
+                    allowed_ips: ["0.0.0.0/0", "::/0"],
+                    reserved: outbound.reserved
+                )],
+                detour: outbound.detour,
+                domain_resolver: outbound.domain_resolver
+            ))
+        }
+        outbounds.removeAll { $0.type == "wireguard" }
+        endpoints = converted
     }
 }
 

@@ -228,6 +228,13 @@
 "DsPath" = "Domain Socket 路徑";
 "WsHeaders" = "WebSocket 請求標頭";
 "Flow" = "流量控制(flow)";
+"CongestionControl" = "擁塞控制";
+"UdpRelayMode" = "UDP 轉發模式";
+"PrivateKey" = "私鑰";
+"PeerPublicKey" = "對端公鑰";
+"LocalAddress" = "本地地址";
+"PreSharedKey" = "預共享密鑰";
+"Reserved" = "Reserved";
 "TcpFastOpen" = "TCP 快速開啟";
 "EnableTls" = "啟用 TLS";
 "SkipCertVerify" = "略過憑證驗證";

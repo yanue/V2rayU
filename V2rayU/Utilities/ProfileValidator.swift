@@ -15,6 +15,7 @@ enum ProfileValidator {
         case missingPassword
         case missingAddress
         case invalidPort(Int)
+        case missingField(LanguageLabel)
     }
 
     struct Failure: Equatable {
@@ -48,6 +49,16 @@ enum ProfileValidator {
             if method == "none" || method == "plain" { return nil }
             return secret.isEmpty ? .missingPassword : nil
         case .trojan, .hysteria2, .anytls:
+            return secret.isEmpty ? .missingPassword : nil
+        case .wireguard:
+            // wireguard: password 存本地私钥, publicKey 存对端公钥, 本地地址 sing-box endpoint 必填
+            if secret.isEmpty { return .missingField(.PrivateKey) }
+            if profile.publicKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return .missingField(.PeerPublicKey) }
+            if WireGuardUri.splitList(profile.getWireGuardConfig().localAddress).isEmpty { return .missingField(.LocalAddress) }
+            return nil
+        case .tuic:
+            // tuic 的 UUID 存在 host
+            if profile.host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return .missingUUID }
             return secret.isEmpty ? .missingPassword : nil
         default:
             // socks/http/naive 的认证是可选的
@@ -85,6 +96,8 @@ enum ProfileValidator {
             return String(localized: .ProfileMissingFieldFormat, arguments: name, String(localized: .ProfileFieldAddress))
         case .invalidPort(let port):
             return String(localized: .ProfileInvalidPortFormat, arguments: name, port)
+        case .missingField(let field):
+            return String(localized: .ProfileMissingFieldFormat, arguments: name, String(localized: field))
         }
     }
 

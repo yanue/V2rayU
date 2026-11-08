@@ -242,6 +242,8 @@
 |---|---|
 | `XHTTP` | 保留现有 `V2rayU` 兼容阈值：旧语义版本 `>= 1.8.24`，日期版本 `>= 24.9.30`；不满足则回退 `Sing-Box` |
 | VLESS Encryption（`encryption` 非 `none`，如 `mlkem768x25519plus...`，#1675） | 规则 `outbound.vless.encryption`：Xray-core 日期版本 `>= 25.8.31`（v25.8.29 首次引入，PR #5067；v25.8.31 调整 1-RTT padding 参数格式），旧语义版本不支持；sing-box 不支持 VLESS Encryption，不能回退（应用内置规则拦截）。空值 / `auto` / `none` 统一视为 `none`，不触发该规则 |
+| TUIC 出站（#1709） | 规则 `outbound.tuic`：Xray-core 没有 TUIC，标记 `unsupported`，自动选择 sing-box；sing-box 只支持 TUIC v5（uuid + password），v4 token 形式导入时直接丢弃。旧版本地规则文件里没有这一项，sing-box 侧由应用内置放行（`SingboxFallbackResolver.builtInSupportedKeys`） |
+| WireGuard 出站 | Xray-core 规则 `outbound.wireguard`：当前官方出站列表支持；sing-box 同名规则：1.11 起 WireGuard 改为 `endpoints`（旧 outbound 写法 1.13 删除），生成器在 `SingboxStruct.toJSON` 里按版本把 wireguard outbound 改写成 endpoint，原来是默认出站时补 `route.final`。旧版本地规则文件没有这一项，sing-box 侧由应用内置放行 |
 | `ws` / `grpc` | **不再**因为“文档误判为已下架”而自动回退 `Sing-Box` |
 | `h2` | 作为历史/兼容 transport，只做提示，不再直接依据错误文档强制判死 |
 

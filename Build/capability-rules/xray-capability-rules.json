@@ -271,6 +271,16 @@
       }
     },
     {
+      "key": "outbound.tuic",
+      "display_name": "TUIC outbound",
+      "kind": "Outbound",
+      "docs_path": null,
+      "rule": {
+        "type": "unsupported",
+        "note": "Xray-core 没有 TUIC outbound；按 capability rule 自动选择 sing-box。"
+      }
+    },
+    {
       "key": "outbound.wireguard",
       "display_name": "WireGuard outbound",
       "kind": "Outbound",

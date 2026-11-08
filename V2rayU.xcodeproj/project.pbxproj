@@ -118,6 +118,9 @@
 		669DCEA62E3D908C0085278B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEA52E3D908C0085278B /* AppSettings.swift */; };
 		669DCEAD2E3D9C440085278B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DCEAC2E3D9C400085278B /* AboutView.swift */; };
 		66A7B0022FA2000100A00002 /* AnyTlsUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0012FA2000100A00001 /* AnyTlsUri.swift */; };
+		66A7B0042FA2000100A00004 /* TuicUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0032FA2000100A00003 /* TuicUri.swift */; };
+		66A7B0062FA2000100A00006 /* WireGuardUri.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0052FA2000100A00005 /* WireGuardUri.swift */; };
+		66A7B0082FA2000100A00008 /* WireGuardConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A7B0072FA2000100A00007 /* WireGuardConfig.swift */; };
 		66B1B5312D282DAB0032DD09 /* V2rayMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B1B5302D282D990032DD09 /* V2rayMetrics.swift */; };
 		66B1B5562D2979BC0032DD09 /* V2rayUTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B1B54C2D2979060032DD09 /* V2rayUTool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		66C0AA022FD9000100C0AA01 /* ClashConnectionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C0AA012FD9000100C0AA01 /* ClashConnectionsHandler.swift */; };
@@ -329,6 +332,9 @@
 		669DCEA52E3D908C0085278B /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		669DCEAC2E3D9C400085278B /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		66A7B0012FA2000100A00001 /* AnyTlsUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyTlsUri.swift; sourceTree = "<group>"; };
+		66A7B0032FA2000100A00003 /* TuicUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuicUri.swift; sourceTree = "<group>"; };
+		66A7B0052FA2000100A00005 /* WireGuardUri.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireGuardUri.swift; sourceTree = "<group>"; };
+		66A7B0072FA2000100A00007 /* WireGuardConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WireGuardConfig.swift; sourceTree = "<group>"; };
 		66B1B5302D282D990032DD09 /* V2rayMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2rayMetrics.swift; sourceTree = "<group>"; };
 		66B1B54C2D2979060032DD09 /* V2rayUTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = V2rayUTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		66B1B55D2D297B590032DD09 /* appdmg.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appdmg.json; sourceTree = "<group>"; };
@@ -492,6 +498,7 @@
 				662CC3EB2D1BED9B006E8450 /* SecurityView.swift */,
 				662CC3EC2D1BED9B006E8450 /* StreamView.swift */,
 				66F77A132F00000100A00003 /* Hysteria2Config.swift */,
+				66A7B0072FA2000100A00007 /* WireGuardConfig.swift */,
 			);
 			path = ProfileForm;
 			sourceTree = "<group>";
@@ -557,6 +564,8 @@
 				662CC4392D1C4CE9006E8450 /* VlessUri.swift */,
 				662CC43A2D1C4CE9006E8450 /* VmessUri.swift */,
 				66A7B0012FA2000100A00001 /* AnyTlsUri.swift */,
+				66A7B0032FA2000100A00003 /* TuicUri.swift */,
+				66A7B0052FA2000100A00005 /* WireGuardUri.swift */,
 				66F77A112F00000100A00001 /* Hysteria2Uri.swift */,
 			);
 			path = Share;
@@ -1135,8 +1144,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				66A7B0022FA2000100A00002 /* AnyTlsUri.swift in Sources */,
+				66A7B0042FA2000100A00004 /* TuicUri.swift in Sources */,
+				66A7B0062FA2000100A00006 /* WireGuardUri.swift in Sources */,
 				66F77A122F00000100A00002 /* Hysteria2Uri.swift in Sources */,
 				66F77A142F00000100A00004 /* Hysteria2Config.swift in Sources */,
+				66A7B0082FA2000100A00008 /* WireGuardConfig.swift in Sources */,
 				667464192F0E7FF700D3D1E9 /* SingBoxConfigHandler.swift in Sources */,
 				662CC4012D1BED9B006E8450 /* RoutingList.swift in Sources */,
 				662CC43F2D1C4CE9006E8450 /* ImportHandler.swift in Sources */,

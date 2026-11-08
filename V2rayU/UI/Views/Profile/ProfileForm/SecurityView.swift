@@ -24,7 +24,7 @@ struct ConfigTransportView: View {
                 getPickerWithLabel(label: .Security, selection: $item.security)
                 getBoolFieldWithLabel(label: .AllowInsecure, isOn: $item.allowInsecure)
                 getTextFieldWithLabel(label: .Sni, text: $item.sni)
-                if item.selectedProtocol != .naive && item.selectedProtocol != .anytls {
+                if item.selectedProtocol != .naive && item.selectedProtocol != .anytls && item.selectedProtocol != .tuic {
                     getPickerWithLabel(label: .Fingerprint, selection: $item.fingerprint)
                 }
                 Group {

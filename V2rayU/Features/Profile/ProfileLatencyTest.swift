@@ -107,9 +107,14 @@ actor LatencyTestRunner {
     }
 
     private func pingEachServer(item: ProfileEntity) async throws {
-        let ping = ProfileLatencyTest(uuid: item.uuid)
-        try await ping.run()
-        let speed = await ping.getSpeed()
+        let speed: Int
+        if await InUseWireGuard.check(item) {
+            speed = await InUseWireGuard.pingThroughRunningCore(item)
+        } else {
+            let ping = ProfileLatencyTest(uuid: item.uuid)
+            try await ping.run()
+            speed = await ping.getSpeed()
+        }
 
         // MARK: - Fix 2: 在任务完成后再递增计数，进度条有实际意义
 
@@ -370,6 +375,34 @@ actor ProfileLatencyTest {
             try? await Task.sleep(nanoseconds: 200000000)
         }
         return false
+    }
+}
+
+/// 正在使用的 WireGuard 节点不能另开核心实例测速: 同一私钥的两个设备连同一对端会互相抢会话, 正在用的连接会断
+enum InUseWireGuard {
+    static func check(_ item: ProfileEntity) async -> Bool {
+        guard item.protocol == .wireguard else { return false }
+        let (turnOn, runningProfile, runningCombination) = await MainActor.run {
+            (AppState.shared.v2rayTurnOn, AppState.shared.runningProfile, AppState.shared.runningCombination)
+        }
+        guard turnOn else { return false }
+        if !runningCombination.isEmpty {
+            let combination = CombinedConfigStore.shared.getValidCombination(uuid: runningCombination)
+            return combination?.groups.contains { $0.outboundProfileUUIDs.contains(item.uuid) } ?? false
+        }
+        return runningProfile == item.uuid
+    }
+
+    /// 单节点模式经当前核心的 latency-in 测(强制走代理, 不另开实例); 组合模式的节点延迟由组合延迟统计更新, 这里保留原值
+    static func pingThroughRunningCore(_ item: ProfileEntity) async -> Int {
+        let runningCombination = await MainActor.run { AppState.shared.runningCombination }
+        guard runningCombination.isEmpty, let port = LatencyTester.runningInboundPort() else {
+            logger.info("skip ping for in-use wireguard \(item.remark): keep \(item.speed)ms")
+            return item.speed
+        }
+        let speed = (try? await LatencyTester.test(socksPort: port)) ?? -1
+        _ = ProfileStore.shared.updateSpeed(uuid: item.uuid, speed: speed)
+        return speed
     }
 }
 

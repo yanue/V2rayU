@@ -510,6 +510,8 @@ class V2rayConfigHandler {
         var comboRules: [V2rayRoutingRule] = []
         var balancers: [V2rayRoutingBalancer] = []
         var subjectSelector: [String] = []
+        // 同一个 WireGuard 节点在多个分组里只生成一份(同一私钥两个设备会抢会话), 其余分组复用它的 tag
+        var wireGuardTags: [String: String] = [:]
 
         for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
             let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
@@ -527,6 +529,13 @@ class V2rayConfigHandler {
             let isChain = resolved.isChain(resolvedGroup)
             var outboundTags: [String] = []
             for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
+                // 链式后续节点要经由上一跳拨号, 路径不同, 不能复用
+                let dialsDirectly = !isChain || outboundTags.isEmpty
+                if profile.protocol == .wireguard, dialsDirectly, let existingTag = wireGuardTags[profile.uuid] {
+                    // 同一分组里放了两次时不重复加入 selector/均衡器
+                    if !outboundTags.contains(existingTag) { outboundTags.append(existingTag) }
+                    continue
+                }
                 let outboundTag = resolved.outboundTag(groupIndex: groupIndex, profileIndex: profileIndex)
                 let outbound = V2rayOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
                 outbound.tag = outboundTag
@@ -536,6 +545,7 @@ class V2rayConfigHandler {
                 }
                 outbounds.append(outbound)
                 outboundTags.append(outboundTag)
+                if profile.protocol == .wireguard, dialsDirectly { wireGuardTags[profile.uuid] = outboundTag }
                 // 链式只观测出口(即整条链)
                 if !isChain || profileIndex == resolvedGroup.profiles.count - 1 {
                     subjectSelector.append(outboundTag)
@@ -567,7 +577,10 @@ class V2rayConfigHandler {
             comboRules.append(rule)
         }
 
-        if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
+        let wireGuardProxyTag = resolved.wireGuardProxyTag
+        if wireGuardProxyTag != nil {
+            // WireGuard 不能复制一份(见 wireGuardProxyTag); xray 没有 selector, 下面把路由规则里的 "proxy" 改指向已有的那个
+        } else if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
             // 首组为链式时，"proxy"(路由规则/远程 DNS 使用)同样走整条链: 复制出口节点并经由出口的上一跳拨号
             let proxyFallback = V2rayOutboundHandler(from: ProfileModel(from: exitProfile)).getOutbound()
             proxyFallback.tag = "proxy"
@@ -614,7 +627,12 @@ class V2rayConfigHandler {
         self.v2ray.dns = dns
 
         var routing = RoutingManager().getRunning()
-        let existingRules = routing.rules.filter { $0.inboundTag != ["metrics_in"] }
+        var existingRules = routing.rules.filter { $0.inboundTag != ["metrics_in"] }
+        if let wireGuardProxyTag {
+            for index in existingRules.indices where existingRules[index].outboundTag == "proxy" {
+                existingRules[index].outboundTag = wireGuardProxyTag
+            }
+        }
         var apiRule = V2rayRoutingRule()
         apiRule.type = "field"
         apiRule.inboundTag = ["metrics_in"]
@@ -706,6 +724,8 @@ class V2rayConfigHandler {
                 settings.servers.forEach { appendIfDomain($0.address) }
             case let settings as V2rayOutboundHttp:
                 settings.servers.forEach { appendIfDomain($0.address) }
+            case let settings as V2rayOutboundWireGuard:
+                settings.peers.forEach { appendIfDomain(WireGuardUri.host(ofEndpoint: $0.endpoint)) }
             default:
                 break
             }

@@ -22,6 +22,10 @@ class ShareUri {
             handler.uri = AnyTlsUri(from: item).encode()
         case .naive:
             handler.uri = NaiveUri(from: item).encode()
+        case .tuic:
+            handler.uri = TuicUri(from: item).encode()
+        case .wireguard:
+            handler.uri = WireGuardUri(from: item).encode()
         default:
             handler.error = "Protocol not supported"
             return ""

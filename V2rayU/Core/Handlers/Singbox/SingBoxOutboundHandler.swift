@@ -40,6 +40,10 @@ class SingboxOutboundHandler {
             return buildAnyTLS()
         case .naive:
             return buildNaive()
+        case .tuic:
+            return buildTuic()
+        case .wireguard:
+            return buildWireGuard()
         }
     }
 
@@ -256,6 +260,51 @@ class SingboxOutboundHandler {
                 alpn: profile.entity.getAlpn()
             )
         )
+    }
+
+    /// TUIC v5: UUID 存在 host, 拥塞控制存在 encryption, UDP 转发模式存在 path
+    private func buildTuic() -> SingboxOutbound {
+        // TUIC 必须带 ALPN: 表单里选了空或从别的协议切过来时用 h3
+        var entity = profile.entity
+        entity.alpn = TuicUri.normalizedAlpn(entity.alpn.rawValue)
+        var outbound = SingboxOutbound(
+            type: "tuic",
+            tag: "proxy",
+            server: profile.address,
+            server_port: profile.port,
+            password: profile.password,
+            uuid: profile.host,
+            tls: TLSConfig(
+                enabled: true,
+                server_name: profile.sni.isEmpty ? profile.address : profile.sni,
+                insecure: profile.allowInsecure,
+                alpn: entity.getAlpn()
+            )
+        )
+        // 从别的协议切过来时 encryption/path 可能是旧值(如 none、/ws), 不认识的不写, 否则 sing-box 启动失败
+        let congestion = TuicUri.normalizedCongestionControl(profile.encryption)
+        let udpRelay = TuicUri.normalizedUdpRelayMode(profile.path)
+        outbound.congestion_control = congestion.isEmpty ? nil : congestion
+        outbound.udp_relay_mode = udpRelay.isEmpty ? nil : udpRelay
+        return outbound
+    }
+
+    /// 生成旧版 wireguard outbound, 新版本在 SingboxStruct.toJSON 里转成 endpoint
+    private func buildWireGuard() -> SingboxOutbound {
+        let wg = profile.entity.getWireGuardConfig()
+        var outbound = SingboxOutbound(
+            type: "wireguard",
+            tag: "proxy",
+            server: profile.address,
+            server_port: profile.port
+        )
+        outbound.local_address = WireGuardUri.localAddresses(wg.localAddress)
+        outbound.private_key = profile.password
+        outbound.peer_public_key = profile.publicKey
+        outbound.pre_shared_key = wg.preSharedKey.isEmpty ? nil : wg.preSharedKey
+        outbound.reserved = WireGuardUri.parseReserved(wg.reserved)
+        outbound.mtu = wg.mtu > 0 ? wg.mtu : nil
+        return outbound
     }
 
 }

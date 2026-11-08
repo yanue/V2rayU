@@ -827,7 +827,7 @@ final class AppMenuManager: NSObject, NSMenuDelegate {
         if let uri = NSPasteboard.general.string(forType: .string), uri.count > 0 {
             importUri(url: uri)
         } else {
-            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or anytls:// or naive:// or naive+https:// or ss:// from Pasteboard")
+            noticeTip(title: "import server fail", informativeText: "no found vmess:// or vless:// or trojan:// or anytls:// or naive:// or naive+https:// or tuic:// or wireguard:// or ss:// from Pasteboard")
         }
     }
 

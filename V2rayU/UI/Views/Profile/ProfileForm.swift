@@ -36,11 +36,11 @@ struct ConfigFormView: View {
                         VStack{
                             ConfigServerView(item: item)
                             Spacer(minLength: 12)
-                            if item.protocol != .socks && item.protocol != .anytls && item.protocol != .naive {
+                            if item.protocol != .socks && item.protocol != .anytls && item.protocol != .naive && item.protocol != .tuic && item.protocol != .wireguard {
                                 ConfigStreamView(item: item)
                                 Spacer(minLength: 12)
                             }
-                            if item.protocol != .socks {
+                            if item.protocol != .socks && item.protocol != .wireguard {
                                 ConfigTransportView(item: item)
                             }
                         }
@@ -100,6 +100,17 @@ struct ConfigFormView: View {
                 } else if item.selectedProtocol == .anytls || item.selectedProtocol == .naive {
                     if item.security == .none { item.security = .tls }
                     if item.network != .tcp { item.network = .tcp }
+                } else if item.selectedProtocol == .tuic {
+                    if item.security == .none { item.security = .tls }
+                    if item.alpn == .h2h1 { item.alpn = .h3 }
+                    if item.network != .tcp { item.network = .tcp }
+                    // encryption/path 复用为拥塞控制/UDP 转发模式, 别的协议的旧值不认识就清掉
+                    if TuicUri.normalizedCongestionControl(item.encryption).isEmpty { item.encryption = "" }
+                    if TuicUri.normalizedUdpRelayMode(item.path).isEmpty { item.path = "" }
+                } else if item.selectedProtocol == .wireguard {
+                    // 传输/安全设置对 WireGuard 无效且被隐藏, 重置掉, 免得旧值影响核心选择
+                    if item.security != .none { item.security = .none }
+                    if item.network != .tcp { item.network = .tcp }
                 }
             }
         }
@@ -113,6 +124,17 @@ struct ConfigFormView: View {
                     if item.network != .hysteria2 { item.network = .hysteria2 }
                 } else if newProtocol == .anytls || newProtocol == .naive {
                     if item.security == .none { item.security = .tls }
+                    if item.network != .tcp { item.network = .tcp }
+                } else if newProtocol == .tuic {
+                    if item.security == .none { item.security = .tls }
+                    if item.alpn == .h2h1 { item.alpn = .h3 }
+                    if item.network != .tcp { item.network = .tcp }
+                    // encryption/path 复用为拥塞控制/UDP 转发模式, 别的协议的旧值不认识就清掉
+                    if TuicUri.normalizedCongestionControl(item.encryption).isEmpty { item.encryption = "" }
+                    if TuicUri.normalizedUdpRelayMode(item.path).isEmpty { item.path = "" }
+                } else if newProtocol == .wireguard {
+                    // 传输/安全设置对 WireGuard 无效且被隐藏, 重置掉, 免得旧值影响核心选择
+                    if item.security != .none { item.security = .none }
                     if item.network != .tcp { item.network = .tcp }
                 }
             }

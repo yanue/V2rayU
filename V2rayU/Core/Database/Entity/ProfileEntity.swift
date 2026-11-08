@@ -213,6 +213,13 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
         } else if `protocol` == .anytls || `protocol` == .naive {
             if security == .none { self.security = .tls }
             self.network = .tcp
+        } else if `protocol` == .wireguard {
+            self.security = .none
+            self.network = .tcp
+        } else if `protocol` == .tuic {
+            if security == .none { self.security = .tls }
+            if alpn == .h2h1 { self.alpn = .h3 }
+            self.network = .tcp
         }
     }
 
@@ -300,6 +307,29 @@ struct ProfileEntity: Codable, Identifiable, Equatable, Hashable, Transferable, 
             return Hysteria2Config()
         }
         return config
+    }
+
+    // MARK: - WireGuard Config
+    // 地址/端口存对端 endpoint, password 存本地私钥, publicKey 存对端公钥, 其余存在 extra
+    struct WireGuardConfig: Codable {
+        var localAddress: String = "" // 本地地址, 逗号分隔, 如 172.16.0.2/32,fd01::2/128
+        var preSharedKey: String = ""
+        var reserved: String = "" // 逗号分隔的 3 个数字, 如 1,2,3
+        var mtu: Int = 1280
+    }
+
+    func getWireGuardConfig() -> WireGuardConfig {
+        guard let data = extra.data(using: .utf8),
+              let config = try? JSONDecoder().decode(WireGuardConfig.self, from: data) else {
+            return WireGuardConfig()
+        }
+        return config
+    }
+
+    mutating func setWireGuardConfig(_ config: WireGuardConfig) {
+        guard let data = try? JSONEncoder().encode(config),
+              let jsonString = String(data: data, encoding: .utf8) else { return }
+        extra = jsonString
     }
 
     // 定义迁移

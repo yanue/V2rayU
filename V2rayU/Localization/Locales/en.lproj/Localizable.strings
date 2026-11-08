@@ -228,6 +228,13 @@
 "DsPath" = "DS Path";
 "WsHeaders" = "WebSocket Headers";
 "Flow" = "Flow";
+"CongestionControl" = "Congestion Control";
+"UdpRelayMode" = "UDP Relay Mode";
+"PrivateKey" = "Private Key";
+"PeerPublicKey" = "Peer Public Key";
+"LocalAddress" = "Local Address";
+"PreSharedKey" = "Pre-shared Key";
+"Reserved" = "Reserved";
 "TcpFastOpen" = "TCP Fast Open";
 "EnableTls" = "Enable TLS";
 "SkipCertVerify" = "Skip Certificate Verification";

@@ -33,6 +33,11 @@ enum SingboxVersionCheck {
         return version >= SingboxVersion(1, 13, 0)
     }
 
+    static func supportsWireGuardEndpoint() -> Bool {
+        guard let version = SingboxVersion(getSingboxVersion()) else { return true }
+        return version >= SingboxVersion(1, 11, 0)
+    }
+
     static func supportsTunDnsMode() -> Bool {
         guard let version = SingboxVersion(getSingboxVersion()) else { return true }
         return version >= SingboxVersion(1, 14, 0)
@@ -124,6 +129,8 @@ class SingboxConfigHandler {
         var inbounds: [SingboxInbound] = []
         var outbounds: [SingboxOutbound] = []
         var comboRules: [RouteRule] = []
+        // 同一个 WireGuard 节点在多个分组里只生成一份(同一私钥两个设备会抢会话), 其余分组复用它的 tag
+        var wireGuardTags: [String: String] = [:]
 
         for (groupIndex, resolvedGroup) in resolved.groups.enumerated() {
             let inboundTag = "combo-in-\(groupIndex)-\(resolvedGroup.group.inboundType.rawValue)-\(resolvedGroup.group.port)"
@@ -137,6 +144,13 @@ class SingboxConfigHandler {
             let isChain = resolved.isChain(resolvedGroup)
             var outboundTags: [String] = []
             for (profileIndex, profile) in resolvedGroup.profiles.enumerated() {
+                // 链式后续节点要经由上一跳拨号, 路径不同, 不能复用
+                let dialsDirectly = !isChain || outboundTags.isEmpty
+                if profile.protocol == .wireguard, dialsDirectly, let existingTag = wireGuardTags[profile.uuid] {
+                    // 同一分组里放了两次时不重复加入 selector/均衡器
+                    if !outboundTags.contains(existingTag) { outboundTags.append(existingTag) }
+                    continue
+                }
                 var outbound = SingboxOutboundHandler(from: ProfileModel(from: profile)).getOutbound()
                 let outboundTag = resolved.outboundTag(groupIndex: groupIndex, profileIndex: profileIndex)
                 outbound.tag = outboundTag
@@ -147,6 +161,7 @@ class SingboxConfigHandler {
                     outbound.domain_resolver = nil
                 }
                 outbounds.append(outbound)
+                if profile.protocol == .wireguard, dialsDirectly { wireGuardTags[profile.uuid] = outboundTag }
                 outboundTags.append(outboundTag)
             }
 
@@ -172,7 +187,10 @@ class SingboxConfigHandler {
             comboRules.append(RouteRule(outbound: routeOutbound, domain: nil, process_name: nil, inbound: [inboundTag]))
         }
 
-        if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
+        if let firstTag = resolved.wireGuardProxyTag {
+            // WireGuard 不能复制一份(见 wireGuardProxyTag), 用 selector 指向已有的那个
+            outbounds.append(SingboxOutbound(type: "selector", tag: "proxy", outbounds: [firstTag]))
+        } else if let previousTag = resolved.chainProxyPreviousTag, let exitProfile = resolved.groups.first?.profiles.last {
             // 首组为链式时，"proxy"(路由规则/远程 DNS 使用)同样走整条链: 复制出口节点并经由出口的上一跳拨号
             var proxyFallback = SingboxOutboundHandler(from: ProfileModel(from: exitProfile)).getOutbound()
             proxyFallback.tag = "proxy"

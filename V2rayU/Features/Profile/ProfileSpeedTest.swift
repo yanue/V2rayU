@@ -105,6 +105,12 @@ actor ProfileSpeedTest {
         guard let fetched = ProfileStore.shared.fetchOne(uuid: uuid) else {
             throw NSError(domain: "ProfileSpeedTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Item not found"])
         }
+        // 正在使用的 WireGuard 不另开实例(见 InUseWireGuard), 保留上次结果
+        if await InUseWireGuard.check(fetched) {
+            NotificationCenter.default.post(name: NOTIFY_UPDATE_SPEED_TEST, object: "Speed-skip: \(fetched.remark) - in use")
+            logger.info("speed test skip in-use wireguard: \(fetched.remark)")
+            return fetched.downloadSpeed
+        }
         item = await CertPinningCoordinator.ensurePinnedCert(for: fetched)
         httpPort = getRandomPort()
         jsonFile = "\(AppHomePath)/.speedtest.\(item.uuid).json"

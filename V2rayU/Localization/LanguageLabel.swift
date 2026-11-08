@@ -271,6 +271,13 @@ enum LanguageLabel: String, CaseIterable {
     case DsPath
     case WsHeaders
     case Flow
+    case CongestionControl
+    case UdpRelayMode
+    case PrivateKey
+    case PeerPublicKey
+    case LocalAddress
+    case PreSharedKey
+    case Reserved
     case TcpFastOpen
     case EnableTls
     case SkipCertVerify

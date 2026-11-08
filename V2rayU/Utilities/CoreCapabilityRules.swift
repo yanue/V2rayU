@@ -659,6 +659,7 @@ enum XraySupportCatalog {
         XrayCapabilityDefinition(key: "outbound.vmess.alterId", displayName: "VMess alterId > 0（旧版 MD5 认证）", kind: .outboundProtocol, rule: .removed(note: "Xray-core 自 v1.8.12 起移除了 Legacy VMess alterId（旧版 MD5 认证），仅支持 AEAD（alterId = 0）。如需使用 alterId > 0，请使用 v1.8.5 或更早版本。", legacyMin: XrayVersion(1, 8, 5), removedAt: XrayVersion(1, 8, 12)), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "V2rayU 当前未实现 Xray-core AnyTLS outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core/V2rayU 当前没有 naive outbound 配置生成；按 capability rule 自动选择 sing-box。"), docsPath: nil),
+        XrayCapabilityDefinition(key: "outbound.tuic", displayName: "TUIC outbound", kind: .outboundProtocol, rule: XraySupportRule(status: .unsupported, legacyMin: nil, calendarMin: nil, removedAt: nil, note: "Xray-core 没有 TUIC outbound；按 capability rule 自动选择 sing-box。"), docsPath: nil),
         XrayCapabilityDefinition(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol, rule: .supported(note: "当前官方出站协议列表明确列出。"), docsPath: "/config/outbounds/wireguard.html"),
         XrayCapabilityDefinition(key: "outbound.hysteria", displayName: "Hysteria2 outbound", kind: .outboundProtocol,             rule: .supported(note: "Xray-core 在 v26.1.23 新增 hysteria2 outbound 支持。日历版本 < 26.1.23 不支持。", legacyMin: XrayVersion(9, 9, 9), calendarMin: XrayVersion(26, 1, 23)), docsPath: "/config/outbounds/hysteria.html"),
 
@@ -777,6 +778,10 @@ enum XraySupportCatalog {
             return capability(forKey: "outbound.anytls")
         case .naive:
             return capability(forKey: "outbound.naive")
+        case .tuic:
+            return capability(forKey: "outbound.tuic")
+        case .wireguard:
+            return capability(forKey: "outbound.wireguard")
         }
     }
 
@@ -849,6 +854,9 @@ enum SingboxFallbackResolver {
         let kind: XrayCapabilityKind
     }
 
+    /// 生成器已实现、但旧版规则文件里可能还没有的能力
+    private static let builtInSupportedKeys: Set<String> = ["outbound.tuic", "outbound.wireguard"]
+
     static func incompatibilityReasons(for profile: ProfileEntity) -> [String] {
         guard let document = CapabilityRulesLoader.load(core: .singbox) else {
             return legacyFallbackReasons(for: profile)
@@ -894,6 +902,8 @@ enum SingboxFallbackResolver {
             return
         }
         guard let capability = capabilities[requirement.key] else {
+            // 已安装用户的本地规则文件在远程更新前没有新加的协议, 内置的直接放行
+            if builtInSupportedKeys.contains(requirement.key) { return }
             reasons.append("Sing-Box 功能支持规则未声明 [\(requirement.kind.rawValue)] \(requirement.displayName)，无法安全自动回退。")
             return
         }
@@ -973,6 +983,10 @@ enum SingboxFallbackResolver {
             return RequiredCapability(key: "outbound.anytls", displayName: "AnyTLS outbound", kind: .outboundProtocol)
         case .naive:
             return RequiredCapability(key: "outbound.naive", displayName: "Naive outbound", kind: .outboundProtocol)
+        case .tuic:
+            return RequiredCapability(key: "outbound.tuic", displayName: "TUIC outbound", kind: .outboundProtocol)
+        case .wireguard:
+            return RequiredCapability(key: "outbound.wireguard", displayName: "WireGuard outbound", kind: .outboundProtocol)
         }
     }
 

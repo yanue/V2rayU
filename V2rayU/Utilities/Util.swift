@@ -608,7 +608,7 @@ enum ProfileCoreSelection: String, Codable, CaseIterable, Identifiable {
 }
 
 enum CoreSelectionDefaults {
-    static let editableProtocols: [V2rayProtocolOutbound] = [.vmess, .shadowsocks, .socks, .vless, .trojan, .hysteria2, .anytls, .naive]
+    static let editableProtocols: [V2rayProtocolOutbound] = [.vmess, .shadowsocks, .socks, .vless, .trojan, .hysteria2, .anytls, .naive, .tuic, .wireguard]
 
     static func selection(for protocol: V2rayProtocolOutbound) -> ProfileCoreSelection {
         let key = storageKey(for: `protocol`)

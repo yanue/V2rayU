@@ -405,6 +405,71 @@ struct ProtocolParserTests {
         #expect(profile.remark == "naive-no-user")
     }
 
+    // MARK: - TUIC
+
+    @Test func tuicBasicParser() throws {
+        let link = "tuic://2dd61d93-75d8-4da4-ac0e-6aece7eac365:pa%40ss@tuic.example.com:8443?congestion_control=bbr&udp_relay_mode=quic&alpn=h3&sni=sni.example.com&allow_insecure=1#my-tuic"
+        let uri = TuicUri()
+        let error = uri.parse(url: URL(string: link)!)
+
+        #expect(error == nil)
+        let profile = uri.getProfile()
+        #expect(profile.protocol == .tuic)
+        #expect(profile.host == "2dd61d93-75d8-4da4-ac0e-6aece7eac365")
+        #expect(profile.password == "pa@ss")
+        #expect(profile.address == "tuic.example.com")
+        #expect(profile.port == 8443)
+        #expect(profile.encryption == "bbr")
+        #expect(profile.path == "quic")
+        #expect(profile.alpn == .h3)
+        #expect(profile.sni == "sni.example.com")
+        #expect(profile.allowInsecure == true)
+        #expect(profile.remark == "my-tuic")
+    }
+
+    /// v4 只有 token、没有 uuid:password, sing-box 不支持
+    @Test func tuicV4Rejected() throws {
+        let uri = TuicUri()
+        #expect(uri.parse(url: URL(string: "tuic://token@tuic.example.com:443#v4")!) != nil)
+    }
+
+    @Test func tuicSingboxOutbound() throws {
+        let uri = TuicUri()
+        #expect(uri.parse(url: URL(string: "tuic://uuid-1:pass@tuic.example.com:443?congestion_control=cubic&udp_relay_mode=native#t")!) == nil)
+        let outbound = SingboxOutboundHandler(from: ProfileModel(from: uri.getProfile())).getOutbound()
+        #expect(outbound.type == "tuic")
+        #expect(outbound.uuid == "uuid-1")
+        #expect(outbound.password == "pass")
+        #expect(outbound.congestion_control == "cubic")
+        #expect(outbound.udp_relay_mode == "native")
+        #expect(outbound.tls?.alpn == ["h3"])
+        #expect(outbound.tls?.server_name == "tuic.example.com")
+        #expect(outbound.transport == nil)
+    }
+
+    @Test func clashTuicParser() throws {
+        let json = """
+        {"type":"tuic","name":"clash-tuic","server":"tuic.example.com","port":443,"uuid":"uuid-2","password":"pw","alpn":["h3"],"congestion-controller":"bbr","udp-relay-mode":"native","sni":"sni.example.com","skip-cert-verify":false}
+        """
+        let proxy = try JSONDecoder().decode(clashProxy.self, from: json.data(using: .utf8)!)
+        let profile = proxy.toProfile()
+
+        #expect(profile?.protocol == .tuic)
+        #expect(profile?.host == "uuid-2")
+        #expect(profile?.password == "pw")
+        #expect(profile?.encryption == "bbr")
+        #expect(profile?.path == "native")
+        #expect(profile?.alpn == .h3)
+        #expect(profile?.sni == "sni.example.com")
+        #expect(profile?.allowInsecure == false)
+
+        // v4 (token) 不导入
+        let v4 = """
+        {"type":"tuic","name":"v4","server":"tuic.example.com","port":443,"token":"tk"}
+        """
+        #expect(try JSONDecoder().decode(clashProxy.self, from: v4.data(using: .utf8)!).toProfile() == nil)
+    }
+
     // MARK: - Clash Proxy Parsing
 
     @Test func clashVmessParser() throws {
@@ -560,6 +625,7 @@ struct ProtocolParserTests {
             "anytls://",
             "naive://",
             "naive+https://",
+            "tuic://",
         ]
         for proto in protocols {
             #expect(supportProtocol(uri: proto + "test"))
@@ -574,6 +640,7 @@ struct ProtocolParserTests {
             ("hysteria2://pass@c.com:443#h1", "h1", .hysteria2),
             ("anytls://pass@d.com:443#a1", "a1", .anytls),
             ("naive://user:pass@e.com:443#n1", "n1", .naive),
+            ("tuic://uuid:pass@f.com:443#tu1", "tu1", .tuic),
         ]
 
         for (uriStr, expectedRemark, expectedProtocol) in testCases {

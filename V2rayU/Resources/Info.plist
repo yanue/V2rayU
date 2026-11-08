@@ -34,6 +34,9 @@
 				<string>anytls</string>
 				<string>naive</string>
 				<string>naive+https</string>
+				<string>tuic</string>
+				<string>wireguard</string>
+				<string>wg</string>
 				<string>v2rayu</string>
 				<string>clash</string>
 				<string>clashmeta</string>

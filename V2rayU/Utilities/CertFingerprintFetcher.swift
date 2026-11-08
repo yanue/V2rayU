@@ -185,7 +185,8 @@ enum CertPinningCoordinator {
     private static func shouldFetch(_ p: ProfileEntity, refreshExisting: Bool) -> Bool {
         guard p.security == .tls, p.allowInsecure else { return false }
         // Hysteria2 走 QUIC，无法用 TCP tls ping 取证书；已在 shouldForceSingBoxWithoutFetch 中提前回退。
-        guard p.protocol != .hysteria2 else { return false }
+        // TUIC 同样走 QUIC，且只能用 sing-box，不需要 pin。
+        guard p.protocol != .hysteria2, p.protocol != .tuic else { return false }
         // 已强制使用 Sing-Box 的节点无需 pin。
         guard p.resolvedCoreSelection != .singbox else { return false }
         // 仅当前核心确实已移除 allowInsecure 时才需要获取。
