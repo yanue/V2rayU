@@ -201,19 +201,38 @@ private struct TableStyleProbe: NSViewRepresentable {
             apply()
         }
 
+        // 布局阶段就改: 只在 async 里改时表格会先按缩进样式画一帧, 切换页面时左右边距跳一下
+        override func layout() {
+            super.layout()
+            // 只在前几次布局里找, 一直找不到(表格还没挂上)交给 apply() 里的异步兜底, 不每帧遍历窗口
+            guard layoutAttempts < 5 else { return }
+            layoutAttempts += 1
+            applyNow()
+        }
+
+        private var layoutAttempts = 0
+
         func apply() {
-            // 等表格挂进窗口后再找
-            DispatchQueue.main.async { [weak self] in
-                guard let self, let root = self.window?.contentView else { return }
-                let mine = self.convert(self.bounds, to: nil)
-                var tables: [NSTableView] = []
-                Self.collect(root, into: &tables)
-                // 探针和表格同一个 frame, 取重叠面积最大的, 不会改到别的表格
-                guard let table = tables.max(by: { Self.overlap($0, mine) < Self.overlap($1, mine) }),
-                      Self.overlap(table, mine) > 0,
-                      table.style != .fullWidth else { return }
-                table.style = .fullWidth
-            }
+            applyNow()
+            // 表格还没挂进窗口时, 下一轮再找一次
+            DispatchQueue.main.async { [weak self] in self?.applyNow() }
+        }
+
+        /// 已经改好的表格; layout() 调用很频繁, 改过就不再遍历窗口
+        private weak var styledTable: NSTableView?
+
+        private func applyNow() {
+            guard let root = window?.contentView, bounds.width > 0, bounds.height > 0 else { return }
+            let mine = convert(bounds, to: nil)
+            // 缓存的表格还和自己重叠才算数; SwiftUI 换了一个新表格时要重新找
+            if let table = styledTable, table.window != nil, table.style == .fullWidth, Self.overlap(table, mine) > 0 { return }
+            var tables: [NSTableView] = []
+            Self.collect(root, into: &tables)
+            // 探针和表格同一个 frame, 取重叠面积最大的, 不会改到别的表格
+            guard let table = tables.max(by: { Self.overlap($0, mine) < Self.overlap($1, mine) }),
+                  Self.overlap(table, mine) > 0 else { return }
+            if table.style != .fullWidth { table.style = .fullWidth }
+            styledTable = table
         }
 
         static func overlap(_ table: NSTableView, _ rect: NSRect) -> CGFloat {
