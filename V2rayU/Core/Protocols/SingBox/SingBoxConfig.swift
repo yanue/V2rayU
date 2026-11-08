@@ -430,6 +430,8 @@ enum SingboxBundledRuleSet {
         "cn": "geoip-cn",
     ]
 
+    private static let bundledTags = Set(geositeTags.values).union(geoipTags.values)
+
     static func normalize(routeRules rules: [RouteRule], forceAll: Bool = false) -> (rules: [RouteRule], ruleSets: [RuleSetConfig]) {
         var usedTags: Set<String> = []
         let normalized = rules.map { rule in
@@ -462,7 +464,7 @@ enum SingboxBundledRuleSet {
         var rule = rule
         let geositeResult = consume(values: rule.geosite, table: geositeTags, defaultPrefix: "geosite", forceAll: forceAll, usedTags: &usedTags)
         let geoipResult = consume(values: rule.geoip, table: geoipTags, defaultPrefix: "geoip", forceAll: forceAll, usedTags: &usedTags)
-        let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
+        let ruleSet = registerBundled(rule.rule_set, usedTags: &usedTags) + geositeResult.tags + geoipResult.tags
 
         rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
         rule.geoip = geoipResult.remaining.isEmpty ? nil : geoipResult.remaining
@@ -474,12 +476,21 @@ enum SingboxBundledRuleSet {
         var rule = rule
         let geositeResult = consume(values: rule.geosite, table: geositeTags, defaultPrefix: "geosite", forceAll: forceAll, usedTags: &usedTags)
         let geoipResult = consume(values: rule.geoip, table: geoipTags, defaultPrefix: "geoip", forceAll: forceAll, usedTags: &usedTags)
-        let ruleSet = (rule.rule_set ?? []) + geositeResult.tags + geoipResult.tags
+        let ruleSet = registerBundled(rule.rule_set, usedTags: &usedTags) + geositeResult.tags + geoipResult.tags
 
         rule.geosite = geositeResult.remaining.isEmpty ? nil : geositeResult.remaining
         rule.geoip = geoipResult.remaining.isEmpty ? nil : geoipResult.remaining
         rule.rule_set = ruleSet.isEmpty ? nil : ruleSet
         return rule
+    }
+
+    /// 规则里直接写的 rule_set 引用 (如兜底的 geoip-cn) 也要登记, 否则没有定义, sing-box 启动即 FATAL (#1708)
+    private static func registerBundled(_ ruleSet: [String]?, usedTags: inout Set<String>) -> [String] {
+        let tags = ruleSet ?? []
+        for tag in tags where bundledTags.contains(tag) {
+            usedTags.insert(tag)
+        }
+        return tags
     }
 
     private static func consume(values: [String]?, table: [String: String], defaultPrefix: String, forceAll: Bool, usedTags: inout Set<String>) -> (tags: [String], remaining: [String]) {

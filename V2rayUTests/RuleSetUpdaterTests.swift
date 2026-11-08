@@ -77,4 +77,15 @@ struct RuleSetUpdaterTests {
         RuleSetUpdater.resetSources()
         #expect(RuleSetUpdater.sources == RuleSetSource.defaults)
     }
+
+    /// 全局 / 仅绕过局域网: 路由里没有 geoip/geosite, 兜底规则直接引用 geoip-cn 也要带上定义 (#1708)
+    @Test func directRuleSetReferenceGetsDefinition() {
+        let rules = [
+            RouteRule(outbound: "direct", ip_is_private: true),
+            RouteRule(outbound: "proxy", rule_set: ["geoip-cn"], invert: true),
+        ]
+        let result = SingboxBundledRuleSet.normalize(routeRules: rules, forceAll: true)
+        #expect(result.ruleSets.map(\.tag) == ["geoip-cn"])
+        #expect(result.rules[1].rule_set == ["geoip-cn"])
+    }
 }
